@@ -1,2 +1,1340 @@
-txt 
-temp
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+ <link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
+<meta name="theme-color" content="#4FB3C2">
+<meta charset="UTF-8">
+<title>Heures supplémentaires – Paie mensuelle</title>
+<button class="menu-btn" onclick="goMenu()">⬅ Retour au menu</button>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+.menu-btn {
+  margin-top: 8px;
+  margin-bottom: 20px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: none;
+  background: rgba(255,255,255,0.85);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+/* =======================
+   TOP BAR
+======================= */
+.topbar{
+  position: sticky;
+  top: 0;
+  z-index: 2000;
+  background: var(--bg);
+  padding: calc(env(safe-area-inset-top) + 10px) 15px 10px;
+}
+
+/* =======================
+   MODE SOMBRE – GLOBAL
+======================= */
+:root{
+  --bg:#0f1115;
+  --card:#1c1f26;
+  --text:#e6e6e6;
+  --muted:#9aa0a6;
+  --accent:#4f8cff;
+  --danger:#c0392b;
+  --success:#2ecc71;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;
+}
+
+.main{
+  padding:15px;
+}
+h1,h2,h3{text-align:center}
+button{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  background:var(--accent);
+  color:white;
+  font-size:15px;
+  margin-top:6px;
+}
+button.secondary{background:#2a2f3a}
+button.danger{background:var(--danger)}
+input,select{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  background:#262a33;
+  color:var(--text);
+  border:1px solid #333;
+  border-radius:6px;
+}
+
+/* =======================
+   CARTES
+======================= */
+.card{
+  background:var(--card);
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+}
+
+/* =======================
+   CALENDRIER
+======================= */
+.calendar{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:6px;
+}
+.weekday{
+  text-align:center;
+  font-weight:bold;
+  font-size:12px;
+}
+.day{
+  background:#262a33;
+  border-radius:8px;
+  padding:6px;
+  text-align:center;
+  cursor:pointer;
+  min-height:60px;
+}
+.day.today{
+  border:2px solid #ff9500;
+}
+.day.locked{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+/* =======================
+   MODALES
+======================= */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:4000;
+
+  opacity:0;
+  pointer-events:none;
+  transform: translateY(10px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.modal.open{
+  opacity:1;
+  pointer-events:auto;
+  transform: translateY(0);
+}
+
+  
+
+/* =======================
+   FLOU €
+======================= */
+.blur{
+  filter:blur(8px);
+}
+
+/* =======================
+   BADGES
+======================= */
+.badge{
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:12px;
+  font-size:12px;
+}
+.badge.ok{background:#1b5e20}
+.badge.file{background:#283593}
+input[type="month"]{
+  text-align: center;
+  padding-right: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+input[type="number"]{
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  padding-left: 0;
+  padding-right: 0;
+}
+.day.after-closing{
+  border: 1px dashed #4f8cff;
+  opacity: 0.75;
+}
+.day{
+  transition: 
+    border 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.1s ease;
+}
+.day.today{
+  border:2px solid #ff9500 !important;
+  opacity: 1 !important;
+  background: #2e2a1f;
+  box-shadow: 0 0 0 2px rgba(255,149,0,0.4);
+  transform: scale(1.03);
+  z-index: 2;
+}
+.day.after-closing.today{
+  opacity: 1 !important;
+  border-style: solid;
+}
+
+</style>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+
+<!-- le reste de ton compteur ici -->
+<div class="topbar">
+  <button onclick="openTutorial()">❓ Tutoriel</button>
+</div>
+
+<div class="main">
+
+  <h1>⏱️ Heures supplémentaires</h1>
+<p style="
+  text-align:center;
+  font-size:14px;
+  color:#9aa0a6;
+  margin-top:-10px;
+">
+  Suivi précis des heures supplémentaires basé sur la
+  <b>logique réelle de paie mensuelle</b>
+  (clôture mensuelle + report automatique)
+</p>
+  <div class="card">
+    <label>Mois suivi</label>
+    <input type="month" id="monthPicker">
+    <label>Jour de clôture mensuelle</label>
+ <input type="date" id="closingDate">
+  </div>
+
+  <div class="calendar card" id="calendar"></div>
+  
+<div class="card">
+  <h3>Récapitulatif</h3>
+  <p>Report précédent : <b id="prevCarry">0.00</b> h</p>
+<p>Total période : <b id="totalMonth">0.00</b> h</p>
+<p>Heures à 25 % : <b id="hours25">0.00</b> h</p>
+<p>Heures à 50 % : <b id="hours50">0.00</b> h</p>
+<p style="font-size:12px;color:#aaa;margin-top:8px">
+  ℹ️ Calcul basé sur une hypothèse standard :
+  25% jusqu’à 8h hebdomadaires, puis 50%.
+  Peut varier selon la convention collective.
+</p>
+  <p>Heures payées : <input type="number" id="paidHours" step="0.25"></p>
+  <p>Reliquat reporté : <b id="carryOver">0.00</b> h</p>
+</div>
+
+<div class="card">
+  <h3>💰 Valeur €</h3>
+  <div id="euroBox" class="blur">
+    <label>Taux horaire (€)</label>
+    <input type="number" id="rate">
+    <label>Coef 25 %</label>
+    <input type="number" id="coef25">
+    <label>Coef 50 %</label>
+    <input type="number" id="coef50">
+    <label>Coef brut → net</label>
+    <input type="number" id="coefNet">
+    <p><b id="euroResult">0.00 €</b></p>
+    <p id="euroDetail" style="font-size:12px;color:#aaa;margin-top:8px"></p>
+  </div>
+  <input type="password" id="unlockCode" placeholder="Code (1234)">
+  <button onclick="unlockEuro()">Déverrouiller</button>
+</div>
+<button class="secondary" onclick="toggleChangeCode()">🔁 Changer le code</button>
+
+<div id="changeCodeBox" style="display:none;margin-top:10px">
+  <input type="password" id="oldCode" placeholder="Ancien code">
+  <input type="password" id="newCode" placeholder="Nouveau code (4 chiffres min)">
+  <input type="password" id="confirmCode" placeholder="Confirmer le code">
+  <button class="danger" onclick="changeCode()">Valider le nouveau code</button>
+</div>
+<div class="card">
+  <span class="badge ok">🟢 Sauvegarde locale auto</span>
+  <span class="badge file">
+  👤 Usage personnel – outil indicatif
+</span>
+  <span class="badge file">💾 Dernier fichier : <span id="fileDate">—</span></span>
+  <button onclick="exportJSON()">💾 Sauvegarde dans un fichier</button>
+  <input type="file" id="importFile" accept=".json" style="display:none">
+<button class="secondary" onclick="document.getElementById('importFile').click()">
+📥 Importer une sauvegarde
+</button>
+   <button onclick="exportMonthlyPDF()">📄 PDF mensuel détaillé</button>
+<button onclick="exportAnnualPDF()">📕 PDF annuel récapitulatif</button>
+</div>
+
+<!-- =======================
+     POPUP HEURES
+======================= -->
+<div class="modal" id="hoursModal">
+  <div class="modal-content">
+    <h3>⏱️ Ajouter des heures</h3>
+    <div id="hoursChoices"></div>
+    <label>Saisie manuelle</label>
+    <input type="number" id="manualHours" step="0.25">
+    <button onclick="confirmManual()">Valider</button>
+    <button class="danger" onclick="deleteDayHours()">🗑️ Supprimer les heures du jour</button>
+    <button class="secondary" onclick="closeHours()">Annuler</button>
+  </div>
+</div>
+<div class="modal" id="tutorialModal">
+  <div class="modal-content" style="max-width:700px;max-height:80vh;overflow:auto;">
+    <h2>📘 Tutoriel – Suivi des heures supplémentaires</h2>
+
+    <h3>1️⃣ Principe général</h3>
+    <p>
+      Cet outil permet de suivre les heures supplémentaires dans le cadre
+      d’une <b>paie mensuelle</b>, avec report automatique des reliquats.
+    </p>
+
+    <h3>2️⃣ Saisie des heures</h3>
+    <ul>
+      <li>Clique sur un jour</li>
+      <li>Choisis +15 min, +30 min, +1h… ou saisis manuellement</li>
+      <li>Les heures sont enregistrées automatiquement</li>
+    </ul>
+
+    <h3>3️⃣ Clôture mensuelle</h3>
+    <p>
+      Le jour de clôture définit la fin de la période de paie.
+      Les heures après cette date sont automatiquement reportées.
+    </p>
+
+    <h3>4️⃣ Zone €</h3>
+    <p>
+      Les montants sont floutés par défaut et protégés par code.
+    </p>
+
+    <button class="secondary" onclick="closeTutorial()">Fermer</button>
+  </div>
+</div>
+<div class="modal" id="legalModal">
+  <div class="modal-content">
+    <h2>⚠️ Avertissement important</h2>
+    <p style="font-size:14px">
+      Cet outil est un <b>simulateur personnel</b>.<br><br>
+      Les calculs sont indicatifs et peuvent différer
+      de votre bulletin de paie réel.<br><br>
+      <b>Seuls les documents de l’employeur font foi.</b>
+    </p>
+    <button onclick="acceptLegal()">J’ai compris</button>
+  </div>
+</div>
+<div class="modal" id="onboardingModal">
+  <div class="modal-content">
+    <h2>👋 Bienvenue</h2>
+    <ol style="font-size:14px">
+      <li>Sélectionne le mois suivi</li>
+      <li>Définis le dimanche de clôture</li>
+      <li>Clique sur un jour pour ajouter des heures</li>
+      <li>Renseigne les heures payées</li>
+    </ol>
+    <button onclick="closeOnboarding()">Commencer</button>
+  </div>
+</div>
+<script>
+function acceptLegal(){
+  localStorage.setItem("LEGAL_OK","1");
+  document.getElementById("legalModal").classList.remove("open");
+}
+window.addEventListener("load",()=>{
+  if(!localStorage.getItem("LEGAL_OK")){
+    document.getElementById("legalModal").classList.add("open");
+    return;
+  }
+
+  if(!localStorage.getItem("ONBOARDING_DONE")){
+  document.getElementById("onboardingModal").classList.add("open");
+}
+});
+
+
+/* =======================
+   DONNÉES
+======================= */
+const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
+function kData(year){
+  return `${STORAGE_PREFIX}_DATA_${year}`;
+}
+function kSettings(){
+  return `${STORAGE_PREFIX}_SETTINGS`;
+}
+function kCode(){
+  return `${STORAGE_PREFIX}_CODE_HASH`;
+}
+function kIndex(){
+  return `${STORAGE_PREFIX}_INDEX`;
+}
+function kBackup(year, date){
+  return `${STORAGE_PREFIX}_BACKUP_${year}_${date}`;
+}
+function getYearFromMonth(key){
+  return key.split("-")[0];
+}
+let DATA = {};
+let SETTINGS = JSON.parse(
+  localStorage.getItem(kSettings()) || "{}"
+);
+let ALL_DATA = {}; // 🔑 cache de toutes les années
+let currentKey="", currentDay=null, unlocked=false;
+const closingDate = document.getElementById("closingDate");
+/* =======================
+   INIT
+======================= */
+const monthPicker = document.getElementById("monthPicker");
+monthPicker.value = new Date().toISOString().slice(0,7);
+const paidInput = document.getElementById("paidHours");
+paidInput.oninput = () => {
+  DATA[currentKey].paid = parseFloat(paidInput.value) || 0;
+  save();
+  recalc();
+};
+monthPicker.onchange = loadMonth;
+/* =======================
+   CALENDRIER
+======================= */
+function getLastSunday(year, monthIndex){
+  const lastDay = new Date(year, monthIndex + 1, 0); // dernier jour du mois
+  const day = lastDay.getDay(); // 0 = dimanche
+  const diff = day === 0 ? 0 : day;
+  lastDay.setDate(lastDay.getDate() - diff);
+  return lastDay.getDate();
+}
+function closeOnboarding(){
+  localStorage.setItem("ONBOARDING_DONE","1");
+  document.getElementById("onboardingModal").classList.remove("open");
+}
+
+function getPeriodBounds(monthKey){
+  const [y, m] = monthKey.split("-").map(Number);
+
+  // Mois précédent
+  const prevMonthDate = new Date(y, m - 2, 1);
+  const prevKey =
+    prevMonthDate.getFullYear() + "-" +
+    String(prevMonthDate.getMonth() + 1).padStart(2,"0");
+
+  let start;
+
+  const prevYear = prevKey.split("-")[0];
+const prevMonth =
+  ALL_DATA[prevYear] && ALL_DATA[prevYear][prevKey];
+
+if(prevMonth && prevMonth.closing){
+    // lundi suivant la clôture précédente (clôture = dimanche)
+    start = new Date(
+      prevMonthDate.getFullYear(),
+      prevMonthDate.getMonth(),
+      prevMonth.closing + 1
+    );
+  } else {
+    // aucun mois précédent → début au 1er du mois courant
+    start = new Date(y, m - 1, 1);
+  }
+
+  // fin période = dimanche de clôture
+  const end = new Date(y, m - 1, DATA[monthKey].closing);
+
+  return { start, end };
+}
+function goMenu() {
+    localStorage.removeItem("lastApp");
+    window.location.href = "../menu.html";
+    }
+function loadMonth(){
+  currentKey = monthPicker.value;
+  const year = getYearFromMonth(currentKey);
+
+registerYear(year);
+
+if(!ALL_DATA[year]){
+  ALL_DATA[year] = loadYearData(year);
+}
+
+DATA = ALL_DATA[year];
+ 
+
+  const [y, m] = currentKey.split("-").map(Number);
+  let needSave = false;
+
+  // 🆕 Création du mois s’il n’existe pas
+  if(!DATA[currentKey]){
+    DATA[currentKey] = {
+      days: {},
+      paid: 0,
+      carry: 0,
+      closing: getLastSunday(y, m - 1), // ✅ dernier dimanche
+      locked: false
+    };
+    needSave = true;
+  }
+
+  // 🧹 Correction automatique des anciennes clôtures invalides
+  {
+    const lastDay = new Date(y, m, 0).getDate();
+    const closing = DATA[currentKey].closing;
+
+    const isInvalid =
+      !closing ||
+      closing > lastDay ||
+      new Date(y, m - 1, closing).getDay() !== 0;
+
+    if(isInvalid){
+      DATA[currentKey].closing = getLastSunday(y, m - 1);
+      needSave = true;
+    }
+  }
+
+  // 🔄 Sync UI
+  paidInput.value = DATA[currentKey].paid || 0;
+  setClosingLimits();
+  syncClosingDate();
+
+  renderCalendar();
+  recalc();
+  scrollToToday();
+
+  // 💾 Sauvegarde UNE SEULE FOIS si nécessaire
+  if(needSave){
+    save();
+  }
+}
+
+
+
+
+function syncClosingDate(){
+  if(!DATA[currentKey]) return;
+
+  const [y, m] = currentKey.split("-").map(Number);
+  const day = DATA[currentKey].closing || 31;
+
+  closingDate.value =
+    `${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+}
+
+function setClosingLimits(){
+  const [y, m] = currentKey.split("-").map(Number);
+  const lastDay = new Date(y, m, 0).getDate();
+
+  closingDate.min = `${y}-${String(m).padStart(2,"0")}-01`;
+  closingDate.max = `${y}-${String(m).padStart(2,"0")}-${lastDay}`;
+}
+
+closingDate.oninput = () => {
+  if(!closingDate.value) return;
+
+  const selected = new Date(closingDate.value);
+  const [y, m] = currentKey.split("-").map(Number);
+
+  if(
+    selected.getFullYear() !== y ||
+    selected.getMonth() + 1 !== m
+  ){
+    alert("⛔ La date doit être dans le mois sélectionné");
+    syncClosingDate();
+    return;
+  }
+if(selected.getDay() !== 0){
+  alert("⛔ La clôture doit obligatoirement être un dimanche");
+  syncClosingDate();
+  return;
+}
+  DATA[currentKey].closing = selected.getDate();
+  save();
+  renderCalendar();
+  recalc();
+}
+closingDate.addEventListener("blur", () => {
+  const cal = document.getElementById("calendar");
+  if(!cal) return;
+
+  // Forcer repaint Safari iOS
+  cal.style.display = "none";
+  cal.offsetHeight; // reflow
+  cal.style.display = "grid";
+});
+function scrollToToday(){
+  const today = new Date().toISOString().slice(0,7);
+  if(currentKey !== today) return;
+
+  const todayEl = document.getElementById("todayCell");
+  if(todayEl){
+    todayEl.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+}
+function renderCalendar(){
+  const cal = document.getElementById("calendar");
+  cal.innerHTML = "";
+
+  // 🗓️ Jours de la semaine
+  const weekDays = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+  weekDays.forEach(d=>{
+    const w = document.createElement("div");
+    w.className = "weekday";
+    w.textContent = d;
+    cal.appendChild(w);
+  });
+
+  const [y, m] = currentKey.split("-").map(Number);
+  const today = new Date();
+const isCurrentMonth = currentKey === today.toISOString().slice(0,7);
+  const firstDay = new Date(y, m-1, 1).getDay() || 7; // lundi = 1
+  const daysInMonth = new Date(y, m, 0).getDate();
+  const closing = DATA[currentKey].closing;
+  const { start, end } = getPeriodBounds(currentKey);
+  const isMonthLocked = DATA[currentKey].locked;
+  
+
+  // ⬅️ Décalage du 1er jour du mois
+  for(let i=1;i<firstDay;i++){
+    cal.appendChild(document.createElement("div"));
+  }
+
+  for(let d = 1; d <= daysInMonth; d++){
+    const div = document.createElement("div");
+    div.className = "day";
+
+    const date = new Date(y, m - 1, d);
+const isInPeriod = date >= start && date <= end;
+const isAfterClosing = date > end;
+
+    /* ====== État visuel ====== */
+
+    if(date > end){
+  div.classList.add("after-closing");
+}
+
+    if(isMonthLocked){
+      div.classList.add("locked"); // verrouillage total
+    }
+
+    if(
+      isCurrentMonth &&
+      d === today.getDate()
+    ){
+      div.classList.add("today");
+    }
+if(isCurrentMonth && d === today.getDate()){
+  div.id = "todayCell";
+}
+    /* ====== Contenu ====== */
+
+    const val = DATA[currentKey].days[d];
+    div.innerHTML = `
+      <b>${d}</b><br>
+      ${val ? val.toFixed(2) + " h" : ""}
+    `;
+
+    /* ====== Interaction ====== */
+
+    div.onclick = () => {
+  if(isMonthLocked){
+    alert("🔒 Mois verrouillé (paie validée)");
+    return;
+  }
+  openHours(d);
+};
+
+    cal.appendChild(div);
+  }
+}
+/* =======================
+   POPUP HEURES
+======================= */
+function deleteDayHours(){
+  if(DATA[currentKey].locked){
+    alert("🔒 Mois verrouillé");
+    return;
+  }
+
+  if(!currentDay || !DATA[currentKey].days[currentDay]){
+    alert("ℹ️ Aucune heure à supprimer");
+    return;
+  }
+
+  if(!confirm(`Supprimer toutes les heures du ${currentDay} ?`)) return;
+
+  // 🗑️ suppression réelle
+  delete DATA[currentKey].days[currentDay];
+
+  currentDay = null; // ✅ reset état
+
+  save();            // recalcul cascade + sauvegarde
+  renderCalendar();  // ✅ MAJEUR : refresh UI
+  recalc();          // ✅ recalcul live
+  closeHours();
+}
+function openHours(d){
+  currentDay=d;
+  const c=document.getElementById("hoursChoices");
+  c.innerHTML="";
+  [0.25,0.5,0.75,1,1.25,1.5,2].forEach(v=>{
+    const b=document.createElement("button");
+    b.textContent="+"+v+" h";
+    b.onclick=()=>applyHours(v);
+    c.appendChild(b);
+  });
+  document.getElementById("hoursModal").classList.add("open");
+}
+function closeHours(){
+  document.getElementById("hoursModal").classList.remove("open");
+}
+function applyHours(h){
+  if(h <= 0) return;
+
+  DATA[currentKey].days[currentDay] =
+    (DATA[currentKey].days[currentDay] || 0) + h;
+// 🔴 AJOUTE CETTE 
+  save();
+  renderCalendar(); // ✅ AJOUT
+  recalc();
+  closeHours();
+  
+
+
+
+}
+
+function confirmManual(){
+  const input = document.getElementById("manualHours");
+  const h = parseFloat(input.value);
+ if(isNaN(h) || h <= 0){
+  alert("⛔ Valeur invalide");
+  return;
+}
+
+  applyHours(h);
+  input.value = ""; // ✅ reset
+}
+function getPreviousCarry(monthKey){
+  // 🔗 récupérer TOUS les mois de TOUTES les années
+  const allMonths = [];
+
+  Object.values(ALL_DATA).forEach(yearData=>{
+    Object.keys(yearData).forEach(key=>{
+      if(/^\d{4}-\d{2}$/.test(key)){
+        allMonths.push({ key, month: yearData[key] });
+      }
+    });
+  });
+
+  // tri chronologique
+  allMonths.sort((a,b)=> a.key.localeCompare(b.key));
+
+  let prevCarry = 0;
+
+  for(const item of allMonths){
+    if(item.key === monthKey) break;
+    if(item.month.carry != null){
+      prevCarry = item.month.carry;
+    }
+  }
+
+  return prevCarry;
+}
+/* =======================
+   CALCUL
+======================= */
+function recalc(){
+  const { start, end } = getPeriodBounds(currentKey);
+
+  // 🔢 Heures par semaine ISO (lundi → dimanche)
+  const weeks = {};
+
+  Object.entries(DATA).forEach(([monthKey, month])=>{
+    Object.entries(month.days || {}).forEach(([d,h])=>{
+      const date = new Date(
+        monthKey.split("-")[0],
+        monthKey.split("-")[1] - 1,
+        d
+      );
+
+      if(date < start || date > end) return;
+
+      const monday = new Date(date);
+      const day = monday.getDay() || 7;
+      monday.setDate(monday.getDate() - day + 1);
+
+      const weekKey =
+        monday.getFullYear() + "-" +
+        String(monday.getMonth()+1).padStart(2,"0") + "-" +
+        String(monday.getDate()).padStart(2,"0");
+
+      weeks[weekKey] = (weeks[weekKey] || 0) + h;
+    });
+  });
+
+  // 🧮 Totaux période
+  let total25 = 0;
+  let total50 = 0;
+  let periodHours = 0;
+
+  Object.values(weeks).forEach(weekHours=>{
+    periodHours += weekHours;
+    total25 += Math.min(8, weekHours);
+    total50 += Math.max(0, weekHours - 8);
+  });
+
+  document.getElementById("hours25").textContent = total25.toFixed(2);
+  document.getElementById("hours50").textContent = total50.toFixed(2);
+
+  // 🔁 Report précédent
+  const prevCarry = getPreviousCarry(currentKey);
+  document.getElementById("prevCarry").textContent =
+    prevCarry.toFixed(2);
+
+  // 🔵 Total période
+  document.getElementById("totalMonth").textContent =
+    periodHours.toFixed(2);
+
+  // ➖ Payé
+  const paid = Number(DATA[currentKey].paid) || 0;
+
+  // ✅ RELIQUAT LOCAL (FORMULE MÉTIER)
+  const computedCarry =
+    prevCarry +
+    periodHours -
+    paid;
+
+  document.getElementById("carryOver").textContent =
+    Math.max(0, computedCarry).toFixed(2);
+
+  if(unlocked) calcEuro();
+}
+function calcEuro(){
+  if(!unlocked) return;
+
+  const rate = Number(document.getElementById("rate").value) || 0;
+  const coef25 = Number(document.getElementById("coef25").value) || 1.25;
+  const coef50 = Number(document.getElementById("coef50").value) || 1.50;
+  const netCoef = Number(document.getElementById("coefNet").value) || 1;
+
+  const h25 = Number(document.getElementById("hours25").textContent) || 0;
+  const h50 = Number(document.getElementById("hours50").textContent) || 0;
+
+  const weighted25 = h25 * coef25;
+  const weighted50 = h50 * coef50;
+  const weightedTotal = weighted25 + weighted50;
+
+  const brut = weightedTotal * rate;
+  const net = brut * netCoef;
+
+  document.getElementById("euroResult").textContent =
+    net.toFixed(2) + " €";
+
+  document.getElementById("euroDetail").innerHTML = `
+    ${h25.toFixed(2)} h × ${coef25} = ${weighted25.toFixed(2)} h<br>
+    ${h50.toFixed(2)} h × ${coef50} = ${weighted50.toFixed(2)} h<br>
+    <b>Total pondéré : ${weightedTotal.toFixed(2)} h</b><br>
+    ${weightedTotal.toFixed(2)} × ${rate} € × ${netCoef}
+  `;
+}
+async function sha256(str){
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(hash))
+    .map(b => b.toString(16).padStart(2,"0"))
+    .join("");
+}
+
+async function getSecureCode(){
+  let h = localStorage.getItem(kCode());
+  if(!h){
+    h = await sha256("1234");
+    localStorage.setItem(kCode(), h);
+  }
+  return h;
+}
+async function unlockEuro(){
+  const input = document.getElementById("unlockCode").value;
+  const inputHash = await sha256(input);
+
+  if(inputHash === await getSecureCode()){
+    unlocked = true;
+    document.getElementById("euroBox").classList.remove("blur");
+    document.getElementById("unlockCode").value = "";
+    recalc();
+
+    if(input === "1234"){
+      alert("⚠️ Pense à changer le code par défaut");
+    }
+
+  } else {
+    alert("❌ Code incorrect");
+  }
+}
+function toggleChangeCode(){
+  if(!unlocked){
+    alert("🔒 Déverrouille d’abord la zone €");
+    return;
+  }
+  const box = document.getElementById("changeCodeBox");
+  box.style.display = box.style.display === "none" ? "block" : "none";
+}
+
+
+
+/* =======================
+   SAUVEGARDE
+======================= */
+
+function save(){
+  localStorage.setItem(
+  `${STORAGE_PREFIX}_AUTO_SAVE_DATE`,
+  Date.now()
+);
+  // 🔥 charger toutes les années connues
+  recalcCascade();
+
+// 💾 sauvegarde TOUTES les années chargées
+Object.entries(ALL_DATA).forEach(([year, yearData])=>{
+  saveYearData(year, yearData);
+});
+
+  updateSaveBadge();
+}
+function updateSaveBadge(){
+  const el = document.querySelector(".badge.ok");
+  if(!el) return;
+
+  const raw = localStorage.getItem(
+    `${STORAGE_PREFIX}_AUTO_SAVE_DATE`
+  );
+
+  const stamp = Number(raw);
+
+  if(!stamp || isNaN(stamp)){
+    el.textContent = "🟢 Sauvegarde locale auto";
+    return;
+  }
+
+  el.textContent =
+    "🟢 Sauvegarde locale : " +
+    new Date(stamp).toLocaleString();
+}
+function exportJSON(){
+  const year = getYearFromMonth(currentKey);
+
+const payload = {
+  exportedAt: new Date().toISOString(),
+  year,
+  version: "1.2",
+  DATA,
+  SETTINGS
+};
+
+  const blob = new Blob(
+    [JSON.stringify(payload,null,2)],
+    {type:"application/json"}
+  );
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "heures_sup_backup_"+Date.now()+".json";
+  a.click();
+
+  document.getElementById("fileDate").textContent =
+    new Date().toLocaleDateString();
+}
+/* =======================
+   PARAMS €
+======================= */
+["rate","coef25","coef50","coefNet"].forEach(id=>{
+  let def;
+  if(id === "rate") def = 10;
+  else if(id === "coef25") def = 1.25;
+  else if(id === "coef50") def = 1.50;
+  else if(id === "coefNet") def = 0.93;
+
+  const input = document.getElementById(id);
+  input.value = SETTINGS[id] ?? def;
+
+  input.oninput = () => {
+    SETTINGS[id] = parseFloat(input.value) || 0;
+    localStorage.setItem(
+      kSettings(),
+      JSON.stringify(SETTINGS)
+    );
+    recalc();
+  };
+});
+   function openTutorial(){
+  document.getElementById("tutorialModal").classList.add("open");
+}
+function closeTutorial(){
+  document.getElementById("tutorialModal").classList.remove("open");
+}
+function exportMonthlyPDF(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  const [y, m] = currentKey.split("-").map(Number);
+  const month = DATA[currentKey];
+  const { start, end } = getPeriodBounds(currentKey);
+
+  let yPos = 15;
+
+  // 🧾 EN-TÊTE
+  pdf.setFontSize(14);
+  pdf.text("Récapitulatif mensuel – Heures supplémentaires", 10, yPos);
+  yPos += 8;
+
+  pdf.setFontSize(11);
+  pdf.text(
+    `Mois suivi : ${currentKey} | Période de paie : ${formatDate(start)} → ${formatDate(end)}`,
+    10,
+    yPos
+  );
+  yPos += 10;
+
+  // 📊 TABLEAU
+  pdf.setFontSize(10);
+  pdf.text("Date", 10, yPos);
+  pdf.text("Heures", 50, yPos);
+  pdf.text("Statut", 80, yPos);
+  yPos += 4;
+  pdf.line(10, yPos, 200, yPos);
+  yPos += 4;
+
+  let periodHours = 0;
+  let afterClosingHours = 0;
+
+  Object.entries(month.days || {})
+    .sort(([a],[b]) => a - b)
+    .forEach(([d,h])=>{
+      const date = new Date(y, m - 1, d);
+      const inPeriod = date >= start && date <= end;
+      const status = inPeriod ? "Période" : "Report";
+
+      if(inPeriod) periodHours += h;
+      else afterClosingHours += h;
+
+      pdf.text(formatDate(date), 10, yPos);
+      pdf.text(h.toFixed(2) + " h", 50, yPos);
+      pdf.text(status, 80, yPos);
+
+      yPos += 6;
+      if(yPos > 270){
+        pdf.addPage();
+        yPos = 15;
+      }
+    });
+
+  yPos += 6;
+  pdf.line(10, yPos, 200, yPos);
+  yPos += 8;
+
+  // 🧮 RÉCAP
+  const paid = month.paid || 0;
+  const prevCarry = getPreviousCarry(currentKey);
+
+  pdf.setFontSize(11);
+  pdf.text(`Report précédent : ${prevCarry.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Heures période : ${periodHours.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Heures reportées (fin de mois) : ${afterClosingHours.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Heures payées : ${paid.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Reliquat final : ${month.carry.toFixed(2)} h`, 10, yPos);
+
+  // ⚠️ MENTION
+  yPos += 12;
+  pdf.setFontSize(9);
+  pdf.text(
+    "Document personnel – valeurs indicatives – ne constitue pas un bulletin de paie",
+    10,
+    yPos
+  );
+
+  pdf.save(`heures_mensuelles_${currentKey}.pdf`);
+}
+function formatDate(d){
+  return d.toLocaleDateString("fr-FR");
+}
+function exportAnnualPDF(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  const months = Object.keys(DATA)
+    .filter(k => /^\d{4}-\d{2}$/.test(k))
+    .sort();
+
+  if(months.length === 0){
+    alert("Aucune donnée annuelle");
+    return;
+  }
+
+  const year = months[0].split("-")[0];
+  let yPos = 15;
+
+  // 🧾 TITRE
+  pdf.setFontSize(14);
+  pdf.text("Bilan annuel – Heures supplémentaires", 10, yPos);
+  yPos += 8;
+
+  pdf.setFontSize(11);
+  pdf.text(`Année : ${year}`, 10, yPos);
+  yPos += 10;
+
+  // 🗂️ EN-TÊTE TABLEAU
+  pdf.setFontSize(10);
+  pdf.text("Mois", 10, yPos);
+  pdf.text("Heures période", 45, yPos);
+  pdf.text("Payées", 90, yPos);
+  pdf.text("Reliquat fin", 130, yPos);
+  yPos += 4;
+  pdf.line(10, yPos, 200, yPos);
+  yPos += 6;
+
+  let totalPeriod = 0;
+  let totalPaid = 0;
+  let finalCarry = 0;
+
+  months.forEach(key=>{
+    const month = DATA[key];
+    const { start, end } = getPeriodBounds(key);
+    const [y, m] = key.split("-").map(Number);
+
+    let periodHours = 0;
+
+    Object.entries(month.days || {}).forEach(([d,h])=>{
+      const date = new Date(y, m - 1, d);
+      if(date >= start && date <= end){
+        periodHours += h;
+      }
+    });
+
+    totalPeriod += periodHours;
+    totalPaid += (month.paid || 0);
+    finalCarry = month.carry || finalCarry;
+
+    pdf.text(key, 10, yPos);
+    pdf.text(periodHours.toFixed(2) + " h", 45, yPos);
+    pdf.text((month.paid || 0).toFixed(2) + " h", 90, yPos);
+    pdf.text((month.carry || 0).toFixed(2) + " h", 130, yPos);
+
+    yPos += 6;
+    if(yPos > 270){
+      pdf.addPage();
+      yPos = 15;
+    }
+  });
+
+  // 🔻 SÉPARATEUR
+  yPos += 6;
+  pdf.line(10, yPos, 200, yPos);
+  yPos += 8;
+
+  // 📊 RÉCAP GLOBAL
+  pdf.setFontSize(11);
+  pdf.text(`Total heures sur période : ${totalPeriod.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Total heures payées : ${totalPaid.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Reliquat final au 31/12 : ${finalCarry.toFixed(2)} h`, 10, yPos);
+
+  // ⚠️ MENTION LÉGALE
+  yPos += 12;
+  pdf.setFontSize(9);
+  pdf.text(
+    "Document personnel – valeurs indicatives – ne constitue pas un bulletin de paie",
+    10,
+    yPos
+  );
+
+  pdf.save(`bilan_annuel_heures_sup_${year}.pdf`);
+}
+
+loadMonth();
+
+
+function registerYear(year){
+  let index = JSON.parse(localStorage.getItem(kIndex()) || "[]");
+  if(!index.includes(year)){
+    index.push(year);
+    index.sort();
+    localStorage.setItem(kIndex(), JSON.stringify(index));
+  }
+}
+
+function loadYearData(year){
+  return JSON.parse(
+    localStorage.getItem(kData(year)) || "{}"
+  );
+}
+
+function saveYearData(year, data){
+  localStorage.setItem(
+    kData(year),
+    JSON.stringify(data)
+  );
+}
+function recalcCascade(){
+  // 🔗 fusion de toutes les années
+  const allMonths = [];
+
+  Object.values(ALL_DATA).forEach(yearData=>{
+    Object.keys(yearData).forEach(key=>{
+      if(/^\d{4}-\d{2}$/.test(key)){
+        allMonths.push({ key, month: yearData[key] });
+      }
+    });
+  });
+
+  allMonths.sort((a,b)=> a.key.localeCompare(b.key));
+
+  let runningCarry = 0;
+
+  allMonths.forEach(({ key, month })=>{
+    const { start, end } = getPeriodBounds(key);
+    const [y, m] = key.split("-").map(Number);
+
+    let periodHours = 0;
+
+    Object.entries(month.days || {}).forEach(([d,h])=>{
+      const date = new Date(y, m - 1, d);
+      if(date >= start && date <= end){
+        periodHours += h;
+      }
+    });
+
+    const paid = Number(month.paid) || 0;
+
+    runningCarry += periodHours;
+    runningCarry -= paid;
+
+    if(runningCarry < 0) runningCarry = 0;
+
+    month.carry = runningCarry;
+  });
+}
+function importJSONFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    let payload;
+
+    try{
+      payload = JSON.parse(reader.result);
+    } catch(err){
+      alert("❌ Fichier invalide");
+      return;
+    }
+
+    // 🔒 Vérifications minimales
+    if(!payload.DATA || !payload.year){
+      alert("❌ Format non reconnu");
+      return;
+    }
+
+    const year = payload.year;// ✅ Appliquer les paramètres €
+if(payload.SETTINGS){
+  SETTINGS = payload.SETTINGS;
+  localStorage.setItem(
+    kSettings(),
+    JSON.stringify(SETTINGS)
+  );
+}
+    registerYear(year);
+
+    const existing = loadYearData(year);
+
+    let added = 0;
+    let skipped = 0;
+
+    Object.keys(payload.DATA).forEach(monthKey=>{
+      if(!existing[monthKey]){
+        existing[monthKey] = payload.DATA[monthKey];
+        added++;
+      } else {
+        skipped++;
+      }
+    });
+
+    saveYearData(year, existing);
+    updateSaveBadge();
+
+    alert(
+      `✅ Import terminé\n\n` +
+      `Année : ${year}\n` +
+      `Mois ajoutés : ${added}\n` +
+      `Mois ignorés : ${skipped}`
+    );
+
+    // Recharge si on est sur la même année
+    if(getYearFromMonth(currentKey) === String(year)){
+      DATA = loadYearData(year);
+      loadMonth();
+    }
+  };
+
+  reader.readAsText(file);
+  e.target.value = ""; // reset input
+}
+document.getElementById("importFile").addEventListener("change", importJSONFile);
+
+</script>
+
+<div class="card" style="font-size:13px;color:#aaa">
+  <h3>📘 Notice utilisateur</h3>
+
+  <p>
+    Cet outil est destiné au suivi personnel des heures supplémentaires
+    dans le cadre d’une rémunération mensuelle.
+  </p>
+
+  <p>
+    Les calculs sont indicatifs et reposent sur les principes généraux :
+  </p>
+
+  <ul>
+    <li>Code du travail</li>
+    <li>Convention collective du commerce de gros (IDCC 573)</li>
+  </ul>
+
+  <p>
+    ⚠️ En cas de litige, seuls les bulletins de paie et documents
+    officiels de l’employeur font foi.
+  </p>
+</div>
+<footer style="margin-top:30px;text-align:center;font-size:12px;color:#777">
+  © Tous droits réservés – C. Anthony<br>
+  Outil indicatif – ne constitue pas un bulletin de paie
+</footer>
+   <script>
+  // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
+  sessionStorage.setItem("appAlive", "true");
+</script>
+
+</body>
+</html>
