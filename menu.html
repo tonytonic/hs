@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="fr">
+ <head>
+  <meta charset="UTF-8">
+
+  <title>Compteur Heures & Paie</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#4FB3C2">
+
+  <!-- iOS -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
+    
+  <style>
+    .title {
+  text-align: center;
+  font-weight: 600;
+  margin-top: 8px;
+  color: #ffffff;
+  font-size: 16px;
+}
+    body {
+      margin: 0;
+      background: #4FB3C2;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      gap: 20px;
+    }
+
+    .btn {
+      width: 220px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+      cursor: pointer;
+      transition: transform .15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.96);
+    }
+
+    .btn img {
+      width: 100%;
+      display: block;
+    }
+
+    footer {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255,255,255,0.8);
+  pointer-events: none;
+}
+#backup-warning {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.backup-box {
+  background: #fff;
+  color: #000;
+  border-radius: 16px;
+  padding: 20px;
+  max-width: 340px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.backup-box h2 {
+  margin-top: 0;
+}
+
+.backup-box button {
+  margin-top: 15px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 12px;
+  background: #4FB3C2;
+  color: #fff;
+  font-size: 14px;
+}
+.backup-advice {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #fff;
+  text-align: center;
+  opacity: 0.9;
+  max-width: 320px;
+}
+  </style>
+</head>
+
+<body>
+<!-- ⚠️ Avertissement sauvegarde (1 seule fois) -->
+<div id="backup-warning">
+  <div class="backup-box">
+    <h2>⚠️ Avertissement important</h2>
+
+    <p>
+      Cette application enregistre les données <strong>localement sur votre appareil</strong>.
+    </p>
+
+    <p>
+      En cas de suppression de l’application, nettoyage du navigateur ou changement d’appareil,
+      <strong>les données peuvent être perdues</strong>.
+    </p>
+
+    <p>
+      👉 Il est fortement recommandé d’effectuer des <strong>sauvegardes régulières</strong>
+      via les fonctions prévues dans chaque module.
+    </p>
+
+    <button onclick="acceptBackupRisk()">J’accepte ces risques</button>
+  </div>
+</div>
+  <!-- 🦊 Compteur annuel -->
+<div class="btn" onclick="go('heures')">
+  <img src="images/renard-annuel.png.jpg" alt="Compteur annuel">
+  <div class="title">Compteur annuel</div>
+</div>
+
+<!-- 🦊 Paye mensuelle -->
+<div class="btn" onclick="go('paye')">
+  <img src="images/renard-mensuel.png.jpg" alt="Paye mensuelle">
+  <div class="title">Paye mensuelle</div>
+  </div>
+<div class="backup-advice">
+  💾 <strong>Conseil sauvegarde</strong><br><br>
+  Chaque module dispose de sa propre fonction de sauvegarde.<br>
+  Pensez à effectuer des <strong>exports réguliers</strong>
+  (fin de mois, fin de période) afin d’éviter toute perte de données.
+</div>
+  <footer>
+    Développé par C. Anthony
+  </footer>
+
+<script>
+  const accepted = localStorage.getItem("backupWarningAccepted");
+
+  if (accepted === "true") {
+    document.getElementById("backup-warning").style.display = "none";
+  }
+
+  function acceptBackupRisk() {
+    localStorage.setItem("backupWarningAccepted", "true");
+    document.getElementById("backup-warning").style.display = "none";
+  }
+  
+    function go(app) {
+      localStorage.setItem("lastApp", app);
+      window.location.href = app + "/index.html";
+    }
+  </script>
+
+</body>
+</html>
