@@ -1,47 +1,38 @@
-const CACHE_NAME = "compteur-v1";
+const CACHE_NAME = "compteur-heures-v1";
 
 const FILES_TO_CACHE = [
-  "./",
-  "./menu.html",
-  "./index.html",
+  "/", 
+  "/index.html",
+  "/menu.html",
+  "/manifest.json",
 
-  "./heures/index.html",
-  "./paye/index.html",
+  "/images/renard-annuel.png.jpg",
+  "/images/renard-mensuel.png.jpg",
 
-  "./images/renard-annuel.jpg",
-  "./images/renard-mensuel.jpg",
+  "/icon-192.png",
+  "/icon-512.png",
+  "/apple-touch-icon.png",
 
-  "./apple-touch-icon.png",
-  "./icon-192.png",
-  "./icon-512.png"
+  "/heures/index.html",
+  "/paye/index.html"
 ];
 
-// Installation : mise en cache
-self.addEventListener("install", event => {
+self.addEventListener("install", (event) => {
+  console.log("SW install");
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(FILES_TO_CACHE);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
   self.skipWaiting();
 });
 
-// Activation : nettoyage anciens caches
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    )
-  );
-  self.clients.claim();
+self.addEventListener("activate", (event) => {
+  console.log("SW activate");
+  event.waitUntil(self.clients.claim());
 });
 
-// Fetch : offline-first
-self.addEventListener("fetch", event => {
+self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then(response => {
+    caches.match(event.request).then((response) => {
       return response || fetch(event.request);
     })
   );
