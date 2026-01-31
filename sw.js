@@ -1,20 +1,20 @@
 const CACHE_NAME = "compteur-heures-v1";
 
 const FILES_TO_CACHE = [
-  "/", 
-  "/index.html",
-  "/menu.html",
-  "/manifest.json",
+  "./", 
+  "./index.html",
+  "./menu.html",
+  "./manifest.json",
 
-  "/images/renard-annuel.png.jpg",
-  "/images/renard-mensuel.png.jpg",
+  "./images/renard-annuel.png.jpg",
+  "./images/renard-mensuel.png.jpg",
 
-  "/icon-192.png",
-  "/icon-512.png",
-  "/apple-touch-icon.png",
+  "./icon-192.png",
+  "./icon-512.png",
+  "./apple-touch-icon.png",
 
-  "/heures/index.html",
-  "/paye/index.html"
+  "./heures/index.html",
+  "./paye/index.html"
 ];
 
 self.addEventListener("install", (event) => {
