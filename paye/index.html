@@ -205,11 +205,11 @@ input[type="number"]{
 </head>
 
 <body>
-  <h3>📸 Snapshots disponibles</h3>
-<div id="snapshotList"></div>
 <div class="modal" id="recoveryModal">
   <div class="modal-content">
     <h2>🛠️ Mode récupération</h2>
+        <h3>📸 Snapshots disponibles</h3>
+    <div id="snapshotList"></div>
     <p style="font-size:14px">
       L’application a détecté un problème lors du dernier démarrage.
     </p>
@@ -386,6 +386,12 @@ const RECOVERY_ACTIVE =
 if(RECOVERY_ACTIVE){
   console.warn("🛠️ MODE RÉCUPÉRATION ACTIVÉ");
 }
+window.addEventListener("load", ()=>{
+  if(RECOVERY_ACTIVE){
+    openRecovery();
+    return;
+  }
+});
 function acceptLegal(){
   localStorage.setItem("LEGAL_OK","1");
   document.getElementById("legalModal").classList.remove("open");
@@ -412,8 +418,18 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
+
+function openRecovery(){
+  document.getElementById("recoveryModal").classList.add("open");
+  renderSnapshots();
+}
 function createSnapshot(reason="auto"){
   try{
+    const last = Number(localStorage.getItem("SNAP_LAST") || 0);
+    if(Date.now() - last < 60_000) return; // 1 min
+
+    localStorage.setItem("SNAP_LAST", Date.now());
+
     const snaps = JSON.parse(
       localStorage.getItem(SNAP_KEY) || "[]"
     );
@@ -426,7 +442,6 @@ function createSnapshot(reason="auto"){
       SETTINGS
     });
 
-    // limite de snapshots
     snaps.splice(SNAP_LIMIT);
 
     localStorage.setItem(
@@ -436,17 +451,6 @@ function createSnapshot(reason="auto"){
   }catch(e){
     console.warn("⚠️ Snapshot échoué", e);
   }
-}
-function openRecovery(){
-  document.getElementById("recoveryModal").classList.add("open");
-  renderSnapshots();
-}
-function createSnapshot(reason="auto"){
-  const last = Number(localStorage.getItem("SNAP_LAST") || 0);
-  if(Date.now() - last < 60_000) return; // 1 min
-
-  localStorage.setItem("SNAP_LAST", Date.now());
-  ...
 }
 function recoverAuto(){
   const fixed = attemptAutoRecovery();
@@ -1530,6 +1534,7 @@ function renderSnapshots(){
 }
 function handleFatalError(err){
   console.error("💥 ERREUR CAPTURÉE", err);
+  localStorage.setItem("CA_HS_RECOVERY_MODE", "1");
 
   // Sauvegarde du log (optionnel)
   try{
@@ -1586,7 +1591,14 @@ function handleFatalError(err){
 
   document.body.appendChild(overlay);
 }
+/* =======================
+   🧯 PROTECTION DES FONCTIONS CRITIQUES
+======================= */
 
+recalc = safe(recalc);
+renderCalendar = safe(renderCalendar);
+loadMonth = safe(loadMonth);
+save = safe(save);
 </script>
 
 <div class="card" style="font-size:13px;color:#aaa">
