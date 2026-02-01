@@ -1326,6 +1326,30 @@ const payload = {
 function closeTutorial(){
   document.getElementById("tutorialModal").classList.remove("open");
 }
+function getPeriodData(monthKey){
+  const { start, end } = getPeriodBounds(monthKey);
+
+  let totalHours = 0;
+  const rows = [];
+
+  Object.entries(ALL_DATA).forEach(([year, yearData])=>{
+    Object.entries(yearData || {}).forEach(([key, month])=>{
+      Object.entries(month.days || {}).forEach(([d, h])=>{
+        const [y, m] = key.split("-").map(Number);
+        const date = new Date(y, m - 1, d);
+
+        if(date >= start && date <= end){
+          totalHours += h;
+          rows.push({ date, h });
+        }
+      });
+    });
+  });
+
+  rows.sort((a,b)=>a.date-b.date);
+
+  return { start, end, rows, totalHours };
+}
 function getPeriodHoursForMonth(monthKey){
   const { start, end } = getPeriodBounds(monthKey);
   let total = 0;
@@ -1352,19 +1376,12 @@ function exportMonthlyPDF(){
   const pdf = new jsPDF();
 
   const month = DATA[currentKey];
+  const { start, end } = getPeriodBounds(currentKey);
   const paid = month.paid || 0;
   const prevCarry = getPreviousCarry(currentKey);
 
-  const {
-    start,
-    end,
-    rows,
-    totalHours
-  } = getPeriodData(currentKey);
-
   let yPos = 15;
 
-  // 🧾 TITRE
   pdf.setFontSize(14);
   pdf.text("Récapitulatif mensuel – Heures supplémentaires", 10, yPos);
   yPos += 8;
@@ -1377,37 +1394,12 @@ function exportMonthlyPDF(){
   );
   yPos += 10;
 
-  // 📊 TABLEAU
-  pdf.setFontSize(10);
-  pdf.text("Date", 10, yPos);
-  pdf.text("Heures", 50, yPos);
-  yPos += 4;
-  pdf.line(10, yPos, 200, yPos);
-  yPos += 4;
-
-  rows.forEach(({ date, h })=>{
-    pdf.text(formatDate(date), 10, yPos);
-    pdf.text(h.toFixed(2) + " h", 50, yPos);
-    yPos += 6;
-
-    if(yPos > 270){
-      pdf.addPage();
-      yPos = 15;
-    }
-  });
-
-  yPos += 6;
-  pdf.line(10, yPos, 200, yPos);
-  yPos += 8;
-
-  // 🧮 RÉCAP
   pdf.setFontSize(11);
   pdf.text(`Report précédent : ${prevCarry.toFixed(2)} h`, 10, yPos); yPos += 6;
-  pdf.text(`Heures période : ${totalHours.toFixed(2)} h`, 10, yPos); yPos += 6;
+  pdf.text(`Heures période : ${document.getElementById("totalMonth").textContent} h`, 10, yPos); yPos += 6;
   pdf.text(`Heures payées : ${paid.toFixed(2)} h`, 10, yPos); yPos += 6;
   pdf.text(`Reliquat final : ${month.carry.toFixed(2)} h`, 10, yPos);
 
-  // ⚠️ MENTION
   yPos += 12;
   pdf.setFontSize(9);
   pdf.text(
@@ -1431,81 +1423,26 @@ function exportAnnualPDF(){
     .filter(k => /^\d{4}-\d{2}$/.test(k))
     .sort();
 
-  if(months.length === 0){
-    alert("Aucune donnée annuelle");
-    return;
-  }
-
-  const year = months[0].split("-")[0];
   let yPos = 15;
 
-  // 🧾 TITRE
   pdf.setFontSize(14);
   pdf.text("Bilan annuel – Heures supplémentaires", 10, yPos);
-  yPos += 8;
-
-  pdf.setFontSize(11);
-  pdf.text(`Année : ${year}`, 10, yPos);
   yPos += 10;
 
-  // 🗂️ EN-TÊTE
   pdf.setFontSize(10);
-  pdf.text("Période", 10, yPos);
-  pdf.text("Heures", 60, yPos);
-  pdf.text("Payées", 100, yPos);
-  pdf.text("Carry fin", 145, yPos);
-  yPos += 4;
-  pdf.line(10, yPos, 200, yPos);
+  pdf.text("Mois", 10, yPos);
+  pdf.text("Carry fin", 80, yPos);
   yPos += 6;
-
-  let totalPeriod = 0;
-  let totalPaid = 0;
-  let finalCarry = 0;
 
   months.forEach(key=>{
-    const month = DATA[key];
-    const { totalHours } = getPeriodData(key);
-
-    totalPeriod += totalHours;
-    totalPaid += (month.paid || 0);
-    finalCarry = month.carry;
-
+    const m = DATA[key];
     pdf.text(key, 10, yPos);
-    pdf.text(totalHours.toFixed(2) + " h", 60, yPos);
-    pdf.text((month.paid || 0).toFixed(2) + " h", 100, yPos);
-    pdf.text(month.carry.toFixed(2) + " h", 145, yPos);
-
+    pdf.text((m.carry || 0).toFixed(2) + " h", 80, yPos);
     yPos += 6;
-
-    if(yPos > 270){
-      pdf.addPage();
-      yPos = 15;
-    }
   });
 
-  // 🔻 SÉPARATEUR
-  yPos += 6;
-  pdf.line(10, yPos, 200, yPos);
-  yPos += 8;
-
-  // 📊 RÉCAP GLOBAL
-  pdf.setFontSize(11);
-  pdf.text(`Total heures période : ${totalPeriod.toFixed(2)} h`, 10, yPos); yPos += 6;
-  pdf.text(`Total heures payées : ${totalPaid.toFixed(2)} h`, 10, yPos); yPos += 6;
-  pdf.text(`Reliquat final : ${finalCarry.toFixed(2)} h`, 10, yPos);
-
-  // ⚠️ MENTION
-  yPos += 12;
-  pdf.setFontSize(9);
-  pdf.text(
-    "Document personnel – valeurs indicatives – ne constitue pas un bulletin de paie",
-    10,
-    yPos
-  );
-
-  pdf.save(`bilan_annuel_heures_sup_${year}.pdf`);
+  pdf.save(`bilan_annuel_heures_sup_${months[0].slice(0,4)}.pdf`);
 }
-
 loadMonth();
 
 
