@@ -1588,7 +1588,10 @@ function importJSONFile(e){
 ===================== */
 if(dataVersion === "1.0"){
   Object.values(payload.DATA).forEach(month=>{
-    if(typeof month.closing !== "number") month.closing = null;
+    if(typeof month.closing !== "number"){
+      month.closing = null;
+    }
+    if(typeof month.locked !== "boolean"){
       month.locked = false;
     }
   });
@@ -1620,7 +1623,7 @@ if(payload.appVersion && payload.appVersion !== APP_VERSION){
       }
       if(typeof month.paid !== "number") month.paid = 0;
       if(typeof month.carry !== "number") month.carry = 0;
-      if(typeof month.closing !== "number") month.closing = 1;
+      if(typeof month.closing !== "number") month.closing = null;
       if(typeof month.locked !== "boolean") month.locked = false;
 
       existing[monthKey] = month;
