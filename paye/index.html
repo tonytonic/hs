@@ -606,6 +606,8 @@ const monthPicker = document.getElementById("monthPicker");
 monthPicker.value = new Date().toISOString().slice(0,7);
 const paidInput = document.getElementById("paidHours");
 paidInput.oninput = () => {
+  if(!DATA || !DATA[currentKey]) return;
+
   DATA[currentKey].paid = parseFloat(paidInput.value) || 0;
   save();
   recalc();
@@ -627,34 +629,65 @@ function closeOnboarding(){
 }
 
 function getPeriodBounds(monthKey){
-  const [y, m] = monthKey.split("-").map(Number);
+  // 🛡️ Sécurité absolue
+  if(!monthKey || typeof monthKey !== "string"){
+    return { start: new Date(0), end: new Date(0) };
+  }
 
-  // Mois précédent
+  const [y, m] = monthKey.split("-").map(Number);
+  if(!y || !m){
+    return { start: new Date(0), end: new Date(0) };
+  }
+
+  const year = String(y);
+  const yearData = ALL_DATA[year];
+
+  if(!yearData || !yearData[monthKey]){
+    return { start: new Date(0), end: new Date(0) };
+  }
+
+  const currentMonth = yearData[monthKey];
+
+  /* =========================
+     🔙 MOIS PRÉCÉDENT
+  ========================= */
   const prevMonthDate = new Date(y, m - 2, 1);
   const prevKey =
     prevMonthDate.getFullYear() + "-" +
-    String(prevMonthDate.getMonth() + 1).padStart(2,"0");
+    String(prevMonthDate.getMonth() + 1).padStart(2, "0");
+
+  const prevYear = String(prevMonthDate.getFullYear());
+  const prevYearData = ALL_DATA[prevYear] || {};
+  const prevMonth = prevYearData[prevKey];
 
   let start;
 
-  const prevYear = prevKey.split("-")[0];
-const prevYearData = ALL_DATA[prevYear] || {};
-const prevMonth = prevYearData[prevKey];
-
-if(prevMonth && prevMonth.closing){
-    // lundi suivant la clôture précédente (clôture = dimanche)
+  if(prevMonth && typeof prevMonth.closing === "number"){
+    // 📌 début = lundi suivant la clôture précédente (clôture = dimanche)
     start = new Date(
       prevMonthDate.getFullYear(),
       prevMonthDate.getMonth(),
       prevMonth.closing + 1
     );
   } else {
-    // aucun mois précédent → début au 1er du mois courant
+    // 📌 aucun mois précédent fiable → 1er du mois courant
     start = new Date(y, m - 1, 1);
   }
 
-  // fin période = dimanche de clôture
-  const end = new Date(y, m - 1, DATA[monthKey].closing);
+  /* =========================
+     🔚 FIN DE PÉRIODE
+  ========================= */
+  let closing = currentMonth.closing;
+
+  // 🔧 réparation ultime si clôture absente / invalide
+  if(
+    typeof closing !== "number" ||
+    new Date(y, m - 1, closing).getDay() !== 0
+  ){
+    closing = getLastSunday(y, m - 1);
+  }
+
+  const end = new Date(y, m - 1, closing);
 
   return { start, end };
 }
