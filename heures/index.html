@@ -1181,11 +1181,14 @@ function openPopup(date){
     console.warn("Date de début d’exercice non définie")
   }
 
-  // 🎌 FÉRIÉ = absence forcée 7h
-  if (specialDays[date] === "ferie") {
-    if (!data[date]) data[date] = {extra:0, recup:0, absent:0}
-    data[date].absent = DAILY_WORK_HOURS
-  }
+  // 🎌 FÉRIÉ : ne forcer l’absence QUE si mode auto OFF
+if (
+  specialDays[date] === "ferie" &&
+  !AUTO_FERIE
+) {
+  if (!data[date]) data[date] = {extra:0, recup:0, absent:0}
+  data[date].absent = DAILY_WORK_HOURS
+}
 
   const d = data[date] || {extra:0, recup:0, absent:0}
 
