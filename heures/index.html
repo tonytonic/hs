@@ -2223,22 +2223,31 @@ d’un professionnel compétent.
   sessionStorage.setItem("appAlive", "true");
 </script>
 
-<!-- 🔒 DEBUG CRASH CACHÉ (ZONE INVISIBLE FIXE) -->
+<!-- 🔒 ZONE DEBUG CACHÉE (FIXE, SOUS LE TEXTE) -->
 <div
-  onclick="protectedCrash()"
-  title="© C.Anthony"
   style="
     position:fixed;
-    bottom:6px;
+    bottom:8px;
     left:50%;
     transform:translateX(-50%);
-    width:40px;
-    height:20px;
+    font-size:12px;
+    color:#777;
     z-index:2147483647;
-    background:rgba(255,0,0,0.2); /* DEBUG */
-    pointer-events:auto;
+    user-select:none;
   "
-></div>
+>
+  © C.Anthony
+
+  <!-- zone cliquable invisible -->
+  <span
+    onclick="protectedCrash()"
+    style="
+      position:absolute;
+      inset:0;
+      cursor:default;
+    "
+  ></span>
+</div>
 
 </body>
 </html>
