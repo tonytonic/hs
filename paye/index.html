@@ -1137,17 +1137,7 @@ function recalc(){
   document.getElementById("totalMonth").textContent =
     periodHours.toFixed(2);
 
-  // ➖ Payé
-  const paid = Number(DATA[currentKey].paid) || 0;
-
-  // ✅ RELIQUAT LOCAL (FORMULE MÉTIER)
-  const computedCarry =
-    prevCarry +
-    periodHours -
-    paid;
-
-  document.getElementById("carryOver").textContent =
-    Math.max(0, computedCarry).toFixed(2);
+  
 
   if(unlocked) calcEuro();
 }
