@@ -442,7 +442,7 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
-(function showVersion(){
+function showVersion(){
   const el = document.getElementById("versionBadge");
   if(el){
     el.textContent = "v" + APP_VERSION;
