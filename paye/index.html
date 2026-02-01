@@ -425,12 +425,29 @@ window.addEventListener("load",()=>{
    DONNÉES
 ======================= */
 const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
+const APP_VERSION = "1.3.0";
 const SNAP_KEY = `${STORAGE_PREFIX}_SNAPSHOTS`;
 const SNAP_LIMIT = 5;
 
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
+(function autoRefreshPWA(){
+  const key = "CA_APP_VERSION";
+  const last = localStorage.getItem(key);
+
+  if(last !== APP_VERSION){
+    console.warn("🔄 Nouvelle version détectée :", APP_VERSION);
+
+    localStorage.setItem(key, APP_VERSION);
+
+    // évite boucle infinie
+    if(!sessionStorage.getItem("CA_REFRESHED")){
+      sessionStorage.setItem("CA_REFRESHED", "1");
+      location.reload();
+    }
+  }
+})();
 function simulateCrash(){
   console.warn("💥 CRASH SIMULÉ");
   throw new Error("CRASH_TEST_INTERNE");
