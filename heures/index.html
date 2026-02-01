@@ -580,9 +580,10 @@ function switchYear(){
   openYearsPopup()
 }
 function openYearsPopup(){
-  const box = document.getElementById("yearsList")
-  box.innerHTML = ""
+  const box = document.getElementById("yearsList");
+  if(!box) return;
 
+  box.innerHTML = "";
   const years = getExistingYears()
 
   if(years.length === 0){
@@ -1238,9 +1239,10 @@ document.body.style.overflow = "hidden";
 }
 function closePopup(){
   document.getElementById("popup").style.display = "none";
-  selectedDate = "";   // 🔥 FIX CRITIQUE
-document.body.style.overflow = "";
-  if (typeof update === "function") update();
+  const hadDate = selectedDate;
+  selectedDate = "";
+  document.body.style.overflow = "";
+  if (hadDate && typeof update === "function") update();
 }
 
 
@@ -1979,15 +1981,42 @@ function closeLegalPopup(){
 }
 // 🔒 Protection tardive des fonctions (APRÈS leur déclaration)
 function protectFunctions(){
-  if (typeof update === "function") update = safe(update, "update");
-  if (typeof calculate === "function") calculate = safe(calculate, "calculate");
-  if (typeof generateCalendar === "function") generateCalendar = safe(generateCalendar, "calendar");
-  if (typeof buildPeriods === "function") buildPeriods = safe(buildPeriods, "periods");
-  if (typeof exportJSON === "function") exportJSON = safe(exportJSON, "exportJSON");
-  if (typeof loadJSON === "function") loadJSON = safe(loadJSON, "importJSON");
-  if (typeof exportMonthlyFullPDF === "function") exportMonthlyFullPDF = safe(exportMonthlyFullPDF, "pdf_month");
-  if (typeof exportAnnualPDF === "function") exportAnnualPDF = safe(exportAnnualPDF, "pdf_annual");
-  if (typeof exportPeriodPDF === "function") exportPeriodPDF = safe(exportPeriodPDF, "pdf_period");
+  if (!update.__safe) {
+    update = safe(update, "update");
+    update.__safe = true;
+  }
+  if (!calculate.__safe) {
+    calculate = safe(calculate, "calculate");
+    calculate.__safe = true;
+  }
+  if (!generateCalendar.__safe) {
+    generateCalendar = safe(generateCalendar, "calendar");
+    generateCalendar.__safe = true;
+  }
+  if (!buildPeriods.__safe) {
+    buildPeriods = safe(buildPeriods, "periods");
+    buildPeriods.__safe = true;
+  }
+  if (!exportJSON.__safe) {
+    exportJSON = safe(exportJSON, "exportJSON");
+    exportJSON.__safe = true;
+  }
+  if (!loadJSON.__safe) {
+    loadJSON = safe(loadJSON, "importJSON");
+    loadJSON.__safe = true;
+  }
+  if (!exportMonthlyFullPDF.__safe) {
+    exportMonthlyFullPDF = safe(exportMonthlyFullPDF, "pdf_month");
+    exportMonthlyFullPDF.__safe = true;
+  }
+  if (!exportAnnualPDF.__safe) {
+    exportAnnualPDF = safe(exportAnnualPDF, "pdf_annual");
+    exportAnnualPDF.__safe = true;
+  }
+  if (!exportPeriodPDF.__safe) {
+    exportPeriodPDF = safe(exportPeriodPDF, "pdf_period");
+    exportPeriodPDF.__safe = true;
+  }
 }
 </script>
 <div id="toast" style="
