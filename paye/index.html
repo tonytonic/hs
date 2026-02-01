@@ -1530,7 +1530,6 @@ function saveYearData(year, data){
   );
 }
 function recalcCascade(){
-  // 🔗 Récupération de tous les mois (toutes années confondues)
   const allMonths = [];
 
   Object.values(ALL_DATA).forEach(yearData => {
@@ -1543,12 +1542,11 @@ function recalcCascade(){
     });
   });
 
-  // 📅 Tri chronologique
+  // ordre chronologique
   allMonths.sort((a, b) => a.key.localeCompare(b.key));
 
   let runningCarry = 0;
 
-  // 🔁 Cascade réelle
   allMonths.forEach(({ key, month }) => {
     const { start, end } = getPeriodBounds(key);
     const [y, m] = key.split("-").map(Number);
@@ -1570,7 +1568,6 @@ function recalcCascade(){
 
     if(runningCarry < 0) runningCarry = 0;
 
-    // 🔒 Valeur officielle persistée
     month.carry = runningCarry;
   });
 }
