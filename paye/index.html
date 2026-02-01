@@ -580,7 +580,7 @@ function restoreSnapshot(index){
   location.reload();
 }
 function recoverFactory(){
-  createSnapshot("factory_reset");
+  createSnapshot("factory_reset", true);
   if(!confirm("⚠️ Supprimer TOUTES les données locales ?")) return;
 
   Object.keys(localStorage)
@@ -1131,9 +1131,8 @@ function recalc(){
 
   // 🔁 Report précédent
   const prevCarry = getPreviousCarry(currentKey);
-  document.getElementById("prevCarry").textContent =
-    prevCarry.toFixed(2);
-
+  document.getElementById("carryOver").textContent =
+  DATA[currentKey].carry.toFixed(2);
   // 🔵 Total période
   document.getElementById("totalMonth").textContent =
     periodHours.toFixed(2);
