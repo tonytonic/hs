@@ -807,12 +807,13 @@ function deletePeriod(i){
 
   periodMeta[i] = { status: "deleted" }
   localStorage.setItem(STORAGE.periodMeta, JSON.stringify(periodMeta))
-  update()
+if (typeof update === "function") update();
 }
 function buildPeriods(){
   const base = getBaseStartDate();
   if(!base){
-    update(); // 🔥 afficher le calendrier même sans exercice
+    periodSelect.innerHTML = "";
+    if (typeof update === "function") update();
     return;
   }
 
@@ -854,7 +855,7 @@ foundIndex = Math.max(0, foundIndex);
 currentPeriodIndex = foundIndex;
 periodSelect.selectedIndex = foundIndex;
 
-update();
+if (typeof update === "function") update();
 }
 
 function toggleConfigLock(){
@@ -1216,7 +1217,7 @@ function closePopup(){
   document.getElementById("popup").style.display = "none";
   selectedDate = "";   // 🔥 FIX CRITIQUE
 document.body.style.overflow = "";
-  update();
+  if (typeof update === "function") update();
 }
 
 
@@ -1410,7 +1411,7 @@ createSnapshot("before_import");
   localStorage.setItem("BASE_HEBDO_" + currentSuffix, BASE_HEBDO);
   localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
 
-  update();
+  if (typeof update === "function") update();
   alert("✅ Import complet réussi");
 }
 
@@ -1442,7 +1443,7 @@ async function importFeries(){
     localStorage.setItem(STORAGE.specialDays, JSON.stringify(specialDays));
     localStorage.setItem(STORAGE.data, JSON.stringify(data));
 
-    update();
+    if (typeof update === "function") update();
     alert("✅ Jours fériés importés (N-1 / N / N+1)");
   }catch(e){
     alert("❌ Impossible d’importer les jours fériés");
@@ -1475,16 +1476,16 @@ function update(){
 }
 monthSelect.onchange = () => {
   viewMonth = +monthSelect.value;
-  update(); // 🔥 recalcul complet (calendrier + soldes + clôture annuelle)
+  if (typeof update === "function") update();// 🔥 recalcul complet (calendrier + soldes + clôture annuelle)
 };
 
 yearSelect.onchange = () => {
   viewYear = +yearSelect.value;
-  update(); // 🔥 recalcul complet
+  if (typeof update === "function") update();// 🔥 recalcul complet
 };
 periodSelect.onchange = () => {
   currentPeriodIndex = +periodSelect.value;
-  update();
+  if (typeof update === "function") update();
   showToast();
 };
 
@@ -1505,7 +1506,7 @@ baseHebdoInput.value = BASE_HEBDO;
 baseHebdoInput.oninput = () => {
   BASE_HEBDO = Number(baseHebdoInput.value) || 35;
   localStorage.setItem("BASE_HEBDO_" + currentSuffix, BASE_HEBDO);
-  update();
+  if (typeof update === "function") update();
 };
 exerciseStartInput.onchange = ()=>{
   exerciseStart = exerciseStartInput.value;
@@ -1934,23 +1935,17 @@ document.querySelectorAll("details.section").forEach(d => {
     }
   });
 });
-update = safe(update, "update");
-calculate = safe(calculate, "calculate");
-generateCalendar = safe(generateCalendar, "calendar");
-buildPeriods = safe(buildPeriods, "periods");
-exportJSON = safe(exportJSON, "exportJSON");
-loadJSON = safe(loadJSON, "importJSON");
-exportMonthlyFullPDF = safe(exportMonthlyFullPDF, "pdf_month");
-exportAnnualPDF = safe(exportAnnualPDF, "pdf_annual");
-exportPeriodPDF = safe(exportPeriodPDF, "pdf_period");
 const crashState = localStorage.getItem("APP_CRASH_STATE");
 if(crashState){
   console.warn("⚠️ Dernier crash détecté:", crashState);
 }
-initSelectors()
-applyConfigLock();
-buildPeriods()
-autoSwitchPeriodAtMidnight()
+document.addEventListener("DOMContentLoaded", () => {
+  initSelectors();
+  applyConfigLock();
+  buildPeriods();
+  autoSwitchPeriodAtMidnight();
+  protectFunctions(); // 👈 TRÈS IMPORTANT
+});
 
 function openLegalPopup(){
   document.getElementById("popupLegal").style.display = "flex";
@@ -1958,6 +1953,18 @@ function openLegalPopup(){
 
 function closeLegalPopup(){
   document.getElementById("popupLegal").style.display = "none";
+}
+// 🔒 Protection tardive des fonctions (APRÈS leur déclaration)
+function protectFunctions(){
+  if (typeof update === "function") update = safe(update, "update");
+  if (typeof calculate === "function") calculate = safe(calculate, "calculate");
+  if (typeof generateCalendar === "function") generateCalendar = safe(generateCalendar, "calendar");
+  if (typeof buildPeriods === "function") buildPeriods = safe(buildPeriods, "periods");
+  if (typeof exportJSON === "function") exportJSON = safe(exportJSON, "exportJSON");
+  if (typeof loadJSON === "function") loadJSON = safe(loadJSON, "importJSON");
+  if (typeof exportMonthlyFullPDF === "function") exportMonthlyFullPDF = safe(exportMonthlyFullPDF, "pdf_month");
+  if (typeof exportAnnualPDF === "function") exportAnnualPDF = safe(exportAnnualPDF, "pdf_annual");
+  if (typeof exportPeriodPDF === "function") exportPeriodPDF = safe(exportPeriodPDF, "pdf_period");
 }
 </script>
 <div id="toast" style="
