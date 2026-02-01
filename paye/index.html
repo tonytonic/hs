@@ -313,6 +313,19 @@ input[type="number"]{
     <input type="number" id="coefNet">
     <p><b id="euroResult">0.00 €</b></p>
     <p id="euroDetail" style="font-size:12px;color:#aaa;margin-top:8px"></p>
+    <p style="
+  font-size:12px;
+  color:#9aa0a6;
+  margin-top:10px;
+  line-height:1.4;
+">
+⚠️ Les <b>taux</b> et <b>coefficients</b> utilisés sont fournis
+à titre <b>strictement indicatif</b>.<br>
+La somme affichée peut <b>ne pas correspondre à la réalité</b>
+(selon la convention collective, les accords d’entreprise
+ou le mode de calcul de l’employeur).<br>
+<b>Seul le bulletin de paie fait foi.</b>
+</p>
   </div>
   <input type="password" id="unlockCode" placeholder="Code (1234)">
   <button onclick="unlockEuro()">Déverrouiller</button>
@@ -1808,6 +1821,26 @@ function handleFatalError(err){
     ⚠️ En cas de litige, seuls les bulletins de paie et documents
     officiels de l’employeur font foi.
   </p>
+</div>
+<div class="card" style="font-size:12px;color:#9aa0a6;line-height:1.5">
+  <b>⚠️ Responsabilité et limites</b><br><br>
+
+  Les données saisies dans ce simulateur sont renseignées
+  <b>sous la seule responsabilité de l’utilisateur</b>.<br><br>
+
+  Les résultats affichés sont fournis à titre indicatif et peuvent
+  ne pas refléter exactement la réalité du terrain, notamment en raison
+  d’erreurs de saisie, de paramètres incomplets ou inexacts, de différences
+  liées à la convention collective, aux accords d’entreprise, aux pratiques
+  internes, d’évolutions du droit applicable, ou de
+  <b>dysfonctionnements techniques, bugs ou limites du simulateur</b>.<br><br>
+
+  Malgré le soin apporté à sa conception, le simulateur peut contenir
+  des erreurs et ne saurait se substituer aux documents officiels,
+  outils de l’employeur ou à l’interprétation des textes légaux.<br><br>
+
+  <b>Seuls les documents établis par l’employeur et le droit applicable
+  font foi.</b>
 </div>
 <footer
   id="debugTrigger"
