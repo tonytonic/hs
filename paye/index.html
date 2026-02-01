@@ -144,7 +144,6 @@ input,select{
   transform: translateY(0);
 }
 
-  
 
 /* =======================
    FLOU €
@@ -206,7 +205,24 @@ input[type="number"]{
 </head>
 
 <body>
+  <h3>📸 Snapshots disponibles</h3>
+<div id="snapshotList"></div>
+<div class="modal" id="recoveryModal">
+  <div class="modal-content">
+    <h2>🛠️ Mode récupération</h2>
+    <p style="font-size:14px">
+      L’application a détecté un problème lors du dernier démarrage.
+    </p>
 
+    <button onclick="recoverAuto()">🔄 Réparation automatique</button>
+    <button class="secondary" onclick="recoverSoftReset()">♻️ Réinitialiser l’interface</button>
+    <button class="danger" onclick="recoverFactory()">🧨 Réinitialisation complète</button>
+
+    <p style="font-size:12px;color:#aaa;margin-top:10px">
+      ⚠️ La réinitialisation complète supprime les données locales.
+    </p>
+  </div>
+</div>
 
 <!-- le reste de ton compteur ici -->
 <div class="topbar">
@@ -360,6 +376,16 @@ input[type="number"]{
   </div>
 </div>
 <script>
+/* =======================
+   🔄 MODE RÉCUPÉRATION
+======================= */
+
+const RECOVERY_ACTIVE =
+  localStorage.getItem("CA_HS_RECOVERY_MODE") === "1";
+
+if(RECOVERY_ACTIVE){
+  console.warn("🛠️ MODE RÉCUPÉRATION ACTIVÉ");
+}
 function acceptLegal(){
   localStorage.setItem("LEGAL_OK","1");
   document.getElementById("legalModal").classList.remove("open");
@@ -379,9 +405,100 @@ window.addEventListener("load",()=>{
 /* =======================
    DONNÉES
 ======================= */
+const SNAP_KEY = `${STORAGE_PREFIX}_SNAPSHOTS`;
+const SNAP_LIMIT = 5;
 const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
+}
+function createSnapshot(reason="auto"){
+  try{
+    const snaps = JSON.parse(
+      localStorage.getItem(SNAP_KEY) || "[]"
+    );
+
+    snaps.unshift({
+      date: new Date().toISOString(),
+      reason,
+      currentKey,
+      DATA: JSON.parse(JSON.stringify(ALL_DATA)),
+      SETTINGS
+    });
+
+    // limite de snapshots
+    snaps.splice(SNAP_LIMIT);
+
+    localStorage.setItem(
+      SNAP_KEY,
+      JSON.stringify(snaps)
+    );
+  }catch(e){
+    console.warn("⚠️ Snapshot échoué", e);
+  }
+}
+function openRecovery(){
+  document.getElementById("recoveryModal").classList.add("open");
+}
+
+function recoverAuto(){
+  const fixed = attemptAutoRecovery();
+  localStorage.removeItem("CA_HS_RECOVERY_MODE");
+
+  alert(
+    fixed
+    ? "✅ Réparation effectuée. L’application va redémarrer."
+    : "ℹ️ Aucun problème détecté."
+  );
+
+  location.reload();
+}
+
+function recoverSoftReset(){
+  localStorage.removeItem("CA_HS_RECOVERY_MODE");
+  location.reload();
+}
+function restoreSnapshot(index){
+  const snaps = JSON.parse(
+    localStorage.getItem(SNAP_KEY) || "[]"
+  );
+
+  if(!snaps[index]){
+    alert("❌ Snapshot introuvable");
+    return;
+  }
+
+  const snap = snaps[index];
+
+  if(!confirm(
+    `Restaurer l’état du ${new Date(snap.date).toLocaleString()} ?`
+  )) return;
+
+  ALL_DATA = snap.DATA;
+  SETTINGS = snap.SETTINGS || {};
+
+  // réécriture propre
+  Object.entries(ALL_DATA).forEach(([year,data])=>{
+    saveYearData(year, data);
+  });
+
+  localStorage.setItem(
+    kSettings(),
+    JSON.stringify(SETTINGS)
+  );
+
+  localStorage.removeItem("CA_HS_RECOVERY_MODE");
+
+  location.reload();
+}
+function recoverFactory(){
+  createSnapshot("factory_reset");
+  if(!confirm("⚠️ Supprimer TOUTES les données locales ?")) return;
+
+  Object.keys(localStorage)
+    .filter(k => k.startsWith(STORAGE_PREFIX))
+    .forEach(k => localStorage.removeItem(k));
+
+  location.reload();
 }
 function kSettings(){
   return `${STORAGE_PREFIX}_SETTINGS`;
@@ -526,7 +643,52 @@ DATA = ALL_DATA[year];
     save();
   }
 }
+function attemptAutoRecovery(){
+  let repaired = false;
 
+  try{
+    const index = JSON.parse(localStorage.getItem(kIndex()) || "[]");
+
+    index.forEach(year=>{
+      let data;
+
+      try{
+        data = loadYearData(year);
+      }catch(e){
+        console.warn("⚠️ Données corrompues pour", year);
+        localStorage.removeItem(kData(year));
+        repaired = true;
+        return;
+      }
+
+      Object.entries(data).forEach(([monthKey, month])=>{
+        // structure minimale
+        if(!month.days) month.days = {};
+        if(typeof month.paid !== "number") month.paid = 0;
+        if(typeof month.carry !== "number") month.carry = 0;
+
+        // clôture invalide → dernier dimanche
+        const [y,m] = monthKey.split("-").map(Number);
+        const lastSunday = getLastSunday(y, m-1);
+
+        if(
+          !month.closing ||
+          new Date(y, m-1, month.closing).getDay() !== 0
+        ){
+          month.closing = lastSunday;
+          repaired = true;
+        }
+      });
+
+      saveYearData(year, data);
+    });
+
+  }catch(e){
+    return false; // échec total
+  }
+
+  return repaired;
+}
 
 
 
@@ -910,6 +1072,7 @@ function toggleChangeCode(){
 ======================= */
 
 function save(){
+  createSnapshot("save");
   localStorage.setItem(
   `${STORAGE_PREFIX}_AUTO_SAVE_DATE`,
   Date.now()
@@ -1236,6 +1399,7 @@ function recalcCascade(){
   });
 }
 function importJSONFile(e){
+  createSnapshot("import");
   const file = e.target.files[0];
   if(!file) return;
 
@@ -1302,6 +1466,102 @@ if(payload.SETTINGS){
   e.target.value = ""; // reset input
 }
 document.getElementById("importFile").addEventListener("change", importJSONFile);
+/* =======================
+   🛡️ ANTI-CRASH GLOBAL
+======================= */
+
+// Erreurs JavaScript classiques
+window.onerror = function (message, source, lineno, colno, error) {
+  handleFatalError({
+    type: "JS_ERROR",
+    message,
+    source,
+    lineno,
+    colno,
+    stack: error?.stack || null
+  });
+  return true; // empêche le crash brutal
+};
+
+// Promesses non catchées
+window.addEventListener("unhandledrejection", event => {
+  handleFatalError({
+    type: "PROMISE_REJECTION",
+    message: event.reason?.message || String(event.reason),
+    stack: event.reason?.stack || null
+  });
+});
+function safe(fn){
+  return function(...args){
+    try{
+      return fn.apply(this, args);
+    }catch(e){
+      handleFatalError({
+        type: "SAFE_FN",
+        message: e.message,
+        stack: e.stack
+      });
+    }
+  };
+}
+function handleFatalError(err){
+  console.error("💥 ERREUR CAPTURÉE", err);
+
+  // Sauvegarde du log (optionnel)
+  try{
+    localStorage.setItem(
+      "CA_HS_LAST_CRASH",
+      JSON.stringify({
+        date: new Date().toISOString(),
+        error: err,
+        state: {
+          currentKey,
+          unlocked
+        }
+      })
+    );
+  }catch(e){}
+
+  // UI de secours (une seule fois)
+  if(document.getElementById("crashOverlay")) return;
+
+  const overlay = document.createElement("div");
+  overlay.id = "crashOverlay";
+  overlay.style = `
+    position:fixed;
+    inset:0;
+    background:#0f1115;
+    color:#fff;
+    z-index:99999;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    text-align:center;
+  `;
+
+  overlay.innerHTML = `
+    <h2>⚠️ Une erreur est survenue</h2>
+    <p style="opacity:.8;font-size:14px;max-width:500px">
+      L’application a rencontré un problème inattendu.<br>
+      Aucune donnée n’a été supprimée.
+    </p>
+    <button onclick="location.reload()" style="
+      margin-top:15px;
+      padding:12px 20px;
+      border-radius:8px;
+      border:none;
+      background:#4f8cff;
+      color:white;
+      font-size:15px;
+    ">
+      🔄 Recharger l’application
+    </button>
+  `;
+
+  document.body.appendChild(overlay);
+}
 
 </script>
 
