@@ -629,57 +629,54 @@ function closeOnboarding(){
 }
 
 function getPeriodBounds(monthKey){
-  // 🛡️ Sécurité absolue
   if(!monthKey || typeof monthKey !== "string"){
-    return { start: new Date(0), end: new Date(0) };
+    const now = new Date();
+    return {
+      start: new Date(now.getFullYear(), now.getMonth(), 1),
+      end: new Date(now.getFullYear(), now.getMonth() + 1, 0)
+    };
   }
 
   const [y, m] = monthKey.split("-").map(Number);
   if(!y || !m){
-    return { start: new Date(0), end: new Date(0) };
+    return {
+      start: new Date(y || 1970, (m || 1) - 1, 1),
+      end: new Date(y || 1970, m || 1, 0)
+    };
   }
 
   const year = String(y);
   const yearData = ALL_DATA[year];
+  const currentMonth = yearData?.[monthKey];
 
-  if(!yearData || !yearData[monthKey]){
-    return { start: new Date(0), end: new Date(0) };
+  if(!currentMonth){
+    return {
+      start: new Date(y, m - 1, 1),
+      end: new Date(y, m, 0)
+    };
   }
 
-  const currentMonth = yearData[monthKey];
-
-  /* =========================
-     🔙 MOIS PRÉCÉDENT
-  ========================= */
+  // 🔙 mois précédent
   const prevMonthDate = new Date(y, m - 2, 1);
   const prevKey =
     prevMonthDate.getFullYear() + "-" +
-    String(prevMonthDate.getMonth() + 1).padStart(2, "0");
+    String(prevMonthDate.getMonth() + 1).padStart(2,"0");
 
-  const prevYear = String(prevMonthDate.getFullYear());
-  const prevYearData = ALL_DATA[prevYear] || {};
+  const prevYearData = ALL_DATA[String(prevMonthDate.getFullYear())] || {};
   const prevMonth = prevYearData[prevKey];
 
   let start;
-
   if(prevMonth && typeof prevMonth.closing === "number"){
-    // 📌 début = lundi suivant la clôture précédente (clôture = dimanche)
     start = new Date(
       prevMonthDate.getFullYear(),
       prevMonthDate.getMonth(),
       prevMonth.closing + 1
     );
-  } else {
-    // 📌 aucun mois précédent fiable → 1er du mois courant
+  }else{
     start = new Date(y, m - 1, 1);
   }
 
-  /* =========================
-     🔚 FIN DE PÉRIODE
-  ========================= */
   let closing = currentMonth.closing;
-
-  // 🔧 réparation ultime si clôture absente / invalide
   if(
     typeof closing !== "number" ||
     new Date(y, m - 1, closing).getDay() !== 0
