@@ -405,9 +405,10 @@ window.addEventListener("load",()=>{
 /* =======================
    DONNÉES
 ======================= */
+const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
 const SNAP_KEY = `${STORAGE_PREFIX}_SNAPSHOTS`;
 const SNAP_LIMIT = 5;
-const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
+
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
@@ -438,8 +439,15 @@ function createSnapshot(reason="auto"){
 }
 function openRecovery(){
   document.getElementById("recoveryModal").classList.add("open");
+  renderSnapshots();
 }
+function createSnapshot(reason="auto"){
+  const last = Number(localStorage.getItem("SNAP_LAST") || 0);
+  if(Date.now() - last < 60_000) return; // 1 min
 
+  localStorage.setItem("SNAP_LAST", Date.now());
+  ...
+}
 function recoverAuto(){
   const fixed = attemptAutoRecovery();
   localStorage.removeItem("CA_HS_RECOVERY_MODE");
@@ -1503,6 +1511,22 @@ function safe(fn){
       });
     }
   };
+}
+function renderSnapshots(){
+  const list = document.getElementById("snapshotList");
+  if(!list) return;
+
+  const snaps = JSON.parse(
+    localStorage.getItem(SNAP_KEY) || "[]"
+  );
+
+  list.innerHTML = snaps.length
+    ? snaps.map((s,i)=>`
+      <button onclick="restoreSnapshot(${i})">
+        📸 ${new Date(s.date).toLocaleString()} – ${s.reason}
+      </button>
+    `).join("")
+    : "<p style='font-size:12px;color:#aaa'>Aucun snapshot</p>";
 }
 function handleFatalError(err){
   console.error("💥 ERREUR CAPTURÉE", err);
