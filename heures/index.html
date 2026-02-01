@@ -115,7 +115,20 @@ textarea{
   justify-content:center;
 
   z-index:10;
-  pointer-events:none; /* 🔥 AJOUT */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:10;
+  pointer-events:auto;
+}
+}
+.popup-content{
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 .popup-content{
   background:#fff;
@@ -2232,7 +2245,7 @@ d’un professionnel compétent.
     width:40px;
     height:20px;
     z-index:2147483647;
-    background:transparent;
+    background:rgba(255,0,0,0.2); /* DEBUG */
     pointer-events:auto;
   "
 ></div>
