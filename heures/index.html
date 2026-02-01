@@ -1992,11 +1992,11 @@ function protectFunctions(){
 </div>
 
 <div style="text-align:center; font-size:12px; color:#666; margin-top:30px;">
-  <a href="#" onclick="openLegalPopup()" style="margin-right:10px">
+ <a href="#" onclick="event.preventDefault(); openLegalPopup();">
     ℹ️ Informations légales & calcul
   </a>
 
-  <a href="#" onclick="openNotice()">
+<a href="#" onclick="event.preventDefault(); openNotice();">
     📘 Notice utilisateur
   </a>
 
