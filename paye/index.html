@@ -665,18 +665,15 @@ function goMenu() {
 function loadMonth(){
   currentKey = monthPicker.value;
   const year = getYearFromMonth(currentKey);
+
+  registerYear(year);
+
+  // 🔒 Chargement UNIQUE et sûr de l’année
   if(!ALL_DATA[year]){
-  ALL_DATA[year] = {};
-}
+    ALL_DATA[year] = loadYearData(year);
+  }
 
-registerYear(year);
-
-if(!ALL_DATA[year]){
-  ALL_DATA[year] = loadYearData(year);
-}
-
-DATA = ALL_DATA[year];
- 
+  DATA = ALL_DATA[year];
 
   const [y, m] = currentKey.split("-").map(Number);
   let needSave = false;
@@ -687,13 +684,13 @@ DATA = ALL_DATA[year];
       days: {},
       paid: 0,
       carry: 0,
-      closing: getLastSunday(y, m - 1), // ✅ dernier dimanche
+      closing: getLastSunday(y, m - 1),
       locked: false
     };
     needSave = true;
   }
 
-  // 🧹 Correction automatique des anciennes clôtures invalides
+  // 🧹 Correction clôture invalide
   {
     const lastDay = new Date(y, m, 0).getDate();
     const closing = DATA[currentKey].closing;
@@ -718,7 +715,6 @@ DATA = ALL_DATA[year];
   recalc();
   scrollToToday();
 
-  // 💾 Sauvegarde UNE SEULE FOIS si nécessaire
   if(needSave){
     save();
   }
