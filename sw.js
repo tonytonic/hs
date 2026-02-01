@@ -1,7 +1,6 @@
 const CACHE_NAME = "compteur-heures-v1";
 
 const FILES_TO_CACHE = [
-  "./", 
   "./index.html",
   "./menu.html",
   "./manifest.json",
@@ -18,22 +17,41 @@ const FILES_TO_CACHE = [
 ];
 
 self.addEventListener("install", (event) => {
-  console.log("SW install");
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const file of FILES_TO_CACHE) {
+        try {
+          await cache.add(file);
+        } catch (e) {
+          console.warn("⚠️ Cache fail:", file);
+        }
+      }
+    })
   );
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  console.log("SW activate");
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((k) => k !== CACHE_NAME)
+          .map((k) => caches.delete(k))
+      )
+    )
+  );
+  self.clients.claim();
 });
 
 self.addEventListener("fetch", (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+
+      return fetch(event.request).catch(() =>
+        caches.match("./menu.html")
+      );
     })
   );
 });
