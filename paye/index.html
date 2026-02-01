@@ -306,6 +306,12 @@ input[type="number"]{
 <button onclick="exportAnnualPDF()">📕 PDF annuel récapitulatif</button>
 </div>
 
+<button class="danger" onclick="simulateCrash()">
+  💥 Simuler un crash (test interne)
+</button>
+
+
+
 <!-- =======================
      POPUP HEURES
 ======================= -->
@@ -418,7 +424,10 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
-
+function simulateCrash(){
+  console.warn("💥 CRASH SIMULÉ");
+  throw new Error("CRASH_TEST_INTERNE");
+}
 function openRecovery(){
   document.getElementById("recoveryModal").classList.add("open");
   renderSnapshots();
