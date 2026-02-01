@@ -47,15 +47,17 @@
   --danger:#c0392b;
   --success:#2ecc71;
 }
-versionBadge{
+#versionBadge{
   position: fixed;
-  bottom: 6px;
-  right: 10px;
+  bottom: calc(env(safe-area-inset-bottom) + 6px);
+  right: calc(env(safe-area-inset-right) + 10px);
   font-size: 11px;
   opacity: 0.45;
   color: #9aa0a6;
   z-index: 9999;
   user-select: none;
+  pointer-events: none;
+}
 }
 
 body{
