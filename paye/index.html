@@ -461,12 +461,6 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
-(function showVersion(){
-  const el = document.getElementById("versionBadge");
-  if(el){
-    el.textContent = "v" + APP_VERSION;
-  }
-})();
 (function autoRefreshPWA(){
   const key = "CA_APP_VERSION";
   const last = localStorage.getItem(key);
@@ -485,7 +479,11 @@ function kData(year){
 })();
 function simulateCrash(){
   console.warn("💥 CRASH SIMULÉ");
-  throw new Error("CRASH_TEST_INTERNE");
+  handleFatalError({
+    type: "SIMULATED_CRASH",
+    message: "Crash interne simulé",
+    stack: null
+  });
 }
 function openRecovery(){
   document.getElementById("recoveryModal").classList.add("open");
@@ -1825,6 +1823,5 @@ window.addEventListener("load", () => {
   // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-<div id="versionBadge"></div>
 </body>
 </html>
