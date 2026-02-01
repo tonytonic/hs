@@ -1460,7 +1460,6 @@ function recalcCascade(){
   });
 }
 function importJSONFile(e){
-  createSnapshot("import");
   const file = e.target.files[0];
   if(!file) return;
 
@@ -1471,60 +1470,81 @@ function importJSONFile(e){
 
     try{
       payload = JSON.parse(reader.result);
-    } catch(err){
-      alert("❌ Fichier invalide");
+    }catch{
+      alert("❌ Fichier JSON invalide");
       return;
     }
 
-    // 🔒 Vérifications minimales
-    if(!payload.DATA || !payload.year){
-      alert("❌ Format non reconnu");
+    /* =====================
+       VALIDATIONS DE BASE
+    ===================== */
+    if(
+      typeof payload !== "object" ||
+      typeof payload.DATA !== "object" ||
+      !payload.year
+    ){
+      alert("❌ Structure du fichier invalide");
       return;
     }
 
-    const year = payload.year;// ✅ Appliquer les paramètres €
-if(payload.SETTINGS){
-  SETTINGS = payload.SETTINGS;
-  localStorage.setItem(
-    kSettings(),
-    JSON.stringify(SETTINGS)
-  );
-}
+    const year = String(payload.year);
+
+    if(!/^\d{4}$/.test(year)){
+      alert("❌ Année invalide dans le fichier");
+      return;
+    }
+
+    /* =====================
+       CHARGEMENT ANNÉE
+    ===================== */
     registerYear(year);
 
     const existing = loadYearData(year);
+    let imported = 0;
+    let repaired = 0;
 
-    let added = 0;
-    let skipped = 0;
+    Object.entries(payload.DATA).forEach(([monthKey, month])=>{
+      if(!/^\d{4}-\d{2}$/.test(monthKey)) return;
 
-    Object.keys(payload.DATA).forEach(monthKey=>{
-      if(!existing[monthKey]){
-        existing[monthKey] = payload.DATA[monthKey];
-        added++;
-      } else {
-        skipped++;
+      // 🔧 réparation minimale
+      if(!month.days || typeof month.days !== "object"){
+        month.days = {};
+        repaired++;
       }
+      if(typeof month.paid !== "number") month.paid = 0;
+      if(typeof month.carry !== "number") month.carry = 0;
+      if(typeof month.closing !== "number") month.closing = 1;
+      if(typeof month.locked !== "boolean") month.locked = false;
+
+      existing[monthKey] = month;
+      imported++;
     });
 
+    /* =====================
+       ÉCRITURE + CACHE
+    ===================== */
     saveYearData(year, existing);
-    updateSaveBadge();
+
+    // 🔥 CRITIQUE : mise à jour mémoire
+    ALL_DATA[year] = existing;
+
+    // 🔁 recalcul global
+    recalcCascade();
+
+    // 🔄 reload UI
+    DATA = ALL_DATA[getYearFromMonth(currentKey)];
+    loadMonth();
 
     alert(
-      `✅ Import terminé\n\n` +
+      `✅ Import terminé\n` +
       `Année : ${year}\n` +
-      `Mois ajoutés : ${added}\n` +
-      `Mois ignorés : ${skipped}`
+      `Mois importés : ${imported}\n` +
+      (repaired ? `Mois réparés : ${repaired}` : "")
     );
-
-    // Recharge si on est sur la même année
-    if(getYearFromMonth(currentKey) === String(year)){
-      DATA = loadYearData(year);
-      loadMonth();
-    }
   };
 
   reader.readAsText(file);
-  e.target.value = ""; // reset input
+  e.target.value = "";
 }
 document.getElementById("importFile").addEventListener("change", importJSONFile);
 /* =======================
