@@ -1530,30 +1530,33 @@ function saveYearData(year, data){
   );
 }
 function recalcCascade(){
-  // 🔗 fusion de toutes les années
+  // 🔗 Récupération de tous les mois (toutes années confondues)
   const allMonths = [];
 
-  Object.values(ALL_DATA).forEach(yearData=>{
-  if(!yearData || typeof yearData !== "object") return;
+  Object.values(ALL_DATA).forEach(yearData => {
+    if(!yearData || typeof yearData !== "object") return;
 
-  Object.keys(yearData).forEach(key=>{
+    Object.entries(yearData).forEach(([key, month]) => {
       if(/^\d{4}-\d{2}$/.test(key)){
-        allMonths.push({ key, month: yearData[key] });
+        allMonths.push({ key, month });
       }
     });
   });
 
-  allMonths.sort((a,b)=> a.key.localeCompare(b.key));
+  // 📅 Tri chronologique
+  allMonths.sort((a, b) => a.key.localeCompare(b.key));
 
   let runningCarry = 0;
 
-  allMonths.forEach(({ key, month })=>{
+  // 🔁 Cascade réelle
+  allMonths.forEach(({ key, month }) => {
     const { start, end } = getPeriodBounds(key);
     const [y, m] = key.split("-").map(Number);
 
     let periodHours = 0;
 
-    Object.entries(month.days || {}).forEach(([d,h])=>{
+    // ✅ UNIQUEMENT les heures de la période
+    Object.entries(month.days || {}).forEach(([d, h]) => {
       const date = new Date(y, m - 1, d);
       if(date >= start && date <= end){
         periodHours += h;
@@ -1567,6 +1570,7 @@ function recalcCascade(){
 
     if(runningCarry < 0) runningCarry = 0;
 
+    // 🔒 Valeur officielle persistée
     month.carry = runningCarry;
   });
 }
