@@ -1056,11 +1056,6 @@ if (AUTO_FERIE) {
   });
 }
 
-      absences[weekKey] =
-        (absences[weekKey] || 0) + DAILY_WORK_HOURS;
-    }
-  });
-}
 
   // ===== 1. AGRÉGATION HEBDOMADAIRE =====
   Object.entries(data).forEach(([date, v]) => {
