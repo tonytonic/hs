@@ -504,28 +504,28 @@ function goMenu() {
     window.location.href = "../menu.html";
     }
 function autoSwitchPeriodAtMidnight(){
-  const now = new Date()
+  const now = new Date();
 
   const nextMidnight = new Date(
     now.getFullYear(),
     now.getMonth(),
     now.getDate() + 1,
     0, 0, 0, 0
-  )
+  );
 
-  const delay = nextMidnight - now
+  const delay = nextMidnight - now;
 
-  // 🔒 Sécurisation : un seul timer actif
   if(midnightTimer){
-    clearTimeout(midnightTimer)
+    clearTimeout(midnightTimer);
   }
 
   midnightTimer = setTimeout(() => {
-  safe(buildPeriods,"midnight_build")()
-  safe(update,"midnight_update")()
-  showToast()
-  autoSwitchPeriodAtMidnight()
-}, delay)
+    if (typeof buildPeriods === "function") buildPeriods();
+    if (typeof update === "function") update();
+    showToast();
+    autoSwitchPeriodAtMidnight();
+  }, delay);
+}
 
 // ===== MULTI-ANNÉE =====
 let currentSuffix = localStorage.getItem("ACTIVE_YEAR_SUFFIX") || new Date().getFullYear();
@@ -1147,12 +1147,25 @@ if(rateInput){
 
   if (shouldShowAnnualClosure()) {
     rateContainer.innerHTML = `
-      <div style="background:#fff3e0;padding:10px;border-radius:6px;border:1px solid #ff9800;margin-top:10px;">
-        <label><b>Taux horaire (€)</b></label>
-        <input type="number" id="hourlyRateInput" step="0.5"
-        value="${annualRate}"
-   <input type="number" id="hourlyRateInput" step="0.5" value="${annualRate}">
-      </div>`;
+  <div style="background:#fff3e0;padding:10px;border-radius:6px;border:1px solid #ff9800;margin-top:10px;">
+    <label><b>Taux horaire (€)</b></label>
+    <input
+      type="number"
+      id="hourlyRateInput"
+      step="0.5"
+      value="${annualRate}"
+    >
+  </div>
+`;
+const rateInput = document.getElementById("hourlyRateInput");
+if(rateInput){
+  rateInput.oninput = () => {
+    const v = Number(rateInput.value);
+    annualRate = isNaN(v) ? 10 : v;
+    localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
+    if (typeof calculate === "function") calculate();
+  };
+}
 
     const rate = annualRate || 10;
     const paiement = net * rate;
