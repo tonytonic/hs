@@ -1231,18 +1231,16 @@ function toggleChangeCode(){
 ======================= */
 
 function save(){
-  createSnapshot("save");
   localStorage.setItem(
-  `${STORAGE_PREFIX}_AUTO_SAVE_DATE`,
-  Date.now()
-);
-  // 🔥 charger toutes les années connues
+    `${STORAGE_PREFIX}_AUTO_SAVE_DATE`,
+    Date.now()
+  );
+
   recalcCascade();
 
-// 💾 sauvegarde TOUTES les années chargées
-Object.entries(ALL_DATA).forEach(([year, yearData])=>{
-  saveYearData(year, yearData);
-});
+  Object.entries(ALL_DATA).forEach(([year, yearData])=>{
+    saveYearData(year, yearData);
+  });
 
   updateSaveBadge();
 }
@@ -1274,7 +1272,17 @@ function updateSaveBadge(){
     console.warn("🧪 MODE DEBUG DÉVERROUILLÉ");
   }
 })();
+function prepareExport(){
+  createSnapshot("before_export"); // ✅ SNAP UTILE
+  recalcCascade();   // 🔥 vérité métier
+  saveYearData(
+    getYearFromMonth(currentKey),
+    ALL_DATA[getYearFromMonth(currentKey)]
+  );
+}
 function exportJSON(){
+  prepareExport(); // ✅ AJOUT CRITIQUE
+
   const year = getYearFromMonth(currentKey);
 
 const payload = {
@@ -1328,6 +1336,7 @@ function closeTutorial(){
   document.getElementById("tutorialModal").classList.remove("open");
 }
 function exportMonthlyPDF(){
+  prepareExport(); // ✅ AJOUT
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
@@ -1413,6 +1422,7 @@ function formatDate(d){
   return d.toLocaleDateString("fr-FR");
 }
 function exportAnnualPDF(){
+  prepareExport(); // ✅ AJOUT
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
@@ -1576,6 +1586,7 @@ function importJSONFile(e){
   const reader = new FileReader();
 
   reader.onload = () => {
+    createSnapshot("before_import");
   let payload;
   let dataVersion = "1.0";
 
