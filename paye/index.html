@@ -501,10 +501,12 @@ function openRecovery(){
   document.getElementById("recoveryModal").classList.add("open");
   renderSnapshots();
 }
-function createSnapshot(reason="auto"){
+function createSnapshot(reason="auto", force=false){
   try{
-    const last = Number(localStorage.getItem("SNAP_LAST") || 0);
-    if(Date.now() - last < 60_000) return; // 1 min
+    if(!force){
+      const last = Number(localStorage.getItem("SNAP_LAST") || 0);
+      if(Date.now() - last < 60_000) return;
+    }
 
     localStorage.setItem("SNAP_LAST", Date.now());
 
@@ -522,10 +524,7 @@ function createSnapshot(reason="auto"){
 
     snaps.splice(SNAP_LIMIT);
 
-    localStorage.setItem(
-      SNAP_KEY,
-      JSON.stringify(snaps)
-    );
+    localStorage.setItem(SNAP_KEY, JSON.stringify(snaps));
   }catch(e){
     console.warn("⚠️ Snapshot échoué", e);
   }
@@ -1273,8 +1272,8 @@ function updateSaveBadge(){
   }
 })();
 function prepareExport(){
-  createSnapshot("before_export"); // ✅ SNAP UTILE
-  recalcCascade();   // 🔥 vérité métier
+  createSnapshot("before_export", true); // 🔥 FORCÉ
+  recalcCascade();
   saveYearData(
     getYearFromMonth(currentKey),
     ALL_DATA[getYearFromMonth(currentKey)]
