@@ -447,13 +447,6 @@ window.addEventListener("load", ()=>{
     document.getElementById("legalModal").classList.add("open");
     return;
   }
-
-  /* 👋 Onboarding */
-  if(!localStorage.getItem("ONBOARDING_DONE")){
-    document.getElementById("onboardingModal").classList.add("open");
-  }
-
-});
 function acceptLegal(){
   localStorage.setItem("LEGAL_OK","1");
   document.getElementById("legalModal").classList.remove("open");
@@ -1821,14 +1814,6 @@ function handleFatalError(err){
 </div>
 
 <script>
-window.addEventListener("load", () => {
-  const el = document.getElementById("versionBadge");
-  if(el){
-    el.textContent = "v" + APP_VERSION;
-    console.log("✅ Version affichée :", APP_VERSION);
-  }
-});
-</script>
 <footer
   id="debugTrigger"
   style="margin-top:30px;text-align:center;font-size:12px;color:#777;cursor:pointer">
