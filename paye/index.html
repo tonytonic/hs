@@ -447,10 +447,7 @@ window.addEventListener("load", ()=>{
     document.getElementById("legalModal").classList.add("open");
     return;
   }
-function acceptLegal(){
-  localStorage.setItem("LEGAL_OK","1");
-  document.getElementById("legalModal").classList.remove("open");
-}
+
 
 
   if(!localStorage.getItem("ONBOARDING_DONE")){
@@ -486,6 +483,10 @@ function kData(year){
     }
   }
 })();
+function acceptLegal(){
+  localStorage.setItem("LEGAL_OK","1");
+  document.getElementById("legalModal").classList.remove("open");
+}
 function simulateCrash(){
   console.warn("💥 CRASH SIMULÉ");
   handleFatalError({
