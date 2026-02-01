@@ -1214,6 +1214,15 @@ function updateSaveBadge(){
     "🟢 Sauvegarde locale : " +
     new Date(stamp).toLocaleString();
 }
+(function enableDebugIfNeeded(){
+  if(localStorage.getItem("CA_DEBUG") === "1"){
+    document
+      .querySelectorAll(".debug-only")
+      .forEach(el => el.style.display = "block");
+
+    console.warn("🧪 MODE DEBUG DÉVERROUILLÉ");
+  }
+})();
 function exportJSON(){
   const year = getYearFromMonth(currentKey);
 
@@ -1742,6 +1751,41 @@ function handleFatalError(err){
     officiels de l’employeur font foi.
   </p>
 </div>
+/* =======================
+   🔐 DEBUG CACHÉ SÉCURISÉ
+======================= */
+
+const DEBUG_CODE = "1234";
+
+document
+  .getElementById("debugTrigger")
+  .addEventListener("click", ()=>{
+    document.getElementById("debugGate").classList.add("open");
+  });
+
+function closeDebugGate(){
+  document.getElementById("debugGate").classList.remove("open");
+}
+
+function validateDebugAccess(){
+  const input = document.getElementById("debugCode").value;
+
+  if(input !== DEBUG_CODE){
+    alert("❌ Code incorrect");
+    return;
+  }
+
+  alert(
+    "🧪 Test de crash requis.\n" +
+    "L’application va volontairement planter."
+  );
+
+  // autorise le debug APRÈS redémarrage
+  localStorage.setItem("CA_DEBUG","1");
+
+  // 🔥 crash volontaire obligatoire
+  simulateCrash();
+}
 <script>
 window.addEventListener("load", () => {
   const el = document.getElementById("versionBadge");
@@ -1751,8 +1795,10 @@ window.addEventListener("load", () => {
   }
 });
 </script>
-<footer style="margin-top:30px;text-align:center;font-size:12px;color:#777">
-  © Tous droits réservés – C. Anthony<br>
+<footer
+  id="debugTrigger"
+  style="margin-top:30px;text-align:center;font-size:12px;color:#777;cursor:pointer">
+  © C. Anthony<br>
   Outil indicatif – ne constitue pas un bulletin de paie
 </footer>
    <script>
