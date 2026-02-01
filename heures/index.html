@@ -315,6 +315,10 @@ textarea{
     <hr>
     <h2>Jours fériés</h2>
     <button onclick="importFeries()">🇫🇷 Importer les jours fériés officiels</button>
+    <label style="display:block;margin-top:10px;">
+  <input type="checkbox" id="autoFerieToggle">
+  🎌 Activer le mode férié automatique (–7h en semaine)
+</label>
 <hr>
 <button
   onclick="resetCurrentExercise()"
@@ -705,6 +709,8 @@ let exerciseStart = localStorage.getItem(STORAGE.exerciseStart) || "";
 let periodMeta = JSON.parse(localStorage.getItem(STORAGE.periodMeta)) || {}
 let BASE_HEBDO =
   Number(localStorage.getItem("BASE_HEBDO_" + currentSuffix)) || 35;
+  let AUTO_FERIE =
+  localStorage.getItem("AUTO_FERIE_" + currentSuffix) === "true";
 const DAILY_WORK_HOURS = 7; // base journalière légale
 // OPTION : autoriser la récup même sans heures sup le même jour
 const ALLOW_RECUP_FREE = true;
@@ -1045,10 +1051,16 @@ function calculate(){
 
     let absentHours = v.absent || 0;
 
-    // 🎌 jour férié chômé
-    if(specialDays[date] === "ferie" && dow !== 0 && dow !== 6){
-      absentHours = DAILY_WORK_HOURS;
-    }
+    // 🎌 férié automatique (si activé)
+if(
+  AUTO_FERIE &&
+  specialDays[date] === "ferie" &&
+  dow !== 0 &&
+  dow !== 6 &&
+  !v.extra
+){
+  absentHours = DAILY_WORK_HOURS;
+}
 
     weeks[weekKey] = (weeks[weekKey] || 0) + (v.extra || 0);
 
@@ -1428,6 +1440,18 @@ function update(){
   calculate()
   applyConfigLock()
   updateSaveBadges()
+  const autoFerieToggle = document.getElementById("autoFerieToggle");
+if(autoFerieToggle){
+  autoFerieToggle.checked = AUTO_FERIE;
+  autoFerieToggle.onchange = () => {
+    AUTO_FERIE = autoFerieToggle.checked;
+    localStorage.setItem(
+      "AUTO_FERIE_" + currentSuffix,
+      AUTO_FERIE
+    );
+    update();
+  };
+}
 
   // 🔔 Bandeau période active
   const banner = document.getElementById("activePeriodBanner")
