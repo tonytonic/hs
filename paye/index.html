@@ -47,6 +47,16 @@
   --danger:#c0392b;
   --success:#2ecc71;
 }
+#versionBadge{
+  position: fixed;
+  bottom: 6px;
+  right: 10px;
+  font-size: 11px;
+  opacity: 0.45;
+  color: #9aa0a6;
+  z-index: 9999;
+  user-select: none;
+}
 
 body{
   margin:0;
@@ -432,6 +442,12 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
+(function showVersion(){
+  const el = document.getElementById("versionBadge");
+  if(el){
+    el.textContent = "v" + APP_VERSION;
+  }
+})();
 (function autoRefreshPWA(){
   const key = "CA_APP_VERSION";
   const last = localStorage.getItem(key);
@@ -1665,6 +1681,6 @@ function handleFatalError(err){
   // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-
+<div id="versionBadge"></div>
 </body>
 </html>
