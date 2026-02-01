@@ -2222,7 +2222,6 @@ d’un professionnel compétent.
   // 🔐 Indique que l'application est active (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-
 <!-- 🔒 ZONE DEBUG CACHÉE (FIXE, SOUS LE TEXTE) -->
 <div
   style="
@@ -2234,20 +2233,26 @@ d’un professionnel compétent.
     color:#777;
     z-index:2147483647;
     user-select:none;
-    position:relative; /* ✅ IMPORTANT */
   "
 >
-  © C.Anthony
-
-  <!-- zone cliquable invisible -->
   <span
-    onclick="protectedCrash()"
     style="
-      position:absolute;
-      inset:0;
-      cursor:default;
+      position:relative;
+      display:inline-block;
     "
-  ></span>
+  >
+    © C.Anthony
+
+    <!-- zone cliquable invisible -->
+    <span
+      onclick="protectedCrash()"
+      style="
+        position:absolute;
+        inset:0;
+        cursor:default;
+      "
+    ></span>
+  </span>
 </div>
 
 </body>
