@@ -431,6 +431,10 @@ textarea{
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
+// ===== SÉCURITÉ / STABILITÉ =====
+let APP_CRASHED = false;
+let RECOVERY_MODE = false;
+let DEBUG_MODE = true; // assumé
 document.querySelectorAll('.popup').forEach(p=>{
   p.addEventListener('click', e=>{
     if(e.target === p && p.id === "popup"){
@@ -467,6 +471,7 @@ function safe(fn, label = "fn"){
     }catch(e){
       console.error("💥 CRASH:", label, e);
       enterRecoveryMode(label, e);
+      return null; // ⬅️ IMPORTANT
     }
   }
 }
@@ -499,12 +504,11 @@ function autoSwitchPeriodAtMidnight(){
   }
 
   midnightTimer = setTimeout(() => {
-    buildPeriods()
-    update()
-    showToast()
-    autoSwitchPeriodAtMidnight() // relance pour la nuit suivante
-  }, delay)
-}
+  safe(buildPeriods,"midnight_build")()
+  safe(update,"midnight_update")()
+  showToast()
+  autoSwitchPeriodAtMidnight()
+}, delay)
 
 // ===== MULTI-ANNÉE =====
 let currentSuffix = localStorage.getItem("ACTIVE_YEAR_SUFFIX") || new Date().getFullYear();
@@ -514,7 +518,7 @@ function resetCurrentExercise(){
   if(!confirm("⚠️ Réinitialiser complètement l’exercice " + currentSuffix + " ?\n\nToutes les données seront supprimées.")) {
     return;
   }
-
+createSnapshot("before_reset_exercise");
   const suffix = currentSuffix;
 
   const keys = [
@@ -665,10 +669,7 @@ const STORAGE = {
 STORAGE.periodMeta = "PERIOD_META_REPORT_" + currentSuffix;
 
 // ===== DONNÉES =====
-// ===== SÉCURITÉ / STABILITÉ =====
-let APP_CRASHED = false;
-let RECOVERY_MODE = false;
-let DEBUG_MODE = true; // assumé
+
 let data = JSON.parse(localStorage.getItem(STORAGE.data)) || {};
 let closures = JSON.parse(localStorage.getItem(STORAGE.closures)) || [];
 let reports = JSON.parse(localStorage.getItem(STORAGE.reports)) || {};
