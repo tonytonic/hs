@@ -1554,15 +1554,16 @@ function importJSONFile(e){
   const reader = new FileReader();
 
   reader.onload = () => {
-    let payload;
+  let payload;
+  let dataVersion = "1.0";
 
-    try{
-      payload = JSON.parse(reader.result);
-      const dataVersion = payload.dataVersion || "1.0";
-    }catch{
-      alert("❌ Fichier JSON invalide");
-      return;
-    }
+  try{
+    payload = JSON.parse(reader.result);
+    dataVersion = payload.dataVersion || "1.0";
+  }catch{
+    alert("❌ Fichier JSON invalide");
+    return;
+  }
 
     /* =====================
        VALIDATIONS DE BASE
@@ -1587,7 +1588,7 @@ function importJSONFile(e){
 ===================== */
 if(dataVersion === "1.0"){
   Object.values(payload.DATA).forEach(month=>{
-    if(typeof month.locked !== "boolean"){
+    if(typeof month.closing !== "number") month.closing = null;
       month.locked = false;
     }
   });
