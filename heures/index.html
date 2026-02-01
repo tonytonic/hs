@@ -464,6 +464,21 @@ function enterRecoveryMode(source, error){
     "Aucune donnée n’a été supprimée."
   );
 }
+// 💥 SIMULATEUR DE CRASH (DEBUG)
+function simulateCrash(){
+  console.warn("💥 Crash simulé volontairement (DEBUG)");
+  undefinedVariable.forceCrash();
+}
+function protectedCrash(){
+  const code = prompt("🔒 Zone protégée\n\nEntrez le code :");
+  if(code === null) return;
+
+  if(code === "1234"){
+    simulateCrash();
+  } else {
+    alert("❌ Code incorrect");
+  }
+}
 function safe(fn, label = "fn"){
   return function(...args){
     try{
@@ -1969,7 +1984,14 @@ function closeLegalPopup(){
   </div>
 </div>
 <p style="text-align:center; font-size:12px; color:#666; margin-top:30px;">
-  © Tous droits réservés C.Anthony ·
+  © Tous droits réservés 
+<span
+  style="cursor:pointer"
+  onclick="protectedCrash()"
+  title="© C.Anthony"
+>
+  C.Anthony
+</span> ·
   <a href="#" onclick="openLegalPopup()" style="margin-right:10px">
   ℹ️ Informations légales & calcul
 </a>
