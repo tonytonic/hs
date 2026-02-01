@@ -1074,17 +1074,6 @@ if (AUTO_FERIE) {
 
     let absentHours = v.absent || 0;
 
-    // 🎌 férié automatique (si activé)
-if(
-  AUTO_FERIE &&
-  specialDays[date] === "ferie" &&
-  dow !== 0 &&
-  dow !== 6 &&
-  !v.extra
-){
-  absentHours = DAILY_WORK_HOURS;
-}
-
     weeks[weekKey] = (weeks[weekKey] || 0) + (v.extra || 0);
 
     if(dow !== 0 && dow !== 6){
