@@ -215,6 +215,29 @@ input[type="number"]{
 </head>
 
 <body>
+  <div class="modal" id="debugGate">
+  <div class="modal-content">
+    <h3>🧪 Accès debug sécurisé</h3>
+
+    <p style="font-size:14px">
+      Avant toute intervention, un <b>test de crash</b> est obligatoire.
+    </p>
+
+    <input
+      type="password"
+      id="debugCode"
+      placeholder="Code requis (1234)"
+    >
+
+    <button class="danger" onclick="validateDebugAccess()">
+      💥 Tester le crash maintenant
+    </button>
+
+    <button class="secondary" onclick="closeDebugGate()">
+      Annuler
+    </button>
+  </div>
+</div>
 <div class="modal" id="recoveryModal">
   <div class="modal-content">
     <h2>🛠️ Mode récupération</h2>
@@ -317,12 +340,7 @@ input[type="number"]{
    <button onclick="exportMonthlyPDF()">📄 PDF mensuel détaillé</button>
 <button onclick="exportAnnualPDF()">📕 PDF annuel récapitulatif</button>
 </div>
-<div class="card">
-  <h3>🧪 Debug interne</h3>
-  <button class="danger" onclick="simulateCrash()">
-    💥 Simuler un crash (test interne)
-  </button>
-</div>
+
 
 
 
@@ -1667,6 +1685,41 @@ function renderSnapshots(){
     `).join("")
     : "<p style='font-size:12px;color:#aaa'>Aucun snapshot</p>";
 }
+/* =======================
+   🔐 DEBUG CACHÉ SÉCURISÉ
+======================= */
+
+const DEBUG_CODE = "1234";
+
+document
+  .getElementById("debugTrigger")
+  .addEventListener("click", ()=>{
+    document.getElementById("debugGate").classList.add("open");
+  });
+
+function closeDebugGate(){
+  document.getElementById("debugGate").classList.remove("open");
+}
+
+function validateDebugAccess(){
+  const input = document.getElementById("debugCode").value;
+
+  if(input !== DEBUG_CODE){
+    alert("❌ Code incorrect");
+    return;
+  }
+
+  alert(
+    "🧪 Test de crash requis.\n" +
+    "L’application va volontairement planter."
+  );
+
+  // autorise le debug APRÈS redémarrage
+  localStorage.setItem("CA_DEBUG","1");
+
+  // 🔥 crash volontaire obligatoire
+  simulateCrash();
+}
 function handleFatalError(err){
   console.error("💥 ERREUR CAPTURÉE", err);
   localStorage.setItem("CA_HS_RECOVERY_MODE", "1");
@@ -1751,41 +1804,7 @@ function handleFatalError(err){
     officiels de l’employeur font foi.
   </p>
 </div>
-/* =======================
-   🔐 DEBUG CACHÉ SÉCURISÉ
-======================= */
 
-const DEBUG_CODE = "1234";
-
-document
-  .getElementById("debugTrigger")
-  .addEventListener("click", ()=>{
-    document.getElementById("debugGate").classList.add("open");
-  });
-
-function closeDebugGate(){
-  document.getElementById("debugGate").classList.remove("open");
-}
-
-function validateDebugAccess(){
-  const input = document.getElementById("debugCode").value;
-
-  if(input !== DEBUG_CODE){
-    alert("❌ Code incorrect");
-    return;
-  }
-
-  alert(
-    "🧪 Test de crash requis.\n" +
-    "L’application va volontairement planter."
-  );
-
-  // autorise le debug APRÈS redémarrage
-  localStorage.setItem("CA_DEBUG","1");
-
-  // 🔥 crash volontaire obligatoire
-  simulateCrash();
-}
 <script>
 window.addEventListener("load", () => {
   const el = document.getElementById("versionBadge");
