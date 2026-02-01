@@ -1,6 +1,6 @@
 {
-  "name": "Compteur Heures & Paie",
-  "short_name": "Heures Sup",
+  "name": "simulateur hs",
+  "short_name": "HS",
   "start_url": "index.html",
   "scope": "./",
   "display": "standalone",
