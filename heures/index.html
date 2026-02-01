@@ -2222,23 +2222,27 @@ d’un professionnel compétent.
   // 🔐 Indique que l'application est active (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-<!-- 🔒 ZONE DEBUG CACHÉE (FIXE, SOUS LE TEXTE) -->
+<!-- 🔒 ZONE DEBUG CACHÉE — FIXÉE AU BAS DE L’ÉCRAN -->
 <div
   style="
     position:fixed;
-    bottom:8px;
-    left:50%;
-    transform:translateX(-50%);
+    left:0;
+    right:0;
+    bottom:0;
+    padding-bottom:env(safe-area-inset-bottom);
+    text-align:center;
     font-size:12px;
     color:#777;
     z-index:2147483647;
     user-select:none;
+    pointer-events:auto;
   "
 >
   <span
     style="
       position:relative;
       display:inline-block;
+      padding:6px 0;
     "
   >
     © C.Anthony
@@ -2254,6 +2258,5 @@ d’un professionnel compétent.
     ></span>
   </span>
 </div>
-
 </body>
 </html>
