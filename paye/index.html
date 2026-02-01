@@ -461,8 +461,10 @@ window.addEventListener("load", ()=>{
 ======================= */
 const STORAGE_PREFIX = "CA_HS_TRACKER_V1";
 const APP_VERSION = "1.3.1";
+
 const SNAP_KEY = `${STORAGE_PREFIX}_SNAPSHOTS`;
 const SNAP_LIMIT = 5;
+const DATA_VERSION = "1.0";
 
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
@@ -1256,7 +1258,8 @@ function exportJSON(){
 const payload = {
   exportedAt: new Date().toISOString(),
   year,
-  version: "1.2",
+  appVersion: APP_VERSION,
+  dataVersion: DATA_VERSION,
   DATA,
   SETTINGS
 };
@@ -1555,6 +1558,7 @@ function importJSONFile(e){
 
     try{
       payload = JSON.parse(reader.result);
+      const dataVersion = payload.dataVersion || "1.0";
     }catch{
       alert("❌ Fichier JSON invalide");
       return;
@@ -1578,7 +1582,24 @@ function importJSONFile(e){
       alert("❌ Année invalide dans le fichier");
       return;
     }
-
+/* =====================
+   🔁 MIGRATION VERSION
+===================== */
+if(dataVersion === "1.0"){
+  Object.values(payload.DATA).forEach(month=>{
+    if(typeof month.locked !== "boolean"){
+      month.locked = false;
+    }
+  });
+}
+if(payload.appVersion && payload.appVersion !== APP_VERSION){
+  console.warn(
+    "⚠️ Import depuis une autre version de l’app :",
+    payload.appVersion,
+    "→",
+    APP_VERSION
+  );
+}
     /* =====================
        CHARGEMENT ANNÉE
     ===================== */
