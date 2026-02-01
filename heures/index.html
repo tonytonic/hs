@@ -109,13 +109,15 @@ textarea{
   inset:0;
   background:rgba(0,0,0,.5);
   display:none;
-
-  /* Bottom sheet mobile */
   align-items:flex-end;
   justify-content:center;
-
   z-index:1000;
   pointer-events:auto;
+
+  /* 🔧 FIX TRAIT NOIR iOS */
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .popup-content{
   background:#fff;
