@@ -488,7 +488,7 @@ function safe(fn, label = "fn"){
     }catch(e){
       console.error("💥 CRASH:", label, e);
       enterRecoveryMode(label, e);
-      return null; // ⬅️ IMPORTANT
+      return undefined; // ✅ NE JAMAIS retourner null
     }
   }
 }
@@ -881,7 +881,10 @@ function applyConfigLock(){
   }
 }
 function getCurrentPeriod(){
-  let start = getBaseStartDate()
+  const base = getBaseStartDate();
+  if(!base) return null;
+
+  let start = base;
 
   for(let i = 0; i <= closures.length; i++){
     const end = i < closures.length ? new Date(closures[i]) : new Date(2099,11,31)
@@ -1132,6 +1135,15 @@ localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
   // --- 4. TAUX ET CLÔTURE (IMAGE 5 - Toujours avec 10€ par défaut) ---
   const rateContainer = document.getElementById("rateContainer");
   rateContainer.innerHTML = "";
+  const rateInput = document.getElementById("hourlyRateInput");
+if(rateInput){
+  rateInput.oninput = () => {
+    const v = Number(rateInput.value);
+    annualRate = isNaN(v) ? 10 : v;
+    localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
+    if (typeof calculate === "function") calculate();
+  };
+}
 
   if (shouldShowAnnualClosure()) {
     rateContainer.innerHTML = `
@@ -1139,9 +1151,7 @@ localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
         <label><b>Taux horaire (€)</b></label>
         <input type="number" id="hourlyRateInput" step="0.5"
         value="${annualRate}"
-   oninput="annualRate = Number(this.value) || 10;
-localStorage.setItem('ANNUAL_RATE_' + currentSuffix, annualRate);
-calculate()"
+   <input type="number" id="hourlyRateInput" step="0.5" value="${annualRate}">
       </div>`;
 
     const rate = annualRate || 10;
@@ -1940,11 +1950,11 @@ if(crashState){
   console.warn("⚠️ Dernier crash détecté:", crashState);
 }
 document.addEventListener("DOMContentLoaded", () => {
+  protectFunctions();          // 🔒 TOUJOURS EN PREMIER
   initSelectors();
   applyConfigLock();
   buildPeriods();
   autoSwitchPeriodAtMidnight();
-  protectFunctions(); // 👈 TRÈS IMPORTANT
 });
 
 function openLegalPopup(){
