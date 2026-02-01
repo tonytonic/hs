@@ -429,20 +429,36 @@ if(RECOVERY_ACTIVE){
   console.warn("🛠️ MODE RÉCUPÉRATION ACTIVÉ");
 }
 window.addEventListener("load", ()=>{
+
+  /* 🔢 Version */
+  const v = document.getElementById("versionBadge");
+  if(v){
+    v.textContent = "v" + APP_VERSION;
+  }
+
+  /* 🛠️ Recovery prioritaire */
   if(RECOVERY_ACTIVE){
     openRecovery();
     return;
   }
+
+  /* ⚠️ Avertissement légal */
+  if(!localStorage.getItem("LEGAL_OK")){
+    document.getElementById("legalModal").classList.add("open");
+    return;
+  }
+
+  /* 👋 Onboarding */
+  if(!localStorage.getItem("ONBOARDING_DONE")){
+    document.getElementById("onboardingModal").classList.add("open");
+  }
+
 });
 function acceptLegal(){
   localStorage.setItem("LEGAL_OK","1");
   document.getElementById("legalModal").classList.remove("open");
 }
-window.addEventListener("load",()=>{
-  if(!localStorage.getItem("LEGAL_OK")){
-    document.getElementById("legalModal").classList.add("open");
-    return;
-  }
+
 
   if(!localStorage.getItem("ONBOARDING_DONE")){
   document.getElementById("onboardingModal").classList.add("open");
