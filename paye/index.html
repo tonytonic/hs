@@ -1700,11 +1700,14 @@ function renderSnapshots(){
 
 const DEBUG_CODE = "1234";
 
-document
-  .getElementById("debugTrigger")
-  .addEventListener("click", ()=>{
-    document.getElementById("debugGate").classList.add("open");
-  });
+window.addEventListener("DOMContentLoaded", ()=>{
+  const dbg = document.getElementById("debugTrigger");
+  if(dbg){
+    dbg.addEventListener("click", ()=>{
+      document.getElementById("debugGate").classList.add("open");
+    });
+  }
+});
 
 function closeDebugGate(){
   document.getElementById("debugGate").classList.remove("open");
@@ -1813,17 +1816,13 @@ function handleFatalError(err){
     officiels de l’employeur font foi.
   </p>
 </div>
-
-<script>
 <footer
   id="debugTrigger"
   style="margin-top:30px;text-align:center;font-size:12px;color:#777;cursor:pointer">
   © C. Anthony<br>
   Outil indicatif – ne constitue pas un bulletin de paie
 </footer>
-   <script>
-  // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
-  sessionStorage.setItem("appAlive", "true");
-</script>
+<script>
+<div id="versionBadge"></div>
 </body>
 </html>
