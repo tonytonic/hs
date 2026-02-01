@@ -439,7 +439,44 @@ document.querySelectorAll('.popup').forEach(p=>{
   });
 });
 let midnightTimer = null
+function enterRecoveryMode(source, error){
+  if(RECOVERY_MODE) return;
 
+  RECOVERY_MODE = true;
+  APP_CRASHED = true;
+
+  localStorage.setItem(
+    "APP_CRASH_STATE",
+    JSON.stringify({
+      at: new Date().toISOString(),
+      source,
+      message: String(error)
+    })
+  );
+
+  alert(
+    "⚠️ Une erreur est survenue.\n\n" +
+    "L’application est passée en mode récupération.\n" +
+    "Aucune donnée n’a été supprimée."
+  );
+}
+function safe(fn, label = "fn"){
+  return function(...args){
+    try{
+      return fn.apply(this, args);
+    }catch(e){
+      console.error("💥 CRASH:", label, e);
+      enterRecoveryMode(label, e);
+    }
+  }
+}
+window.onerror = function(msg, src, line, col, err){
+  enterRecoveryMode("window.onerror", err || msg);
+};
+
+window.addEventListener("unhandledrejection", e=>{
+  enterRecoveryMode("promise", e.reason);
+});
 function goMenu() {
     localStorage.removeItem("lastApp");
     window.location.href = "../menu.html";
@@ -628,6 +665,10 @@ const STORAGE = {
 STORAGE.periodMeta = "PERIOD_META_REPORT_" + currentSuffix;
 
 // ===== DONNÉES =====
+// ===== SÉCURITÉ / STABILITÉ =====
+let APP_CRASHED = false;
+let RECOVERY_MODE = false;
+let DEBUG_MODE = true; // assumé
 let data = JSON.parse(localStorage.getItem(STORAGE.data)) || {};
 let closures = JSON.parse(localStorage.getItem(STORAGE.closures)) || [];
 let reports = JSON.parse(localStorage.getItem(STORAGE.reports)) || {};
@@ -1174,8 +1215,35 @@ function save(){
 }
 
 function isIOS(){return /iPad|iPhone|iPod/.test(navigator.userAgent)}
+function createSnapshot(label){
+  const key = "SNAPSHOT_" + Date.now();
+  const payload = {
+    label,
+    date: new Date().toISOString(),
+    data,
+    closures,
+    reports,
+    periodMeta,
+    exerciseStart,
+    annualDate,
+    specialDays,
+    BASE_HEBDO,
+    annualRate
+  };
 
+  localStorage.setItem(key, JSON.stringify(payload));
+
+  // rotation max 5
+  const snaps = Object.keys(localStorage)
+    .filter(k => k.startsWith("SNAPSHOT_"))
+    .sort();
+
+  while(snaps.length > 5){
+    localStorage.removeItem(snaps.shift());
+  }
+}
 function exportJSON(){
+  createSnapshot("before_export");
   const payload = {
     version: 1,                // ✅ version
     exercise: currentSuffix,   // ✅ année d’exercice
@@ -1300,7 +1368,7 @@ function loadJSON(text){
   )){
     return;
   }
-
+createSnapshot("before_import");
   // 6️⃣ Import réel (SANS RISQUE D’ÉCRASER UNE AUTRE ANNÉE)
   data = obj.data;
   closures = obj.closures;
@@ -1429,6 +1497,7 @@ exerciseStartInput.onchange = ()=>{
 
   // ===== FONCTION DE VÉRIFICATION DU MOIS EXACT =====
 function exportMonthlyFullPDF(){
+  createSnapshot("before_export");
   const { jsPDF } = window.jspdf
   const pdf = new jsPDF()
 
@@ -1516,6 +1585,7 @@ if(period){
   pdf.save(`mensuel_${monthName}_${viewYear}.pdf`)
 }
 function exportAnnualPDF(){
+  createSnapshot("before_export");
   const { jsPDF } = window.jspdf
   const pdf = new jsPDF()
 
@@ -1674,6 +1744,7 @@ annualNet += net
 pdf.save(`annuel_${currentSuffix}.pdf`)
 }
 function exportPeriodPDF(){
+  createSnapshot("before_export");
   const { jsPDF } = window.jspdf
   const pdf = new jsPDF()
 
@@ -1845,7 +1916,19 @@ document.querySelectorAll("details.section").forEach(d => {
     }
   });
 });
-
+update = safe(update, "update");
+calculate = safe(calculate, "calculate");
+generateCalendar = safe(generateCalendar, "calendar");
+buildPeriods = safe(buildPeriods, "periods");
+exportJSON = safe(exportJSON, "exportJSON");
+loadJSON = safe(loadJSON, "importJSON");
+exportMonthlyFullPDF = safe(exportMonthlyFullPDF, "pdf_month");
+exportAnnualPDF = safe(exportAnnualPDF, "pdf_annual");
+exportPeriodPDF = safe(exportPeriodPDF, "pdf_period");
+const crashState = localStorage.getItem("APP_CRASH_STATE");
+if(crashState){
+  console.warn("⚠️ Dernier crash détecté:", crashState);
+}
 initSelectors()
 applyConfigLock();
 buildPeriods()
