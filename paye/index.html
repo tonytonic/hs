@@ -581,8 +581,24 @@ let SETTINGS = JSON.parse(
   localStorage.getItem(kSettings()) || "{}"
 );
 let ALL_DATA = {}; // 🔑 cache de toutes les années
+/* =======================
+   🔄 PRÉCHARGEMENT ANNÉES
+======================= */
+(function preloadAllYears(){
+  const index = JSON.parse(localStorage.getItem(kIndex()) || "[]");
+
+  index.forEach(year=>{
+    try{
+      ALL_DATA[year] = loadYearData(year);
+    }catch(e){
+      console.warn("⚠️ Impossible de charger l’année", year);
+      ALL_DATA[year] = {};
+    }
+  });
+})();
 let currentKey="", currentDay=null, unlocked=false;
 const closingDate = document.getElementById("closingDate");
+
 /* =======================
    INIT
 ======================= */
@@ -622,8 +638,8 @@ function getPeriodBounds(monthKey){
   let start;
 
   const prevYear = prevKey.split("-")[0];
-const prevMonth =
-  ALL_DATA[prevYear] && ALL_DATA[prevYear][prevKey];
+const prevYearData = ALL_DATA[prevYear] || {};
+const prevMonth = prevYearData[prevKey];
 
 if(prevMonth && prevMonth.closing){
     // lundi suivant la clôture précédente (clôture = dimanche)
@@ -649,6 +665,9 @@ function goMenu() {
 function loadMonth(){
   currentKey = monthPicker.value;
   const year = getYearFromMonth(currentKey);
+  if(!ALL_DATA[year]){
+  ALL_DATA[year] = {};
+}
 
 registerYear(year);
 
@@ -965,7 +984,9 @@ function getPreviousCarry(monthKey){
   const allMonths = [];
 
   Object.values(ALL_DATA).forEach(yearData=>{
-    Object.keys(yearData).forEach(key=>{
+  if(!yearData || typeof yearData !== "object") return;
+
+  Object.keys(yearData).forEach(key=>{
       if(/^\d{4}-\d{2}$/.test(key)){
         allMonths.push({ key, month: yearData[key] });
       }
@@ -1425,7 +1446,9 @@ function recalcCascade(){
   const allMonths = [];
 
   Object.values(ALL_DATA).forEach(yearData=>{
-    Object.keys(yearData).forEach(key=>{
+  if(!yearData || typeof yearData !== "object") return;
+
+  Object.keys(yearData).forEach(key=>{
       if(/^\d{4}-\d{2}$/.test(key)){
         allMonths.push({ key, month: yearData[key] });
       }
