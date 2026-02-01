@@ -442,7 +442,7 @@ const SNAP_LIMIT = 5;
 function kData(year){
   return `${STORAGE_PREFIX}_DATA_${year}`;
 }
-function showVersion(){
+(function showVersion(){
   const el = document.getElementById("versionBadge");
   if(el){
     el.textContent = "v" + APP_VERSION;
@@ -1681,6 +1681,12 @@ function handleFatalError(err){
   // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-<div id="versionBadge"></div>
+window.addEventListener("load", () => {
+  const el = document.getElementById("versionBadge");
+  if(el){
+    el.textContent = "v" + APP_VERSION;
+    console.log("✅ Version affichée :", APP_VERSION);
+  }
+});
 </body>
 </html>
