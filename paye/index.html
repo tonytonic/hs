@@ -1516,6 +1516,14 @@ function safe(fn){
     }
   };
 }
+/* =======================
+   🧯 PROTECTION DES FONCTIONS CRITIQUES
+======================= */
+
+recalc = safe(recalc);
+renderCalendar = safe(renderCalendar);
+loadMonth = safe(loadMonth);
+save = safe(save);
 function renderSnapshots(){
   const list = document.getElementById("snapshotList");
   if(!list) return;
@@ -1591,14 +1599,7 @@ function handleFatalError(err){
 
   document.body.appendChild(overlay);
 }
-/* =======================
-   🧯 PROTECTION DES FONCTIONS CRITIQUES
-======================= */
 
-recalc = safe(recalc);
-renderCalendar = safe(renderCalendar);
-loadMonth = safe(loadMonth);
-save = safe(save);
 </script>
 
 <div class="card" style="font-size:13px;color:#aaa">
