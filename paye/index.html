@@ -1546,20 +1546,26 @@ function recalcCascade(){
 
   let runningCarry = 0;
 
-  allMonths.forEach(({ key, month }) => {
+  allMonths.forEach(({ key }) => {
     const { start, end } = getPeriodBounds(key);
-    const [y, m] = key.split("-").map(Number);
 
     let periodHours = 0;
 
-    // ✅ UNIQUEMENT les heures de la période
-    Object.entries(month.days || {}).forEach(([d, h]) => {
-      const date = new Date(y, m - 1, d);
-      if(date >= start && date <= end){
-        periodHours += h;
-      }
+    // 🔥 PARCOURT TOUTES LES HEURES, TOUS LES MOIS
+    Object.entries(ALL_DATA).forEach(([year, yearData]) => {
+      Object.entries(yearData || {}).forEach(([monthKey, month]) => {
+        Object.entries(month.days || {}).forEach(([d, h]) => {
+          const [y, m] = monthKey.split("-").map(Number);
+          const date = new Date(y, m - 1, d);
+
+          if(date >= start && date <= end){
+            periodHours += h;
+          }
+        });
+      });
     });
 
+    const month = ALL_DATA[key.slice(0,4)][key];
     const paid = Number(month.paid) || 0;
 
     runningCarry += periodHours;
