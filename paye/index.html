@@ -652,6 +652,28 @@ function getLastSunday(year, monthIndex){
   lastDay.setDate(lastDay.getDate() - diff);
   return lastDay.getDate();
 }
+(function migrateLocalDataIfNeeded(){
+  const stored = localStorage.getItem("CA_DATA_VERSION");
+
+  if(stored === DATA_VERSION) return;
+
+  console.warn("🔁 Migration locale des données :", stored, "→", DATA_VERSION);
+
+  Object.entries(ALL_DATA).forEach(([year, yearData])=>{
+    Object.values(yearData).forEach(month=>{
+      if(typeof month.closing !== "number"){
+        month.closing = null;
+      }
+      if(typeof month.locked !== "boolean"){
+        month.locked = false;
+      }
+    });
+
+    saveYearData(year, yearData);
+  });
+
+  localStorage.setItem("CA_DATA_VERSION", DATA_VERSION);
+})();
 function closeOnboarding(){
   localStorage.setItem("ONBOARDING_DONE","1");
   document.getElementById("onboardingModal").classList.remove("open");
