@@ -1032,7 +1032,7 @@ function calculate(){
   const pEnd = new Date(period.end);
   pStart.setHours(0,0,0,0);
   pEnd.setHours(0,0,0,0);
-  // 🎌 FÉRIÉS AUTOMATIQUES (même sans saisie)
+  // 🎌 AUTO-FÉRIÉ = 7h d'absence même sans saisie
 if (AUTO_FERIE) {
   Object.entries(specialDays).forEach(([date, type]) => {
     if (type !== "ferie") return;
@@ -1043,12 +1043,18 @@ if (AUTO_FERIE) {
     const dow = d.getDay();
     if (dow === 0 || dow === 6) return;
 
-    // si le jour n’a aucune saisie
-    if (!data[date]) {
+    // seulement si aucune absence déjà saisie
+    if (!data[date] || !data[date].absent) {
       const iso = dow === 0 ? 7 : dow;
       const monday = new Date(d);
       monday.setDate(monday.getDate() - (iso - 1));
       const weekKey = dateKeyLocal(monday);
+
+      absences[weekKey] =
+        (absences[weekKey] || 0) + DAILY_WORK_HOURS;
+    }
+  });
+}
 
       absences[weekKey] =
         (absences[weekKey] || 0) + DAILY_WORK_HOURS;
