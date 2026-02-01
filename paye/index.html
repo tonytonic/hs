@@ -1673,10 +1673,7 @@ function handleFatalError(err){
     officiels de l’employeur font foi.
   </p>
 </div>
-<footer style="margin-top:30px;text-align:center;font-size:12px;color:#777">
-  © Tous droits réservés – C. Anthony<br>
-  Outil indicatif – ne constitue pas un bulletin de paie
-</footer>
+<script>
 window.addEventListener("load", () => {
   const el = document.getElementById("versionBadge");
   if(el){
@@ -1684,10 +1681,15 @@ window.addEventListener("load", () => {
     console.log("✅ Version affichée :", APP_VERSION);
   }
 });
+</script>
+<footer style="margin-top:30px;text-align:center;font-size:12px;color:#777">
+  © Tous droits réservés – C. Anthony<br>
+  Outil indicatif – ne constitue pas un bulletin de paie
+</footer>
    <script>
   // 🔐 Indique que l'app est vivante (anti-refresh / anti-retour menu)
   sessionStorage.setItem("appAlive", "true");
 </script>
-
+<div id="versionBadge"></div>
 </body>
 </html>
