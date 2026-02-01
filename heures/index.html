@@ -983,227 +983,170 @@ function getLastValidReport(index) {
 }
 function calculate(){
 
-  const period = getCurrentPeriod()
+  const period = getCurrentPeriod();
   if(!period){
     totaux.innerHTML = `
       <div style="background:#fff3cd;border:1px solid #ffeeba;padding:12px;border-radius:8px;color:#856404">
         ℹ️ Définissez une date de début d’exercice et des clôtures
         pour activer les calculs.
       </div>
-    `
-    return
+    `;
+    return;
   }
 
-  let weeks = {}
-let absences = {}
-let totalRecup = 0
-let recups = {}
-let feries = {} // ⬅️ ICI
-let details = []
-let h25 = 0
-let h50 = 0
-
-  
   if(periodMeta[period.index]?.status === "deleted"){
-  totaux.innerHTML = "<i>❌ Cette période est supprimée</i>"
-  return
-}
-
-  // ✅ CORRECTION IMAGE 4 : Sécurisation du reportPrev contre les valeurs NaN ou vides
-ensureReportsUpTo(period.index)
-const reportPrev = getLastValidReport(period.index)
-
-  periodInfo.innerHTML=`<b>Période :</b> ${period.start.toLocaleDateString()} → ${period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString()}<br>
-  <b>Report précédent :</b> ${reportPrev.toFixed(2)} h`
-// 🔒 Normalisation des bornes de période
-const pStart = new Date(period.start)
-const pEnd = new Date(period.end)
-pStart.setHours(0,0,0,0)
-pEnd.setHours(0,0,0,0)
-// --- 1. TRAITEMENT DES DONNÉES (HEBDOMADAIRE) ---
-Object.entries(data).forEach(([date, v]) => {
-
-  const [y, m, d] = date.split("-").map(Number)
-  const dayDate = new Date(y, m - 1, d)
-  const dayOfWeek = dayDate.getDay() // 0 = dim
-
-  if (dayDate < pStart || dayDate > pEnd) return
-
-// 📅 Lundi de la semaine
-const isoDay = dayOfWeek === 0 ? 7 : dayOfWeek
-const monday = new Date(dayDate)
-monday.setDate(monday.getDate() - (isoDay - 1))
-
-// ❌ ignorer les semaines dont le lundi est hors période
-if (monday < pStart || monday > pEnd) {
-  return
-}
-// ✅ semaine valide → on peut créer la clé
-const weekKey = dateKeyLocal(monday)
-
-  // 🎌 FÉRIÉ = absence automatique 7h (jours ouvrés)
-  let absentHours = v.absent || 0
-  if (
-    specialDays[date] === "ferie" &&
-    dayOfWeek !== 0 &&
-    dayOfWeek !== 6
-  ) {
-    absentHours = DAILY_WORK_HOURS
-    feries[weekKey] = (feries[weekKey] || 0) + DAILY_WORK_HOURS
+    totaux.innerHTML = "<i>❌ Cette période est supprimée</i>";
+    return;
   }
 
-  // ➕ Heures effectuées au-delà de la base ajustée
-  weeks[weekKey] = (weeks[weekKey] || 0) + (v.extra || 0)
+  let weeks = {};
+  let absences = {};
+  let recups = {};
+  let totalRecup = 0;
+  let details = [];
+  let h25 = 0;
+  let h50 = 0;
 
-  // ❌ Absences (inclut férié car transformé en absence)
-  if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-    absences[weekKey] = (absences[weekKey] || 0) + absentHours
-  }
+  // 🔁 sécurisation du report précédent
+  ensureReportsUpTo(period.index);
+  const reportPrev = getLastValidReport(period.index);
 
-  // 🔁 Récupérations
-  recups[weekKey] = (recups[weekKey] || 0) + (v.recup || 0)
-  totalRecup += v.recup || 0
-})
+  periodInfo.innerHTML = `
+    <b>Période :</b> ${period.start.toLocaleDateString()} →
+    ${period.end.getFullYear() === 2099 ? "en cours" : period.end.toLocaleDateString()}<br>
+    <b>Report précédent :</b> ${reportPrev.toFixed(2)} h
+  `;
 
-  // --- 2. CALCUL DES MAJORATIONS (RÈGLE DÉFINITIVE) ---
-Object.entries(weeks).forEach(([week, extra]) => {
-  const absent = absences[week] || 0;
-  const recup = recups[week] || 0;
+  const pStart = new Date(period.start);
+  const pEnd = new Date(period.end);
+  pStart.setHours(0,0,0,0);
+  pEnd.setHours(0,0,0,0);
 
+  // ===== 1. AGRÉGATION HEBDOMADAIRE =====
+  Object.entries(data).forEach(([date, v]) => {
+    const [y,m,d] = date.split("-").map(Number);
+    const dayDate = new Date(y, m-1, d);
+    const dow = dayDate.getDay();
 
-// base juridique = heures réellement travaillables
-const base = Math.max(
-  0,
-  BASE_HEBDO - absent - recup
-);
-  const total = base + extra;
+    if(dayDate < pStart || dayDate > pEnd) return;
 
-  let w25 = 0;
-  let w50 = 0;
+    const isoDay = dow === 0 ? 7 : dow;
+    const monday = new Date(dayDate);
+    monday.setDate(monday.getDate() - (isoDay - 1));
 
-  // 🔹 25 % : dès qu'on dépasse 35h jusqu'à 43h inclus
-  if (total > BASE_HEBDO) {
-  w25 = Math.min(total, BASE_HEBDO + 8) - BASE_HEBDO;
-}
+    if(monday < pStart || monday > pEnd) return;
 
-  // 🔹 50 % : dès qu'on dépasse 43h
-  if (total > BASE_HEBDO + 8) {
-  w50 = total - (BASE_HEBDO + 8);
-}
+    const weekKey = dateKeyLocal(monday);
 
-  // Sécurisation
-  w25 = Math.max(0, w25);
-  w50 = Math.max(0, w50);
+    let absentHours = v.absent || 0;
 
-  h25 += w25;
-  h50 += w50;
+    // 🎌 jour férié chômé
+    if(specialDays[date] === "ferie" && dow !== 0 && dow !== 6){
+      absentHours = DAILY_WORK_HOURS;
+    }
 
-  // (optionnel) détail affichage
-  const [y, m, d] = week.split("-");
-  const weekDate = new Date(y, m - 1, d);
-  details.push(
-    `Semaine du ${weekDate.toLocaleDateString()} : ${w25.toFixed(2)}h à 25% / ${w50.toFixed(2)}h à 50%`
-  );
-});
-    
-    // ✅ CORRECTION IMAGE 3 : Affichage sans bug UTC pour la date de 
+    weeks[weekKey] = (weeks[weekKey] || 0) + (v.extra || 0);
+
+    if(dow !== 0 && dow !== 6){
+      absences[weekKey] = (absences[weekKey] || 0) + absentHours;
+    }
+
+    recups[weekKey] = (recups[weekKey] || 0) + (v.recup || 0);
+    totalRecup += v.recup || 0;
+  });
+
+  // ===== 2. CALCUL MAJORATIONS =====
+  Object.entries(weeks).forEach(([week, extra]) => {
+    const absent = absences[week] || 0;
+    const recup = recups[week] || 0;
+
+    const base = Math.max(0, BASE_HEBDO - absent - recup);
+    const total = base + extra;
+
+    let w25 = 0;
+    let w50 = 0;
+
+    if(total > BASE_HEBDO){
+      w25 = Math.min(total, BASE_HEBDO + 8) - BASE_HEBDO;
+    }
+    if(total > BASE_HEBDO + 8){
+      w50 = total - (BASE_HEBDO + 8);
+    }
+
+    w25 = Math.max(0, w25);
+    w50 = Math.max(0, w50);
+
+    h25 += w25;
+    h50 += w50;
+
+    const [y,m,d] = week.split("-");
+    const wd = new Date(y, m-1, d);
+    details.push(
+      `Semaine du ${wd.toLocaleDateString()} : ${w25.toFixed(2)}h à 25% / ${w50.toFixed(2)}h à 50%`
+    );
+  });
 
   const brut25 = h25 * 1.25;
   const brut50 = h50 * 1.5;
   const brut = brut25 + brut50 + reportPrev;
   const net = brut - totalRecup;
-reports[period.index] = net;
-localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
 
-  // --- 3. AFFICHAGE HTML ---
+  reports[period.index] = net;
+  localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
+
+  // ===== 3. AFFICHAGE =====
   totaux.innerHTML = `
-  <details class="calc-details">
-    <summary>📊 Détails des calculs</summary>
-    <div class="breakdown">
-      ${details.join("<br>")}
-      <hr>
-      25% : ${h25}h × 1,25 = ${brut25.toFixed(2)} h<br>
-      50% : ${h50}h × 1,50 = ${brut50.toFixed(2)} h<br>
-      Report précédent : ${reportPrev.toFixed(2)} h
-    </div>
-  </details>
-  <hr>
-  <b>Solde brut :</b> ${brut.toFixed(2)} h<br>
-  Récup : ${totalRecup.toFixed(2)} h<br>
-  <b>Solde net :</b> ${net.toFixed(2)} h
+    <details class="calc-details">
+      <summary>📊 Détails des calculs</summary>
+      <div class="breakdown">
+        ${details.join("<br>")}
+        <hr>
+        25% : ${h25}h × 1,25 = ${brut25.toFixed(2)} h<br>
+        50% : ${h50}h × 1,50 = ${brut50.toFixed(2)} h<br>
+        Report précédent : ${reportPrev.toFixed(2)} h
+      </div>
+    </details>
+    <hr>
+    <b>Solde brut :</b> ${brut.toFixed(2)} h<br>
+    Récup : ${totalRecup.toFixed(2)} h<br>
+    <b>Solde net :</b> ${net.toFixed(2)} h
   `;
 
-  // --- 4. TAUX ET CLÔTURE (IMAGE 5 - Toujours avec 10€ par défaut) ---
+  // ===== 4. TAUX + CLÔTURE ANNUELLE (BLOC UNIQUE) =====
   const rateContainer = document.getElementById("rateContainer");
   rateContainer.innerHTML = "";
-  const rateInput = document.getElementById("hourlyRateInput");
-if(rateInput){
-  rateInput.oninput = () => {
-    const v = Number(rateInput.value);
-    annualRate = isNaN(v) ? 10 : v;
-    localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
-    if (typeof calculate === "function") calculate();
-  };
-}
 
-  if (shouldShowAnnualClosure()) {
+  if(shouldShowAnnualClosure()){
     rateContainer.innerHTML = `
-  <div style="background:#fff3e0;padding:10px;border-radius:6px;border:1px solid #ff9800;margin-top:10px;">
-    <label><b>Taux horaire (€)</b></label>
-    <input
-      type="number"
-      id="hourlyRateInput"
-      step="0.5"
-      value="${annualRate}"
-    >
-  </div>
-`;
-const rateInput = document.getElementById("hourlyRateInput");
-if(rateInput){
-  rateInput.oninput = () => {
-    const v = Number(rateInput.value);
-    annualRate = isNaN(v) ? 10 : v;
-    localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
-    if (typeof calculate === "function") calculate();
-  };
-}
+      <div style="background:#fff3e0;padding:10px;border-radius:6px;border:1px solid #ff9800;margin-top:10px;">
+        <label><b>Taux horaire (€)</b></label>
+        <input
+          type="number"
+          id="hourlyRateInput"
+          step="0.5"
+          value="${annualRate}"
+        >
+      </div>
+    `;
+
+    const rateInput = document.getElementById("hourlyRateInput");
+    rateInput.oninput = () => {
+      const v = Number(rateInput.value);
+      annualRate = isNaN(v) ? 10 : v;
+      localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
+      calculate();
+    };
 
     const rate = annualRate || 10;
     const paiement = net * rate;
-
-    // Récapitulatif absences/fériés annuel
-    let annAbsH = 0, annAbsD = 0, annFerH = 0, annFerD = 0;
-    const limit = annualDate ? new Date(annualDate) : null;
-    
-    Object.entries(data).forEach(([date, v]) => {
-      const parts = date.split('-');
-      const d = new Date(parts[0], parts[1]-1, parts[2]);
-      const dayOfWeek = d.getDay(); // 0 = dim, 6 = sam
-
-if (
-  limit &&
-  d <= limit &&
-  dayOfWeek !== 0 &&
-  dayOfWeek !== 6
-) {
-        const abs = v.absent || 0;
-        if(abs > 0){
-          if(specialDays[date] === "ferie"){
-            annFerD++; annFerH += abs;
-          } else {
-            annAbsH += abs;
-            if(abs >= 7) annAbsD++;
-          }
-        }
-      }
-    });
 
     totaux.innerHTML += `
       <hr>
       <div style="background:#e8f5e9;padding:15px;border:2px solid #2e7d32;border-radius:8px;">
         <h3 style="margin:0;color:#2e7d32;">🎯 Clôture Annuelle</h3>
         <b>Paiement (${rate}€/h) :</b> ${paiement.toFixed(2)} €
-      </div>`;
+      </div>
+    `;
   }
 }
 function openNotice(){
