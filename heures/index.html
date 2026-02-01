@@ -1986,12 +1986,22 @@ function closeLegalPopup(){
 <p style="text-align:center; font-size:12px; color:#666; margin-top:30px;">
   © Tous droits réservés 
 <span
-  style="cursor:pointer"
+  style="
+    cursor:pointer;
+    position:fixed;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:2147483647;
+    pointer-events:auto;
+    user-select:none;
+    opacity:0.0001;
+  "
   onclick="protectedCrash()"
   title="© C.Anthony"
 >
   C.Anthony
-</span> ·
+</span>
   <a href="#" onclick="openLegalPopup()" style="margin-right:10px">
   ℹ️ Informations légales & calcul
 </a>
