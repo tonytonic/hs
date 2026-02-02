@@ -137,64 +137,143 @@
   z-index:10000;
 ">
   <div style="
-    background:#fff;
-    color:#000;
-    border-radius:16px;
-    padding:20px;
-    max-width:700px;
-    max-height:80vh;
-    overflow:auto;
+  background:#fff;
+  color:#000;
+  border-radius:16px;
+  padding:20px;
+  max-width:700px;
+  max-height:80vh;
+  overflow:auto;
+  font-size:14px;
+"
+onclick="event.stopPropagation()">
+
+  <h2>📦 Présentation du projet</h2>
+
+  <p>
+    <b>Simulateur d’heures supplémentaires</b><br>
+    Écosystème PWA – Développé par <b>C. Anthony</b>
+  </p>
+
+  <hr>
+
+  <h3>🎯 Objectif du projet</h3>
+  <p>
+    Ce projet a pour objectif de fournir un <b>outil personnel fiable</b>
+    permettant de suivre, comprendre et analyser les heures supplémentaires,
+    en s’appuyant sur les <b>principes généraux du droit du travail</b>
+    et sur la <b>réalité des pratiques de paie</b>.
+  </p>
+
+  <p>
+    Il ne s’agit <b>pas</b> d’un logiciel de paie, mais d’un
+    <b>outil d’aide à la lecture, au suivi et à la compréhension</b>,
+    fonctionnant <b>sans serveur</b>, y compris <b>hors connexion</b>.
+  </p>
+
+  <h3>🧠 Architecture générale</h3>
+  <ul>
+    <li><b>Index</b> : point d’entrée et redirection</li>
+    <li><b>Menu central</b> : hub applicatif</li>
+    <li><b>Module annuel</b> : logique RH / compteur légal</li>
+    <li><b>Module mensuel</b> : logique réelle de paie terrain</li>
+    <li><b>PWA</b> : application installable et offline</li>
+  </ul>
+
+  <h3>🔹 Module 1 — Compteur annuel</h3>
+  <p>
+    Le module annuel est conçu pour suivre les heures supplémentaires
+    dans une <b>logique RH</b>, proche du raisonnement légal.
+  </p>
+
+  <ul>
+    <li>Calcul hebdomadaire des heures</li>
+    <li>Distinction heures travaillées / absences</li>
+    <li>Déclenchement des majorations 25 % et 50 %</li>
+    <li>Reports automatiques de période</li>
+    <li>Exports PDF et sauvegardes JSON</li>
+  </ul>
+
+  <h3>🔹 Module 2 — Heures mensualisées</h3>
+  <p>
+    Le module mensuel reproduit la <b>logique réelle de paie</b>
+    telle qu’elle est vécue par les salariés :
+    clôture mensuelle, heures payées et reliquats.
+  </p>
+
+  <ul>
+    <li>Définition d’un dimanche de clôture</li>
+    <li>Saisie quotidienne des heures</li>
+    <li>Calcul automatique du reliquat</li>
+    <li>Reports multi-mois et multi-années</li>
+    <li>Zone financière protégée par code</li>
+  </ul>
+
+  <h3>💾 Données & sécurité</h3>
+  <p>
+    Les données sont stockées <b>exclusivement en local</b>
+    sur l’appareil de l’utilisateur.
+  </p>
+
+  <ul>
+    <li>Aucun serveur, aucune transmission externe</li>
+    <li>Sauvegardes manuelles recommandées</li>
+    <li>Snapshots automatiques</li>
+    <li>Mode récupération en cas de crash</li>
+  </ul>
+
+  <h3>📱 Progressive Web App (PWA)</h3>
+  <ul>
+    <li>Application installable</li>
+    <li>Fonctionnement hors connexion</li>
+    <li>Cache maîtrisé via Service Worker</li>
+    <li>Compatibilité mobile et desktop</li>
+  </ul>
+
+  <h3>⚖️ Cadre légal & responsabilité</h3>
+  <p>
+    Cet outil est fourni <b>à titre indicatif</b>.
+    Les calculs peuvent différer de la réalité selon :
+    la convention collective, les accords d’entreprise
+    ou les pratiques internes.
+  </p>
+
+  <p>
+    <b>Seuls les bulletins de paie et documents de l’employeur font foi.</b>
+  </p>
+
+  <h3>🏁 Conclusion</h3>
+  <p>
+    Ce projet constitue un <b>outil métier personnel</b>,
+    conçu avec une attention particulière portée à :
+  </p>
+
+  <ul>
+    <li>la fiabilité des calculs</li>
+    <li>la robustesse technique</li>
+    <li>la clarté pour l’utilisateur</li>
+    <li>la responsabilité juridique</li>
+  </ul>
+
+  <p>
+    Il s’inscrit dans une démarche professionnelle,
+    orientée terrain et usage réel.
+  </p>
+
+  <button onclick="closePresentation()" style="
+    margin-top:20px;
+    padding:10px 16px;
+    border:none;
+    border-radius:12px;
+    background:#4FB3C2;
+    color:#fff;
     font-size:14px;
+    width:100%;
   ">
-    <h2>📦 Présentation du projet</h2>
+    Fermer
+  </button>
 
-    <p>
-      <b>Simulateur d’heures supplémentaires</b><br>
-      Écosystème PWA – Développé par <b>C. Anthony</b>
-    </p>
-
-    <hr>
-
-    <p>
-      Outil personnel destiné au suivi et à la compréhension
-      des heures supplémentaires, fonctionnant
-      <b>sans serveur</b> et <b>hors connexion</b>.
-    </p>
-
-    <h3>🧠 Structure</h3>
-    <ul>
-      <li>Menu central (hub applicatif)</li>
-      <li>Compteur annuel (logique RH)</li>
-      <li>Simulateur mensuel (logique paie)</li>
-      <li>PWA installable</li>
-    </ul>
-
-    <h3>🔐 Données</h3>
-    <ul>
-      <li>Stockage local uniquement</li>
-      <li>Exports manuels recommandés</li>
-      <li>Snapshots & récupération</li>
-    </ul>
-
-    <h3>⚖️ Cadre légal</h3>
-    <p>
-      Outil indicatif – ne constitue pas un bulletin de paie.<br>
-      Seuls les documents de l’employeur font foi.
-    </p>
-
-    <button onclick="closePresentation()" style="
-      margin-top:15px;
-      padding:10px 16px;
-      border:none;
-      border-radius:12px;
-      background:#4FB3C2;
-      color:#fff;
-      font-size:14px;
-      width:100%;
-    ">
-      Fermer
-    </button>
-  </div>
+</div>
 </div>
 <!-- ⚠️ Avertissement sauvegarde (1 seule fois) -->
 <div id="backup-warning">
