@@ -105,10 +105,97 @@
   opacity: 0.9;
   max-width: 320px;
 }
+.info-btn{
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.9);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 22px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .1s ease;
+}
+
+.info-btn:active{
+  transform: scale(0.96);
+}
+
+.info-btn:hover{
+  background: rgba(255,255,255,0.15);
+}
   </style>
 </head>
 
 <body>
+  <div id="presentationPopup" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:10000;
+">
+  <div style="
+    background:#fff;
+    color:#000;
+    border-radius:16px;
+    padding:20px;
+    max-width:700px;
+    max-height:80vh;
+    overflow:auto;
+    font-size:14px;
+  ">
+    <h2>📦 Présentation du projet</h2>
+
+    <p>
+      <b>Simulateur d’heures supplémentaires</b><br>
+      Écosystème PWA – Développé par <b>C. Anthony</b>
+    </p>
+
+    <hr>
+
+    <p>
+      Outil personnel destiné au suivi et à la compréhension
+      des heures supplémentaires, fonctionnant
+      <b>sans serveur</b> et <b>hors connexion</b>.
+    </p>
+
+    <h3>🧠 Structure</h3>
+    <ul>
+      <li>Menu central (hub applicatif)</li>
+      <li>Compteur annuel (logique RH)</li>
+      <li>Simulateur mensuel (logique paie)</li>
+      <li>PWA installable</li>
+    </ul>
+
+    <h3>🔐 Données</h3>
+    <ul>
+      <li>Stockage local uniquement</li>
+      <li>Exports manuels recommandés</li>
+      <li>Snapshots & récupération</li>
+    </ul>
+
+    <h3>⚖️ Cadre légal</h3>
+    <p>
+      Outil indicatif – ne constitue pas un bulletin de paie.<br>
+      Seuls les documents de l’employeur font foi.
+    </p>
+
+    <button onclick="closePresentation()" style="
+      margin-top:15px;
+      padding:10px 16px;
+      border:none;
+      border-radius:12px;
+      background:#4FB3C2;
+      color:#fff;
+      font-size:14px;
+      width:100%;
+    ">
+      Fermer
+    </button>
+  </div>
+</div>
 <!-- ⚠️ Avertissement sauvegarde (1 seule fois) -->
 <div id="backup-warning">
   <div class="backup-box">
@@ -142,6 +229,9 @@
   <img src="images/renard-mensuel.png.jpg" alt="Paye mensuelle">
   <div class="title">Simulateur d’heures mensualisées</div>
   </div>
+  <button class="info-btn" onclick="openPresentation()">
+  📄 Présentation du projet
+</button>
 <div class="backup-advice">
   💾 <strong>Conseil sauvegarde</strong><br><br>
   Chaque module dispose de sa propre fonction de sauvegarde.<br>
@@ -165,7 +255,13 @@ if ("serviceWorker" in navigator) {
   if (accepted === "true") {
     document.getElementById("backup-warning").style.display = "none";
   }
+function openPresentation(){
+  document.getElementById("presentationPopup").style.display = "flex";
+}
 
+function closePresentation(){
+  document.getElementById("presentationPopup").style.display = "none";
+}
   function acceptBackupRisk() {
     localStorage.setItem("backupWarningAccepted", "true");
     document.getElementById("backup-warning").style.display = "none";
