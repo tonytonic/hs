@@ -667,9 +667,7 @@ onclick="event.stopPropagation()">
   (fin de mois, fin de période) afin d’éviter toute perte de données.
 </div>
 <button class="info-btn"
-        onclick="openFirstUseTutorial()"
-        aria-haspopup="dialog"
-        aria-controls="firstUseTutorial">
+        onclick="openTutorial()">
   📘 Tutoriel – Première utilisation
 </button>
   <footer>
@@ -712,9 +710,7 @@ function closePresentation(){
     localStorage.setItem("backupWarningAccepted", "true");
     document.getElementById("backup-warning").style.display = "none";
   }
-  function go(app){
-  window.location.href = app + "/index.html";
-}
+  
 
 function openTutorial(){
   document.getElementById("tutorialPopup").style.display = "flex";
