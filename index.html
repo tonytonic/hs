@@ -18,7 +18,7 @@
       // évite boucle infinie
       if (!sessionStorage.getItem("APP_RELOADED")) {
         sessionStorage.setItem("APP_RELOADED", "1");
-        location.reload(true);
+        location.reload();
       }
     }
 
