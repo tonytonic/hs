@@ -384,12 +384,22 @@ onclick="event.stopPropagation()">
 
 <script>
 if ("serviceWorker" in navigator) {
+
+  // Enregistrement du Service Worker
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("./sw.js")
       .then(() => console.log("Service Worker enregistré"))
       .catch(err => console.log("SW erreur", err));
   });
+
+  // Détection d’un nouveau Service Worker actif
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    console.log("🔄 Nouveau Service Worker actif");
+    location.reload();
+  });
+
 }
+
   const accepted = localStorage.getItem("backupWarningAccepted");
 
   if (accepted === "true") {
