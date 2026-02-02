@@ -229,7 +229,10 @@
   <img src="images/renard-mensuel.png.jpg" alt="Paye mensuelle">
   <div class="title">Simulateur d’heures mensualisées</div>
   </div>
-  <button class="info-btn" onclick="openPresentation()">
+<button class="info-btn"
+        onclick="openPresentation()"
+        aria-haspopup="dialog"
+        aria-controls="presentationPopup">
   📄 Présentation du projet
 </button>
 <div class="backup-advice">
@@ -257,10 +260,12 @@ if ("serviceWorker" in navigator) {
   }
 function openPresentation(){
   document.getElementById("presentationPopup").style.display = "flex";
+  document.body.style.overflow = "hidden";
 }
 
 function closePresentation(){
   document.getElementById("presentationPopup").style.display = "none";
+  document.body.style.overflow = "";
 }
   function acceptBackupRisk() {
     localStorage.setItem("backupWarningAccepted", "true");
