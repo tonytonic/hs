@@ -1,48 +1,44 @@
 <!DOCTYPE html>
 <html lang="fr">
- <head>
+<head>
   <meta charset="UTF-8">
-
   <title>simulateur heures supplémentaires </title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#4FB3C2">
 
-  <!-- iOS -->
-<link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
     
   <style>
-    .title {
-  text-align: center;
-  font-weight: 600;
-  margin-top: 8px;
-  color: #ffffff;
-  font-size: 16px;
-}
     body {
       margin: 0;
       background: #4FB3C2;
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      /* Police système plus universelle pour Android/PC */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
+      /* Correction majeure : min-height au lieu de height fixe */
+      min-height: 100vh;
+      justify-content: flex-start;
+      padding: 40px 20px;
+      box-sizing: border-box;
       gap: 20px;
     }
 
     .btn {
-      width: 220px;
+      /* Largeur adaptative pour mobile, limitée pour PC */
+      width: 90%;
+      max-width: 250px;
       border-radius: 28px;
       overflow: hidden;
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
       cursor: pointer;
       transition: transform .15s ease;
+      background: rgba(255,255,255,0.1);
     }
 
     .btn:active {
@@ -51,364 +47,179 @@
 
     .btn img {
       width: 100%;
+      height: auto;
       display: block;
     }
 
+    .title {
+      text-align: center;
+      font-weight: 600;
+      margin-top: 8px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      font-size: 16px;
+      padding: 0 10px;
+    }
+
+    /* Footer adaptatif pour éviter les chevauchements sur Android */
     footer {
-  position: fixed;
-  bottom: 10px;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255,255,255,0.8);
-  pointer-events: none;
-}
-#backup-warning {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
+      margin-top: auto;
+      padding-top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: rgba(255,255,255,0.8);
+    }
 
-.backup-box {
-  background: #fff;
-  color: #000;
-  border-radius: 16px;
-  padding: 20px;
-  max-width: 340px;
-  text-align: center;
-  font-size: 14px;
-}
+    /* Popups et Avertissements */
+    #backup-warning, #presentationPopup {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
 
-.backup-box h2 {
-  margin-top: 0;
-}
+    .backup-box, .presentation-box {
+      background: #fff;
+      color: #000;
+      border-radius: 16px;
+      padding: 20px;
+      max-width: 400px;
+      width: 100%;
+      text-align: center;
+      font-size: 14px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
 
-.backup-box button {
-  margin-top: 15px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 12px;
-  background: #4FB3C2;
-  color: #fff;
-  font-size: 14px;
-}
-.backup-advice {
-  margin-top: 20px;
-  font-size: 13px;
-  color: #fff;
-  text-align: center;
-  opacity: 0.9;
-  max-width: 320px;
-}
-.info-btn{
-  background: transparent;
-  border: 2px solid rgba(255,255,255,0.9);
-  color: #fff;
-  padding: 10px 18px;
-  border-radius: 22px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background .15s ease, color .15s ease, transform .1s ease;
-}
+    .presentation-box {
+      max-width: 700px;
+      text-align: left;
+    }
 
-.info-btn:active{
-  transform: scale(0.96);
-}
+    .presentation-box h2, .presentation-box h3 {
+      color: #4FB3C2;
+      margin-top: 15px;
+    }
 
-.info-btn:hover{
-  background: rgba(255,255,255,0.15);
-}
+    .close-btn {
+      margin-top: 15px;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 12px;
+      background: #4FB3C2;
+      color: #fff;
+      font-size: 14px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .backup-advice {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #fff;
+      text-align: center;
+      opacity: 0.9;
+      max-width: 320px;
+      line-height: 1.4;
+    }
+
+    .info-btn {
+      background: transparent;
+      border: 2px solid rgba(255,255,255,0.9);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 22px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background .15s ease;
+      margin-top: 10px;
+    }
+
+    .info-btn:hover { background: rgba(255,255,255,0.15); }
+
+    hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
   </style>
 </head>
 
 <body>
-  <div id="presentationPopup" style="
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.75);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:10000;
-">
-  <div style="
-  background:#fff;
-  color:#000;
-  border-radius:16px;
-  padding:20px;
-  max-width:700px;
-  max-height:80vh;
-  overflow:auto;
-  font-size:14px;
-"
-onclick="event.stopPropagation()">
 
- <h2>📦 Présentation du projet</h2>
-
-<p>
-  <b>Simulateur d’heures supplémentaires</b><br>
-  Écosystème PWA – Développé par <b>C. Anthony</b>
-</p>
-
-<hr>
-
-<h3>🎯 Objectif général</h3>
-<p>
-  Ce projet est un <b>outil personnel de simulation</b> permettant
-  de visualiser et organiser des heures supplémentaires
-  à titre <b>strictement indicatif</b>.
-</p>
-
-<p>
-  Il ne s’agit ni d’un logiciel de paie, ni d’un outil employeur,
-  ni d’un document officiel.
-</p>
-
-<hr>
-
-<h3>🧑‍💼 Pour un utilisateur non technique (néophyte)</h3>
-
-<p>
-  Ce simulateur s’adresse à toute personne souhaitant
-  <b>mieux comprendre et suivre ses heures supplémentaires</b>
-  au quotidien, sans connaissances techniques particulières.
-</p>
-
-<p>
-  Concrètement, il permet :
-</p>
-
-<ul>
-  <li>de saisir des heures travaillées jour après jour</li>
-  <li>de visualiser des volumes cumulés sur un mois ou une période plus longue</li>
-  <li>d’avoir une estimation indicative des majorations usuelles</li>
-  <li>de mieux comprendre la notion de report d’heures</li>
-</ul>
-
-<p>
-  L’outil aide à <b>se repérer</b>, à <b>anticiper</b>
-  et à <b>structurer des informations personnelles</b>,
-  sans jamais se substituer aux documents fournis par l’employeur.
-</p>
-
-<p>
-  <b>Les résultats affichés n’ont aucune valeur officielle.</b>
-</p>
-
-<hr>
-
-<h3>👨‍💻 Pour un développeur / profil technique</h3>
-
-<p>
-  Le projet est conçu comme un <b>écosystème applicatif autonome</b>,
-  orienté robustesse, lisibilité et usage réel.
-</p>
-
-<p>
-  Les choix techniques reposent sur les principes suivants :
-</p>
-
-<ul>
-  <li>architecture modulaire (menu central + modules indépendants)</li>
-  <li>absence totale de backend</li>
-  <li>stockage local via <code>localStorage</code></li>
-  <li>gestion explicite des versions et migrations de données</li>
-  <li>tolérance aux erreurs (snapshots, recovery mode)</li>
-</ul>
-
-<p>
-  La logique métier est volontairement
-  <b>simplifiée et déclarative</b>,
-  afin de rester compréhensible, traçable et modifiable.
-</p>
-
-<hr>
-
-<h3>🧠 Architecture générale</h3>
-<ul>
-  <li><b>Index</b> : point d’entrée et redirection</li>
-  <li><b>Menu central</b> : hub de navigation</li>
-  <li><b>Module annuel</b> : simulation sur période longue</li>
-  <li><b>Module mensuel</b> : simulation sur cycles mensuels</li>
-  <li><b>PWA</b> : installation et fonctionnement hors connexion</li>
-</ul>
-
-<hr>
-
-<h3>🔹 Module annuel — Simulation longue durée</h3>
-<p>
-  Ce module permet de simuler l’accumulation d’heures
-  sur une période étendue, dans une logique de suivi personnel.
-</p>
-
-<ul>
-  <li>saisie hebdomadaire</li>
-  <li>visualisation des cumuls</li>
-  <li>application de taux indicatifs</li>
-  <li>reports internes entre périodes</li>
-  <li>exports PDF / JSON</li>
-</ul>
-
-<hr>
-
-<h3>🔹 Module mensuel — Simulation mensualisée</h3>
-<p>
-  Ce module propose une simulation inspirée
-  de mécanismes couramment observés dans les pratiques de paie,
-  sans prétendre reproduire un calcul réel.
-</p>
-
-<ul>
-  <li>définition d’une date de clôture</li>
-  <li>saisie quotidienne</li>
-  <li>calculs indicatifs</li>
-  <li>reports inter-mois</li>
-  <li>zone financière indicative protégée</li>
-</ul>
-
-<hr>
-
-<h3>💾 Données & fonctionnement</h3>
-<p>
-  Toutes les données sont stockées <b>localement</b>
-  sur l’appareil de l’utilisateur.
-</p>
-
-<ul>
-  <li>aucun serveur</li>
-  <li>aucune transmission externe</li>
-  <li>sauvegardes manuelles recommandées</li>
-  <li>mécanismes de récupération en cas d’erreur</li>
-</ul>
-
-<hr>
-
-<h3>⚖️ Cadre d’utilisation</h3>
-<p>
-  Les informations générées par ce simulateur sont
-  <b>strictement indicatives</b>.
-</p>
-
-<p>
-  Elles ne constituent ni une preuve,
-  ni un document opposable,
-  ni une référence officielle.
-</p>
-
-<p>
-  <b>Seuls les documents fournis par l’employeur font foi.</b>
-</p>
-
-<hr>
-
-<h3>🏁 Conclusion</h3>
-<p>
-  Ce projet est un <b>outil personnel de simulation</b>,
-  pensé pour être compréhensible par un utilisateur non technique
-  tout en restant structuré et lisible pour un développeur.
-</p>
-
-<p>
-  Il privilégie la clarté, la sobriété
-  et la responsabilité d’usage.
-</p>
-
-  <button onclick="closePresentation()" style="
-    margin-top:20px;
-    padding:10px 16px;
-    border:none;
-    border-radius:12px;
-    background:#4FB3C2;
-    color:#fff;
-    font-size:14px;
-    width:100%;
-  ">
-    Fermer
-  </button>
-
-</div>
-</div>
-<!-- ⚠️ Avertissement sauvegarde (1 seule fois) -->
-<div id="backup-warning">
-  <div class="backup-box">
-    <h2>⚠️ Avertissement important</h2>
-
-    <p>
-      Cette application enregistre les données <strong>localement sur votre appareil</strong>.
-    </p>
-
-    <p>
-      En cas de suppression de l’application, nettoyage du navigateur ou changement d’appareil,
-      <strong>les données peuvent être perdues</strong>.
-    </p>
-
-    <p>
-      👉 Il est fortement recommandé d’effectuer des <strong>sauvegardes régulières</strong>
-      via les fonctions prévues dans chaque module.
-    </p>
-
-    <button onclick="acceptBackupRisk()">J’accepte ces risques</button>
+  <div id="presentationPopup" style="display:none;">
+    <div class="presentation-box" onclick="event.stopPropagation()">
+      <h2>📦 Présentation du projet</h2>
+      <p><b>Simulateur d’heures supplémentaires</b><br>Écosystème PWA – Développé par <b>C. Anthony</b></p>
+      <hr>
+      <h3>🎯 Objectif général</h3>
+      <p>Outil personnel de simulation permettant de visualiser et organiser des heures supplémentaires à titre <b>strictement indicatif</b>.</p>
+      <p>Il ne s’agit ni d’un logiciel de paie, ni d’un document officiel.</p>
+      <hr>
+      <h3>💾 Données & fonctionnement</h3>
+      <p>Toutes les données sont stockées <b>localement</b> sur votre appareil. Aucun serveur, aucune transmission externe.</p>
+      <button class="close-btn" onclick="closePresentation()">Fermer</button>
+    </div>
   </div>
-</div>
-  <!-- 🦊 Compteur annuel -->
-<div class="btn" onclick="go('heures')">
-  <img src="images/renard-annuel.png.jpg" alt="Compteur annuel">
-  <div class="title">Simulateur de compteur annuel</div>
-</div>
 
-<!-- 🦊 Paye mensuelle -->
-<div class="btn" onclick="go('paye')">
-  <img src="images/renard-mensuel.png.jpg" alt="Paye mensuelle">
-  <div class="title">Simulateur d’heures mensualisées</div>
+  <div id="backup-warning">
+    <div class="backup-box">
+      <h2>⚠️ Avertissement important</h2>
+      <p>Cette application enregistre les données <strong>localement sur votre appareil</strong>.</p>
+      <p>En cas de nettoyage du navigateur ou changement d'appareil, <strong>les données seront perdues</strong>.</p>
+      <button class="close-btn" onclick="acceptBackupRisk()">J’accepte ces risques</button>
+    </div>
   </div>
-<button class="info-btn"
-        onclick="openPresentation()"
-        aria-haspopup="dialog"
-        aria-controls="presentationPopup">
-  📄 Présentation du projet
-</button>
-<div class="backup-advice">
-  💾 <strong>Conseil sauvegarde</strong><br><br>
-  Chaque module dispose de sa propre fonction de sauvegarde.<br>
-  Pensez à effectuer des <strong>exports réguliers</strong>
-  (fin de mois, fin de période) afin d’éviter toute perte de données.
-</div>
+
+  <div class="btn" onclick="go('heures')">
+    <img src="images/renard-annuel.png.jpg" alt="Compteur annuel">
+    <div class="title">Simulateur de compteur annuel</div>
+  </div>
+
+  <div class="btn" onclick="go('paye')">
+    <img src="images/renard-mensuel.png.jpg" alt="Paye mensuelle">
+    <div class="title">Simulateur d’heures mensualisées</div>
+  </div>
+
+  <button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
+
+  <div class="backup-advice">
+    💾 <strong>Conseil sauvegarde</strong><br>
+    Effectuez des <strong>exports réguliers</strong> (JSON/PDF) pour éviter toute perte de données.
+  </div>
+
   <footer>
     Développé par C. Anthony
   </footer>
 
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .then(() => console.log("Service Worker enregistré"))
-      .catch(err => console.log("SW erreur", err));
-  });
-}
-  const accepted = localStorage.getItem("backupWarningAccepted");
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(err => console.log("SW erreur", err));
+      });
+    }
 
-  if (accepted === "true") {
-    document.getElementById("backup-warning").style.display = "none";
-  }
-function openPresentation(){
-  document.getElementById("presentationPopup").style.display = "flex";
-  document.body.style.overflow = "hidden";
-}
+    const accepted = localStorage.getItem("backupWarningAccepted");
+    if (accepted === "true") {
+      document.getElementById("backup-warning").style.display = "none";
+    }
 
-function closePresentation(){
-  document.getElementById("presentationPopup").style.display = "none";
-  document.body.style.overflow = "";
-}
-  function acceptBackupRisk() {
-    localStorage.setItem("backupWarningAccepted", "true");
-    document.getElementById("backup-warning").style.display = "none";
-  }
-  
+    function openPresentation() {
+      document.getElementById("presentationPopup").style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+
+    function closePresentation() {
+      document.getElementById("presentationPopup").style.display = "none";
+      document.body.style.overflow = "";
+    }
+
+    function acceptBackupRisk() {
+      localStorage.setItem("backupWarningAccepted", "true");
+      document.getElementById("backup-warning").style.display = "none";
+    }
+
     function go(app) {
       localStorage.setItem("lastApp", app);
       window.location.href = app + "/index.html";
