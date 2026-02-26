@@ -1,4 +1,4 @@
-const CACHE_NAME = "compteur-heures-v1.4.1";
+const CACHE_NAME = "compteur-heures-v1.4.2";
 
 const FILES_TO_CACHE = [
   "./index.html",
