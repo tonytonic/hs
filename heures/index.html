@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
+<meta name="theme-color" content="#4FB3C2">
+<meta charset="UTF-8">
+<title>Simulateur de compteur annuel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+.kitsune-btn {
+  flex: 1; padding: 8px 16px; border-radius: 20px; border: none;
+  background: linear-gradient(135deg, #4FB3C2, #2196a6); color: #fff;
+  font-size: 14px; font-weight: 500; cursor: pointer;
+  box-shadow: 0 2px 8px rgba(79,179,194,0.35);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.kitsune-btn:hover { transform: scale(1.02); box-shadow: 0 4px 16px rgba(79,179,194,0.55); }
+.kitsune-btn:active { transform: scale(0.97); }
+.top-nav-bar { display: flex; gap: 8px; margin-top: 8px; margin-bottom: 20px; }
+.top-nav-bar .menu-btn { flex: 1; margin: 0; }
+.menu-btn {
+  margin-top: 8px; margin-bottom: 20px; padding: 8px 16px;
+  border-radius: 20px; border: none; background: rgba(255,255,255,0.85);
+  font-size: 14px; font-weight: 500; cursor: pointer;
+}
+.month-nav { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; }
+.month-nav select {
+  flex: 1; min-height: 40px; display: block; width: 100%; box-sizing: border-box;
+  background-color: #fff; -webkit-appearance: menulist;
+  border: 1px solid #ccc; border-radius: 4px;
+}
+.calc-details summary {
+  cursor: pointer; font-weight: bold; background: #e3f2fd;
+  padding: 8px; border-radius: 6px; margin-bottom: 8px;
+}
+.calc-details[open] summary { background: #bbdefb; }
+body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 15px; }
+h1, h2 { text-align: center; }
+.config, .totaux { background: #fff; padding: 15px; border-radius: 8px; max-width: 900px; margin: 15px auto; }
+.calendar-wrapper { max-width: 900px; margin: 20px auto; }
+.weekdays, .calendar { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.weekday { text-align: center; font-weight: bold; background: #ddd; padding: 8px 0; border-radius: 6px; }
+.day {
+  background: #fff; padding: 6px; border-radius: 6px; cursor: pointer;
+  text-align: center; height: 80px; box-sizing: border-box; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.day small { font-size: 11px; line-height: 1.1; white-space: nowrap; }
+.day.in-period { border: 2px solid #2196a6; background: #e0f4f7; }
+button, input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+.popup {
+  position: fixed; inset: 0; background: rgba(0,0,0,.5);
+  display: none; align-items: flex-end; justify-content: center;
+  z-index: 1000; pointer-events: auto;
+  will-change: transform; transform: translateZ(0); backface-visibility: hidden;
+}
+.popup-content {
+  background: #fff; width: 100%; max-width: 500px;
+  max-height: 70svh; overflow-y: auto;
+  border-radius: 16px 16px 0 0;
+  padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+}
+.breakdown { background: #f9f9f9; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 14px; }
+.day.today { outline: 3px solid #2196a6; box-shadow: 0 0 6px rgba(33,150,166,.6); }
+.sheet-handle { width: 40px; height: 4px; background: #ccc; border-radius: 2px; margin: 6px auto 10px; }
+.block { border: none; margin-bottom: 16px; }
+.block.plus legend { color: #1976d2; }
+.block.minus legend { color: #ef6c00; }
+.block.absence legend { color: #c62828; }
+.popup-actions { position: sticky; bottom: env(safe-area-inset-bottom); background: #fff; padding-top: 10px; }
+
+/* ===== SETTINGS BUTTON ===== */
+#openSettingsBtn {
+  display: block; width: calc(100% - 30px); max-width: 900px;
+  margin: 0 auto 20px; padding: 13px 20px;
+  background: linear-gradient(135deg, #37474f, #546e7a);
+  color: #fff; border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+  box-shadow: 0 2px 10px rgba(55,71,79,.3);
+  transition: transform .15s, box-shadow .15s; text-align: left;
+}
+#openSettingsBtn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(55,71,79,.45); }
+#openSettingsBtn:active { transform: scale(.98); }
+
+/* ===== SETTINGS MODAL ===== */
+#settingsModal .popup-content { max-width: 600px; max-height: 70svh; overflow-y: auto; border-radius: 16px 16px 0 0; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+.settings-group { margin-bottom: 18px; }
+.settings-group-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .8px; color: #888; margin-bottom: 8px; display: block;
+}
+.settings-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+.settings-row button,
+.settings-row input,
+.settings-row select { flex: 1; min-width: 120px; margin: 0; }
+.settings-divider { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+.settings-danger-btn {
+  background: #ffcdd2; color: #b71c1c; font-weight: bold;
+  border: 1px solid #ef9a9a; border-radius: 8px; padding: 8px; cursor: pointer; width: 100%;
+}
+.settings-modal-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.settings-modal-title h3 { margin: 0; }
+.settings-close-x {
+  background: none; border: none; font-size: 22px; cursor: pointer;
+  color: #888; padding: 0 4px; line-height: 1; width: auto;
+}
+
+/* ===== WIZARD ===== */
+#wizardModal .popup-content { max-width: 540px; max-height: 70svh; overflow-y: auto; border-radius: 16px 16px 0 0; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
+.wiz-progress { background: #e0e0e0; border-radius: 4px; height: 6px; margin-bottom: 6px; overflow: hidden; }
+.wiz-progress-bar {
+  height: 100%; background: linear-gradient(90deg, #4FB3C2, #2196a6);
+  border-radius: 4px; transition: width .4s ease;
+}
+.wiz-step-label { font-size: 11px; color: #aaa; margin-bottom: 20px; display: block; }
+.wiz-step { display: none; }
+.wiz-step.wiz-active { display: block; }
+.wiz-question { font-size: 18px; font-weight: 700; color: #2c3e50; margin-bottom: 18px; line-height: 1.4; }
+.wiz-hint { font-size: 13px; color: #888; margin-top: -10px; margin-bottom: 14px; }
+.wiz-choice-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.wiz-choice-btn {
+  flex: 1; padding: 14px 10px; border-radius: 12px; border: 2px solid #e0e0e0;
+  background: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: all .2s; text-align: center; line-height: 1.4;
+}
+.wiz-choice-btn:hover, .wiz-choice-btn.wiz-selected { border-color: #4FB3C2; background: #e0f4f7; color: #2196a6; }
+.wiz-nav {
+  display: flex; gap: 10px; margin-top: 20px;
+  background: #fff; padding-top: 10px;
+  padding-bottom: 4px;
+}
+.wiz-closures-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.wiz-closures-grid label { font-size: 12px; color: #666; margin-bottom: 2px; display: block; }
+.wiz-closures-grid input { margin: 0; font-size: 13px; padding: 6px; }
+.wiz-check-row {
+  display: flex; align-items: center; gap: 10px; padding: 12px;
+  border-radius: 10px; background: #f9f9f9; border: 1px solid #eee;
+  margin-bottom: 10px; cursor: pointer;
+}
+.wiz-check-row input[type=checkbox] { width: 18px; height: 18px; margin: 0; flex-shrink: 0; cursor: pointer; }
+.wiz-check-row span { font-size: 14px; font-weight: 500; }
+.wiz-summary {
+  background: #f1f8e9; border: 1px solid #aed581; border-radius: 10px;
+  padding: 14px; font-size: 13px; line-height: 1.8; margin-bottom: 16px;
+}
+.wiz-summary b { color: #33691e; }
+</style>
+</head>
+<body>
+
+<div class="top-nav-bar">
+  <button class="menu-btn" onclick="goMenu()">&#8592; Retour au menu</button>
+  <button class="kitsune-btn" onclick="window.location.href='../fox/index.html'" title="Ouvrir FOX Engine">&#x1F98A; Kitsune</button>
+</div>
+
+<div id="exerciseAlert" style="display:none;max-width:900px;margin:10px auto;background:#fff3cd;border:1px solid #ffeeba;color:#856404;padding:12px;border-radius:8px;font-weight:bold;text-align:center;">
+  &#9888;&#65039; Action requise : D&eacute;finissez votre date de d&eacute;but d&apos;exercice dans la Configuration pour activer le calendrier.
+</div>
+
+<div class="popup" id="popupNotice">
+  <div class="popup-content" style="max-width:800px;max-height:80vh;overflow:auto;">
+    <h3>📘 Notice utilisateur – Compteur annuel d'heures</h3>
+
+    <p>Cet outil permet de suivre et d'estimer les heures de travail, les heures supplémentaires,
+    les récupérations et les absences dans le cadre d'un <b>compteur annuel</b>.</p>
+
+    <hr>
+    <h4>🗓️ Principe général</h4>
+    <p>Le suivi est organisé par exercice annuel, découpé en périodes comptables.
+    Les calculs sont réalisés semaine par semaine, puis cumulés sur la période et sur l'année.</p>
+
+    <hr>
+    <h4>⏱️ Base hebdomadaire</h4>
+    <p>La base hebdomadaire (ex : 35h) représente une semaine complète théorique.
+    Les heures supplémentaires sont déclenchées uniquement après dépassement de cette base,
+    déduction faite des absences.</p>
+
+    <hr>
+    <h4>❌ Absences</h4>
+    <p>Les absences correspondent à du temps non travaillé. Elles <b>réduisent le volume
+    d'heures attendues</b> dans la semaine, ce qui diminue le solde brut de la période.
+    Elles ne génèrent pas d'heures supplémentaires.</p>
+
+    <hr>
+    <h4>🔁 Récupérations</h4>
+    <p>Les récupérations sont des heures précédemment travaillées, reprises ultérieurement
+    sous forme de repos.</p>
+    <p><b>Dans cet outil, les récupérations ne réduisent pas la base hebdomadaire.</b>
+    Elles sont uniquement soustraites du <b>solde brut</b> pour obtenir le <b>solde net</b>,
+    afin d'éviter un double comptage.</p>
+    <p>Exemple : 2h supplémentaires effectuées, 1h récupérée → solde brut = 2h majorées,
+    solde net = solde brut − 1h.</p>
+
+    <hr>
+    <h4>🎌 Jours fériés</h4>
+    <p>Un jour férié chômé et payé réduit le volume d'heures attendues (par défaut 7h),
+    au même titre qu'une absence. Il ne modifie pas le seuil de déclenchement des heures
+    supplémentaires.</p>
+    <p>En mode <b>férié automatique</b>, les jours fériés en semaine sont traités automatiquement
+    sans saisie manuelle.</p>
+
+    <hr>
+    <h4>➕ Heures supplémentaires</h4>
+    <p>Déclenchées à partir de la 36ᵉ heure réellement travaillée dans la semaine
+    (base 35h, ajustée des absences uniquement) :</p>
+    <ul>
+      <li>36ᵉ à 43ᵉ heure : majoration de <b>25 %</b></li>
+      <li>Au-delà de la 43ᵉ heure : majoration de <b>50 %</b></li>
+    </ul>
+
+    <hr>
+    <h4>📆 Périodes et clôtures</h4>
+    <p>Les périodes se terminent le dimanche. La période suivante débute automatiquement
+    le lundi. Le solde d'une période est automatiquement reporté sur la période suivante.</p>
+
+    <hr>
+    <h4>🔒 Verrouillage de la configuration</h4>
+    <p>Il est possible de verrouiller les paramètres généraux (date de début, base hebdomadaire,
+    clôture annuelle) afin d'éviter toute modification involontaire.</p>
+
+    <hr>
+    <h4>💾 Sauvegarde</h4>
+    <p>Les données sont enregistrées localement sur l'appareil utilisé. Il est fortement
+    recommandé d'effectuer des exports réguliers (mensuels ou après chaque clôture)
+    pour sécuriser le suivi annuel.</p>
+
+    <hr>
+    <p style="font-size:12px;color:#777">Cette notice est fournie à titre informatif.
+    L'outil ne constitue pas un logiciel de paie et ne se substitue pas aux documents
+    officiels de l'employeur.</p>
+
+    <button onclick="closeNotice()">Fermer</button>
+  </div>
+</div>
+
+<h1>Compteur Heures Sup</h1>
+<p style="text-align:center"></p>
+<p style="text-align:center">
+  Exercice : <b id="activeYearLabel"></b>
+  <button onclick="switchYear()">&#128193; Changer</button>
+</p>
+
+<!-- BOUTON SETTINGS (remplace l'ancien <details class="section">) -->
+<button id="openSettingsBtn" onclick="openSettingsModal()">
+  &#9881;&#65039; Configuration &amp; R&eacute;glages
+  <span style="float:right;opacity:.6;font-weight:400;font-size:13px">Appuyer pour ouvrir &rsaquo;</span>
+</button>
+
+<!--
+  =================================================================
+  SETTINGS MODAL
+  IMPORTANT : cette modale DOIT rester AVANT le <script> principal.
+  Le script principal fait des getElementById() sur les inputs
+  exerciseStartInput, annualDateInput, baseHebdoInput, periodSelect,
+  periodInfo, rateContainer, configLockInfo, autoFerieToggle
+  au moment de son chargement (hors DOMContentLoaded).
+  Si la modale est placee apres le script, ces elements sont null
+  et l'application plante immediatement.
+  =================================================================
+-->
+<div class="popup" id="settingsModal">
+  <div class="popup-content">
+    <div class="settings-modal-title">
+      <h3>&#9881;&#65039; Configuration</h3>
+      <button class="settings-close-x" onclick="closeSettingsModal()">&#10005;</button>
+    </div>
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#128197; Exercice &amp; Calendrier</span>
+      <label style="font-size:13px;margin-bottom:4px;display:block;">Date de d&eacute;but d&apos;exercice</label>
+      <input type="date" id="exerciseStartInput">
+      <label style="font-size:13px;margin-top:8px;margin-bottom:4px;display:block;">Date de cl&ocirc;ture annuelle</label>
+      <input type="date" id="annualDateInput">
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#x23F1;&#65039; Temps de travail</span>
+      <label style="font-size:13px;margin-bottom:4px;display:block;">Base hebdomadaire (heures)</label>
+      <input type="number" step="0.5" id="baseHebdoInput">
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#128198; Cl&ocirc;tures comptables</span>
+      <div class="settings-row">
+        <button onclick="openClosures()">&#128197; G&eacute;rer les cl&ocirc;tures</button>
+        <select id="periodSelect" style="min-width:0"></select>
+      </div>
+      <p id="periodInfo" style="font-size:13px;color:#555;margin:6px 0 0;"></p>
+      <div id="rateContainer"></div>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#x1F38C; Jours f&eacute;ri&eacute;s</span>
+      <button onclick="importFeries()">&#x1F1EB;&#x1F1F7; Importer jours f&eacute;ri&eacute;s officiels</button>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;cursor:pointer;">
+        <input type="checkbox" id="autoFerieToggle" style="width:auto;margin:0;">
+        Mode f&eacute;ri&eacute; automatique (&minus;7h en semaine)
+      </label>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#x1F4BE; Import / Export</span>
+      <div class="settings-row">
+        <button onclick="importJSON()">&#x2B06;&#65039; Importer (.json)</button>
+        <button onclick="exportJSON()">&#x1F4BE; Sauvegarder</button>
+      </div>
+      <div class="settings-row" style="margin-top:8px;">
+        <button onclick="exportPeriodPDF()">&#x1F4D8; PDF P&eacute;riode</button>
+        <button onclick="exportMonthlyFullPDF()">&#x1F4C4; PDF Mensuel</button>
+        <button onclick="exportAnnualPDF()">&#x1F4D5; PDF Annuel</button>
+      </div>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#x1F512; S&eacute;curit&eacute;</span>
+      <button onclick="toggleConfigLock()">&#x1F512; / &#x1F513; Verrouiller la configuration</button>
+      <p id="configLockInfo" style="font-size:13px;color:#555;margin:6px 0 0;"></p>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label">&#x1F9D9; Assistant de configuration</span>
+      <button class="kitsune-btn" style="width:100%;" onclick="restartWizard()">
+        &#x1F9D9; Relancer l&apos;assistant de d&eacute;marrage
+      </button>
+    </div>
+
+    <hr class="settings-divider">
+
+    <div class="settings-group">
+      <span class="settings-group-label" style="color:#c62828;">&#9888;&#65039; Zone de danger</span>
+      <button class="settings-danger-btn" onclick="resetCurrentExercise()">
+        &#x267B;&#65039; R&eacute;initialiser l&apos;exercice en cours
+      </button>
+    </div>
+
+    <div class="popup-actions">
+      <button onclick="closeSettingsModal()">Fermer</button>
+    </div>
+  </div>
+</div>
+<!-- FIN settingsModal -->
+
+<div id="activePeriodBanner" style="max-width:900px;margin:10px auto;background:#e3f2fd;border:1px solid #90caf9;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:bold;"></div>
+
+<div class="calendar-wrapper main-zone">
+  <div class="month-nav">
+    <select id="monthSelect"></select>
+    <select id="yearSelect"></select>
+  </div>
+  <div class="weekdays">
+    <div class="weekday">Lun</div><div class="weekday">Mar</div><div class="weekday">Mer</div>
+    <div class="weekday">Jeu</div><div class="weekday">Ven</div><div class="weekday">Sam</div><div class="weekday">Dim</div>
+  </div>
+  <div class="calendar" id="calendar"></div>
+</div>
+
+<div style="max-width:900px;margin:15px auto;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;">
+    <button onclick="exportJSON()" style="background:#e0f4f7;border:1px solid #2196a6;font-weight:bold;">
+      &#x1F4BE; Sauvegarde dans un fichier
+    </button>
+  </div>
+  <div id="saveBadges" style="font-size:13px;color:#2196a6;margin-top:6px;width:100%;">
+    <span id="autoSaveBadge">&#x1F7E2; Dans l&apos;application : &mdash;</span><br>
+    <span id="fileSaveBadge">&#x1F4BE; Sauvegarde fichier : &mdash;</span>
+  </div>
+  <span style="font-size:13px;color:#2196a6;align-self:center;">Sauvegarde automatique dans l&apos;application &middot; Sauvegarde fichier recommand&eacute;e</span>
+</div>
+
+<div class="totaux main-zone" id="totaux"></div>
+
+<div class="popup" id="popup">
+  <div class="popup-content">
+    <div class="sheet-handle"></div>
+    <h3 id="popupDate"></h3>
+    <fieldset class="block plus">
+      <legend>&#10133; Heures suppl&eacute;mentaires</legend>
+      <button onclick="addExtra(0.25)">+15 min</button>
+      <button onclick="addExtra(0.5)">+30 min</button>
+      <button onclick="addExtra(1)">+1 h</button>
+      <button onclick="addExtra(2)">+2 h</button>
+      <input id="manualExtra" type="number" step="0.25">
+    </fieldset>
+    <fieldset class="block minus">
+      <legend>&#10134; R&eacute;cup&eacute;ration</legend>
+      <button onclick="addRecup(0.25)">-15 min</button>
+      <button onclick="addRecup(0.5)">-30 min</button>
+      <button onclick="addRecup(1)">-1 h</button>
+      <input id="manualRecup" type="number" step="0.25">
+    </fieldset>
+    <fieldset class="block absence">
+      <legend>&#10060; Absence</legend>
+      <label><input type="checkbox" id="isAbsent"> Jour d&apos;absence</label>
+      <input id="absentHours" type="number" step="0.25">
+    </fieldset>
+    <div class="popup-actions">
+      <button onclick="saveManual()">Valider</button>
+      <button onclick="resetDay()" style="background:#c62828;color:#fff">&#x1F5D1;&#65039; Supprimer les heures du jour</button>
+      <button onclick="closePopup()">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div class="popup" id="popupJSON">
+  <div class="popup-content">
+    <h3 id="jsonTitle"></h3>
+    <textarea id="jsonArea" style="width:100%;height:200px"></textarea>
+    <button onclick="confirmImportJSON()">Importer</button>
+    <button onclick="closeJSONPopup()">Fermer</button>
+  </div>
+</div>
+
+<!-- ================================================================
+     SCRIPT PRINCIPAL
+     Tous les getElementById() ci-dessous trouvent leurs elements
+     car settingsModal est declare AVANT cette balise <script>.
+     ================================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+let APP_CRASHED = false, RECOVERY_MODE = false, DEBUG_MODE = true;
+
+document.querySelectorAll('.popup').forEach(p => {
+  p.addEventListener('click', e => { if (e.target === p && p.id === "popup") closePopup(); });
+});
+
+let midnightTimer = null;
+
+function enterRecoveryMode(source, error) {
+  if (RECOVERY_MODE) return;
+  RECOVERY_MODE = true; APP_CRASHED = true;
+  localStorage.setItem("APP_CRASH_STATE", JSON.stringify({ at: new Date().toISOString(), source, message: String(error) }));
+  alert("⚠️ Une erreur est survenue.\n\nL'application est passée en mode récupération.\nAucune donnée n'a été supprimée.");
+}
+function simulateCrash() { console.warn("💥 Crash simulé"); undefinedVariable.forceCrash(); }
+function protectedCrash() {
+  const code = prompt("🔒 Zone protégée\n\nEntrez le code :");
+  if (code === null) return;
+  if (code === "1234") simulateCrash(); else alert("❌ Code incorrect");
+}
+function safe(fn, label) {
+  return function (...args) {
+    try { return fn.apply(this, args); }
+    catch (e) { console.error("💥 CRASH:", label, e); enterRecoveryMode(label, e); return undefined; }
+  };
+}
+window.onerror = (msg, src, l, c, err) => enterRecoveryMode("window.onerror", err || msg);
+window.addEventListener("unhandledrejection", e => enterRecoveryMode("promise", e.reason));
+
+function goMenu() { localStorage.removeItem("lastApp"); window.location.href = "../menu.html"; }
+
+function autoSwitchPeriodAtMidnight() {
+  const now = new Date();
+  const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0, 0);
+  if (midnightTimer) clearTimeout(midnightTimer);
+  midnightTimer = setTimeout(() => {
+    if (typeof buildPeriods === "function") buildPeriods();
+    if (typeof update === "function") update();
+    showToast(); autoSwitchPeriodAtMidnight();
+  }, next - now);
+}
+
+let currentSuffix = localStorage.getItem("ACTIVE_YEAR_SUFFIX") || new Date().getFullYear();
+document.getElementById("activeYearLabel").textContent = currentSuffix;
+
+function resetCurrentExercise() {
+  if (!confirm("⚠️ Réinitialiser complètement l'exercice " + currentSuffix + " ?\n\nToutes les données seront supprimées.")) return;
+  createSnapshot("before_reset_exercise");
+  ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_"]
+    .forEach(p => localStorage.removeItem(p + currentSuffix));
+  alert("✅ Exercice " + currentSuffix + " remis à zéro");
+  location.reload();
+}
+function resetDay() {
+  if (!selectedDate) return;
+  if (!confirm("❌ Supprimer toutes les données de cette journée ?")) return;
+  delete data[selectedDate]; save(); closePopup();
+}
+function checkExerciseStartAlert() {
+  document.getElementById("exerciseAlert").style.display = exerciseStart ? "none" : "block";
+}
+function switchYear() { openYearsPopup(); }
+function openYearsPopup() {
+  const box = document.getElementById("yearsList"); if (!box) return;
+  box.innerHTML = "";
+  const years = getExistingYears();
+  if (!years.length) box.innerHTML = "<i>Aucun exercice existant</i>";
+  else years.forEach(y => {
+    const btn = document.createElement("button");
+    btn.textContent = y + (String(y) === String(currentSuffix) ? " (actif)" : "");
+    btn.onclick = () => { localStorage.setItem("ACTIVE_YEAR_SUFFIX", y); location.reload(); };
+    box.appendChild(btn);
+  });
+  document.getElementById("popupYears").style.display = "flex";
+}
+function saveManual() {
+  if (!selectedDate) return;
+  if (!data[selectedDate]) data[selectedDate] = { extra: 0, recup: 0, absent: 0 };
+  data[selectedDate].extra = Number(manualExtra.value) || 0;
+  data[selectedDate].recup = Number(manualRecup.value) || 0;
+  data[selectedDate].absent = isAbsent.checked ? (Number(absentHours.value) || DAILY_WORK_HOURS) : 0;
+  save(); closePopup();
+}
+function closeYearsPopup() { document.getElementById("popupYears").style.display = "none"; }
+function confirmSwitchYear() {
+  const val = document.getElementById("newYearInput").value; if (!val) return;
+  if (!localStorage.getItem("DATA_REPORT_" + val)) {
+    localStorage.setItem("DATA_REPORT_" + val, JSON.stringify({}));
+    localStorage.setItem("CLOSURES_REPORT_" + val, JSON.stringify([]));
+    localStorage.setItem("REPORTS_REPORT_" + val, JSON.stringify({}));
+    localStorage.setItem("PERIOD_META_REPORT_" + val, JSON.stringify({}));
+  }
+  localStorage.setItem("ACTIVE_YEAR_SUFFIX", val); location.reload();
+}
+function addRecup(h) {
+  if (!data[selectedDate]) data[selectedDate] = { extra: 0, recup: 0 };
+  const nv = Math.round((data[selectedDate].recup + h) * 4) / 4;
+  data[selectedDate].recup = ALLOW_RECUP_FREE ? nv : Math.min(nv, data[selectedDate].extra);
+  save(); closePopup();
+}
+function addExtra(h) {
+  if (!data[selectedDate]) data[selectedDate] = { extra: 0, recup: 0 };
+  data[selectedDate].extra = Math.round((data[selectedDate].extra + h) * 4) / 4;
+  save(); closePopup();
+}
+function getExistingYears() {
+  const s = new Set();
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k.startsWith("DATA_REPORT_")) s.add(k.replace("DATA_REPORT_", ""));
+  }
+  return Array.from(s).sort();
+}
+
+const STORAGE = {
+  data: "DATA_REPORT_" + currentSuffix,
+  closures: "CLOSURES_REPORT_" + currentSuffix,
+  reports: "REPORTS_REPORT_" + currentSuffix,
+  annualDate: "ANNUAL_DATE_" + currentSuffix,
+  specialDays: "SPECIAL_DAYS_" + currentSuffix,
+  exerciseStart: "EXERCISE_START_" + currentSuffix,
+  periodMeta: "PERIOD_META_REPORT_" + currentSuffix
+};
+
+let data        = JSON.parse(localStorage.getItem(STORAGE.data))       || {};
+let closures    = JSON.parse(localStorage.getItem(STORAGE.closures))   || [];
+let reports     = JSON.parse(localStorage.getItem(STORAGE.reports))    || {};
+let annualDate  = localStorage.getItem(STORAGE.annualDate)             || "";
+let annualRate  = Number(localStorage.getItem("ANNUAL_RATE_" + currentSuffix)) || 10;
+let specialDays = JSON.parse(localStorage.getItem(STORAGE.specialDays)) || {};
+let exerciseStart = localStorage.getItem(STORAGE.exerciseStart)        || "";
+let periodMeta  = JSON.parse(localStorage.getItem(STORAGE.periodMeta)) || {};
+let BASE_HEBDO  = Number(localStorage.getItem("BASE_HEBDO_" + currentSuffix)) || 35;
+let AUTO_FERIE  = localStorage.getItem("AUTO_FERIE_" + currentSuffix)  === "true";
+
+const DAILY_WORK_HOURS = 7;
+const ALLOW_RECUP_FREE = true;
+const months = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+
+// Ces elements existent dans le DOM car settingsModal est AVANT ce script
+const monthSelect  = document.getElementById("monthSelect");
+const yearSelect   = document.getElementById("yearSelect");
+const periodSelect = document.getElementById("periodSelect");
+const calendar     = document.getElementById("calendar");
+const periodInfo   = document.getElementById("periodInfo");
+const totaux       = document.getElementById("totaux");
+const popup        = document.getElementById("popup");
+const popupDate    = document.getElementById("popupDate");
+const manualExtra  = document.getElementById("manualExtra");
+const manualRecup  = document.getElementById("manualRecup");
+const isAbsent     = document.getElementById("isAbsent");
+const absentHours  = document.getElementById("absentHours");
+const popupJSON    = document.getElementById("popupJSON");
+const jsonTitle    = document.getElementById("jsonTitle");
+const jsonArea     = document.getElementById("jsonArea");
+
+let view = new Date(), viewMonth = view.getMonth(), viewYear = view.getFullYear();
+let selectedDate = "", currentPeriodIndex = 0;
+
+function dateKeyLocal(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function getBaseStartDate() { return exerciseStart ? new Date(exerciseStart) : null; }
+
+function initSelectors() {
+  monthSelect.innerHTML = "";
+  months.forEach((m, i) => {
+    const o = document.createElement("option"); o.value = i; o.textContent = m;
+    if (i === viewMonth) o.selected = true; monthSelect.appendChild(o);
+  });
+  yearSelect.innerHTML = "";
+  for (let y = viewYear - 2; y <= 2050; y++) {
+    const o = document.createElement("option"); o.value = y; o.textContent = y;
+    if (y === viewYear) o.selected = true; yearSelect.appendChild(o);
+  }
+}
+
+function openClosures() {
+  const box = document.getElementById("closuresInputs"); box.innerHTML = "";
+  for (let i = 0; i < 13; i++) {
+    const inp = document.createElement("input"); inp.type = "date"; inp.value = closures[i] || "";
+    box.appendChild(inp);
+  }
+  document.getElementById("popupClosures").style.display = "flex";
+}
+function closeClosures() { document.getElementById("popupClosures").style.display = "none"; }
+
+function forceSunday(dateStr) {
+  if (!dateStr) return dateStr;
+  const d = new Date(dateStr), day = d.getDay();
+  if (day === 0) return dateStr;
+  d.setDate(d.getDate() - day); return d.toISOString().slice(0, 10);
+}
+
+function saveClosures() {
+  let adj = false;
+  closures = [...document.querySelectorAll("#closuresInputs input")].map(i => {
+    const f = forceSunday(i.value); if (i.value && i.value !== f) adj = true; return f;
+  }).filter(v => v).sort();
+  localStorage.setItem(STORAGE.closures, JSON.stringify(closures));
+  if (adj) alert("ℹ️ Toute clôture doit être un dimanche.\nLes dates saisies ont été automatiquement ajustées.");
+  buildPeriods(); closeClosures();
+}
+
+function buildPeriods() {
+  const base = getBaseStartDate();
+  if (!base) { periodSelect.innerHTML = ""; if (typeof update === "function") update(); return; }
+  periodSelect.innerHTML = "";
+  let start = new Date(base); start.setHours(0,0,0,0);
+  const today = new Date(); today.setHours(0,0,0,0);
+  let found = null;
+  const periods = []; // stocker toutes les périodes pour la recherche fallback
+
+  closures.forEach((c, i) => {
+    const end = new Date(c); end.setHours(0,0,0,0);
+    const opt = document.createElement("option"); opt.value = i;
+    opt.textContent = `${start.toLocaleDateString()} → ${end.toLocaleDateString()}`;
+    periodSelect.appendChild(opt);
+    periods.push({ start: new Date(start), end: new Date(end), index: i });
+    if (today >= start && today <= end) found = i;
+    start = new Date(end); start.setDate(start.getDate() + 1);
+  });
+
+  if (closures.length === 0) {
+    found = 0;
+  } else if (found === null) {
+    // Aujourd'hui avant toutes les périodes → première période
+    if (today < periods[0].start) {
+      found = 0;
+    } else {
+      // Aujourd'hui après toutes les périodes → dernière période
+      found = closures.length - 1;
+    }
+  }
+
+  found = Math.max(0, found);
+  currentPeriodIndex = found; periodSelect.selectedIndex = found;
+  if (typeof update === "function") update();
+}
+
+function toggleConfigLock() {
+  const key = "CONFIG_LOCK_" + currentSuffix;
+  localStorage.setItem(key, !(localStorage.getItem(key) === "true")); applyConfigLock();
+}
+function applyConfigLock() {
+  const locked = localStorage.getItem("CONFIG_LOCK_" + currentSuffix) === "true";
+  document.querySelectorAll("#exerciseStartInput,#baseHebdoInput,#annualDateInput").forEach(el => el.disabled = locked);
+  const info = document.getElementById("configLockInfo");
+  if (info) info.textContent = locked ? "🔒 Configuration verrouillée" : "🔓 Configuration modifiable";
+}
+
+function getCurrentPeriod() {
+  const base = getBaseStartDate(); if (!base) return null;
+  let start = base;
+  for (let i = 0; i <= closures.length; i++) {
+    const end = i < closures.length ? new Date(closures[i]) : new Date(2099,11,31);
+    if (i === currentPeriodIndex) return { start, end, index: i };
+    start = new Date(end); start.setDate(start.getDate() + 1);
+  }
+  return null;
+}
+
+function ensureReportsUpTo(index) {
+  // Recalcule toutes les périodes précédentes dans l'ordre
+  // (le résultat de chaque période alimente le "report précédent" de la suivante)
+  const sv = currentPeriodIndex;
+  for (let i = 0; i < index; i++) {
+    currentPeriodIndex = i;
+    calculate();
+  }
+  currentPeriodIndex = sv;
+}
+
+function generateCalendar() {
+  calendar.innerHTML = "";
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const offset = firstDay === 0 ? 6 : firstDay - 1;
+  const days = new Date(viewYear, viewMonth + 1, 0).getDate();
+  for (let i = 0; i < offset; i++) calendar.appendChild(document.createElement("div"));
+  const period = getCurrentPeriod();
+  let pStart = null, pEnd = null;
+  if (period) {
+    pStart = new Date(period.start); pEnd = new Date(period.end);
+    pStart.setHours(0,0,0,0); pEnd.setHours(0,0,0,0);
+  }
+  for (let d = 1; d <= days; d++) {
+    const key = `${viewYear}-${String(viewMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    const div = document.createElement("div"); div.className = "day";
+    if (period) { const dk = new Date(key); if (pStart && dk >= pStart && dk <= pEnd) div.classList.add("in-period"); }
+    const day = data[key] || { extra:0, recup:0, absent:0 };
+    let html = `<strong>${d}</strong>`;
+    if (day.extra) html += `<small style="color:#000;font-weight:600">+${day.extra}h</small>`;
+    if (day.recup) html += `<small style="color:#ef6c00">-${day.recup}h</small>`;
+    if (specialDays[key] === "ferie") {
+      html += `<small style="color:#0d47a1;font-weight:bold">🎌 Férié</small>`;
+      div.style.background = "#e3f2fd"; div.style.border = "2px dashed #1976d2";
+    } else if (day.absent) {
+      html += `<small style="color:#c62828;font-weight:bold">ABS ${day.absent}h</small>`;
+      div.style.background = "#ffebee"; div.style.border = "2px solid #c62828";
+    }
+    div.innerHTML = html;
+    if (key === dateKeyLocal(new Date())) div.classList.add("today");
+    div.onclick = () => openPopup(key); calendar.appendChild(div);
+  }
+}
+
+function getLastValidReport(index) {
+  for (let i = index - 1; i >= 0; i--)
+    if (reports[i] !== undefined && reports[i] !== null) return Number(reports[i]) || 0;
+  return 0;
+}
+
+function calculate() {
+  const period = getCurrentPeriod();
+  if (!period) {
+    totaux.innerHTML = `<div style="background:#fff3cd;border:1px solid #ffeeba;padding:12px;border-radius:8px;color:#856404">ℹ️ Définissez une date de début d'exercice et des clôtures pour activer les calculs.</div>`;
+    return;
+  }
+  if (periodMeta[period.index]?.status === "deleted") { totaux.innerHTML = "<i>❌ Cette période est supprimée</i>"; return; }
+
+  let weeks = {}, absences = {}, recups = {}, totalRecup = 0, details = [], h25 = 0, h50 = 0;
+  ensureReportsUpTo(period.index);
+  const reportPrev = getLastValidReport(period.index);
+  periodInfo.innerHTML = `<b>Période :</b> ${period.start.toLocaleDateString()} → ${period.end.getFullYear() === 2099 ? "en cours" : period.end.toLocaleDateString()}<br><b>Report précédent :</b> ${reportPrev.toFixed(2)} h`;
+
+  const pStart = new Date(period.start); pStart.setHours(0,0,0,0);
+  const pEnd   = new Date(period.end);   pEnd.setHours(0,0,0,0);
+
+  if (AUTO_FERIE) {
+    Object.entries(specialDays).forEach(([date, type]) => {
+      if (type !== "ferie") return;
+      const d = new Date(date); if (d < pStart || d > pEnd) return;
+      const dow = d.getDay(); if (dow === 0 || dow === 6) return;
+      if (!data[date] || !data[date].absent) {
+        const iso = dow === 0 ? 7 : dow;
+        const monday = new Date(d); monday.setDate(monday.getDate() - (iso - 1));
+        const wk = dateKeyLocal(monday); absences[wk] = (absences[wk] || 0) + DAILY_WORK_HOURS;
+      }
+    });
+  }
+
+  Object.entries(data).forEach(([date, v]) => {
+    const [y,m,d] = date.split("-").map(Number);
+    const dd = new Date(y, m-1, d); const dow = dd.getDay();
+    if (dd < pStart || dd > pEnd) return;
+    const iso = dow === 0 ? 7 : dow;
+    const monday = new Date(dd); monday.setDate(monday.getDate() - (iso - 1));
+    if (monday < pStart || monday > pEnd) return;
+    const wk = dateKeyLocal(monday);
+    weeks[wk] = (weeks[wk] || 0) + (v.extra || 0);
+    if (dow !== 0 && dow !== 6) absences[wk] = (absences[wk] || 0) + (v.absent || 0);
+    recups[wk] = (recups[wk] || 0) + (v.recup || 0); totalRecup += v.recup || 0;
+  });
+
+  Object.entries(weeks).forEach(([week, extra]) => {
+    const absent = absences[week] || 0;
+    // Absences réduisent la base (heures non effectuées)
+    // Récupérations ne réduisent PAS la base : elles ne touchent qu'au solde net final
+    const base  = Math.max(0, BASE_HEBDO - absent);
+    const total = base + extra;
+    let w25 = 0, w50 = 0;
+    if (total > BASE_HEBDO) w25 = Math.min(total, BASE_HEBDO + 8) - BASE_HEBDO;
+    if (total > BASE_HEBDO + 8) w50 = total - (BASE_HEBDO + 8);
+    w25 = Math.max(0, w25); w50 = Math.max(0, w50); h25 += w25; h50 += w50;
+    const [y,m,d] = week.split("-");
+    details.push(`Semaine du ${new Date(y, m-1, d).toLocaleDateString()} : ${w25.toFixed(2)}h à 25% / ${w50.toFixed(2)}h à 50%`);
+  });
+
+  const brut25 = h25 * 1.25, brut50 = h50 * 1.5;
+  const brut = brut25 + brut50 + reportPrev, net = brut - totalRecup;
+  reports[period.index] = net; localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
+
+  totaux.innerHTML = `
+    <details class="calc-details">
+      <summary>📊 Détails des calculs</summary>
+      <div class="breakdown">${details.join("<br>")}<hr>25% : ${h25}h × 1,25 = ${brut25.toFixed(2)} h<br>50% : ${h50}h × 1,50 = ${brut50.toFixed(2)} h<br>Report précédent : ${reportPrev.toFixed(2)} h</div>
+    </details>
+    <hr><b>Solde brut :</b> ${brut.toFixed(2)} h<br>Récup : ${totalRecup.toFixed(2)} h<br><b>Solde net :</b> ${net.toFixed(2)} h`;
+
+  const rateContainer = document.getElementById("rateContainer"); rateContainer.innerHTML = "";
+  if (shouldShowAnnualClosure()) {
+    rateContainer.innerHTML = `<div style="background:#e0f4f7;padding:10px;border-radius:6px;border:1px solid #4FB3C2;margin-top:10px;box-sizing:border-box;width:100%;"><label style="display:block;font-weight:bold;margin-bottom:4px;">Taux horaire (€)</label><input type="number" id="hourlyRateInput" step="0.5" value="${annualRate}" style="width:100%;box-sizing:border-box;margin:0;"></div>`;
+    document.getElementById("hourlyRateInput").oninput = () => {
+      const v = Number(document.getElementById("hourlyRateInput").value);
+      annualRate = isNaN(v) ? 10 : v; localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate); calculate();
+    };
+    totaux.innerHTML += `<hr><div style="background:#e0f4f7;padding:15px;border:2px solid #2196a6;border-radius:8px;"><h3 style="margin:0;color:#2196a6;">🎯 Clôture Annuelle</h3><b>Paiement (${annualRate}€/h) :</b> ${(net * annualRate).toFixed(2)} €</div>`;
+  }
+}
+
+function openNotice()  { document.getElementById("popupNotice").style.display = "flex"; }
+function closeNotice() { document.getElementById("popupNotice").style.display = "none"; }
+
+function openPopup(date) {
+  selectedDate = date;
+  if (specialDays[date] === "ferie" && !AUTO_FERIE) {
+    if (!data[date]) data[date] = { extra:0, recup:0, absent:0 };
+    data[date].absent = DAILY_WORK_HOURS;
+  }
+  const d = data[date] || { extra:0, recup:0, absent:0 };
+  popupDate.textContent = date; manualExtra.value = d.extra; manualRecup.value = d.recup;
+  absentHours.value = d.absent || 0; isAbsent.checked = (d.absent || 0) > 0;
+  lockBodyScroll(); popup.style.display = "flex";
+}
+function closePopup() {
+  document.getElementById("popup").style.display = "none";
+  const had = selectedDate; selectedDate = ""; unlockBodyScroll();
+  if (had && typeof update === "function") update();
+}
+
+function save() {
+  localStorage.setItem(STORAGE.data, JSON.stringify(data));
+  localStorage.setItem("AUTO_SAVE_DATE_" + currentSuffix, new Date().toISOString());
+
+  // Invalider les reports depuis la période affectée pour forcer le recalcul en cascade
+  if (selectedDate) {
+    const affectedPeriod = getPeriodIndexForDate(selectedDate);
+    if (affectedPeriod !== null) {
+      // Effacer tous les reports à partir de cette période (cascade)
+      // Invalider depuis la période affectée jusqu'à la fin (toutes les périodes suivantes
+      // dépendent en cascade du solde de la période précédente)
+      for (let i = affectedPeriod; i <= closures.length + 1; i++) {
+        delete reports[i];
+      }
+      localStorage.setItem(STORAGE.reports, JSON.stringify(reports));
+    }
+  }
+
+  updateSaveBadges();
+}
+
+// Retourne l'index de la période à laquelle appartient une date donnée
+function getPeriodIndexForDate(dateStr) {
+  const base = getBaseStartDate();
+  if (!base) return 0;
+  const d = new Date(dateStr); d.setHours(0,0,0,0);
+  if (!closures.length) return 0;
+  let start = new Date(base); start.setHours(0,0,0,0);
+  for (let i = 0; i < closures.length; i++) {
+    const end = new Date(closures[i]); end.setHours(0,0,0,0);
+    if (d >= start && d <= end) return i;
+    start = new Date(end); start.setDate(start.getDate() + 1);
+  }
+  // Date après toutes les clôtures (future) → dernière période connue
+  return Math.max(0, closures.length - 1);
+}
+function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent); }
+
+function createSnapshot(label) {
+  const key = "SNAPSHOT_" + Date.now();
+  localStorage.setItem(key, JSON.stringify({ label, date: new Date().toISOString(), data, closures, reports, periodMeta, exerciseStart, annualDate, specialDays, BASE_HEBDO, annualRate }));
+  const snaps = Object.keys(localStorage).filter(k => k.startsWith("SNAPSHOT_")).sort();
+  while (snaps.length > 5) localStorage.removeItem(snaps.shift());
+}
+
+function exportJSON() {
+  createSnapshot("before_export");
+  const blob = new Blob([JSON.stringify({ version:1, exercise:currentSuffix, data, closures, reports, periodMeta, exerciseStart, annualDate, specialDays, BASE_HEBDO, annualRate }, null, 2)], { type:"application/json" });
+  const fn = `heures_sup_${currentSuffix}.json`;
+  if (navigator.canShare && navigator.canShare({ files:[new File([blob], fn)] })) {
+    localStorage.setItem("FILE_SAVE_DATE_" + currentSuffix, new Date().toISOString()); updateSaveBadges();
+    navigator.share({ files:[new File([blob], fn, { type:"application/json" })], title:"Sauvegarde heures supplémentaires" }); return;
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = fn; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  localStorage.setItem("FILE_SAVE_DATE_" + currentSuffix, new Date().toISOString()); updateSaveBadges();
+}
+
+function importJSON() {
+  if (isIOS()) { jsonTitle.textContent = "Collez le texte JSON (Import)"; jsonArea.value = ""; popupJSON.style.display = "flex"; }
+  else {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json";
+    inp.onchange = e => { const r = new FileReader(); r.onload = () => loadJSON(r.result); r.readAsText(e.target.files[0]); };
+    inp.click();
+  }
+}
+function updateSaveBadges() {
+  const ae = document.getElementById("autoSaveBadge"), fe = document.getElementById("fileSaveBadge");
+  if (!ae || !fe) return;
+  const a = localStorage.getItem("AUTO_SAVE_DATE_" + currentSuffix);
+  const f = localStorage.getItem("FILE_SAVE_DATE_" + currentSuffix);
+  ae.textContent = a ? "🟢 Dans l'application : " + new Date(a).toLocaleString() : "🟢 Dans l'application : —";
+  fe.textContent = f ? "💾 Sauvegarde fichier : "  + new Date(f).toLocaleString()  : "💾 Sauvegarde fichier : —";
+}
+function confirmImportJSON() { loadJSON(jsonArea.value); closeJSONPopup(); }
+function loadJSON(text) {
+  let obj; try { obj = JSON.parse(text); } catch(e) { alert("❌ JSON invalide"); return; }
+  if (obj.version !== 1) { alert("❌ Version de sauvegarde incompatible"); return; }
+  if (obj.exercise && String(obj.exercise) !== String(currentSuffix)) {
+    if (!confirm(`⚠️ Ce fichier appartient à l'exercice ${obj.exercise}.\n\nVoulez-vous basculer automatiquement dessus ?`)) return;
+    localStorage.setItem("ACTIVE_YEAR_SUFFIX", obj.exercise); location.reload(); return;
+  }
+  if (!obj.data || !obj.closures) { alert("❌ Sauvegarde invalide ou incomplète"); return; }
+  if (!confirm("⚠️ Cette action va remplacer les données de l'exercice en cours.\n\nContinuer ?")) return;
+  createSnapshot("before_import");
+  data = obj.data; closures = obj.closures; reports = obj.reports || {}; periodMeta = obj.periodMeta || {};
+  exerciseStart = obj.exerciseStart || ""; annualDate = obj.annualDate || ""; specialDays = obj.specialDays || {};
+  BASE_HEBDO = Number(obj.BASE_HEBDO) || 35; annualRate = Number(obj.annualRate) || 10;
+  localStorage.setItem(STORAGE.data,       JSON.stringify(data));
+  localStorage.setItem(STORAGE.closures,   JSON.stringify(closures));
+  localStorage.setItem(STORAGE.reports,    JSON.stringify(reports));
+  localStorage.setItem(STORAGE.periodMeta, JSON.stringify(periodMeta));
+  localStorage.setItem(STORAGE.exerciseStart, exerciseStart);
+  localStorage.setItem(STORAGE.annualDate,    annualDate);
+  localStorage.setItem(STORAGE.specialDays,   JSON.stringify(specialDays));
+  localStorage.setItem("BASE_HEBDO_" + currentSuffix, BASE_HEBDO);
+  localStorage.setItem("ANNUAL_RATE_" + currentSuffix, annualRate);
+  if (typeof update === "function") update(); alert("✅ Import complet réussi");
+}
+function closeJSONPopup() { popupJSON.style.display = "none"; }
+
+async function importFeries() {
+  const by = Number(currentSuffix), years = [by-1, by, by+1];
+  if (!confirm(`Importer les jours fériés officiels pour ${years.join(", ")} ?`)) return;
+  try {
+    for (const y of years) {
+      const res = await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`);
+      const f = await res.json(); Object.keys(f).forEach(d => { if (!specialDays[d]) specialDays[d] = "ferie"; });
+    }
+    localStorage.setItem(STORAGE.specialDays, JSON.stringify(specialDays));
+    localStorage.setItem(STORAGE.data, JSON.stringify(data));
+    if (typeof update === "function") update(); alert("✅ Jours fériés importés (N-1 / N / N+1)");
+  } catch(e) { alert("❌ Impossible d'importer les jours fériés"); }
+}
+
+function update() {
+  checkExerciseStartAlert(); generateCalendar(); calculate(); applyConfigLock(); updateSaveBadges();
+  const aft = document.getElementById("autoFerieToggle");
+  if (aft) {
+    aft.checked = AUTO_FERIE;
+    aft.onchange = () => { AUTO_FERIE = aft.checked; localStorage.setItem("AUTO_FERIE_" + currentSuffix, AUTO_FERIE); update(); };
+  }
+  const banner = document.getElementById("activePeriodBanner"), period = getCurrentPeriod();
+  if (banner) {
+    if (period && exerciseStart) {
+      const s = period.start.toLocaleDateString(), e = period.end.getFullYear() === 2099 ? "en cours" : period.end.toLocaleDateString();
+      banner.innerHTML = `📘 Période ${period.index + 1} : ${s} → ${e}`;
+    } else banner.innerHTML = "";
+  }
+}
+
+monthSelect.onchange  = () => { viewMonth = +monthSelect.value;  if (typeof update === "function") update(); };
+yearSelect.onchange   = () => { viewYear  = +yearSelect.value;   if (typeof update === "function") update(); };
+periodSelect.onchange = () => { currentPeriodIndex = +periodSelect.value; if (typeof update === "function") update(); showToast(); };
+
+const annualDateInput    = document.getElementById("annualDateInput");
+const exerciseStartInput = document.getElementById("exerciseStartInput");
+const baseHebdoInput     = document.getElementById("baseHebdoInput");
+annualDateInput.value    = annualDate;
+exerciseStartInput.value = exerciseStart;
+baseHebdoInput.value     = BASE_HEBDO;
+
+annualDateInput.onchange = () => {
+  annualDate = forceSunday(annualDateInput.value); annualDateInput.value = annualDate;
+  localStorage.setItem(STORAGE.annualDate, annualDate);
+};
+exerciseStartInput.onchange = () => {
+  exerciseStart = exerciseStartInput.value; localStorage.setItem(STORAGE.exerciseStart, exerciseStart); buildPeriods();
+};
+baseHebdoInput.oninput = () => {
+  BASE_HEBDO = Number(baseHebdoInput.value) || 35; localStorage.setItem("BASE_HEBDO_" + currentSuffix, BASE_HEBDO);
+  if (typeof update === "function") update();
+};
+
+function exportMonthlyFullPDF() {
+  createSnapshot("before_export");
+  const { jsPDF } = window.jspdf; const pdf = new jsPDF(); let y = 15;
+  pdf.setFontSize(14); pdf.text("Compteur annuel d'heures – Récapitulatif mensuel", 10, y); y += 10;
+  pdf.setFontSize(10); pdf.text(`Mois : ${months[viewMonth]} ${viewYear}`, 10, y); y += 6;
+  pdf.text(`Base hebdomadaire : ${BASE_HEBDO} h`, 10, y); y += 6;
+  const period = getCurrentPeriod();
+  if (period) { pdf.text("Période comptable : période active au moment de l'export", 10, y); y += 6; }
+  pdf.line(10, y, 200, y); y += 8;
+  let wks = {}, abs = {}, rec = {}, t25 = 0, t50 = 0, tR = 0;
+  Object.entries(data).forEach(([date, v]) => {
+    const d = new Date(date); if (d.getFullYear() !== viewYear || d.getMonth() !== viewMonth) return;
+    const dow = d.getDay(), iso = dow === 0 ? 7 : dow;
+    const mon = new Date(d); mon.setDate(mon.getDate() - (iso - 1)); const wk = dateKeyLocal(mon);
+    wks[wk] = (wks[wk] || 0) + (v.extra || 0); rec[wk] = (rec[wk] || 0) + (v.recup || 0);
+    if (dow !== 0 && dow !== 6) abs[wk] = (abs[wk] || 0) + (v.absent || 0);
+  });
+  Object.keys(wks).sort().forEach(w => {
+    const base = Math.max(0, BASE_HEBDO - (abs[w]||0) - (rec[w]||0)), total = base + wks[w];
+    let h25 = 0, h50 = 0;
+    if (total > BASE_HEBDO) h25 = Math.min(total, BASE_HEBDO+8) - BASE_HEBDO;
+    if (total > BASE_HEBDO+8) h50 = total - (BASE_HEBDO+8);
+    t25 += Math.max(0,h25); t50 += Math.max(0,h50); tR += rec[w]||0;
+    pdf.text(`Semaine du ${new Date(w).toLocaleDateString()} : ${h25.toFixed(2)}h 25% / ${h50.toFixed(2)}h 50%`, 10, y);
+    y += 6; if (y > 270) { pdf.addPage(); y = 15; }
+  });
+  y += 6; pdf.line(10,y,200,y); y += 8;
+  pdf.text(`Total 25 % : ${t25.toFixed(2)} h`,10,y); y+=6;
+  pdf.text(`Total 50 % : ${t50.toFixed(2)} h`,10,y); y+=6;
+  pdf.text(`Récupérations : ${tR.toFixed(2)} h`,10,y); y+=10;
+  pdf.setFontSize(8); pdf.text("Document informatif – ne constitue pas un bulletin de paie.",10,y);
+  pdf.save(`mensuel_${months[viewMonth]}_${viewYear}.pdf`);
+}
+
+function exportAnnualPDF() {
+  createSnapshot("before_export");
+  const { jsPDF } = window.jspdf; const pdf = new jsPDF(); let y = 15, annualNet = 0;
+  const addH = (t) => { pdf.setFontSize(14); pdf.text(t,10,y); y+=8; pdf.setFontSize(10); pdf.text(`Exercice : ${currentSuffix}`,10,y); y+=8; pdf.line(10,y,200,y); y+=6; };
+  addH("Compteur annuel d'heures – Bilan annuel");
+  closures.forEach((_, idx) => {
+    if (periodMeta[idx]?.status === "deleted") return;
+    let start = getBaseStartDate(), period = null;
+    for (let i = 0; i <= closures.length; i++) {
+      const end = i < closures.length ? new Date(closures[i]) : new Date(2099,11,31);
+      if (i === idx) { period = { start, end }; break; }
+      start = new Date(end); start.setDate(start.getDate()+1);
+    }
+    if (!period) return;
+    if (y > 230) { pdf.addPage(); y = 15; addH("Suite – Bilan annuel"); }
+    pdf.setFontSize(12);
+    pdf.text(`Période ${idx+1} : ${period.start.toLocaleDateString()} → ${period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString()}`, 10, y); y+=6;
+    pdf.setFontSize(9); pdf.text(`Base hebdomadaire : ${BASE_HEBDO} h`,10,y); y+=5;
+    let wks={}, abs={}, rec={}, p25=0, p50=0, pR=0;
+    Object.entries(data).forEach(([date,v]) => {
+      const d = new Date(date); if (d < period.start || d > period.end) return;
+      const dow = d.getDay(), iso = dow===0?7:dow;
+      const mon = new Date(d); mon.setDate(mon.getDate()-(iso-1)); const wk = dateKeyLocal(mon);
+      wks[wk]=(wks[wk]||0)+(v.extra||0); rec[wk]=(rec[wk]||0)+(v.recup||0);
+      if (dow!==0&&dow!==6) abs[wk]=(abs[wk]||0)+(v.absent||0);
+    });
+    Object.keys(wks).sort().forEach(w => {
+      const base=Math.max(0,BASE_HEBDO-(abs[w]||0)-(rec[w]||0)), total=base+wks[w];
+      let h25=0,h50=0;
+      if(total>BASE_HEBDO) h25=Math.min(total,BASE_HEBDO+8)-BASE_HEBDO;
+      if(total>BASE_HEBDO+8) h50=total-(BASE_HEBDO+8);
+      p25+=Math.max(0,h25); p50+=Math.max(0,h50); pR+=rec[w]||0;
+      pdf.text(`• Semaine du ${new Date(w).toLocaleDateString()} : ${h25.toFixed(2)}h 25% / ${h50.toFixed(2)}h 50%`,12,y); y+=4;
+      if(y>270){pdf.addPage();y=15;}
+    });
+    const net = p25*1.25+p50*1.5+getLastValidReport(idx)-pR; annualNet+=net;
+    y+=4; pdf.text(`Total 25 % : ${p25.toFixed(2)} h`,12,y); y+=4;
+    pdf.text(`Total 50 % : ${p50.toFixed(2)} h`,12,y); y+=4;
+    pdf.text(`Récupérations : ${pR.toFixed(2)} h`,12,y); y+=4;
+    pdf.text(`Solde net de période : ${net.toFixed(2)} h`,12,y); y+=6;
+    pdf.line(10,y,200,y); y+=6;
+  });
+  if(y>240){pdf.addPage();y=15;}
+  pdf.setFontSize(14); pdf.text("Synthèse annuelle",10,y); y+=10;
+  pdf.setFontSize(12); pdf.text(`Solde annuel net cumulé : ${annualNet.toFixed(2)} h`,10,y); y+=14;
+  pdf.setFontSize(10); pdf.text("Validation / Signature :",10,y); y+=10; pdf.rect(10,y,90,20); y+=30;
+  pdf.setFontSize(8); pdf.text("Bilan annuel généré automatiquement.\nDocument indicatif – ne constitue pas un bulletin de paie.",10,y);
+  pdf.save(`annuel_${currentSuffix}.pdf`);
+}
+
+function exportPeriodPDF() {
+  createSnapshot("before_export");
+  const { jsPDF } = window.jspdf; const pdf = new jsPDF();
+  const period = getCurrentPeriod(); if (!period) { alert("❌ Aucune période active"); return; }
+  let y = 15;
+  pdf.setFontSize(14); pdf.text("Compteur annuel d'heures – Récapitulatif de période",10,y); y+=10;
+  pdf.setFontSize(10);
+  pdf.text(`Période : ${period.start.toLocaleDateString()} → ${period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString()}`,10,y); y+=6;
+  pdf.text(`Base hebdomadaire : ${BASE_HEBDO} h`,10,y); y+=14; pdf.line(10,y,200,y); y+=6;
+  let wks={}, abs={}, rec={}, t25=0, t50=0, tR=0;
+  Object.entries(data).forEach(([date,v]) => {
+    const d = new Date(date); if(d<period.start||d>period.end) return;
+    const dow=d.getDay(), iso=dow===0?7:dow;
+    const mon=new Date(d); mon.setDate(mon.getDate()-(iso-1)); const wk=dateKeyLocal(mon);
+    wks[wk]=(wks[wk]||0)+(v.extra||0); rec[wk]=(rec[wk]||0)+(v.recup||0);
+    if(dow!==0&&dow!==6) abs[wk]=(abs[wk]||0)+(v.absent||0);
+  });
+  Object.keys(wks).sort().forEach(w => {
+    const base=Math.max(0,BASE_HEBDO-(abs[w]||0)-(rec[w]||0)), total=base+wks[w];
+    let h25=0,h50=0;
+    if(total>BASE_HEBDO) h25=Math.min(total,BASE_HEBDO+8)-BASE_HEBDO;
+    if(total>BASE_HEBDO+8) h50=total-(BASE_HEBDO+8);
+    t25+=Math.max(0,h25); t50+=Math.max(0,h50); tR+=rec[w]||0;
+    pdf.text(`Semaine du ${new Date(w).toLocaleDateString()} : ${h25.toFixed(2)}h à 25% / ${h50.toFixed(2)}h à 50%`,10,y); y+=6;
+    if(y>270){pdf.addPage();y=15;}
+  });
+  const rp=getLastValidReport(period.index), net=t25*1.25+t50*1.5+rp-tR;
+  y+=6; pdf.line(10,y,200,y); y+=8;
+  pdf.text(`Total 25 % : ${t25.toFixed(2)} h`,10,y); y+=6;
+  pdf.text(`Total 50 % : ${t50.toFixed(2)} h`,10,y); y+=6;
+  pdf.text(`Récupérations : ${tR.toFixed(2)} h`,10,y); y+=6;
+  pdf.text(`Report précédent : ${rp.toFixed(2)} h`,10,y); y+=6;
+  pdf.setFontSize(12); pdf.text(`Solde net de période : ${net.toFixed(2)} h`,10,y); y+=12;
+  pdf.setFontSize(10); pdf.text("Validation / Signature :",10,y); y+=10; pdf.rect(10,y,90,20); y+=30;
+  pdf.setFontSize(8); pdf.text("Document généré automatiquement à titre informatif.\nNe constitue pas un bulletin de paie.",10,y);
+  pdf.save(`periode_${period.start.toISOString().slice(0,10)}_${currentSuffix}.pdf`);
+}
+
+function shouldShowAnnualClosure() {
+  if (!annualDate) return false;
+  const ad = new Date(annualDate); return ad.getFullYear() === viewYear && ad.getMonth() === viewMonth;
+}
+function showToast() {
+  const t = document.getElementById("toast"); if (!t) return;
+  t.style.opacity = "1"; setTimeout(() => { t.style.opacity = "0"; }, 3000);
+}
+
+const crashState = localStorage.getItem("APP_CRASH_STATE");
+if (crashState) console.warn("⚠️ Dernier crash détecté:", crashState);
+
+
+// ── MOBILE SCROLL LOCK (iOS + Android) ──────────────────────────────
+let _scrollY = 0;
+function lockBodyScroll() {
+  _scrollY = window.scrollY;
+  document.body.style.overflow   = "hidden";
+  document.body.style.position   = "fixed";
+  document.body.style.top        = "-" + _scrollY + "px";
+  document.body.style.width      = "100%";
+}
+function unlockBodyScroll() {
+  document.body.style.overflow   = "";
+  document.body.style.position   = "";
+  document.body.style.top        = "";
+  document.body.style.width      = "";
+  window.scrollTo(0, _scrollY);
+}
+// ────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+  protectFunctions(); initSelectors(); applyConfigLock(); buildPeriods(); autoSwitchPeriodAtMidnight();
+  if (!exerciseStart) setTimeout(openWizardModal, 300);
+});
+
+function openLegalPopup()  { document.getElementById("popupLegal").style.display = "flex"; }
+function closeLegalPopup() { document.getElementById("popupLegal").style.display = "none"; }
+
+function protectFunctions() {
+  if (!update.__safe)               { update = safe(update,"update");                       update.__safe=true; }
+  if (!calculate.__safe)            { calculate = safe(calculate,"calculate");               calculate.__safe=true; }
+  if (!generateCalendar.__safe)     { generateCalendar = safe(generateCalendar,"calendar"); generateCalendar.__safe=true; }
+  if (!buildPeriods.__safe)         { buildPeriods = safe(buildPeriods,"periods");           buildPeriods.__safe=true; }
+  if (!exportJSON.__safe)           { exportJSON = safe(exportJSON,"exportJSON");             exportJSON.__safe=true; }
+  if (!loadJSON.__safe)             { loadJSON = safe(loadJSON,"importJSON");                 loadJSON.__safe=true; }
+  if (!exportMonthlyFullPDF.__safe) { exportMonthlyFullPDF=safe(exportMonthlyFullPDF,"pdf_month"); exportMonthlyFullPDF.__safe=true; }
+  if (!exportAnnualPDF.__safe)      { exportAnnualPDF=safe(exportAnnualPDF,"pdf_annual");     exportAnnualPDF.__safe=true; }
+  if (!exportPeriodPDF.__safe)      { exportPeriodPDF=safe(exportPeriodPDF,"pdf_period");     exportPeriodPDF.__safe=true; }
+}
+</script>
+
+<div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#323232;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .4s;z-index:9999;">
+  &#x1F55B; Nouvelle période activée automatiquement
+</div>
+
+<div class="popup" id="popupClosures">
+  <div class="popup-content">
+    <h3>&#128197; Clôtures comptables</h3>
+    <div id="closuresInputs"></div>
+    <button onclick="saveClosures()">Enregistrer</button>
+    <button onclick="closeClosures()">Fermer</button>
+  </div>
+</div>
+
+<div style="text-align:center;font-size:12px;color:#666;margin-top:30px;">
+  <a href="#" onclick="event.preventDefault();openLegalPopup();">&#x2139;&#65039; Informations légales &amp; calcul</a>
+  <a href="#" onclick="event.preventDefault();openNotice();">&#x1F4D8; Notice utilisateur</a>
+  <button type="button" onclick="protectedCrash()" style="margin-left:10px;background:none;border:none;padding:0;color:#777;font-size:12px;cursor:pointer;user-select:none;">&copy; C.Anthony</button>
+</div>
+
+<p style="max-width:900px;margin:20px auto;font-size:12px;color:#555;background:#fffde7;border:1px solid #ffe082;padding:12px;border-radius:8px;text-align:center;">
+  &#9888;&#65039; <b>Sauvegarde des données</b><br><br>
+  Les données saisies dans cette application sont enregistrées <b>localement sur cet appareil</b>.<br><br>
+  <b>Il est fortement recommandé d'effectuer des exports réguliers</b> (mensuels ou après chaque clôture).
+</p>
+
+<div class="popup" id="popupLegal">
+  <div class="popup-content" style="max-width:700px;max-height:80vh;overflow:auto;">
+    <h3>ℹ️ Informations légales &amp; règles de calcul</h3>
+
+    <div style="font-size:12px;color:#9aa0a6;line-height:1.5">
+      <b>⚠️ Responsabilité et limites</b><br><br>
+      Les données saisies dans ce simulateur sont renseignées
+      <b>sous la seule responsabilité de l'utilisateur</b>.<br><br>
+      Les résultats affichés sont fournis à titre indicatif et peuvent
+      ne pas refléter exactement la réalité du terrain, notamment en raison
+      d'erreurs de saisie, de paramètres incomplets, de différences
+      liées à la convention collective, aux accords d'entreprise, aux pratiques
+      internes, d'évolutions du droit applicable, ou de
+      <b>dysfonctionnements techniques, bugs ou limites du simulateur</b>.<br><br>
+      <b>Seuls les documents établis par l'employeur et le droit applicable font foi.</b>
+    </div>
+
+    <p>Cet outil a pour finalité d'aider au suivi, à l'estimation et à la compréhension
+    du temps de travail, des heures supplémentaires, des récupérations et des soldes
+    horaires, à partir des données saisies par l'utilisateur.</p>
+
+    <hr>
+
+    <h4>⚙️ Fonctionnement général</h4>
+    <p>Cet outil fonctionne comme un <b>compteur annuel du temps de travail</b>.<br><br>
+    Les <b>absences</b> réduisent le volume d'heures attendues dans la semaine.
+    Elles diminuent donc la base sur laquelle les heures supplémentaires sont calculées
+    et réduisent le <b>solde brut</b>.<br><br>
+    Les <b>récupérations</b> représentent des heures déjà comptabilisées dans le solde
+    et prises ultérieurement en repos. Elles ne réduisent pas la base de calcul
+    des heures supplémentaires : elles sont uniquement soustraites du solde brut
+    pour obtenir le <b>solde net</b>.
+    </p>
+
+    <hr>
+
+    <h4>⚖️ Cadre juridique de référence</h4>
+    <p>Les règles de calcul appliquées reposent sur les principes généraux du Code du travail
+    et de la convention collective nationale du commerce de gros (IDCC 573), dans leur
+    version en vigueur au moment de l'utilisation.</p>
+    <p>Ces règles sont susceptibles d'évoluer et peuvent être aménagées par des accords
+    d'entreprise, des usages internes ou des dispositions contractuelles spécifiques.</p>
+
+    <hr>
+
+    <h4>🎌 Jours fériés</h4>
+    <p>Un jour férié chômé et payé ne constitue pas du temps de travail effectif.
+    Il entraîne une réduction du temps de travail attendu (par défaut 7 heures pour
+    une journée complète), sans modifier le seuil légal de déclenchement des heures
+    supplémentaires.</p>
+    <p>Les heures supplémentaires sont déclenchées uniquement à partir de la
+    <b>36ᵉ heure réellement travaillée</b> dans la semaine, y compris lorsqu'un ou plusieurs
+    jours fériés sont présents.</p>
+
+    <hr>
+
+    <h4>❌ Absences</h4>
+    <p>Les absences correspondent à des périodes non travaillées imputables au salarié.
+    Elles sont prises en compte uniquement sur les jours ouvrés et <b>réduisent le volume
+    d'heures travaillables</b> servant de base au calcul hebdomadaire.<br><br>
+    Conséquence : les absences diminuent le solde brut de la période.</p>
+
+    <hr>
+
+    <h4>🔁 Récupérations</h4>
+    <p>Les récupérations correspondent à des heures précédemment travaillées et
+    ultérieurement non travaillées.<br><br>
+    Elles <b>ne réduisent pas la base hebdomadaire</b> de calcul des heures supplémentaires.
+    Elles sont uniquement soustraites du solde brut pour obtenir le <b>solde net</b>.<br><br>
+    Exemple : 2h supplémentaires effectuées + 1h récupérée → solde brut = 2h (majorées),
+    solde net = solde brut − 1h récup.</p>
+
+    <hr>
+
+    <h4>➕ Heures supplémentaires</h4>
+    <p>Le seuil de déclenchement correspond à l'équivalent de 35 heures hebdomadaires,
+    ajusté selon les absences uniquement.</p>
+    <ul>
+      <li>Heures de la 36ᵉ à la 43ᵉ heure : majoration de 25 %</li>
+      <li>Heures au-delà de la 43ᵉ heure : majoration de 50 %</li>
+    </ul>
+
+    <hr>
+
+    <h4>📚 Sources officielles</h4>
+    <ul>
+      <li><a href="https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006072050/" target="_blank" rel="noopener">Code du travail – Légifrance</a></li>
+      <li><a href="https://www.legifrance.gouv.fr/conv_coll/id/KALICONT000005635624" target="_blank" rel="noopener">Convention collective nationale du commerce de gros (IDCC 573)</a></li>
+    </ul>
+
+    <p style="font-size:11px;color:#aaa;">Cet outil ne constitue pas un conseil juridique
+    et ne se substitue pas à l'analyse d'un professionnel compétent.</p>
+
+    <button onclick="closeLegalPopup()">Fermer</button>
+  </div>
+</div>
+
+<div class="popup" id="popupYears">
+  <div class="popup-content">
+    <h3>&#128193; Exercices existants</h3>
+    <div id="yearsList"></div>
+    <hr>
+    <label>Créer / ouvrir un nouvel exercice</label>
+    <input type="number" id="newYearInput" placeholder="Ex : 2039">
+    <button onclick="confirmSwitchYear()">Ouvrir</button>
+    <button onclick="closeYearsPopup()">Fermer</button>
+  </div>
+</div>
+
+<!-- WIZARD — accessible uniquement via des appels de fonction JS -->
+<div class="popup" id="wizardModal">
+  <div class="popup-content" style="max-width:540px;">
+    <div class="sheet-handle"></div>
+    <div class="wiz-progress"><div class="wiz-progress-bar" id="wizProgressBar" style="width:20%"></div></div>
+    <span class="wiz-step-label" id="wizStepLabel">Étape 1 / 5</span>
+
+    <div class="wiz-step wiz-active" id="wizStep1">
+      <div class="wiz-question">📅 Quelle est la date de début de ton exercice ?</div>
+      <p class="wiz-hint">Ex : 01/01/2025 ou le premier lundi de ton exercice comptable.</p>
+      <input type="date" id="wizStartDate">
+      <div class="wiz-nav"><button class="kitsune-btn" onclick="wizGoTo(2)">Suivant →</button></div>
+    </div>
+
+    <div class="wiz-step" id="wizStep2">
+      <div class="wiz-question">📆 Comment veux-tu définir tes clôtures mensuelles ?</div>
+      <div class="wiz-choice-row">
+        <div class="wiz-choice-btn" id="wizChoiceAuto" onclick="wizSelectClosureMode('auto')">🤖 Automatique<br><small style="font-weight:400;color:#999;">Dernier dimanche de chaque mois</small></div>
+        <div class="wiz-choice-btn" id="wizChoiceManual" onclick="wizSelectClosureMode('manual')">✏️ Manuel<br><small style="font-weight:400;color:#999;">Je saisis les 12 dates moi-même</small></div>
+      </div>
+      <div id="wizManualDates" style="display:none;"><div class="wiz-closures-grid" id="wizClosuresGrid"></div></div>
+      <div id="wizAutoInfo" style="display:none;font-size:13px;color:#2196a6;background:#e0f4f7;border-radius:8px;padding:10px;margin-bottom:10px;">✅ Les 12 derniers dimanches de chaque mois seront générés automatiquement.</div>
+      <div class="wiz-nav">
+        <button onclick="wizGoTo(1)" style="flex:0 0 auto;width:auto;padding:8px 16px;">← Retour</button>
+        <button class="kitsune-btn" onclick="wizGoTo(3)">Suivant →</button>
+      </div>
+    </div>
+
+    <div class="wiz-step" id="wizStep3">
+      <div class="wiz-question">🏁 Date de clôture annuelle finale ?</div>
+      <p class="wiz-hint">Cette date marque la fin de l'exercice. Elle sera automatiquement ramenée au dimanche le plus proche.</p>
+      <input type="date" id="wizAnnualDate">
+      <p id="wizAnnualDateInfo" style="font-size:12px;color:#888;margin-top:4px;"></p>
+      <div class="wiz-nav">
+        <button onclick="wizGoTo(2)" style="flex:0 0 auto;width:auto;padding:8px 16px;">← Retour</button>
+        <button class="kitsune-btn" onclick="wizGoTo(4)">Suivant →</button>
+      </div>
+    </div>
+
+    <div class="wiz-step" id="wizStep4">
+      <div class="wiz-question">🇫🇷 Configurer pour la France ?</div>
+      <p class="wiz-hint">Ces options sont recommandées pour les contrats relevant du droit français.</p>
+      <label class="wiz-check-row"><input type="checkbox" id="wizImportFeries" checked><span>🎌 Importer les jours fériés officiels (API Gouvernement)</span></label>
+      <label class="wiz-check-row"><input type="checkbox" id="wizAutoFerie" checked><span>⚙️ Mode férié automatique : appliquer −7h les jours fériés en semaine</span></label>
+      <div class="wiz-nav">
+        <button onclick="wizGoTo(3)" style="flex:0 0 auto;width:auto;padding:8px 16px;">← Retour</button>
+        <button class="kitsune-btn" onclick="wizGoTo(5)">Suivant →</button>
+      </div>
+    </div>
+
+    <div class="wiz-step" id="wizStep5">
+      <div class="wiz-question">💶 Quel est ton taux horaire brut (€) ?</div>
+      <p class="wiz-hint">Utilisé pour estimer le montant des heures supplémentaires lors de la clôture annuelle.</p>
+      <input type="number" id="wizHourlyRate" step="0.5" min="0" value="10" placeholder="Ex : 12.50">
+      <div class="wiz-summary" id="wizSummary" style="display:none;margin-top:16px;"><b>Récapitulatif</b><br><span id="wizSummaryContent"></span></div>
+      <div class="wiz-nav">
+        <button onclick="wizGoTo(4)" style="flex:0 0 auto;width:auto;padding:8px 16px;">← Retour</button>
+        <button class="kitsune-btn" onclick="wizShowSummary()" id="wizSummaryBtn">Voir le récapitulatif →</button>
+        <button class="kitsune-btn" onclick="finishWiz()" id="wizFinishBtn" style="display:none;">✅ Terminer &amp; Lancer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== SETTINGS MODAL ===== */
+function openSettingsModal() {
+  document.getElementById("exerciseStartInput").value = exerciseStart || "";
+  document.getElementById("annualDateInput").value    = annualDate    || "";
+  document.getElementById("baseHebdoInput").value     = BASE_HEBDO;
+  const aft = document.getElementById("autoFerieToggle");
+  if (aft) aft.checked = AUTO_FERIE;
+  document.getElementById("settingsModal").style.display = "flex";
+  lockBodyScroll();
+}
+function closeSettingsModal() { document.getElementById("settingsModal").style.display="none"; unlockBodyScroll(); if(typeof update==="function") update(); }
+document.getElementById("settingsModal").addEventListener("click",function(e){ if(e.target===this) closeSettingsModal(); });
+document.getElementById("wizardModal").addEventListener("click", function(e){ if(e.target===this) closeWizardModal(); });
+
+/* ===== WIZARD ===== */
+let wizClosureMode=null, wizCurrentStep=1;
+const WIZ_TOTAL=5;
+
+function wizGoTo(step) {
+  if(step>wizCurrentStep && !wizValidate(wizCurrentStep)) return;
+  if(step===5){ document.getElementById("wizSummary").style.display="none"; document.getElementById("wizSummaryBtn").style.display="inline-block"; document.getElementById("wizFinishBtn").style.display="none"; }
+  document.querySelectorAll(".wiz-step").forEach(s=>s.classList.remove("wiz-active"));
+  document.getElementById("wizStep"+step).classList.add("wiz-active");
+  document.getElementById("wizProgressBar").style.width=Math.round((step/WIZ_TOTAL)*100)+"%";
+  document.getElementById("wizStepLabel").textContent="Étape "+step+" / "+WIZ_TOTAL;
+  wizCurrentStep=step;
+  if(step===2) wizBuildManualGrid();
+  if(step===3){
+    const inp=document.getElementById("wizAnnualDate");
+    inp.onchange=()=>{ const f=forceSunday(inp.value); document.getElementById("wizAnnualDateInfo").textContent=f&&f!==inp.value?"📅 Date ajustée au dimanche : "+new Date(f).toLocaleDateString():""; inp.value=f; };
+  }
+}
+function wizValidate(step){
+  if(step===1&&!document.getElementById("wizStartDate").value){alert("⚠️ Merci de saisir la date de début d'exercice.");return false;}
+  if(step===2&&!wizClosureMode){alert("⚠️ Choisis un mode de clôture.");return false;}
+  return true;
+}
+function wizSelectClosureMode(mode){
+  wizClosureMode=mode;
+  document.getElementById("wizChoiceAuto").classList.toggle("wiz-selected",mode==="auto");
+  document.getElementById("wizChoiceManual").classList.toggle("wiz-selected",mode==="manual");
+  document.getElementById("wizManualDates").style.display=mode==="manual"?"block":"none";
+  document.getElementById("wizAutoInfo").style.display=mode==="auto"?"block":"none";
+}
+function wizBuildManualGrid(){
+  const grid=document.getElementById("wizClosuresGrid"); if(grid.children.length>0) return;
+  const sv=document.getElementById("wizStartDate").value;
+  const startD=sv?new Date(sv):new Date();
+  const startMonth=startD.getMonth(), startYear=startD.getFullYear();
+  const moisNoms=["Janv.","Févr.","Mars","Avr.","Mai","Juin","Juil.","Août","Sept.","Oct.","Nov.","Déc."];
+  for(let i=0;i<13;i++){
+    const month=(startMonth+i)%12;
+    const year=startYear+Math.floor((startMonth+i)/12);
+    const wrap=document.createElement("div");
+    const lbl=document.createElement("label");
+    lbl.textContent=moisNoms[month]+" "+year;
+    const inp=document.createElement("input"); inp.type="date"; inp.id="wizManDate_"+i;
+    const pre=wizLastSunday(year,month); if(pre) inp.value=pre;
+    inp.onchange=()=>{ const f=forceSunday(inp.value); if(f!==inp.value) inp.value=f; };
+    wrap.appendChild(lbl); wrap.appendChild(inp); grid.appendChild(wrap);
+  }
+}
+function wizLastSunday(year,month){
+  const last=new Date(year,month+1,0), dow=last.getDay();
+  if(dow===0) return last.toISOString().slice(0,10);
+  last.setDate(last.getDate()-dow); return last.toISOString().slice(0,10);
+}
+function wizShowSummary(){
+  const sd=document.getElementById("wizStartDate").value;
+  const ad=document.getElementById("wizAnnualDate").value;
+  const rate=document.getElementById("wizHourlyRate").value||"—";
+  const feries=document.getElementById("wizImportFeries").checked?"Oui":"Non";
+  const autoF=document.getElementById("wizAutoFerie").checked?"Oui":"Non";
+  const cm=wizClosureMode==="auto"?"Automatique (derniers dimanches)":"Manuel (12 dates saisies)";
+  document.getElementById("wizSummaryContent").innerHTML=`📅 Début d'exercice : <b>${sd?new Date(sd).toLocaleDateString():"Non définie"}</b><br>🏁 Clôture annuelle : <b>${ad?new Date(ad).toLocaleDateString():"Non définie"}</b><br>📆 Clôtures : <b>${cm}</b><br>⏱️ Base hebdomadaire : <b>35 h</b><br>🎌 Jours fériés importés : <b>${feries}</b><br>⚙️ Mode auto-férié : <b>${autoF}</b><br>💶 Taux horaire : <b>${rate} €/h</b>`;
+  document.getElementById("wizSummary").style.display="block";
+  document.getElementById("wizSummaryBtn").style.display="none";
+  document.getElementById("wizFinishBtn").style.display="inline-block";
+}
+async function finishWiz(){
+  const sd=document.getElementById("wizStartDate").value; if(!sd){alert("❌ Date de début manquante.");return;}
+  exerciseStart=sd; localStorage.setItem(STORAGE.exerciseStart,sd);
+  BASE_HEBDO=35; localStorage.setItem("BASE_HEBDO_"+currentSuffix,35);
+  const by=new Date(sd).getFullYear();
+  if(wizClosureMode==="auto"){
+    closures=[];
+    const startMonth2=new Date(sd).getMonth(), startYear2=new Date(sd).getFullYear();
+    for(let i=0;i<13;i++){
+      const month=(startMonth2+i)%12;
+      const year=startYear2+Math.floor((startMonth2+i)/12);
+      closures.push(wizLastSunday(year,month));
+    }
+  }
+  else{
+    closures=[];
+    for(let m=0;m<13;m++){ const v=document.getElementById("wizManDate_"+m)?.value; if(v) closures.push(forceSunday(v)); }
+    closures=closures.filter(Boolean).sort();
+  }
+  localStorage.setItem(STORAGE.closures,JSON.stringify(closures));
+  const ra=document.getElementById("wizAnnualDate").value;
+  if(ra){ annualDate=forceSunday(ra); localStorage.setItem(STORAGE.annualDate,annualDate); }
+  annualRate=Number(document.getElementById("wizHourlyRate").value)||10;
+  localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);
+  AUTO_FERIE=document.getElementById("wizAutoFerie").checked;
+  localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);
+  if(document.getElementById("wizImportFeries").checked){
+    try{
+      const years=[by-1,by,by+1];
+      for(const y of years){ const res=await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`); const f=await res.json(); Object.keys(f).forEach(d=>{if(!specialDays[d]) specialDays[d]="ferie";}); }
+      localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));
+    }catch(e){ console.warn("Import jours fériés échoué:",e); }
+  }
+  closeWizardModal();
+  if(typeof buildPeriods==="function") buildPeriods();
+  if(typeof update==="function") update();
+  showToast();
+}
+function openWizardModal()  { wizReset(); document.getElementById("wizardModal").style.display="flex"; lockBodyScroll(); }
+function closeWizardModal() { document.getElementById("wizardModal").style.display="none"; unlockBodyScroll(); }
+function restartWizard()    { closeSettingsModal(); openWizardModal(); }
+function wizReset(){
+  wizClosureMode=null; wizCurrentStep=1;
+  document.querySelectorAll(".wiz-step").forEach(s=>s.classList.remove("wiz-active"));
+  document.getElementById("wizStep1").classList.add("wiz-active");
+  document.getElementById("wizProgressBar").style.width="20%";
+  document.getElementById("wizStepLabel").textContent="Étape 1 / 5";
+  document.getElementById("wizStartDate").value=exerciseStart||"";
+  document.getElementById("wizAnnualDate").value=annualDate||"";
+  document.getElementById("wizAnnualDateInfo").textContent="";
+  document.getElementById("wizHourlyRate").value=annualRate||10;
+  document.getElementById("wizImportFeries").checked=true;
+  document.getElementById("wizAutoFerie").checked=AUTO_FERIE;
+  document.getElementById("wizSummary").style.display="none";
+  document.getElementById("wizSummaryBtn").style.display="inline-block";
+  document.getElementById("wizFinishBtn").style.display="none";
+  document.getElementById("wizChoiceAuto").classList.remove("wiz-selected");
+  document.getElementById("wizChoiceManual").classList.remove("wiz-selected");
+  document.getElementById("wizManualDates").style.display="none";
+  document.getElementById("wizAutoInfo").style.display="none";
+  document.getElementById("wizClosuresGrid").innerHTML="";
+}
+</script>
+<script>sessionStorage.setItem("appAlive","true");</script>
+</body>
+</html>
