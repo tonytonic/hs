@@ -8,6 +8,7 @@
   "display": "standalone",
   "display_override": [
     "window-controls-overlay",
+    "tabbed",
     "standalone",
     "minimal-ui"
   ],
@@ -21,6 +22,9 @@
   ],
   "lang": "fr",
   "dir": "ltr",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
   "prefer_related_applications": true,
   "related_applications": [
     {
@@ -30,30 +34,10 @@
     }
   ],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
     {
@@ -70,55 +54,13 @@
     }
   ],
   "screenshots": [
-    {
-      "src": "01-bienvenue.png",
-      "sizes": "818x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Bienvenue"
-    },
-    {
-      "src": "02-compteur-annuel.png",
-      "sizes": "834x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Compteur annuel"
-    },
-    {
-      "src": "03-calendrier-annuel.png",
-      "sizes": "829x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Calendrier annuel"
-    },
-    {
-      "src": "04-details-calculs.png",
-      "sizes": "834x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Détails calculs"
-    },
-    {
-      "src": "05-calendrier-mensuel.png",
-      "sizes": "770x1501",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Calendrier mensuel"
-    },
-    {
-      "src": "06-recapitulatif.png",
-      "sizes": "758x1501",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Récapitulatif"
-    },
-    {
-      "src": "07-wide-compteur.png",
-      "sizes": "1334x750",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Vue large"
-    }
+    { "src": "01-bienvenue.png", "sizes": "818x1386", "type": "image/png", "form_factor": "narrow", "label": "Bienvenue" },
+    { "src": "02-compteur-annuel.png", "sizes": "834x1386", "type": "image/png", "form_factor": "narrow", "label": "Compteur annuel" },
+    { "src": "03-calendrier-annuel.png", "sizes": "829x1386", "type": "image/png", "form_factor": "narrow", "label": "Calendrier annuel" },
+    { "src": "04-details-calculs.png", "sizes": "834x1386", "type": "image/png", "form_factor": "narrow", "label": "Détails" },
+    { "src": "05-calendrier-mensuel.png", "sizes": "770x1501", "type": "image/png", "form_factor": "narrow", "label": "Simulateur mensuel" },
+    { "src": "06-recapitulatif.png", "sizes": "758x1501", "type": "image/png", "form_factor": "narrow", "label": "Récapitulatif" },
+    { "src": "07-wide-compteur.png", "sizes": "1334x750", "type": "image/png", "form_factor": "wide", "label": "Vue large" }
   ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
 }
