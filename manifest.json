@@ -1,21 +1,50 @@
 {
-  "name": "simulateur hs",
+  "name": "Simulateur HS",
   "short_name": "HS",
-  "start_url": "index.html",
+  "description": "Un simulateur complet et optimisé pour vos sessions de jeu.",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#4FB3C2",
   "theme_color": "#4FB3C2",
+  "orientation": "portrait",
+  "categories": ["games", "utilities"],
+  "lang": "fr-FR",
+  "dir": "ltr",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Lancer le Simulateur",
+      "short_name": "Simuler",
+      "description": "Ouvrir directement le simulateur",
+      "url": "./index.html",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": []
 }
