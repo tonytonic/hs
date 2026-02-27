@@ -1,0 +1,131 @@
+{
+  "name": "Simulateur Heures Supplémentaires",
+  "short_name": "Heures Sup",
+  "description": "Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.",
+  "id": "/hs/menu.html",
+  "start_url": "/hs/menu.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#4FB3C2",
+  "theme_color": "#4FB3C2",
+  "orientation": "portrait-primary",
+  "categories": [
+    "productivity",
+    "finance",
+    "utilities"
+  ],
+  "lang": "fr",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/hs/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/hs/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/hs/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/hs/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Compteur annuel",
+      "short_name": "Annuel",
+      "description": "Accéder directement au compteur annuel",
+      "url": "/hs/heures/index.html",
+      "icons": [
+        {
+          "src": "/hs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Simulateur mensuel",
+      "short_name": "Mensuel",
+      "description": "Accéder directement au simulateur mensuel",
+      "url": "/hs/paye/index.html",
+      "icons": [
+        {
+          "src": "/hs/icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/hs/01-bienvenue.png",
+      "sizes": "818x1386",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Écran de bienvenue"
+    },
+    {
+      "src": "/hs/02-compteur-annuel.png",
+      "sizes": "834x1386",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Compteur annuel - Vue principale"
+    },
+    {
+      "src": "/hs/03-calendrier-annuel.png",
+      "sizes": "829x1386",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Calendrier annuel avec clôture"
+    },
+    {
+      "src": "/hs/04-details-calculs.png",
+      "sizes": "834x1386",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Détails des calculs et clôture annuelle"
+    },
+    {
+      "src": "/hs/05-calendrier-mensuel.png",
+      "sizes": "770x1501",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Simulateur mensuel - Calendrier"
+    },
+    {
+      "src": "/hs/06-recapitulatif.png",
+      "sizes": "758x1501",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Récapitulatif et estimation €"
+    },
+    {
+      "src": "/hs/07-wide-compteur.png",
+      "sizes": "1334x750",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Compteur annuel - Vue desktop"
+    }
+  ],
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+}
