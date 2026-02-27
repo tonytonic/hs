@@ -4,7 +4,7 @@
 “description”: “Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.”,
 “id”: “/hs/menu.html”,
 “start_url”: “/hs/menu.html”,
-“scope”: “/hs/”,
+“scope”: “/”,
 “display”: “standalone”,
 “display_override”: [“window-controls-overlay”, “standalone”, “minimal-ui”],
 “background_color”: “#4FB3C2”,
