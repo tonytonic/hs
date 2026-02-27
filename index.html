@@ -2,27 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Simulateur heures supplémentaires</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulateur HS</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <meta name="theme-color" content="#4FB3C2">
 
   <script>
-    const APP_VERSION = "1.4.7"; // VERSION MAÎTRE
+    // 1. ENREGISTREMENT DU SERVICE WORKER (Indispensable pour le score)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
 
+    // 2. TA LOGIQUE DE VERSION
+    const APP_VERSION = "1.4.8";
     const stored = localStorage.getItem("APP_VERSION");
 
     if (stored !== APP_VERSION) {
       console.log("🔄 Nouvelle version détectée :", APP_VERSION);
-
       localStorage.setItem("APP_VERSION", APP_VERSION);
-
       if (!sessionStorage.getItem("APP_RELOADED")) {
         sessionStorage.setItem("APP_RELOADED", "1");
         location.reload();
       }
     } else {
-      // Version identique → accès normal
+      // On laisse un petit délai pour que le Service Worker puisse s'installer
+      // avant de rediriger, ou on redirige directement :
       location.replace("./menu.html");
     }
   </script>
 </head>
-<body></body>
+<body>
+  <p>Chargement du simulateur...</p>
+</body>
 </html>
