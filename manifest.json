@@ -25,13 +25,25 @@
   "launch_handler": {
     "client_mode": "focus-existing"
   },
+  "scope_extensions": [
+    { "origin": "https://tonytonic.github.io" }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+heures",
+      "url": "/menu.html?type=%s"
+    }
+  ],
   "note_taking": {
     "new_note_url": "/paye/index.html"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
   },
   "widgets": [
     {
       "name": "Compteur Rapide",
-      "description": "Aperçu de vos heures supplémentaires",
+      "description": "Aperçu de vos heures",
       "tag": "heures-widget",
       "ms_ac_template": "widgets/template.json",
       "data": "widgets/data.json",
@@ -41,7 +53,7 @@
           "src": "02-compteur-annuel.png",
           "sizes": "834x1386",
           "type": "image/png",
-          "label": "Widget Preview"
+          "label": "Aperçu du widget"
         }
       ]
     }
