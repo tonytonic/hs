@@ -1,0 +1,103 @@
+{
+  "name": "Simulateur Heures Supplémentaires",
+  "short_name": "Heures Sup",
+  "description": "Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.",
+  "id": "/hs/menu.html",
+  "start_url": "/hs/menu.html",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#4FB3C2",
+  "theme_color": "#4FB3C2",
+  "orientation": "portrait-primary",
+  "categories": ["productivity", "finance", "utilities"],
+  "lang": "fr",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/hs/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/hs/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/hs/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/hs/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Compteur annuel",
+      "short_name": "Annuel",
+      "description": "Accéder directement au compteur annuel",
+      "url": "/hs/heures/index.html",
+      "icons": [{ "src": "/hs/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    },
+    {
+      "name": "Simulateur mensuel",
+      "short_name": "Mensuel",
+      "description": "Accéder directement au simulateur mensuel",
+      "url": "/hs/paye/index.html",
+      "icons": [{ "src": "/hs/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/hs/screenshots/01-menu.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Menu principal"
+    },
+    {
+      "src": "/hs/screenshots/02-wizard.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Assistant de configuration"
+    },
+    {
+      "src": "/hs/screenshots/03-calendrier.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Calendrier mensuel"
+    },
+    {
+      "src": "/hs/screenshots/04-recapitulatif.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Récapitulatif des heures"
+    },
+    {
+      "src": "/hs/screenshots/05-euro.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Estimation en euros"
+    },
+    {
+      "src": "/hs/screenshots/06-clotures.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Configuration des clôtures"
+    }
+  ]
+}
