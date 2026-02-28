@@ -27,6 +27,7 @@
   },
   "scope_extensions": [
     {
+      "type": "origin",
       "origin": "https://tonytonic.github.io"
     }
   ],
