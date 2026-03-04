@@ -17,12 +17,25 @@
         try {
           const reg = await navigator.serviceWorker.register('./sw.js');
           console.log("✅ Service Worker enregistré");
+
+          // --- TON SYSTÈME DE PERIODIC SYNC ---
+          if ('periodicSync' in reg) {
+            const status = await navigator.permissions.query({
+              name: 'periodic-background-sync',
+            });
+            if (status.state === 'granted') {
+              await reg.periodicSync.register('update-cache', {
+                minInterval: 24 * 60 * 60 * 1000, // 24h
+              });
+            }
+          }
         } catch (err) {
           console.error("❌ Échec SW:", err);
         }
       }
     }
 
+    // Gestion de la version et redirection
     async function initApp() {
       await registerSW();
 
@@ -30,11 +43,12 @@
 
       if (stored !== APP_VERSION) {
         localStorage.setItem("APP_VERSION", APP_VERSION);
-        // On force le rafraîchissement pour vider le vieux cache
+        // On force le rafraîchissement pour vider le cache navigateur
         location.reload(true); 
       } else {
-        // IMPORTANT : On laisse 1.5s pour que le SW finisse sa mise en cache
-        // C'est ce délai qui permet à PWABuilder de valider le mode Offline
+        // --- MODIFICATION CRUCIALE POUR PWABUILDER ---
+        // On laisse 1.5 seconde pour que le Service Worker ait le temps 
+        // de mettre en cache le menu.html avant de rediriger.
         setTimeout(() => {
           location.replace("./menu.html");
         }, 1500);
@@ -59,7 +73,7 @@
 </head>
 <body>
   <div style="text-align: center;">
-    <p>Initialisation du simulateur...</p>
+    <p>Chargement du simulateur RPG...</p>
     <small>Version v1.6.2</small>
   </div>
 </body>
