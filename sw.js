@@ -1,10 +1,10 @@
 /**
  * Service Worker : Compteur d'Heures & RPG Fox
- * Version : 1.6.2 (Optimisé pour PWABuilder)
+ * Version : 1.6.2 (Optimisé pour PWABuilder & Google Play)
  */
 
 const CACHE_NAME = "compteur-heures-v1.6.2";
-const OFFLINE_URL = "./menu.html"; // Page par défaut si hors-ligne
+const OFFLINE_URL = "./menu.html"; // Page de secours impérative pour le Play Store
 
 const FILES_TO_CACHE = [
   "./",
@@ -53,7 +53,7 @@ const FILES_TO_CACHE = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("📥 Mise en cache des ressources");
+      console.log("📥 Mise en cache globale des ressources");
       return cache.addAll(FILES_TO_CACHE);
     })
   );
@@ -72,15 +72,21 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// --- FETCH (Gestion du cache et mode hors-ligne) ---
+// --- FETCH (Gestion du cache avec Fallback Offline strict) ---
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      const fetchPromise = fetch(event.request)
+      // 1. Si la ressource est déjà en cache, on la sert immédiatement
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // 2. Sinon, on tente de la récupérer sur le réseau
+      return fetch(event.request)
         .then((networkResponse) => {
-          // Si réseau OK, on met à jour le cache
+          // Si réseau OK, on clone la réponse pour mettre à jour le cache
           if (networkResponse && networkResponse.status === 200) {
             const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
@@ -90,13 +96,11 @@ self.addEventListener("fetch", (event) => {
           return networkResponse;
         })
         .catch(() => {
-          // Si réseau KO et pas en cache, on gère le fallback offline
+          // 3. FALLBACK : Si le réseau échoue et que c'est une navigation (page HTML)
           if (event.request.mode === "navigate") {
             return caches.match(OFFLINE_URL);
           }
         });
-
-      return cachedResponse || fetchPromise;
     })
   );
 });
@@ -108,7 +112,7 @@ self.addEventListener("sync", (event) => {
   }
 });
 
-// --- PERIODIC SYNC (Pour le badge PWABuilder) ---
+// --- PERIODIC SYNC ---
 self.addEventListener("periodicsync", (event) => {
   if (event.tag === "update-cache") {
     event.waitUntil(
@@ -119,7 +123,7 @@ self.addEventListener("periodicsync", (event) => {
 
 // --- PUSH NOTIFICATIONS ---
 self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Rappel de pointage" };
+  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "N'oubliez pas de pointer !" };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
@@ -129,19 +133,19 @@ self.addEventListener("push", (event) => {
   );
 });
 
-// --- GÉOLOCALISATION & MESSAGES ---
+// --- MESSAGES & GÉOLOCALISATION ---
 self.addEventListener("message", (event) => {
   if (!event.data || event.data.type !== "GEO_NOTIFY") return;
   const { action, distance } = event.data;
   const isArrival = action === "in";
   
-  self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
-    body: isArrival ? `Zone à ${Math.round(distance)}m` : `Sortie à ${Math.round(distance)}m`,
+  self.registration.showNotification(isArrival ? "📍 Arrivée détectée" : "🏁 Départ détecté", {
+    body: isArrival ? `Zone de travail à ${Math.round(distance)}m` : `Vous quittez la zone à ${Math.round(distance)}m`,
     icon: "./icon-192.png",
     tag: "geo-punch",
     actions: [
-      { action: "punch", title: "Pointer" }, 
-      { action: "dismiss", title: "Fermer" }
+      { action: "punch", title: "Pointer maintenant" }, 
+      { action: "dismiss", title: "Ignorer" }
     ],
     data: { action }
   });
@@ -156,7 +160,6 @@ self.addEventListener("notificationclick", (event) => {
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
       const action = event.notification.data?.action || "in";
       
-      // Chercher si la page de paye est déjà ouverte
       for (const client of clientList) {
         if (client.url.includes("paye/index.html") && "focus" in client) {
           client.postMessage({ type: "DO_PUNCH", action });
@@ -164,12 +167,8 @@ self.addEventListener("notificationclick", (event) => {
         }
       }
       
-      // Sinon l'ouvrir
       return clients.openWindow("./paye/index.html").then((w) => {
-        if (w) {
-          // Délai pour laisser le temps au script de charger
-          setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
-        }
+        if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
       });
     })
   );
