@@ -10,33 +10,19 @@
   <meta name="theme-color" content="#4FB3C2">
 
   <script>
-    const APP_VERSION = "1.6.2"; // Mis à jour pour correspondre au sw.js
+    const APP_VERSION = "1.6.2"; 
 
     async function registerSW() {
       if ('serviceWorker' in navigator) {
         try {
           const reg = await navigator.serviceWorker.register('./sw.js');
           console.log("✅ Service Worker enregistré");
-
-          // --- OPTIMISATION : ENREGISTREMENT PERIODIC SYNC ---
-          // Cela aide PWABuilder à voir que tu utilises activement l'API
-          if ('periodicSync' in reg) {
-            const status = await navigator.permissions.query({
-              name: 'periodic-background-sync',
-            });
-            if (status.state === 'granted') {
-              await reg.periodicSync.register('update-cache', {
-                minInterval: 24 * 60 * 60 * 1000, // 24h
-              });
-            }
-          }
         } catch (err) {
           console.error("❌ Échec SW:", err);
         }
       }
     }
 
-    // Gestion de la version et redirection
     async function initApp() {
       await registerSW();
 
@@ -44,13 +30,14 @@
 
       if (stored !== APP_VERSION) {
         localStorage.setItem("APP_VERSION", APP_VERSION);
-        // On force le rafraîchissement pour vider le cache navigateur
+        // On force le rafraîchissement pour vider le vieux cache
         location.reload(true); 
       } else {
-        // Redirection vers le menu après un court délai pour la stabilité sur mobile
+        // IMPORTANT : On laisse 1.5s pour que le SW finisse sa mise en cache
+        // C'est ce délai qui permet à PWABuilder de valider le mode Offline
         setTimeout(() => {
           location.replace("./menu.html");
-        }, 300);
+        }, 1500);
       }
     }
 
@@ -72,7 +59,7 @@
 </head>
 <body>
   <div style="text-align: center;">
-    <p>Chargement du simulateur...</p>
+    <p>Initialisation du simulateur...</p>
     <small>Version v1.6.2</small>
   </div>
 </body>
