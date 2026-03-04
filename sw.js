@@ -1,10 +1,10 @@
 /**
  * Service Worker : Compteur d'Heures & RPG Fox
- * Version : 1.6.2 (Optimisé pour PWABuilder & Google Play)
+ * Version : 1.6.2 (Optimisé pour PWABuilder Offline Test)
  */
 
 const CACHE_NAME = "compteur-heures-v1.6.2";
-const OFFLINE_URL = "./menu.html"; // Page de secours impérative pour le Play Store
+const OFFLINE_URL = "./menu.html"; 
 
 const FILES_TO_CACHE = [
   "./",
@@ -53,7 +53,6 @@ const FILES_TO_CACHE = [
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      console.log("📥 Mise en cache globale des ressources");
       return cache.addAll(FILES_TO_CACHE);
     })
   );
@@ -72,104 +71,32 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// --- FETCH (Gestion du cache avec Fallback Offline strict) ---
+// --- FETCH (Logique Offline validée par PWABuilder) ---
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET") return;
-
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      // 1. Si la ressource est déjà en cache, on la sert immédiatement
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-
-      // 2. Sinon, on tente de la récupérer sur le réseau
-      return fetch(event.request)
-        .then((networkResponse) => {
-          // Si réseau OK, on clone la réponse pour mettre à jour le cache
-          if (networkResponse && networkResponse.status === 200) {
-            const responseToCache = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() => {
-          // 3. FALLBACK : Si le réseau échoue et que c'est une navigation (page HTML)
-          if (event.request.mode === "navigate") {
-            return caches.match(OFFLINE_URL);
-          }
-        });
-    })
-  );
-});
-
-// --- SYNC (Background Sync pour PWABuilder) ---
-self.addEventListener("sync", (event) => {
-  if (event.tag === "sync-punches") {
-    console.log("🔄 Synchronisation en arrière-plan activée");
-  }
-});
-
-// --- PERIODIC SYNC ---
-self.addEventListener("periodicsync", (event) => {
-  if (event.tag === "update-cache") {
-    event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
+  if (event.request.mode === "navigate") {
+    // Pour les pages HTML, on tente le réseau, sinon le menu.html du cache
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match(OFFLINE_URL);
+      })
+    );
+  } else {
+    // Pour les assets (images/js), cache d'abord, puis réseau
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request);
+      })
     );
   }
 });
 
 // --- PUSH NOTIFICATIONS ---
 self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "N'oubliez pas de pointer !" };
+  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Rappel" };
   event.waitUntil(
     self.registration.showNotification(data.title, {
       body: data.body,
-      icon: "./icon-192.png",
-      badge: "./icon-192.png"
-    })
-  );
-});
-
-// --- MESSAGES & GÉOLOCALISATION ---
-self.addEventListener("message", (event) => {
-  if (!event.data || event.data.type !== "GEO_NOTIFY") return;
-  const { action, distance } = event.data;
-  const isArrival = action === "in";
-  
-  self.registration.showNotification(isArrival ? "📍 Arrivée détectée" : "🏁 Départ détecté", {
-    body: isArrival ? `Zone de travail à ${Math.round(distance)}m` : `Vous quittez la zone à ${Math.round(distance)}m`,
-    icon: "./icon-192.png",
-    tag: "geo-punch",
-    actions: [
-      { action: "punch", title: "Pointer maintenant" }, 
-      { action: "dismiss", title: "Ignorer" }
-    ],
-    data: { action }
-  });
-});
-
-// --- CLIC SUR NOTIFICATION ---
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  if (event.action === "dismiss") return;
-
-  event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      const action = event.notification.data?.action || "in";
-      
-      for (const client of clientList) {
-        if (client.url.includes("paye/index.html") && "focus" in client) {
-          client.postMessage({ type: "DO_PUNCH", action });
-          return client.focus();
-        }
-      }
-      
-      return clients.openWindow("./paye/index.html").then((w) => {
-        if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
-      });
+      icon: "./icon-192.png"
     })
   );
 });
