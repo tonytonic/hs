@@ -1,10 +1,10 @@
- /**
- * Service Worker : Compteur d'Heures & RPG Fox
- * Version : 1.6.4 (Complet avec dossier Fox)
+/**
+ * Service Worker : Simulateur Heures Sup & RPG Fox
+ * Version : 1.7.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "compteur-heures-v1.6.4";
-const OFFLINE_URL = "./menu.html"; 
+const CACHE_NAME = "heuressup-cache-v1.7.0";
+const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
   "./", 
@@ -49,15 +49,14 @@ const FILES_TO_CACHE = [
   "./fox/js/main-rpg.js"
 ];
 
-// --- INSTALLATION (Plus robuste contre les erreurs 404) ---
+// --- INSTALLATION : Mise en cache fichier par fichier ---
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // On utilise une boucle pour que si UN fichier manque, les AUTRES soient quand même cachés
       return Promise.all(
         FILES_TO_CACHE.map((url) => {
           return cache.add(url).catch((err) => {
-            console.warn("⚠️ Impossible de mettre en cache (vérifie le nom) :", url);
+            console.warn("⚠️ Échec mise en cache (ignorable si en dev) :", url);
           });
         })
       );
@@ -66,78 +65,107 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// --- ACTIVATION (Nettoyage des anciens caches) ---
+// --- ACTIVATION : Nettoyage automatique des vieux caches ---
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
-      )
-    )
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    })
   );
   self.clients.claim();
 });
 
-// --- FETCH (Gestion du mode hors-ligne) ---
+// --- FETCH : Stratégie Network First (Plus frais) avec Fallback Cache (Solidité) ---
 self.addEventListener("fetch", (event) => {
-  // Stratégie : Réseau d'abord, sinon Cache, sinon page de secours (Offline URL)
-  if (event.request.mode === "navigate") {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(OFFLINE_URL))
-    );
-  } else {
-    event.respondWith(
-      caches.match(event.request).then((res) => res || fetch(event.request))
+  if (event.request.method !== "GET") return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        // Si réseau OK, on met à jour le cache avec la nouvelle version
+        if (networkResponse && networkResponse.status === 200) {
+          const cacheCopy = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy));
+        }
+        return networkResponse;
+      })
+      .catch(() => {
+        // SI OFFLINE : On pioche dans le cache
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          
+          // Secours ultime pour la navigation : renvoyer le menu
+          if (event.request.headers.get("accept").includes("text/html")) {
+            return caches.match(OFFLINE_URL);
+          }
+        });
+      })
+  );
+});
+
+// --- SYNC : Pour les actions en attente ---
+self.addEventListener("sync", (event) => {
+  if (event.tag === "sync-punches") {
+    console.log("🔄 Synchronisation des pointages...");
+  }
+});
+
+// --- PERIODIC SYNC : La fameuse mise à jour auto ---
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "update-cache") {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) => {
+        return Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})));
+      })
     );
   }
 });
 
-// --- SYNC (Background Sync) ---
-self.addEventListener("sync", (event) => {
-  if (event.tag === "sync-punches") console.log("🔄 Sync active");
-});
-
-// --- PUSH NOTIFICATIONS ---
+// --- NOTIFICATIONS PUSH ---
 self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Rappel" };
+  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Nouvelle notification" };
   event.waitUntil(
-    self.registration.showNotification(data.title, { 
-      body: data.body, 
-      icon: "./icon-192.png" 
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "./icon-192.png",
+      badge: "./icon-192.png"
     })
   );
 });
 
-// --- GÉOLOCALISATION & MESSAGES ---
+// --- MESSAGES (GÉOLOCALISATION) ---
 self.addEventListener("message", (event) => {
-  if (!event.data || event.data.type !== "GEO_NOTIFY") return;
-  const { action, distance } = event.data;
-  const isArrival = action === "in";
-  self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
-    body: isArrival ? `Zone à ${Math.round(distance)}m` : `Sortie à ${Math.round(distance)}m`,
-    icon: "./icon-192.png",
-    tag: "geo-punch",
-    actions: [
-      { action: "punch", title: "Pointer" }, 
-      { action: "dismiss", title: "Fermer" }
-    ],
-    data: { action }
-  });
+  if (event.data && event.data.type === "GEO_NOTIFY") {
+    const { action, distance } = event.data;
+    const isArrival = action === "in";
+    self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
+      body: isArrival ? `Zone à ${Math.round(distance)}m` : `Sortie de zone`,
+      icon: "./icon-192.png",
+      tag: "geo-punch",
+      actions: [{ action: "punch", title: "Pointer" }, { action: "dismiss", title: "Fermer" }],
+      data: { action }
+    });
+  }
 });
 
 // --- CLIC SUR NOTIFICATION ---
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   if (event.action === "dismiss") return;
+
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       const action = event.notification.data?.action || "in";
+      // Si une fenêtre est déjà ouverte, on se focus dessus
       for (const c of list) {
         if (c.url.includes("paye/index.html") && "focus" in c) {
           c.postMessage({ type: "DO_PUNCH", action });
           return c.focus();
         }
       }
+      // Sinon on ouvre une nouvelle fenêtre
       return clients.openWindow("./paye/index.html").then((w) => {
         if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
       });
