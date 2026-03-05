@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>FOX Debug</title>
+<style>
+  body { background:#111; color:#eee; font-family:monospace; padding:20px; }
+  h2 { color:#FF8C42; }
+  pre { background:#1a1a1a; padding:12px; border-radius:8px; overflow:auto; font-size:12px; }
+  .ok { color:#4CAF50; } .err { color:#E53935; } .warn { color:#FF8C42; }
+  section { margin-bottom:24px; border:1px solid #333; border-radius:8px; padding:14px; }
+</style>
+</head>
+<body>
+<h1>\u{1F98A} FOX Debug</h1>
+<div id="out"></div>
+<script>
+function section(title, content, cls) {
+  return '<section><h2>' + title + '</h2><pre class="' + (cls||'') + '">' + escHtml(content) + '</pre></section>';
+}
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+let html = '';
+
+// ─── 1. Clés localStorage ───────────────────────────────────────
+const allKeys = [];
+for (let i = 0; i < localStorage.length; i++) allKeys.push(localStorage.key(i));
+
+const m1Keys = allKeys.filter(k => k && (k.startsWith('DATA_REPORT_') || k.startsWith('ANNUAL_RATE_') || k.startsWith('BASE_HEBDO_') || k.startsWith('REPORTS_REPORT_')));
+const m2Keys = allKeys.filter(k => k && k.startsWith('CA_HS_TRACKER'));
+
+html += section('Cles M1', m1Keys.map(k => k + ' → ' + localStorage.getItem(k)).join('\n') || '(aucune)');
+html += section('Cles M2', m2Keys.map(k => k + ' → ' + localStorage.getItem(k)).join('\n') || '(aucune)');
+html += section('Cles FOX', [
+  'ACTIVE_YEAR_SUFFIX : ' + localStorage.getItem('ACTIVE_YEAR_SUFFIX'),
+  'FOX_LAST_CUMUL     : ' + localStorage.getItem('FOX_LAST_CUMUL'),
+  'rpg_xp             : ' + localStorage.getItem('rpg_xp'),
+  'rpg_level          : ' + localStorage.getItem('rpg_level'),
+].join('\n'));
+
+// ─── 2. Contenu M1 ──────────────────────────────────────────────
+const activeYear = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || new Date().getFullYear();
+const m1Raw = JSON.parse(localStorage.getItem('DATA_REPORT_' + activeYear) || '{}');
+const m1Entries = Object.entries(m1Raw);
+html += section('M1 DATA_REPORT_' + activeYear + ' (' + m1Entries.length + ' jours)',
+  m1Entries.length
+    ? m1Entries.map(([d,v]) => d + ' : extra=' + (v.extra||0) + ' recup=' + (v.recup||0) + ' absent=' + (v.absent||0)).join('\n')
+    : '(vide - pas de donnees M1 pour ' + activeYear + ')'
+);
+
+// ─── 3. Contenu M2 ──────────────────────────────────────────────
+const m2Raw = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + activeYear) || '{}');
+const m2Months = Object.entries(m2Raw).filter(([k]) => /^\d{4}-\d{2}$/.test(k));
+html += section('M2 CA_HS_TRACKER_V1_DATA_' + activeYear + ' (' + m2Months.length + ' mois)',
+  m2Months.length
+    ? m2Months.map(([k,v]) => {
+        const daysStr = v.days ? Object.entries(v.days).map(([d,h]) => 'jour ' + d + '=' + h + 'h').join(', ') : 'pas de days';
+        const tot = v.days ? Object.values(v.days).reduce((a,b)=>a+b,0) : 0;
+        return k + ' : [' + daysStr + '] TOTAL=' + tot.toFixed(2) + 'h  closing=' + v.closing + ' carry=' + v.carry;
+      }).join('\n')
+    : '(vide - pas de donnees M2 pour ' + activeYear + ')'
+);
+
+// ─── 4. Recalcul M2 manuel ───────────────────────────────────────
+let m2Total = 0;
+const m2WeeklyDebug = {};
+m2Months.forEach(([monthKey, month]) => {
+  if (!month || !month.days) return;
+  const [y, m] = monthKey.split('-').map(Number);
+  Object.entries(month.days).forEach(([dayStr, h]) => {
+    const hours = parseFloat(h) || 0;
+    if (hours <= 0) return;
+    const d = parseInt(dayStr);
+    const date = new Date(y, m - 1, d);
+    const dow = date.getDay() || 7;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - dow + 1);
+    const wk = monday.getFullYear() + '-' + String(monday.getMonth()+1).padStart(2,'0') + '-' + String(monday.getDate()).padStart(2,'0');
+    if (!m2WeeklyDebug[wk]) m2WeeklyDebug[wk] = 0;
+    m2WeeklyDebug[wk] += hours;
+  });
+});
+let m2hs25 = 0, m2hs50 = 0;
+const weekLines = Object.entries(m2WeeklyDebug).map(([wk, t]) => {
+  const s25 = Math.min(8, t);
+  const s50 = Math.max(0, t - 8);
+  m2hs25 += s25; m2hs50 += s50; m2Total += t;
+  return 'Sem ' + wk + ' : ' + t.toFixed(2) + 'h → hs25=' + s25.toFixed(2) + 'h hs50=' + s50.toFixed(2) + 'h';
+});
+html += section('M2 Recalcul (reproduction algo FOX)',
+  weekLines.join('\n') + '\n\nTOTAL HS25 = ' + m2hs25.toFixed(2) + 'h\nTOTAL HS50 = ' + m2hs50.toFixed(2) + 'h\nTOTAL HS = ' + m2Total.toFixed(2) + 'h',
+  m2Total > 0 ? 'ok' : 'warn'
+);
+
+// ─── 5. Recalcul M1 manuel ───────────────────────────────────────
+const BASE_HEBDO = Number(localStorage.getItem('BASE_HEBDO_' + activeYear)) || 35;
+const m1Weekly = {};
+m1Entries.forEach(([dateKey, val]) => {
+  const extra = Number(val.extra || 0);
+  const recup = Number(val.recup || 0);
+  const absent = Number(val.absent || 0);
+  const d = new Date(dateKey);
+  const thu = new Date(d); thu.setDate(d.getDate() - ((d.getDay()+6)%7) + 3);
+  const yStart = new Date(thu.getFullYear(), 0, 4);
+  const wNum = 1 + Math.round(((thu - yStart)/86400000 - 3 + ((yStart.getDay()+6)%7))/7);
+  const wk = thu.getFullYear() + '-W' + String(wNum).padStart(2,'0');
+  if (!m1Weekly[wk]) m1Weekly[wk] = { extra:0, recup:0, absent:0 };
+  m1Weekly[wk].extra += extra;
+  m1Weekly[wk].recup += recup;
+  m1Weekly[wk].absent += absent;
+});
+let m1Net = 0;
+const m1Lines = Object.entries(m1Weekly).map(([wk, w]) => {
+  const eff = BASE_HEBDO + w.extra - w.recup - w.absent;
+  const ot = Math.max(0, eff - BASE_HEBDO);
+  m1Net += ot;
+  return 'Sem ' + wk + ' : extra=' + w.extra.toFixed(2) + ' recup=' + w.recup.toFixed(2) + ' absent=' + w.absent.toFixed(2) + ' → OT=' + ot.toFixed(2) + 'h';
+});
+html += section('M1 Recalcul (base=' + BASE_HEBDO + 'h)',
+  m1Lines.join('\n') + '\n\nNET OVERTIME M1 = ' + m1Net.toFixed(2) + 'h',
+  m1Net > 0 ? 'ok' : (m1Entries.length > 0 ? 'warn' : 'err')
+);
+
+document.getElementById('out').innerHTML = html;
+</script>
+</body>
+</html>
