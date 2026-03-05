@@ -2,15 +2,15 @@
   "name": "Simulateur Heures Supplémentaires",
   "short_name": "Heures Sup",
   "description": "Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.",
-  "id": "/menu.html",
-  "start_url": "/menu.html",
-  "scope": "/",
+  "id": "/hs/menu.html",
+  "start_url": "/hs/menu.html",
+  "scope": "/hs/",
   "display": "standalone",
   "display_override": [
-    "window-controls-overlay",
-    "tabbed",
     "standalone",
-    "minimal-ui"
+    "minimal-ui",
+    "window-controls-overlay",
+    "tabbed"
   ],
   "background_color": "#4FB3C2",
   "theme_color": "#4FB3C2",
@@ -34,11 +34,11 @@
   "protocol_handlers": [
     {
       "protocol": "web+heures",
-      "url": "/menu.html?type=%s"
+      "url": "/hs/menu.html?type=%s"
     }
   ],
   "note_taking": {
-    "new_note_url": "/paye/index.html"
+    "new_note_url": "/hs/paye/index.html"
   },
   "edge_side_panel": {
     "preferred_width": 400
@@ -70,7 +70,7 @@
     }
   ],
   "share_target": {
-    "action": "/menu.html",
+    "action": "/hs/menu.html",
     "method": "GET",
     "enctype": "application/x-www-form-urlencoded",
     "params": {
@@ -81,7 +81,7 @@
   },
   "file_handlers": [
     {
-      "action": "/menu.html",
+      "action": "/hs/menu.html",
       "accept": {
         "application/json": [
           ".json"
@@ -130,7 +130,7 @@
     {
       "name": "Compteur annuel",
       "short_name": "Annuel",
-      "url": "/heures/index.html",
+      "url": "/hs/heures/index.html",
       "icons": [
         {
           "src": "icon-192.png",
@@ -141,7 +141,7 @@
     {
       "name": "Simulateur mensuel",
       "short_name": "Mensuel",
-      "url": "/paye/index.html",
+      "url": "/hs/paye/index.html",
       "icons": [
         {
           "src": "icon-192.png",
