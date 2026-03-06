@@ -1,8 +1,8 @@
 [{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.tonytonic.heuressup",
-        "sha256_cert_fingerprints": ["AB:00:E4:D8:D8:FF:DE:34:D3:1C:68:C1:7F:39:E1:E1:7A:9E:28:5A:9B:EC:37:26:48:22:64:C7:D0:D3:50:63"]
-      }
-    }]
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.tonytonic.heuressup",
+    "sha256_cert_fingerprints": ["AB:00:E4:D8:D8:FF:DE:34:D3:1C:68:C1:7F:39:E1:E1:7A:9E:28:5A:9B:EC:37:26:48:22:64:C7:D0:D3:50:63"]
+  }
+}]
