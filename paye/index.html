@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="manifest" href="/hs/manifest.json">
+<link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
+<meta name="theme-color" content="#4FB3C2">
+<meta charset="UTF-8">
+<title>Simulateur d'heures mensualisé</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+.kitsune-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:24px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:auto;margin:0;box-shadow:0 2px 8px rgba(79,179,194,0.35);transition:transform .15s,box-shadow .15s;line-height:1}
+.kitsune-btn:hover{transform:scale(1.02);box-shadow:0 4px 16px rgba(79,179,194,0.55)}
+.kitsune-btn:active{transform:scale(0.97)}
+.menu-btn{padding:9px 16px;border-radius:20px;border:none;background:rgba(255,255,255,0.12);color:#e6e6e6;font-size:14px;font-weight:500;cursor:pointer;width:auto;margin:0;line-height:1}
+.topbar{position:sticky;top:0;z-index:2000;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;display:flex;gap:8px;align-items:center;justify-content:flex-start;flex-wrap:nowrap;border-bottom:1px solid #1c1f26;min-height:54px}
+
+:root{--bg:#0f1115;--card:#1c1f26;--text:#e6e6e6;--muted:#9aa0a6;--accent:#4FB3C2;--accent2:#2196a6;--danger:#c0392b;--success:#2ecc71}
+#versionBadge{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 14px);right:calc(env(safe-area-inset-right) + 14px);font-size:11px;opacity:.55;color:#9aa0a6;z-index:99999;user-select:none;pointer-events:none}
+html{background:var(--bg)}body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;overflow-x:hidden}
+.main{padding:12px;padding-top:70px;overflow-x:hidden}
+h1,h2,h3{text-align:center}
+button{width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:15px;margin-top:6px}
+button.secondary{background:#2a2f3a}
+button.danger{background:var(--danger)}
+input,select{width:100%;max-width:100%;padding:8px;margin-top:6px;background:#262a33;color:var(--text);border:1px solid #333;border-radius:6px;display:block}input[type="date"],input[type="month"]{overflow:hidden;min-width:0;-webkit-appearance:none;appearance:none;max-width:100%;width:100%}
+.card{background:var(--card);padding:15px;border-radius:12px;margin-top:15px;overflow:hidden}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;box-sizing:border-box}
+.weekday{text-align:center;font-weight:bold;font-size:12px}
+.day{background:#262a33;border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;min-height:60px;overflow:hidden;word-break:break-word;min-width:0;transition:border .2s ease,opacity .2s ease,transform .1s ease}
+.day.today{border:2px solid #4FB3C2 !important;opacity:1 !important;background:#0d2630;box-shadow:0 0 0 2px rgba(79,179,194,0.4);transform:scale(1.03);z-index:2}
+.day.locked{opacity:.4;cursor:not-allowed}
+.day.after-closing{border:1px dashed #4FB3C2;opacity:0.75}
+.day.after-closing.today{opacity:1 !important;border-style:solid}
+.closures-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.closure-row{display:flex;flex-direction:column;gap:4px}
+.closure-row label{font-size:12px;color:var(--muted)}
+.closure-row input{margin-top:0;font-size:13px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:4000;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .2s ease,transform .2s ease}
+.modal.open{opacity:1;pointer-events:auto;transform:translateY(0)}
+.modal-content{background:var(--card);padding:20px;border-radius:16px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto}
+.wiz-progress-bar{background:#333;border-radius:4px;height:5px;margin-bottom:16px;overflow:hidden}
+.wiz-progress-fill{height:100%;background:linear-gradient(90deg,#4FB3C2,#2196a6);transition:width .3s ease}
+.wiz-step{display:none}
+.wiz-step.active{display:block}
+.wiz-nav{display:flex;gap:10px;margin-top:20px}
+.wiz-nav button{flex:1;margin-top:0}
+.wiz-choice{display:flex;gap:10px;margin-top:8px}
+.wiz-choice button{flex:1;margin-top:0;font-size:13px;padding:10px 8px}
+.blur{filter:blur(8px)}
+.badge{display:inline-block;padding:4px 8px;border-radius:12px;font-size:12px}
+.badge.ok{background:#1a3a4a;color:#4FB3C2}
+.badge.file{background:#283593}
+input[type="month"]{text-align:center;padding-right:0;appearance:none;-webkit-appearance:none}
+input[type="number"]{text-align:center;appearance:none;-webkit-appearance:none;-moz-appearance:textfield;padding-left:0;padding-right:0}
+
+/* === MODALE PDF UNIFIÉE === */
+.pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid #333}
+.pdf-tab{flex:1;padding:9px 4px;font-size:13px;font-weight:600;border:none;background:#262a33;color:var(--muted);cursor:pointer;margin:0;border-radius:0;transition:background .15s,color .15s}
+.pdf-tab.active{background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff}
+.pdf-tab:first-child{border-radius:9px 0 0 9px}
+.pdf-tab:last-child{border-radius:0 9px 9px 0}
+.pdf-panel{display:none;margin-top:14px}
+.pdf-panel.active{display:block}
+.period-shortcuts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.period-shortcuts button{flex:1;min-width:calc(50% - 3px);font-size:12px;padding:8px 6px;margin-top:0;background:#262a33;border:1px solid #333;border-radius:8px;color:var(--text);cursor:pointer}
+.period-shortcuts button:hover{background:#2e3442;border-color:#4FB3C2}
+.period-range-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.period-range-row .period-field{display:flex;flex-direction:column;gap:4px}
+.period-range-row label{font-size:12px;color:var(--muted)}
+
+/* TOAST */
+#toastContainer{position:fixed;bottom:calc(env(safe-area-inset-bottom)+70px);left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:90%;max-width:400px}
+.toast{background:#1c2a1c;color:#e6e6e6;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transform:translateY(16px);transition:opacity .25s,transform .25s;pointer-events:none;text-align:center;border-left:3px solid #4FB3C2}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:#2ecc71}
+.toast.error{border-color:#c0392b}
+.toast.warn{border-color:#f39c12}
+.toast.info{border-color:#4FB3C2}
+/* CONFIRM MODAL */
+#confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:98000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#confirmModal.open{opacity:1;pointer-events:auto}
+#confirmModal .cm-box{background:#1c1f26;border-radius:16px;padding:24px 20px;width:88%;max-width:360px;text-align:center}
+#confirmModal .cm-msg{font-size:15px;margin-bottom:20px;line-height:1.5}
+#confirmModal .cm-btns{display:flex;gap:10px}
+#confirmModal .cm-btns button{flex:1;margin:0;padding:11px}
+
+/* BARRE 220H */
+#contingentBar{max-width:900px;margin:10px auto;padding:0 12px}
+.contingent-wrap{background:#1c1f26;border-radius:12px;padding:12px 14px}
+.contingent-label{font-size:12px;color:#9aa0a6;display:flex;justify-content:space-between;margin-bottom:6px}
+.contingent-track{background:#262a33;border-radius:6px;height:10px;overflow:hidden}
+.contingent-fill{height:100%;border-radius:6px;transition:width .4s ease,background .4s}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="menu-btn" onclick="goMenu()">&#x2B05; Menu</button>
+  <button class="kitsune-btn" onclick="window.location.href='../fox/index.html'" title="Ouvrir FOX Engine" style="display:none">&#x1F98A; Kitsune</button>
+  <button onclick="openTutorial()" style="margin:0;width:auto;padding:9px 14px;background:#2a2f3a;border-radius:20px;font-size:13px;line-height:1;">&#x2753; Tutoriel</button>
+</div>
+
+
+<!-- MODALE EXERCICES -->
+<div class="modal" id="yearsModal">
+  <div class="modal-content">
+    <h3>&#128193; Exercices</h3>
+    <p style="font-size:13px;color:#9aa0a6">Chaque exercice a son propre contingent annuel.<br>Les données de chaque année sont conservées indépendamment.</p>
+    <div id="yearsList" style="display:flex;flex-direction:column;gap:8px;margin:12px 0"></div>
+    <hr style="border-color:#2a2f3a;margin:12px 0">
+    <label style="font-size:13px">Créer / ouvrir un nouvel exercice</label>
+    <input type="number" id="newYearInput" placeholder="Ex : 2027" min="2000" max="2099" style="margin-top:6px">
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button onclick="confirmSwitchYear()">Ouvrir</button>
+      <button class="secondary" onclick="closeYearsPopup()">Annuler</button>
+    </div>
+  </div>
+</div>
+<!-- MODALES SYSTÈME -->
+<div class="modal" id="debugGate"><div class="modal-content">
+  <h3>&#x1F9EA; Accès debug sécurisé</h3>
+  <p style="font-size:14px">Avant toute intervention, un <b>test de crash</b> est obligatoire.</p>
+  <input type="password" id="debugCode" placeholder="Code requis (1234)">
+  <button class="danger" onclick="validateDebugAccess()">&#x1F4A5; Tester le crash maintenant</button>
+  <button class="secondary" onclick="closeDebugGate()">Annuler</button>
+</div></div>
+
+<div class="modal" id="recoveryModal"><div class="modal-content">
+  <h2>&#x1F6E0;&#xFE0F; Mode récupération</h2>
+  <h3>&#x1F4F8; Snapshots disponibles</h3>
+  <div id="snapshotList"></div>
+  <p style="font-size:14px">L'application a détecté un problème lors du dernier démarrage.</p>
+  <button onclick="recoverAuto()">&#x1F504; Réparation automatique</button>
+  <button class="secondary" onclick="recoverSoftReset()">&#x267B;&#xFE0F; Réinitialiser l'interface</button>
+  <button class="danger" onclick="recoverFactory()">&#x1F9E8; Réinitialisation complète</button>
+  <p style="font-size:12px;color:#aaa;margin-top:10px">&#x26A0;&#xFE0F; La réinitialisation complète supprime les données locales.</p>
+</div></div>
+
+<div class="modal" id="legalModal"><div class="modal-content">
+  <h2>&#x26A0;&#xFE0F; Avertissement important</h2>
+  <p style="font-size:14px">Cet outil est un <b>simulateur personnel</b>.<br><br>Les calculs sont indicatifs et peuvent différer de votre bulletin de paie réel.<br><br><b>Seuls les documents de l'employeur font foi.</b></p>
+  <button onclick="acceptLegal()">J'ai compris</button>
+</div></div>
+
+<!-- WIZARD -->
+<div class="modal" id="wizardModal"><div class="modal-content">
+  <div class="wiz-progress-bar"><div class="wiz-progress-fill" id="wizProgress" style="width:25%"></div></div>
+  <div id="wizStepLabel" style="font-size:12px;color:#9aa0a6;text-align:right;margin-bottom:10px;">Étape 1 / 4</div>
+
+  <div class="wiz-step active" id="wizStep1">
+    <h2 style="margin-top:0">&#x1F44B; Bienvenue</h2>
+    <p style="font-size:14px;color:var(--muted)">Cet outil te permet de suivre tes heures supplémentaires mois par mois, avec report automatique et estimation €.<br><br>La configuration prend moins d'une minute.</p>
+    <ol style="font-size:14px;line-height:1.9">
+      <li>Clique sur un jour pour saisir des heures</li>
+      <li>La clôture mensuelle est le dernier dimanche par défaut</li>
+      <li>Les reliquats sont reportés automatiquement</li>
+      <li>La zone € est protégée par un code</li>
+    </ol>
+    <div class="wiz-nav"><button onclick="wizNext()">Suivant &#x2192;</button></div>
+  </div>
+
+  <div class="wiz-step" id="wizStep2">
+    <h2 style="margin-top:0">&#x1F4C6; Clôture mensuelle</h2>
+    <p style="font-size:14px;color:var(--muted)">La clôture définit la fin de ta période de paie.<br>Par défaut : <b>dernier dimanche du mois</b>.</p>
+    <div style="background:#262a33;border-radius:10px;padding:14px;margin-top:10px">
+      <label style="font-size:13px;color:var(--muted)">Mode de clôture</label>
+      <div class="wiz-choice">
+        <button id="wizClosureAuto" onclick="wizSelectClosure('auto')" style="background:#2196a6">&#x1F916; Auto<br><small style="font-weight:400;color:#cde">Dernier dimanche</small></button>
+        <button id="wizClosureManual" onclick="wizSelectClosure('manual')" style="background:#2a2f3a">&#x270F;&#xFE0F; Manuel<br><small style="font-weight:400;color:#999">12 dates différentes</small></button>
+      </div>
+    </div>
+    <div class="wiz-nav">
+      <button class="secondary" onclick="wizPrev()">&#x2190; Retour</button>
+      <button onclick="wizNextStep2()">Suivant &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="wiz-step" id="wizStep2b">
+    <h2 style="margin-top:0">&#x1F4C5; Clôtures des 12 mois</h2>
+    <p style="font-size:13px;color:var(--muted);margin-top:0">Choisis un dimanche par mois. Laisse vide = dernier dimanche automatique.</p>
+    <div class="closures-grid" id="wizClosuresGrid" style="margin-top:10px"></div>
+    <div class="wiz-nav">
+      <button class="secondary" onclick="wizPrev2b()">&#x2190; Retour</button>
+      <button onclick="wizNext()">Suivant &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="wiz-step" id="wizStep3_taux">
+    <h2 style="margin-top:0">&#x1F4B6; Taux horaire</h2>
+    <p style="font-size:14px;color:var(--muted)">Ces valeurs pré-remplissent la zone €. Modifiables à tout moment.</p>
+    <div style="background:#262a33;border-radius:10px;padding:14px;margin-top:10px">
+      <label style="font-size:13px;color:var(--muted)">Taux horaire de base (€/h)</label>
+      <input type="number" id="wizRate" step="0.5" placeholder="Ex: 12.50">
+      <label style="font-size:13px;color:var(--muted);margin-top:10px;display:block">Coefficient brut &#x2192; net</label>
+      <input type="number" id="wizCoefNet" step="0.01" placeholder="Ex: 0.93">
+      <p style="font-size:11px;color:#9aa0a6;margin-top:6px">Laisser vide = valeurs par défaut.</p>
+    </div>
+    <div class="wiz-nav">
+      <button class="secondary" onclick="wizPrev()">&#x2190; Retour</button>
+      <button onclick="wizNext()">Suivant &#x2192;</button>
+    </div>
+  </div>
+
+  <div class="wiz-step" id="wizStep4_code">
+    <h2 style="margin-top:0">&#x1F510; Code de sécurité</h2>
+    <p style="font-size:14px;color:var(--muted)">La zone € est protégée par un code. Le code par défaut est <b>1234</b> — change-le pour sécuriser tes données.</p>
+    <div style="background:#262a33;border-radius:10px;padding:14px;margin-top:10px">
+      <label style="font-size:13px;color:var(--muted)">Nouveau code (laisser vide = garder 1234)</label>
+      <input type="password" id="wizNewCode" placeholder="Minimum 4 caractères">
+      <input type="password" id="wizConfirmCode" placeholder="Confirmer le code" style="margin-top:8px">
+    </div>
+    <div class="wiz-nav">
+      <button class="secondary" onclick="wizPrev()">&#x2190; Retour</button>
+      <button onclick="wizFinish()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x2705; Terminer &amp; Lancer</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- POPUP HEURES -->
+<div class="modal" id="hoursModal"><div class="modal-content">
+  <h3>&#x23F1;&#xFE0F; Ajouter des heures</h3>
+  <div id="hoursChoices"></div>
+  <label>Saisie manuelle</label>
+  <input type="number" id="manualHours" step="0.25">
+  <button onclick="confirmManual()">Valider</button>
+  <button class="danger" onclick="deleteDayHours()">&#x1F5D1;&#xFE0F; Supprimer les heures du jour</button>
+  <button class="secondary" onclick="closeHours()">Annuler</button>
+</div></div>
+
+<!-- TUTORIEL -->
+<div class="modal" id="tutorialModal"><div class="modal-content" style="max-width:700px;max-height:80vh;overflow:auto">
+  <h2>&#x1F4D8; Tutoriel</h2>
+  <h3>1&#xFE0F;&#x20E3; Principe général</h3>
+  <p>Suivi des heures sup dans le cadre d'une <b>paie mensuelle</b>, avec report automatique des reliquats.</p>
+  <h3>2&#xFE0F;&#x20E3; Saisie des heures</h3>
+  <ul><li>Clique sur un jour</li><li>Choisis +15 min, +1h… ou saisis manuellement</li><li>Enregistrement automatique</li></ul>
+  <h3>3&#xFE0F;&#x20E3; Clôture mensuelle</h3>
+  <p>Définit la fin de la période de paie. Les heures après cette date sont reportées.</p>
+  <h3>4&#xFE0F;&#x20E3; Zone €</h3>
+  <p>Floutée par défaut et protégée par code.</p>
+  <button class="secondary" onclick="closeTutorial()">Fermer</button>
+</div></div>
+
+<!-- MODALE CLÔTURES 12 MOIS -->
+<div class="modal" id="closuresModal"><div class="modal-content" style="max-height:85vh;overflow-y:auto">
+  <h3 style="margin-top:0">&#x1F4C5; Clôtures des 12 mois</h3>
+  <p style="font-size:13px;color:var(--muted);margin-top:0">Chaque mois peut avoir son propre dimanche de clôture.<br>Laisse vide = dernier dimanche du mois (automatique).</p>
+  <div class="closures-grid" id="closuresGrid"></div>
+  <button onclick="saveAllClosures()" style="margin-top:16px;background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x2705; Enregistrer</button>
+  <button class="secondary" onclick="closeClosuresModal()" style="margin-top:6px">Annuler</button>
+</div></div>
+
+<!-- ====================================================
+     MODALE PDF UNIFIÉE
+===================================================== -->
+<div class="modal" id="pdfModal"><div class="modal-content" style="max-width:520px">
+  <h3 style="margin-top:0">&#x1F4C4; Exporter en PDF</h3>
+
+  <!-- Onglets -->
+  <div class="pdf-tabs">
+    <button class="pdf-tab active" id="tab-mensuel" onclick="switchPdfTab('mensuel')">&#x1F4C5; Mensuel</button>
+    <button class="pdf-tab" id="tab-annuel" onclick="switchPdfTab('annuel')">&#x1F4C6; Annuel</button>
+    <button class="pdf-tab" id="tab-periode" onclick="switchPdfTab('periode')">&#x1F4CA; Période</button>
+  </div>
+
+  <!-- ── PANEL MENSUEL ── -->
+  <div class="pdf-panel active" id="panel-mensuel">
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 6px">Relevé complet jour par jour de la <b>période de paie</b> du mois sélectionné, avec report, sous-totaux semaine et détail 25%/50%.</p>
+    <label style="font-size:12px;color:var(--muted)">Mois à exporter</label>
+    <input type="month" id="pdfMonthPicker">
+    <div style="background:#262a33;border-radius:8px;padding:12px;margin-top:10px">
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Options</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px">
+        <input type="checkbox" id="mOptJourSans" checked style="width:auto;margin:0"> Inclure jours sans heures
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="mOptWeekTotals" checked style="width:auto;margin:0"> Sous-totaux par semaine
+      </label>
+    </div>
+    <button onclick="generateMonthlyPDF()" style="margin-top:12px;background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x1F4E5; Générer le PDF mensuel</button>
+  </div>
+
+  <!-- ── PANEL ANNUEL ── -->
+  <div class="pdf-panel" id="panel-annuel">
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 6px">Bilan complet de l'année : tableau mensuel avec périodes, heures 25%/50%, payées, reliquats et sous-totaux trimestriels.</p>
+    <label style="font-size:12px;color:var(--muted)">Année à exporter</label>
+    <input type="number" id="pdfYearPicker" min="2020" max="2099" step="1" style="text-align:left">
+    <div style="background:#262a33;border-radius:8px;padding:12px;margin-top:10px">
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Options</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px">
+        <input type="checkbox" id="aOptQuarter" checked style="width:auto;margin:0"> Sous-totaux trimestriels
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="aOptDetail" style="width:auto;margin:0"> Détail jour par jour par mois (PDF long)
+      </label>
+    </div>
+    <button onclick="generateAnnualPDF()" style="margin-top:12px;background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x1F4E5; Générer le PDF annuel</button>
+  </div>
+
+  <!-- ── PANEL PÉRIODE ── -->
+  <div class="pdf-panel" id="panel-periode">
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 6px">Relevé détaillé jour par jour sur n'importe quelle plage de dates.</p>
+    <label style="font-size:12px;color:var(--muted)">Raccourcis</label>
+    <div class="period-shortcuts">
+      <button onclick="setPeriodShortcut('month')">&#x1F4C5; Mois en cours</button>
+      <button onclick="setPeriodShortcut('prevmonth')">&#x23EA; Mois précédent</button>
+      <button onclick="setPeriodShortcut('quarter')">&#x1F4CA; Trimestre en cours</button>
+      <button onclick="setPeriodShortcut('year')">&#x1F4C6; Année en cours</button>
+    </div>
+    <label style="font-size:12px;color:var(--muted);margin-top:10px;display:block">Période de paie</label>
+    <select id="pdfPayPeriodSelect" style="background:#262a33;color:var(--text);border:1px solid #444;border-radius:6px;padding:8px;font-size:13px;margin-top:4px;" onchange="applyPayPeriodShortcut()"></select>
+    <div class="period-range-row">
+      <div class="period-field">
+        <label>Du</label>
+        <input type="date" id="periodStart">
+      </div>
+      <div class="period-field">
+        <label>Au</label>
+        <input type="date" id="periodEnd">
+      </div>
+    </div>
+    <div style="background:#262a33;border-radius:8px;padding:12px;margin-top:10px">
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Options</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px">
+        <input type="checkbox" id="pdfOptJourSans" checked style="width:auto;margin:0"> Inclure jours sans heures
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+        <input type="checkbox" id="pdfOptWeekTotals" checked style="width:auto;margin:0"> Sous-totaux par semaine
+      </label>
+    </div>
+    <button onclick="generatePeriodPDF()" style="margin-top:12px;background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x1F4E5; Générer le PDF de période</button>
+  </div>
+
+  <button class="secondary" onclick="closePdfModal()" style="margin-top:10px">Fermer</button>
+</div></div>
+
+<!-- CONTENU PRINCIPAL -->
+
+<div id="contingentBar" style="max-width:900px;margin:10px auto;padding:0 12px"><div class="contingent-wrap"><div class="contingent-label"><span>📊 Contingent annuel</span><span id="contingentText">0h / 220h</span></div><div class="contingent-track"><div class="contingent-fill" id="contingentFill" style="width:0%;background:#2ecc71"></div></div></div></div>
+
+<div style="max-width:900px;margin:8px auto;padding:0 12px;text-align:center">
+  <button onclick="openYearsPopup()" style="background:#2a2f3a;border-radius:20px;padding:9px 20px;font-size:14px;font-weight:600;letter-spacing:.3px;width:auto">&#x1F4C5; Exercice <span id="activeYearLabel">...</span></button>
+</div>
+
+<div class="main">
+  <h1>&#x23F1;&#xFE0F; Heures supplémentaires</h1>
+  <p style="text-align:center;font-size:14px;color:#9aa0a6;margin-top:-10px">
+    Suivi précis basé sur la <b>logique réelle de paie mensuelle</b> (clôture + report automatique)
+  </p>
+
+  <div class="card">
+    <label>Mois suivi</label>
+    <input type="month" id="monthPicker">
+    <label>Jour de clôture mensuelle</label>
+    <input type="date" id="closingDate">
+    <button onclick="openClosuresModal()" style="margin-top:10px;background:#2a2f3a;font-size:13px;">&#x1F4C5; Configurer les clôtures des 12 mois</button>
+  </div>
+
+  <div class="calendar card" id="calendar"></div>
+
+  <div class="card">
+    <h3>Récapitulatif</h3>
+    <p>Report précédent : <b id="prevCarry">0.00</b></p>
+    <p>Total période : <b id="totalMonth">0.00</b></p>
+    <p>Heures à 25 % : <b id="hours25">0.00</b></p>
+    <p>Heures à 50 % : <b id="hours50">0.00</b></p>
+    <p style="font-size:12px;color:#aaa;margin-top:8px">&#x2139;&#xFE0F; Calcul standard : 25% jusqu'à 8h hebdomadaires, puis 50%.</p>
+    <p>Heures payées : <input type="number" id="paidHours" step="0.25"></p>
+    <p>Reliquat reporté : <b id="carryOver">0.00</b></p>
+  </div>
+
+  <div class="card">
+    <h3>&#x1F4B0; Valeur €</h3>
+    <div id="euroBox" class="blur">
+      <label>Taux horaire (€)</label><input type="number" id="rate">
+      <label>Coef 25 %</label><input type="number" id="coef25">
+      <label>Coef 50 %</label><input type="number" id="coef50">
+      <label>Coef brut &#x2192; net</label><input type="number" id="coefNet">
+      <p><b id="euroResult">0.00 €</b></p>
+      <p id="euroDetail" style="font-size:12px;color:#aaa;margin-top:8px"></p>
+      <p style="font-size:12px;color:#9aa0a6;margin-top:10px;line-height:1.4">
+        &#x26A0;&#xFE0F; Taux et coefficients fournis à titre <b>strictement indicatif</b>. <b>Seul le bulletin de paie fait foi.</b>
+      </p>
+    </div>
+    <input type="password" id="unlockCode" placeholder="Code (1234)">
+    <button onclick="unlockEuro()">Déverrouiller</button>
+  </div>
+
+  <button class="secondary" onclick="toggleChangeCode()">&#x1F501; Changer le code</button>
+  <div id="changeCodeBox" style="display:none;margin-top:10px">
+    <input type="password" id="oldCode" placeholder="Ancien code">
+    <input type="password" id="newCode" placeholder="Nouveau code (4 chiffres min)">
+    <input type="password" id="confirmCode" placeholder="Confirmer le code">
+    <button class="danger" onclick="changeCode()">Valider le nouveau code</button>
+  </div>
+
+  <div class="card">
+    <span class="badge ok">&#x1F7E2; Sauvegarde locale auto</span>
+    <span class="badge file">&#x1F464; Usage personnel – outil indicatif</span>
+    <span class="badge file">&#x1F4BE; Dernier fichier : <span id="fileDate">—</span></span>
+    <button onclick="exportJSON()">&#x1F4BE; Sauvegarde dans un fichier</button>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+    <button class="secondary" onclick="document.getElementById('importFile').click()">&#x1F4E5; Importer une sauvegarde</button>
+    <!-- ★ BOUTON PDF UNIFIÉ ★ -->
+    <button onclick="openPdfModal()" style="background:linear-gradient(135deg,#2a5298,#1a237e);margin-top:10px">&#x1F4C4; Exporter en PDF&ensp;&#x2192;</button>
+    <button class="secondary" onclick="restartWizard()" style="margin-top:14px">&#x1F504; Recommencer la configuration</button>
+    <button class="danger" onclick="resetCurrentYear()" style="margin-top:10px;width:100%">&#x267B;&#xFE0F; R&#233;initialiser l'exercice en cours</button>
+  </div>
+
+  <div class="card" style="font-size:13px;color:#aaa">
+    <h3>&#x1F4D8; Notice utilisateur</h3>
+    <p>Outil de suivi personnel des heures supplémentaires – rémunération mensuelle.</p>
+    <ul><li>Code du travail</li><li>Convention collective du commerce de gros (IDCC 573)</li></ul>
+    <p>&#x26A0;&#xFE0F; En cas de litige, seuls les bulletins de paie et documents officiels font foi.</p>
+  </div>
+
+  <div class="card" style="font-size:12px;color:#9aa0a6;line-height:1.5">
+    <b>&#x26A0;&#xFE0F; Responsabilité et limites</b><br><br>
+    Les données sont renseignées <b>sous la seule responsabilité de l'utilisateur</b>.<br><br>
+    Les résultats sont indicatifs et peuvent ne pas refléter la réalité en raison d'erreurs de saisie, de différences liées à la convention collective, aux accords d'entreprise ou de <b>dysfonctionnements techniques</b>.<br><br>
+    <b>Seuls les documents établis par l'employeur et le droit applicable font foi.</b>
+  </div>
+
+  <footer id="debugTrigger" style="margin-top:30px;text-align:center;font-size:12px;color:#777;cursor:pointer;padding-bottom:40px">
+    &#x00A9; C. Anthony<br>Outil indicatif – ne constitue pas un bulletin de paie
+  </footer>
+</div>
+<div id="versionBadge"></div>
+
+<script>
+
+/* GESTION EXERCICES / ANNÉES */
+
+function updateYearLabel(){
+  const el = document.getElementById("activeYearLabel");
+  if(el) el.textContent = currentYear;
+}
+
+function getExistingYears(){
+  const idx = JSON.parse(localStorage.getItem(kIndex()) || "[]");
+  // Ajouter l'année courante si absente
+  if(!idx.includes(currentYear)) idx.push(currentYear);
+  return idx.sort();
+}
+
+function openYearsPopup(){
+  const box = document.getElementById("yearsList");
+  if(!box) return;
+  box.innerHTML = "";
+  getExistingYears().forEach(y => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;align-items:center;gap:8px";
+    const btn = document.createElement("button");
+    btn.style.cssText = "flex:1;margin:0";
+    btn.textContent = y + (String(y) === String(currentYear) ? " ✓ (actif)" : "");
+    btn.style.background = String(y) === String(currentYear) ? "var(--accent)" : "#2a2f3a";
+    btn.onclick = () => switchYear(y);
+    row.appendChild(btn);
+    box.appendChild(row);
+  });
+  document.getElementById("yearsModal").classList.add("open");
+  lockBodyScroll();
+}
+
+function closeYearsPopup(){
+  document.getElementById("yearsModal").classList.remove("open");
+  unlockBodyScroll();
+}
+
+function switchYear(y){
+  y = String(y);
+  if(y === String(currentYear)){ closeYearsPopup(); return; }
+  registerYear(y);
+  localStorage.setItem(ACTIVE_YEAR_KEY, y);
+  currentYear = y;
+  // Recharger les données sans reload de page
+  if(!ALL_DATA[currentYear]) ALL_DATA[currentYear] = loadYearData(currentYear);
+  DATA = ALL_DATA[currentYear];
+  const m = String(new Date().getMonth()+1).padStart(2,"0");
+  monthPicker.value = currentYear + "-" + m;
+  closeYearsPopup();
+  loadMonth();
+  toast("📅 Exercice " + currentYear + " chargé","info");
+}
+
+function confirmSwitchYear(){
+  const val = document.getElementById("newYearInput").value;
+  if(!val || val < 2000 || val > 2099){ toast("⛔ Année invalide","error"); return; }
+  const y = String(val);
+  registerYear(y);
+  if(Object.keys(loadYearData(y)||{}).length === 0) saveYearData(y, {});
+  switchYear(y);
+}
+
+const STORAGE_PREFIX="CA_HS_TRACKER_V1",APP_VERSION="1.5.0",SNAP_KEY=`${STORAGE_PREFIX}_SNAPSHOTS`,SNAP_LIMIT=5,DATA_VERSION="1.0";
+const ACTIVE_YEAR_KEY=STORAGE_PREFIX+"_ACTIVE_YEAR";
+let currentYear=localStorage.getItem(ACTIVE_YEAR_KEY)||String(new Date().getFullYear());
+const RECOVERY_ACTIVE=localStorage.getItem("CA_HS_RECOVERY_MODE")==="1";
+function kData(y){return`${STORAGE_PREFIX}_DATA_${y}`}
+function kSettings(){return`${STORAGE_PREFIX}_SETTINGS`}
+function kCode(){return`${STORAGE_PREFIX}_CODE_HASH`}
+function kIndex(){return`${STORAGE_PREFIX}_INDEX`}
+function getYearFromMonth(k){return k.split("-")[0]}
+
+let DATA={},SETTINGS=JSON.parse(localStorage.getItem(kSettings())||"{}"),ALL_DATA={};
+let currentKey="",currentDay=null,unlocked=false;
+
+/* SCROLL LOCK */
+let _scrollY=0;
+function lockBodyScroll(){_scrollY=window.scrollY;document.body.style.overflow="hidden";document.body.style.position="fixed";document.body.style.top="-"+_scrollY+"px";document.body.style.width="100%"}
+function unlockBodyScroll(){document.body.style.overflow="";document.body.style.position="";document.body.style.top="";document.body.style.width="";window.scrollTo(0,_scrollY)}
+
+/* WIZARD */
+let wizStep=1,wizClosureMode="auto";
+const WIZ_TOTAL=5;
+function openWizard(){wizStepId=1;wizClosureMode="auto";const wg=document.getElementById("wizClosuresGrid");if(wg)wg.innerHTML="";document.getElementById("wizardModal").classList.add("open");lockBodyScroll();wizUpdateUI()}
+function closeWizard(){document.getElementById("wizardModal").classList.remove("open");unlockBodyScroll()}
+let wizStepId = 1;
+const WIZ_STEP_IDS = [1, 2, '2b', 3, 4];
+
+function wizUpdateUI(){
+  const stepEl = {1:"wizStep1", 2:"wizStep2", '2b':"wizStep2b", 3:"wizStep3_taux", 4:"wizStep4_code"};
+  Object.values(stepEl).forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.remove("active"); });
+  const active = stepEl[wizStepId];
+  if(active) document.getElementById(active).classList.add("active");
+  const idx = WIZ_STEP_IDS.indexOf(wizStepId);
+  document.getElementById("wizProgress").style.width=((idx+1)/WIZ_TOTAL*100)+"%";
+  document.getElementById("wizStepLabel").textContent=`Étape ${idx+1} / ${WIZ_TOTAL}`;
+  if(wizStepId==='2b') wizBuildManualGrid();
+}
+function wizNext(){
+  const idx=WIZ_STEP_IDS.indexOf(wizStepId);
+  if(idx<WIZ_STEP_IDS.length-1){ wizStepId=WIZ_STEP_IDS[idx+1]; wizUpdateUI(); }
+}
+function wizPrev(){
+  const idx=WIZ_STEP_IDS.indexOf(wizStepId);
+  if(idx>0){ wizStepId=WIZ_STEP_IDS[idx-1]; wizUpdateUI(); }
+}
+function wizNextStep2(){
+  wizStepId = wizClosureMode==="manual" ? '2b' : 3;
+  wizUpdateUI();
+}
+function wizPrev2b(){ wizStepId=2; wizUpdateUI(); }
+
+function wizSelectClosure(mode){
+  wizClosureMode=mode;
+  document.getElementById("wizClosureAuto").style.background=mode==="auto"?"#2196a6":"#2a2f3a";
+  document.getElementById("wizClosureManual").style.background=mode==="manual"?"#2196a6":"#2a2f3a";
+}
+
+function wizBuildManualGrid(){
+  const grid=document.getElementById("wizClosuresGrid");
+  if(grid.children.length>0) return;
+  grid.innerHTML="";
+  const y=new Date().getFullYear(); // toujours Jan-Dec de l'année en cours
+  for(let m=0;m<12;m++){
+    const ls=getLastSunday(y,m);
+    const row=document.createElement("div"); row.className="closure-row";
+    const lbl=document.createElement("label"); lbl.textContent=MOIS_NOMS[m];
+    const inp=document.createElement("input"); inp.type="date"; inp.id="wizCls_"+m;
+    inp.value=`${y}-${String(m+1).padStart(2,"0")}-${String(ls).padStart(2,"0")}`;
+    inp.min=`${y}-${String(m+1).padStart(2,"0")}-01`;
+    const ld=new Date(y,m+1,0).getDate();
+    inp.max=`${y}-${String(m+1).padStart(2,"0")}-${ld}`;
+    inp.onchange=()=>{ if(!inp.value)return; const sel=new Date(inp.value); if(sel.getDay()!==0){toast("⛔ Doit être un dimanche","error");inp.value="";}};
+    row.appendChild(lbl); row.appendChild(inp); grid.appendChild(row);
+  }
+}
+async function wizFinish(){
+  const nc=document.getElementById("wizNewCode").value,cc=document.getElementById("wizConfirmCode").value;
+  if(nc){if(nc.length<4){toast("⚠️ Code trop court","warn");return}if(nc!==cc){toast("❌ Codes différents","error");return}localStorage.setItem(kCode(),await sha256(nc))}
+  const r=parseFloat(document.getElementById("wizRate").value),cn=parseFloat(document.getElementById("wizCoefNet").value);
+  if(!isNaN(r)){SETTINGS["rate"]=r;document.getElementById("rate").value=r}
+  if(!isNaN(cn)){SETTINGS["coefNet"]=cn;document.getElementById("coefNet").value=cn}
+  localStorage.setItem(kSettings(),JSON.stringify(SETTINGS));
+  if(wizClosureMode==="manual"){
+    const now=new Date(),y=now.getFullYear(),year=String(y);
+    if(!ALL_DATA[year])ALL_DATA[year]={};
+    MOIS_NOMS.forEach((_,m)=>{
+      const mk=`${y}-${String(m+1).padStart(2,"0")}`;
+      if(!ALL_DATA[year][mk])ALL_DATA[year][mk]={days:{},paid:0,carry:0,closing:getLastSunday(y,m),locked:false};
+      const inp=document.getElementById("wizCls_"+m);
+      if(inp&&inp.value){const sel=new Date(inp.value);if(sel.getDay()===0)ALL_DATA[year][mk].closing=sel.getDate();}
+    });
+    saveYearData(year,ALL_DATA[year]);
+  }
+  localStorage.setItem("ONBOARDING_DONE","1");localStorage.setItem("CA_HS_TRACKER_V1_ONBOARDING","1");
+  closeWizard();loadMonth();
+}
+
+/* INIT */
+;(function autoRefreshPWA(){const key="CA_APP_VERSION",last=localStorage.getItem(key);if(last!==APP_VERSION){localStorage.setItem(key,APP_VERSION);localStorage.removeItem("CA_HS_RECOVERY_MODE");if(!sessionStorage.getItem("CA_REFRESHED")){sessionStorage.setItem("CA_REFRESHED","1");location.reload()}}})();
+;(function preloadAllYears(){const idx=JSON.parse(localStorage.getItem(kIndex())||"[]");if(!idx.includes(currentYear))idx.push(currentYear);idx.forEach(y=>{try{ALL_DATA[y]=loadYearData(y)}catch(e){ALL_DATA[y]={}}}); })();
+;(function migrate(){const s=localStorage.getItem("CA_DATA_VERSION");if(s===DATA_VERSION)return;Object.entries(ALL_DATA).forEach(([y,yd])=>{Object.values(yd).forEach(m=>{if(typeof m.closing!=="number")m.closing=null;if(typeof m.locked!=="boolean")m.locked=false});saveYearData(y,yd)});localStorage.setItem("CA_DATA_VERSION",DATA_VERSION)})();
+
+window.addEventListener("load",()=>{
+  const v=document.getElementById("versionBadge");if(v)v.textContent="v"+APP_VERSION;
+  if(RECOVERY_ACTIVE){openRecovery();return}
+  if(!localStorage.getItem("LEGAL_OK")){document.getElementById("legalModal").classList.add("open");return}
+  if(!localStorage.getItem("CA_HS_TRACKER_V1_ONBOARDING")){openWizard();return}
+  loadMonth();
+});
+
+function acceptLegal(){localStorage.setItem("LEGAL_OK","1");document.getElementById("legalModal").classList.remove("open");if(!localStorage.getItem("CA_HS_TRACKER_V1_ONBOARDING"))openWizard();else loadMonth()}
+
+/* RECOVERY */
+function openRecovery(){document.getElementById("recoveryModal").classList.add("open");renderSnapshots()}
+function recoverAuto(){const f=attemptAutoRecovery();localStorage.removeItem("CA_HS_RECOVERY_MODE");toast(f?"✅ Réparation effectuée":"ℹ️ Aucun problème",f?"success":"info");location.reload()}
+function recoverSoftReset(){localStorage.removeItem("CA_HS_RECOVERY_MODE");location.reload()}
+function recoverFactory(){createSnapshot("factory_reset",true);confirmModal("⚠️ Supprimer TOUTES les données ?",()=>{Object.keys(localStorage).filter(k=>k.startsWith(STORAGE_PREFIX)).forEach(k=>localStorage.removeItem(k));location.reload();},"Supprimer",true);return;Object.keys(localStorage).filter(k=>k.startsWith(STORAGE_PREFIX)).forEach(k=>localStorage.removeItem(k));location.reload()}
+function attemptAutoRecovery(){
+  let repaired=false;
+  try{const idx=JSON.parse(localStorage.getItem(kIndex())||"[]");
+    idx.forEach(year=>{let data;try{data=loadYearData(year)}catch(e){localStorage.removeItem(kData(year));repaired=true;return}
+      Object.entries(data).forEach(([mk,m])=>{if(!m.days)m.days={};if(typeof m.paid!=="number")m.paid=0;if(typeof m.carry!=="number")m.carry=0;const[y,mo]=mk.split("-").map(Number);const ls=getLastSunday(y,mo-1);if(!m.closing||new Date(y,mo-1,m.closing).getDay()!==0){m.closing=ls;repaired=true}});
+      saveYearData(year,data)});
+  }catch(e){return false}return repaired;
+}
+
+/* SNAPSHOTS */
+function createSnapshot(reason="auto",force=false){
+  try{if(!force){const last=Number(localStorage.getItem("SNAP_LAST")||0);if(Date.now()-last<60000)return}
+    localStorage.setItem("SNAP_LAST",Date.now());const snaps=JSON.parse(localStorage.getItem(SNAP_KEY)||"[]");
+    snaps.unshift({date:new Date().toISOString(),reason,currentKey,DATA:JSON.parse(JSON.stringify(ALL_DATA)),SETTINGS});
+    snaps.splice(SNAP_LIMIT);localStorage.setItem(SNAP_KEY,JSON.stringify(snaps));
+  }catch(e){console.warn("Snapshot échoué",e)}}
+function renderSnapshots(){const list=document.getElementById("snapshotList");if(!list)return;const snaps=JSON.parse(localStorage.getItem(SNAP_KEY)||"[]");list.innerHTML=snaps.length?snaps.map((s,i)=>`<button onclick="restoreSnapshot(${i})">📸 ${new Date(s.date).toLocaleString()} – ${s.reason}</button>`).join(""):"<p style='font-size:12px;color:#aaa'>Aucun snapshot</p>"}
+function restoreSnapshot(index){const snaps=JSON.parse(localStorage.getItem(SNAP_KEY)||"[]");if(!snaps[index]){toast("❌ Introuvable","error");return}const snap=snaps[index];confirmModal(`Restaurer du ${new Date(snap.date).toLocaleString()} ?`,()=>{ALL_DATA=snap.DATA;SETTINGS=snap.SETTINGS||{};Object.entries(ALL_DATA).forEach(([y,d])=>saveYearData(y,d));localStorage.setItem(kSettings(),JSON.stringify(SETTINGS));localStorage.removeItem("CA_HS_RECOVERY_MODE");location.reload();},"Restaurer");}
+
+/* CALENDRIER */
+const closingDate=document.getElementById("closingDate"),monthPicker=document.getElementById("monthPicker"),paidInput=document.getElementById("paidHours");
+monthPicker.value=currentYear+"-"+(String(new Date().getMonth()+1).padStart(2,"0"));
+monthPicker.onchange=loadMonth;
+paidInput.oninput=()=>{if(!DATA||!DATA[currentKey])return;DATA[currentKey].paid=parseFloat(paidInput.value)||0;save();recalc()};
+
+function getLastSunday(year,monthIndex){const d=new Date(year,monthIndex+1,0);const diff=d.getDay()===0?0:d.getDay();d.setDate(d.getDate()-diff);return d.getDate()}
+function getPeriodBounds(monthKey){
+  if(!monthKey||typeof monthKey!=="string"){const now=new Date();return{start:new Date(now.getFullYear(),now.getMonth(),1),end:new Date(now.getFullYear(),now.getMonth()+1,0)}}
+  const[y,m]=monthKey.split("-").map(Number);if(!y||!m)return{start:new Date(y||1970,(m||1)-1,1),end:new Date(y||1970,m||1,0)};
+  const yd=ALL_DATA[String(y)],cm=yd?.[monthKey];if(!cm)return{start:new Date(y,m-1,1),end:new Date(y,m,0)};
+  const pmd=new Date(y,m-2,1),pk=pmd.getFullYear()+"-"+String(pmd.getMonth()+1).padStart(2,"0");
+  const pyd=ALL_DATA[String(pmd.getFullYear())]||{},pm=pyd[pk];
+  let start=pm&&typeof pm.closing==="number"?new Date(pmd.getFullYear(),pmd.getMonth(),pm.closing+1):new Date(y,m-1,1);
+  let closing=cm.closing;if(typeof closing!=="number"||new Date(y,m-1,closing).getDay()!==0)closing=getLastSunday(y,m-1);
+  return{start,end:new Date(y,m-1,closing)};
+}
+function goMenu(){localStorage.removeItem("lastApp");window.location.href="../menu.html"}
+function loadMonth(){updateYearLabel();
+  currentKey=monthPicker.value;const year=getYearFromMonth(currentKey);registerYear(year);
+  if(!ALL_DATA[year])ALL_DATA[year]=loadYearData(year);DATA=ALL_DATA[year];
+  const[y,m]=currentKey.split("-").map(Number);let needSave=false;
+  if(!DATA[currentKey]){DATA[currentKey]={days:{},paid:0,carry:0,closing:getLastSunday(y,m-1),locked:false};needSave=true}
+  {const ld=new Date(y,m,0).getDate(),cl=DATA[currentKey].closing;if(!cl||cl>ld||new Date(y,m-1,cl).getDay()!==0){DATA[currentKey].closing=getLastSunday(y,m-1);needSave=true}}
+  paidInput.value=DATA[currentKey].paid||0;setClosingLimits();syncClosingDate();renderCalendar();recalcCascade();recalc();scrollToToday();if(needSave)save();
+}
+function syncClosingDate(){if(!DATA[currentKey])return;const[y,m]=currentKey.split("-").map(Number),day=DATA[currentKey].closing||31;closingDate.value=`${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`}
+function setClosingLimits(){const[y,m]=currentKey.split("-").map(Number),ld=new Date(y,m,0).getDate();closingDate.min=`${y}-${String(m).padStart(2,"0")}-01`;closingDate.max=`${y}-${String(m).padStart(2,"0")}-${ld}`}
+closingDate.oninput=()=>{if(!closingDate.value)return;const sel=new Date(closingDate.value),[y,m]=currentKey.split("-").map(Number);if(sel.getFullYear()!==y||sel.getMonth()+1!==m){toast("⛔ La date doit être dans le mois sélectionné","error");syncClosingDate();return}if(sel.getDay()!==0){toast("⛔ La clôture doit être un dimanche","error");syncClosingDate();return}DATA[currentKey].closing=sel.getDate();save();renderCalendar();recalc()};
+closingDate.addEventListener("blur",()=>{const cal=document.getElementById("calendar");if(!cal)return;cal.style.display="none";cal.offsetHeight;cal.style.display="grid"});
+function scrollToToday(){const today=new Date().toISOString().slice(0,7);if(currentKey!==today)return;const el=document.getElementById("todayCell");if(el)el.scrollIntoView({behavior:"smooth",block:"center"})}
+function renderCalendar(){
+  const cal=document.getElementById("calendar");cal.innerHTML="";
+  ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].forEach(d=>{const w=document.createElement("div");w.className="weekday";w.textContent=d;cal.appendChild(w)});
+  const[y,m]=currentKey.split("-").map(Number),today=new Date(),isCurMonth=currentKey===today.toISOString().slice(0,7);
+  const firstDay=new Date(y,m-1,1).getDay()||7,dim=new Date(y,m,0).getDate(),{start,end}=getPeriodBounds(currentKey),isLocked=DATA[currentKey].locked;
+  for(let i=1;i<firstDay;i++)cal.appendChild(document.createElement("div"));
+  for(let d=1;d<=dim;d++){
+    const div=document.createElement("div");div.className="day";
+    const date=new Date(y,m-1,d);
+    if(date>end)div.classList.add("after-closing");
+    if(isLocked)div.classList.add("locked");
+    if(isCurMonth&&d===today.getDate()){div.classList.add("today");div.id="todayCell"}
+    const val=DATA[currentKey].days[d];
+    div.innerHTML=`<b style="font-size:13px">${d}</b><br><span style="color:#fff;font-weight:600;font-size:11px;display:block;line-height:1.2">${val?fmtH(val):""}</span>`;
+    div.onclick=()=>{if(isLocked){toast("🔒 Mois verrouillé","warn");return}openHours(d)};
+    cal.appendChild(div);
+  }
+}
+
+/* POPUP HEURES */
+function openHours(d){currentDay=d;const c=document.getElementById("hoursChoices");c.innerHTML="";[0.25,0.5,0.75,1,1.25,1.5,2].forEach(v=>{const b=document.createElement("button");b.textContent="+"+fmtH(v);b.onclick=()=>applyHours(v);c.appendChild(b)});document.getElementById("hoursModal").classList.add("open");lockBodyScroll()}
+function closeHours(){document.getElementById("hoursModal").classList.remove("open");unlockBodyScroll()}
+function applyHours(h){if(h<=0)return;DATA[currentKey].days[currentDay]=(DATA[currentKey].days[currentDay]||0)+h;save();renderCalendar();recalc();const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)}
+function confirmManual(){const inp=document.getElementById("manualHours"),h=parseFloat(inp.value);if(isNaN(h)||h<=0){toast("⛔ Valeur invalide","error");return}applyHours(h);inp.value=""}
+function deleteDayHours(){if(DATA[currentKey].locked){toast("🔒 Mois verrouillé","warn");return}if(!currentDay||!DATA[currentKey].days[currentDay]){toast("ℹ️ Aucune heure à supprimer","info");return}confirmModal(`Supprimer les heures du ${currentDay} ?`,()=>{delete DATA[currentKey].days[currentDay];currentDay=null;save();renderCalendar();recalc();closeHours();},"Supprimer",true);return;currentDay=null;save();renderCalendar();recalc();closeHours()}
+
+/* TUTORIEL */
+function openTutorial(){document.getElementById("tutorialModal").classList.add("open");lockBodyScroll()}
+function closeTutorial(){document.getElementById("tutorialModal").classList.remove("open");unlockBodyScroll()}
+
+/* CALCUL */
+function getPreviousCarry(mk){const am=[];const yd=ALL_DATA[currentYear]||{};Object.keys(yd).forEach(k=>{if(/^\d{4}-\d{2}$/.test(k))am.push({key:k,month:yd[k]})});am.sort((a,b)=>a.key.localeCompare(b.key));let pc=0;for(const item of am){if(item.key===mk)break;if(item.month.carry!=null)pc=item.month.carry}return pc}
+function recalc(){
+  const{start,end}=getPeriodBounds(currentKey);const weeks={};
+  Object.entries(DATA).forEach(([mk,month])=>{Object.entries(month.days||{}).forEach(([d,h])=>{const date=new Date(mk.split("-")[0],mk.split("-")[1]-1,d);if(date<start||date>end)return;const mon=new Date(date);const day=mon.getDay()||7;mon.setDate(mon.getDate()-day+1);const wk=mon.getFullYear()+"-"+String(mon.getMonth()+1).padStart(2,"0")+"-"+String(mon.getDate()).padStart(2,"0");weeks[wk]=(weeks[wk]||0)+h})});
+  let t25=0,t50=0,ph=0;Object.values(weeks).forEach(wh=>{ph+=wh;t25+=Math.min(8,wh);t50+=Math.max(0,wh-8)});
+  document.getElementById("hours25").textContent=fmtH(t25);document.getElementById("hours25").dataset.val=t25;document.getElementById("hours50").textContent=fmtH(t50);document.getElementById("hours50").dataset.val=t50;document.getElementById("totalMonth").textContent=fmtH(ph);document.getElementById("prevCarry").textContent=fmtH(getPreviousCarry(currentKey));document.getElementById("carryOver").textContent=fmtH((DATA[currentKey].carry||0));
+  if(unlocked)calcEuro();
+  updateContingent();
+}
+function calcEuro(){if(!unlocked)return;const rate=Number(document.getElementById("rate").value)||0,c25=Number(document.getElementById("coef25").value)||1.25,c50=Number(document.getElementById("coef50").value)||1.50,cn=Number(document.getElementById("coefNet").value)||1,h25=Number(document.getElementById("hours25").dataset.val)||0,h50=Number(document.getElementById("hours50").dataset.val)||0;const w25=h25*c25,w50=h50*c50,wt=w25+w50,brut=wt*rate,net=brut*cn;document.getElementById("euroResult").textContent=net.toFixed(2)+" €";document.getElementById("euroDetail").innerHTML=`${fmtH(h25)} × ${c25} = ${fmtH(w25)}<br>${fmtH(h50)} × ${c50} = ${fmtH(w50)}<br><b>Total pondéré : ${fmtH(wt)}</b>`}
+function recalcCascade(){
+  // Opérer uniquement sur l'exercice actif pour éviter contamination entre années
+  const yd=ALL_DATA[currentYear]||{};
+  const am=[];
+  Object.entries(yd).forEach(([k,m])=>{if(/^\d{4}-\d{2}$/.test(k))am.push({key:k,month:m})});
+  am.sort((a,b)=>a.key.localeCompare(b.key));
+  let rc=0;
+  am.forEach(({key})=>{
+    const{start,end}=getPeriodBounds(key);
+    let ph=0;
+    const myd=ALL_DATA[currentYear]||{};
+    Object.entries(myd).forEach(([mk,m])=>{
+      Object.entries(m.days||{}).forEach(([d,h])=>{
+        const[y,mo]=mk.split("-").map(Number);
+        const date=new Date(y,mo-1,d);
+        if(date>=start&&date<=end)ph+=h;
+      });
+    });
+    const m=yd[key];
+    if(!m)return;
+    rc+=ph-(Number(m.paid)||0);
+    if(rc<0)rc=0;
+    m.carry=rc;
+  });
+}
+
+/* SÉCURITÉ */
+async function sha256(str){const buf=new TextEncoder().encode(str);const hash=await crypto.subtle.digest("SHA-256",buf);return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("")}
+async function getSecureCode(){let h=localStorage.getItem(kCode());if(!h){h=await sha256("1234");localStorage.setItem(kCode(),h)}return h}
+async function unlockEuro(){const inp=document.getElementById("unlockCode").value,ih=await sha256(inp);if(ih===await getSecureCode()){unlocked=true;document.getElementById("euroBox").classList.remove("blur");document.getElementById("unlockCode").value="";resetEuroTimer();recalc();if(inp==="1234")toast("⚠️ Pense à changer le code","warn")}else toast("❌ Code incorrect","error")}
+function toggleChangeCode(){if(!unlocked){toast("🔒 Déverrouille d'abord la zone €","warn");return}const box=document.getElementById("changeCodeBox");box.style.display=box.style.display==="none"?"block":"none"}
+async function changeCode(){const o=document.getElementById("oldCode").value,n=document.getElementById("newCode").value,c=document.getElementById("confirmCode").value;if(!o||!n||!c){toast("⚠️ Remplis tous les champs","warn");return}if(n.length<4){toast("⚠️ Code trop court","warn");return}if(n!==c){toast("❌ Codes différents","error");return}if(await sha256(o)!==await getSecureCode()){toast("❌ Code incorrect","error");return}localStorage.setItem(kCode(),await sha256(n));document.getElementById("changeCodeBox").style.display="none";["oldCode","newCode","confirmCode"].forEach(id=>document.getElementById(id).value="");toast("✅ Code mis à jour","success")}
+
+/* SAUVEGARDE */
+function save(){localStorage.setItem(`${STORAGE_PREFIX}_AUTO_SAVE_DATE`,Date.now());recalcCascade();Object.entries(ALL_DATA).forEach(([y,yd])=>saveYearData(y,yd));updateSaveBadge()}
+function updateSaveBadge(){const el=document.querySelector(".badge.ok");if(!el)return;const stamp=Number(localStorage.getItem(`${STORAGE_PREFIX}_AUTO_SAVE_DATE`));el.textContent=(!stamp||isNaN(stamp))?"🟢 Sauvegarde locale auto":"🟢 Sauvegarde : "+new Date(stamp).toLocaleString()}
+function registerYear(y){let idx=JSON.parse(localStorage.getItem(kIndex())||"[]");if(!idx.includes(y)){idx.push(y);idx.sort();localStorage.setItem(kIndex(),JSON.stringify(idx))}}
+function loadYearData(y){return JSON.parse(localStorage.getItem(kData(y))||"{}")}
+function saveYearData(y,d){localStorage.setItem(kData(y),JSON.stringify(d))}
+
+/* PARAMS € */
+["rate","coef25","coef50","coefNet"].forEach(id=>{const def={rate:10,coef25:1.25,coef50:1.50,coefNet:0.93}[id],inp=document.getElementById(id);inp.value=SETTINGS[id]??def;inp.oninput=()=>{SETTINGS[id]=parseFloat(inp.value)||0;localStorage.setItem(kSettings(),JSON.stringify(SETTINGS));recalc()}});
+
+/* EXPORT */
+function prepareExport(){createSnapshot("before_export",true);recalcCascade();saveYearData(getYearFromMonth(currentKey),ALL_DATA[getYearFromMonth(currentKey)])}
+function exportJSON(){prepareExport();const y=getYearFromMonth(currentKey),p={exportedAt:new Date().toISOString(),year:y,appVersion:APP_VERSION,dataVersion:DATA_VERSION,DATA,SETTINGS};const b=new Blob([JSON.stringify(p,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="heures_sup_backup_"+Date.now()+".json";a.click();document.getElementById("fileDate").textContent=new Date().toLocaleDateString()}
+/* =====================================================
+   MODALE PDF UNIFIÉE
+===================================================== */
+function openPdfModal(){
+  // Pré-remplir les pickers
+  document.getElementById("pdfMonthPicker").value = currentKey;
+  document.getElementById("pdfYearPicker").value  = currentKey.slice(0,4);
+  // Pré-remplir période avec la période de paie active
+  const {start, end} = getPeriodBounds(currentKey);
+  document.getElementById("periodStart").value = toInputDate(start);
+  document.getElementById("periodEnd").value   = toInputDate(end);
+  // Peupler le sélecteur de périodes de paie
+  const sel=document.getElementById("pdfPayPeriodSelect");
+  if(sel){
+    sel.innerHTML="<option value=''>— Sélectionner une période de paie —</option>";
+    // Collecter tous les mois ayant des données ou dans ALL_DATA
+    const allKeys=new Set();
+    Object.entries(ALL_DATA).forEach(([y,yd])=>{
+      Object.keys(yd||{}).forEach(mk=>{if(/^\d{4}-\d{2}$/.test(mk))allKeys.add(mk);});
+    });
+    // Toujours inclure le mois courant
+    allKeys.add(currentKey);
+    const sorted=[...allKeys].sort().reverse();
+    sorted.forEach(mk=>{
+      const[y,m]=mk.split("-").map(Number);
+      const b=getPeriodBounds(mk);
+      const o=document.createElement("option");
+      o.value=mk;
+      o.textContent=`${MOIS_NOMS[m-1]} ${y} (${formatDate(b.start)} → ${formatDate(b.end)})`;
+      if(mk===currentKey)o.selected=true;
+      sel.appendChild(o);
+    });
+  }
+  document.getElementById("pdfModal").classList.add("open");
+  lockBodyScroll();
+}
+function applyPayPeriodShortcut(){
+  const sel=document.getElementById("pdfPayPeriodSelect");
+  if(!sel||!sel.value)return;
+  const b=getPeriodBounds(sel.value);
+  document.getElementById("periodStart").value=toInputDate(b.start);
+  document.getElementById("periodEnd").value=toInputDate(b.end);
+}
+function closePdfModal(){
+  document.getElementById("pdfModal").classList.remove("open");
+  unlockBodyScroll();
+}
+function switchPdfTab(name){
+  ["mensuel","annuel","periode"].forEach(n=>{
+    document.getElementById("tab-"+n).classList.toggle("active", n===name);
+    document.getElementById("panel-"+n).classList.toggle("active", n===name);
+  });
+}
+
+/* ── Utilitaires PDF communs ── */
+function toInputDate(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+const PDF_ACCENT=[79,179,194],PDF_MUTED=[0,0,0],PDF_LIGHT=[240,248,250];
+const PDF_JOURS=["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
+function pdfStr(s){
+  if(s===null||s===undefined)return"";
+  return String(s)
+    .replace(/[àáâãäå]/g,"a").replace(/[ÀÁÂÃÄÅ]/g,"A")
+    .replace(/[éèêë]/g,"e").replace(/[ÉÈÊË]/g,"E")
+    .replace(/[îï]/g,"i").replace(/[ÎÏ]/g,"I")
+    .replace(/[ôö]/g,"o").replace(/[ÔÖ]/g,"O")
+    .replace(/[ùûü]/g,"u").replace(/[ÙÛÜ]/g,"U")
+    .replace(/ç/g,"c").replace(/Ç/g,"C")
+    .replace(/œ/g,"oe").replace(/Œ/g,"OE")
+    .replace(/æ/g,"ae").replace(/Æ/g,"AE")
+    .replace(/[«»]/g,'"').replace(/[–—]/g,"-")
+    .replace(/→/g,"->").replace(/←/g,"<-").replace(/↔/g,"<->")
+    .replace(/×/g,"x").replace(/÷/g,"/")
+    .replace(/€/g,"EUR").replace(/£/g,"GBP")
+    .replace(/°/g," deg").replace(/ /g," ").replace(/’/g,"'")
+    .replace(/¹/g,"1").replace(/²/g,"2").replace(/³/g,"3")
+    .replace(/[^ -~]/g,"?");
+}
+
+function fmtH(h){
+  if(h===null||h===undefined||isNaN(h))return"0 min";
+  const neg=h<0;const abs=Math.abs(h);
+  const totalMin=Math.round(abs*60);
+  const hours=Math.floor(totalMin/60);
+  const mins=totalMin%60;
+  let s="";
+  if(hours>0&&mins>0)s=hours+"h"+String(mins).padStart(2,"0");
+  else if(hours>0)s=hours+"h";
+  else s=mins+" min";
+  return neg?"-"+s:s;
+}
+const PDF_MARGIN=14,PDF_W=210,PDF_H=297,PDF_LINE=7;
+
+function pdfBuildBase(){
+  const {jsPDF}=window.jspdf;
+  return new jsPDF();
+}
+
+function pdfHeader(pdf, titre, sousTitre){
+  pdf.setFillColor(...PDF_ACCENT);
+  pdf.rect(0,0,PDF_W,22,"F");
+  pdf.setTextColor(255,255,255);
+  pdf.setFontSize(13);pdf.setFont(undefined,"bold");
+  pdf.text(pdfStr(titre), PDF_W/2, 9, {align:"center"});
+  pdf.setFontSize(9);pdf.setFont(undefined,"normal");
+  pdf.text(pdfStr(sousTitre), PDF_W/2, 16, {align:"center"});
+  pdf.setTextColor(0,0,0);
+  return 28;
+}
+
+function pdfFooter(pdf){
+  pdf.setTextColor(...PDF_MUTED);pdf.setFontSize(7.5);pdf.setFont(undefined,"normal");
+  pdf.text(pdfStr("Document personnel – valeurs indicatives – ne constitue pas un bulletin de paie"), PDF_W/2, PDF_H-5, {align:"center"});
+  pdf.setTextColor(0,0,0);
+}
+
+function pdfTableHeader(pdf, y, cols){
+  pdf.setFillColor(...PDF_ACCENT);
+  pdf.rect(PDF_MARGIN, y-4, PDF_W-PDF_MARGIN*2, 8, "F");
+  pdf.setTextColor(255,255,255);pdf.setFontSize(8.5);pdf.setFont(undefined,"bold");
+  cols.forEach(([txt,x])=>pdf.text(pdfStr(txt), x, y+1));
+  pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");
+  return y+PDF_LINE;
+}
+
+function pdfRecapBlock(pdf, y, items){
+  // items = [[label, val], ...]  2 colonnes
+  const h = Math.ceil(items.length/2)*7 + 8;
+  pdf.setFillColor(...PDF_LIGHT);
+  pdf.roundedRect(PDF_MARGIN, y, PDF_W-PDF_MARGIN*2, h, 3, 3, "F");
+  pdf.setFontSize(8.5);pdf.setFont(undefined,"normal");pdf.setTextColor(...PDF_MUTED);
+  const col2x = PDF_W/2+4;
+  items.forEach(([lbl,val],i)=>{
+    const col = i%2===0 ? PDF_MARGIN+3 : col2x;
+    const row = y + 6 + Math.floor(i/2)*7;
+    pdf.setFont(undefined,"normal");pdf.text(pdfStr(lbl), col, row);
+    pdf.setFont(undefined,"bold");pdf.text(pdfStr(String(val)), col+52, row);
+  });
+  pdf.setFont(undefined,"normal");pdf.setTextColor(0,0,0);
+  return y+h+5;
+}
+
+function pdfDayTable(pdf, startY, allDays, inclSansHeures, inclSemaines){
+  const C={DATE:PDF_MARGIN+1,JOUR:PDF_MARGIN+40,H:PDF_MARGIN+58,SEMAINE:PDF_MARGIN+80,CUM:PDF_MARGIN+110};
+  let curY=startY, cumul=0, weekKey=null, weekTotal=0, rowIdx=0;
+
+  function chk(n=PDF_LINE){
+    if(curY+n>PDF_H-12){
+      pdfFooter(pdf);pdf.addPage();curY=15;
+      curY=pdfTableHeader(pdf,curY,[["Date",C.DATE],["Jour",C.JOUR],["Heures",C.H],["Sem.",C.SEMAINE],["Cumul",C.CUM]]);
+    }
+  }
+
+  curY=pdfTableHeader(pdf,curY,[["Date",C.DATE],["Jour",C.JOUR],["Heures",C.H],["Sem.",C.SEMAINE],["Cumul",C.CUM]]);
+
+  for(let i=0;i<allDays.length;i++){
+    const {date,h}=allDays[i];
+    const mon=new Date(date);const dow=mon.getDay()||7;mon.setDate(mon.getDate()-dow+1);
+    const wk=toInputDate(mon);
+
+    if(inclSemaines&&weekKey&&wk!==weekKey){
+      chk(PDF_LINE+2);
+      pdf.setFillColor(220,240,244);
+      pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE,"F");
+      pdf.setFontSize(8);pdf.setFont(undefined,"bold");pdf.setTextColor(...PDF_ACCENT);
+      pdf.text(pdfStr("Sous-total S "+weekKey),C.DATE,curY);
+      pdf.text(pdfStr(fmtH(weekTotal)),C.H,curY);
+      const w25=Math.min(8,weekTotal),w50=Math.max(0,weekTotal-8);
+      pdf.text(pdfStr(`25%: ${fmtH(w25)}  50%: ${fmtH(w50)}`),C.SEMAINE,curY);
+      pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");
+      curY+=PDF_LINE;weekTotal=0;
+    }
+
+    if(!inclSansHeures&&h===0){weekKey=wk;weekTotal+=h;continue;}
+    chk();
+
+    if(rowIdx%2===0){pdf.setFillColor(245,248,250);pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE-0.5,"F");}
+    cumul+=h;
+    const isWE=[0,6].includes(date.getDay());
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(isWE?60:0,isWE?60:0,isWE?60:0);
+    if(h>0)pdf.setFont(undefined,"bold");
+    pdf.text(pdfStr(date.toLocaleDateString("fr-FR")),C.DATE,curY);
+    pdf.text(pdfStr(PDF_JOURS[date.getDay()]),C.JOUR,curY);
+    pdf.text(pdfStr(h>0?fmtH(h):"—"),C.H,curY);
+    pdf.text(pdfStr(weekTotal+h>0?`S: ${fmtH(weekTotal+h)}`:""),C.SEMAINE,curY);
+    pdf.text(pdfStr(fmtH(cumul)),C.CUM,curY);
+    pdf.setDrawColor(230,230,230);pdf.line(PDF_MARGIN,curY+2,PDF_W-PDF_MARGIN,curY+2);
+    pdf.setFont(undefined,"normal");pdf.setTextColor(0,0,0);
+    curY+=PDF_LINE;weekTotal+=h;weekKey=wk;rowIdx++;
+  }
+
+  // Dernier sous-total semaine
+  if(inclSemaines&&weekKey&&weekTotal>0){
+    chk(PDF_LINE+2);
+    pdf.setFillColor(220,240,244);
+    pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE,"F");
+    pdf.setFontSize(8);pdf.setFont(undefined,"bold");pdf.setTextColor(...PDF_ACCENT);
+    pdf.text(pdfStr("Sous-total S "+weekKey),PDF_MARGIN+1,curY);
+    const w25=Math.min(8,weekTotal),w50=Math.max(0,weekTotal-8);
+    const C2={DATE:PDF_MARGIN+1,JOUR:PDF_MARGIN+40,H:PDF_MARGIN+58,SEMAINE:PDF_MARGIN+80,CUM:PDF_MARGIN+110};
+    pdf.text(pdfStr(fmtH(weekTotal)),C2.H,curY);
+    pdf.text(pdfStr(`25%: ${fmtH(w25)}  50%: ${fmtH(w50)}`),C2.SEMAINE,curY);
+    pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");curY+=PDF_LINE;
+  }
+
+  // Ligne totale
+  const total=allDays.reduce((s,r)=>s+r.h,0);
+  chk(PDF_LINE+4);
+  pdf.setFillColor(...PDF_ACCENT);pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE+1,"F");
+  pdf.setTextColor(255,255,255);pdf.setFontSize(9.5);pdf.setFont(undefined,"bold");
+  pdf.text(pdfStr("TOTAL"),PDF_MARGIN+1,curY+1);
+  const C3={DATE:PDF_MARGIN+1,JOUR:PDF_MARGIN+40,H:PDF_MARGIN+58,SEMAINE:PDF_MARGIN+80,CUM:PDF_MARGIN+110};
+  pdf.text(pdfStr(fmtH(total)),C3.H,curY+1);
+  pdf.text(pdfStr(fmtH(total)),C3.CUM,curY+1);
+  pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");
+  return curY+PDF_LINE+6;
+}
+
+function buildDayList(start, end){
+  const dayMap={};
+  Object.entries(ALL_DATA).forEach(([,yd])=>{
+    Object.entries(yd||{}).forEach(([mk,month])=>{
+      Object.entries(month.days||{}).forEach(([d,h])=>{
+        const[y,m]=mk.split("-").map(Number);
+        const date=new Date(y,m-1,d);
+        if(date>=start&&date<=end) dayMap[toInputDate(date)]=(dayMap[toInputDate(date)]||0)+h;
+      });
+    });
+  });
+  const list=[];
+  for(let d=new Date(start);d<=end;d.setDate(d.getDate()+1)){
+    const k=toInputDate(new Date(d));
+    list.push({date:new Date(d),h:dayMap[k]||0});
+  }
+  return list;
+}
+
+function calcWeeks(allDays){
+  const wm={};
+  allDays.forEach(({date,h})=>{
+    const m=new Date(date);const dw=m.getDay()||7;m.setDate(m.getDate()-dw+1);
+    const k=toInputDate(m);wm[k]=(wm[k]||0)+h;
+  });
+  let h25=0,h50=0;
+  Object.values(wm).forEach(wh=>{h25+=Math.min(8,wh);h50+=Math.max(0,wh-8);});
+  return{h25,h50};
+}
+
+/* ── PDF MENSUEL (amélioré) ── */
+function generateMonthlyPDF(){
+  const mk = document.getElementById("pdfMonthPicker").value;
+  if(!mk){toast("⛔ Sélectionne un mois","error");return;}
+  prepareExport();
+  const [y,m]=mk.split("-").map(Number);
+  const {start,end}=getPeriodBounds(mk);
+  const monthData=ALL_DATA[String(y)]?.[mk]||{days:{},paid:0,carry:0};
+  const paid=monthData.paid||0;
+  const pc=getPreviousCarry(mk);
+  const inclSansHeures=document.getElementById("mOptJourSans").checked;
+  const inclSemaines=document.getElementById("mOptWeekTotals").checked;
+
+  const allDays=buildDayList(start,end);
+  const total=allDays.reduce((s,r)=>s+r.h,0);
+  const {h25,h50}=calcWeeks(allDays);
+  const carry=monthData.carry||0;
+
+  const pdf=pdfBuildBase();
+  let curY=pdfHeader(pdf,
+    `Relevé mensuel – ${MOIS_NOMS[m-1]} ${y}`,
+    `Période de paie : ${formatDate(start)} → ${formatDate(end)}`
+  );
+
+  curY=pdfRecapBlock(pdf,curY,[
+    ["Report précédent",fmtH(pc)],
+    ["Total heures",fmtH(total)],
+    ["Heures à 25%",fmtH(h25)],
+    ["Heures à 50%",fmtH(h50)],
+    ["Heures payées",fmtH(paid)],
+    ["Reliquat reporté",fmtH(carry)],
+    ["Jours travaillés",allDays.filter(r=>r.h>0).length+" j"],
+    [`Généré le`,new Date().toLocaleDateString("fr-FR")],
+  ]);
+
+  pdfDayTable(pdf, curY, allDays, inclSansHeures, inclSemaines);
+  pdfFooter(pdf);
+  pdf.save(`heures_mensuel_${mk}.pdf`);
+  closePdfModal();
+}
+
+/* ── PDF ANNUEL (amélioré) ── */
+function generateAnnualPDF(){
+  const y=parseInt(document.getElementById("pdfYearPicker").value);
+  if(!y||y<2000||y>2099){toast("⛔ Année invalide","error");return;}
+  prepareExport();
+  const inclQuarter=document.getElementById("aOptQuarter").checked;
+  const inclDetail=document.getElementById("aOptDetail").checked;
+  const yearStr=String(y);
+  const pdf=pdfBuildBase();
+  const C={MOIS:PDF_MARGIN+1,PERIODE:PDF_MARGIN+28,TOTAL:PDF_MARGIN+82,H25:PDF_MARGIN+100,H50:PDF_MARGIN+116,PAYE:PDF_MARGIN+132,CARRY:PDF_MARGIN+152};
+
+  let curY=pdfHeader(pdf,
+    `Bilan annuel – Heures supplémentaires ${y}`,
+    `Généré le ${new Date().toLocaleString("fr-FR")}`
+  );
+
+  // Calcul annuel global
+  let annualTotal=0,annualPaid=0,annualH25=0,annualH50=0;
+  const monthsData=[];
+  for(let mi=0;mi<12;mi++){
+    const mk=`${y}-${String(mi+1).padStart(2,"0")}`;
+    const {start,end}=getPeriodBounds(mk);
+    const md=ALL_DATA[yearStr]?.[mk]||{days:{},paid:0,carry:0};
+    const allDays=buildDayList(start,end);
+    const total=allDays.reduce((s,r)=>s+r.h,0);
+    const{h25,h50}=calcWeeks(allDays);
+    const paid=md.paid||0;
+    const carry=md.carry||0;
+    annualTotal+=total;annualPaid+=paid;annualH25+=h25;annualH50+=h50;
+    monthsData.push({mk,start,end,total,h25,h50,paid,carry,allDays});
+  }
+
+  // Bloc récap global
+  curY=pdfRecapBlock(pdf,curY,[
+    ["Total heures",fmtH(annualTotal)],
+    ["Total payées",fmtH(annualPaid)],
+    ["Total à 25%",fmtH(annualH25)],
+    ["Total à 50%",fmtH(annualH50)],
+    ["Reliquat final",fmtH(monthsData[11]?.carry||0)],
+    ["Mois avec heures",monthsData.filter(m=>m.total>0).length+" mois"],
+  ]);
+
+  // Tableau mensuel
+  function drawMonthTableHeader(y2){
+    return pdfTableHeader(pdf,y2,[
+      ["Mois",C.MOIS],["Période",C.PERIODE],["Total h",C.TOTAL],
+      ["25%",C.H25],["50%",C.H50],["Payées",C.PAYE],["Reliquat",C.CARRY]
+    ]);
+  }
+  function chkAnn(n=PDF_LINE){
+    if(curY+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();curY=15;curY=drawMonthTableHeader(curY);}
+  }
+
+  curY=drawMonthTableHeader(curY);
+
+  let qTotal=0,qPaid=0,qH25=0,qH50=0;
+  monthsData.forEach(({mk,start,end,total,h25,h50,paid,carry},mi)=>{
+    const qi=Math.floor(mi/3)+1;
+    chkAnn();
+
+    if(mi%2===0){pdf.setFillColor(245,248,250);pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE-0.5,"F");}
+
+    const periodeStr=`${start.getDate().toString().padStart(2,"0")}/${(start.getMonth()+1).toString().padStart(2,"0")} → ${end.getDate().toString().padStart(2,"0")}/${(end.getMonth()+1).toString().padStart(2,"0")}`;
+    pdf.setFontSize(8.5);pdf.setFont(undefined,total>0?"bold":"normal");
+    pdf.setTextColor(total>0?0:60,total>0?0:60,total>0?0:60);
+    pdf.text(pdfStr(MOIS_NOMS[mi].slice(0),4)+".",C.MOIS,curY);
+    pdf.text(pdfStr(periodeStr),C.PERIODE,curY);
+    pdf.text(pdfStr(total>0?fmtH(total):"—"),C.TOTAL,curY);
+    pdf.text(pdfStr(h25>0?fmtH(h25):"—"),C.H25,curY);
+    pdf.text(pdfStr(h50>0?fmtH(h50):"—"),C.H50,curY);
+    pdf.text(pdfStr(paid>0?fmtH(paid):"—"),C.PAYE,curY);
+    pdf.text(pdfStr(fmtH(carry)),C.CARRY,curY);
+    pdf.setDrawColor(230,230,230);pdf.line(PDF_MARGIN,curY+2,PDF_W-PDF_MARGIN,curY+2);
+    pdf.setFont(undefined,"normal");pdf.setTextColor(0,0,0);
+    curY+=PDF_LINE;
+
+    qTotal+=total;qPaid+=paid;qH25+=h25;qH50+=h50;
+
+    // Sous-total trimestriel
+    if(inclQuarter&&(mi+1)%3===0){
+      chkAnn(PDF_LINE+2);
+      pdf.setFillColor(220,240,244);pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE,"F");
+      pdf.setFontSize(8.5);pdf.setFont(undefined,"bold");pdf.setTextColor(...PDF_ACCENT);
+      pdf.text(pdfStr(`T${qi} – Sous-total`),C.MOIS,curY);
+      pdf.text(pdfStr(qTotal.toFixed(2)),C.TOTAL,curY);
+      pdf.text(pdfStr(qH25.toFixed(2)),C.H25,curY);
+      pdf.text(pdfStr(qH50.toFixed(2)),C.H50,curY);
+      pdf.text(pdfStr(qPaid.toFixed(2)),C.PAYE,curY);
+      pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");
+      curY+=PDF_LINE+2;qTotal=0;qPaid=0;qH25=0;qH50=0;
+    }
+  });
+
+  // Ligne totale
+  chkAnn(PDF_LINE+4);
+  pdf.setFillColor(...PDF_ACCENT);pdf.rect(PDF_MARGIN,curY-4,PDF_W-PDF_MARGIN*2,PDF_LINE+1,"F");
+  pdf.setTextColor(255,255,255);pdf.setFontSize(9);pdf.setFont(undefined,"bold");
+  pdf.text(pdfStr("TOTAL ANNUEL"),C.MOIS,curY+1);
+  pdf.text(pdfStr(fmtH(annualTotal)),C.TOTAL,curY+1);
+  pdf.text(pdfStr(fmtH(annualH25)),C.H25,curY+1);
+  pdf.text(pdfStr(fmtH(annualH50)),C.H50,curY+1);
+  pdf.text(pdfStr(fmtH(annualPaid)),C.PAYE,curY+1);
+  pdf.text(pdfStr(fmtH(monthsData[11]?.carry||0)),C.CARRY,curY+1);
+  pdf.setTextColor(0,0,0);pdf.setFont(undefined,"normal");
+  curY+=PDF_LINE+6;
+
+  // Détail jour par jour par mois si option cochée
+  if(inclDetail){
+    monthsData.forEach(({mk,start,end,total,allDays},mi)=>{
+      if(total===0)return; // Saute les mois vides
+      pdfFooter(pdf);pdf.addPage();
+      curY=pdfHeader(pdf,
+        `Détail – ${MOIS_NOMS[mi]} ${y}`,
+        `Période : ${formatDate(start)} → ${formatDate(end)}`
+      );
+      curY=pdfDayTable(pdf,curY,allDays,true,true);
+    });
+  }
+
+  pdfFooter(pdf);
+  pdf.save(`heures_annuel_${y}.pdf`);
+  closePdfModal();
+}
+
+/* ── PDF PÉRIODE PERSONNALISÉE ── */
+function setPeriodShortcut(type){
+  const now=new Date(),y=now.getFullYear(),m=now.getMonth();
+  let start,end;
+  if(type==="month"){start=new Date(y,m,1);end=new Date(y,m+1,0);}
+  else if(type==="prevmonth"){start=new Date(y,m-1,1);end=new Date(y,m,0);}
+  else if(type==="quarter"){const q=Math.floor(m/3);start=new Date(y,q*3,1);end=new Date(y,q*3+3,0);}
+  else if(type==="year"){start=new Date(y,0,1);end=new Date(y,12,0);}
+  else if(type==="payperiod"){const b=getPeriodBounds(currentKey);start=b.start;end=b.end;}
+  document.getElementById("periodStart").value=toInputDate(start);
+  document.getElementById("periodEnd").value=toInputDate(end);
+}
+
+function generatePeriodPDF(){
+  const startStr=document.getElementById("periodStart").value,endStr=document.getElementById("periodEnd").value;
+  if(!startStr||!endStr){toast("⛔ Sélectionne une plage","error");return;}
+  const start=new Date(startStr+"T00:00:00"),end=new Date(endStr+"T00:00:00");
+  if(start>end){toast("⛔ Dates invalides","error");return;}
+  const inclSansHeures=document.getElementById("pdfOptJourSans").checked;
+  const inclSemaines=document.getElementById("pdfOptWeekTotals").checked;
+
+  prepareExport();
+  const allDays=buildDayList(start,end);
+  const total=allDays.reduce((s,r)=>s+r.h,0);
+  const daysWorked=allDays.filter(r=>r.h>0).length;
+  const{h25,h50}=calcWeeks(allDays);
+
+  const pdf=pdfBuildBase();
+  let curY=pdfHeader(pdf,
+    "Relevé d'heures – Période personnalisée",
+    `Du ${formatDate(start)} au ${formatDate(end)}`
+  );
+
+  curY=pdfRecapBlock(pdf,curY,[
+    ["Total heures",fmtH(total)],
+    ["Jours travaillés",daysWorked+" j"],
+    ["Heures à 25%",fmtH(h25)],
+    ["Heures à 50%",fmtH(h50)],
+    ["Jours dans la période",allDays.length+" j"],
+    [`Généré le`,new Date().toLocaleDateString("fr-FR")],
+  ]);
+
+  pdfDayTable(pdf, curY, allDays, inclSansHeures, inclSemaines);
+  pdfFooter(pdf);
+  pdf.save(`heures_periode_${startStr}_${endStr}.pdf`);
+  closePdfModal();
+}
+function formatDate(d){return d.toLocaleDateString("fr-FR")}
+function importJSONFile(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{createSnapshot("before_import");let payload,dv="1.0";try{payload=JSON.parse(reader.result);dv=payload.dataVersion||"1.0"}catch{toast("❌ JSON invalide","error");return}if(typeof payload!=="object"||typeof payload.DATA!=="object"||!payload.year){toast("❌ Structure invalide","error");return}const year=String(payload.year);if(!/^\d{4}$/.test(year)){toast("❌ Année invalide","error");return}if(dv==="1.0")Object.values(payload.DATA).forEach(m=>{if(typeof m.closing!=="number")m.closing=null;if(typeof m.locked!=="boolean")m.locked=false});registerYear(year);const existing=loadYearData(year);let imp=0,rep=0;Object.entries(payload.DATA).forEach(([mk,m])=>{if(!/^\d{4}-\d{2}$/.test(mk))return;if(!m.days||typeof m.days!=="object"){m.days={};rep++}if(typeof m.paid!=="number")m.paid=0;if(typeof m.carry!=="number")m.carry=0;if(typeof m.closing!=="number")m.closing=null;if(typeof m.locked!=="boolean")m.locked=false;existing[mk]=m;imp++});saveYearData(year,existing);ALL_DATA[year]=existing;recalcCascade();DATA=ALL_DATA[getYearFromMonth(currentKey)];loadMonth();toast(`✅ Import : ${imp} mois importés`,"success")};reader.readAsText(file);e.target.value=""}
+document.getElementById("importFile").addEventListener("change",importJSONFile);
+
+
+/* TOAST SYSTEM */
+function toast(msg,type="info",duration=2800){
+  const c=document.getElementById("toastContainer");
+  const t=document.createElement("div");t.className="toast "+type;t.textContent=msg;
+  c.appendChild(t);requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add("show")));
+  setTimeout(()=>{t.classList.remove("show");setTimeout(()=>t.remove(),300)},duration);
+}
+function confirmModal(msg,onOk,okLabel="Confirmer",danger=false){
+  const m=document.getElementById("confirmModal");
+  document.getElementById("cmMsg").textContent=msg;
+  const okBtn=document.getElementById("cmOk");
+  okBtn.textContent=okLabel;
+  okBtn.style.background=danger?"var(--danger)":"var(--accent)";
+  m.classList.add("open");
+  const close=()=>{m.classList.remove("open");okBtn.onclick=null;document.getElementById("cmCancel").onclick=null;};
+  okBtn.onclick=()=>{close();onOk();};
+  document.getElementById("cmCancel").onclick=close;
+}
+
+
+/* SWIPE CALENDRIER */
+(function(){
+  let _sx=null,_sy=null;
+  const cal=document.getElementById("calendar");
+  if(!cal)return;
+  cal.addEventListener("touchstart",e=>{_sx=e.touches[0].clientX;_sy=e.touches[0].clientY;},{passive:true});
+  cal.addEventListener("touchend",e=>{
+    if(_sx===null)return;
+    const dx=e.changedTouches[0].clientX-_sx;
+    const dy=e.changedTouches[0].clientY-_sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
+      const[y,m]=monthPicker.value.split("-").map(Number);
+      const d=new Date(y,m-1+(dx<0?1:-1),1);
+      // Rester dans l'exercice actif
+      if(String(d.getFullYear())===String(currentYear)){
+        monthPicker.value=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+        loadMonth();
+      } else {
+        toast(dx<0?"📅 Fin de l'exercice "+currentYear:"📅 Début de l'exercice "+currentYear,"info");
+      }
+    }
+    _sx=null;_sy=null;
+  },{passive:true});
+})();
+
+/* SESSION EURO */
+let _euroTimer=null;
+function resetEuroTimer(){
+  clearTimeout(_euroTimer);
+  _euroTimer=setTimeout(()=>{
+    if(unlocked){
+      unlocked=false;
+      document.getElementById("euroBox").classList.add("blur");
+      toast("🔒 Zone € verrouillée automatiquement","info");
+    }
+  },30*60*1000);
+}
+
+/* SAVE FEEDBACK */
+function showSaveFeedback(dayNum){
+  try{
+    const cells=document.querySelectorAll(".day");
+    let el=null;
+    cells.forEach(c=>{const b=c.querySelector("b");if(b&&parseInt(b.textContent)===dayNum)el=c;});
+    if(!el)return;
+    const fb=document.createElement("span");
+    fb.style.cssText="position:absolute;top:2px;right:4px;font-size:10px;color:#2ecc71;opacity:1;transition:opacity 1.2s;pointer-events:none";
+    fb.textContent="✓";
+    el.style.position="relative";
+    el.appendChild(fb);
+    setTimeout(()=>{fb.style.opacity="0";setTimeout(()=>fb.remove(),1200)},1500);
+  }catch(e){}
+}
+
+/* CONTINGENT 220H */
+function updateContingent(){
+  const LIMIT=220;
+  let total=0;
+  // Contingent = uniquement l'exercice actif (currentYear)
+  const yd=ALL_DATA[currentYear]||{};
+  Object.values(yd).forEach(m=>{Object.values(m.days||{}).forEach(h=>total+=h)});
+  const pct=Math.min(100,total/LIMIT*100);
+  const fill=document.getElementById("contingentFill");
+  const txt=document.getElementById("contingentText");
+  if(!fill||!txt)return;
+  fill.style.width=pct+"%";
+  fill.style.background=pct<70?"#2ecc71":pct<90?"#f39c12":"#c0392b";
+  txt.textContent=fmtH(total)+" / 220h";
+  if(pct>=100)toast("⚠️ Contingent annuel de 220h atteint !","warn",5000);
+  else if(pct>=90&&!sessionStorage.getItem("contingent_warned")){sessionStorage.setItem("contingent_warned","1");toast("⚠️ Contingent annuel : "+Math.round(pct)+"% atteint","warn",4000);}
+}
+
+/* ANTI-CRASH */
+window.onerror=function(msg,src,l,c,err){handleFatalError({type:"JS_ERROR",message:msg,source:src,lineno:l,colno:c,stack:err?.stack||null});return true};
+window.addEventListener("unhandledrejection",ev=>{handleFatalError({type:"PROMISE_REJECTION",message:ev.reason?.message||String(ev.reason),stack:ev.reason?.stack||null})});
+
+function resetCurrentYear(){
+  confirmModal(
+    "Reinitialiser exercice "+currentYear+" ? Toutes les donnees seront supprimees.",
+    function(){
+      saveYearData(currentYear,{});
+      ALL_DATA[currentYear]={};
+      DATA={};
+      localStorage.removeItem(kData(currentYear));
+      // Forcer la réinitialisation propre du mois
+      const m=String(new Date().getMonth()+1).padStart(2,"0");
+      monthPicker.value=currentYear+"-"+m;
+      loadMonth();
+      toast("Exercice "+currentYear+" reinitialise","success");
+    },
+    "Reinitialiser",
+    true
+  );
+}
+function safe(fn){return function(...args){try{return fn.apply(this,args)}catch(e){handleFatalError({type:"SAFE_FN",message:e.message,stack:e.stack})}}}
+recalc=safe(recalc);renderCalendar=safe(renderCalendar);loadMonth=safe(loadMonth);save=safe(save);
+function handleFatalError(err){console.error("💥",err);localStorage.setItem("CA_HS_RECOVERY_MODE","1");try{localStorage.setItem("CA_HS_LAST_CRASH",JSON.stringify({date:new Date().toISOString(),error:err,state:{currentKey,unlocked}}))}catch(e){}if(document.getElementById("crashOverlay"))return;const ov=document.createElement("div");ov.id="crashOverlay";ov.style="position:fixed;inset:0;background:#0f1115;color:#fff;z-index:99999;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:20px;text-align:center";ov.innerHTML=`<h2>⚠️ Une erreur est survenue</h2><p style="opacity:.8;font-size:14px;max-width:500px">Aucune donnée n'a été supprimée.</p><button onclick="location.reload()" style="margin-top:15px;padding:12px 20px;border-radius:8px;border:none;background:#4FB3C2;color:white;font-size:15px">🔄 Recharger</button>`;document.body.appendChild(ov)}
+
+/* DEBUG */
+const DEBUG_CODE="1234";
+window.addEventListener("DOMContentLoaded",()=>{const dbg=document.getElementById("debugTrigger");if(dbg)dbg.addEventListener("click",()=>document.getElementById("debugGate").classList.add("open"))});
+function closeDebugGate(){document.getElementById("debugGate").classList.remove("open")}
+function validateDebugAccess(){const inp=document.getElementById("debugCode").value;if(inp!==DEBUG_CODE){toast("❌ Code incorrect","error");return}toast("🧪 Crash simulé...","warn");localStorage.setItem("CA_DEBUG","1");simulateCrash()}
+function restartWizard(){
+  confirmModal("Relancer l'assistant ?\nTes données ne seront pas effacées.",()=>{localStorage.removeItem("ONBOARDING_DONE");localStorage.removeItem("CA_HS_TRACKER_V1_ONBOARDING");openWizard();},"Relancer");
+}
+function simulateCrash(){handleFatalError({type:"SIMULATED_CRASH",message:"Crash simulé",stack:null})}
+
+/* =======================
+   FONCTIONS UTILITAIRES PÉRIODE
+======================= */
+function getPeriodData(monthKey){
+  const{start,end}=getPeriodBounds(monthKey);
+  let totalHours=0;
+  const rows=[];
+  Object.entries(ALL_DATA).forEach(([year,yearData])=>{
+    Object.entries(yearData||{}).forEach(([key,month])=>{
+      Object.entries(month.days||{}).forEach(([d,h])=>{
+        const[y,m]=key.split("-").map(Number);
+        const date=new Date(y,m-1,d);
+        if(date>=start&&date<=end){totalHours+=h;rows.push({date,h});}
+      });
+    });
+  });
+  rows.sort((a,b)=>a.date-b.date);
+  return{start,end,rows,totalHours};
+}
+
+function getPeriodHoursForMonth(monthKey){
+  const{start,end}=getPeriodBounds(monthKey);
+  let total=0;
+  Object.entries(ALL_DATA).forEach(([year,yearData])=>{
+    Object.entries(yearData||{}).forEach(([key,month])=>{
+      Object.entries(month.days||{}).forEach(([d,h])=>{
+        const[y,m]=key.split("-").map(Number);
+        const date=new Date(y,m-1,d);
+        if(date>=start&&date<=end)total+=h;
+      });
+    });
+  });
+  return total;
+}
+
+/* GESTION 12 CLÔTURES */
+const MOIS_NOMS=["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+
+function openClosuresModal(){
+  const grid=document.getElementById("closuresGrid");
+  grid.innerHTML="";
+  const year=getYearFromMonth(currentKey);
+  const y=parseInt(year);
+  for(let m=0;m<12;m++){
+    const mk=`${y}-${String(m+1).padStart(2,"0")}`;
+    if(!ALL_DATA[year]) ALL_DATA[year]={};
+    if(!ALL_DATA[year][mk]) ALL_DATA[year][mk]={days:{},paid:0,carry:0,closing:getLastSunday(y,m),locked:false};
+    const closing=ALL_DATA[year][mk].closing;
+    const row=document.createElement("div"); row.className="closure-row";
+    const lbl=document.createElement("label"); lbl.textContent=MOIS_NOMS[m]+" "+y;
+    const inp=document.createElement("input"); inp.type="date"; inp.id="cls_"+m;
+    if(closing){inp.value=`${y}-${String(m+1).padStart(2,"0")}-${String(closing).padStart(2,"0")}`;}
+    inp.min=`${y}-${String(m+1).padStart(2,"0")}-01`;
+    const lastDay=new Date(y,m+1,0).getDate();
+    inp.max=`${y}-${String(m+1).padStart(2,"0")}-${lastDay}`;
+    inp.onchange=()=>{if(!inp.value) return;const sel=new Date(inp.value);if(sel.getDay()!==0){ toast("⛔ Doit être un dimanche","error"); inp.value=""; return; }};
+    row.appendChild(lbl); row.appendChild(inp); grid.appendChild(row);
+  }
+  document.getElementById("closuresModal").classList.add("open");
+  lockBodyScroll();
+}
+
+function saveAllClosures(){
+  const year=getYearFromMonth(currentKey);
+  const y=parseInt(year);
+  let changed=0;
+  for(let m=0;m<12;m++){
+    const mk=`${y}-${String(m+1).padStart(2,"0")}`;
+    const inp=document.getElementById("cls_"+m);
+    if(!inp) continue;
+    if(!ALL_DATA[year]) ALL_DATA[year]={};
+    if(!ALL_DATA[year][mk]) ALL_DATA[year][mk]={days:{},paid:0,carry:0,closing:getLastSunday(y,m),locked:false};
+    if(inp.value){const sel=new Date(inp.value);if(sel.getDay()===0){ALL_DATA[year][mk].closing=sel.getDate();changed++;}}
+    else{ALL_DATA[year][mk].closing=getLastSunday(y,m);changed++;}
+  }
+  save();
+  closeClosuresModal();
+  syncClosingDate();
+  renderCalendar();
+  recalc();
+  if(changed) toast("✅ "+changed+" clôture(s) enregistrée(s)","success");
+}
+
+function closeClosuresModal(){
+  document.getElementById("closuresModal").classList.remove("open");
+  unlockBodyScroll();
+}
+
+
+</script>
+
+<div id="toastContainer"></div>
+<div id="confirmModal"><div class="cm-box"><p class="cm-msg" id="cmMsg"></p><div class="cm-btns"><button class="secondary" id="cmCancel">Annuler</button><button id="cmOk">Confirmer</button></div></div></div>
+</body>
+</html>
+
