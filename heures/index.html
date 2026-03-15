@@ -208,7 +208,7 @@ button,input,textarea{width:100%;padding:8px;margin:5px 0}
     <hr class="settings-divider">
     <div class="settings-group">
       <span class="settings-group-label" style="color:#c62828;">&#9888;&#65039; Zone de danger</span>
-      <button class="settings-danger-btn" onclick="console.log('[DEBUG] Reset btn clicked');event.stopPropagation();try{resetCurrentExercise();console.log('[DEBUG] resetCurrentExercise called OK');}catch(e){console.error('[DEBUG] ERROR in resetCurrentExercise:',e);}">&#x267B;&#65039; R&eacute;initialiser l&apos;exercice en cours</button>
+      <button class="settings-danger-btn" onclick="event.stopPropagation();try{resetCurrentExercise();}catch(e){console.error(e);}">&#x267B;&#65039; R&eacute;initialiser l&apos;exercice en cours</button>
     </div>
     <div class="popup-actions"><button onclick="closeSettingsModal()">Fermer</button></div>
   </div>
@@ -417,14 +417,10 @@ function autoSwitchPeriodAtMidnight(){const now=new Date();const next=new Date(n
 let currentSuffix=localStorage.getItem("ACTIVE_YEAR_SUFFIX")||new Date().getFullYear();
 document.getElementById("activeYearLabel").textContent=currentSuffix;
 function resetCurrentExercise(){
-  console.log("[DEBUG] resetCurrentExercise() entered");
   if(window.event)window.event.stopPropagation();
   setTimeout(function(){
-    console.log("[DEBUG] setTimeout fired, calling confirmModal");
     var msg="Reinitialiser exercice "+currentSuffix+" ? Toutes les donnees seront supprimees.";
-    console.log("[DEBUG] confirmModal msg=",msg);
     confirmModal(msg,function(){
-      console.log("[DEBUG] onOk callback fired");
       createSnapshot("before_reset_exercise");
       ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CONFIG_LOCK_"].forEach(function(p){localStorage.removeItem(p+currentSuffix);});
       localStorage.setItem("DATA_REPORT_"+currentSuffix,JSON.stringify({}));
