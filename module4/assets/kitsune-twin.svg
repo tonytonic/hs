@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <radialGradient id="aura" cx="50%" cy="60%" r="50%">
+      <stop offset="0%" stop-color="rgba(0,215,240,0.18)"/>
+      <stop offset="100%" stop-color="rgba(0,215,240,0)"/>
+    </radialGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a3a5c"/>
+      <stop offset="100%" stop-color="#0d2240"/>
+    </linearGradient>
+    <linearGradient id="eye-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#00d7f0"/>
+      <stop offset="100%" stop-color="#b06aff"/>
+    </linearGradient>
+    <filter id="glow-fx">
+      <feGaussianBlur stdDeviation="2.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Aura -->
+  <ellipse cx="60" cy="72" rx="52" ry="48" fill="url(#aura)"/>
+  <!-- Body -->
+  <ellipse cx="60" cy="80" rx="26" ry="22" fill="url(#fur)" stroke="rgba(0,215,240,0.3)" stroke-width="1"/>
+  <!-- Tails -->
+  <ellipse cx="84" cy="88" rx="12" ry="7" fill="#0d2240" stroke="rgba(0,215,240,0.25)" stroke-width=".8" transform="rotate(-20 84 88)"/>
+  <ellipse cx="88" cy="82" rx="10" ry="6" fill="#0d2240" stroke="rgba(0,215,240,0.2)" stroke-width=".8" transform="rotate(-35 88 82)"/>
+  <ellipse cx="36" cy="88" rx="12" ry="7" fill="#0d2240" stroke="rgba(0,215,240,0.25)" stroke-width=".8" transform="rotate(20 36 88)"/>
+  <!-- Head -->
+  <ellipse cx="60" cy="52" rx="24" ry="22" fill="url(#fur)" stroke="rgba(0,215,240,0.35)" stroke-width="1"/>
+  <!-- Ears -->
+  <polygon points="42,36 36,16 52,30" fill="#0d2240" stroke="rgba(0,215,240,0.4)" stroke-width=".8"/>
+  <polygon points="78,36 84,16 68,30" fill="#0d2240" stroke="rgba(0,215,240,0.4)" stroke-width=".8"/>
+  <!-- Inner ears -->
+  <polygon points="43,34 38,20 51,31" fill="rgba(176,106,255,0.3)"/>
+  <polygon points="77,34 82,20 69,31" fill="rgba(176,106,255,0.3)"/>
+  <!-- Eyes -->
+  <ellipse cx="51" cy="50" rx="6" ry="5" fill="url(#eye-g)" filter="url(#glow-fx)" opacity=".9"/>
+  <ellipse cx="69" cy="50" rx="6" ry="5" fill="url(#eye-g)" filter="url(#glow-fx)" opacity=".9"/>
+  <ellipse cx="51" cy="50" rx="3" ry="3" fill="#050810"/>
+  <ellipse cx="69" cy="50" rx="3" ry="3" fill="#050810"/>
+  <ellipse cx="52" cy="49" rx="1.2" ry="1.2" fill="white" opacity=".9"/>
+  <ellipse cx="70" cy="49" rx="1.2" ry="1.2" fill="white" opacity=".9"/>
+  <!-- Nose -->
+  <ellipse cx="60" cy="57" rx="3" ry="2" fill="rgba(0,215,240,0.6)" filter="url(#glow-fx)"/>
+  <!-- Mouth -->
+  <path d="M55 60 Q60 64 65 60" fill="none" stroke="rgba(0,215,240,0.4)" stroke-width=".8"/>
+  <!-- Data circuit markings on body -->
+  <line x1="50" y1="78" x2="70" y2="78" stroke="rgba(0,215,240,0.3)" stroke-width=".6"/>
+  <line x1="60" y1="72" x2="60" y2="90" stroke="rgba(0,215,240,0.2)" stroke-width=".6"/>
+  <circle cx="60" cy="78" r="2" fill="none" stroke="rgba(0,215,240,0.5)" stroke-width=".8"/>
+  <circle cx="50" cy="78" r="1" fill="rgba(0,215,240,0.6)"/>
+  <circle cx="70" cy="78" r="1" fill="rgba(0,215,240,0.6)"/>
+  <!-- HUD ring -->
+  <circle cx="60" cy="52" r="28" fill="none" stroke="rgba(0,215,240,0.12)" stroke-width=".8" stroke-dasharray="3,4"/>
+</svg>

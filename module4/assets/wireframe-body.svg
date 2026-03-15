@@ -1,0 +1,216 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 420" id="wireframe-body">
+<defs>
+  <filter id="glow-body">
+    <feGaussianBlur stdDeviation="2.5" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="glow-hot">
+    <feGaussianBlur stdDeviation="4" result="blur"/>
+    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <linearGradient id="body-fade" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.9"/>
+    <stop offset="60%" stop-color="#00c8ff" stop-opacity="0.6"/>
+    <stop offset="100%" stop-color="#00c8ff" stop-opacity="0.3"/>
+  </linearGradient>
+  <!-- Zone color overlays -->
+  <radialGradient id="zone-head" cx="50%" cy="40%" r="50%">
+    <stop offset="0%" stop-color="var(--zone-head-c,#00ffcc)" stop-opacity="0.35"/>
+    <stop offset="100%" stop-color="var(--zone-head-c,#00ffcc)" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="zone-chest" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="var(--zone-chest-c,#00c8ff)" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="var(--zone-chest-c,#00c8ff)" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="zone-core" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="var(--zone-core-c,#00c8ff)" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="var(--zone-core-c,#00c8ff)" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="zone-arm-l" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="var(--zone-arml-c,#00c8ff)" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="var(--zone-arml-c,#00c8ff)" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="zone-arm-r" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="var(--zone-armr-c,#00c8ff)" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="var(--zone-armr-c,#00c8ff)" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="zone-legs" cx="50%" cy="30%" r="60%">
+    <stop offset="0%" stop-color="var(--zone-legs-c,#00c8ff)" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="var(--zone-legs-c,#00c8ff)" stop-opacity="0"/>
+  </radialGradient>
+</defs>
+
+<!-- ═══ SILHOUETTE OUTLINE ═══ -->
+<g filter="url(#glow-body)" opacity="0.9">
+
+<!-- HEAD outline -->
+<ellipse cx="100" cy="38" rx="26" ry="32" fill="none" stroke="url(#body-fade)" stroke-width="1.2"/>
+<!-- Neck -->
+<path d="M88,68 Q100,72 112,68 L114,82 Q100,86 86,82 Z" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<!-- Shoulders -->
+<path d="M86,82 Q70,85 58,95 Q50,102 48,115" fill="none" stroke="#00c8ff" stroke-width="1.2"/>
+<path d="M114,82 Q130,85 142,95 Q150,102 152,115" fill="none" stroke="#00c8ff" stroke-width="1.2"/>
+<!-- Torso sides -->
+<path d="M48,115 Q44,140 46,165 Q50,178 60,183" fill="none" stroke="#00c8ff" stroke-width="1.2"/>
+<path d="M152,115 Q156,140 154,165 Q150,178 140,183" fill="none" stroke="#00c8ff" stroke-width="1.2"/>
+<!-- Hips -->
+<path d="M60,183 Q80,192 100,193 Q120,192 140,183" fill="none" stroke="#00c8ff" stroke-width="1.2"/>
+<!-- Groin split -->
+<path d="M100,193 L100,215" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<!-- Upper arms -->
+<path d="M48,115 Q38,130 36,155 Q35,165 38,175" fill="none" stroke="#00c8ff" stroke-width="1.1"/>
+<path d="M152,115 Q162,130 164,155 Q165,165 162,175" fill="none" stroke="#00c8ff" stroke-width="1.1"/>
+<!-- Lower arms -->
+<path d="M38,175 Q34,195 36,215 Q37,225 42,232" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<path d="M162,175 Q166,195 164,215 Q163,225 158,232" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<!-- Hands -->
+<ellipse cx="41" cy="240" rx="11" ry="14" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+<ellipse cx="159" cy="240" rx="11" ry="14" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+<!-- Thighs -->
+<path d="M60,193 Q52,220 54,255 Q55,270 60,280" fill="none" stroke="#00c8ff" stroke-width="1.1"/>
+<path d="M140,193 Q148,220 146,255 Q145,270 140,280" fill="none" stroke="#00c8ff" stroke-width="1.1"/>
+<path d="M100,215 Q80,225 60,280" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+<path d="M100,215 Q120,225 140,280" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+<!-- Knees -->
+<ellipse cx="62" cy="285" rx="12" ry="9" fill="none" stroke="#00c8ff" stroke-width="0.9" opacity="0.7"/>
+<ellipse cx="138" cy="285" rx="12" ry="9" fill="none" stroke="#00c8ff" stroke-width="0.9" opacity="0.7"/>
+<!-- Lower legs -->
+<path d="M54,290 Q50,320 52,345 Q53,358 60,368" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<path d="M70,290 Q72,320 70,345 Q68,358 64,368" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<path d="M130,290 Q128,320 130,345 Q132,358 136,368" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<path d="M146,290 Q150,320 148,345 Q147,358 140,368" fill="none" stroke="#00c8ff" stroke-width="1"/>
+<!-- Feet -->
+<path d="M54,368 Q52,378 50,382 Q48,388 55,390 Q65,393 72,390 Q76,386 74,378 Q72,370 64,368 Z" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+<path d="M128,368 Q126,378 124,382 Q122,388 130,390 Q140,393 148,390 Q152,386 150,378 Q148,370 140,368 Z" fill="none" stroke="#00c8ff" stroke-width="0.9"/>
+
+</g>
+
+<!-- ═══ MESH GRID LINES — HEAD ═══ -->
+<g opacity="0.45" stroke="#00c8ff" stroke-width="0.5" fill="none">
+<!-- Horizontal head rings -->
+<ellipse cx="100" cy="22" rx="14" ry="5"/>
+<ellipse cx="100" cy="32" rx="23" ry="8"/>
+<ellipse cx="100" cy="42" rx="26" ry="9"/>
+<ellipse cx="100" cy="52" rx="24" ry="7"/>
+<ellipse cx="100" cy="62" rx="18" ry="5"/>
+<!-- Vertical head meridians -->
+<path d="M100,6 Q114,22 114,38 Q114,54 100,68"/>
+<path d="M100,6 Q86,22 86,38 Q86,54 100,68"/>
+<path d="M100,6 Q120,20 124,38 Q122,56 100,68"/>
+<path d="M100,6 Q80,20 76,38 Q78,56 100,68"/>
+</g>
+
+<!-- ═══ MESH GRID — TORSO ═══ -->
+<g opacity="0.4" stroke="#00c8ff" stroke-width="0.5" fill="none">
+<!-- Torso horizontals -->
+<path d="M60,95 Q100,98 140,95"/>
+<path d="M54,108 Q100,112 146,108"/>
+<path d="M50,122 Q100,126 150,122"/>
+<path d="M49,136 Q100,140 151,136"/>
+<path d="M49,150 Q100,154 151,150"/>
+<path d="M49,164 Q100,168 151,164"/>
+<path d="M52,178 Q100,182 148,178"/>
+<path d="M58,188 Q100,191 142,188"/>
+<!-- Torso verticals -->
+<path d="M100,82 L100,193"/>
+<path d="M84,84 Q82,120 84,160 Q85,178 88,190"/>
+<path d="M116,84 Q118,120 116,160 Q115,178 112,190"/>
+<path d="M70,90 Q66,130 68,165 Q70,180 74,188"/>
+<path d="M130,90 Q134,130 132,165 Q130,180 126,188"/>
+</g>
+
+<!-- ═══ MESH GRID — ARMS ═══ -->
+<g opacity="0.38" stroke="#00c8ff" stroke-width="0.45" fill="none">
+<!-- Left arm rings -->
+<ellipse cx="44" cy="118" rx="8" ry="5" transform="rotate(-15 44 118)"/>
+<ellipse cx="40" cy="135" rx="8" ry="5" transform="rotate(-18 40 135)"/>
+<ellipse cx="38" cy="152" rx="8" ry="4" transform="rotate(-10 38 152)"/>
+<ellipse cx="38" cy="168" rx="7" ry="4" transform="rotate(-5 38 168)"/>
+<ellipse cx="39" cy="183" rx="7" ry="4"/>
+<ellipse cx="39" cy="200" rx="7" ry="3.5"/>
+<ellipse cx="39" cy="216" rx="7" ry="3"/>
+<!-- Right arm rings -->
+<ellipse cx="156" cy="118" rx="8" ry="5" transform="rotate(15 156 118)"/>
+<ellipse cx="160" cy="135" rx="8" ry="5" transform="rotate(18 160 135)"/>
+<ellipse cx="162" cy="152" rx="8" ry="4" transform="rotate(10 162 152)"/>
+<ellipse cx="162" cy="168" rx="7" ry="4" transform="rotate(5 162 168)"/>
+<ellipse cx="161" cy="183" rx="7" ry="4"/>
+<ellipse cx="161" cy="200" rx="7" ry="3.5"/>
+<ellipse cx="161" cy="216" rx="7" ry="3"/>
+<!-- Arm longitudinals -->
+<path d="M48,115 Q36,155 38,175"/>
+<path d="M44,115 Q34,155 36,175"/>
+<path d="M152,115 Q164,155 162,175"/>
+<path d="M156,115 Q166,155 164,175"/>
+</g>
+
+<!-- ═══ MESH GRID — LEGS ═══ -->
+<g opacity="0.38" stroke="#00c8ff" stroke-width="0.45" fill="none">
+<!-- Left leg rings -->
+<ellipse cx="72" cy="205" rx="16" ry="7" transform="rotate(-5 72 205)"/>
+<ellipse cx="68" cy="220" rx="15" ry="6"/>
+<ellipse cx="65" cy="238" rx="14" ry="6"/>
+<ellipse cx="62" cy="256" rx="13" ry="5.5"/>
+<ellipse cx="62" cy="274" rx="12" ry="5"/>
+<!-- Right leg rings -->
+<ellipse cx="128" cy="205" rx="16" ry="7" transform="rotate(5 128 205)"/>
+<ellipse cx="132" cy="220" rx="15" ry="6"/>
+<ellipse cx="135" cy="238" rx="14" ry="6"/>
+<ellipse cx="138" cy="256" rx="13" ry="5.5"/>
+<ellipse cx="138" cy="274" rx="12" ry="5"/>
+<!-- Lower leg rings -->
+<ellipse cx="62" cy="300" rx="10" ry="4"/>
+<ellipse cx="62" cy="318" rx="9" ry="4"/>
+<ellipse cx="62" cy="336" rx="8" ry="3.5"/>
+<ellipse cx="62" cy="354" rx="7" ry="3"/>
+<ellipse cx="138" cy="300" rx="10" ry="4"/>
+<ellipse cx="138" cy="318" rx="9" ry="4"/>
+<ellipse cx="138" cy="336" rx="8" ry="3.5"/>
+<ellipse cx="138" cy="354" rx="7" ry="3"/>
+<!-- Leg longitudinals -->
+<path d="M58,193 Q50,240 54,280"/>
+<path d="M68,196 Q62,240 62,280"/>
+<path d="M132,193 Q140,240 146,280"/>
+<path d="M142,196 Q138,240 138,280"/>
+</g>
+
+<!-- ═══ ZONE COLOR OVERLAYS (dynamically colored) ═══ -->
+<!-- Head/Brain zone -->
+<ellipse id="zone-head-fill" cx="100" cy="38" rx="26" ry="32" fill="url(#zone-head)" class="body-zone" data-zone="brain"/>
+<!-- Chest/Heart zone -->
+<rect id="zone-chest-fill" x="54" y="88" width="92" height="55" rx="4" fill="url(#zone-chest)" class="body-zone" data-zone="heart"/>
+<!-- Core/Spine zone -->
+<rect id="zone-core-fill" x="54" y="143" width="92" height="50" rx="4" fill="url(#zone-core)" class="body-zone" data-zone="spine"/>
+<!-- Left arm zone -->
+<ellipse id="zone-arml-fill" cx="44" cy="170" rx="14" ry="55" fill="url(#zone-arm-l)" class="body-zone" data-zone="arms" transform="rotate(-8 44 170)"/>
+<!-- Right arm zone -->
+<ellipse id="zone-armr-fill" cx="156" cy="170" rx="14" ry="55" fill="url(#zone-arm-r)" class="body-zone" data-zone="arms" transform="rotate(8 156 170)"/>
+<!-- Legs zone -->
+<rect id="zone-legs-fill" x="48" y="193" width="104" height="185" rx="4" fill="url(#zone-legs)" class="body-zone" data-zone="legs"/>
+
+<!-- ═══ HOTSPOT DOTS ═══ -->
+<g filter="url(#glow-hot)">
+<!-- Brain node -->
+<circle id="node-brain" cx="100" cy="30" r="3.5" fill="#00c8ff" opacity="0.9" class="zone-node" data-zone="brain"/>
+<circle cx="100" cy="30" r="6" fill="none" stroke="#00c8ff" stroke-width="0.6" opacity="0.5"/>
+<!-- Heart node -->
+<circle id="node-heart" cx="92" cy="118" r="3.5" fill="#00c8ff" opacity="0.9" class="zone-node" data-zone="heart"/>
+<circle cx="92" cy="118" r="7" fill="none" stroke="#00c8ff" stroke-width="0.6" opacity="0.4"/>
+<!-- Lungs node -->
+<circle id="node-lungs" cx="108" cy="125" r="2.5" fill="#00ffcc" opacity="0.8" class="zone-node" data-zone="lungs"/>
+<!-- Spine node -->
+<circle id="node-spine" cx="100" cy="162" r="3" fill="#00c8ff" opacity="0.8" class="zone-node" data-zone="spine"/>
+<!-- Arms node -->
+<circle id="node-arms-l" cx="38" cy="155" r="2.5" fill="#00c8ff" opacity="0.7" class="zone-node" data-zone="arms"/>
+<circle id="node-arms-r" cx="162" cy="155" r="2.5" fill="#00c8ff" opacity="0.7" class="zone-node" data-zone="arms"/>
+<!-- Legs node -->
+<circle id="node-legs-l" cx="68" cy="240" r="2.5" fill="#00c8ff" opacity="0.7" class="zone-node" data-zone="legs"/>
+<circle id="node-legs-r" cx="132" cy="240" r="2.5" fill="#00c8ff" opacity="0.7" class="zone-node" data-zone="legs"/>
+</g>
+
+<!-- ═══ SCAN LINE ANIMATION ═══ -->
+<rect id="body-scan" x="30" y="0" width="140" height="3" fill="rgba(0,200,255,0.4)" opacity="0">
+  <animate attributeName="y" from="-10" to="430" dur="3s" repeatCount="indefinite"/>
+  <animate attributeName="opacity" values="0;0.6;0.6;0" keyTimes="0;0.05;0.95;1" dur="3s" repeatCount="indefinite"/>
+</rect>
+</svg>
