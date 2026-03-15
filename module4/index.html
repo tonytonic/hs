@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Digital Twin Engine — Module 4</title>
+  <meta name="theme-color" content="#00060f">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/twin-body.css">
+  <link rel="stylesheet" href="css/charts.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<!-- ANIMUS BOOT SCREEN -->
+<div id="animus-boot">
+  <div class="boot-hex-grid"></div>
+  <div class="boot-scan"></div>
+  <div class="boot-sweep"></div>
+  <span class="boot-corner tl"></span>
+  <span class="boot-corner tr"></span>
+  <span class="boot-corner bl"></span>
+  <span class="boot-corner br"></span>
+  <div class="boot-core">
+    <div class="boot-rings">
+      <div class="boot-ring"></div>
+      <div class="boot-ring"></div>
+      <div class="boot-ring"></div>
+      <div class="boot-ring"></div>
+      <div class="boot-center-dot"></div>
+    </div>
+    <div class="boot-title">DIGITAL TWIN ENGINE</div>
+    <div class="boot-subtitle">MODULE 4 &mdash; PREDICTIVE BEHAVIORAL CORE</div>
+    <div class="boot-status" id="boot-status">INITIALISATION...</div>
+    <div class="boot-progress-wrap">
+      <div class="boot-progress-bar" id="boot-progress-bar"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notifications-container"></div>
+
+<!-- MODAL AIDE -->
+<div id="help-modal" class="modal hidden">
+  <div class="modal-overlay"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>&#63; COMMENT ÇA MARCHE</h2>
+      <span class="modal-close" id="help-close">&#x2715;</span>
+    </div>
+    <div id="help-content">
+      <div class="help-intro">
+        Le Digital Twin lit automatiquement vos données de suivi des heures (M1) et de paie (M2) pour calculer votre état de santé au travail en temps réel.
+      </div>
+      <div class="help-sections">
+        <div class="help-card">
+          <div class="help-card-icon">&#9650;</div>
+          <div class="help-card-title">MON ÉTAT</div>
+          <div class="help-card-desc">Votre score global de 0 à 100. Le corps humain se colore selon chaque zone : vert = OK, orange = vigilance, rouge = danger. Chaque score (fatigue, stress, performance…) est calculé depuis vos vraies heures travaillées.</div>
+        </div>
+        <div class="help-card">
+          <div class="help-card-icon">&#9654;</div>
+          <div class="help-card-title">PRÉVISIONS</div>
+          <div class="help-card-desc">Si vous continuez à ce rythme, où serez-vous dans 30 jours ? Bougez le curseur "HS/jour" pour voir l'impact d'heures supplémentaires sur votre fatigue future.</div>
+        </div>
+        <div class="help-card">
+          <div class="help-card-icon">&#8645;</div>
+          <div class="help-card-title">SIMULATION</div>
+          <div class="help-card-desc">Testez des scénarios : "Et si je prends 2 jours de repos ?", "Et si la semaine prochaine est chargée ?". L'application calcule l'impact sur votre santé.</div>
+        </div>
+        <div class="help-card">
+          <div class="help-card-icon">&#9830;</div>
+          <div class="help-card-title">CONSEILS</div>
+          <div class="help-card-desc">Le bouton ◈ ouvre 1000 conseils juridiques et de prévention adaptés à votre situation. Aucune connexion internet requise.</div>
+        </div>
+      </div>
+      <div class="help-legal-note">
+        &#9632; Les risques affichés indiquent les articles du Code du travail applicables à votre situation.
+      </div>
+      <button class="btn btn--animus" id="help-ok" style="width:100%;margin-top:var(--gap-l);justify-content:center;">COMPRIS — VOIR MON ÉTAT</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CHECK-IN -->
+<div id="checkin-modal" class="modal hidden">
+  <div class="modal-overlay"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>&#9728; CHECK-IN QUOTIDIEN</h2>
+      <span class="modal-close" id="checkin-close">&#x2715;</span>
+    </div>
+    <div id="checkin-content"></div>
+  </div>
+</div>
+
+<!-- MODAL CONSEILLER -->
+
+
+<!-- APP -->
+<div id="app" style="display:flex;">
+
+  <header class="app-header">
+    <div class="header-brand">
+      <button class="back-btn" id="btn-back" title="Retourner au module précédent">&#8592; RETOUR</button>
+    </div>
+    <nav class="header-nav">
+      <button class="nav-btn active" data-view="dashboard">MON ÉTAT</button>
+      <button class="nav-btn" data-view="predictions">PRÉVISIONS</button>
+      <button class="nav-btn" data-view="whatif">SIMULATION</button>
+      <button class="nav-btn" data-view="heatmap">CALENDRIER</button>
+    </nav>
+    <div class="header-actions"></div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- DASHBOARD -->
+    <section id="view-dashboard" class="view active">
+      <div class="dashboard-grid">
+
+        <!-- BLOC ACTIONS -->
+        <div class="panel panel--actions" id="panel-actions">
+          <div class="panel-label">ACTIONS</div>
+          <div class="panel-corner-br"></div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+
+            <!-- CHECK-IN en premier, plus grand -->
+            <button class="action-block-btn" id="btn-checkin" style="
+              background:rgba(0,255,204,0.10);border:2px solid rgba(0,255,204,0.45);
+              padding:14px 9px;flex-direction:column;align-items:center;
+              text-align:center;gap:5px;">
+              <span style="font-size:26px;line-height:1;">☀</span>
+              <div>
+                <div style="font-family:var(--font-mono);font-size:13px;font-weight:700;
+                  color:var(--sync);letter-spacing:.08em;">CHECK-IN</div>
+                <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px;">
+                  Comment vous sentez-vous ?
+                </div>
+              </div>
+            </button>
+
+            <!-- SYNC -->
+            <button class="action-block-btn" id="btn-sync-visible"
+              onclick="window._forcSync&&window._forcSync()">
+              <span class="abtn-icon">&#8635;</span>
+              <div class="abtn-text">
+                <div class="abtn-label">SYNCHRONISER</div>
+                <div class="abtn-sub">Forcer la mise à jour</div>
+              </div>
+            </button>
+
+            <!-- Jours de repos -->
+            <div style="padding:8px 9px;background:rgba(0,10,25,.8);
+              border:1px solid rgba(255,255,255,0.1);">
+              <div style="font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,0.5);
+                letter-spacing:.08em;margin-bottom:6px;">⏰ MES JOURS DE REPOS</div>
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:5px;">
+                <input type="checkbox" id="dte-rest-sat" onchange="window._updateRestDays()"
+                  style="width:14px;height:14px;accent-color:var(--sync);">
+                <span style="font-size:11px;color:#fff;">Samedi repos</span>
+              </label>
+              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
+                <input type="checkbox" id="dte-rest-sun" onchange="window._updateRestDays()"
+                  style="width:14px;height:14px;accent-color:var(--sync);">
+                <span style="font-size:11px;color:#fff;">Dimanche repos</span>
+              </label>
+            </div>
+
+            <!-- RYTHME DE VIE -->
+            <button class="action-block-btn" id="btn-lifestyle">
+              <span class="abtn-icon">🌿</span>
+              <div class="abtn-text">
+                <div class="abtn-label">RYTHME DE VIE</div>
+                <div class="abtn-sub" id="lifestyle-sub">Sport, sommeil, alimentation...</div>
+              </div>
+            </button>
+
+            <!-- SOURCES -->
+            <button class="action-block-btn" id="btn-glossary">
+              <span class="abtn-icon">&#128218;</span>
+              <div class="abtn-text"><div class="abtn-label">SOURCES</div><div class="abtn-sub">20 études scientifiques</div></div>
+            </button>
+
+            <!-- CONSEILS -->
+            <button class="action-block-btn" id="btn-ai">
+              <span class="abtn-icon">&#9830;</span>
+              <div class="abtn-text"><div class="abtn-label">CONSEILS</div><div class="abtn-sub">1000 scénarios locaux</div></div>
+            </button>
+
+
+
+            <!-- AIDE en dernier -->
+            <button class="action-block-btn" id="btn-help">
+              <span class="abtn-icon">?</span>
+              <div class="abtn-text"><div class="abtn-label">AIDE</div><div class="abtn-sub">Comment ça marche</div></div>
+            </button>
+
+          </div>
+        </div>
+
+        <div class="panel panel--hero">
+          <div class="panel-label">SCORE GLOBAL</div>
+          <div class="panel-corner-br"></div>
+          <div class="hero-score">
+            <span id="score-global-value" class="hero-score-num">--</span>
+            <span class="hero-score-unit">/100</span>
+          </div>
+          <div id="hero-level" class="hero-level bon">--</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);margin-top:4px;">
+            MARGE SECURITE : <span id="marge-securite" style="color:var(--animus)">--</span> pts
+          </div>
+        </div>
+
+        <div class="panel panel--twin">
+          <div class="panel-label">JUMEAU NUMERIQUE</div>
+          <div class="panel-corner-br"></div>
+          <div id="twin-body-container" style="height:calc(100% - 2.5rem);"></div>
+          <div id="twin-body-tooltip" class="twin-tooltip hidden"></div>
+        </div>
+
+        <div class="panel panel--scores">
+          <div class="panel-label">SCORES BIOMETRIQUES</div>
+          <div class="panel-corner-br"></div>
+          <div id="scores-grid"></div>
+        </div>
+
+        
+
+        <div class="panel panel--risks">
+          <div class="panel-label">RISQUES DETECTES</div>
+          <div class="panel-corner-br"></div>
+          <div id="risks-list">
+            <div style="color:var(--animus);font-family:var(--font-mono);font-size:10px;text-align:center;padding:var(--gap);opacity:.5;">
+              ANALYSE EN COURS...
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel--advice">
+          <div class="panel-label">RECOMMANDATIONS</div>
+          <div class="panel-corner-br"></div>
+          <div id="advice-list"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PREDICTIONS -->
+    <section id="view-predictions" class="view hidden">
+      <div class="predictions-grid">
+        
+        <div class="panel panel--scenarios">
+          <div class="panel-label">SCENARIOS</div>
+          <div class="panel-corner-br"></div>
+          <div id="scenarios-container"></div>
+        </div>
+        <div class="panel panel--futur">
+          <div class="panel-label">ETAT PREDIT +30J</div>
+          <div class="panel-corner-br"></div>
+          <div id="futur-state-container"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WHAT IF -->
+    <section id="view-whatif" class="view hidden">
+      <div id="whatif-container" style="display:grid;grid-template-columns:300px 1fr;gap:6px;min-height:calc(100vh - 70px);"></div>
+    </section>
+
+    <!-- HEATMAP -->
+    <section id="view-heatmap" class="view hidden">
+      <div class="panel" style="min-height:calc(100vh - 70px);">
+        <div class="panel-label">HEATMAP ANNUELLE &mdash; RISQUES PAR JOUR</div>
+        <div class="panel-corner-br"></div>
+        <div id="heatmap-container" style="overflow-x:auto;margin-top:4px;"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Disclaimer bande -->
+  <div style="background:rgba(255,179,0,0.04);border-top:1px solid rgba(255,179,0,0.15);
+    padding:5px 16px;font-family:var(--font-mono);font-size:8px;color:rgba(255,255,255,0.38);
+    letter-spacing:.04em;line-height:1.6;text-align:center;">
+    ⚠ Outil préventif — estimations statistiques. Peut ne pas refléter exactement votre réalité.
+    Consultez un médecin du travail pour tout problème de santé.
+    &nbsp;·&nbsp; 🔒 Données 100% locales — rien n'est transmis.
+  </div>
+  <footer class="app-footer">
+    <span id="footer-year">ANNEE --</span>
+    <span id="footer-timestamp">DERNIERE ANALYSE : --</span>
+    <span id="footer-contingent">CONTINGENT : --/220H</span>
+    <span id="footer-status" class="status-ok">&#9632; SYNCHRONISE</span>
+  </footer>
+
+</div>
+
+<div id="chart-tooltip" class="chart-tooltip"></div>
+
+<!-- DATA PARTICLES (spawned by boot) -->
+
+<!-- CORE -->
+<script src="js/core/dte-engine.js"></script>
+<script src="js/core/dte-simulator.js"></script>
+<script src="js/core/dte-risks.js"></script>
+<script src="js/core/dte-learning.js"></script>
+<!-- UI -->
+<script src="js/ui/animus-boot.js"></script>
+<script src="js/ui/twin-body.js"></script>
+<script src="js/ui/radar-chart.js"></script>
+<script src="js/ui/timeline-chart.js"></script>
+<script src="js/ui/heatmap.js"></script>
+<script src="js/ui/whatif-panel.js"></script>
+<script src="js/ui/dashboard.js"></script>
+<!-- FEATURES -->
+<script src="js/features/dte-scenarios.js"></script>
+<script src="js/features/ai-advisor.js"></script>
+<script src="js/features/checkin.js"></script>
+<script src="js/features/pdf-report.js"></script>
+<script src="js/features/notifications.js"></script>
+<!-- APP -->
+<script src="js/features/dte-glossary.js"></script>
+<script src="js/features/lifestyle.js"></script>
+<script src="js/app.js"></script>
+
+<!-- BOOT INIT -->
+<script>
+function showApp() {
+  var app = document.getElementById('app');
+  var boot = document.getElementById('animus-boot');
+  if (app) app.style.display = 'flex';
+  if (boot) boot.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  // Fallback: affiche l'app après 5s max si le boot plante
+  var fallback = setTimeout(showApp, 5000);
+
+  try {
+    var boot = new AnimusBoot();
+    boot.start(function(){
+      clearTimeout(fallback);
+      showApp();
+      for(var i=0;i<12;i++){
+        var p = document.createElement('div');
+        p.className = 'data-particle';
+        var x = Math.random()*100, h = 30+Math.random()*90;
+        var dur = 3+Math.random()*5, delay = Math.random()*4;
+        p.style.cssText='position:fixed;left:'+x+'%;height:'+h+'px;width:1px;background:linear-gradient(to bottom,transparent,rgba(0,200,255,0.15),transparent);pointer-events:none;z-index:0;animation:particle-fall '+dur+'s linear -'+delay+'s infinite;';
+        document.body.appendChild(p);
+      }
+    });
+  } catch(e) {
+    clearTimeout(fallback);
+    showApp();
+  }
+});
+</script>
+
+</body>
+</html>
