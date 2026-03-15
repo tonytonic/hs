@@ -1,0 +1,95 @@
+/* Check-in */
+.checkin-step { animation: fade-in .3s ease; }
+.checkin-question { font-family: var(--font-hud); font-size: 13px; font-weight: 600; letter-spacing: .08em; margin-bottom: var(--gap); color: var(--animus); }
+.checkin-options { display: flex; flex-direction: column; gap: 5px; }
+.checkin-option {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(0,10,25,0.8); border: 1px solid rgba(0,200,255,0.12);
+  padding: 8px 12px; cursor: crosshair; transition: all .15s;
+  font-size: 12px;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+.checkin-option:hover { border-color: rgba(0,200,255,0.35); background: rgba(0,200,255,0.06); }
+.checkin-option.selected { border-color: var(--animus); background: var(--animus-mid); color: var(--animus); box-shadow: var(--glow-a); }
+.checkin-option-emoji { font-size: 18px; }
+.checkin-nav { display: flex; justify-content: space-between; margin-top: var(--gap-l); }
+.checkin-progress { display: flex; gap: 5px; justify-content: center; margin-bottom: var(--gap-l); }
+.checkin-dot { width: 20px; height: 2px; background: rgba(0,200,255,0.15); transition: all .2s; }
+.checkin-dot.active { background: var(--animus); box-shadow: var(--glow-a); }
+.checkin-dot.done   { background: var(--sync); }
+
+/* AI Advisor / Scenario */
+.ai-chat { display: flex; flex-direction: column; height: 440px; }
+.ai-messages { flex: 1; overflow-y: auto; padding: var(--gap); display: flex; flex-direction: column; gap: 8px; }
+.ai-msg { display: flex; gap: 8px; animation: fade-in .3s ease; }
+.ai-msg-avatar {
+  width: 26px; height: 26px;
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+.ai-msg-avatar.user { background: var(--animus-mid); }
+.ai-msg-avatar.bot  { background: var(--sync-mid); }
+.ai-msg-bubble {
+  background: rgba(0,10,25,0.8); border: 1px solid rgba(0,200,255,0.12);
+  padding: 8px 12px; font-size: 12px; line-height: 1.5; max-width: 88%;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+.ai-msg.user .ai-msg-bubble { background: var(--animus-dim); border-color: rgba(0,200,255,0.25); margin-left: auto; }
+.ai-suggestions {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 0 var(--gap) 8px;
+}
+.ai-suggestion {
+  background: rgba(0,10,25,0.8); border: 1px solid rgba(0,200,255,0.12);
+  padding: 3px 9px; font-family: var(--font-mono); font-size: 9px;
+  color: var(--text-dim); cursor: crosshair; transition: all .2s;
+  clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+}
+.ai-suggestion:hover { color: var(--animus); border-color: rgba(0,200,255,0.3); }
+.ai-input-wrap {
+  display: flex; gap: 6px;
+  border-top: 1px solid rgba(0,200,255,0.12);
+  padding-top: var(--gap); margin-top: 4px;
+}
+.ai-input {
+  flex: 1; background: rgba(0,10,25,0.8); border: 1px solid rgba(0,200,255,0.2);
+  color: var(--text); font-family: var(--font-mono); font-size: 11px;
+  padding: 7px 12px; outline: none; transition: border-color .2s;
+  clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+}
+.ai-input:focus { border-color: var(--animus); box-shadow: var(--glow-a); }
+.ai-send {
+  background: var(--animus-mid); border: 1px solid rgba(0,200,255,0.3);
+  color: var(--animus); width: 34px; height: 34px; cursor: crosshair;
+  transition: all .2s; font-size: 13px;
+  display: flex; align-items: center; justify-content: center;
+  clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+}
+.ai-send:hover { background: var(--animus-hot); box-shadow: var(--glow-a); }
+
+/* Notifications */
+#notifications-container {
+  position: fixed; top: 58px; right: var(--gap-l);
+  z-index: 2000;
+  display: flex; flex-direction: column; gap: 5px; width: 300px;
+}
+.notif {
+  background: linear-gradient(135deg, #001428, #000d1a);
+  border: 1px solid rgba(0,200,255,0.25);
+  padding: 8px 12px; display: flex; gap: 8px; align-items: flex-start;
+  box-shadow: var(--glow-a); cursor: crosshair;
+  animation: notif-in .25s ease;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+@keyframes notif-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+.notif.fade-out { animation: notif-out .3s ease forwards; }
+@keyframes notif-out { to { opacity: 0; transform: translateX(16px); } }
+.notif.ok      { border-left: 2px solid var(--sync); }
+.notif.warning { border-left: 2px solid var(--amber); }
+.notif.danger  { border-left: 2px solid var(--red); animation: notif-in .25s ease, danger-notif 1s ease-in-out infinite; }
+@keyframes danger-notif { 50% { box-shadow: var(--glow-r); } }
+.notif.info    { border-left: 2px solid var(--animus); }
+.notif-emoji   { font-size: 14px; flex-shrink: 0; }
+.notif-title   { font-family: var(--font-hud); font-size: 10px; font-weight: 700; letter-spacing: .08em; color: var(--text); }
+.notif-msg     { font-size: 10px; color: var(--text-dim); margin-top: 2px; }

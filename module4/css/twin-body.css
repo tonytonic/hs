@@ -1,0 +1,43 @@
+.twin-body-wrap { display: flex; flex-direction: column; align-items: center; height: 100%; position: relative; }
+.twin-svg-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+.twin-svg-container svg { width: auto; height: 100%; max-height: 320px; }
+
+.body-zone { transition: fill .5s, filter .5s; cursor: crosshair; }
+.body-zone:hover { filter: brightness(1.3); }
+
+.zone-ok   { fill: rgba(0,255,204,0.6); }
+.zone-warn { fill: rgba(255,179,0,0.6); }
+.zone-risk { fill: rgba(255,102,0,0.7); }
+.zone-crit { fill: rgba(255,34,68,0.8); animation: zone-crit-pulse 1.2s ease-in-out infinite; }
+.zone-base { fill: rgba(0,20,50,0.75); }
+
+.zone-ok-c   { fill: rgba(0,255,204,0.85);  stroke: rgba(0,255,204,0.5);  stroke-width: 1; }
+.zone-warn-c { fill: rgba(255,179,0,0.85);  stroke: rgba(255,179,0,0.5);  stroke-width: 1; }
+.zone-risk-c { fill: rgba(255,102,0,0.9);   stroke: rgba(255,102,0,0.6);  stroke-width: 1; }
+.zone-crit-c { fill: rgba(255,34,68,1);     stroke: rgba(255,34,68,0.7);  stroke-width: 1.5; animation: zone-crit-pulse 1.2s ease-in-out infinite; }
+
+@keyframes zone-crit-pulse { 50% { filter: drop-shadow(0 0 8px rgba(255,34,68,0.9)); } }
+
+.twin-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 3px; padding-top: 6px; width: 100%; }
+.twin-legend-item {
+  display: flex; align-items: center; gap: 3px;
+  font-family: var(--font-mono); font-size: 8px; color: var(--text-muted);
+  cursor: crosshair; padding: 2px 5px;
+  transition: background .2s;
+}
+.twin-legend-item:hover { background: rgba(0,200,255,0.05); }
+.twin-legend-dot { width: 6px; height: 6px; clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+
+.twin-tooltip {
+  position: absolute; top: 0; left: 50%;
+  transform: translate(-50%, calc(-100% - 8px));
+  background: linear-gradient(135deg, #001428, #000d1a);
+  border: 1px solid rgba(0,200,255,0.4);
+  padding: 8px 12px; pointer-events: none; z-index: 100;
+  white-space: nowrap; box-shadow: var(--glow-a);
+  animation: fade-in .15s ease;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.twin-tooltip-title { font-family: var(--font-hud); font-size: 11px; color: var(--animus); letter-spacing: .1em; }
+.twin-tooltip-val   { font-family: var(--font-hud); font-size: 18px; font-weight: 700; margin-top: 2px; }
+.twin-tooltip-desc  { font-size: 10px; color: var(--text-dim); margin-top: 2px; }

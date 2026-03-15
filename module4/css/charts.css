@@ -1,0 +1,23 @@
+#radar-canvas { display: block; width: 100%; max-width: 250px; margin: 0 auto; }
+.radar-legend {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 3px 8px;
+  margin-top: 6px; font-family: var(--font-mono); font-size: 8px; color: var(--text-muted);
+}
+.radar-legend-item { display: flex; align-items: center; gap: 3px; }
+.radar-legend-dot  { width: 5px; height: 5px; clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%); }
+
+#timeline-canvas, #whatif-canvas {
+  display: block; width: 100%;
+  background: rgba(0,5,15,0.6);
+  border: 1px solid rgba(0,200,255,0.08);
+}
+
+.chart-tooltip {
+  position: fixed;
+  background: linear-gradient(135deg, #001428, #000d1a);
+  border: 1px solid rgba(0,200,255,0.35);
+  padding: 6px 10px; pointer-events: none; z-index: 500;
+  font-family: var(--font-mono); font-size: 10px;
+  box-shadow: var(--glow-a); display: none;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%);
+}
