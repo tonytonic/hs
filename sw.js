@@ -1,9 +1,9 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 3.0.0 (Le Parfait - Offline Solide + Periodic Sync)
+ * Version : 3.1.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "heuressup-cache-v3.0.0";
+const CACHE_NAME = "heuressup-cache-v3.1.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -16,6 +16,28 @@ const FILES_TO_CACHE = [
   "./apple-touch-icon.png",
   "./heures/index.html", 
   "./paye/index.html",
+  "./module4/index.html",
+  "./module4/js/app.js",
+  "./module4/js/core/dte-engine.js",
+  "./module4/js/core/dte-simulator.js",
+  "./module4/js/core/dte-risks.js",
+  "./module4/js/core/dte-learning.js",
+  "./module4/js/features/ai-advisor.js",
+  "./module4/js/features/checkin.js",
+  "./module4/js/features/lifestyle.js",
+  "./module4/js/features/notifications.js",
+  "./module4/js/features/dte-glossary.js",
+  "./module4/js/features/dte-scenarios.js",
+  "./module4/js/ui/dashboard.js",
+  "./module4/js/ui/heatmap.js",
+  "./module4/js/ui/whatif-panel.js",
+  "./module4/js/ui/twin-body.js",
+  "./module4/js/ui/animus-boot.js",
+  "./module4/css/main.css",
+  "./module4/css/dashboard.css",
+  "./module4/css/components.css",
+  "./module4/css/charts.css",
+  "./module4/css/twin-body.css",
   "./images/renard-annuel.png.jpg", 
   "./images/renard-mensuel.png.jpg", 
   "./images/renard-central.png.jpg",
