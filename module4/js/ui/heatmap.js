@@ -1,0 +1,142 @@
+/**
+ * Heatmap — Calendrier annuel redesigné
+ * Affichage par mois avec couleurs de risque et légende claire
+ */
+(function(global){
+'use strict';
+
+class Heatmap {
+  constructor(container){ this._container = container; }
+
+  render(state){
+    if(!this._container) return;
+    // Convertit décimal → h:mm  ex: 8.25 → "8h15",  0.25 → "0h15"
+    const fmtH = v => {
+      if (!v) return '0h00';
+      const h = Math.floor(v);
+      const m = Math.round((v - h) * 60);
+      return h + 'h' + String(m).padStart(2,'0');
+    };
+    const scores = state && state.scores;
+    const norm   = state && state.norm;
+    // Fusionner m1.days + données M2 (pour afficher les HS même si seulement M2 renseigné)
+    const m1days = (state && state.raw && state.raw.m1 && state.raw.m1.days) || {};
+    const m2raw  = (state && state.raw && state.raw.m2 && state.raw.m2.months) || {};
+    const days   = Object.assign({}, ...Object.entries(m2raw).map(([mk, md]) => {
+      const out = {};
+      Object.entries(md.rawDays || {}).forEach(([d, hs]) => {
+        const key = mk + '-' + String(d).padStart(2, '0');
+        if (!m1days[key]) {  // M1 prioritaire
+          const _s = String(hs).trim();
+          const h = _s.includes(':')
+            ? (parseFloat(_s.split(':')[0])||0) + (parseFloat(_s.split(':')[1])||0)/60
+            : parseFloat(_s.replace(',','.')) || 0;
+          if (h > 0) out[key] = { extra: h, recup: 0, absent: 0 };
+        }
+      });
+      return out;
+    }), m1days);
+    const year   = (state && state.raw && state.raw.year) || new Date().getFullYear();
+
+    const riskLevel = (extra, absent) => {
+      if(absent) return 'absent';
+      if(extra === undefined) return 'empty';
+      if(extra >= 4) return 'crit';
+      if(extra >= 2.5) return 'danger';
+      if(extra >= 1) return 'warn';
+      return 'ok';
+    };
+
+    const COLORS = {
+      ok:     { bg:'rgba(0,255,204,0.25)',  label:'Journée normale' },
+      warn:   { bg:'rgba(255,179,0,0.30)',  label:'+1 à 2.5h HS' },
+      danger: { bg:'rgba(255,102,0,0.35)',  label:'+2.5 à 4h HS' },
+      crit:   { bg:'rgba(255,34,68,0.45)',  label:'+4h HS et plus' },
+      absent: { bg:'rgba(0,200,255,0.08)',  label:'Absence / repos' },
+      empty:  { bg:'rgba(0,200,255,0.04)',  label:'Non renseigné' },
+    };
+
+    const MONTHS = ['Janv','Févr','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
+
+    // Stats globales
+    const allEntries = Object.entries(days);
+    const daysWorked = allEntries.filter(([,e]) => !e.absent).length;
+    const daysHS     = allEntries.filter(([,e]) => !e.absent && e.extra > 0).length;
+    const totalHS    = allEntries.reduce((s,[,e]) => s + (e.extra||0), 0);
+    const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
+    const contingentPct = norm ? (norm._contingentPct || 0) : 0;
+
+    // Génération des mois
+    const monthsHTML = Array.from({length:12}, (_, m) => {
+      const monthKey = `${year}-${String(m+1).padStart(2,'0')}`;
+      const daysInMonth = new Date(year, m+1, 0).getDate();
+      const firstDow = new Date(year, m, 1).getDay(); // 0=dim
+
+      // Cellules
+      let cells = '';
+      // Cases vides avant le 1er
+      for(let i=0; i<firstDow; i++) cells += `<div></div>`;
+      for(let day=1; day<=daysInMonth; day++){
+        const dateKey = `${year}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        const entry   = days[dateKey];
+        const dow     = new Date(year, m, day).getDay();
+        const isWE    = dow === 0 || dow === 6;
+        const level   = entry ? riskLevel(entry.extra, entry.absent) : (isWE ? 'absent' : 'empty');
+        const col     = COLORS[level];
+        const title   = entry ? `J${day} : ${entry.extra||0}h HS` : `J${day}`;
+        cells += `<div title="${title}" style="
+          aspect-ratio:1;background:${col.bg};
+          border:1px solid ${level==='crit'?'rgba(255,34,68,0.4)':level==='danger'?'rgba(255,102,0,0.3)':'rgba(0,200,255,0.06)'};
+          cursor:crosshair;transition:transform .1s;
+          ${level==='crit'?'animation:cell-crit 1.5s ease-in-out infinite;':''}
+        " onmouseover="this.style.transform='scale(1.6)';this.style.zIndex=10;this.style.position='relative'"
+           onmouseout="this.style.transform='';this.style.zIndex=''"></div>`;
+      }
+
+      return `<div style="min-width:85px;">
+        <div style="font-family:var(--font-mono);font-size:8px;color:var(--text-muted);
+          text-align:center;margin-bottom:4px;letter-spacing:.1em;">${MONTHS[m]}</div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:1px;">
+          ${['D','L','M','M','J','V','S'].map(d=>`<div style="font-family:var(--font-mono);font-size:6px;color:var(--text-muted);text-align:center;">${d}</div>`).join('')}
+          ${cells}
+        </div>
+      </div>`;
+    }).join('');
+
+    this._container.innerHTML = `
+      <!-- Stats rapides -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;">
+        ${[
+          ['JOURS TRAVAILLÉS', daysWorked, 'var(--animus)'],
+          ['JOURS AVEC HS',    daysHS,     daysHS>50?'var(--orange)':daysHS>20?'var(--amber)':'var(--sync)'],
+          ['TOTAL HS',         fmtH(totalHS), totalHS>220?'var(--red)':totalHS>150?'var(--orange)':'var(--animus)'],
+          ['CONTINGENT',       Math.round(contingentPct)+'%', contingentPct>100?'var(--red)':contingentPct>75?'var(--amber)':'var(--sync)'],
+          ['PIC HS/JOUR',      maxExtraDay.v ? '+'+fmtH(maxExtraDay.v) : '—', maxExtraDay.v>=4?'var(--red)':maxExtraDay.v>=2?'var(--amber)':'var(--sync)'],
+        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;">
+          <div style="font-family:var(--font-hud);font-size:16px;font-weight:700;color:${col};">${v}</div>
+          <div style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);">${l}</div>
+        </div>`).join('')}
+      </div>
+
+      <!-- Légende -->
+      <div style="display:flex;gap:10px;margin-bottom:10px;flex-wrap:wrap;align-items:center;
+        padding:5px 8px;background:rgba(0,10,25,.6);border:1px solid rgba(0,200,255,0.08);">
+        <span style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);letter-spacing:.1em;">LÉGENDE :</span>
+        ${Object.entries(COLORS).map(([k,v]) => `
+          <span style="display:flex;align-items:center;gap:4px;font-family:var(--font-mono);font-size:8px;color:var(--text-muted);">
+            <span style="width:10px;height:10px;background:${v.bg};border:1px solid rgba(0,200,255,0.2);display:inline-block;"></span>
+            ${v.label}
+          </span>`).join('')}
+      </div>
+
+      <!-- Grille calendrier -->
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-width:560px;">
+          ${monthsHTML}
+        </div>
+      </div>`;
+  }
+}
+
+global.Heatmap = Heatmap;
+}(typeof window !== 'undefined' ? window : global));
