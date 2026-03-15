@@ -10,6 +10,7 @@
 <title>Simulateur de compteur annuel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+.popup-content input[type=number]{box-sizing:border-box;width:100%;}
 .kitsune-btn{flex:1;padding:8px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(79,179,194,.35);transition:transform .15s,box-shadow .15s}
 .kitsune-btn:hover{transform:scale(1.02);box-shadow:0 4px 16px rgba(79,179,194,.55)}
 .kitsune-btn:active{transform:scale(.97)}
@@ -300,6 +301,7 @@ button,input,textarea{width:100%;padding:8px;margin:5px 0}
     <span id="autoSaveBadge">&#x1F7E2; Dans l&apos;application&nbsp;: &mdash;</span><br>
     <span id="fileSaveBadge">&#x1F4BE; Sauvegarde fichier&nbsp;: &mdash;</span>
   </div>
+  <button onclick="window.location.href='../module4/index.html'" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;border:none;border-radius:20px;padding:8px 22px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;">📊 Prédiction</button>
   <span style="font-size:13px;color:#2196a6;align-self:center;">Sauvegarde automatique dans l&apos;application &middot; Sauvegarde fichier recommand&eacute;e</span>
 </div>
 <div class="totaux main-zone" id="totaux"></div>
