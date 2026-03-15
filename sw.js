@@ -1,9 +1,9 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 2.0.5 (Le Parfait - Offline Solide + Periodic Sync)
+ * Version : 3.0.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "heuressup-cache-v2.0.5";
+const CACHE_NAME = "heuressup-cache-v3.0.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
