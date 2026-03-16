@@ -107,9 +107,32 @@ class Heatmap {
         const entry   = days[dateKey];
         const dow     = new Date(year, m, day).getDay();
         const isWE    = dow === 0 || dow === 6;
-        const level   = entry ? riskLevel(entry.extra, entry.absent) : (isWE ? 'absent' : 'empty');
-        const col     = COLORS[level];
-        const title   = entry ? `J${day} : ${entry.extra||0}h HS` : `J${day}`;
+        const dateObj  = new Date(year, m, day);
+        const isPast   = dateObj <= new Date();
+        const isFerie  = _feries[dateKey];
+        const isVac    = _vacances[dateKey];
+        let level, titleTxt;
+        if (entry) {
+          level    = riskLevel(entry.extra, entry.absent);
+          titleTxt = entry.absent ? `J${day} : Absence` : `J${day} : +${entry.extra||0}h HS`;
+        } else if (isWE) {
+          level    = 'absent';
+          titleTxt = `J${day} : Weekend`;
+        } else if (isFerie) {
+          level    = 'absent';
+          titleTxt = `J${day} : Jour férié`;
+        } else if (isVac) {
+          level    = 'absent';
+          titleTxt = `J${day} : Vacances`;
+        } else if (isPast && !_restSet.has(dow)) {
+          level    = 'ok';  // jour ouvré passé sans HS = journée normale
+          titleTxt = `J${day} : Journée normale`;
+        } else {
+          level    = 'empty';
+          titleTxt = `J${day}`;
+        }
+        const col  = COLORS[level];
+        const title = titleTxt;
         cells += `<div title="${title}" style="
           aspect-ratio:1;background:${col.bg};
           border:1px solid ${level==='crit'?'rgba(255,34,68,0.4)':level==='danger'?'rgba(255,102,0,0.3)':'rgba(0,200,255,0.06)'};
