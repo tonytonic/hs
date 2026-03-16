@@ -509,15 +509,15 @@ class DTEEngine {
     }
     const cumulMonths = cumulWeeks / 4.33;
 
-    // Variabilité horaire (ANACT) — fenêtre VARIAB_WINDOW semaines
-    // Compte tous les jours ouvrés (M2 ne stocke que les jours avec HS)
+    // Variabilité horaire (ANACT) — fenêtre VARIAB_WINDOW semaines COMPLÈTES passées
+    // Exclut la semaine courante si incomplète (< 3 jours) pour éviter sigma artificiel
     const weekTotals = [];
     const todayDowV = today.getDay() || 7;
     const todayMondayV = new Date(today);
     todayMondayV.setDate(today.getDate() - (todayDowV - 1));
-    for (let w = 0; w < D.VARIAB_WINDOW; w++) {
-      let wt = 0, hasDay = false;
-      for (let dd = 0; dd < 5; dd++) { // lun(0) à ven(4)
+    for (let w = 0; w < D.VARIAB_WINDOW + 1; w++) { // +1 pour ignorer sem courante si besoin
+      let wt = 0, daysInWeek = 0;
+      for (let dd = 0; dd < 5; dd++) {
         const dt = new Date(todayMondayV);
         dt.setDate(todayMondayV.getDate() - w * 7 + dd);
         if (dt > today) continue;
@@ -525,11 +525,12 @@ class DTEEngine {
         const e = days[k];
         if (e && e.absent) continue;
         if (specialDays[k] === 'ferie' || vacances[k]) continue;
-        // Jour ouvré : BASE_JOUR + HS (0 si pas d'entrée M2 = jour normal)
         wt += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
-        hasDay = true;
+        daysInWeek++;
       }
-      if (hasDay) weekTotals.push(wt);
+      // Inclure uniquement les semaines avec ≥ 3 jours ouvrés (semaine représentative)
+      if (daysInWeek >= 3) weekTotals.push(wt);
+      if (weekTotals.length >= D.VARIAB_WINDOW) break;
     }
     // mean : calculé seulement sur les semaines avec des données (évite dilution)
     const nonZeroWeeks = weekTotals.filter(w => w > 0);
