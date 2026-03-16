@@ -416,7 +416,7 @@ class DTEEngine {
     // avgExtra7 = moyenne sur la SEMAINE (7 jours), pas sur les jours saisis
     // Ex: 2h le samedi → 2/7 = 0.29h/j de moyenne → weeklyH = 35 + 2 = 37h/sem
     // On divise TOUJOURS par 7 pour une moyenne journalière hebdomadaire réelle
-    const avgExtra7  = sumExtra7 / 7;                          // vraie moyenne sur 7j
+    const avgExtra7  = count7 > 0 ? sumExtra7 / Math.max(5, count7) : 0; // ÷ jours réels (min 5 ouvrés, max si weekend saisi)
     const avgExtra30 = countDays > 0 ? sumExtra / 30 : 0;      // moyenne sur 30j
     // Pour le weeklyH : somme hebdo réelle (pas ×5 qui suppose 5j de surcharge)
     const weeklyExtra = sumExtra7;                              // total HS sur 7j
@@ -424,18 +424,17 @@ class DTEEngine {
     const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
     // Jours consécutifs travaillés (date locale)
-    // M2 ne stocke que les jours avec HS — les jours sans entrée = jours normaux travaillés
-    // On s'arrête uniquement sur : absent, weekend, ou recup
+    // M2 ne stocke que les jours avec HS — jours sans entrée = jours normaux travaillés
+    // On IGNORE les weekends (on continue à compter), on s'arrête sur absent/récup
     let consec = 0;
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 60; i++) {
       const d = new Date(today); d.setDate(d.getDate() - i);
       const dow = d.getDay();
-      if (dow === 0 || dow === 6) break; // weekend = arrêt
+      if (dow === 0 || dow === 6) continue; // weekend : ignorer, ne pas compter ni s'arrêter
       const k = localDK(d);
       const e = days[k];
       if (e && (e.absent > 0 || e.recup > 0)) break; // absent ou récup = arrêt
-      // Jour ouvré avec ou sans HS = compte
-      consec++;
+      consec++; // jour ouvré travaillé
     }
 
     // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
