@@ -461,9 +461,9 @@ class DTEEngine {
       }
       if (prevCount >= 3) weeklyExtra = prevExtra; // semaine précédente si assez de données
     }
-    const avgH7       = D.BASE_JOUR + avgExtra7;               // h/j moyenne
-    const avgExtra7  = weeklyExtra / 5;  // HS/j = total semaine ÷ 5 jours ouvrés
-    const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
+    const avgExtra7  = weeklyExtra / 5;         // HS/j = total semaine ÷ 5 jours ouvrés
+    const avgH7      = D.BASE_JOUR + avgExtra7; // h/j moyenne
+    const weeklyH7   = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
     // Jours consécutifs SANS repos (L3132-1 : repos hebdo 35h minimum)
     // Le weekend CASSE le compteur — c'est le repos légal
