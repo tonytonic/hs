@@ -115,7 +115,7 @@ class Dashboard {
       source: 'Thompson 2022 (Frontiers) · ANACT/INRS · ANI 2008',
       facteurs_heures: [
         { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: v => v.toFixed(0)+'h/sem (optimal : 35h)' },
-        { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v>3?'Élevée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h)' },
+        { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Insuffisant (1 semaine)':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
         { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => v>0 ? v+' semaines de surcharge' : 'Première semaine' },
       ],
       facteurs_vie: [
