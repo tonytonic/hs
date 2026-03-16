@@ -447,7 +447,6 @@ class DTEEngine {
     // avgExtra7 = moyenne sur la SEMAINE (7 jours), pas sur les jours saisis
     // Ex: 2h le samedi → 2/7 = 0.29h/j de moyenne → weeklyH = 35 + 2 = 37h/sem
     // On divise TOUJOURS par 7 pour une moyenne journalière hebdomadaire réelle
-    const avgExtra7  = count7 > 0 ? sumExtra7 / Math.max(5, count7) : 0; // ÷ jours réels (min 5 ouvrés, max si weekend saisi)
     const avgExtra30 = countDays > 0 ? sumExtra / 30 : 0;      // moyenne sur 30j
     // Pour le weeklyH : somme hebdo réelle (pas ×5 qui suppose 5j de surcharge)
     // Si semaine courante incomplète (<2j) → utiliser la semaine précédente
@@ -463,6 +462,7 @@ class DTEEngine {
       if (prevCount >= 3) weeklyExtra = prevExtra; // semaine précédente si assez de données
     }
     const avgH7       = D.BASE_JOUR + avgExtra7;               // h/j moyenne
+    const avgExtra7  = weeklyExtra / 5;  // HS/j = total semaine ÷ 5 jours ouvrés
     const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
     // Jours consécutifs SANS repos (L3132-1 : repos hebdo 35h minimum)
