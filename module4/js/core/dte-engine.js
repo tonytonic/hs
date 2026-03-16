@@ -436,20 +436,26 @@ class DTEEngine {
 
     // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
     // Parcours lun-ven de chaque semaine civile en remontant
+    // IMPORTANT : M2 ne stocke que les jours avec HS → on compte TOUS les jours ouvrés
+    // même sans entrée (= jour normal à BASE_JOUR heures)
     let cumulWeeks = 0;
     const todayDow = today.getDay() || 7; // 1=lun ... 7=dim
     const todayMonday = new Date(today);
-    todayMonday.setDate(today.getDate() - (todayDow - 1)); // lundi de la semaine courante
-    for (let w = 0; w < 52; w++) { // 52 semaines = 1 an
-      let weekH = 0, wd = 0;
-      for (let dd = 0; dd < 5; dd++) { // lundi(0) à vendredi(4)
+    todayMonday.setDate(today.getDate() - (todayDow - 1));
+    for (let w = 0; w < 52; w++) {
+      let weekH = 0, hasAnyDay = false;
+      for (let dd = 0; dd < 5; dd++) { // lun=0 à ven=4
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
+        if (dt > today) continue; // pas dans le futur
         const k = localDK(dt);
         const e = days[k];
-        if (e && !e.absent) { weekH += D.BASE_JOUR + (e.extra || 0); wd++; }
+        if (e && e.absent) continue; // jour absent ignoré
+        // Jour ouvré : BASE_JOUR + HS (0 si pas d'entrée = jour normal)
+        weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
+        hasAnyDay = true;
       }
-      if (wd > 0 && weekH > D.H_OPTIMAL) cumulWeeks++;
+      if (hasAnyDay && weekH > D.H_OPTIMAL) cumulWeeks++;
     }
     const cumulMonths = cumulWeeks / 4.33;
 
