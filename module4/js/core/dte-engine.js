@@ -419,19 +419,30 @@ class DTEEngine {
       return y+'-'+m+'-'+d2;
     };
 
-    // Heures moyennes : fenêtre 30 jours (pondérée, récentes × 2)
-    // Évite le bug "heures entrées hors 7j = score nul"
+    // Heures moyennes : semaine civile courante (lun-ven) + fenêtre 30j
+    // sumExtra7 = HS de la semaine civile EN COURS (lun à aujourd'hui)
+    const todayDowA = today.getDay() || 7; // 1=lun..7=dim
+    const weekMondayA = new Date(today);
+    weekMondayA.setDate(today.getDate() - (todayDowA - 1)); // lundi de cette semaine
     let sumExtra = 0, countDays = 0;
     let sumExtra7 = 0, count7 = 0;
+    // Semaine civile courante : lundi à aujourd'hui
+    for (let dd = 0; dd < todayDowA && dd < 5; dd++) {
+      const d = new Date(weekMondayA); d.setDate(weekMondayA.getDate() + dd);
+      if (d > today) break;
+      const k = localDK(d);
+      const e = days[k];
+      const ex = e ? (e.extra || 0) : 0;
+      if (!e || !e.absent) { sumExtra7 += ex; count7++; }
+    }
+    // Fenêtre 30j pour moyenne longue
     for (let i = 0; i < 30; i++) {
       const d = new Date(today); d.setDate(d.getDate() - i);
       const k = localDK(d);
       const e = days[k];
       if (!e || e.absent > 0) continue;
-      const ex = e.extra || 0;
-      sumExtra += ex;
+      sumExtra += e.extra || 0;
       countDays++;
-      if (i < 7) { sumExtra7 += ex; count7++; }
     }
     // avgExtra7 = moyenne sur la SEMAINE (7 jours), pas sur les jours saisis
     // Ex: 2h le samedi → 2/7 = 0.29h/j de moyenne → weeklyH = 35 + 2 = 37h/sem
@@ -439,7 +450,18 @@ class DTEEngine {
     const avgExtra7  = count7 > 0 ? sumExtra7 / Math.max(5, count7) : 0; // ÷ jours réels (min 5 ouvrés, max si weekend saisi)
     const avgExtra30 = countDays > 0 ? sumExtra / 30 : 0;      // moyenne sur 30j
     // Pour le weeklyH : somme hebdo réelle (pas ×5 qui suppose 5j de surcharge)
-    const weeklyExtra = sumExtra7;                              // total HS sur 7j
+    // Si semaine courante incomplète (<2j) → utiliser la semaine précédente
+    let weeklyExtra = sumExtra7;
+    if (count7 < 2) {
+      let prevExtra = 0, prevCount = 0;
+      for (let dd = 0; dd < 5; dd++) {
+        const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() - 7 + dd);
+        const k = localDK(dt);
+        const e = days[k];
+        if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
+      }
+      if (prevCount >= 3) weeklyExtra = prevExtra; // semaine précédente si assez de données
+    }
     const avgH7       = D.BASE_JOUR + avgExtra7;               // h/j moyenne
     const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
@@ -487,17 +509,27 @@ class DTEEngine {
     }
     const cumulMonths = cumulWeeks / 4.33;
 
-    // Variabilité horaire (ANACT)
+    // Variabilité horaire (ANACT) — fenêtre VARIAB_WINDOW semaines
+    // Compte tous les jours ouvrés (M2 ne stocke que les jours avec HS)
     const weekTotals = [];
+    const todayDowV = today.getDay() || 7;
+    const todayMondayV = new Date(today);
+    todayMondayV.setDate(today.getDate() - (todayDowV - 1));
     for (let w = 0; w < D.VARIAB_WINDOW; w++) {
-      let wt = 0;
-      for (let dd = 0; dd < 7; dd++) {
-        const dt = new Date(today); dt.setDate(dt.getDate() - w * 7 - dd);
-        const k  = localDK(dt);
-        const e  = days[k];
-        if (e) wt += D.BASE_JOUR + (e.extra || 0);
+      let wt = 0, hasDay = false;
+      for (let dd = 0; dd < 5; dd++) { // lun(0) à ven(4)
+        const dt = new Date(todayMondayV);
+        dt.setDate(todayMondayV.getDate() - w * 7 + dd);
+        if (dt > today) continue;
+        const k = localDK(dt);
+        const e = days[k];
+        if (e && e.absent) continue;
+        if (specialDays[k] === 'ferie' || vacances[k]) continue;
+        // Jour ouvré : BASE_JOUR + HS (0 si pas d'entrée M2 = jour normal)
+        wt += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
+        hasDay = true;
       }
-      weekTotals.push(wt);
+      if (hasDay) weekTotals.push(wt);
     }
     // mean : calculé seulement sur les semaines avec des données (évite dilution)
     const nonZeroWeeks = weekTotals.filter(w => w > 0);
