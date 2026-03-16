@@ -374,22 +374,21 @@ class DTEEngine {
     const clamp = (v, min, max) => max === min ? 0 : Math.max(0, Math.min(1, (v - min) / (max - min)));
     const today = new Date();
 
-    // Si M1 vide mais M2 disponible : reconstruire les jours depuis M2.months[mk].rawDays
-    let days = m1.days;
-    if (!Object.keys(days).length && m2 && m2.months && Object.keys(m2.months).length) {
-      const synth = {};
+    // Fusionner M1 + M2 : M1 prioritaire par jour, M2 complète les jours manquants
+    // Cas : début d'année en M1, suite en M2 → les deux sont utilisés
+    const days = Object.assign({}, m1.days); // copie M1
+    if (m2 && m2.months && Object.keys(m2.months).length) {
       for (const [mk, monthData] of Object.entries(m2.months)) {
         if (!/^\d{4}-\d{2}$/.test(mk)) continue;
         const rawDays = monthData.rawDays || {};
         for (const [day, hs] of Object.entries(rawDays)) {
-          const h = parseHours(hs);
-          if (h > 0) {
-            const dateKey = mk + '-' + String(day).padStart(2, '0');
-            synth[dateKey] = { extra: h, recup: 0, absent: 0 };
+          const dateKey = mk + '-' + String(day).padStart(2, '0');
+          if (!days[dateKey]) { // M1 prioritaire : ne pas écraser
+            const h = parseHours(hs);
+            if (h > 0) days[dateKey] = { extra: h, recup: 0, absent: 0 };
           }
         }
       }
-      if (Object.keys(synth).length) days = synth;
     }
 
     // Fonction date locale (évite le bug toISOString/UTC+1)
