@@ -435,14 +435,18 @@ class DTEEngine {
     }
 
     // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
-    // Compte toutes les semaines en surcharge sur 26 semaines (pas d'arrêt à la 1ère semaine normale)
+    // Parcours lun-ven de chaque semaine civile en remontant
     let cumulWeeks = 0;
+    const todayDow = today.getDay() || 7; // 1=lun ... 7=dim
+    const todayMonday = new Date(today);
+    todayMonday.setDate(today.getDate() - (todayDow - 1)); // lundi de la semaine courante
     for (let w = 0; w < 52; w++) { // 52 semaines = 1 an
       let weekH = 0, wd = 0;
-      for (let dd = 0; dd < 5; dd++) {
-        const dt = new Date(today); dt.setDate(dt.getDate() - w * 7 - dd);
-        const k  = localDK(dt);
-        const e  = days[k];
+      for (let dd = 0; dd < 5; dd++) { // lundi(0) à vendredi(4)
+        const dt = new Date(todayMonday);
+        dt.setDate(todayMonday.getDate() - w * 7 + dd);
+        const k = localDK(dt);
+        const e = days[k];
         if (e && !e.absent) { weekH += D.BASE_JOUR + (e.extra || 0); wd++; }
       }
       if (wd > 0 && weekH > D.H_OPTIMAL) cumulWeeks++;
