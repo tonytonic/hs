@@ -443,20 +443,20 @@ class DTEEngine {
     const avgH7       = D.BASE_JOUR + avgExtra7;               // h/j moyenne
     const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
-    // Jours consécutifs travaillés (date locale)
-    // M2 ne stocke que les jours avec HS — jours sans entrée = jours normaux travaillés
-    // On IGNORE les weekends (on continue à compter), on s'arrête sur absent/récup
+    // Jours consécutifs SANS repos (L3132-1 : repos hebdo 35h minimum)
+    // Le weekend CASSE le compteur — c'est le repos légal
+    // On détecte uniquement les semaines travaillées 7/7 sans repos
     let consec = 0;
     for (let i = 0; i < 60; i++) {
       const d = new Date(today); d.setDate(d.getDate() - i);
       const dow = d.getDay();
-      if (dow === 0 || dow === 6) continue; // weekend : ignorer, ne pas compter ni s'arrêter
+      if (dow === 0 || dow === 6) break; // weekend = repos = arrêt du compteur
       const k = localDK(d);
       const e = days[k];
-      if (e && (e.absent > 0 || e.recup > 0)) break; // absent ou récup = arrêt
-      if (specialDays[k] === 'ferie') break; // férié = arrêt
-      if (vacances[k]) break; // vacances = arrêt
-      consec++; // jour ouvré travaillé
+      if (e && (e.absent > 0 || e.recup > 0)) break;
+      if (specialDays[k] === 'ferie') break;
+      if (vacances[k]) break;
+      consec++;
     }
 
     // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
