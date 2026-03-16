@@ -64,7 +64,8 @@ class Heatmap {
     const daysHS     = allEntries.filter(([,e]) => !e.absent && e.extra > 0).length;
     const totalHS    = allEntries.reduce((s,[,e]) => s + (e.extra||0), 0);
     const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
-    const contingentPct = norm ? (norm._contingentPct || 0) : 0;
+    // Calculer depuis totalHS local (inclut M1+M2 mergés) — plus fiable que norm
+    const contingentPct = totalHS > 0 ? (totalHS / 220) * 100 : (norm ? (norm._contingentPct || 0) : 0);
 
     // Génération des mois
     const monthsHTML = Array.from({length:12}, (_, m) => {
