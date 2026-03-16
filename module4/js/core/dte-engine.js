@@ -434,9 +434,10 @@ class DTEEngine {
       consec++;
     }
 
-    // Semaines cumulées de surcharge (J.Occup.Health 2021 : 6 mois)
+    // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
+    // Compte toutes les semaines en surcharge sur 26 semaines (pas d'arrêt à la 1ère semaine normale)
     let cumulWeeks = 0;
-    for (let w = 0; w < 26; w++) { // 26 semaines = 6 mois
+    for (let w = 0; w < 52; w++) { // 52 semaines = 1 an
       let weekH = 0, wd = 0;
       for (let dd = 0; dd < 5; dd++) {
         const dt = new Date(today); dt.setDate(dt.getDate() - w * 7 - dd);
@@ -445,7 +446,6 @@ class DTEEngine {
         if (e && !e.absent) { weekH += D.BASE_JOUR + (e.extra || 0); wd++; }
       }
       if (wd > 0 && weekH > D.H_OPTIMAL) cumulWeeks++;
-      else if (wd > 0) break; // arrêt à la 1ère semaine normale
     }
     const cumulMonths = cumulWeeks / 4.33;
 
