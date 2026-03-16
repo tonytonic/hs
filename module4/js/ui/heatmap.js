@@ -60,10 +60,35 @@ class Heatmap {
 
     // Stats globales
     const allEntries = Object.entries(days);
-    const daysWorked = allEntries.filter(([,e]) => !e.absent).length;
     const daysHS     = allEntries.filter(([,e]) => !e.absent && e.extra > 0).length;
     const totalHS    = allEntries.reduce((s,[,e]) => s + (e.extra||0), 0);
     const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
+    // Jours travaillés = tous les jours ouvrés depuis le 1er janvier jusqu'à aujourd'hui
+    // Exclut : jours de repos configurés, absences, fériés M1, vacances module4
+    const _restDays = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || '{"sat":true,"sun":true}');
+    const _restSet = new Set();
+    if (_restDays.sat) _restSet.add(6);
+    if (_restDays.sun) _restSet.add(0);
+    // Charger fériés et vacances
+    const _feries = {};
+    const _vacances = {};
+    for (const y of [year-1, year, year+1]) {
+      try { const sd=JSON.parse(localStorage.getItem('SPECIAL_DAYS_'+y)||'{}'); Object.entries(sd).forEach(([d,t])=>{ if(t==='ferie') _feries[d]=true; }); } catch(_){}
+      try { const fd=JSON.parse(localStorage.getItem('DTE_FERIES_'+y)||'{}'); Object.keys(fd).forEach(d=>{ _feries[d]=true; }); } catch(_){}
+      try { const vac=JSON.parse(localStorage.getItem('DTE_VACANCES_'+y)||'{}'); Object.keys(vac).forEach(d=>{ _vacances[d]=true; }); } catch(_){}
+    }
+    const _startYear = new Date(year, 0, 1);
+    const _today = new Date(); _today.setHours(0,0,0,0);
+    let daysWorked = 0;
+    for (let d = new Date(_startYear); d <= _today; d.setDate(d.getDate()+1)) {
+      const dow = d.getDay();
+      if (_restSet.has(dow)) continue;
+      const dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+      if (_feries[dk] || _vacances[dk]) continue; // férié ou vacances
+      const e = days[dk];
+      if (e && e.absent) continue;
+      daysWorked++;
+    }
     // Calculer depuis totalHS local (inclut M1+M2 mergés) — plus fiable que norm
     const contingentPct = totalHS > 0 ? (totalHS / 220) * 100 : (norm ? (norm._contingentPct || 0) : 0);
 
