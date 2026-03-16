@@ -229,7 +229,7 @@ class DTEEngine {
   }
 
   _m1(year) {
-    const r = { days: {}, totalExtra: 0, totalRecup: 0, violations: [], totalWorkedDays: 0 };
+    const r = { days: {}, totalExtra: 0, totalRecup: 0, violations: [], totalWorkedDays: 0, specialDays: {}, vacances: {} };
     try {
       // Essayer plusieurs formats de clé utilisés par M1
       const keys = [
@@ -265,6 +265,24 @@ class DTEEngine {
         if (!absent) r.totalWorkedDays++;
       }
       r.violations = d.violations || [];
+      // Lire les jours fériés : M1 (SPECIAL_DAYS) + M4 propre (DTE_FERIES)
+      try {
+        const year = new Date().getFullYear();
+        for (const y of [year-1, year, year+1]) {
+          const sd = JSON.parse(localStorage.getItem('SPECIAL_DAYS_'+y) || '{}');
+          Object.entries(sd).forEach(([date, type]) => { if(type==='ferie') r.specialDays[date] = 'ferie'; });
+          const fd = JSON.parse(localStorage.getItem('DTE_FERIES_'+y) || '{}');
+          Object.keys(fd).forEach(date => { r.specialDays[date] = 'ferie'; });
+        }
+      } catch(_) {}
+      // Lire les vacances module4 (DTE_VACANCES_{year})
+      try {
+        const year = new Date().getFullYear();
+        for (const y of [year-1, year, year+1]) {
+          const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+y) || '{}');
+          Object.keys(vac).forEach(date => { r.vacances[date] = true; });
+        }
+      } catch(_) {}
     } catch(e) { console.warn('[DTE-E] m1:', e); }
     return r;
   }
@@ -371,6 +389,8 @@ class DTEEngine {
   /* ── Normalisation ───────────────────────────────────────────── */
   _normalize(raw) {
     const { m1, m2, rpg } = raw;
+    const specialDays = m1.specialDays || {};
+    const vacances    = m1.vacances    || {};
     const clamp = (v, min, max) => max === min ? 0 : Math.max(0, Math.min(1, (v - min) / (max - min)));
     const today = new Date();
 
@@ -434,6 +454,8 @@ class DTEEngine {
       const k = localDK(d);
       const e = days[k];
       if (e && (e.absent > 0 || e.recup > 0)) break; // absent ou récup = arrêt
+      if (specialDays[k] === 'ferie') break; // férié = arrêt
+      if (vacances[k]) break; // vacances = arrêt
       consec++; // jour ouvré travaillé
     }
 
@@ -458,7 +480,10 @@ class DTEEngine {
         weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
         hasAnyDay = true;
       }
-      if (hasAnyDay && weekH > D.H_OPTIMAL) cumulWeeks++;
+      // Ignorer les semaines de vacances ou entièrement fériées
+      const wkKey = (() => { const wm = new Date(todayMonday); wm.setDate(todayMonday.getDate()-w*7); return wm.getFullYear()+'-'+String(wm.getMonth()+1).padStart(2,'0')+'-'+String(wm.getDate()).padStart(2,'0'); })();
+      const isVacWeek = [0,1,2,3,4].some(dd => { const dt2=new Date(todayMonday); dt2.setDate(todayMonday.getDate()-w*7+dd); const k2=localDK(dt2); return vacances[k2]; });
+      if (hasAnyDay && !isVacWeek && weekH > D.H_OPTIMAL) cumulWeeks++;
     }
     const cumulMonths = cumulWeeks / 4.33;
 
