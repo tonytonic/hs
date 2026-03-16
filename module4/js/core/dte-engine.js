@@ -424,13 +424,18 @@ class DTEEngine {
     const avgH7       = D.BASE_JOUR + avgExtra7;               // h/j moyenne
     const weeklyH7    = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
 
-    // Jours consécutifs (date locale)
+    // Jours consécutifs travaillés (date locale)
+    // M2 ne stocke que les jours avec HS — les jours sans entrée = jours normaux travaillés
+    // On s'arrête uniquement sur : absent, weekend, ou recup
     let consec = 0;
     for (let i = 0; i < 30; i++) {
       const d = new Date(today); d.setDate(d.getDate() - i);
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) break; // weekend = arrêt
       const k = localDK(d);
       const e = days[k];
-      if (!e || e.absent > 0 || e.recup > 0) break;
+      if (e && (e.absent > 0 || e.recup > 0)) break; // absent ou récup = arrêt
+      // Jour ouvré avec ou sans HS = compte
       consec++;
     }
 
