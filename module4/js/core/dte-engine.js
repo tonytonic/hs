@@ -419,39 +419,49 @@ class DTEEngine {
       return y+'-'+m+'-'+d2;
     };
 
-    // Heures moyennes : semaine civile courante (lun-ven) + fenêtre 30j
-    // sumExtra7 = HS de la semaine civile EN COURS (lun à aujourd'hui)
+    // ── VOLUME HEBDOMADAIRE — fenêtre glissante 28 jours (Thompson 2022 rolling model)
+    // Approche : moyenne des HS/jour sur les 28 derniers jours calendaires,
+    // projetée sur 5 jours ouvrés → weeklyH réelle, insensible aux semaines civiles tronquées.
+    // Fondement : un mardi en milieu de semaine ne doit pas donner 41h si le rythme est 45h.
     const todayDowA = today.getDay() || 7; // 1=lun..7=dim
     const weekMondayA = new Date(today);
     weekMondayA.setDate(today.getDate() - (todayDowA - 1)); // lundi de cette semaine
-    let sumExtra = 0, countDays = 0;
+    let sumExtra = 0, countWorkDays28 = 0;
+    // Fenêtre 28j glissante — ne compte que les jours ouvrés (lun-ven) non absents
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) continue; // ignorer week-ends
+      const k = localDK(d);
+      if (specialDays[k] === 'ferie' || vacances[k]) continue;
+      const e = days[k];
+      if (e && e.absent > 0) continue;
+      // Jour ouvré : on compte les HS (0 si pas d'entrée = journée normale, sans HS)
+      sumExtra += (e ? (e.extra || 0) : 0);
+      countWorkDays28++;
+    }
+    // avgExtraPerDay28 = HS/jour moyen sur 4 semaines → weeklyExtra = HS/sem = avg × 5
+    const avgExtraPerDay28 = countWorkDays28 > 0 ? sumExtra / countWorkDays28 : 0;
+    const weeklyExtra28 = avgExtraPerDay28 * 5;  // projeté sur 5j ouvrés/sem
+
+    // Semaine civile courante (lun → aujourd'hui) — pour affichage et fallback
     let sumExtra7 = 0, count7 = 0;
-    // Semaine civile courante : lundi à aujourd'hui
     for (let dd = 0; dd < todayDowA && dd < 5; dd++) {
       const d = new Date(weekMondayA); d.setDate(weekMondayA.getDate() + dd);
       if (d > today) break;
       const k = localDK(d);
       const e = days[k];
-      const ex = e ? (e.extra || 0) : 0;
-      if (!e || !e.absent) { sumExtra7 += ex; count7++; }
+      if (!e || !e.absent) { sumExtra7 += (e ? (e.extra || 0) : 0); count7++; }
     }
-    // Fenêtre 30j pour moyenne longue
-    for (let i = 0; i < 30; i++) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
-      const k = localDK(d);
-      const e = days[k];
-      if (!e || e.absent > 0) continue;
-      sumExtra += e.extra || 0;
-      countDays++;
-    }
-    // avgExtra7 = moyenne sur la SEMAINE (7 jours), pas sur les jours saisis
-    // Ex: 2h le samedi → 2/7 = 0.29h/j de moyenne → weeklyH = 35 + 2 = 37h/sem
-    // On divise TOUJOURS par 7 pour une moyenne journalière hebdomadaire réelle
-    const avgExtra30 = countDays > 0 ? sumExtra / 30 : 0;      // moyenne sur 30j
-    // Pour le weeklyH : somme hebdo réelle (pas ×5 qui suppose 5j de surcharge)
-    // Si semaine courante incomplète (<2j) → utiliser la semaine précédente
-    let weeklyExtra = sumExtra7;
-    if (count7 < 2) {
+    // weeklyExtra : on utilise la fenêtre 28j si suffisamment de données (≥5 jours ouvrés)
+    // Sinon extrapolation de la semaine civile courante si elle a ≥2 jours
+    let weeklyExtra;
+    if (countWorkDays28 >= 5) {
+      weeklyExtra = weeklyExtra28; // fenêtre 28j = référence principale
+    } else if (count7 >= 2) {
+      weeklyExtra = (sumExtra7 / count7) * 5; // extrapolation semaine courante
+    } else {
+      // Fallback : semaine précédente
       let prevExtra = 0, prevCount = 0;
       for (let dd = 0; dd < 5; dd++) {
         const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() - 7 + dd);
@@ -459,20 +469,20 @@ class DTEEngine {
         const e = days[k];
         if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
       }
-      if (prevCount >= 3) weeklyExtra = prevExtra; // semaine précédente si assez de données
+      weeklyExtra = prevCount >= 3 ? prevExtra : 0;
     }
     const avgExtra7  = weeklyExtra / 5;         // HS/j = total semaine ÷ 5 jours ouvrés
     const avgH7      = D.BASE_JOUR + avgExtra7; // h/j moyenne
-    const weeklyH7   = 35 + weeklyExtra;                      // 35h base + HS réelles de la semaine
+    const weeklyH7   = 35 + weeklyExtra;        // 35h base + HS réelles de la semaine
 
-    // Jours consécutifs SANS repos (L3132-1 : repos hebdo 35h minimum)
-    // Le weekend CASSE le compteur — c'est le repos légal
-    // On détecte uniquement les semaines travaillées 7/7 sans repos
+    // ── JOURS CONSÉCUTIFS — deux compteurs distincts ─────────────────────────
+    // [1] consec (légal) : jours ouverts SANS weekend (L3132-1)
+    //     → le weekend casse le compteur = repos hebdomadaire légal
     let consec = 0;
     for (let i = 0; i < 60; i++) {
-      const d = new Date(today); d.setDate(d.getDate() - i);
+      const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      if (dow === 0 || dow === 6) break; // weekend = repos = arrêt du compteur
+      if (dow === 0 || dow === 6) break; // weekend = repos légal
       const k = localDK(d);
       const e = days[k];
       if (e && (e.absent > 0 || e.recup > 0)) break;
@@ -480,17 +490,45 @@ class DTEEngine {
       if (vacances[k]) break;
       consec++;
     }
+    // [2] consecOT (médical chronique) : jours ouvrés AVEC heures sup, en ignorant
+    //     les week-ends car ils ne permettent pas la récupération après surcharge chronique
+    //     (Sonnentag 2003 : détachement psychologique rompu ; Thompson 2022 : cortisol cumulatif)
+    //     → reset uniquement sur : absence, récup, ferie, vacances, OU semaine entière sans HS
+    let consecOT = 0;
+    let blankWeeks = 0; // semaines sans aucune HS → seul vrai "reset" biologique
+    outer_loop: for (let i = 0; i < 90; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const dow = d.getDay();
+      if (dow === 0 || dow === 6) continue; // passer le week-end sans casser le compteur
+      const k = localDK(d);
+      const e = days[k];
+      if (vacances[k]) break; // vacances = récupération réelle
+      if (specialDays[k] === 'ferie') { continue; } // férié ouvré = pause, ne casse pas
+      if (e && (e.absent > 0 || e.recup > 0)) break; // repos compensateur = reset
+      // Vérifier si toute la semaine de ce jour était sans HS (récupération complète)
+      const wMon = new Date(d); wMon.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+      let weekHasOT = false;
+      for (let dd = 0; dd < 5; dd++) {
+        const wd = new Date(wMon); wd.setDate(wMon.getDate() + dd);
+        const ek = localDK(wd);
+        if (days[ek] && days[ek].extra > 0) { weekHasOT = true; break; }
+      }
+      if (!weekHasOT) { blankWeeks++; if (blankWeeks >= 2) break; continue; }
+      blankWeeks = 0;
+      if (e && e.extra > 0) consecOT++; // jour ouvré avec HS → compte
+    }
 
     // Semaines cumulées de surcharge sur 1 an (J.Occup.Health 2021)
     // Parcours lun-ven de chaque semaine civile en remontant
-    // IMPORTANT : M2 ne stocke que les jours avec HS → on compte TOUS les jours ouvrés
-    // même sans entrée (= jour normal à BASE_JOUR heures)
+    // BUG FIX :
+    //   1. La semaine courante incomplète (ex: mer) est extrapolée → comptée si proj > H_OPTIMAL
+    //   2. Fallback : si count logique = 0, recalcul via la plage de dates du log
     let cumulWeeks = 0;
     const todayDow = today.getDay() || 7; // 1=lun ... 7=dim
     const todayMonday = new Date(today);
     todayMonday.setDate(today.getDate() - (todayDow - 1));
     for (let w = 0; w < 52; w++) {
-      let weekH = 0, hasAnyDay = false;
+      let weekH = 0, hasAnyDay = false, daysLogged = 0;
       for (let dd = 0; dd < 5; dd++) { // lun=0 à ven=4
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
@@ -501,12 +539,31 @@ class DTEEngine {
         // Jour ouvré : BASE_JOUR + HS (0 si pas d'entrée = jour normal)
         weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
         hasAnyDay = true;
+        if (e && e.extra > 0) daysLogged++;
+      }
+      // Extrapoler la semaine courante (w=0) si incomplète
+      // Ex: mer avec 3×2h HS = 27h → projeté 5j = 45h > 40h → compter
+      if (w === 0 && count7 >= 2 && count7 < 5 && daysLogged >= 2) {
+        // On a déjà calculé weeklyExtra (extrapolé) — l'utiliser directement
+        weekH = 35 + weeklyExtra;
       }
       // Ignorer les semaines de vacances ou entièrement fériées
-      const wkKey = (() => { const wm = new Date(todayMonday); wm.setDate(todayMonday.getDate()-w*7); return wm.getFullYear()+'-'+String(wm.getMonth()+1).padStart(2,'0')+'-'+String(wm.getDate()).padStart(2,'0'); })();
       const isVacWeek = [0,1,2,3,4].some(dd => { const dt2=new Date(todayMonday); dt2.setDate(todayMonday.getDate()-w*7+dd); const k2=localDK(dt2); return vacances[k2]; });
       if (hasAnyDay && !isVacWeek && weekH > D.H_OPTIMAL) cumulWeeks++;
     }
+
+    // Fallback robuste : si cumulWeeks = 0 mais qu'il existe des logs,
+    // estimer la durée d'exposition via la plage de dates réelle du log.
+    // Corrige le cas où des semaines partielles tombent toutes sous H_OPTIMAL.
+    if (cumulWeeks === 0 && Object.keys(days).length > 0) {
+      const allDateKeys = Object.keys(days).filter(k => days[k] && days[k].extra > 0).sort();
+      if (allDateKeys.length >= 5) { // au moins 1 semaine de données
+        const firstDate = new Date(allDateKeys[0] + 'T12:00:00');
+        const diffDays  = Math.ceil((today - firstDate) / 864e5);
+        cumulWeeks = Math.max(1, Math.round(diffDays / 7));
+      }
+    }
+
     const cumulMonths = cumulWeeks / 4.33;
 
     // Variabilité horaire (ANACT) — fenêtre VARIAB_WINDOW semaines COMPLÈTES passées
@@ -569,6 +626,7 @@ class DTEEngine {
       _weeklyH7:      weeklyH7,
       _recentWeeklyH: recentWeeklyH,
       _consec:        consec,
+      _consecOT:      consecOT,   // jours ouvrés consécutifs avec HS (cross-semaines, médical)
       _cumulWeeks:    cumulWeeks,
       _cumulMonths:   cumulMonths,
       _sigma:         sigma,
@@ -643,11 +701,16 @@ class DTEEngine {
 
     // ── FATIGUE (INRS — non-linéaire, J.Occup.Health 2021) ──────
     // Composantes : HS + jours consécutifs + dette sommeil + burnout RPG
-    const fatHS      = norm._avgExtra7 * 0.090 * c.fh; // HS/jour → fatigue (recalibré OMS phases)
-    const fatConsec  = norm.consec * 0.12 * c.fc;       // jours consécutifs (6 jours = 8.6%)
-    const fatSommeil = norm.sleepDebt * 0.35;            // dette sommeil Thompson 2022
-    const fatSurchar = norm.surcharge * 0.12;
-    const fatBurnout = norm.burnout * 0.22;
+    // BUG FIX : utiliser _consecOT (jours ouvrés avec HS, cross-semaines)
+    //           et non norm.consec (légal, cassé par weekend) pour la fatigue chronique
+    const consecOT    = norm._consecOT || 0;
+    const fatHS       = norm._avgExtra7 * 0.090 * c.fh; // HS/jour → fatigue (recalibré OMS phases)
+    // INRS : séquence de jours ouvrés avec HS = fatigue neurologique cumulée
+    // 13j × 0.035 = 0.455 (contribution significative) vs 3j × 0.12 = 0.036 (ancien calcul)
+    const fatConsec   = Math.min(0.50, consecOT * 0.035) * c.fc;
+    const fatSommeil  = norm.sleepDebt * 0.35;            // dette sommeil Thompson 2022
+    const fatSurchar  = norm.surcharge * 0.12;
+    const fatBurnout  = norm.burnout * 0.22;
     // Facteur cumulatif : 6 mois comptent (J.Occup.Health 2021)
     const cumulAmp   = cumW >= 24 ? 1.55   // 6 mois
                      : cumW >= 16 ? 1.40   // 4 mois
