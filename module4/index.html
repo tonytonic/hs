@@ -266,7 +266,18 @@
           <div id="scenarios-container"></div>
         </div>
         <div class="panel panel--futur">
-          <div class="panel-label">ETAT PREDIT +30J</div>
+          <div class="panel-label">ETAT PREDIT
+            <span style="margin-left:8px;">
+              <select id="timeline-days" style="background:rgba(0,10,25,.9);color:var(--animus);
+                border:1px solid rgba(0,200,255,0.25);font-family:var(--font-mono);
+                font-size:9px;padding:1px 4px;cursor:pointer;letter-spacing:.08em;">
+                <option value="14">+14J</option>
+                <option value="30" selected>+30J</option>
+                <option value="60">+60J</option>
+                <option value="90">+90J</option>
+              </select>
+            </span>
+          </div>
           <div class="panel-corner-br"></div>
           <div id="futur-state-container"></div>
         </div>
