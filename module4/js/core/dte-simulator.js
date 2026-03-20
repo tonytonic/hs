@@ -34,30 +34,42 @@ const BIO = {
   H_CEREBRAL:  52,   // OEM 2025 : +19% gyrus frontal
   H_CV:        55,   // OMS 2021 : +35% AVC, +17% cardio
 
-  // Fatigue — INRS + J.Occup.Health 2021 + OMS/OIT
-  // Calibration validée : 35h→0%, 45h→8%/J+30 44%/J+90 (Phase 2), 55h→alerte rapide
-  // Coefficient dynamique selon charge : fatPerHS(hs) = 0.013/0.017/0.019
-  FAT_PER_HS_BASE:  0.013,  // ≤40h/sem : quasi stable
-  FAT_PER_HS_MID:   0.020,  // 40-48h/sem : 45h→15%/J+30, 48h→50%/J+30 (INRS)
-  FAT_PER_HS_HIGH:  0.017,  // >48h/sem : nonlinear + cumul font le reste
-  FAT_NONLINEAR:    0.08,   // amplification légère si déjà fatigué (réduit de 0.65)
-  FAT_BASE:         0.000,  // supprimé — inclus dans RECOVERY
-  FAT_CONSEC:       0.000,  // supprimé — muscle recovery déjà dans REC_WEEKEND
+  // ── FATIGUE — INRS phases + J.Occup.Health 2021 ──────────────────
+  // Coefficients FAT_PER_HS alignés sur dte-engine.js (fatHS = 0.130/j)
+  // Dérivation : net hebdo = 5×hs×coef×cumulF - 2×REC_WEEKEND
+  //   P2 entry (35%) : ~5 sem à 45h → coef calibré à 0.013 (FAT_PER_HS_MID)
+  //   Cohérence avec engine : à fat=0, cumulF=1.25, net ≈ +9%/sem à 45h
+  FAT_PER_HS_BASE:  0.010,  // ≤40h/sem — quasi stable (P1 maintenu)
+  FAT_PER_HS_MID:   0.013,  // 40-48h/sem — INRS : P2 entry ~5 sem à 45h
+  FAT_PER_HS_HIGH:  0.016,  // >48h/sem — accélération non-linéaire (INRS P3)
+  FAT_NONLINEAR:    0.06,   // amplification si déjà fatigué (réduit — plus fidèle à INRS)
+  FAT_BASE:         0.000,
+  FAT_CONSEC:       0.000,
 
-  // Récupération (INRS + Nature Hum.Behav. 2025 Fan et al.)
+  // ── RÉCUPÉRATION ─────────────────────────────────────────────────
+  // INRS + Sonnentag 2003 : récupération week-end partiellement réduite
+  // en surcharge chronique (détachement psychologique compromis)
+  // REC_WEEKEND légèrement réduit (0.055→0.050) pour refléter Sonnentag
   REC_REST:         0.075,  // jour de repos complet
-  REC_WEEKEND:      0.055,  // par jour week-end (2j = 0.110/sem)
-  REC_VACANCES:     0.130,  // jour de vacances
+  REC_WEEKEND:      0.050,  // par jour WE — Sonnentag 2003 : partiel en surcharge
+  REC_VACANCES:     0.130,  // jour de vacances (Nature Hum.Behav. 2025 Fan et al.)
   REC_4DAY_BONUS:   0.018,  // bonus 4j/sem (Nature 2025)
-  // Facteurs cumulatifs (J.Occup.Health : 6 mois décisifs) — réduits vs ancien
-  CUMUL_4W:         1.10,   // 4 semaines
-  CUMUL_8W:         1.20,   // 2 mois
-  CUMUL_16W:        1.35,   // 4 mois
-  CUMUL_24W:        1.52,   // 6 mois — seuil J.Occup.Health 2021
 
-  // Stress/Cortisol — Thompson 2022 + ANACT (recalibré)
-  STR_PER_HS:     0.010,  // cortisol par heure HS (réduit)
-  STR_FAT_AMP:    0.009,  // fatigue amplifie le stress (réduit)
+  // ── FACTEURS CUMULATIFS — J.Occup.Health 2021 ────────────────────
+  // Alignés sur dte-engine.js (même courbe non-linéaire)
+  // L'étude Taiwan montre que les 6 derniers mois comptent autant
+  // que la semaine courante → amplification forte à partir de 8 semaines
+  CUMUL_4W:         1.25,   // 1 mois   (was 1.10)
+  CUMUL_8W:         1.55,   // 2 mois   (was 1.20)
+  CUMUL_16W:        1.95,   // 4 mois   (was 1.35)
+  CUMUL_24W:        2.20,   // 6 mois — seuil décisif J.Occup.Health (was 1.52)
+
+  // ── STRESS/CORTISOL — Thompson 2022 + ANACT ──────────────────────
+  // STR_PER_HS : dérivé de Thompson +14% cortisol/nuit courte
+  //   À 45h (2h HS/j → sommeil réduit ~0.9h) : cortisol +6%/nuit
+  //   Par heure HS/jour : 0.14 × (0.9/2) = 0.063 → normalisé à 0.012
+  STR_PER_HS:     0.012,  // cortisol par heure HS — Thompson 2022 dérivé
+  STR_FAT_AMP:    0.009,  // fatigue amplifie le stress — ANACT
   STR_REC_REST:   0.055,  // décroissance repos
   STR_REC_DAY:    0.008,  // décroissance quotidienne en travaillant
 
@@ -160,7 +172,12 @@ class DTESimulator {
     let fat  = s._f || 0;
     let str  = s._s || 0;
     let perf = s._p || 0.70;
-    let cvAcc = 0;
+    // cvAcc : reconstituer l'accumulation dose-temps actuelle depuis le score CV engine
+    // cvRisk actuel = min(0.65, cvAcc + fat*0.12 + str*0.08)
+    // → cvAcc = max(0, cvRisk_actuel - fat*0.12 - str*0.08)
+    // Fondement OMS/OIT 2021 : le risque CV est cumulatif, pas remis à zéro à chaque simulation
+    const _cvNow = (s.cvRisk || 0) / 100;
+    let cvAcc = Math.max(0, _cvNow - (s._f||0) * 0.12 - (s._s||0) * 0.08);
 
     const weeklyH = (D.BASE_JOUR + hoursPerDay) * 5;
     const today   = new Date();
@@ -184,11 +201,12 @@ class DTESimulator {
         else cumulWeeks = Math.max(0, cumulWeeks - 0.3); // décroissance lente
       }
 
-      // Facteur cumulatif INRS (6 mois décisifs)
-      const cumulF = cumulWeeks >= 24 ? BIO.CUMUL_24W
-                   : cumulWeeks >= 16 ? BIO.CUMUL_16W
-                   : cumulWeeks >= 8  ? BIO.CUMUL_8W
-                   : cumulWeeks >= 4  ? BIO.CUMUL_4W
+      // Facteur cumulatif — J.Occup.Health 2021, aligné sur dte-engine.js
+      const cumulF = cumulWeeks >= 24 ? BIO.CUMUL_24W   // 2.20
+                   : cumulWeeks >= 16 ? BIO.CUMUL_16W   // 1.95
+                   : cumulWeeks >= 10 ? 1.65             // palier 2.5 mois (engine)
+                   : cumulWeeks >= 8  ? BIO.CUMUL_8W    // 1.55
+                   : cumulWeeks >= 4  ? BIO.CUMUL_4W    // 1.25
                    : 1.0;
 
       // ── FATIGUE (INRS — dose-réponse non-linéaire) ──────────────
