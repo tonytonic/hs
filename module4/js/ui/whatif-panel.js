@@ -130,7 +130,14 @@ class WhatIfPanel {
     const el = document.getElementById('wi-result');
     if(!el) return;
     let result = null;
-    try { result = this._simulator.run(this._plan); } catch(e){ console.warn('[WhatIf]',e); }
+    try {
+      // Passer l'état actuel de l'engine explicitement (fat, str, cumulWeeks, cvAcc)
+      // Sans ça, le simulateur repart de zéro si getState() n'est pas encore initialisé
+      const currentScores = (window.DTE && window.DTE.engine && window.DTE.engine.getState())
+        ? window.DTE.engine.getState().scores
+        : null;
+      result = this._simulator.run(this._plan, currentScores);
+    } catch(e){ console.warn('[WhatIf]',e); }
     if(!result){ el.innerHTML='<div style="color:var(--text-muted);font-size:10px;font-family:var(--font-mono);padding:var(--gap);">Saisissez vos heures dans M1 pour activer la simulation.</div>'; return; }
 
     const s = result.summary;
