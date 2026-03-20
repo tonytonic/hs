@@ -94,7 +94,7 @@ class Dashboard {
       source: 'INRS · J.Occup.Health 2021 (Taiwan, 6 mois) · Thompson 2022',
       facteurs_heures: [
         { label:'Heures supplémentaires/sem', key:'_avgExtra7', fmt: v => v>0 ? '+'+v.toFixed(1)+'h/j × 0.09' : '0h supp.' },
-        { label:'Jours consécutifs',          key:'_consec',    fmt: v => v > 5 ? v+'j consécutifs sans repos ⚠️' : v+'j consécutifs cette semaine' },
+        { label:'Jours consécutifs',          key:'_consecOT',  fmt: v => v > 10 ? v+'j ouvrés de surcharge ⚠️' : v > 5 ? v+'j ouvrés de surcharge' : v+'j consécutifs cette semaine' },
         { label:'Semaines de surcharge',       key:'_cumulWeeks',fmt: v => v>0 ? v+' sem. cumulées (×'+( v>=24?'1.55':v>=16?'1.40':v>=8?'1.25':v>=4?'1.12':'1.00')+')' : 'Pas de cumul' },
       ],
       facteurs_vie: [
@@ -266,6 +266,7 @@ class Dashboard {
       const normVal = (k) => {
         if(k.startsWith('ci_')) return ci[k.replace('ci_','')];
         if(k==='_cumulMonths') return norm ? (norm._cumulWeeks||0)/4.33 : 0;
+        if(k==='_consecOT')   return norm ? (norm._consecOT || 0) : 0;
         return norm ? norm[k] : 0;
       };
 
