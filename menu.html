@@ -9,6 +9,7 @@
   <link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
+  <script src="ccn/conventions-collectives.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -20,7 +21,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      min-height: 100vh;
+      min-height: 100vh; min-height: 100dvh; height: 100dvh;
       justify-content: flex-start;
       padding: calc(env(safe-area-inset-top) + 40px) 20px calc(env(safe-area-inset-bottom) + 20px);
       gap: 20px;
@@ -32,14 +33,30 @@
       width: 90%;
       max-width: 250px;
       border-radius: 28px;
-      overflow: hidden;
+      overflow: visible;          /* ← était hidden : coupait les titres */
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
       cursor: pointer;
       transition: transform .15s ease;
       background: rgba(255,255,255,0.1);
     }
     .btn:active { transform: scale(0.96); }
-    .btn img { width: 100%; height: auto; display: block; }
+    /* Image : coins arrondis en haut, titre en dessous */
+    .btn img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 28px 28px 0 0;  /* arrondi en haut seulement */
+    }
+    /* Bouton sans image (ex: module4) */
+    .btn-no-img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 90px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(20,20,50,0.8));
+      border: 1px solid rgba(255,255,255,0.15);
+    }
 
     .title {
       text-align: center;
@@ -47,13 +64,15 @@
       margin-top: 8px;
       margin-bottom: 12px;
       color: #fff;
-      font-size: 16px;
-      padding: 0 10px;
+      font-size: 15px;
+      padding: 0 12px;
+      word-wrap: break-word;
+      line-height: 1.3;
     }
 
     footer {
-      margin-top: auto;
-      padding-top: 20px;
+      margin-top: 20px;
+      padding-top: 0;
       width: 100%;
       text-align: center;
       font-size: 12px;
@@ -223,6 +242,82 @@
     }
     .info-btn:hover { background: rgba(255,255,255,0.15); }
     hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
+
+    /* === CCN BADGE === */
+    #ccn-badge {
+      display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.3);
+      border-radius:22px; padding:8px 16px;
+      cursor:pointer; transition:background .15s;
+      font-size:13px; color:#fff; margin-bottom:6px;
+      width:90%; max-width:420px; box-sizing:border-box;
+    }
+    #ccn-badge:hover { background:rgba(255,255,255,0.2); }
+    #ccn-badge .ccn-name { font-weight:600; white-space:normal; word-break:break-word; flex:1; min-width:0; }
+    #ccn-badge .ccn-edit { font-size:11px; color:rgba(255,255,255,0.6); white-space:nowrap; }
+
+    /* === CCN MODAL === */
+    #ccnModal {
+      display:none; position:fixed; inset:0; z-index:9999;
+      background:rgba(0,0,0,0.55); align-items:center; justify-content:center;
+    }
+    #ccnModal.open { display:flex; }
+    .ccn-box {
+      background:#fff; border-radius:16px; padding:20px;
+      width:min(520px, 96vw); max-height:88vh;
+      display:flex; flex-direction:column; gap:12px;
+      box-shadow:0 8px 40px rgba(0,0,0,0.3);
+    }
+    .ccn-box h2 { margin:0; font-size:16px; color:#2196a6; }
+    #ccn-search {
+      width:100%; padding:10px 12px; border:1px solid #ddd;
+      border-radius:10px; font-size:14px; box-sizing:border-box;
+    }
+    #ccn-results {
+      overflow-y:auto; flex:1; max-height:320px;
+      border:1px solid #eee; border-radius:10px;
+    }
+    .ccn-item {
+      padding:10px 14px; cursor:pointer; border-bottom:1px solid #f5f5f5;
+      font-size:13px; transition:background .1s;
+    }
+    .ccn-item:hover { background:#f0fbfc; }
+    .ccn-item.active { background:#e0f4f7; font-weight:600; }
+    .ccn-item .ccn-item-idcc { color:#999; font-size:11px; }
+    .ccn-item-custom {
+      padding:10px 14px; cursor:pointer;
+      font-size:13px; color:#2196a6; font-weight:600;
+      border-top:2px solid #e0f4f7;
+      background:#f8fdfe;
+    }
+    .ccn-item-custom:hover { background:#e0f4f7; }
+    .ccn-custom-form { display:none; flex-direction:column; gap:8px; }
+    .ccn-custom-form.open { display:flex; }
+    .ccn-custom-form label { font-size:12px; color:#555; margin-bottom:2px; }
+    .ccn-custom-form input, .ccn-custom-form select {
+      padding:8px 10px; border:1px solid #ddd; border-radius:8px;
+      font-size:13px; width:100%; box-sizing:border-box;
+    }
+    .ccn-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+    .ccn-save-btn {
+      background:linear-gradient(135deg,#4FB3C2,#2196a6);
+      color:#fff; border:none; border-radius:10px;
+      padding:11px; font-size:14px; font-weight:600;
+      cursor:pointer; margin-top:4px;
+    }
+    .ccn-cancel-btn {
+      background:transparent; border:1px solid #ddd; border-radius:10px;
+      padding:10px; font-size:13px; cursor:pointer; color:#555;
+    }
+  /* ── COMPATIBILITY FIXES ─────────────────────────────── */
+  * { -webkit-tap-highlight-color: transparent; }
+  button, [onclick] { -webkit-user-select: none; user-select: none; }
+  .overlay { overscroll-behavior: contain; }
+  body { overscroll-behavior-y: none; }
+  /* ── ANTI-ZOOM iOS ───────────────────────────────────────────────
+     Safari zoome si font-size < 16px sur un input au focus         */
+  input, select, textarea { font-size: 16px !important; }
   </style>
 </head>
 
@@ -253,8 +348,74 @@
       <button class="wiz-btn primary" onclick="goStep(2)" style="margin-top:10px">Commencer →</button>
     </div>
 
-    <!-- Étape 2 : Quelle situation ? -->
+    <!-- Étape 2 : CCN + Mode -->
+    <!-- Étape 2 : Configuration -->
     <div class="wiz-step" id="wStep2">
+      <h2>⚙️ Ton contrat de travail</h2>
+
+      <div style="margin-bottom:16px;">
+        <p style="font-size:12px;color:#666;margin-bottom:10px;">
+          Les règles sur les heures sup varient selon ton secteur. Choisis ce qui correspond à ta situation :
+        </p>
+        <div style="display:grid;gap:8px;">
+          <button class="wiz-btn secondary" onclick="wizChooseCCN('search')" style="text-align:left;padding:10px;">
+            🔍 <strong>Je connais ma convention collective</strong><br>
+            <span style="font-size:11px;opacity:0.7;">Hôtellerie, BTP, Commerce, etc.</span>
+          </button>
+          <button class="wiz-btn secondary" onclick="wizChooseCCN('default')" style="text-align:left;padding:10px;">
+            📋 <strong>Droit commun (35h)</strong><br>
+            <span style="font-size:11px;opacity:0.7;">Règles de base — 220h/an</span>
+          </button>
+          <button class="wiz-btn secondary" onclick="wizChooseCCN('custom')" style="text-align:left;padding:10px;">
+            ⚙️ <strong>Accord personnalisé</strong><br>
+            <span style="font-size:11px;opacity:0.7;">Mon entreprise a ses propres règles</span>
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <h3 style="font-size:14px;margin-bottom:8px;">🔧 Quel profil es-tu ?</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button class="wiz-btn" id="wizModeDebutant" onclick="wizChooseMode('debutant')" style="background:rgba(0,200,255,0.1);border:2px solid rgba(0,200,255,0.3);">
+            🎓 Débutant<br>
+            <span style="font-size:10px;">Termes simplifiés</span>
+          </button>
+          <button class="wiz-btn" id="wizModeExpert" onclick="wizChooseMode('expert')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+            ⚡ Expert<br>
+            <span style="font-size:10px;">Termes techniques</span>
+          </button>
+        </div>
+      </div>
+
+      <button class="wiz-btn primary" onclick="goStep(3)" style="margin-top:16px">Continuer →</button>
+    </div>
+
+    <!-- Étape 3 : Découverte M3 et M4 -->
+    <div class="wiz-step" id="wStep3">
+      <h2>🎁 Deux modules bonus</h2>
+      <p style="text-align:center;font-size:12px;color:#666;margin-bottom:16px;">En plus du suivi des heures, tu as accès à deux expériences uniques :</p>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+        <div style="background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.25);border-radius:12px;padding:14px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">🦊 Mon compagnon d'analyse</div>
+          <div style="font-size:12px;color:#555;line-height:1.6;">
+            Imagine un ami renard qui lit le Code du travail et ta convention collective à ta place. Il célèbre quand tu gères bien, il te prévient quand ça dépasse les seuils légaux, et il te récompense avec des badges et du XP. Pas de jargon — juste ton compagnon qui te dit <em>"hey, cette semaine t'as assuré !"</em> ou <em>"doucement, là tu dépasses ce que la loi autorise..."</em> 🎮
+          </div>
+        </div>
+
+        <div style="background:rgba(0,200,100,0.06);border:1px solid rgba(0,200,100,0.2);border-radius:12px;padding:14px;">
+          <div style="font-size:15px;font-weight:700;margin-bottom:6px;">🩺 Ma prédiction santé</div>
+          <div style="font-size:12px;color:#555;line-height:1.6;">
+            Ton jumeau numérique : un double virtuel de toi qui absorbe le même rythme de travail. Ses calculs s'appuient sur de vraies études scientifiques — OMS, INRS, Lancet, Stanford — pour mesurer l'impact réel sur ta fatigue, ton stress et ta santé à long terme. Présenté simplement, sans rapport médical.
+          </div>
+        </div>
+      </div>
+
+      <button class="wiz-btn primary" onclick="goStep(4)">C'est parti ! →</button>
+    </div>
+
+    <!-- Étape 3 : Quelle situation ? -->
+    <div class="wiz-step" id="wStep4">
       <h2>🎯 Votre situation</h2>
       <p style="text-align:center;color:#555;font-size:13px;margin-bottom:4px">
         Comment sont payées vos heures supplémentaires ?
@@ -301,14 +462,14 @@
         </button>
       </div>
 
-      <button class="wiz-btn secondary" onclick="goStep(3)" style="margin-top:16px">
+      <button class="wiz-btn secondary" onclick="goStep(5)" style="margin-top:16px">
         Je veux voir les deux outils →
       </button>
       <p class="legal-note">Vous pourrez changer d'outil à tout moment depuis ce menu.</p>
     </div>
 
-    <!-- Étape 3 : Voir les deux -->
-    <div class="wiz-step" id="wStep3">
+    <!-- Étape 4 : Voir les deux -->
+    <div class="wiz-step" id="wStep5">
       <h2>✅ Tout est prêt</h2>
       <p style="text-align:center;font-size:13px;color:#555">
         Les deux simulateurs sont accessibles depuis le menu principal.
@@ -327,9 +488,12 @@
 <!-- =====================
      POPUP PRÉSENTATION
 ===================== -->
-<div class="overlay" id="presentationPopup" style="display:none;">
+<div class="overlay" id="presentationPopup" style="display:none;" onclick="closePresentation()">
   <div class="presentation-box" onclick="event.stopPropagation()">
-    <h2>📦 Présentation du projet</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+      <h2 style="margin:0;">📦 Présentation du projet</h2>
+      <button onclick="closePresentation()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#333;padding:0;width:auto;margin:0;line-height:1;">✕</button>
+    </div>
     <p><b>Simulateur d'heures supplémentaires</b><br>Écosystème PWA – Développé par <b>C. Anthony</b></p>
     <hr>
     <h3>🎯 Objectif général</h3>
@@ -351,6 +515,15 @@
 <!-- =====================
      MENU PRINCIPAL
 ===================== -->
+<button class="info-btn" onclick="reopenWizard()" style="background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
+
+<!-- CCN BADGE en haut -->
+<div id="ccn-badge" onclick="openCCNModal()" title="Changer de convention collective">
+  <span>⚖️</span>
+  <span class="ccn-name" id="ccn-badge-name">Mon contrat de travail</span>
+  <span class="ccn-edit">✎ modifier</span>
+</div>
+
 <div class="btn" onclick="go('heures')">
   <img src="images/renard-annuel.png.jpg" loading="lazy" alt="Compteur annuel">
   <div class="title">Simulateur de compteur annuel</div>
@@ -363,20 +536,87 @@
 
 <div class="btn" onclick="go('fox')">
   <img src="images/renard-central.png.jpg" loading="lazy" alt="Module central">
-  <div class="title">Fox player</div>
+  <div class="title">Mon compagnon d'analyse</div>
+</div>
+
+<div class="btn" onclick="go('module4')">
+  <img src="foxpredit.jpg" loading="eager" alt="Ma prédiction santé" onerror="this.style.display='none'">
+  <div class="title">🩺 Ma prédiction santé</div>
 </div>
 
 <button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
-<button class="info-btn" onclick="reopenWizard()">🔁 Revoir l'aide au choix</button>
 
-<div class="backup-advice">
-  💾 <strong>Conseil sauvegarde</strong><br>
-  Effectuez des <strong>exports réguliers</strong> (JSON/PDF) pour éviter toute perte de données.
+
+<!-- MODAL CCN -->
+<div id="ccnModal">
+  <div class="ccn-box">
+    <h2>⚖️ Convention collective applicable</h2>
+    <input id="ccn-search" type="text" placeholder="🔍 Rechercher par nom ou N° IDCC..." oninput="ccnSearch(this.value)" autocomplete="off">
+    <div id="ccn-results"></div>
+
+    <!-- Formulaire accord personnalisé -->
+    <div class="ccn-custom-form" id="ccnCustomForm">
+      <hr style="margin:0">
+      <div style="font-size:13px;font-weight:600;color:#2196a6">⚙️ Accord d'entreprise / de branche</div>
+      <div class="ccn-row">
+        <div><label>Nom de l'accord</label><input id="cc-nom" placeholder="Ex: Accord entreprise 2026"></div>
+        <div><label>Seuil HS (h/sem)</label><input id="cc-seuil" type="number" value="35" min="35" max="48"></div>
+      </div>
+      <div class="ccn-row">
+        <div><label>Taux palier 1 (%)</label><input id="cc-taux1" type="number" value="25" min="10" max="100"></div>
+        <div><label>Durée palier 1 (h)</label><input id="cc-palier1" type="number" value="8" min="1" max="16"></div>
+      </div>
+      <div class="ccn-row">
+        <div><label>Taux inter. (% ou vide)</label><input id="cc-taux-inter" type="number" placeholder="Vide = pas de palier inter." min="10" max="100"></div>
+        <div><label>Durée palier inter. (h)</label><input id="cc-palier-inter" type="number" placeholder="Ex: 4" min="1" max="16"></div>
+      </div>
+      <div class="ccn-row">
+        <div><label>Taux final (%)</label><input id="cc-taux2" type="number" value="50" min="25" max="100"></div>
+        <div><label>Contingent annuel (h)</label><input id="cc-contingent" type="number" value="220" min="90" max="360"></div>
+      </div>
+      <div>
+        <label>Début de semaine HS</label>
+        <select id="cc-debut">
+          <option value="1">Lundi (défaut légal)</option>
+          <option value="2">Mardi</option>
+          <option value="3">Mercredi</option>
+          <option value="4">Jeudi</option>
+          <option value="5">Vendredi</option>
+          <option value="6">Samedi</option>
+          <option value="7">Dimanche</option>
+        </select>
+      </div>
+      <p style="font-size:11px;color:#888;margin:0">Art. L3121-32 C.trav. — Un accord peut fixer n'importe quelle période de 7 jours consécutifs comme semaine HS.</p>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="ccn-cancel-btn" style="flex:1" onclick="closeCCNModal()">Annuler</button>
+      <button class="ccn-save-btn" style="flex:2" onclick="saveCCN()">✅ Appliquer</button>
+    </div>
+  </div>
 </div>
 
-<footer>Développé par C. Anthony v3.0.0</footer>
+
+<div style="display:flex;gap:12px;justify-content:center;padding:8px 0;font-size:11px;opacity:0.7;">
+  <button onclick="window.openLicensePopup()" style="background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:11px;padding:0;margin:0;text-decoration:underline;">📄 Licence</button>
+  <span style="opacity:0.5;">•</span>
+  <button onclick="window.openPrivacyPopup()" style="background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:11px;padding:0;margin:0;text-decoration:underline;">🔒 Confidentialité</button>
+</div>
+
+<footer>
+  <div style="margin-bottom: 8px;">Développé par C. Anthony v3.0.0</div>
+</footer>
 
 <script>
+  /* ── SAFE localStorage (iOS Navigation Privée) ───────────────
+   * Sur iPhone en navigation privée, localStorage lance une
+   * SecurityError. Ce wrapper absorbe l'erreur silencieusement.  */
+  const _safeLS = {
+    get:  (k, d='')  => { try { return localStorage.getItem(k) ?? d; }    catch(_) { return d; } },
+    set:  (k, v)     => { try { localStorage.setItem(k, v); }              catch(_) {} },
+    del:  (k)        => { try { localStorage.removeItem(k); }              catch(_) {} },
+    json: (k, d={})  => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(_) { return d; } },
+  };
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(err => console.log("SW erreur", err));
@@ -401,19 +641,87 @@
   }
 
   // Afficher le wizard seulement à la première ouverture
-  if (localStorage.getItem("menuWizardDone") === "1") {
+  if (_safeLS.get("menuWizardDone") === "1") {
     document.getElementById("welcomeWizard").style.display = "none";
   } else {
     lockScroll();
   }
 
   let selectedMode = null;
+  let selectedGlossaireMode = 'debutant'; // Par défaut débutant
+
+  function wizChooseCCN(choice) {
+    if (choice === 'search') {
+      // Ouvrir le modal CCN
+      if (typeof openCCNModal === 'function') {
+        openCCNModal();
+      }
+    } else if (choice === 'default') {
+      _safeLS.del('CCN_IDCC');
+      _safeLS.del('CCN_NOM');
+      _safeLS.del('CCN_CUSTOM');
+      // Feedback : juste une coche verte sur le bouton, rien d'autre
+      document.querySelectorAll('#wStep2 .wiz-btn.secondary').forEach(b => {
+        b.style.background = '';
+        b.style.border = '';
+        b.style.color = '';
+        const chk = b.querySelector('.wiz-ccn-check');
+        if (chk) chk.remove();
+      });
+      const btns = document.querySelectorAll('#wStep2 .wiz-btn.secondary');
+      if (btns[1]) {
+        const check = document.createElement('span');
+        check.className = 'wiz-ccn-check';
+        check.textContent = ' ✅';
+        btns[1].appendChild(check);
+      }
+      // Scroll vers le choix du mode
+      setTimeout(() => {
+        const modeDiv = document.querySelector('#wStep2 #wizModeDebutant');
+        if (modeDiv) modeDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    } else if (choice === 'custom') {
+      // Ouvrir le formulaire personnalisé
+      if (typeof openCCNModal === 'function') {
+        openCCNModal();
+        setTimeout(() => {
+          if (typeof toggleCustomForm === 'function') toggleCustomForm();
+        }, 300);
+      }
+    }
+  }
+
+  function wizChooseMode(mode) {
+    selectedGlossaireMode = mode;
+    // Sauvegarder dans localStorage pour le glossaire
+    _safeLS.set('APP_MODE', mode); // clé utilisée par glossaire.js
+    _safeLS.set('GLOSSAIRE_MODE', mode);
+    // Propager en temps réel à tous les modules ouverts
+    try { const bc = new BroadcastChannel('glossaire_mode'); bc.postMessage({type:'MODE_CHANGE',mode}); bc.close(); } catch(_) {}
+    
+    // Mettre à jour l'UI
+    const btnDebutant = document.getElementById('wizModeDebutant');
+    const btnExpert = document.getElementById('wizModeExpert');
+    if (btnDebutant && btnExpert) {
+      if (mode === 'debutant') {
+        btnDebutant.style.background = 'rgba(0,200,255,0.2)';
+        btnDebutant.style.border = '2px solid rgba(0,200,255,0.5)';
+        btnExpert.style.background = 'rgba(255,255,255,0.05)';
+        btnExpert.style.border = '1px solid rgba(255,255,255,0.1)';
+      } else {
+        btnExpert.style.background = 'rgba(0,200,255,0.2)';
+        btnExpert.style.border = '2px solid rgba(0,200,255,0.5)';
+        btnDebutant.style.background = 'rgba(255,255,255,0.05)';
+        btnDebutant.style.border = '1px solid rgba(255,255,255,0.1)';
+      }
+    }
+  }
 
   function goStep(n) {
     document.querySelectorAll(".wiz-step").forEach(el => el.classList.remove("active"));
     document.getElementById("wStep" + n).classList.add("active");
-    const prog = { 1: "33%", 2: "66%", 3: "100%" };
-    document.getElementById("wizProg").style.width = prog[n] || "33%";
+    const prog = { 1: "25%", 2: "50%", 3: "75%", 4: "100%" };
+    document.getElementById("wizProg").style.width = prog[n] || "25%";
   }
 
   function selectMode(mode) {
@@ -425,7 +733,7 @@
   }
 
   function closeWizard() {
-    localStorage.setItem("menuWizardDone", "1");
+    _safeLS.set("menuWizardDone", "1");
     document.getElementById("welcomeWizard").style.display = "none";
     unlockScroll();
   }
@@ -456,11 +764,242 @@
     unlockScroll();
   }
 
+  window.openLicensePopup = function openLicensePopup() {
+    const popup = document.createElement('div');
+    popup.id = 'license-popup';
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
+    popup.addEventListener('click', e => { if(e.target===popup) window.closeLicensePopup(); });
+    popup.innerHTML = `
+      <div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="color:#00c8ff;margin:0;font-size:17px;">📄 Licence</h2>
+          <button onclick="window.closeLicensePopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
+        </div>
+        <div style="color:#ccc;line-height:1.7;font-size:13px;">
+          <p style="color:#fff;font-weight:700;margin-bottom:4px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p>
+          <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Droits accordés</p>
+          <p>L'auteur accorde à tout utilisateur le droit :</p>
+          <ul style="margin:6px 0 12px 16px;padding:0;">
+            <li>D'utiliser l'application à titre <strong>personnel et non commercial</strong></li>
+            <li>De consulter le code source à des fins d'information et de vérification</li>
+            <li>De signaler des bugs et proposer des améliorations via GitHub</li>
+          </ul>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Droits réservés — Interdictions explicites</p>
+          <p>Sont <strong>strictement interdits</strong> sans autorisation écrite préalable :</p>
+          <ul style="margin:6px 0 12px 16px;padding:0;">
+            <li>Toute utilisation commerciale, directe ou indirecte</li>
+            <li>Toute vente, revente, location ou monétisation</li>
+            <li>Toute intégration dans un produit ou service commercial</li>
+            <li>Toute modification et redistribution sous un autre nom</li>
+            <li>Toute suppression des mentions de copyright</li>
+            <li>Tout déploiement sur des infrastructures d'entreprise sans accord écrit</li>
+            <li>Toute création d'œuvre dérivée à des fins commerciales</li>
+          </ul>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Données utilisateur</p>
+          <p>Cette application traite les données localement. Aucune donnée personnelle n'est collectée ni transmise par l'auteur.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">4. Sources scientifiques</p>
+          <p>Les références scientifiques (OMS, INRS, HAS, Lancet, etc.) sont citées à titre informatif. L'application ne constitue pas un avis médical.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">5. Limitation de responsabilité</p>
+          <p>L'application est fournie "telle quelle". L'auteur ne pourra être tenu responsable de décisions prises sur la base des résultats affichés. Seuls les documents officiels de l'employeur et le droit applicable font foi.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">6. Cession commerciale</p>
+          <p>Toute cession commerciale fait l'objet d'un contrat distinct négocié avec l'auteur.</p>
+
+          <div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
+            Contact : appareils.treves6g@icloud.com
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    lockScroll();
+  }
+
+    window.closeLicensePopup = function closeLicensePopup() {
+    const popup = document.getElementById('license-popup');
+    if (popup) popup.remove();
+    unlockScroll();
+  }
+
+  window.openPrivacyPopup = function openPrivacyPopup() {
+    const popup = document.createElement('div');
+    popup.id = 'privacy-popup';
+    popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
+    popup.addEventListener('click', e => { if(e.target===popup) window.closePrivacyPopup(); });
+    popup.innerHTML = `
+      <div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <h2 style="color:#00c8ff;margin:0;font-size:17px;">🔒 Confidentialité</h2>
+          <button onclick="window.closePrivacyPopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
+        </div>
+        <div style="color:#ccc;line-height:1.7;font-size:13px;">
+          <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Dernière mise à jour : 28 février 2026</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Absence de collecte de données</p>
+          <p>L'Application est conçue pour fonctionner de manière totalement autonome. Nous ne collectons, ne stockons, ni ne transmettons aucune donnée personnelle vers des serveurs externes ou vers des tiers.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Stockage local (LocalStorage)</p>
+          <p>Toutes les données saisies sont conservées <strong>exclusivement sur votre appareil</strong>. Ces données ne nous sont jamais envoyées et restent sous votre contrôle exclusif. Vous pouvez les effacer à tout moment en vidant le cache de votre navigateur.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Pas de services de suivi</p>
+          <p>Nous n'utilisons aucun outil de suivi, de cookies publicitaires ou de services d'analyse tiers. Votre utilisation reste totalement anonyme.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">4. Sécurité</p>
+          <p>Puisque aucune donnée n'est transmise sur Internet, les risques liés à la sécurité des serveurs tiers sont inexistants. La sécurité de vos données dépend de la sécurité de votre propre appareil.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">5. Modifications</p>
+          <p>Nous pouvons mettre à jour cette politique de temps à autre. Toute modification sera publiée sur cette page.</p>
+
+          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">6. Contact</p>
+          <div style="margin-top:8px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
+            Email : appareils.treves6g@icloud.com
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    lockScroll();
+  }
+
+    window.closePrivacyPopup = function closePrivacyPopup() {
+    const popup = document.getElementById('privacy-popup');
+    if (popup) popup.remove();
+    unlockScroll();
+  }
+
   function go(app) {
-    localStorage.setItem("lastApp", app);
+    _safeLS.set("lastApp", app);
     window.location.href = app + "/index.html";
   }
+
+  /* ===================== CCN ===================== */
+  let _ccnSelected = null;
+  let _ccnCustom = false;
+
+  function initCCNBadge() {
+    const idcc   = _safeLS.get('CCN_IDCC');
+    const nom    = _safeLS.get('CCN_NOM');
+    const custom = _safeLS.get('CCN_CUSTOM');
+    let label = 'Convention collective — cliquer pour choisir';
+    if (custom) {
+      try { const c = JSON.parse(custom); label = '⚙️ ' + (c.nom || 'Accord personnalisé'); } catch(e){}
+    } else if (idcc && nom) {
+      label = nom + ' · IDCC ' + idcc;
+    }
+    document.getElementById('ccn-badge-name').textContent = label;
+  }
+
+  function openCCNModal() {
+    _ccnSelected = null;
+    _ccnCustom = false;
+    document.getElementById('ccnCustomForm').classList.remove('open');
+    document.getElementById('ccn-search').value = '';
+    ccnSearch('');
+    const idcc = _safeLS.get('CCN_IDCC');
+    if (idcc) _ccnSelected = { idcc: parseInt(idcc), nom: _safeLS.get('CCN_NOM') || '' };
+    document.getElementById('ccnModal').classList.add('open');
+  }
+
+  function closeCCNModal() {
+    document.getElementById('ccnModal').classList.remove('open');
+  }
+
+  function ccnSearch(q) {
+    const results = document.getElementById('ccn-results');
+    if (typeof CCN_API === 'undefined') {
+      results.innerHTML = '<div style="padding:12px;color:#c00;font-size:13px">❌ Fichier CCN non chargé</div>';
+      return;
+    }
+    const items = CCN_API.search(q, 60);
+    const activeIdcc = _ccnSelected ? _ccnSelected.idcc : parseInt(_safeLS.get('CCN_IDCC') || '0');
+    let html = items.map(it => {
+      const isActive = it.i === activeIdcc;
+      return `<div class="ccn-item${isActive?' active':''}" onclick="selectCCN(${it.i},this)">
+        <div>${it.n}</div>
+        <div class="ccn-item-idcc">IDCC ${it.i} · ${it.g}</div>
+      </div>`;
+    }).join('');
+    html += `<div class="ccn-item-custom" onclick="toggleCustomForm()">⚙️ Accord d'entreprise / personnalisé…</div>`;
+    results.innerHTML = html;
+    // Récupérer nom depuis DOM
+    results.querySelectorAll('.ccn-item').forEach(el => {
+      el.addEventListener('click', function() {
+        const idccVal = parseInt(this.querySelector('.ccn-item-idcc').textContent.split(' ')[1]);
+        const nomVal  = this.querySelector('div:first-child').textContent;
+        _ccnSelected = { idcc: idccVal, nom: nomVal };
+        _ccnCustom = false;
+        document.getElementById('ccnCustomForm').classList.remove('open');
+        results.querySelectorAll('.ccn-item').forEach(e => e.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+  }
+
+  function selectCCN(idcc, el) { /* handled above via addEventListener */ }
+
+  function toggleCustomForm() {
+    _ccnCustom = true;
+    _ccnSelected = null;
+    document.getElementById('ccnCustomForm').classList.toggle('open');
+    const saved = _safeLS.get('CCN_CUSTOM');
+    if (saved) {
+      try {
+        const c = JSON.parse(saved);
+        document.getElementById('cc-nom').value         = c.nom || '';
+        document.getElementById('cc-seuil').value       = c.seuil || 35;
+        document.getElementById('cc-taux1').value       = c.taux1 || 25;
+        document.getElementById('cc-palier1').value     = c.palier1 || 8;
+        document.getElementById('cc-taux-inter').value  = c.taux_inter || '';
+        document.getElementById('cc-palier-inter').value= c.palier_inter || '';
+        document.getElementById('cc-taux2').value       = c.taux2 || 50;
+        document.getElementById('cc-contingent').value  = c.contingent || 220;
+        document.getElementById('cc-debut').value       = c.debutSemaine || 1;
+      } catch(e){}
+    }
+  }
+
+  function saveCCN() {
+    if (_ccnCustom) {
+      const nom          = document.getElementById('cc-nom').value.trim() || 'Accord personnalisé';
+      const seuil        = parseInt(document.getElementById('cc-seuil').value) || 35;
+      const taux1        = parseInt(document.getElementById('cc-taux1').value) || 25;
+      const palier1      = parseInt(document.getElementById('cc-palier1').value) || 8;
+      const tiRaw        = document.getElementById('cc-taux-inter').value;
+      const piRaw        = document.getElementById('cc-palier-inter').value;
+      const taux_inter   = tiRaw ? parseInt(tiRaw) : null;
+      const palier_inter = piRaw ? parseInt(piRaw) : null;
+      const taux2        = parseInt(document.getElementById('cc-taux2').value) || 50;
+      const contingent   = parseInt(document.getElementById('cc-contingent').value) || 220;
+      const debutSemaine = parseInt(document.getElementById('cc-debut').value) || 1;
+      if (seuil < 35)  { alert('⚠️ Le seuil ne peut pas être inférieur à 35h'); return; }
+      if (taux1 < 10)  { alert('⚠️ Taux minimum légal : 10% (Art. L3121-33)'); return; }
+      CCN_API.setCustom({ nom, seuil, taux1, palier1, taux_inter, palier_inter, taux2, contingent, debutSemaine });
+      _safeLS.del('CCN_IDCC');
+      _safeLS.set('CCN_NOM', nom);
+    } else if (_ccnSelected) {
+      CCN_API.resetCustom();
+      _safeLS.set('CCN_IDCC', _ccnSelected.idcc);
+      _safeLS.set('CCN_NOM', _ccnSelected.nom);
+    } else {
+      closeCCNModal();
+      return;
+    }
+    initCCNBadge();
+    closeCCNModal();
+  }
+
+  window.addEventListener('DOMContentLoaded', initCCNBadge);
 </script>
+
+<!-- Glossaire mode débutant/expert -->
+<!-- Glossaire désactivé pour l'instant -->
+<!-- <script src="./glossaire.js"></script> -->
 
 </body>
 </html>
