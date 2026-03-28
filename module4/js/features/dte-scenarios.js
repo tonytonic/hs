@@ -20251,6 +20251,30 @@ class ScenarioAdvisor {
     this._db = DTE_SCENARIOS;
   }
 
+  // Retourne des mots-clés sectoriels selon la CCN active
+  _getCCNSectorKeywords() {
+    if (typeof CCN_API === 'undefined') return [];
+    const idcc = parseInt((typeof localStorage !== 'undefined' && localStorage.getItem('CCN_IDCC')) || '0');
+    const rules = CCN_API.getGroupeForCCN(idcc);
+    if (!rules) return [];
+    const groupe = rules.groupeId || '';
+    const nom = (localStorage.getItem('CCN_NOM') || '').toLowerCase();
+    const kw = [];
+    if (groupe === 'HCR'   || nom.includes('hôtel') || nom.includes('restaurant') || nom.includes('café'))
+      kw.push('service','horaires décalés','nuit','week-end');
+    if (groupe === 'IAA180'|| nom.includes('btp') || nom.includes('bâtiment') || nom.includes('travaux'))
+      kw.push('chantier','intempéries','physique','effort');
+    if (nom.includes('transport') || nom.includes('logistique') || nom.includes('conduite'))
+      kw.push('conduite','transport','logistique','amplitude');
+    if (nom.includes('santé') || nom.includes('médical') || nom.includes('hôpital') || nom.includes('soin'))
+      kw.push('garde','astreinte','nuit','stress');
+    if (groupe === 'CHIM130'|| nom.includes('chimie') || nom.includes('pharmacie'))
+      kw.push('exposition','risque chimique','concentration');
+    if (nom.includes('syntec') || nom.includes('informatique') || nom.includes('numérique'))
+      kw.push('télétravail','forfait','présentéisme','autonomie');
+    return kw;
+  }
+
   /**
    * Retourne les N meilleurs scénarios pour l'état donné
    * @param {scores, norm} state - État du Digital Twin
@@ -20264,6 +20288,8 @@ class ScenarioAdvisor {
     const conscBucket = this._consecBucket(norm._consec || 0);
     const contBucket = this._contBucket(norm._contingentPct || 0);
     const perfBucket = this._perfBucket(scores.performance);
+    const sectorKw = this._getCCNSectorKeywords();
+    const normTxt = t => (t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 
     const scored = this._db.map(s => {
       let score = 0;
@@ -20280,6 +20306,12 @@ class ScenarioAdvisor {
       score += (3 - Math.abs(s.perf - perfBucket)) * 1;
       // Urgence bonus si situation grave
       if (fatBucket >= 3 && s.urgence >= 2) score += 3;
+      // Bonus secteur CCN — léger (max +1.5) pour ne pas écraser le matching fatigue
+      if (sectorKw.length > 0) {
+        const txt = normTxt([s.titre, s.message, (s.conseils||[]).join(' ')].join(' '));
+        const hits = sectorKw.filter(kw => txt.includes(normTxt(kw))).length;
+        score += Math.min(hits * 0.5, 1.5);
+      }
       // Small random pour variété
       score += Math.random() * 0.5;
       return { ...s, _score: score };

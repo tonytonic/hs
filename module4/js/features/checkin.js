@@ -1,3 +1,12 @@
+/* ── SAFE localStorage WRAPPER (iOS Private Mode) ─────────────
+ * In iOS private browsing, localStorage throws SecurityError.
+ * All access goes through _safeLS to prevent crashes.          */
+const _safeLS = {
+  get: (k, def='') => { try { return localStorage.getItem(k) ?? def; } catch(_) { return def; } },
+  set: (k, v)      => { try { localStorage.setItem(k, v); } catch(_) {} },
+  del: (k)         => { try { localStorage.removeItem(k); } catch(_) {} },
+  json:(k, def={}) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch(_) { return def; } },
+};
 /**
  * Check-in quotidien — 5 questions, 2 minutes
  */
