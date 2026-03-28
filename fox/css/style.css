@@ -54,7 +54,7 @@ body {
 font-family: ‘Inter’, ‘Segoe UI’, system-ui, -apple-system, sans-serif;
 background: linear-gradient(135deg, var(–bg-darker) 0%, var(–bg-dark) 100%);
 color: var(–text-primary);
-min-height: 100vh;
+min-height: 100vh; min-height: 100dvh; height: 100dvh;
 line-height: 1.6;
 overflow-x: hidden;
 }
@@ -1478,7 +1478,7 @@ radial-gradient(ellipse at 20% 50%, rgba(255,140,66,0.08) 0%, transparent 60%),
 radial-gradient(ellipse at 80% 20%, rgba(60,60,200,0.08) 0%, transparent 60%);
 color: #e0e0e0;
 font-family: ‘Segoe UI’, system-ui, sans-serif;
-min-height: 100vh;
+min-height: 100vh; min-height: 100dvh; height: 100dvh;
 margin: 0;
 }
 
@@ -2071,3 +2071,13 @@ font-size: 0.72rem;
 @media (orientation: landscape) and (min-width: 600px) {
   #bg-decor { object-position: center 30% !important; }
 }
+
+/* ── COMPATIBILITY FIXES ─────────────────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+button, [onclick] { -webkit-user-select: none; user-select: none; }
+.modal, .overlay, [class*="popup"], [class*="panel"] { overscroll-behavior: contain; }
+body { overscroll-behavior-y: none; }
+input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; }
+
+/* Anti-zoom iOS */
+input, select, textarea { font-size: 16px !important; }
