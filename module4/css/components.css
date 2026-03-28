@@ -70,9 +70,12 @@
 
 /* Notifications */
 #notifications-container {
-  position: fixed; top: 58px; right: var(--gap-l);
+  position: fixed; 
+  top: max(58px, calc(env(safe-area-inset-top) + 12px)); 
+  right: max(var(--gap-l), env(safe-area-inset-right));
   z-index: 2000;
-  display: flex; flex-direction: column; gap: 5px; width: 300px;
+  display: flex; flex-direction: column; gap: 5px; 
+  width: min(300px, calc(100vw - 2 * var(--gap-l)));
 }
 .notif {
   background: linear-gradient(135deg, #001428, #000d1a);

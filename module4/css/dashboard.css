@@ -114,6 +114,7 @@
   overflow: hidden;
   transition: border-color .2s;
   clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  text-align: center;
 }
 .score-card:hover { border-color: rgba(0,200,255,0.3); }
 .score-card::before {
@@ -381,12 +382,20 @@
   .panel { padding: 10px; }
   .panel-label { font-size: 8px; margin-bottom: 8px; }
 
-  /* Viewport */
-  #app { overflow-y: auto; height: auto; min-height: 100vh; }
+  /* Viewport - Support Safari iOS */
+  #app { 
+    overflow-y: auto; 
+    height: auto; 
+    min-height: 100dvh;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
   .app-main { overflow: visible; height: auto; }
   .view { position: relative; overflow: visible; height: auto; }
   .view.active { opacity: 1; pointer-events: auto; }
-  #view-dashboard { padding: 5px; }
+  #view-dashboard { 
+    padding: 5px; 
+    padding-bottom: max(20px, calc(env(safe-area-inset-bottom) + 20px));
+  }
 }
 
 /* ── RESPONSIVE ACTIONS PANEL ───────────────────────────────────── */
@@ -404,4 +413,9 @@
     display: flex; flex-direction: row; flex-wrap: wrap; gap: 4px;
   }
   .action-block-btn { width: auto; flex: 1; min-width: 80px; }
+}
+
+/* ── COMPATIBILITY FIXES ─────────────────────────────────── */
+.score-detail-modal, .modal-overlay {
+  overscroll-behavior: contain;
 }

@@ -1,3 +1,4 @@
+* { -webkit-tap-highlight-color: transparent; }
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap');
 
 /* ── VARIABLES ANIMUS ───────────────────────────────────────────── */
@@ -286,17 +287,45 @@ body {
 /* ── HEADER ─────────────────────────────────────────────────────── */
 .app-header {
   display: flex;
-  align-items: center;
-  gap: var(--gap);
+  flex-direction: column;
+  gap: 0;
   padding: 0 var(--gap-l);
   padding-top: max(0px, env(safe-area-inset-top));
-  height: calc(48px + env(safe-area-inset-top, 0px));
+  min-height: calc(88px + env(safe-area-inset-top, 0px));
   background: linear-gradient(90deg, var(--void) 0%, var(--deep) 50%, var(--void) 100%);
   border-bottom: 1px solid rgba(0,200,255,0.2);
   flex-shrink: 0;
   z-index: 200;
   position: sticky;
   top: 0;
+}
+
+.header-row-1 {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  height: 48px;
+  width: 100%;
+}
+
+.header-row-2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap);
+  height: 40px;
+  width: 100%;
+  border-top: 1px solid rgba(0,200,255,0.1);
+}
+
+.header-row-3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--gap);
+  height: 40px;
+  width: 100%;
+  border-top: 1px solid rgba(0,200,255,0.1);
 }
 
 /* Animated header line */
@@ -506,7 +535,15 @@ body {
 }
 
 /* ── MODAL ──────────────────────────────────────────────────────── */
-.modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.modal { 
+  position: fixed; 
+  inset: 0; 
+  z-index: 1000; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
 .modal.hidden { display: none; }
 .modal-overlay { position: absolute; inset: 0; background: rgba(0,6,15,0.92); backdrop-filter: blur(4px); }
 .modal-box {
@@ -514,7 +551,7 @@ body {
   background: linear-gradient(135deg, #001428 0%, #000d1a 100%);
   border: 1px solid rgba(0,200,255,0.3);
   padding: var(--gap-l);
-  width: 92%; max-width: 540px; max-height: 88vh; overflow-y: auto;
+  width: 92%; max-width: 540px; max-height: calc(100% - 24px); overflow-y: auto;
   box-shadow: var(--glow-a), 0 40px 80px rgba(0,0,0,.8);
   animation: modal-in .25s ease;
   clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
@@ -814,9 +851,9 @@ body {
   body { font-size: 13px; }
 
   /* Header */
-  .app-header { height: 50px; padding: 0 8px; }
+  .app-header { height: 50px; padding: 0 6px; }
   .back-btn   { font-size: 11px; padding: 6px 12px; }
-  .nav-btn    { font-size: 10px; letter-spacing: .06em; padding: 4px 10px; }
+  .nav-btn    { font-size: 10px; letter-spacing: .03em; padding: 4px 6px; }
   .hdr-btn-icon { font-size: 14px; }
   .hdr-btn-lbl  { font-size: 8px; }
   .brand-name   { font-size: 11px; }
@@ -893,7 +930,7 @@ body {
   body { font-size: 14px; }
   .hero-score-num { font-size: 48px; }
   .score-card-val { font-size: 22px; }
-  .nav-btn        { font-size: 9px; padding: 3px 7px; }
+  .nav-btn        { font-size: 9px; padding: 3px 4px; letter-spacing: .03em; }
   .panel          { padding: 10px; }
   .panel-label    { font-size: 9px; }
 }
@@ -910,7 +947,7 @@ body {
 .advice-msg       { font-size: 12px !important; }
 .twin-legend-item { font-size: 11px !important; }
 .hero-bar-label   { font-size: 12px !important; }
-.nav-btn          { font-size: 11px !important; letter-spacing: .06em; }
+.nav-btn          { font-size: 11px !important; letter-spacing: .04em; }
 .abtn-label       { font-size: 10px !important; }
 .abtn-sub         { font-size: 9px  !important; }
 /* GLOBAL BASE SIZES */
@@ -920,3 +957,10 @@ body {
 .gloss-cat-neuro     { color: #c86830; }
 .gloss-cat-burnout   { color: #c88020; }
 .gloss-cat-prod      { color: #2090b8; }
+
+/* ── ANTI-ZOOM iOS ─────────────────────────────────────────────────
+   Sur iOS Safari, tout input/select avec font-size < 16px déclenche
+   un zoom automatique au focus. On force 16px pour tous les champs.   */
+input, select, textarea {
+  font-size: 16px !important;
+}
