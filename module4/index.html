@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Digital Twin Engine — Module 4</title>
+  <title>Ma prédiction santé</title>
   <meta name="theme-color" content="#00060f">
+  <link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Digital Twin">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <link rel="stylesheet" href="css/main.css">
@@ -32,8 +36,8 @@
       <div class="boot-ring"></div>
       <div class="boot-center-dot"></div>
     </div>
-    <div class="boot-title">DIGITAL TWIN ENGINE</div>
-    <div class="boot-subtitle">MODULE 4 &mdash; PREDICTIVE BEHAVIORAL CORE</div>
+    <div class="boot-title">MA PRÉDICTION SANTÉ</div>
+    <div class="boot-subtitle">Analyse de ma santé au travail</div>
     <div class="boot-status" id="boot-status">INITIALISATION...</div>
     <div class="boot-progress-wrap">
       <div class="boot-progress-bar" id="boot-progress-bar"></div>
@@ -105,16 +109,36 @@
 <div id="app" style="display:flex;">
 
   <header class="app-header">
-    <div class="header-brand">
-      <button class="back-btn" id="btn-back" title="Retourner au module précédent">&#8592; RETOUR</button>
+    <div class="header-row-1">
+      <div class="header-brand">
+        <button class="back-btn" id="btn-back" title="Retourner au module précédent">&#8592; RETOUR</button>
+      </div>
     </div>
-    <nav class="header-nav">
-      <button class="nav-btn active" data-view="dashboard">MON ÉTAT</button>
-      <button class="nav-btn" data-view="predictions">PRÉVISIONS</button>
-      <button class="nav-btn" data-view="whatif">SIMULATION</button>
-      <button class="nav-btn" data-view="heatmap">CALENDRIER</button>
-    </nav>
-    <div class="header-actions"></div>
+    <div class="header-row-2">
+      <nav class="header-nav">
+        <button class="nav-btn active" data-view="dashboard">MON ÉTAT</button>
+        <button class="nav-btn" data-view="predictions">PRÉVISIONS</button>
+        <button class="nav-btn" data-view="schedule">HORAIRES</button>
+        <button class="nav-btn" data-view="whatif">SIMULATION</button>
+        <button class="nav-btn" data-view="heatmap">CALENDRIER</button>
+      </nav>
+    </div>
+    <div class="header-row-3">
+      <div class="header-actions">
+        <button class="hdr-btn" onclick="window.location.href='../heures/index.html'" title="Aller au module Annuel (M1)">
+          <div class="hdr-btn-icon">📅</div>
+          <div class="hdr-btn-lbl">ANNUEL</div>
+        </button>
+        <button class="hdr-btn" onclick="window.location.href='../paye/index.html'" title="Aller au module Mensuel (M2)">
+          <div class="hdr-btn-icon">💰</div>
+          <div class="hdr-btn-lbl">MENSUEL</div>
+        </button>
+        <button class="hdr-btn" onclick="window.location.href='../fox/index.html'" title="Aller au module Fox (M3)">
+          <div class="hdr-btn-icon">🦊</div>
+          <div class="hdr-btn-lbl">FOX</div>
+        </button>
+      </div>
+    </div>
   </header>
 
   <main class="app-main">
@@ -284,6 +308,15 @@
       </div>
     </section>
 
+    <!-- SCHEDULE -->
+    <section id="view-schedule" class="view hidden">
+      <div class="panel" style="max-width:480px;margin:0 auto;">
+        <div class="panel-label">HORAIRES &amp; RÉGIME DE TRAVAIL</div>
+        <div class="panel-corner-br"></div>
+        <div id="schedule-container"></div>
+      </div>
+    </section>
+
     <!-- WHAT IF -->
     <section id="view-whatif" class="view hidden">
       <div id="whatif-container" style="display:grid;grid-template-columns:300px 1fr;gap:6px;min-height:calc(100vh - 70px);"></div>
@@ -322,6 +355,7 @@
 <!-- DATA PARTICLES (spawned by boot) -->
 
 <!-- CORE -->
+<script src="../ccn/conventions-collectives.js"></script>
 <script src="js/core/dte-engine.js"></script>
 <script src="js/core/dte-simulator.js"></script>
 <script src="js/core/dte-risks.js"></script>
@@ -331,6 +365,7 @@
 <script src="js/ui/twin-body.js"></script>
 <script src="js/ui/radar-chart.js"></script>
 <script src="js/ui/timeline-chart.js"></script>
+<script src="js/features/schedule.js"></script>
 <script src="js/ui/heatmap.js"></script>
 <script src="js/ui/whatif-panel.js"></script>
 <script src="js/ui/dashboard.js"></script>
