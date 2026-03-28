@@ -169,13 +169,16 @@ class DTESimulator {
     const s   = initialScores || (this._engine.getState() && this._engine.getState().scores) || {};
     const motiv = this._engine._lastNorm ? this._engine._lastNorm.motiv : 0.5;
 
+    // Profil horaire — lu depuis l'état actuel (norm) si disponible
+    const _norm      = this._engine._lastNorm || {};
+    const _schedule  = _norm._schedule  || { startH:9, endH:17, commuteH:0 };
+    const _nightFactor = _norm._nightFactor || 1.0;
+    const _isNight   = _norm._isNight   || false;
+
     let fat  = s._f || 0;
     let str  = s._s || 0;
     let perf = s._p || 0.70;
     // cvAcc : reconstituer l'accumulation dose-temps actuelle depuis le score CV engine
-    // cvRisk actuel = min(0.65, cvAcc + fat*0.12 + str*0.08)
-    // → cvAcc = max(0, cvRisk_actuel - fat*0.12 - str*0.08)
-    // Fondement OMS/OIT 2021 : le risque CV est cumulatif, pas remis à zéro à chaque simulation
     const _cvNow = (s.cvRisk || 0) / 100;
     let cvAcc = Math.max(0, _cvNow - (s._f||0) * 0.12 - (s._s||0) * 0.08);
 
@@ -211,27 +214,37 @@ class DTESimulator {
 
       // ── FATIGUE (INRS — dose-réponse non-linéaire) ──────────────
       if (isRest || isVacance) {
-        // Nature Hum.Behav. 2025 : repos supplémentaire amplifie la récupération
-        const rec4day = (restDays.includes(5) || restDays.includes(6)) ? BIO.REC_4DAY_BONUS : 0;
-        const rec     = isVacance ? BIO.REC_VACANCES : BIO.REC_WEEKEND + rec4day;
-        fat           = Math.max(0, fat - rec / Math.max(1, cumulF * 0.92));
-        consecDays    = 0;
+        // Récupération weekend : réduite si travail de nuit (INRS : sommeil diurne = 70%)
+        const rec4day    = (restDays.includes(5) || restDays.includes(6)) ? BIO.REC_4DAY_BONUS : 0;
+        const nightPenal = _isNight ? 0.70 : 1.0; // INRS — qualité du repos dégradée nuit
+        const rec        = isVacance ? BIO.REC_VACANCES : (BIO.REC_WEEKEND + rec4day) * nightPenal;
+        fat              = Math.max(0, fat - rec / Math.max(1, cumulF * 0.92));
+        consecDays       = 0;
       } else {
         consecDays++;
         // Coefficient dynamique selon charge (3 paliers calibrés OMS/INRS/J.Occup.Health)
-        const fatCoef   = hsH <= 1 ? BIO.FAT_PER_HS_BASE
-                        : hsH <= 3 ? BIO.FAT_PER_HS_MID
-                        :            BIO.FAT_PER_HS_HIGH;
-        const nonLinear = 1 + fat * BIO.FAT_NONLINEAR;
-        const fatLoad   = hsH * fatCoef * nonLinear * cumulF;
-        fat = Math.min(1, fat + fatLoad - D.RECOVERY);
+        const fatCoef    = hsH <= 1 ? BIO.FAT_PER_HS_BASE
+                         : hsH <= 3 ? BIO.FAT_PER_HS_MID
+                         :            BIO.FAT_PER_HS_HIGH;
+        const nonLinear  = 1 + fat * BIO.FAT_NONLINEAR;
+        const fatLoad    = hsH * fatCoef * nonLinear * cumulF;
+        // Dette de sommeil quotidienne depuis horaires réels (Thompson 2022)
+        // sommeilDispo = 24h - heures travaillées - trajet×2 - 0.75h prépa
+        const totalDayH   = D.BASE_JOUR + hsH;
+        const sommeilDispo = Math.max(0, 24 - totalDayH - (_schedule.commuteH||0)*2 - 0.75);
+        const sommeilReel  = _isNight ? sommeilDispo * 0.70 : Math.min(sommeilDispo, 10.5);
+        const detteSommeil = Math.max(0, 8 - sommeilReel);
+        const fatSommeil   = detteSommeil * 0.035 * cumulF; // Thompson 2022 : +14%/nuit
+        fat = Math.min(1, fat + fatLoad + fatSommeil - D.RECOVERY);
       }
 
-      // ── STRESS/CORTISOL (Thompson 2022 + ANACT) ─────────────────
+      // ── STRESS/CORTISOL (Thompson 2022 + ANACT + IARC 2019) ─────────────────
       if (isRest || isVacance) {
-        str = Math.max(0, str - BIO.STR_REC_REST);
+        // Nuit : cortisol ne redescend pas autant au repos (IARC 2019)
+        const strRec = _isNight ? BIO.STR_REC_REST * 0.70 : BIO.STR_REC_REST;
+        str = Math.max(0, str - strRec);
       } else {
-        const strLoad = hsH * BIO.STR_PER_HS + fat * BIO.STR_FAT_AMP * cumulF;
+        const strLoad = hsH * BIO.STR_PER_HS * _nightFactor + fat * BIO.STR_FAT_AMP * cumulF;
         str = Math.min(1, str + strLoad - BIO.STR_REC_DAY);
       }
 
@@ -245,8 +258,8 @@ class DTESimulator {
       perf = Math.max(0.05, Math.min(1, perfBase * (1 - cogDeg) - perfDeg));
 
       // ── RISQUES SPÉCIFIQUES ──────────────────────────────────────
-      // CV OMS 2021 (accumulation dose-temps)
-      if (weeklyH >= BIO.H_LEGAL) cvAcc += (weeklyH - BIO.H_LEGAL) * BIO.CV_PER_H / 7;
+      // CV : majoré par nightFactor (Kivimäki 2015 : nuit × RR 1.4-1.7)
+      if (weeklyH >= BIO.H_LEGAL) cvAcc += (weeklyH - BIO.H_LEGAL) * BIO.CV_PER_H * _nightFactor / 7;
       const cvRiskDay  = Math.min(BIO.CV_MAX, cvAcc + fat * 0.12 + str * 0.08);
       const cogRiskDay = weeklyH >= BIO.H_CEREBRAL
         ? Math.min(BIO.COG_MAX, (weeklyH - BIO.H_CEREBRAL) * BIO.COG_PER_H * (1 + cumulWeeks / 15))
