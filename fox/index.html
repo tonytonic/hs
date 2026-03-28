@@ -101,7 +101,7 @@ window._fox_pre = (function() {
 
 <!-- ZONE PRINCIPALE -->
 <!-- ── Vue PRO (analytics) ─────────────────────────── -->
-<div id="vue-pro" style="display:none;position:fixed;inset:0;z-index:10000;background:#06080f;overflow-y:auto;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;font-family:inherit;color:#e0e0e0;"></div>
+<div id="vue-pro" style="display:none;position:fixed;inset:0;z-index:10000;background:#06080f;overflow-y:auto;padding:0;padding-bottom:env(safe-area-inset-bottom,0px);box-sizing:border-box;font-family:inherit;color:#ffffff !important;"></div>
 
 <div id="gaming-main">
 
@@ -114,7 +114,7 @@ window._fox_pre = (function() {
 
   <!-- Renard central -->
   <div id="kitsune-center" onclick="openPopup('popup-fox')">
-    <img id="kitsune-svg" src="../images/foxplayer.PNG" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen; alt="Kitsune" onerror="this.style.display='none'">
+    <img id="kitsune-svg" src="../images/foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune" onerror="this.style.display='none'">
     <div id="kitsune-tap-hint">Appuie sur moi !</div>
   </div>
 
@@ -414,6 +414,14 @@ window._fox_pre = (function() {
 
 
 <style>
+/* Vue PRO - Forcer texte blanc pour meilleure lisibilité */
+#vue-pro, #vue-pro * {
+  color: #ffffff !important;
+}
+#vue-pro h1, #vue-pro h2, #vue-pro h3, #vue-pro h4 {
+  color: #00c8ff !important;
+}
+
 /* Animations récompenses */
 @keyframes badgeUnlock {
   0%  { transform: scale(0.3) rotate(-15deg); opacity: 0; }
@@ -822,6 +830,7 @@ body {
 </style>
 
 <!-- Scripts (ordre inchangé) -->
+<script src="../ccn/conventions-collectives.js"></script>
 <script src="js/articles-loi.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/config.js"></script>
@@ -912,6 +921,34 @@ function _getKitsuneHistoryContext() {
 //  Sélection aléatoire par reload + contexte jour/situation/saison
 // ══════════════════════════════════════════════════════════════
 
+// ── Helper CCN pour messages dynamiques ──────────────────────
+function _kitsuneGetCCN() {
+  // Fallback par défaut (droit commun)
+  const defaultCCN = { contingent: 220, seuil: 35, taux1: 25, palier1: 8, taux_inter: null, palier_inter: 0, taux2: 50, nom: null };
+
+  if (typeof CCN_API === 'undefined') return defaultCCN;
+
+  const idcc = parseInt((localStorage.getItem('CCN_IDCC') || '0'));
+
+  // getGroupeForCCN retourne directement l'objet de règles (pas un nom de groupe)
+  const ccnData = CCN_API.getGroupeForCCN(idcc);
+  return (ccnData && ccnData.contingent) ? ccnData : defaultCCN;
+}
+function _kitsuneFormatMsg(msg, h) {
+  const r = _kitsuneGetCCN();
+  const nom = localStorage.getItem('CCN_NOM') || '';
+  const seuil75 = Math.round(r.contingent * 0.75);
+  return msg
+    .replace(/{h}/g, h)
+    .replace(/{contingent}/g, r.contingent)
+    .replace(/{taux1}/g, r.taux1)
+    .replace(/{palier1}/g, r.palier1)
+    .replace(/{taux2}/g, r.taux2)
+    .replace(/{seuil}/g, r.seuil)
+    .replace(/{seuil75}/g, seuil75)
+    .replace(/{ccn}/g, nom ? `(${nom})` : '');
+}
+
 // ── Messages selon delta d'heures sup détectées ──────────────
 const _kitsuneMessages = [
   // ── Moins de 2h ──
@@ -951,7 +988,7 @@ const _kitsuneMessages = [
   { min: 5, max: 10, msg: '🦊 {h}h sup : ouvre le détail pour voir l\'analyse complète de la semaine — violations, majorations, contingent.' },
 
   // ── 10 à 20h ──
-  { min: 10, max: 20, msg: '🦊 {h}h sup — c\'est significatif. Vérifie ton contingent annuel (220h maximum, Art. L3121-33).' },
+  { min: 10, max: 20, msg: '🦊 {h}h sup — c\'est significatif. Vérifie ton contingent annuel ({contingent}h {ccn} Art. L3121-33).' },
   { min: 10, max: 20, msg: '🦊 {h}h en plus sur ce relevé. Au-delà du contingent, des repos compensateurs obligatoires s\'appliquent.' },
   { min: 10, max: 20, msg: '🦊 {h}h sup. Ta fiche de paie doit refléter ces heures avec la majoration correspondante — compare à réception.' },
   { min: 10, max: 20, msg: '🦊 {h}h supplémentaires, c\'est beaucoup sur une période. Ton score santé est impacté — surveille-le dans FOX.' },
@@ -960,14 +997,14 @@ const _kitsuneMessages = [
   { min: 10, max: 20, msg: '🦊 {h}h sup : une charge élevée. Demande un bilan de tes compteurs à ton employeur si tu n\'as pas de visibilité.' },
   { min: 10, max: 20, msg: '🦊 {h}h sur ce relevé. As-tu vérifié que ton repos hebdomadaire de 35h consécutives a bien été respecté ? (Art. L3132-2)' },
   { min: 10, max: 20, msg: '🦊 {h}h sup — ton droit à la déconnexion est total pendant ton temps de repos. Aucune obligation de répondre (Art. L2242-17).' },
-  { min: 10, max: 20, msg: '🦊 {h}h en plus. Si le contingent approche 220h, exige le planning de tes repos compensateurs à l\'avance.' },
+  { min: 10, max: 20, msg: '🦊 {h}h en plus. Si le contingent approche {contingent}h, exige le planning de tes repos compensateurs à l\'avance.' },
 
   // ── 20h et plus ──
-  { min: 20, max: 999, msg: '🦊 {h}h sup en une fois — ton droit à repos compensateur s\'applique automatiquement si tu dépasses le contingent annuel (220h). Vérifie ton cumul dans FOX.' },
+  { min: 20, max: 999, msg: '🦊 {h}h sup en une fois — ton droit à repos compensateur s\'applique automatiquement si tu dépasses le contingent annuel ({contingent}h). Vérifie ton cumul dans FOX.' },
   { min: 20, max: 999, msg: '🦊 {h}h, c\'est beaucoup. Si c\'est régulier, ton organisme finit par en payer le prix. Surveille ton score santé.' },
   { min: 20, max: 999, msg: '🦊 {h}h sup enregistrées. Ça dépasse deux semaines de travail normal. Parles-en à ton représentant si c\'est récurrent.' },
   { min: 20, max: 999, msg: '🦊 {h}h sur ce relevé — situation très chargée. Ouvre l\'analyse complète pour voir si les seuils légaux sont franchis.' },
-  { min: 20, max: 999, msg: '🦊 {h}h sup : au-delà du contingent annuel de 220h, chaque heure donne droit à une COR (50% >20 salariés, 100% ≤20 salariés).' },
+  { min: 20, max: 999, msg: '🦊 {h}h sup : au-delà du contingent annuel de {contingent}h, chaque heure donne droit à une COR (50% >20 salariés, 100% ≤20 salariés).' },
   { min: 20, max: 999, msg: '🦊 {h}h supplémentaires. À ce niveau, une discussion formelle avec ton employeur sur la charge de travail s\'impose.' },
   { min: 20, max: 999, msg: '🦊 {h}h — ton compteur annuel avance vite. Les heures hors contingent ont un coût légal majoré pour ton employeur.' },
   { min: 20, max: 999, msg: '🦊 {h}h sup. Ces données FOX constituent un historique solide de ta charge de travail.' },
@@ -1037,7 +1074,7 @@ const _kitsuneNormalPools = {
     '🦊 Le médecin du travail peut être consulté en toute confidentialité — il est là pour ta santé, pas pour te juger.',
     '🦊 L\'amplitude de ta journée (début premier service → fin dernier) peut différer de ton temps de travail effectif.',
     '🦊 Heures complémentaires (temps partiel) : limitées à 10% des heures contractuelles, sauf accord prévoyant 1/3 max.',
-    '🦊 Au-delà du contingent annuel (220h), des repos compensateurs obligatoires s\'appliquent (Art. L3121-33).',
+    '🦊 Au-delà du contingent annuel ({contingent}h), des repos compensateurs obligatoires s\'appliquent (Art. L3121-33).',
     '🦊 En France, la durée légale hebdomadaire est 35h — mais ta durée contractuelle peut être différente (ex: 39h avec forfait).',
     '🦊 Si tu as un forfait-jours, le suivi des heures fonctionne différemment — mais le droit au repos de 11h reste absolu.',
     '🦊 Congés : les jours fériés travaillés génèrent des droits supplémentaires selon ton accord collectif.',
@@ -2313,9 +2350,10 @@ function _getDailyDanger() {
 function _analyzeLegalSituation() {
   try {
     const year      = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
-    const baseHebdo = 35;  // base légale fixe
-    const baseJour  = 7;   // base légale fixe
-    const contingentMax = 220;
+    const ccnRules  = _kitsuneGetCCN();
+    const baseHebdo = ccnRules.seuil;
+    const baseJour  = ccnRules.seuil / 5;
+    const contingentMax = ccnRules.contingent;
 
     function isoWeekKey(dk) {
       const d = new Date(dk), dow = (d.getDay() + 6) % 7;
@@ -2457,12 +2495,13 @@ function _analyzeLegalSituation() {
 
   } catch(e) {
     console.warn('_analyzeLegalSituation:', e);
+    const fallbackCCN = _kitsuneGetCCN();
     return {
-      daily:  { hasDailyCrit:false, hasDailyRisk:false, maxDayTotal:0, maxDayExtra:0, baseJour:7, daysOver10:0, daysOver12:0 },
+      daily:  { hasDailyCrit:false, hasDailyRisk:false, maxDayTotal:0, maxDayExtra:0, baseJour:fallbackCCN.seuil/5, daysOver10:0, daysOver12:0 },
       weekly: { hasWeekViol:false, hasAvgViol:false, hasWeekAlert:false, maxWeekTotal:0, maxAvg12:0, weeksOver48:0, weeksOver44:0, totalWeeks:0 },
       period: { current:null, lastClosed:null, hasClosure:false, all:[] },
-      annual: { annualOT:0, contingentMax:220, contingentPct:0, contingentRem:220, hasContingentAlert:false, hasContingentDanger:false },
-      globalLevel:'ok', baseHebdo:35, baseJour:7
+      annual: { annualOT:0, contingentMax:fallbackCCN.contingent, contingentPct:0, contingentRem:fallbackCCN.contingent, hasContingentAlert:false, hasContingentDanger:false },
+      globalLevel:'ok', baseHebdo:fallbackCCN.seuil, baseJour:fallbackCCN.seuil/5
     };
   }
 }
@@ -2602,7 +2641,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       {
         titre: `${jr} — ${_fmtH(xh)} sup enregistrées`,
         message: `Journée de ${_fmtH(th)} documentée (base 7h + ${_fmtH(xh)} sup). Ces heures s'ajoutent à ton contingent annuel et doivent figurer sur ta prochaine fiche de paie avec majoration (Art. L3121-28).`,
-        actions: ['Vérifier le cumul hebdomadaire dans FOX', 'Anticiper la fiche de paie en fin de mois', 'Surveille le contingent annuel (max 220h)']
+        actions: ['Vérifier le cumul hebdomadaire dans FOX', 'Anticiper la fiche de paie en fin de mois', 'Surveille le contingent annuel (max {contingent}h)']
       },
       {
         titre: `${_fmtH(xh)} sup saisies ce ${jr}`,
@@ -2709,7 +2748,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         actions: ['Respecte ton repos de 11h minimum', 'Si reprise imposée trop tôt : note et signale', 'Surveille ta fatigue accumulée cette semaine'] },
       { titre: _fmtH(total)+' — vérification compteur',
         message: 'Ces '+_fmtH(extra)+' supplémentaires s\'ajoutent à ton compteur annuel. À partir de 220h sup/an, des repos compensateurs obligatoires s\'appliquent (Art. L3121-30).',
-        actions: ['Consulte ton compteur d\'heures sup annuel', 'Vérifie si le seuil de 220h approche', 'Demande un récapitulatif à ton employeur'] },
+        actions: ['Consulte ton compteur d\'heures sup annuel', 'Vérifie si le seuil de {contingent}h approche', 'Demande un récapitulatif à ton employeur'] },
       { titre: 'Journée '+_fmtH(total)+' : article L3121-18',
         message: 'Art. L3121-18 : la durée quotidienne ne peut excéder 10h (dérogation possible jusqu\'à 12h). '+_fmtH(total)+' le '+date+' nécessite une dérogation valide.',
         actions: ['Vérifier la base légale de cette journée', 'Consulter ton représentant syndical si besoin', 'Archiver ton planning de la semaine'] },
@@ -2785,7 +2824,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Après '+_fmtH(total)+' de travail, ton repos de 11h s\'impose. Prochaine prise de poste légale au minimum 11h après la fin de journée (Art. L3131-1).',
         actions: ['Calcule ton heure de reprise minimale', 'Si reprise anticipée : signale-le à ton responsable', 'Récupère bien cette nuit'] },
       { titre: _fmtH(total)+' enregistrées ✓',
-        message: 'Bonne saisie. '+_fmtH(total)+' pour cette journée avec '+_fmtH(extra)+' sup. Sur ta semaine en cours, le cumul sup est de '+_fmtH(h)+' — reste sous 220h annuelles.',
+        message: 'Bonne saisie. '+_fmtH(total)+' pour cette journée avec '+_fmtH(extra)+' sup. Sur ta semaine en cours, le cumul sup est de '+_fmtH(h)+' — reste sous {contingent}h annuelles.',
         actions: ['Vérifie ton total hebdomadaire', 'Anticipe les repos compensateurs si >220h cette année', 'Continue à saisir régulièrement'] },
       { titre: 'Journée à '+_fmtH(total)+' : article L3121-19',
         message: 'Art. L3121-19 : des dérogations jusqu\'à 12h/j sont possibles par accord collectif ou autorisation de l\'inspecteur du travail. Vérifie si c\'est le cas dans ton entreprise.',
@@ -2861,7 +2900,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Avec '+_fmtH(total)+' cette semaine, tu dépasses le plafond légal de 8h. En logistique/transport, les contingents sont parfois plus élevés — vérifie ton accord.',
         actions: ['Consulter ton accord de branche', 'Vérifier le contingent applicable', 'Documenter les raisons de cette surcharge'] },
       { titre: 'Semaine chargée : '+_fmtH(total)+' enregistrées',
-        message: _fmtH(total)+' = '+(total-35)+'h supplémentaires cette semaine. Ces heures s\'ajoutent à ton contingent annuel. Surveille que tu ne dépasses pas les 220h (Art. L3121-33).',
+        message: _fmtH(total)+' = '+(total-35)+'h supplémentaires cette semaine. Ces heures s\'ajoutent à ton contingent annuel. Surveille que tu ne dépasses pas les {contingent}h (Art. L3121-33).',
         actions: ['Consulte ton contingent annuel dans FOX', 'Anticipe les prochaines semaines', 'Si >175h déjà : alerte jaune'] },
       { titre: _fmtH(total)+' : impact sur la moyenne',
         message: 'Cette semaine à '+_fmtH(total)+' pèse sur ta moyenne 12 semaines. La limite est 44h/sem en moyenne (Art. L3121-22). Surveillance nécessaire.',
@@ -2879,7 +2918,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Rythme soutenu cette semaine. '+_fmtH(total)+' représente '+(Math.round((total/35)*10)/10)+'x la durée légale. Un rythme durable est impossible à ce niveau.',
         actions: ['Parle de ta charge à ton responsable', 'Identifie les tâches à reporter', 'Prévois une semaine de récupération'] },
       { titre: _fmtH(total)+' — contingent annuel',
-        message: 'Cette semaine ajoute '+Math.max(0, total-35)+'h à ton contingent annuel. À 220h/an, des repos compensateurs obligatoires s\'appliquent (Art. L3121-30).',
+        message: 'Cette semaine ajoute '+Math.max(0, total-35)+'h à ton contingent annuel. À {contingent}h/an, des repos compensateurs obligatoires s\'appliquent (Art. L3121-30).',
         actions: ['Vérifie ton cumul annuel dans FOX', 'Note l\'approche du seuil de 220h', 'Demande le calcul des repos compensateurs si dépassé'] },
       { titre: '📊 Semaine à '+_fmtH(total)+' : bilan',
         message: 'Bilan hebdomadaire : '+_fmtH(total)+' travaillées. Heures sup : '+(total-35)+'h. Dont +25% : '+(Math.min(8, total-35))+'h, dont +50% : '+(Math.max(0, total-43))+'h.',
@@ -4493,12 +4532,31 @@ function syncModulesAndAwardXP(source) {
     }
 
     const _retroSync = isFirstSync || _forceRetro;
-    const deltaM1 = _retroSync ? (cumM1Cap - Math.max(0, _lastM1Net)) : (cumM1Cap - Math.max(0, _lastM1Net));
-    const deltaM2 = _retroSync ? (cumM2Cap - Math.max(0, _lastM2Tot)) : (cumM2Cap - Math.max(0, _lastM2Tot));
+    const deltaM1 = cumM1Cap - Math.max(0, _lastM1Net);
+    const deltaM2 = cumM2Cap - Math.max(0, _lastM2Tot);
 
-    // Utiliser le delta le plus significatif
-    const totalDelta = deltaM1 !== 0 ? deltaM1 : deltaM2;
-    console.log('🦊 XP delta (caps 5h/j 35h/sem 450h/an) : M1='+deltaM1.toFixed(2)+'h M2='+deltaM2.toFixed(2)+'h totalDelta='+totalDelta.toFixed(2)+'h');
+    // Anti double-comptage : si M1 et M2 ont les mêmes jours, on prend le MAX
+    // pour éviter de créditer 2× les mêmes heures (même logique que module-reader fusion)
+    // On utilise la source primaire pour déterminer le delta pertinent
+    let totalDelta;
+    if (primary === 'M2') {
+      totalDelta = deltaM2;
+    } else if (deltaM1 !== 0) {
+      totalDelta = deltaM1;
+    } else {
+      totalDelta = deltaM2;
+    }
+
+    // Sécurité : le delta ne peut jamais être négatif à cause du plafonnement
+    // (les retraits volontaires d'heures sont détectés via cumM1Cap < _lastM1Net
+    //  UNIQUEMENT si la réduction est significative ET confirmée dans les deux sources)
+    const _isHoursRemoved = (cumM1Cap < (oldM1 - 0.5) && primary !== 'M2') ||
+                            (cumM2Cap < (oldM2 - 0.5) && primary === 'M2');
+    if (totalDelta < -0.09 && !_isHoursRemoved) {
+      totalDelta = 0; // faux négatif lié au plafonnement ou rechargement → ignorer
+    }
+
+    console.log('🦊 XP delta : M1='+deltaM1.toFixed(2)+'h M2='+deltaM2.toFixed(2)+'h → '+totalDelta.toFixed(2)+'h (src:'+primary+')');
 
     // Analyse Kitsune — toujours, même sans nouvelles heures
     if (!isFirstSync) { try { kitsuneNarrateOvertime(totalDelta, primary); } catch(_e) {} }
@@ -4508,27 +4566,27 @@ function syncModulesAndAwardXP(source) {
     console.log('🔍 Analyse situation légale:', situation);
     let xpPenalty = 0;
     let burnoutIncrease = 0;
-    
-    // Détecter violations
-    if (situation.daily?.hasDailyCrit) {
-      xpPenalty += 500;
-      burnoutIncrease += 15;
-      console.log('⚠️ VIOLATION CRITIQUE : Journée > 12h → -500 XP, +15 burn-out');
-    }
-    if (situation.weekly?.hasWeekViol) {
-      xpPenalty += 300;
-      burnoutIncrease += 10;
-      console.log('⚠️ VIOLATION : Semaine > 48h → -300 XP, +10 burn-out');
-    }
-    if (situation.weekly?.hasAvgViol && situation.weekly?.weeksCount >= 12) {
-      xpPenalty += 200;
-      burnoutIncrease += 8;
-      console.log('⚠️ VIOLATION : Moyenne 12 sem > 44h → -200 XP, +8 burn-out');
-    }
-    if (situation.annual?.hasContingentDanger) {
-      xpPenalty += 400;
-      burnoutIncrease += 12;
-      console.log('⚠️ VIOLATION : Contingent annuel dépassé → -400 XP, +12 burn-out');
+
+    // Pénalités XP : uniquement si des heures ont été saisies AUJOURD'HUI (source='data-change')
+    // Évite de pénaliser la saisie d'historique ou le chargement initial
+    const _isPenaltyEligible = (source === 'data-change' || source === 'popup');
+    if (_isPenaltyEligible) {
+      if (situation.daily?.hasDailyCrit) {
+        xpPenalty += 500;
+        burnoutIncrease += 15;
+      }
+      if (situation.weekly?.hasWeekViol) {
+        xpPenalty += 300;
+        burnoutIncrease += 10;
+      }
+      if (situation.weekly?.hasAvgViol && situation.weekly?.weeksCount >= 12) {
+        xpPenalty += 200;
+        burnoutIncrease += 8;
+      }
+      if (situation.annual?.hasContingentDanger) {
+        xpPenalty += 400;
+        burnoutIncrease += 12;
+      }
     }
     
     // Appliquer pénalités XP avec cooldown
@@ -4634,7 +4692,8 @@ function syncModulesAndAwardXP(source) {
       }
       _lastM1Net = cumM1Cap !== undefined ? cumM1Cap : cumM1Net;
       _lastM2Tot = cumM2Cap !== undefined ? cumM2Cap : cumM2Tot;
-      _saveLastCumul(cumM1Net, cumM2Tot);
+      _saveLastCumul(cumM1Cap !== undefined ? cumM1Cap : cumM1Net,
+                     cumM2Cap !== undefined ? cumM2Cap : cumM2Tot);
       refreshHUD();
     }
 
@@ -4706,7 +4765,8 @@ function syncModulesAndAwardXP(source) {
 
     _lastM1Net = cumM1Cap !== undefined ? cumM1Cap : cumM1Net;
     _lastM2Tot = cumM2Cap !== undefined ? cumM2Cap : cumM2Tot;
-    _saveLastCumul(cumM1Net, cumM2Tot);
+    _saveLastCumul(cumM1Cap !== undefined ? cumM1Cap : cumM1Net,
+                   cumM2Cap !== undefined ? cumM2Cap : cumM2Tot);
 
     // ── Bonus XP nuit / week-end ──────────────────────────────────────
     if (totalDelta > 0.09 && typeof xpSystem !== 'undefined') {
@@ -5087,21 +5147,25 @@ function refreshHUD() {
         const leagueData = leagueSystem.getCurrentLeague(_xpForLeague);
         const lgEl = document.getElementById('hud-league');
         if (lgEl && leagueData) {
-          // Mise à jour couleur dynamique selon la ligue
           const _lc = leagueData.color || '#CD7F32';
           lgEl.style.background = _lc + '33';
           lgEl.style.borderColor = _lc + '99';
           lgEl.style.color = _lc;
-          // Affichage ligue : icône emoji + nom (image si dispo)
+          // Dirty-check : ne réécrire innerHTML que si la ligue a changé
           const _lgIcon = leagueData.icon || '\uD83E\uDD49';
-          lgEl.innerHTML = _lgIcon + ' <strong>' + leagueData.name + '</strong>';
-          // Tenter chargement image en arrière-plan
-          if (leagueData.img) {
-            const _tImg = new Image();
-            _tImg.onload = function() {
-              lgEl.innerHTML = '<img src="' + leagueData.img + '" style="height:18px;vertical-align:middle;margin-right:3px;filter:drop-shadow(0 0 5px ' + _lc + ');"> <strong>' + leagueData.name + '</strong>';
-            };
-            _tImg.src = leagueData.img;
+          const _lgNewHtml = _lgIcon + ' <strong>' + leagueData.name + '</strong>';
+          if (!lgEl.dataset.leagueId || lgEl.dataset.leagueId !== String(leagueData.id)) {
+            lgEl.dataset.leagueId = String(leagueData.id);
+            lgEl.innerHTML = _lgNewHtml;
+            // Charger l'image une seule fois par ligue
+            if (leagueData.img && !lgEl.dataset.imgLoaded) {
+              const _tImg = new Image();
+              _tImg.onload = function() {
+                lgEl.innerHTML = '<img src="' + leagueData.img + '" style="height:18px;vertical-align:middle;margin-right:3px;filter:drop-shadow(0 0 5px ' + _lc + ');"> <strong>' + leagueData.name + '</strong>';
+                lgEl.dataset.imgLoaded = '1';
+              };
+              _tImg.src = leagueData.img;
+            }
           }
         }
         // Prochaine ligue
@@ -5448,19 +5512,50 @@ function refreshModulesPopup() {
           <div style="color:#555;font-size:0.7rem;">Mois analys\u00E9s</div>
           <div style="font-weight:900;font-size:1.3rem;color:#FF8C42;">${cum?.monthCount||0}</div>
         </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(${(() => {
+        const ccn = _kitsuneGetCCN();
+        return ccn.taux_inter !== null ? 4 : 3;
+      })()},1fr);gap:8px;font-size:0.83rem;margin-top:8px;">
+        ${(() => {
+          const ccn = _kitsuneGetCCN();
+          const label1 = ccn.taux1 || 25;
+          const label2 = ccn.taux_inter || 10;
+          const label3 = ccn.taux2 || 50;
+          const has3Tiers = ccn.taux_inter !== null;
+          return `
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;text-align:center;">
-          <div style="color:#555;font-size:0.7rem;">HS +25%</div>
+          <div style="color:#555;font-size:0.7rem;">HS +${label1}%</div>
           <div style="font-weight:700;color:#eee;">${_fmtH((cum?.totalPlus25||0))}</div>
         </div>
+        ${has3Tiers ? `
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;text-align:center;">
-          <div style="color:#555;font-size:0.7rem;">HS +50%</div>
+          <div style="color:#555;font-size:0.7rem;">HS +${label2}%</div>
+          <div style="font-weight:700;color:#eee;">${_fmtH((cum?.totalPlus10||0))}</div>
+        </div>` : ''}
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;text-align:center;">
+          <div style="color:#555;font-size:0.7rem;">HS +${label3}%</div>
           <div style="font-weight:700;color:#eee;">${_fmtH((cum?.totalPlus50||0))}</div>
         </div>
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;text-align:center;">
           <div style="color:#555;font-size:0.7rem;">XP bonus</div>
           <div style="font-weight:700;color:#FFD700;">+${cum?.xpBonus||0} XP</div>
-        </div>
+        </div>`;
+        })()}
       </div>
+      ${(() => {
+        const ccn = _kitsuneGetCCN();
+        const contingent = ccn.contingent || 220;
+        const totalHS = cum?.totalNetOvertime || 0;
+        const pct = Math.round((totalHS / contingent) * 100);
+        const color = pct >= 100 ? '#E53935' : pct >= 75 ? '#FF8C42' : '#4CAF50';
+        return `
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-top:8px;text-align:center;">
+          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Contingent annuel</div>
+          <div style="font-weight:900;font-size:1.2rem;color:${color};">${_fmtH(totalHS)} / ${contingent}h</div>
+          <div style="font-size:0.7rem;color:${color};margin-top:2px;">${pct}% consomm\u00E9</div>
+        </div>`;
+      })()}
     </div>
     <div style="font-size:0.72rem;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;">D\u00E9tail par ann\u00E9e</div>`;
 
@@ -5480,10 +5575,11 @@ function refreshModulesPopup() {
             ${m2cov ? `<span style="color:#FFD700;background:rgba(255,215,0,0.1);border-radius:8px;padding:2px 7px;">M2: ${m2cov} mois</span>` : ''}
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-size:0.82rem;">
+        <div style="display:grid;grid-template-columns:${(() => { const c=_kitsuneGetCCN(); return c.taux_inter!==null?'1fr 1fr 1fr 1fr':'1fr 1fr 1fr'; })()};gap:6px;font-size:0.82rem;">
           <div><div style="color:#555;font-size:0.7rem;">HS nettes</div><strong style="color:${netColor};">${_fmtH(net)}</strong></div>
-          <div><div style="color:#555;font-size:0.7rem;">HS +25%</div><strong>${_fmtH((py?.hs25||0))}</strong></div>
-          <div><div style="color:#555;font-size:0.7rem;">HS +50%</div><strong>${_fmtH((py?.hs50||0))}</strong></div>
+          <div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux1||25}%</div><strong>${_fmtH((py?.hs25||0))}</strong></div>
+          ${(() => { const c=_kitsuneGetCCN(); return c.taux_inter!==null ? `<div><div style="color:#555;font-size:0.7rem;">HS +${c.taux_inter}%</div><strong>${_fmtH((py?.hs10||0))}</strong></div>` : ''; })()}
+          <div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux2||50}%</div><strong>${_fmtH((py?.hs50||0))}</strong></div>
         </div>
       </div>`;
   });
@@ -13531,11 +13627,53 @@ const GLOSSAIRE_BASE = [
     ex: 'Message Kitsune dans : Info droit',
     mots: ["kitsune", "message", "limite_légale"],
     liens: []
+  },
+  {
+    art: 'Convention collective (CCN)',
+    titre: 'Convention collective nationale',
+    def: 'Accord négocié entre les organisations syndicales et patronales d\'un secteur d\'activité. La CCN peut prévoir des règles plus favorables que le Code du travail : seuil de déclenchement des HS, taux de majoration, contingent annuel, jour de début de la semaine de travail, etc.',
+    ex: 'Ta CCN peut fixer un contingent annuel supérieur à 220h, ou des majorations différentes de 25%/50%.',
+    mots: ['convention collective', 'CCN', 'IDCC', 'branche', 'accord', 'secteur', 'négociation'],
+    liens: [
+      { label: 'Légifrance – Conventions collectives', url: 'https://www.legifrance.gouv.fr/conv_coll/' },
+      { label: 'Ministère du Travail – CCN', url: 'https://travail-emploi.gouv.fr/dialogue-social/negociation-collective/' }
+    ]
+  },
+  {
+    art: 'IDCC — Identifiant CCN',
+    titre: 'Identifiant des Conventions Collectives (IDCC)',
+    def: 'Code numérique à 4 chiffres attribué à chaque convention collective par le Ministère du Travail. Il figure sur le bulletin de paie et permet d\'identifier précisément la CCN applicable au salarié.',
+    ex: 'IDCC 0016 = Transports routiers, IDCC 1486 = Bureaux d\'études (Syntec), IDCC 3248 = Métallurgie.',
+    mots: ['IDCC', 'identifiant', 'convention', 'code', 'bulletin de paie', 'branche'],
+    liens: [
+      { label: 'Légifrance – Recherche par IDCC', url: 'https://www.legifrance.gouv.fr/conv_coll/' }
+    ]
+  },
+  {
+    art: 'Art. L3121-27 à L3121-33',
+    titre: 'Contingent annuel & seuil HS selon la CCN',
+    def: 'Le contingent annuel d\'heures supplémentaires est fixé à 220h par défaut (Art. D3121-24), mais la convention collective peut le modifier. De même, le seuil de déclenchement des HS est de 35h/semaine, mais certaines CCN prévoient un seuil différent (ex. 37h, 39h). Le jour de début de la semaine de travail peut aussi varier.',
+    ex: 'CCN Métallurgie : contingent de 220h, seuil 35h, majoration 25%/50%. CCN BTP : contingent de 180h.',
+    mots: ['contingent', 'seuil', 'heures supplémentaires', 'CCN', 'convention', '35h', '220h', 'semaine'],
+    liens: [
+      { label: 'Art. L3121-27 – Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020097/' },
+      { label: 'Art. D3121-24 – Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033510747/' }
+    ]
+  },
+  {
+    art: 'Art. L3121-36',
+    titre: 'Majorations des heures supplémentaires',
+    def: 'Les heures supplémentaires donnent droit à une majoration salariale : +25% pour les 8 premières HS de la semaine (de la 36e à la 43e heure), +50% au-delà. La convention collective peut prévoir des taux différents, avec un minimum légal de 10%.',
+    ex: 'Certaines CCN (ex. HCR) prévoient +10% dès la première heure supplémentaire.',
+    mots: ['majoration', 'heures supplémentaires', '25%', '50%', 'taux', 'CCN', 'salaire'],
+    liens: [
+      { label: 'Art. L3121-36 – Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020085/' }
+    ]
   }
 ];
 
 // Fusion : GLOSSAIRE = articles de loi + entrées thématiques
-const GLOSSAIRE = (typeof ARTICLES_LOI !== 'undefined')
+var GLOSSAIRE = (typeof ARTICLES_LOI !== 'undefined')
   ? [...ARTICLES_LOI, ...GLOSSAIRE_BASE]
   : GLOSSAIRE_BASE;
 
@@ -14186,7 +14324,7 @@ function renderRapport() {
     <div class="rapport-section">
       <div class="rapport-title">⚖️ Situation légale — ${year}</div>
       <div class="rapport-row"><span class="rr-label">Heures sup cumulées</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${_fmtH(dN.totalHS)}</span></div>
-      <div class="rapport-row"><span class="rr-label">% du contingent (220h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>
+      <div class="rapport-row"><span class="rr-label">% du contingent ({contingent}h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>
       <div class="rapport-row"><span class="rr-label">Journée max détectée</span><span class="rr-val ${s.daily?.hasDailyCrit ? 'rr-danger' : s.daily?.hasDailyRisk ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.daily?.maxDayTotal || 0)}</span></div>
       <div class="rapport-row"><span class="rr-label">Semaine max détectée</span><span class="rr-val ${s.weekly?.hasWeekViol ? 'rr-danger' : s.weekly?.hasWeekAlert ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.weekly?.maxWeekTotal || 35)}</span></div>
       <div class="rapport-row"><span class="rr-label">Niveau global</span><span class="rr-val" style="color:${levelColor(s.globalLevel || 'ok')};text-transform:uppercase;">${s.globalLevel || 'ok'}</span></div>
@@ -14660,6 +14798,11 @@ function buildBadgeStats() {
             <div style="color:#455A64;font-size:0.8rem;line-height:1.6;">Graphique mensuel, historique multi-années, patterns de surcharge détectés.</div>
           </div>
         </div>
+        <div style="background:rgba(0,200,255,0.08);border-left:3px solid #00c8ff;padding:12px;border-radius:8px;margin-bottom:16px;">
+          <div style="color:#00c8ff;font-size:0.8rem;line-height:1.6;">
+            <strong>💡 Mode PRO recommandé si :</strong> Le mode RPG (badges, récompenses) ne vous intéresse pas, mais vous voulez quand même l'analyse juridique et les conseils pratiques. Toutes les fonctionnalités d'analyse sont identiques, sans les éléments ludiques.
+          </div>
+        </div>
         <div style="color:#2D3F4A;font-size:0.7rem;margin-bottom:16px;line-height:1.6;">Vous pouvez basculer entre les deux modes à tout moment via le bouton 📊 PRO dans le menu.</div>
         <button onclick="obFinishPro()" style="width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#90A4AE;border-radius:12px;padding:14px;font-weight:700;font-size:0.92rem;cursor:pointer;margin-bottom:10px;">Démarrer en mode analytique</button>
         <button onclick="obNext(2)" style="width:100%;background:none;border:none;color:#37474F;font-size:0.75rem;cursor:pointer;padding:8px;">← Revenir au mode Kitsune</button>
@@ -14830,6 +14973,9 @@ function buildBadgeStats() {
 </div>
 
 
+
+<!-- Glossaire mode débutant/expert -->
+<!-- glossaire.js désactivé dans M3 — GLOSSAIRE intégré dans ce fichier (évite redéclaration const) -->
 
 </body>
 </html>
