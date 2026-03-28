@@ -1,20 +1,14 @@
 /**
  * Animus Boot Sequence — Séquence d'initialisation style AC Animus
+ * Version raccourcie : 3 messages, typage rapide, transition courte
  */
 (function(global){
 'use strict';
 
 const BOOT_MESSAGES = [
-  'INITIALISATION DU JUMEAU NUMERIQUE...',
-  'SYNCHRONISATION DES DONNEES M1...',
-  'CHARGEMENT DU MODULE PAIE M2...',
-  'CONNEXION AU MOTEUR RPG M3...',
-  'CALIBRATION DES CAPTEURS BIOMETRIQUES...',
-  'ANALYSE DES VIOLATIONS LEGALES...',
-  'CONSTRUCTION DE LA MATRICE PREDICTIVE...',
-  'CHARGEMENT DES 1000 SCENARIOS...',
-  'APPRENTISSAGE ADAPTATIF EN COURS...',
-  'DIGITAL TWIN PRET — SYNCHRONISATION COMPLETE.',
+  'Chargement de tes données...',
+  'Analyse de ta santé en cours...',
+  'Prédiction prête.',
 ];
 
 class AnimusBoot {
@@ -41,8 +35,8 @@ class AnimusBoot {
             if(this._screen) this._screen.style.display='none';
             this._killParticles();
             if(onComplete) onComplete();
-          }, 800);
-        }, 400);
+          }, 400); // réduit de 800ms → 400ms
+        }, 200); // réduit de 400ms → 200ms
         return;
       }
       const msg = BOOT_MESSAGES[this._step];
@@ -50,7 +44,7 @@ class AnimusBoot {
         this._step++;
         const pct = Math.round((this._step / total) * 100);
         if(this._bar) this._bar.style.width = pct + '%';
-        const delay = this._step === total ? 500 : 120 + Math.random()*200;
+        const delay = this._step === total ? 200 : 60 + Math.random()*80;
         setTimeout(tick, delay);
       });
     };
@@ -61,11 +55,11 @@ class AnimusBoot {
     if(!this._status){ cb(); return; }
     this._status.textContent = '';
     let i = 0;
-    const speed = msg.length > 30 ? 18 : 30;
+    const speed = 12; // réduit de 18-30ms → 12ms par caractère
     const timer = setInterval(()=>{
       this._status.textContent += msg[i];
       i++;
-      if(i >= msg.length){ clearInterval(timer); setTimeout(cb, 80); }
+      if(i >= msg.length){ clearInterval(timer); setTimeout(cb, 40); }
     }, speed);
   }
 

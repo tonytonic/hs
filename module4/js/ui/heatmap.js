@@ -90,7 +90,11 @@ class Heatmap {
       daysWorked++;
     }
     // Calculer depuis totalHS local (inclut M1+M2 mergés) — plus fiable que norm
-    const contingentPct = totalHS > 0 ? (totalHS / 220) * 100 : (norm ? (norm._contingentPct || 0) : 0);
+    const _heatCCN = (typeof CCN_API !== 'undefined')
+      ? (CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')) || {contingent:220})
+      : {contingent:220};
+    const _heatLimit = _heatCCN.contingent;
+    const contingentPct = totalHS > 0 ? (totalHS / _heatLimit) * 100 : (norm ? (norm._contingentPct || 0) : 0);
 
     // Génération des mois
     const monthsHTML = Array.from({length:12}, (_, m) => {
@@ -158,7 +162,7 @@ class Heatmap {
         ${[
           ['JOURS TRAVAILLÉS', daysWorked, 'var(--animus)'],
           ['JOURS AVEC HS',    daysHS,     daysHS>50?'var(--orange)':daysHS>20?'var(--amber)':'var(--sync)'],
-          ['TOTAL HS',         fmtH(totalHS), totalHS>220?'var(--red)':totalHS>150?'var(--orange)':'var(--animus)'],
+          ['TOTAL HS',         fmtH(totalHS), totalHS>_heatLimit?'var(--red)':totalHS>(_heatLimit*0.68)?'var(--orange)':'var(--animus)'],
           ['CONTINGENT',       Math.round(contingentPct)+'%', contingentPct>100?'var(--red)':contingentPct>75?'var(--amber)':'var(--sync)'],
           ['PIC HS/JOUR',      maxExtraDay.v ? '+'+fmtH(maxExtraDay.v) : '—', maxExtraDay.v>=4?'var(--red)':maxExtraDay.v>=2?'var(--amber)':'var(--sync)'],
         ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;">

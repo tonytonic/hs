@@ -8,10 +8,18 @@ class Dashboard {
   constructor(){}
 
   render(state, risks, advice){
-    // Pas de données M1 → bandeau info
+    // Pas de données M1/M2 → bandeau info
     const noData = state && state.scores && !state.scores._hasData;
     const noDataBanner = document.getElementById('no-data-banner');
     if(noDataBanner) noDataBanner.remove();
+    if(noData) {
+      const banner = document.createElement('div');
+      banner.id = 'no-data-banner';
+      banner.style.cssText = 'margin:16px;padding:14px 16px;background:rgba(0,200,255,0.07);border:1px solid rgba(0,200,255,0.2);border-left:3px solid rgba(0,200,255,0.6);border-radius:10px;font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;';
+      banner.innerHTML = '<b style="color:#00c8ff;">👆 Pour voir ton analyse</b><br>Commence par saisir des heures dans le <b>Compteur annuel (M1)</b> ou le <b>Simulateur mensuel (M2)</b>. Ce module lit automatiquement tes données.';
+      const main = document.querySelector('.dashboard-main') || document.querySelector('.view.active') || document.body;
+      main.prepend(banner);
+    }
         if(!state||!state.scores) return;
     const {scores, norm, raw}=state;
     this._renderHero(scores, norm, raw);
@@ -31,7 +39,7 @@ class Dashboard {
     const sg = hasData ? (window.DTE&&window.DTE.app ? window.DTE.app.scoreGlobal : this._calcGlobal(scores)) : null;
     el.textContent = sg !== null ? sg : '--';
     const levelMap={EXCELLENT:'excellent',BON:'bon',MOYEN:'moyen',FAIBLE:'faible',CRITIQUE:'critique'};
-    const level = sg === null ? 'EN ATTENTE' : sg>=80?'EXCELLENT':sg>=60?'BON':sg>=40?'MOYEN':sg>=20?'FAIBLE':'CRITIQUE';
+    const level = sg === null ? 'En attente de données' : sg>=80?'EXCELLENT':sg>=60?'BON':sg>=40?'MOYEN':sg>=20?'FAIBLE':'CRITIQUE';
     const lel=document.getElementById('hero-level');
     if(lel){
       lel.textContent=level;
@@ -60,10 +68,10 @@ class Dashboard {
             📋 Saisissez des heures dans<br><b style="color:#fff">M1 (Suivi annuel)</b><br>pour activer l'analyse complète.
           </div>` :
           [
-            ['🧠 Fatigue','fatigue','red', fatV, fatLbl],
-            ['⚡ Performance','performance','cyan', perfV, perfLbl],
-            ['💊 Stress','stress','amber', strV, strLbl],
-          ].map(([l,k,col,v,desc])=>`
+            ['🧠 Fatigue accumulée',     'fatigue',     v=>v>=80?'red':v>=60?'orange':v>=35?'amber':'sync', fatV,  fatLbl],
+            ['⚡ Forme & énergie', 'performance', v=>v>=80?'sync':v>=60?'sync':v>=40?'amber':'red',   perfV, perfLbl],
+            ['💊 Niveau de stress',      'stress',      v=>v>=80?'red':v>=60?'orange':v>=35?'amber':'sync', strV,  strLbl],
+          ].map(([l,k,colFn3,v,desc])=>{ const col=colFn3(v); return `
             <div style="margin-top:10px;">
               <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
                 <span style="font-size:11px;color:#fff;">${l}</span>
@@ -71,7 +79,7 @@ class Dashboard {
               </div>
               <div class="hero-bar"><div class="hero-bar-fill" style="width:${v}%;background:var(--${col});box-shadow:0 0 6px var(--${col})40;"></div></div>
               <div style="font-size:10px;color:rgba(255,255,255,0.55);margin-top:2px;">${desc}</div>
-            </div>`).join('')
+            </div>`; }).join('')
           }
       </div>`;
       container.insertAdjacentHTML('beforeend',barHtml);
@@ -79,7 +87,9 @@ class Dashboard {
   }
 
   _calcGlobal(scores){
-    return Math.max(0,Math.min(100,scores.performance-Math.floor(scores.fatigue*.3)));
+    // Cohérence avec app.js : 100 - MAX(fatigue, stress, cogRisk)
+    const worst = Math.max(scores.fatigue||0, scores.stress||0, scores.cogRisk||0);
+    return Math.max(0, Math.min(100, Math.round(100 - worst)));
   }
 
   _renderScores(scores){
@@ -95,7 +105,10 @@ class Dashboard {
       facteurs_heures: [
         { label:'Heures supplémentaires/sem', key:'_avgExtra7', fmt: v => v>0 ? '+'+v.toFixed(1)+'h/j × 0.09' : '0h supp.' },
         { label:'Jours consécutifs',          key:'_consecOT',  fmt: v => v > 10 ? v+'j ouvrés de surcharge ⚠️' : v > 5 ? v+'j ouvrés de surcharge' : v+'j consécutifs cette semaine' },
-        { label:'Semaines de surcharge',       key:'_cumulWeeks',fmt: v => v>0 ? v+' sem. cumulées (×'+( v>=24?'1.55':v>=16?'1.40':v>=8?'1.25':v>=4?'1.12':'1.00')+')' : 'Pas de cumul' },
+        { label:'Semaines de surcharge', key:'_cumulWeeks', fmt: v => {
+            const vR = Math.round(v * 10) / 10;
+            return vR > 0 ? vR+' sem. cumulées (×'+(vR>=24?'1.55':vR>=16?'1.40':vR>=8?'1.25':vR>=4?'1.12':'1.00')+')' : 'Pas de cumul';
+        }},
       ],
       facteurs_vie: [
         { label:'Sommeil (check-in)',   key:'ci_sleep',  fmt: v => v!==undefined ? ['< 4h','4-5h','6h','7h','8h+'][v]||'—' : 'Non renseigné' },
@@ -134,7 +147,11 @@ class Dashboard {
       desc: 'Votre efficacité estimée. Pencavel/Stanford 2014 : chute après 50h/sem, falaise à 55h.',
       source: 'Pencavel 2014 (Stanford) · OEM 2025 (Jang) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: v => v.toFixed(0)+'h/sem — perf. Pencavel '+( v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%' ) },
+        { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: v => {
+            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
+            if (isRest) return '0h travaillées — potentiel de récupération actif';
+            return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%');
+        }},
         { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
       ],
       facteurs_vie: [
@@ -155,7 +172,21 @@ class Dashboard {
       source: 'OMS/OIT 2021 (Pega et al.) · Lancet 2021 (Ervasti) · Kivimäki 2015',
       facteurs_heures: [
         { label:'Heures hebdo vs seuil OMS (48h)', key:'_recentWeeklyH', fmt: v => v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)' },
-        { label:'Durée d\'exposition (dose-temps)', key:'_cumulMonths', fmt: v => v>0 ? v.toFixed(1)+' mois cumulés (risque ×'+Math.min(1.8,(1+v*0.08)).toFixed(2)+')' : 'Court terme (<1 mois)' },
+        { label:'Durée d\'exposition (dose-temps)', key:'_cumulMonths', fmt: v => {
+            const vR = Math.round(v * 100) / 100; // 2 décimales pour voir le decay
+            const norm3 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
+            const isRest = norm3&&norm3._isVacationWeek;
+            const consecRest = (norm3&&norm3._consecRestDays)||0;
+            // Décroissance lente (demi-vie 180j — Kivimäki 2015 : risque structurel)
+            // 2 décimales permettent de voir le mouvement même à court terme
+            const vDisplay = isRest && consecRest > 0
+              ? Math.round(Math.max(0, vR * Math.exp(-Math.LN2 * consecRest / 180)) * 100) / 100
+              : vR;
+            const suffix = isRest ? ' ↓ (récup. lente — risque structurel)' : '';
+            return vDisplay > 0
+              ? vDisplay.toFixed(2)+' mois cumulés (risque ×'+Math.round(Math.min(1.8,(1+vDisplay*0.08))*100)/100+')'+suffix
+              : 'Court terme (<1 mois)';
+        }},
       ],
       facteurs_vie: [
         { label:'Sport régulier',    key:'ci_motiv', fmt: v => 'Non mesuré dans le check-in' },
@@ -174,7 +205,10 @@ class Dashboard {
       source: 'OEM 2025 — Jang W. et al., Yonsei University',
       facteurs_heures: [
         { label:'Seuil ≥52h/sem', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)' },
-        { label:'Durée exposition', key:'_cumulWeeks',   fmt: v => v>0 ? v+' sem. → risque ×'+Math.min(2.0,(1+v*0.05)).toFixed(2) : 'Sous le seuil' },
+        { label:'Durée exposition', key:'_cumulWeeks', fmt: v => {
+            const vR = Math.round(v * 10) / 10;
+            return vR > 0 ? vR+' sem. → risque ×'+Math.round(Math.min(2.0,(1+vR*0.05))*100)/100 : 'Sous le seuil';
+        }},
       ],
       facteurs_vie: [
         { label:'Sommeil (protecteur)', key:'ci_sleep', fmt: v => v!==undefined && v>=3 ? 'Bon sommeil — facteur protecteur' : v!==undefined ? 'Sommeil insuffisant — facteur aggravant' : 'Non mesuré' },
@@ -191,7 +225,25 @@ class Dashboard {
       desc: 'Capacité à récupérer. Diminue avec l\'accumulation. Sonnentag 2003 : le détachement psychologique est clé.',
       source: 'INRS · Sonnentag 2003 (J.Applied Psychology) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Fatigue accumulée',    key:'_cumulWeeks', fmt: v => v>0 ? 'Réduite : '+v+' sem. de surcharge' : 'Normale : pas de surcharge' },
+        { label:'Fatigue accumulée', key:'_cumulWeeks', fmt: v => {
+            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
+            const vR = Math.round(v * 10) / 10;
+            if (isRest && vR > 0) {
+              // Seuil P2 (phase vigilance) = 4 semaines cumulées — INRS phases RPS
+              // Objectif : sortir de la zone surcharge (vR → <4 sem), pas atteindre 0
+              // Vacances : -0.25/sem = -0.25/7j. Semaines normales : -0.10/sem.
+              const surplusVersP2 = Math.max(0, vR - 4);
+              const joursVac   = Math.round(surplusVersP2 * 7 / 0.25);  // jours de vacances
+              const semNorm    = Math.round(surplusVersP2 / 0.10);       // semaines normales
+              if (surplusVersP2 <= 0) {
+                return '✓ Sous le seuil P2 — restauration en bonne voie (' + vR + ' sem.)';
+              }
+              return '↓ Restauration active — ~' + joursVac + 'j de repos' +
+                     (semNorm > 0 ? ' ou ' + semNorm + ' sem. normales' : '') +
+                     ' pour sortir de surcharge (' + vR + ' sem. cumulées)';
+            }
+            return vR > 0 ? 'Réduite : '+vR+' sem. de surcharge' : 'Normale : pas de surcharge';
+        }},
         { label:'Base de récupération', key:'_recentWeeklyH', fmt: v => v>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
       ],
       facteurs_vie: [
@@ -213,14 +265,16 @@ class Dashboard {
     const defs=[
       {key:'fatigue',    label:'FATIGUE',       sub:'Niveau d\'épuisement', inv:false},
       {key:'stress',     label:'STRESS',        sub:'Cortisol & tension',   inv:false},
-      {key:'performance',label:'PERFORMANCE',   sub:'Efficacité au travail', inv:true},
-      {key:'cvRisk',     label:'CŒUR',          sub:'Risque cardio OMS',    inv:false},
-      {key:'cogRisk',    label:'CERVEAU',        sub:'Risque cérébral OEM',  inv:false},
-      {key:'recovery',   label:'RÉCUPÉRATION',  sub:'Capacité de récup.',   inv:true},
+      {key:'performance',label:'PERFORMANCE',   sub:'Efficacité au travail', inv:true, subFn: (s,n) => (n&&n._isVacationWeek) ? 'Potentiel de récupération' : 'Efficacité au travail'},
+      {key:'cvRisk',     label:'CŒUR',          sub:'Risque cœur (OMS)',    inv:false},
+      {key:'cogRisk',    label:'CERVEAU',        sub:'Risque cerveau (études)',  inv:false},
+      {key:'recovery',   label:'RÉCUPÉRATION',  sub:'Capacité de récup.',   inv:true, subFn: (s,n) => (n&&n._isVacationWeek) ? 'Phase de restauration active' : 'Capacité de récup.'},
     ];
     el.innerHTML=defs.map(d=>{
       const v=Math.round(scores[d.key])||0;
       const c=colFn(d.inv)(v);
+      const norm2 = window.DTE && window.DTE._state && window.DTE._state.norm;
+      const subLabel = d.subFn ? d.subFn(scores, norm2) : d.sub;
       return `<div class="score-card" style="cursor:pointer;transition:border-color .15s;"
         onclick="window._showScoreDetail('${d.key}')"
         onmouseover="this.style.borderColor='rgba(0,200,255,0.4)'"
@@ -228,7 +282,7 @@ class Dashboard {
         <div class="score-card-label">${d.label}</div>
         <div class="score-card-val" style="color:${c};">${v}</div>
         <div class="score-card-bar"><div class="score-card-bar-fill" style="width:${v}%;background:${c};"></div></div>
-        <div class="score-card-sub">${d.sub}</div>
+        <div class="score-card-sub">${subLabel}</div>
         <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-top:2px;">Toucher pour détails ›</div>
       </div>`;
     }).join('');
@@ -423,7 +477,14 @@ class Dashboard {
     const year=raw&&raw.year?raw.year:new Date().getFullYear();
     const el=document.getElementById('footer-year'); if(el) el.textContent='Année '+year;
     const ts=document.getElementById('footer-timestamp'); if(ts) ts.textContent='Analyse : '+new Date().toLocaleTimeString('fr-FR');
-    const cont=document.getElementById('footer-contingent'); if(cont) cont.textContent=`Contingent : ${raw&&raw.m1?Math.round(raw.m1.totalExtra):0}/220h`;
+    const cont=document.getElementById('footer-contingent'); 
+    if(cont) {
+      const ccnRules = (typeof CCN_API !== 'undefined') 
+        ? CCN_API.getGroupeForCCN(parseInt((()=>{try{return localStorage.getItem('CCN_IDCC')}catch(_){return '0'}})() || '0'))
+        : {contingent: 220};
+      const _limit = (ccnRules && ccnRules.contingent) ? ccnRules.contingent : 220;
+      cont.textContent=`Contingent : ${raw&&raw.m1?Math.round(raw.m1.netOvertime||raw.m1.totalExtra||0):0}/${_limit}h`;
+    }
     const st=document.getElementById('footer-status');
     if(st){
       if(scores.fatigue>=95){st.textContent='● DANGER CRITIQUE';st.className='status-danger';}
