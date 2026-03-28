@@ -170,6 +170,11 @@ class ModuleReader {
 
     if (!m2.hasData) alerts.push({ type: 'info', msg: '\uD83D\uDCCA Aucune donn\u00E9e M2 \u2014 consultez le Module 2 Paie' });
 
+    // RCO — Art. L3121-38
+    const rcoDepassement = Math.max(0, (m2.annualHours || 0) - m2.contingentMax);
+    const rcoH50  = rcoDepassement * 0.5;
+    const rcoH100 = rcoDepassement;
+
     return {
       label:              'Module 2 \u2014 Paie & contingent',
       year:                m2.year,
@@ -180,6 +185,9 @@ class ModuleReader {
       contingentMax:       m2.contingentMax,
       overtimeRate:        m2.contingentPercent,
       isCompliant:         m2.annualHours <= m2.contingentMax,
+      rcoDepassement,
+      rcoH50,
+      rcoH100,
       alerts,
       hasData:             m2.hasData,
     };
@@ -326,9 +334,9 @@ class ModuleReaderPro extends ModuleReader {
   // \u2500\u2500 Helper : calcul hs25/hs50 avec regroupement semaine ISO \u2500\u2500\u2500\u2500\u2500
   _computeM2YearTotals(yearData, year) {
     // Regroupe tous les jours de l'annee par semaine ISO lun-dim
-    // puis calcule hs25/hs50 par semaine
+    // puis calcule hs25/hs50/hsInter par semaine selon CCN
     const weeks = {}; // weekKey -> totalOT
-    const monthBreakdown = {}; // YYYY-MM -> { hs25, hs50 }
+    const monthBreakdown = {}; // YYYY-MM -> { hs25, hs50, hsInter }
 
     Object.entries(yearData).forEach(([monthKey, month]) => {
       if (!/^\d{4}-\d{2}$/.test(monthKey) || !month || !month.days) return;
@@ -355,27 +363,55 @@ class ModuleReaderPro extends ModuleReader {
       });
     });
 
-    // Calcul hs25/hs50 par semaine, ventilation par mois proportionnelle
-    let totalHs25 = 0, totalHs50 = 0, totalAnnual = 0;
+    // Récupérer les règles CCN depuis localStorage
+    const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
+    console.log('[FOX module-reader] IDCC lu:', idcc);
+    
+    // getGroupeForCCN() retourne l'objet de règles directement — pas un nom de groupe
+    const _defaultRules = { taux1: 25, palier1: 8, taux_inter: null, palier_inter: 0, taux2: 50, contingent: 220 };
+    let rules = _defaultRules;
+    if (typeof window.CCN_API !== 'undefined') {
+      rules = window.CCN_API.getGroupeForCCN(idcc) || _defaultRules;
+      console.log('[FOX module-reader] CCN rules pour IDCC', idcc, ':', rules);
+    }
+
+    // Calcul hs25/hsInter/hs50 par semaine, ventilation par mois proportionnelle
+    let totalHs25 = 0, totalHsInter = 0, totalHs50 = 0, totalAnnual = 0;
 
     Object.values(weeks).forEach(wk => {
-      const t   = wk.total;
-      const s25 = Math.min(8, t);   // premieres 8h HS = taux 25%
-      const s50 = Math.max(0, t - 8); // au dela = taux 50%
+      const t = wk.total;
+      
+      // Calculer les paliers selon CCN (support 2 ou 3 paliers)
+      let s25, sInter, s50;
+      
+      if (rules.taux_inter !== null) {
+        // 3 paliers (ex: HCR)
+        s25 = Math.min(rules.palier1, t);
+        sInter = Math.max(0, Math.min(rules.palier_inter, t - rules.palier1));
+        s50 = Math.max(0, t - rules.palier1 - rules.palier_inter);
+      } else {
+        // 2 paliers (droit commun)
+        s25 = Math.min(rules.palier1, t);
+        sInter = 0;
+        s50 = Math.max(0, t - rules.palier1);
+      }
+      
       totalHs25    += s25;
+      totalHsInter += sInter;
       totalHs50    += s50;
       totalAnnual  += t;
 
       // Ventiler dans les mois touches (proportionnel)
       const nb = wk.months.length;
       wk.months.forEach(mk => {
-        if (!monthBreakdown[mk]) monthBreakdown[mk] = { hs25: 0, hs50: 0 };
+        if (!monthBreakdown[mk]) monthBreakdown[mk] = { hs25: 0, hsInter: 0, hs50: 0 };
         monthBreakdown[mk].hs25 += s25 / nb;
+        monthBreakdown[mk].hsInter += sInter / nb;
         monthBreakdown[mk].hs50 += s50 / nb;
       });
     });
 
-    return { totalHs25, totalHs50, totalAnnual, monthBreakdown };
+    return { totalHs25, totalHsInter, totalHs50, totalAnnual, monthBreakdown };
   }
 
   loadModule2ForYear(year) {
@@ -393,18 +429,19 @@ class ModuleReaderPro extends ModuleReader {
         function(m) { return m && typeof m === 'object' && (m.hsPlus25 != null || m.hs25 != null); }
       );
 
-      var totalAnnual = 0, totalPlus25 = 0, totalPlus50 = 0;
+      var totalAnnual = 0, totalPlus25 = 0, totalPlus10 = 0, totalPlus50 = 0;
       var monthlyBreakdown = {};
 
       if (hasDays) {
-        // Format reel M2 : calculer hs25/hs50 par semaine ISO
+        // Format reel M2 : calculer hs25/hsInter/hs50 par semaine ISO
         var res = this._computeM2YearTotals(yearData, year);
         totalAnnual = res.totalAnnual;
         totalPlus25 = res.totalHs25;
+        totalPlus10 = res.totalHsInter || 0;
         totalPlus50 = res.totalHs50;
         Object.entries(res.monthBreakdown).forEach(function(entry) {
           var mk = entry[0], v = entry[1];
-          monthlyBreakdown[mk] = { hs25: v.hs25, hs50: v.hs50, total: v.hs25 + v.hs50 };
+          monthlyBreakdown[mk] = { hs25: v.hs25, hsInter: v.hsInter || 0, hs50: v.hs50, total: v.hs25 + (v.hsInter||0) + v.hs50 };
         });
       } else if (hasOldFormat) {
         Object.entries(yearData).forEach(function(entry) {
@@ -413,14 +450,14 @@ class ModuleReaderPro extends ModuleReader {
           var hs25 = Number(month.hsPlus25 || month.hs25 || month.extra25 || 0);
           var hs50 = Number(month.hsPlus50 || month.hs50 || month.extra50 || 0);
           totalPlus25 += hs25; totalPlus50 += hs50; totalAnnual += hs25 + hs50;
-          monthlyBreakdown[key] = { hs25: hs25, hs50: hs50, total: hs25 + hs50 };
+          monthlyBreakdown[key] = { hs25: hs25, hsInter: 0, hs50: hs50, total: hs25 + hs50 };
         });
       }
 
       var hasData = hasDays || hasOldFormat;
       return {
         year: year, totalAnnual: totalAnnual, totalPlus25: totalPlus25,
-        totalPlus50: totalPlus50, contingentMax: contingentMax,
+        totalPlus10: totalPlus10, totalPlus50: totalPlus50, contingentMax: contingentMax,
         contingentPercent: Math.min(100, Math.round((totalAnnual / contingentMax) * 100)),
         monthlyBreakdown: monthlyBreakdown, hasData: hasData,
       };
@@ -562,8 +599,15 @@ class ModuleReaderPro extends ModuleReader {
     const manual = localStorage.getItem('FOX_SOURCE_OVERRIDE');
     const globalSource = manual || 'fusion';
 
+    // Récupérer la CCN pour les paliers — getGroupeForCCN retourne l'objet de règles directement
+    const _idccCum = parseInt((localStorage.getItem('CCN_IDCC') || '0'));
+    const rules = (typeof CCN_API !== 'undefined')
+      ? (CCN_API.getGroupeForCCN(_idccCum) || { taux1: 25, palier1: 8, taux_inter: null, palier_inter: 0, taux2: 50, contingent: 220 })
+      : { taux1: 25, palier1: 8, taux_inter: null, palier_inter: 0, taux2: 50, contingent: 220 };
+
     let totalExtra  = 0;
     let totalPlus25 = 0;
+    let totalPlus10 = 0;
     let totalPlus50 = 0;
     let totalAbsent = 0;
     let weekCount   = 0;
@@ -649,7 +693,7 @@ class ModuleReaderPro extends ModuleReader {
       //                                               heures ont quand m\u00EAme \u00E9t\u00E9 pay\u00E9es)
       const allWeeks = new Set([...Object.keys(m1Weeks), ...Object.keys(m2Weeks)]);
       const monthBreakdown = {};
-      let yearHs25 = 0, yearHs50 = 0, yearOT = 0, yearAbsent = 0;
+      let yearHs25 = 0, yearHs10 = 0, yearHs50 = 0, yearOT = 0, yearAbsent = 0;
 
       allWeeks.forEach(wk => {
         const w1 = m1Weeks[wk];
@@ -678,9 +722,22 @@ class ModuleReaderPro extends ModuleReader {
 
         if (!months || months.size === 0) return;
 
-        const s25 = Math.min(8, ot);
-        const s50 = Math.max(0, ot - 8);
+        // Calculer les paliers selon CCN (2 ou 3 paliers)
+        let s25, s10, s50;
+        if (rules.taux_inter !== null) {
+          // 3 paliers (ex: HCR)
+          s25 = Math.min(rules.palier1, ot);
+          s10 = Math.max(0, Math.min(rules.palier_inter, ot - rules.palier1));
+          s50 = Math.max(0, ot - rules.palier1 - rules.palier_inter);
+        } else {
+          // 2 paliers (droit commun)
+          s25 = Math.min(rules.palier1, ot);
+          s10 = 0;
+          s50 = Math.max(0, ot - rules.palier1);
+        }
+        
         yearHs25   += s25;
+        yearHs10   += s10;
         yearHs50   += s50;
         yearOT     += ot;
         yearAbsent += absent;
@@ -689,9 +746,10 @@ class ModuleReaderPro extends ModuleReader {
         const mArr = Array.from(months);
         const nb   = mArr.length;
         mArr.forEach(mk => {
-          if (!monthBreakdown[mk]) monthBreakdown[mk] = { ot:0, hs25:0, hs50:0 };
+          if (!monthBreakdown[mk]) monthBreakdown[mk] = { ot:0, hs25:0, hs10:0, hs50:0 };
           monthBreakdown[mk].ot   += ot  / nb;
           monthBreakdown[mk].hs25 += s25 / nb;
+          monthBreakdown[mk].hs10 += s10 / nb;
           monthBreakdown[mk].hs50 += s50 / nb;
         });
       });
@@ -701,6 +759,7 @@ class ModuleReaderPro extends ModuleReader {
       monthCount  += Object.keys(monthBreakdown).length;
       totalExtra  += yearOT;
       totalPlus25 += yearHs25;
+      totalPlus10 += yearHs10;
       totalPlus50 += yearHs50;
       totalAbsent += yearAbsent;
 
@@ -714,6 +773,7 @@ class ModuleReaderPro extends ModuleReader {
         extra      : yearOT,
         recup      : 0,
         hs25       : yearHs25,
+        hs10       : yearHs10,
         hs50       : yearHs50,
         months     : monthBreakdown,
         m1Coverage : m1cov,
@@ -728,12 +788,13 @@ class ModuleReaderPro extends ModuleReader {
       totalRecup  : 0,
       totalAbsent,
       totalPlus25,
+      totalPlus10,
       totalPlus50,
       netOvertime : totalExtra,
       weekCount,
       monthCount,
-      contingentMax         : 220,
-      contingentUsedCurrent : totalPlus25 + totalPlus50,
+      contingentMax         : rules.contingent,
+      contingentUsedCurrent : totalPlus25 + totalPlus10 + totalPlus50,
       perYear,
     };
   }
@@ -818,6 +879,7 @@ class ModuleReaderPro extends ModuleReader {
       years           : cum.years,
       totalNetOvertime: cum.netOvertime,
       totalPlus25     : cum.totalPlus25,
+      totalPlus10     : cum.totalPlus10 || 0,
       totalPlus50     : cum.totalPlus50,
       weekCount       : cum.weekCount,
       monthCount      : cum.monthCount,

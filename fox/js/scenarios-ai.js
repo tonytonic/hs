@@ -1,3 +1,10 @@
+/* ── SAFE localStorage (iOS Private Mode) ── */
+const _safeLS = {
+  get:  (k, d='') => { try { return localStorage.getItem(k) ?? d; } catch(_) { return d; } },
+  set:  (k, v)    => { try { localStorage.setItem(k, v); } catch(_) {} },
+  del:  (k)       => { try { localStorage.removeItem(k); } catch(_) {} },
+  json: (k, d={}) => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(_) { return d; } },
+};
 // ===== SCENARIOS AI SYSTEM (600 Scenarios) =====
 // Système de scénarios avec base de données + génération IA
 

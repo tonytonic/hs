@@ -92,6 +92,15 @@ class RTFExportSystem {
         rtf += this.addParagraph(`Taux d'utilisation: ${m2.contingent.percentage.toFixed(1)}%`);
         rtf += this.addParagraph(`Conformité: ${m2.isCompliant ? 'OUI' : 'NON'}`);
 
+        // RCO — Art. L3121-38
+        if (m2.rcoDepassement > 0) {
+          rtf += this.addSubSection('Repos Compensateur Obligatoire (RCO):');
+          rtf += this.addParagraph(`Dépassement du contingent: ${m2.rcoDepassement.toFixed(1)}h`);
+          rtf += this.addParagraph(`RCO dû (≤20 salariés): ${m2.rcoH50.toFixed(1)}h`);
+          rtf += this.addParagraph(`RCO dû (>20 salariés): ${m2.rcoH100.toFixed(1)}h`);
+          rtf += this.addParagraph(`Base légale: Art. L3121-38 Code du travail`);
+        }
+
         if (m2.alerts.length > 0) {
             rtf += this.addSubSection('Alertes:');
             m2.alerts.forEach(alert => {

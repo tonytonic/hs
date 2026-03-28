@@ -65,7 +65,14 @@ const FOX_LEGAL_LIMITS = {
   DAILY_MAX_DERO        : 12,    // Dérogation accord collectif
   REST_DAILY_MIN        : 11,    // Art. L3131-1 : repos quotidien
   REST_WEEKLY_MIN       : 35,    // Art. L3132-2 : repos hebdomadaire
-  CONTINGENT_ANNUEL     : 220,   // Art. D3121-24 : seuil légal
+  get CONTINGENT_ANNUEL() {      // Dynamique selon CCN active
+    if (typeof CCN_API !== 'undefined') {
+      const idcc = parseInt((typeof localStorage !== 'undefined' && localStorage.getItem('CCN_IDCC')) || '0');
+      const r = CCN_API.getGroupeForCCN(idcc);
+      if (r) return r.contingent;
+    }
+    return 220;
+  },
   NIGHT_THRESHOLD_START : 21,    // Début travail de nuit (heure)
   NIGHT_THRESHOLD_END   : 6,     // Fin travail de nuit (heure)
   NIGHT_ANNUAL_THRESHOLD: 270,   // Heures nuit/an → statut travailleur nuit
@@ -80,7 +87,10 @@ const FOX_VIOLATIONS = {
   V03: { code: 'V03', label: 'Repos quotidien < 11h',     severity: 'critique', article: 'L3131-1'  },
   V04: { code: 'V04', label: 'Repos hebdo < 35h',         severity: 'élevé',   article: 'L3132-2'  },
   V05: { code: 'V05', label: 'Journée > 10h',             severity: 'moyen',   article: 'L3121-19' },
-  V06: { code: 'V06', label: 'Contingent annuel > 220h',  severity: 'élevé',   article: 'D3121-24' },
+  get V06() {
+    const limit = FOX_LEGAL_LIMITS.CONTINGENT_ANNUEL;
+    return { code: 'V06', label: `Contingent annuel > ${limit}h`, severity: 'élevé', article: 'D3121-24' };
+  },
   V07: { code: 'V07', label: 'Travail nuit non déclaré',  severity: 'moyen',   article: 'L3122-2'  },
   V08: { code: 'V08', label: 'Dimanche sans compensation', severity: 'élevé',  article: 'L3132-3'  },
   V09: { code: 'V09', label: '6 jours consécutifs+',      severity: 'moyen',   article: 'L3132-1'  },
@@ -160,6 +170,9 @@ function _buildContext(gs) {
     nightHoursYear : gs.nightHoursYear   || 0,
     annualHours    : m2.totalHours       || gs.annualHours || 0,
     contingentPct  : m2.contingentPercent || 0,
+    rcoDepassement : m2.rcoDepassement   || 0,
+    rcoH50         : m2.rcoH50           || 0,
+    rcoH100        : m2.rcoH100          || 0,
     rolling,
     burnoutScore   : burnout.score,
     burnoutLevel   : burnout.level,
@@ -289,8 +302,12 @@ function _analyzeBurnout(ctx, v, sc) {
 
 // ─── Contingent annuel ────────────────────────────────────────────
 function _analyzeContingent(ctx, v, sc) {
+  const limit = FOX_LEGAL_LIMITS.CONTINGENT_ANNUEL;
   if (ctx.contingentPct >= 100) {
-    v.push({ ...FOX_VIOLATIONS.V06, value: `${ctx.annualHours}h` });
+    const rcoMsg = ctx.rcoDepassement > 0
+      ? ` · RCO dû : ${ctx.rcoH50.toFixed(1)}h (≤20 sal.) à ${ctx.rcoH100.toFixed(1)}h (>20 sal.)`
+      : '';
+    v.push({ ...FOX_VIOLATIONS.V06, value: `${ctx.annualHours}h / ${limit}h${rcoMsg}` });
     sc.push(foxFindScenario(4));
   } else if (ctx.contingentPct >= 80) {
     sc.push(foxFindScenario(3));
@@ -315,10 +332,16 @@ function _riskLevel(score) {
 }
 
 function _buildSummary(violations, score, ctx) {
-  if (violations.length === 0) return '✅ Situation conforme — aucune violation détectée.';
+  // Nom de la CCN active pour contextualiser le rapport
+  let ccnLabel = '';
+  if (typeof CCN_API !== 'undefined') {
+    const nom = (typeof localStorage !== 'undefined' && localStorage.getItem('CCN_NOM')) || '';
+    if (nom) ccnLabel = ` [${nom}]`;
+  }
+  if (violations.length === 0) return `✅ Situation conforme${ccnLabel} — aucune violation détectée.`;
   const top = violations.slice(0, 3).map(v => `${v.label} (art. ${v.article})`).join(' · ');
   const suffix = violations.length > 3 ? ` + ${violations.length - 3} autre(s)` : '';
-  return `⚠️ ${violations.length} violation(s) — ${top}${suffix}`;
+  return `⚠️ ${violations.length} violation(s)${ccnLabel} — ${top}${suffix}`;
 }
 
 function _emptyEngineResult() {
