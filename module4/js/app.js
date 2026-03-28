@@ -92,7 +92,13 @@ document.addEventListener('DOMContentLoaded', function () {
       const el = id => document.getElementById(id);
       if (el('footer-year'))       el('footer-year').textContent       = 'ANNÉE ' + yr;
       if (el('footer-timestamp'))  el('footer-timestamp').textContent  = 'ANALYSE : ' + new Date().toLocaleTimeString('fr-FR');
-      if (el('footer-contingent')) el('footer-contingent').textContent = 'CONTINGENT : ' + Math.round(state.norm._contingentPct || 0) + '/220H';
+      if (el('footer-contingent')) {
+        const ccnRules = (typeof CCN_API !== 'undefined') 
+          ? CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0'))
+          : {contingent: 220};
+        const _limit = (ccnRules && ccnRules.contingent) ? ccnRules.contingent : 220;
+        el('footer-contingent').textContent = 'CONTINGENT : ' + Math.round(state.norm._contingentPct || 0) + '/' + _limit + 'H';
+      }
       const statusEl = el('footer-status');
       if (statusEl) {
         const f = state.scores.fatigue;
@@ -101,13 +107,22 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       // Score global dans DTE.app
+      // CORRECTION : GlobalScore = état de récupération réel, pas performance
+      // Formule : 100 - MAX(fatigue, stress, risqueCérébral)
+      // Justification : pendant le repos, performance=100% (Pencavel 35h) mais
+      // fatigue/stress résiduels empêchent un état global parfait.
+      // Le 100 doit être une CIBLE à atteindre, pas une valeur forcée. (Sonnentag 2003)
       if(!state.scores._hasData) {
         DTE.app = { scoreGlobal: null };
       } else {
+        const s = state.scores;
+        // Résidus biologiques actifs — le max domine (maillon le plus faible)
+        const worstResidue = Math.max(s.fatigue || 0, s.stress || 0, s.cogRisk || 0);
+        // Pénalité risques détectés
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
-        const base = state.scores.performance || 50;
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, base - dangers * 15 - alertes * 5)) };
+        const base = Math.max(0, 100 - worstResidue);
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - dangers * 5 - alertes * 2))) };
       }
 
       DTE.notifs.checkAndNotify(state, risks);
@@ -218,13 +233,16 @@ document.addEventListener('DOMContentLoaded', function () {
       const r2 = DTE.risks.detect(s.scores, s.norm);
       const a2 = buildAdvice(s.scores, r2, s.norm);
       DTE.lastRisks = r2; DTE.lastAdvice = a2;
-      // Recalculer le scoreGlobal
+      // Recalculer le scoreGlobal — formule unifiée avec runAnalysis
       if (!s.scores._hasData) {
         DTE.app = { scoreGlobal: null };
       } else {
+        const sc = s.scores;
+        const worstResidue = Math.max(sc.fatigue||0, sc.stress||0, sc.cogRisk||0);
         const d2 = r2.filter(r => r.level === 'CRITIQUE').length;
         const al = r2.filter(r => r.level !== 'CRITIQUE').length;
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, (s.scores.performance||50) - d2*15 - al*5)) };
+        const base = Math.max(0, 100 - worstResidue);
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - d2*5 - al*2))) };
       }
       DTE.dashboard.render(s, r2, a2);
       if (DTE.twin) DTE.twin.update(s.scores);
@@ -233,6 +251,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (av.id === 'view-predictions') renderPredictions(s);
         if (av.id === 'view-whatif' && DTE.whatif) DTE.whatif.render();
       }
+      // Notifier les autres composants qu'une analyse vient d'être faite
+      document.dispatchEvent(new CustomEvent('dte:analyzed', { detail: s }));
     } catch(e) { console.warn('[DTE] fullSync:', e); }
   };
 
@@ -252,6 +272,16 @@ document.addEventListener('DOMContentLoaded', function () {
       if (view === 'predictions') { _predictionsInited = false; initPredictions(); }
       if (view === 'whatif')      initWhatIf();
       if (view === 'heatmap' && DTE.heatmap) DTE.heatmap.render(DTE._state);
+      if (view === 'schedule') {
+        if (typeof DTESchedule !== 'undefined') {
+          DTESchedule.renderSchedulePanel('schedule-container');
+        }
+      }
+      // Réécouter les changements horaires pour relancer l'analyse
+      document.addEventListener('dte:schedule:changed', () => {
+        runAnalysis();
+        if (view === 'predictions') renderPredictions(DTE._state);
+      }, { once: true });
     });
   });
 
