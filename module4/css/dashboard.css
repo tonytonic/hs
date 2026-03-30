@@ -310,11 +310,11 @@
     width: 100%;
   }
 
-  /* Hero : horizontal compact */
-  .panel--hero { flex-direction: row; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; }
-  .hero-score { margin: 0; }
+  /* Hero : centré vertical sur mobile */
+  .panel--hero { flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 10px 12px; }
+  .hero-score { margin: 0; text-align: center; }
   .hero-score-num { font-size: 48px; }
-  .hero-margin { display: none; }
+  .hero-margin { display: block; text-align: center; }
 
   /* Twin body : hauteur réduite */
   .panel--twin { height: 220px; }
