@@ -46,6 +46,28 @@ class Dashboard {
       lel.className='hero-level '+(levelMap[level]||'bon');
       if(sg===null){ lel.style.color='var(--text-muted)'; lel.style.borderColor='var(--text-muted)'; lel.style.background='transparent'; }
     }
+    // Indicateur "mise à jour ce soir" avec décompte — inséré dans le panel hero
+    const _now = new Date();
+    const _h = _now.getHours(), _m = _now.getMinutes();
+    const _isBeforeCutoff = _h < 22 || (_h === 22 && _m < 30);
+    // Retirer l'ancien hint s'il existe
+    const _todayEl = document.getElementById('dte-today-hint');
+    if (_todayEl) _todayEl.remove();
+    if (hasData && _isBeforeCutoff) {
+      // Calcul décompte
+      const _totalMins = (22 - _h) * 60 + (30 - _m);
+      const _hLeft = Math.floor(_totalMins / 60);
+      const _mLeft = _totalMins % 60;
+      const _countdown = _hLeft > 0 ? _hLeft + 'h' + String(_mLeft).padStart(2,'0') : _mLeft + ' min';
+      const _hint = document.createElement('div');
+      _hint.id = 'dte-today-hint';
+      _hint.style.cssText = 'font-size:11px;color:rgba(255,255,255,0.35);text-align:center;margin-top:10px;margin-bottom:2px;display:block;width:100%;clear:both;';
+      _hint.textContent = '⏱ Mise à jour dans ' + _countdown + ' (22h30)';
+      // Insérer à la fin du panel hero — après tous les éléments existants
+      const _heroPanel = document.querySelector('.panel--hero');
+      if (_heroPanel) _heroPanel.appendChild(_hint);
+    }
+
     const mel=document.getElementById('marge-securite');
     if(mel){
       if(!hasData){ mel.textContent='—'; mel.style.color='var(--text-muted)'; }
