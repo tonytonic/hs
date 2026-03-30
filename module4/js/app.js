@@ -648,7 +648,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
   /* ── Init ────────────────────────────────────────────────────── */
   wireButtons();
+
+  // ── SCORES EN FIN DE JOURNÉE ────────────────────────────────────
+  // Les scores biométriques reflètent l'impact d'une journée complète.
+  // Avant 22h30, on affiche les scores tels quels (données historiques).
+  // À partir de 22h30 les scores incluent la journée en cours.
+  // Un timer se déclenche automatiquement à 22h30 pour rafraîchir.
+  function scheduleEndOfDaySync() {
+    const now = new Date();
+    const h = now.getHours(), m = now.getMinutes();
+    const isAfterCutoff = h > 22 || (h === 22 && m >= 30);
+
+    if (!isAfterCutoff) {
+      // Calculer combien de ms jusqu'à 22h30
+      const target = new Date(now);
+      target.setHours(22, 30, 0, 0);
+      if (target <= now) target.setDate(target.getDate() + 1);
+      const msUntil = target - now;
+      console.log('[DTE] Scores fin de journée à 22h30 — dans', Math.round(msUntil/60000), 'min');
+      setTimeout(() => {
+        runAnalysis();
+        scheduleEndOfDaySync(); // Reprogrammer pour le lendemain
+      }, msUntil);
+    }
+  }
+
   runAnalysis();
+  scheduleEndOfDaySync();
   showWelcomeIfNeeded();
 
   // ── LIVE SYNC — re-analyse toutes les 3s
