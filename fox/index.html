@@ -7838,13 +7838,18 @@ function checkMonthlySummary() {
   if (localStorage.getItem(key)) return;
   if (now.getDate() !== 1) return;
   localStorage.setItem(key, '1');
-  setTimeout(() => showMonthlySummary(), 2000);
+  // Le 1er du mois → bilan du mois qui VIENT DE SE TERMINER (mois précédent)
+  const prevMonth = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+  setTimeout(() => showMonthlySummary(prevMonth), 2000);
 }
 function showMonthlySummary(forceMonth) {
   const now = new Date();
-  // Mois actuel (pas précédent)
   const targetMonth = forceMonth !== undefined ? forceMonth : now.getMonth();
-  const d = new Date(now.getFullYear(), targetMonth, 1);
+  // Si forceMonth > mois courant → mois de l'année précédente (ex: déc affiché le 1er janv)
+  const targetYear = (forceMonth !== undefined && targetMonth > now.getMonth())
+    ? now.getFullYear() - 1
+    : now.getFullYear();
+  const d = new Date(targetYear, targetMonth, 1);
   const y = d.getFullYear().toString();
   const m = String(d.getMonth() + 1).padStart(2, '0');
   const monthName = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
