@@ -231,107 +231,82 @@ class LifestylePanel {
       return { fatigueMult:1.0, stress:0, performance:0, recovery:0, cvRisk:0 };
     }
 
-    let fatigueMult = 1.0;
-    let cvRiskAdd   = 0;
+    // ── ARCHITECTURE : MOYENNE PONDÉRÉE DES DELTAS (Framingham-style) ────────
+    // Ancienne approche : produit des multiplicateurs → explosion exponentielle
+    //   Ex: âge×poids×tabac×enfants = 1.28×1.15×1.15×1.22 = 2.06 → cap forcé à 1.80
+    // Nouvelle approche : Σ(weight_i × delta_i) / Σweight_i_présents
+    //   Les facteurs se moyennent (comme Framingham Heart Score, OMS SCORE-2)
+    //   Les facteurs corrélés (âge + sédentarité + obésité) ne se multiplient plus.
+    //
+    // Amplitude calibrée pour rester dans [0.65, 1.45] naturellement sans cap forcé :
+    //   Profil tout-neutre    → ×1.00
+    //   Profil idéal          → ×0.85 (lifestyle parfait ≠ immunité biologique)
+    //   Profil tout-défavorable → ×1.42 (significatif, mais plus ×1.80 cap artificiel)
+    //   Cadre 45ans/enfants/stress → ×1.10 (vs ×1.52 ancien — bien plus réaliste)
 
-    // ── ÂGE (INRS — vieillissement et récupération) ──────────────
-    if (d.age !== undefined) {
-      const ageMult = [0.95, 1.00, 1.18, 1.28][d.age] || 1.0;  // INRS: 45-54→+18%, 55+→+28%
-      fatigueMult *= ageMult;
+    const FACTORS = [
+      // [id, poids_scientifique, [mult_v0, mult_v1, mult_v2, mult_v3]]
+      // Poids calibrés sur l'importance relative dans les études INRS/HAS/ANACT/OMS
+      // Profil santé
+      ['age',          0.12, [0.95, 1.00, 1.18, 1.28]],  // INRS — vieillissement et récup
+      ['poids',        0.08, [1.05, 1.00, 1.08, 1.15]],  // Lancet 2021 — IMC et fatigue
+      ['fumeur',       0.08, [1.00, 0.98, 1.08, 1.15]],  // HAS 2023 — tabac et cortisol
+      ['handicap',     0.10, [1.00, 1.06, 1.20, 1.30]],  // HAS — charge physique/cognitive
+      ['enfants',      0.08, [1.00, 1.08, 1.15, 1.22]],  // ANACT — charge parentale
+      // Rythme de vie
+      ['sport',        0.13, [1.08, 1.02, 0.90, 0.85]],  // OMS — activité physique protectrice
+      ['nutrition',    0.08, [1.08, 1.02, 0.97, 0.93]],  // ANSES — nutrition et récupération
+      ['sleep_quality',0.12, [1.12, 1.06, 1.00, 0.92]],  // INSERM — qualité sommeil habituel
+      ['sens',         0.10, [1.12, 1.04, 1.00, 0.80]],  // Nature 2025 (Fan) — sens au travail
+      ['pauses',       0.05, [1.08, 1.02, 0.97, 0.92]],  // INRS — micropausses et récup
+      ['ecrans_soir',  0.03, [1.08, 1.03, 1.00, 0.97]],  // INSERM — mélatonine et sommeil
+      ['alcool',       0.08, [1.00, 1.04, 1.10, 1.20]],  // INSERM 2021 — alcool et fatigue
+      ['drogues',      0.05, [1.00, 1.10, 1.12, 1.25]],  // INSERM 2022 — substances psycho
+    ];
+    // Σ poids = 1.10 (intentionnel : pondération relative, normalisée aux facteurs présents)
+
+    let weightedDelta = 0;
+    let totalWeight   = 0;
+
+    for (const [id, w, mults] of FACTORS) {
+      if (d[id] !== undefined) {
+        const delta = (mults[d[id]] ?? 1.0) - 1.0; // delta relatif au neutre (×1.0)
+        weightedDelta += w * delta;
+        totalWeight   += w;
+      }
     }
 
-    // ── POIDS / IMC (Lancet 2021) ────────────────────────────────
-    if (d.poids !== undefined) {
-      const poiMult = [1.05, 1.00, 1.08, 1.15][d.poids] || 1.0;
-      fatigueMult *= poiMult;
-      if (d.poids === 2) cvRiskAdd += 0.02;
-      if (d.poids === 3) cvRiskAdd += 0.06;
-    }
+    // Normaliser par les poids des facteurs réellement renseignés
+    // Amplifier ×2.5 pour conserver une gamme significative [~0.85, ~1.42]
+    const normalizedDelta = totalWeight > 0 ? weightedDelta / totalWeight : 0;
+    const fatigueMult = Math.max(0.65, Math.min(1.45, 1.0 + normalizedDelta * 2.5));
 
-    // ── TABAC (HAS 2023) ─────────────────────────────────────────
-    if (d.fumeur !== undefined) {
-      const fumMult = [1.00, 0.98, 1.08, 1.15][d.fumeur] || 1.0;
-      fatigueMult *= fumMult;
-      if (d.fumeur === 2) cvRiskAdd += 0.03;
-      if (d.fumeur === 3) cvRiskAdd += 0.08;
-    }
-
-    // ── HANDICAP/MALADIE CHRONIQUE (HAS) ─────────────────────────
-    if (d.handicap !== undefined) {
-      const hanMult = [1.00, 1.06, 1.20, 1.30][d.handicap] || 1.0;
-      fatigueMult *= hanMult;
-    }
-
-    // ── ENFANTS / CHARGE FAMILIALE (ANACT) ───────────────────────
-    if (d.enfants !== undefined) {
-      // Réduit récupération nocturne + augmente stress
-      const enfMult = [1.00, 1.08, 1.15, 1.22][d.enfants] || 1.0;  // ANACT: 1-2→+8%, aidant→+22%
-      fatigueMult *= enfMult;
-    }
-
-    // ── SPORT ────────────────────────────────────────────────────
-    if (d.sport !== undefined) {
-      fatigueMult *= [1.10, 1.03, 0.87, 0.80][d.sport] || 1.0;
-    }
-
-    // ── NUTRITION ────────────────────────────────────────────────
-    if (d.nutrition !== undefined) {
-      fatigueMult *= [1.08, 1.02, 0.97, 0.93][d.nutrition] || 1.0;
-    }
-
-    // ── SOMMEIL HABITUEL ─────────────────────────────────────────
-    if (d.sleep_quality !== undefined) {
-      fatigueMult *= [1.20, 1.10, 1.00, 0.90][d.sleep_quality] || 1.0;
-    }
-
-    // ── SENS AU TRAVAIL ──────────────────────────────────────────
-    if (d.sens !== undefined) {
-      fatigueMult *= [1.15, 1.05, 1.00, 0.72][d.sens] || 1.0;
-    }
-
-    // ── PAUSES ───────────────────────────────────────────────────
-    if (d.pauses !== undefined) {
-      fatigueMult *= [1.08, 1.02, 0.97, 0.92][d.pauses] || 1.0;
-    }
-
-    // ── ÉCRANS ───────────────────────────────────────────────────
-    if (d.ecrans_soir !== undefined) {
-      fatigueMult *= [1.08, 1.03, 1.00, 0.97][d.ecrans_soir] || 1.0;
-    }
-
-    // ── ALCOOL (INSERM 2021 · OMS) ───────────────────────────────
-    if (d.alcool !== undefined) {
-      fatigueMult *= [1.00, 1.06, 1.15, 1.30][d.alcool] || 1.0;
-      if (d.alcool >= 2) cvRiskAdd += (d.alcool - 1) * 0.03; // risque cardio
-    }
-
-    // ── SUBSTANCES PSYCHOACTIVES (INSERM 2022) ───────────────────
-    if (d.drogues !== undefined) {
-      fatigueMult *= [1.00, 1.10, 1.12, 1.25][d.drogues] || 1.0;
-    }
-
-    fatigueMult = Math.max(0.50, Math.min(1.80, fatigueMult));
-
-    // ── ADDITIFS (stress, perf, récup, cvRisk) ───────────────────
-    let stress = 0, perf = 0, rec = 0;
-
-    if (d.social !== undefined)       { stress -= (d.social / 3) * 0.06; rec += (d.social / 3) * 0.04; }
-    if (d.stress_extra !== undefined) { stress += (d.stress_extra / 3) * 0.10; rec -= (d.stress_extra / 3) * 0.05; }
-    if (d.enfants !== undefined)      { stress += (d.enfants / 3) * 0.06; rec -= (d.enfants / 3) * 0.05; }
-    if (d.fumeur !== undefined)       { rec -= (d.fumeur / 3) * 0.05; }
-    if (d.alcool !== undefined)       { rec -= (d.alcool / 3) * 0.06; }
-    if (d.drogues !== undefined)      { rec -= (d.drogues / 3) * 0.05; perf -= (d.drogues / 3) * 0.04; }
-    if (d.sens !== undefined)         { perf += ((d.sens - 1) / 3) * 0.08; stress -= ((d.sens - 1) / 3) * 0.04; }
-    if (d.sport !== undefined)        { rec += (d.sport / 3) * 0.06; cvRiskAdd -= (d.sport / 3) * 0.04; }
-    if (d.sleep_quality !== undefined){ perf += ((d.sleep_quality - 1.5) / 1.5) * 0.07; rec += ((d.sleep_quality - 1.5) / 1.5) * 0.05; }
-
-    // Âge réduit performance en cas de surcharge
-    if (d.age !== undefined && d.age >= 2) { perf -= (d.age - 1) * 0.03; }
-
-    stress  = Math.max(-0.10, Math.min(0.15, stress));
-    perf    = Math.max(-0.12, Math.min(0.10, perf));
-    rec     = Math.max(-0.12, Math.min(0.10, rec));
+    // ── CVRISKADD — conservé tel quel (additif, déjà borné) ─────────────────
+    let cvRiskAdd = 0;
+    if (d.poids  === 2) cvRiskAdd += 0.02;
+    if (d.poids  === 3) cvRiskAdd += 0.06;
+    if (d.fumeur === 2) cvRiskAdd += 0.03;
+    if (d.fumeur === 3) cvRiskAdd += 0.08;
+    if (d.alcool >= 2)  cvRiskAdd += (d.alcool - 1) * 0.03;
+    if (d.sport  !== undefined) cvRiskAdd -= (d.sport / 3) * 0.04;
     cvRiskAdd = Math.max(-0.05, Math.min(0.15, cvRiskAdd));
+
+    // ── ADDITIFS stress/perf/récup — conservés (déjà additifs et bornés) ────
+    let stress = 0, perf = 0, rec = 0;
+    if (d.social       !== undefined) { stress -= (d.social / 3) * 0.06;       rec += (d.social / 3) * 0.04; }
+    if (d.stress_extra !== undefined) { stress += (d.stress_extra / 3) * 0.10; rec -= (d.stress_extra / 3) * 0.05; }
+    if (d.enfants      !== undefined) { stress += (d.enfants / 3) * 0.06;      rec -= (d.enfants / 3) * 0.05; }
+    if (d.fumeur       !== undefined) { rec    -= (d.fumeur / 3) * 0.05; }
+    if (d.alcool       !== undefined) { rec    -= (d.alcool / 3) * 0.06; }
+    if (d.drogues      !== undefined) { rec    -= (d.drogues / 3) * 0.05; perf -= (d.drogues / 3) * 0.04; }
+    if (d.sens         !== undefined) { perf   += ((d.sens - 1) / 3) * 0.08;   stress -= ((d.sens - 1) / 3) * 0.04; }
+    if (d.sport        !== undefined) { rec    += (d.sport / 3) * 0.06; }
+    if (d.sleep_quality!== undefined) { perf   += ((d.sleep_quality - 1.5) / 1.5) * 0.07; rec += ((d.sleep_quality - 1.5) / 1.5) * 0.05; }
+    if (d.age          !== undefined && d.age >= 2) { perf -= (d.age - 1) * 0.03; }
+
+    stress = Math.max(-0.10, Math.min(0.15, stress));
+    perf   = Math.max(-0.12, Math.min(0.10, perf));
+    rec    = Math.max(-0.12, Math.min(0.10, rec));
 
     return { fatigueMult, stress, performance: perf, recovery: rec, cvRisk: cvRiskAdd };
   }
