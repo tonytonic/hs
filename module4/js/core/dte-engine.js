@@ -175,7 +175,7 @@ function musculoRisk(weeklyH, cumulMonths, consec) {
  *   - À 10 sem : saturation HPA → factor 2.50 (cortisol fixe même WE)
  *   - Pente : (2.50-1) / 10 = 0.15/semaine → min(2.5, 1 + cumW×0.15)
  */
-function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays) {
+function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays, consecNonOTDays) {
   const loadF    = Math.max(0, (weeklyH - D.H_OPTIMAL) / (D.H_CV - D.H_OPTIMAL));
   const variabF  = Math.min(1, variabSigma / 8);
   // Saturation HPA à ~10 semaines — Thompson 2022 + ANACT
@@ -184,8 +184,6 @@ function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays) {
   // ── DÉCROISSANCE BIOLOGIQUE EN REPOS (Sonnentag 2003 + INRS) ─────────────
   // Le cortisol décroit exponentiellement pendant le repos actif.
   // Sonnentag 2003 : "psychological detachment" = mécanisme clé de récupération.
-  // Demi-vie cortisol en repos : ~3-4 jours (INRS 2014, Pruessner et al. 1997).
-  // Avec 7j de repos complet : retour à ~50% du niveau chronique (exp(-0.693*7/4)=0.29).
   // IMPORTANT : le repos ne ramène pas le biologique à 0 immédiatement —
   //   il réduit la charge active mais les traces épigénétiques restent (Thompson 2022).
   let restDecay = 1.0;
@@ -200,6 +198,16 @@ function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays) {
     restDecay = Math.exp(-Math.log(2) * consecRestDays / halfLife);
     // Plancher : trace épigénétique / allostatic load résiduelle (McEwen 1998)
     restDecay = Math.max(0.08, restDecay);
+  } else if ((consecNonOTDays || 0) >= 1) {
+    // ── RÉCUPÉRATION PARTIELLE sur semaines normales sans HS ─────────────────
+    // Meijman & Mulder 1998 (Effort-Recovery model) :
+    //   "Recovery begins as soon as load returns to baseline" — y compris sans repos complet.
+    // Sans détachement psychologique (Sonnentag), la récupération est plus lente :
+    //   demi-vie 20j (vs 9j en repos complet). Plancher 0.30 (récupération incomplète sans vrai repos).
+    // 5j=0.84, 10j=0.71, 20j=0.50, 30j=0.35 → plancher 0.30
+    const halfLifePartial = 20.0;
+    restDecay = Math.exp(-Math.log(2) * consecNonOTDays / halfLifePartial);
+    restDecay = Math.max(0.30, restDecay); // plancher : sans détachement, récupération incomplète
   }
 
   return Math.min(1, (loadF * 0.55 + variabF * 0.45) * chronicF * restDecay);
@@ -641,23 +649,18 @@ class DTEEngine {
       : (() => { const d=new Date(today); d.setDate(today.getDate()-((today.getDay()||7)-1)); return d; })();
     const todayDowA = today.getDay() || 7; // 1=lun..7=dim (gardé pour comptage jours)
     let sumExtra = 0, countWorkDays28 = 0;
-    // Fenêtre 28j glissante — jours ouvrés (lun-ven) + week-ends si HS saisies (HCR, BTP)
+    // Fenêtre 28j glissante — ne compte que les jours ouvrés (lun-ven) non absents
     for (let i = 0; i < 28; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      const isWE28 = dow === 0 || dow === 6;
+      if (dow === 0 || dow === 6) continue; // ignorer week-ends
       const k = localDK(d);
       if (specialDays[k] === 'ferie' || vacances[k]) continue;
       const e = days[k];
       if (e && e.absent > 0) continue;
-      if (isWE28) {
-        // Week-end : compter uniquement les HS réellement saisies (HCR, BTP...)
-        if (e && e.extra > 0) sumExtra += e.extra;
-        // Ne pas incrémenter countWorkDays28 (base = jours ouvrés)
-      } else {
-        sumExtra += (e ? (e.extra || 0) : 0);
-        countWorkDays28++;
-      }
+      // Jour ouvré : on compte les HS (0 si pas d'entrée = journée normale, sans HS)
+      sumExtra += (e ? (e.extra || 0) : 0);
+      countWorkDays28++;
     }
     // avgExtraPerDay28 = HS/jour moyen sur 4 semaines → weeklyExtra = HS/sem = avg × 5
     const avgExtraPerDay28 = countWorkDays28 > 0 ? sumExtra / countWorkDays28 : 0;
@@ -785,23 +788,16 @@ class DTEEngine {
 
     for (let w = 51; w >= 0; w--) { // chronologique : w=51 (passé) → w=0 (maintenant)
       let weekH = 0, hasAnyDay = false, daysLogged = 0;
-      for (let dd = 0; dd < 7; dd++) { // 7 jours : lun→dim (HCR, BTP travaillent le week-end)
+      for (let dd = 0; dd < 5; dd++) {
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
-        const dowDt = dt.getDay();
-        const isWEdt = dowDt === 0 || dowDt === 6;
         const k = localDK(dt);
         const e = days[k];
         if (e && e.absent) continue;
-        if (isWEdt) {
-          // Week-end : ajouter uniquement les HS saisies (pas BASE_JOUR)
-          if (e && e.extra > 0) { weekH += e.extra; hasAnyDay = true; daysLogged++; }
-        } else {
-          weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
-          hasAnyDay = true;
-          if (e && e.extra > 0) daysLogged++;
-        }
+        weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
+        hasAnyDay = true;
+        if (e && e.extra > 0) daysLogged++;
       }
       // Extrapolation semaine courante
       if (w === 0 && count7 >= 2 && count7 < 5 && daysLogged >= 2) {
@@ -819,21 +815,15 @@ class DTEEngine {
     // Passe 2 : réductions de récupération (même ordre chronologique)
     for (let w = 51; w >= 0; w--) {
       let weekH = 0, hasAnyDay = false;
-      for (let dd = 0; dd < 7; dd++) { // 7 jours : lun→dim
+      for (let dd = 0; dd < 5; dd++) {
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
-        const dowDt2 = dt.getDay();
-        const isWEdt2 = dowDt2 === 0 || dowDt2 === 6;
         const k = localDK(dt);
         const e = days[k];
         if (e && e.absent) continue;
-        if (isWEdt2) {
-          if (e && e.extra > 0) { weekH += e.extra; hasAnyDay = true; }
-        } else {
-          weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
-          hasAnyDay = true;
-        }
+        weekH += D.BASE_JOUR + (e ? (e.extra || 0) : 0);
+        hasAnyDay = true;
       }
       const isVacWeekP2 = [0,1,2,3,4].some(dd => {
         const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
@@ -1016,43 +1006,19 @@ class DTEEngine {
     // Meijman & Mulder 1998 : l'absence de surcharge = début de récupération,
     // qu'elle soit déclarée "vacances" ou non.
 
-    // ── DÉTECTION VACANCES DYNAMIQUE — de Bloom 2010 ──────────────────────────
-    // Compte toutes les semaines de vacances consécutives déclarées dans M4,
-    // en remontant depuis la semaine en cours vers le passé.
-    // Si on est lundi, on inclut aussi la semaine précédente (cas lundi matin).
-    // Résultat : consVacWeeks = nombre de semaines de vacances contiguës actives.
+    const isVacFromDTE = [0,1,2,3,4].some(dd => {
+      const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() + dd);
+      if (dt > today) return false;
+      return !!vacances[localDK(dt)];
+    });
 
-    function _isVacWeek(mondayOffset) {
-      return [0,1,2,3,4].some(dd => {
-        const dt = new Date(weekMondayA);
-        dt.setDate(weekMondayA.getDate() + mondayOffset * 7 + dd);
-        if (dt > today && mondayOffset === 0) return false;
-        return !!vacances[localDK(dt)];
-      });
-    }
+    // Signal calendrier : aucune heure saisie cette semaine dans M1/M2
+    // (noWorkThisWeek déclaré plus haut, avant les boucles de compteurs)
 
-    // Compter les semaines de vacances consécutives en remontant (max 12 semaines)
-    let consVacWeeks = 0;
-    const isMonday = (today.getDay() || 7) === 1;
-    // Semaine en cours
-    if (_isVacWeek(0)) {
-      consVacWeeks = 1;
-      // Remonter dans le passé
-      for (let w = 1; w <= 12; w++) {
-        if (_isVacWeek(-w)) consVacWeeks++;
-        else break;
-      }
-    } else if (isMonday && _isVacWeek(-1)) {
-      // Lundi matin : la sem passée était vacances → on part de la semaine précédente
-      consVacWeeks = 1;
-      for (let w = 2; w <= 12; w++) {
-        if (_isVacWeek(-w)) consVacWeeks++;
-        else break;
-      }
-    }
-
-    const isCurrentWeekVacation = consVacWeeks > 0;
+    // Signal combiné : weeklyH7 effective ≤ seuil ET peu de données historiques
     const belowBaseThisWeek = weeklyH7Effective <= _seuil && countWorkDays28 < 3;
+
+    const isCurrentWeekVacation = isVacFromDTE; // uniquement vacances déclarées dans M4
 
     // avgH7 déjà déclaré plus haut — fatHS forcé à 0 en vacances dans _scores()
 
@@ -1076,7 +1042,6 @@ class DTEEngine {
       _weeklyH7:      weeklyH7Effective,
       _recentWeeklyH: recentWeeklyH,
       _isVacationWeek: isCurrentWeekVacation,
-      _consVacWeeks:  consVacWeeks,
       _consec:        consec,
       _consecOT:      consecOT,
       _cumulWeeks:    cumulWeeksR,
@@ -1110,28 +1075,28 @@ class DTEEngine {
     try {
       const today    = (() => { const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); })();
       const history  = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY')||'[]');
-      const ci       = history.find(h=>h.date===today) || history[history.length-1];
+      const ci       = history.find(h=>h.date===today); // check-in du jour uniquement — pas de fallback (hier≠aujourd'hui)
       if (ci) {
         // Sommeil court → fatigue +, performance −
         if (ci.sleep !== undefined) {
           const sleepDef = (4 - ci.sleep) / 4;  // 0=bien, 1=très mal
-          checkinBoost.fatigue    += sleepDef * 0.14;  // Thompson 2022: +14% cortisol après privation
-          checkinBoost.performance -= sleepDef * 0.15;  // Thomson 2022 + OMS: perf −15% nuit courte
-          checkinBoost.recovery   -= sleepDef * 0.15;
+          checkinBoost.fatigue    += sleepDef * 0.09;  // Thompson 2022 — atténué : signal parmi d'autres
+          checkinBoost.performance -= sleepDef * 0.10;  // Thomson 2022 + OMS — atténué
+          checkinBoost.recovery   -= sleepDef * 0.10;
         }
         // Énergie basse → fatigue +
         if (ci.energy !== undefined) {
           const energyDef = (4 - ci.energy) / 4;
-          checkinBoost.fatigue    += energyDef * 0.15;
-          checkinBoost.performance -= energyDef * 0.12;
+          checkinBoost.fatigue    += energyDef * 0.10;
+          checkinBoost.performance -= energyDef * 0.08;
         }
         // Stress ressenti → stress +
         if (ci.stress !== undefined) {
-          checkinBoost.stress += (ci.stress / 4) * 0.30;  // ANACT: stress ressenti corrèle 0.65 avec cortisol
+          checkinBoost.stress += (ci.stress / 4) * 0.15;  // ANACT — atténué : subjectif, ne remplace pas le modèle biologique
         }
         // Douleurs → fatigue musculo +
         if (ci.pain !== undefined && ci.pain > 0) {
-          checkinBoost.fatigue += (ci.pain / 4) * 0.10;
+          checkinBoost.fatigue += (ci.pain / 4) * 0.07;
         }
         // Motivation → performance +
         if (ci.motiv !== undefined) {
@@ -1198,40 +1163,21 @@ class DTEEngine {
     const isVacWeekNow = norm._isVacationWeek || false;
     const fatHS         = isVacWeekNow ? 0 : norm._avgExtra7 * 0.130 * c.fh; // INRS phases
     const fatSommeil    = norm.sleepDebt * 0.35;           // Thompson 2022 : +14% cortisol/nuit courte
-    // ── COEFFICIENTS VACANCES DYNAMIQUES — de Bloom 2010 ──────────────────────
-    // Plus les vacances consécutives sont longues, plus la récupération est profonde.
-    // Calibration : de Bloom 2010 J.Occup.Health — fade-in effect sur 1-3 semaines.
-    //   1 sem  : récupération partielle (~30-40% load réduit)
-    //   2 sem  : récupération significative (~50-65% load réduit)
-    //   3 sem+ : récupération quasi-complète (~70-80% load réduit)
-    const _nVac = isVacWeekNow ? (norm._consVacWeeks || 1) : 0;
-    // _vacCumulF : réduction de cumulAmp selon semaines de vacances consécutives
-    const _vacCumulF = _nVac >= 3 ? 0.40   // 3 sem+ : récupération quasi-complète
-                     : _nVac === 2 ? 0.55   // 2 sem  : récupération significative
-                     : _nVac === 1 ? 0.70   // 1 sem  : récupération partielle
-                     : 1.0;                 // pas de vacances
-    // _vacFatF : réduction fatSurchar/fatBurnout selon semaines de vacances
-    const _vacFatF   = _nVac >= 3 ? 0.20   // 3 sem+ : traces résiduelles minimales
-                     : _nVac === 2 ? 0.35   // 2 sem
-                     : _nVac === 1 ? 0.50   // 1 sem
-                     : 1.0;
-    const fatSurchar = norm.surcharge * 0.12 * _vacFatF;
-    const fatBurnout = norm.burnout * 0.22 * _vacFatF;
+    const fatSurchar    = norm.surcharge * 0.12;
+    const fatBurnout    = norm.burnout * 0.22;
 
     // J.Occup.Health 2021 — amplification dose-temps non-linéaire
-    const _cumulAmpBase = cumW >= 24 ? 2.20   // 6 mois — seuil décisif étude Taiwan
-                        : cumW >= 16 ? 1.95   // 4 mois
-                        : cumW >= 12 ? 1.75   // 3 mois — risque OMS biologique établi
-                        : cumW >= 10 ? 1.65   // 2.5 mois
-                        : cumW >= 8  ? 1.55   // 2 mois
-                        : cumW >= 4  ? 1.25   // 1 mois
-                        : 1.0;
-    const cumulAmp = isVacWeekNow ? Math.max(1.0, _cumulAmpBase * _vacCumulF) : _cumulAmpBase;
+    const cumulAmp = cumW >= 24 ? 2.20   // 6 mois — seuil décisif étude Taiwan
+                   : cumW >= 16 ? 1.95   // 4 mois
+                   : cumW >= 12 ? 1.75   // 3 mois — risque OMS biologique établi
+                   : cumW >= 10 ? 1.65   // 2.5 mois
+                   : cumW >= 8  ? 1.55   // 2 mois
+                   : cumW >= 4  ? 1.25   // 1 mois
+                   : 1.0;
 
     // Sonnentag 2003 — dégradation du détachement psychologique
-    // En vacances : sonnentagMult = 1.0 (les vacances permettent la récupération du détachement)
-    const sonnentagMult = isVacWeekNow ? 1.0
-                        : consecOT >= 20 ? 1.15   // >4 sem HS : détachement sévèrement compromis
+    // Effets mesurés sur : relaxation, maîtrise, contrôle pendant les hors-travail
+    const sonnentagMult = consecOT >= 20 ? 1.15   // >4 sem HS : détachement sévèrement compromis
                         : consecOT >= 12 ? 1.10   // >2.4 sem HS : détachement partiellement compromis
                         : consecOT >= 5  ? 1.05   // >1 sem HS : premier signal Sonnentag
                         : 1.0;                    // <5j : récupération weekend normale (baseline)
@@ -1246,7 +1192,7 @@ class DTEEngine {
     //   Nuit partielle : ×1.20 (mélatonine partiellement supprimée, INRS)
     //   Décalé tard    : ×1.10 (dette sommeil mécanique, ANACT)
     const nightFactor = norm._nightFactor || 1.0;
-    const cortisolS   = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest);
+    const cortisolS   = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest, consecNonOT);
 
     // stressExt : composante chronique (fatigue × variabilité) — décroit avec TOUTE absence de HS
     // Meijman & Mulder 1998 : récupération commence dès que charge ≤ baseline, WE ou pas.
@@ -1393,8 +1339,6 @@ class DTEEngine {
     // OEM 2025 (Jang) : stress chronique amplifie le risque cérébral si exposé >52h
     const stressBoostCV  = strFinal * 0.15;   // stress 100% → +15 pts cvRisk
     const stressBoostCog = (strFinal > 0.6 && cumW > 4) ? (strFinal - 0.6) * 0.10 : 0;
-
-
 
     return {
       fatigue:      Math.round(fatFinal * 100),
