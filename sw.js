@@ -1,9 +1,9 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 3.1.0 (Le Parfait - Offline Solide + Periodic Sync)
+ * Version : 6.0.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "heuressup-cache-v3.1.0";
+const CACHE_NAME = "heuressup-cache-v6.0.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -119,7 +119,7 @@ self.addEventListener("fetch", (event) => {
           if (cachedResponse) return cachedResponse;
           
           // Secours ultime pour la navigation : renvoyer le menu
-          if (event.request.headers.get("accept").includes("text/html")) {
+          if (event.request.headers.get("accept") && event.request.headers.get("accept").includes("text/html")) {
             return caches.match(OFFLINE_URL);
           }
         });
