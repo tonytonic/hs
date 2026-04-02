@@ -11,15 +11,13 @@
   <meta name="mobile-web-app-capable" content="yes">
 
   <script>
-    // Mise à jour de la version pour forcer le rafraîchissement sur Cloudflare
-    const APP_VERSION = "6.0.1"; 
+    const APP_VERSION = "6.0.2"; 
 
     async function registerSW() {
       if ('serviceWorker' in navigator) {
         try {
-          // Utilisation du chemin racine /sw.js
           const reg = await navigator.serviceWorker.register('/sw.js');
-          console.log("✅ Service Worker 6.0.1 enregistré");
+          console.log("✅ Service Worker enregistré");
 
           if ('periodicSync' in reg) {
             const status = await navigator.permissions.query({
@@ -27,7 +25,7 @@
             });
             if (status.state === 'granted') {
               await reg.periodicSync.register('update-cache', {
-                minInterval: 24 * 60 * 60 * 1000, // 24h
+                minInterval: 24 * 60 * 60 * 1000,
               });
             }
           }
@@ -44,14 +42,14 @@
 
       if (stored !== APP_VERSION) {
         localStorage.setItem("APP_VERSION", APP_VERSION);
-        // Force le rechargement pour vider le vieux cache GitHub
-        location.reload(true); 
-      } else {
-        // Redirection vers le menu sur la racine Cloudflare
-        setTimeout(() => {
-          location.replace("/menu.html");
-        }, 1500);
+
+        // 🔥 FIX iOS : reload propre
+        window.location.href = "/";
+        return;
       }
+
+      // 🔥 FIX iOS : redirection propre sans conflit SW
+      window.location.href = "/menu.html";
     }
 
     window.addEventListener('DOMContentLoaded', initApp);
@@ -75,7 +73,7 @@
   <div style="text-align: center;">
     <div class="loader"></div>
     <p>Lancement du simulateur RPG...</p>
-    <small>Version v6.0.1</small>
+    <small>Version v6.0.2</small>
   </div>
 </body>
 </html>
