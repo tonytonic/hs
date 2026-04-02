@@ -1,12 +1,12 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 6.0.1 (L'Intégral - Zéro Simplification)
+ * Version : 6.0.1 (L'Intégral - CCN & Full Logic)
  */
 
 const CACHE_NAME = "heuressup-cache-v6.0.1";
 const OFFLINE_URL = "/menu.html";
 
-// --- LA LISTE TOTALE ---
+// --- LA LISTE TOTALE (Zéro oubli) ---
 const FILES_TO_CACHE = [
   "/", 
   "/index.html", 
@@ -20,6 +20,12 @@ const FILES_TO_CACHE = [
   "/foxpredit.jpg",
   "/heures/index.html", 
   "/paye/index.html",
+  
+  // --- DOSSIER CCN (Fixé selon capture) ---
+  "/ccn/index.html",
+  "/ccn/conventions-collectives.js",
+
+  // --- DOSSIER MODULE 4 ---
   "/module4/index.html",
   "/module4/js/app.js",
   "/module4/js/core/dte-engine.js",
@@ -42,9 +48,13 @@ const FILES_TO_CACHE = [
   "/module4/css/components.css",
   "/module4/css/charts.css",
   "/module4/css/twin-body.css",
+
+  // --- DOSSIER IMAGES ---
   "/images/renard-annuel.png.jpg", 
   "/images/renard-mensuel.png.jpg", 
   "/images/renard-central.png.jpg",
+
+  // --- DOSSIER FOX (RPG COMPLET) ---
   "/fox/index.html", 
   "/fox/css/style.css", 
   "/fox/js/safety.js",
@@ -75,15 +85,15 @@ const FILES_TO_CACHE = [
   "/fox/js/main-rpg.js"
 ];
 
-// --- INSTALLATION : Mise en cache fichier par fichier avec logs ---
+// --- INSTALLATION ---
 self.addEventListener("install", (event) => {
-  console.log("📥 [SW] Installation en cours...");
+  console.log("📥 [SW] Installation Master Cloudflare...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return Promise.all(
         FILES_TO_CACHE.map((url) => {
           return cache.add(url).catch((err) => {
-            console.warn("⚠️ [SW] Échec de mise en cache pour :", url, err);
+            console.warn("⚠️ [SW] Fichier ignoré au cache :", url);
           });
         })
       );
@@ -92,142 +102,100 @@ self.addEventListener("install", (event) => {
   self.skipWaiting();
 });
 
-// --- ACTIVATION : Nettoyage des anciens caches ---
+// --- ACTIVATION ---
 self.addEventListener("activate", (event) => {
-  console.log("🚀 [SW] Activation du Service Worker...");
+  console.log("🚀 [SW] Service Worker Activé.");
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => {
-          console.log("🗑️ [SW] Suppression ancien cache :", key);
-          return caches.delete(key);
-        })
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
       );
     })
   );
   self.clients.claim();
 });
 
-// --- FETCH : Network First avec Fallback Cache & Navigation ---
+// --- FETCH (Network First) ---
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
-
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const cacheCopy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, cacheCopy);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy));
         }
         return networkResponse;
       })
-      .catch((err) => {
-        console.log("📶 [SW] Offline détecté, tentative de cache pour :", event.request.url);
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          
-          // Secours ultime pour la navigation (HTML)
-          if (event.request.mode === 'navigate' || (event.request.headers.get("accept") && event.request.headers.get("accept").includes("text/html"))) {
-            console.log("🏠 [SW] Redirection vers l'URL Offline :", OFFLINE_URL);
-            return caches.match(OFFLINE_URL);
-          }
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.mode === 'navigate') return caches.match(OFFLINE_URL);
         });
       })
   );
 });
 
-// --- SYNC : Synchronisation en arrière-plan (Punches) ---
+// --- SYNC ---
 self.addEventListener("sync", (event) => {
-  console.log("🔄 [SW] Événement Sync détecté :", event.tag);
   if (event.tag === "sync-punches") {
-    event.waitUntil(
-      console.log("✅ [SW] Synchronisation des pointages Cloudflare réussie.")
-    );
+    console.log("🔄 [SW] Synchronisation des données Cloudflare...");
   }
 });
 
-// --- PERIODIC SYNC : Mise à jour automatique du cache ---
+// --- PERIODIC SYNC ---
 self.addEventListener("periodicsync", (event) => {
-  console.log("📅 [SW] Événement PeriodicSync détecté :", event.tag);
   if (event.tag === "update-cache") {
     event.waitUntil(
       caches.open(CACHE_NAME).then((cache) => {
-        return Promise.all(
-          FILES_TO_CACHE.map(url => cache.add(url).catch(e => console.error("❌ [SW] Update failed for:", url)))
-        );
+        return Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})));
       })
     );
   }
 });
 
-// --- PUSH : Notifications distantes ---
+// --- NOTIFICATIONS PUSH ---
 self.addEventListener("push", (event) => {
-  console.log("🔔 [SW] Notification Push reçue.");
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Nouvelle notification du simulateur" };
-  
-  const options = {
-    body: data.body,
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
-    vibrate: [100, 50, 100],
-    data: { dateOfArrival: Date.now(), primaryKey: 1 }
-  };
-
+  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Notification RPG active" };
   event.waitUntil(
-    self.registration.showNotification(data.title, options)
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      vibrate: [100, 50, 100]
+    })
   );
 });
 
-// --- MESSAGE : Communication avec l'App (Géolocalisation) ---
+// --- GÉOLOCALISATION ---
 self.addEventListener("message", (event) => {
-  console.log("💬 [SW] Message reçu du client :", event.data);
   if (event.data && event.data.type === "GEO_NOTIFY") {
     const { action, distance } = event.data;
     const isArrival = action === "in";
-    
-    self.registration.showNotification(isArrival ? "📍 Arrivée en zone" : "🏁 Départ de zone", {
-      body: isArrival ? `Vous êtes à ${Math.round(distance)}m de la zone.` : `Vous avez quitté la zone de pointage.`,
+    self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
+      body: isArrival ? `Zone à ${Math.round(distance)}m` : `Sortie de zone`,
       icon: "/icon-192.png",
-      tag: "geo-punch",
-      actions: [
-        { action: "punch", title: "Pointer maintenant" },
-        { action: "dismiss", title: "Fermer" }
-      ],
+      actions: [{ action: "punch", title: "Pointer" }, { action: "dismiss", title: "Fermer" }],
       data: { action }
     });
   }
 });
 
-// --- NOTIFICATION CLICK : Gestion des actions et redirections ---
+// --- CLIC NOTIF ---
 self.addEventListener("notificationclick", (event) => {
-  console.log("🖱️ [SW] Clic sur notification :", event.notification.tag);
   event.notification.close();
-  
   if (event.action === "dismiss") return;
-
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       const action = event.notification.data?.action || "in";
-      
-      // Chercher si la page est déjà ouverte
       for (const c of list) {
         if (c.url.includes("/paye/index.html") && "focus" in c) {
           c.postMessage({ type: "DO_PUNCH", action });
           return c.focus();
         }
       }
-      
-      // Sinon ouvrir une nouvelle fenêtre
       return clients.openWindow("/paye/index.html").then((w) => {
-        if (w) {
-          setTimeout(() => {
-            w.postMessage({ type: "DO_PUNCH", action });
-          }, 1500);
-        }
+        if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
       });
     })
   );
