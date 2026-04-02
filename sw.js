@@ -1,12 +1,12 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 6.0.3 (L'INTÉGRAL - FIX CLOUDFLARE ONLINE + FIX iOS REDIRECT)
+ * Version : 6.0.3 (FIX iOS STABLE)
  */
 
 const CACHE_NAME = "heuressup-cache-v6.0.3";
 const OFFLINE_URL = "/menu.html";
 
-// --- LA LISTE TOTALE (Zéro oubli, chemins absolus) ---
+// --- LA LISTE TOTALE ---
 const FILES_TO_CACHE = [
   "/", 
   "/index.html", 
@@ -80,15 +80,13 @@ const FILES_TO_CACHE = [
 
 // --- INSTALLATION ---
 self.addEventListener("install", (event) => {
-  console.log("📥 [SW] Installation en cours...");
+  console.log("📥 [SW] Installation...");
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return Promise.all(
-        FILES_TO_CACHE.map((url) => {
-          return cache.add(url).catch((err) => {
-            console.warn("⚠️ [SW] Fichier non mis en cache :", url, err);
-          });
-        })
+        FILES_TO_CACHE.map((url) =>
+          cache.add(url).catch(() => {})
+        )
       );
     })
   );
@@ -97,21 +95,20 @@ self.addEventListener("install", (event) => {
 
 // --- ACTIVATION ---
 self.addEventListener("activate", (event) => {
-  console.log("🚀 [SW] Activation et nettoyage...");
+  console.log("🚀 [SW] Activation...");
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => {
-          console.log("🗑️ [SW] Suppression ancien cache :", key);
-          return caches.delete(key);
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys
+          .filter((key) => key !== CACHE_NAME)
+          .map((key) => caches.delete(key))
+      )
+    )
   );
   self.clients.claim();
 });
 
-// --- FETCH (Network-First avec fix iOS redirection) ---
+// --- FETCH (VERSION STABLE iOS + Android) ---
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
@@ -119,31 +116,31 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((networkResponse) => {
 
-        // 🔥 FIX iOS : bloquer redirections et réponses invalides
+        // 🔥 FIX iOS sans casser le flux
         if (
           !networkResponse ||
           networkResponse.status !== 200 ||
           networkResponse.type === "opaqueredirect"
         ) {
-          return caches.match(event.request);
+          return caches.match(event.request).then((cached) => {
+            return cached || networkResponse;
+          });
         }
 
-        // Mise à jour du cache
-        const responseToCache = networkResponse.clone();
+        // Mise en cache
+        const responseClone = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, responseToCache);
+          cache.put(event.request, responseClone);
         });
 
         return networkResponse;
       })
-      .catch((err) => {
-        console.log("📶 [SW] Mode Offline ou Erreur Réseau sur :", event.request.url);
-        
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
+      .catch(() => {
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
 
           if (
-            event.request.mode === 'navigate' ||
+            event.request.mode === "navigate" ||
             event.request.headers.get("accept")?.includes("text/html")
           ) {
             return caches.match(OFFLINE_URL);
@@ -153,21 +150,20 @@ self.addEventListener("fetch", (event) => {
   );
 });
 
-// --- SYNC (Punches) ---
+// --- SYNC ---
 self.addEventListener("sync", (event) => {
-  console.log("🔄 [SW] Synchro détectée :", event.tag);
   if (event.tag === "sync-punches") {
-    console.log("✅ [SW] Pointages synchronisés.");
+    console.log("✅ Sync OK");
   }
 });
 
-// --- PERIODIC SYNC (Auto-Update) ---
+// --- PERIODIC SYNC ---
 self.addEventListener("periodicsync", (event) => {
   if (event.tag === "update-cache") {
     event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => {
-        return Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})));
-      })
+      caches.open(CACHE_NAME).then((cache) =>
+        Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})))
+      )
     );
   }
 });
@@ -175,45 +171,61 @@ self.addEventListener("periodicsync", (event) => {
 // --- PUSH ---
 self.addEventListener("push", (event) => {
   const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Notification RPG" };
-  const options = {
-    body: data.body,
-    icon: "/icon-192.png",
-    badge: "/icon-192.png",
-    vibrate: [100, 50, 100]
-  };
-  event.waitUntil(self.registration.showNotification(data.title, options));
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      vibrate: [100, 50, 100]
+    })
+  );
 });
 
-// --- MESSAGE (Géolocalisation) ---
+// --- MESSAGE ---
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "GEO_NOTIFY") {
+  if (event.data?.type === "GEO_NOTIFY") {
     const { action, distance } = event.data;
     const isArrival = action === "in";
-    self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
-      body: isArrival ? `Zone à ${Math.round(distance)}m.` : `Sortie de zone.`,
-      icon: "/icon-192.png",
-      tag: "geo-punch",
-      actions: [{ action: "punch", title: "Pointer" }, { action: "dismiss", title: "Fermer" }],
-      data: { action }
-    });
+
+    self.registration.showNotification(
+      isArrival ? "📍 Arrivée" : "🏁 Départ",
+      {
+        body: isArrival ? `Zone à ${Math.round(distance)}m.` : `Sortie de zone.`,
+        icon: "/icon-192.png",
+        tag: "geo-punch",
+        actions: [
+          { action: "punch", title: "Pointer" },
+          { action: "dismiss", title: "Fermer" }
+        ],
+        data: { action }
+      }
+    );
   }
 });
 
-// --- NOTIFICATION CLICK ---
+// --- CLICK NOTIF ---
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
   if (event.action === "dismiss") return;
+
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       const action = event.notification.data?.action || "in";
+
       for (const c of list) {
         if (c.url.includes("/paye/index.html") && "focus" in c) {
           c.postMessage({ type: "DO_PUNCH", action });
           return c.focus();
         }
       }
+
       return clients.openWindow("/paye/index.html").then((w) => {
-        if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
+        if (w) {
+          setTimeout(() => {
+            w.postMessage({ type: "DO_PUNCH", action });
+          }, 1500);
+        }
       });
     })
   );
