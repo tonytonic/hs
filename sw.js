@@ -1,6 +1,6 @@
 /**
  * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 6.0.3 (L'INTÉGRAL - FIX CLOUDFLARE ONLINE)
+ * Version : 6.0.3 (L'INTÉGRAL - FIX CLOUDFLARE ONLINE + FIX iOS REDIRECT)
  */
 
 const CACHE_NAME = "heuressup-cache-v6.0.3";
@@ -111,19 +111,24 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// --- FETCH (Network-First avec détection de redirection Cloudflare) ---
+// --- FETCH (Network-First avec fix iOS redirection) ---
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Si Cloudflare renvoie une redirection ou une erreur, on laisse passer sans toucher
-        if (!networkResponse || networkResponse.status !== 200) {
-          return networkResponse;
+
+        // 🔥 FIX iOS : bloquer redirections et réponses invalides
+        if (
+          !networkResponse ||
+          networkResponse.status !== 200 ||
+          networkResponse.type === "opaqueredirect"
+        ) {
+          return caches.match(event.request);
         }
 
-        // On met à jour le cache proprement
+        // Mise à jour du cache
         const responseToCache = networkResponse.clone();
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache);
@@ -134,12 +139,13 @@ self.addEventListener("fetch", (event) => {
       .catch((err) => {
         console.log("📶 [SW] Mode Offline ou Erreur Réseau sur :", event.request.url);
         
-        // On cherche dans le cache
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) return cachedResponse;
 
-          // Si c'est une page HTML, on renvoie vers le menu offline
-          if (event.request.mode === 'navigate' || event.request.headers.get("accept").includes("text/html")) {
+          if (
+            event.request.mode === 'navigate' ||
+            event.request.headers.get("accept")?.includes("text/html")
+          ) {
             return caches.match(OFFLINE_URL);
           }
         });
