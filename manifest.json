@@ -2,8 +2,8 @@
   "name": "Simulateur Heures Supplémentaires",
   "short_name": "Heures Sup",
   "description": "Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.",
-  "id": "/menu.html",
-  "start_url": "/menu.html",
+  "id": "/",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "display_override": [
