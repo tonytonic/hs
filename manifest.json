@@ -2,90 +2,14 @@
   "name": "Simulateur Heures Supplémentaires",
   "short_name": "Heures Sup",
   "description": "Outil personnel de suivi des heures supplémentaires. Compteur annuel et simulateur mensuel avec report automatique, estimation € et export PDF/JSON.",
-  "id": "https://tonytonic.github.io/hs/menu.html",
-  "start_url": "https://tonytonic.github.io/hs/menu.html",
-  "scope": "https://tonytonic.github.io/hs/",
+  "id": "/menu.html",
+  "start_url": "/menu.html",
+  "scope": "/",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui"
-  ],
   "background_color": "#4FB3C2",
   "theme_color": "#4FB3C2",
   "orientation": "portrait-primary",
-  "categories": [
-    "productivity",
-    "finance",
-    "utilities"
-  ],
   "lang": "fr",
-  "dir": "ltr",
-  "launch_handler": {
-    "client_mode": "focus-existing"
-  },
-  "scope_extensions": [
-    {
-      "type": "origin",
-      "origin": "https://tonytonic.github.io"
-    }
-  ],
-  "protocol_handlers": [
-    {
-      "protocol": "web+heures",
-      "url": "https://tonytonic.github.io/hs/menu.html?type=%s"
-    }
-  ],
-  "note_taking": {
-    "new_note_url": "https://tonytonic.github.io/hs/paye/index.html"
-  },
-  "edge_side_panel": {
-    "preferred_width": 400
-  },
-  "widgets": [
-    {
-      "name": "Heures Sup",
-      "short_name": "Heures",
-      "description": "Aperçu rapide de vos heures",
-      "tag": "heures-widget",
-      "ms_ac_template": "widgets/template.json",
-      "data": "widgets/data.json",
-      "type": "application/json",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ],
-      "screenshots": [
-        {
-          "src": "02-compteur-annuel.png",
-          "sizes": "834x1386",
-          "type": "image/png",
-          "label": "Widget Preview"
-        }
-      ]
-    }
-  ],
-  "share_target": {
-    "action": "https://tonytonic.github.io/hs/menu.html",
-    "method": "GET",
-    "enctype": "application/x-www-form-urlencoded",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  },
-  "file_handlers": [
-    {
-      "action": "https://tonytonic.github.io/hs/menu.html",
-      "accept": {
-        "application/json": [".json"],
-        "application/pdf": [".pdf"]
-      }
-    }
-  ],
   "prefer_related_applications": true,
   "related_applications": [
     {
@@ -95,105 +19,18 @@
     }
   ],
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "shortcuts": [
-    {
-      "name": "Compteur annuel",
-      "short_name": "Annuel",
-      "url": "https://tonytonic.github.io/hs/heures/index.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Simulateur mensuel",
-      "short_name": "Mensuel",
-      "url": "https://tonytonic.github.io/hs/paye/index.html",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    }
+    { "name": "Compteur annuel", "url": "/heures/index.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Simulateur mensuel", "url": "/paye/index.html", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ],
   "screenshots": [
-    {
-      "src": "01-bienvenue.png",
-      "sizes": "818x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Bienvenue"
-    },
-    {
-      "src": "02-compteur-annuel.png",
-      "sizes": "834x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Annuel"
-    },
-    {
-      "src": "03-calendrier-annuel.png",
-      "sizes": "829x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Calendrier"
-    },
-    {
-      "src": "04-details-calculs.png",
-      "sizes": "834x1386",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Détails"
-    },
-    {
-      "src": "05-calendrier-mensuel.png",
-      "sizes": "770x1501",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Mensuel"
-    },
-    {
-      "src": "06-recapitulatif.png",
-      "sizes": "758x1501",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Récap"
-    },
-    {
-      "src": "07-wide-compteur.png",
-      "sizes": "1334x750",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Vue large"
-    }
+    { "src": "/01-bienvenue.png", "sizes": "818x1386", "type": "image/png", "form_factor": "narrow" },
+    { "src": "/07-wide-compteur.png", "sizes": "1334x750", "type": "image/png", "form_factor": "wide" }
   ],
   "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
 }
