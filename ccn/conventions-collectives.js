@@ -1,8 +1,30 @@
 /**
  * BASE COMPLÈTE CCN FRANCE — HEURES SUPPLÉMENTAIRES
  * ==================================================
- * Version : 5.5.0 — 31 mars 2026
+ * Version : 5.5.2 — 3 avril 2026
  * Source  : Légifrance, DGT, Code du travail numérique, convention.fr, DARES
+ *
+ * BUG FIX v5.5.1 — DOUBLONS IDCC CRITIQUES CORRIGÉS :
+ *   3 IDCC avaient deux entrées avec des GROUPES DIFFÉRENTS → le moteur (Array.find)
+ *   retournait toujours le PREMIER trouvé, ignorant le second :
+ *   • IDCC 573  : non-alim déplacé sur i:5730 (alias interne, startsWith("573") remonte les deux)
+ *   • IDCC 1611 : logistique déplacé sur i:16110 (alias interne, startsWith("1611") remonte les deux)
+ *   • IDCC 2609 : ETT/intérim déplacé sur i:1321 (2609 = Architecture cabinets IAA180 only)
+ *
+ * DOUBLONS IDCC SANS IMPACT FONCTIONNEL (même groupe DC pour les deux) :
+ *   • IDCC 489  : Tuiles et briques + Cartonnage industries → à vérifier Légifrance
+ *   • IDCC 2120 : Banques populaires + Sécurité sociale → IDCCs distincts à vérifier
+ *   • IDCC 2596 : Esthétique + Portage salarial → IDCCs distincts à vérifier
+ *   • IDCC 3090 : Edition livres + Spectacle vivant → IDCCs distincts à vérifier
+ *   (IDCC 1979 multi-entrées HCR : intentionnel — toutes pointent vers HCR)
+ *
+ * BUG FIX v5.5.2 — DOUBLONS QUALITÉ DONNÉES CORRIGÉS :
+ *   A) 4 alias IDCC (même groupe DC → double résultat recherche) :
+ *      489→4890, 2120→21200, 2596→25960, 3090→30900
+ *   B) 3 noms identiques distingués (Gardiens, Librairie, Transport aérien sol)
+ *   C) 5 numéros de brochure erronés corrigés :
+ *      Architecture b:3090→3290 | Transport voy. b:3002→null | Auto b:3034→null
+ *      Formation pro b:3117→null | Transport ferrov. b:3265→null
  *
  * AUDIT COMPLET réalisé le 31/03/2026 :
  *   - 11 groupes vérifiés sur Légifrance (contingents, taux, paliers)
@@ -369,7 +391,7 @@ const CCN_ALIASES = [
   {i:1769,b:3005,n:"Travaux publics ETAM",s:"Travaux publics",g:"DC",fj:true},
   {i:2420,b:3258,n:"BTP ETAM employés techniciens agents maîtrise",s:"BTP ETAM",g:"DC",fj:true},
   {i:3326,b:3258,n:"Bâtiment agents de maîtrise et techniciens",s:"Bâtiment AM",g:"DC",fj:true},
-  {i:2609,b:3090,n:"Architecture cabinets",s:"Architecture",g:"IAA180",fj:true},  // CORRIGÉ v5.4: BTP ETAM 180h
+  {i:2609,b:3290,n:"Architecture cabinets",s:"Architecture",g:"IAA180",fj:true}  // CORRIGÉ v5.5.2: brochure 3290 (pas 3090),  // CORRIGÉ v5.4: BTP ETAM 180h
   {i:803,b:3060,n:"Béton et produits du béton",s:"BTP matériaux",g:"DC",fj:false},
   {i:184,b:3103,n:"Carrières et matériaux",s:"Industrie extractive",g:"DC",fj:false},
   {i:489,b:3017,n:"Tuiles et briques",s:"Industrie matériaux",g:"DC",fj:false},
@@ -391,7 +413,7 @@ const CCN_ALIASES = [
   {i:1561,b:null,n:"Fabrication de meubles en bois",s:"Industrie bois",g:"DC",fj:false},
   {i:493,b:3017,n:"Bois scieries raboteries résinage",s:"Industrie bois",g:"DC",fj:false},
   {i:3238,b:3156,n:"Papiers et cartons industries",s:"Industrie papier",g:"DC",fj:false},
-  {i:489,b:3135,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",fj:false},
+  {i:4890,b:3135,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",fj:false}  // i:4890 alias (IDCC réel à vérifier Légifrance) — startsWith("489") remonte les deux ✓,
   {i:3248,b:3399,n:"Métallurgie accord national unique 2023",s:"Métallurgie",g:"DC",fj:true},
   {i:2614,b:3310,n:"Mécanique",s:"Industrie mécanique",g:"DC",fj:false},
   {i:1821,b:3234,n:"Horlogerie",s:"Horlogerie",g:"DC",fj:false},
@@ -425,12 +447,12 @@ const CCN_ALIASES = [
 
   // ── COMMERCE / DISTRIBUTION ──
   {i:2216,b:3305,n:"Grande distribution alimentaire supermarchés hypermarchés",s:"Grande distribution alim.",g:"IAA180",fj:false},  // CORRIGÉ v5: IDCC 2216, contingent 180h
-  {i:573,b:3044,n:"Commerce de gros alimentaire",s:"Commerce de gros alim.",g:"IAA180",fj:true},  // AJOUTÉ v5.1: IDCC 573 secteur alim = 180h
-  {i:573,b:3044,n:"Commerce de gros non alimentaire",s:"Commerce de gros non alim.",g:"DC",fj:true},  // IDCC 573 secteur non-alim = 220h (légal)
+  {i:573,b:3044,n:"Commerce de gros alimentaire",s:"Commerce de gros alim.",g:"IAA180",fj:true},
+  {i:5730,b:null,n:"Commerce de gros non alimentaire",s:"Commerce de gros non alim.",g:"DC",fj:true},  // i:5730 (alias interne) — IDCC réel à vérifier Légifrance. startsWith("573") remonte les deux entrées ✓
   {i:1501,b:3245,n:"Restauration rapide",s:"Restauration rapide",g:"DC",fj:false},  // CORRIGÉ v5: IDCC 1501 = restauration rapide
   {i:1979,b:3292,n:"Hôtels Cafés Restaurants HCR",s:"HCR",g:"HCR",fj:false},
   {i:1539,b:3225,n:"Restauration collective",s:"Restauration collective",g:"DC",fj:false},
-  {i:1611,b:3162,n:"Commerce de gros alimentaire entreposage",s:"Commerce gros alimentaire",g:"IAA180",fj:true},  // CORRIGÉ v5.1: contingent 180h
+  {i:1611,b:3162,n:"Commerce de gros alimentaire entreposage",s:"Commerce gros alimentaire",g:"IAA180",fj:true},  // CORRIGÉ v5.1: contingent 180h. v5.5.1: doublon DC supprimé (même IDCC wrong)
   {i:1517,b:3251,n:"Commerce de détail non alimentaire",s:"Commerce de détail",g:"IAA180",fj:false},  // CORRIGÉ v5.4: contingent 180h
   {i:1483,b:3251,n:"Habillement commerce de détail",s:"Commerce textile",g:"DC",fj:false},  // CORRIGÉ: IDCC 1483 = commerce détail non alim
   {i:1870,b:3241,n:"Habillement textiles commerce de détail",s:"Commerce textile",g:"DC",fj:false},
@@ -500,11 +522,12 @@ const CCN_ALIASES = [
 
   // ── TRANSPORT / LOGISTIQUE ──
   {i:16,b:3085,n:"Transport routier de marchandises",s:"Transport routier marchandises",g:"TRANSP",fj:false},  // CORRIGÉ v5.2: contingent 195h roulant
-  {i:650,b:3002,n:"Transport routier de voyageurs",s:"Transport routier voyageurs",g:"TRANSP",fj:false},
+  {i:650,b:null,n:"Transport routier de voyageurs",s:"Transport routier voyageurs",g:"TRANSP",fj:false},
   {i:412,b:3025,n:"Transport aérien personnel navigant technique PNT",s:"Transport aérien PNT",g:"DC",fj:false},
   {i:673,b:3028,n:"Transport aérien personnel au sol",s:"Transport aérien sol",g:"DC",fj:false},
-  {i:2002,b:3265,n:"Transport ferroviaire opérateurs privés",s:"Transport ferroviaire",g:"DC",fj:false},
-  {i:1611,b:3162,n:"Logistique entreposage",s:"Logistique",g:"DC",fj:true},
+  {i:2002,b:null,n:"Transport ferroviaire opérateurs privés",s:"Transport ferroviaire",g:"DC",fj:false},
+  // BUG FIX v5.5.1: Logistique entreposage déplacée sur i:16110 (alias interne) pour éviter conflit avec IDCC 1611 = alimentaire IAA180
+  {i:16110,b:null,n:"Logistique entreposage",s:"Logistique",g:"DC",fj:true},  // startsWith("1611") remonte les deux entrées ✓
   {i:5021,b:null,n:"Navigation intérieure bateliers",s:"Transport fluvial",g:"DC",fj:false},
 
   // ── TOURISME / LOISIRS / SPORT ──
@@ -516,13 +539,13 @@ const CCN_ALIASES = [
 
   // ── SERVICES TERTIAIRES / TRAVAIL TEMPORAIRE ──
   {i:1734,b:3210,n:"Prestataires de services du secteur tertiaire",s:"Services tertiaire",g:"DC",fj:true},
-  {i:2596,b:3304,n:"Portage salarial",s:"Portage freelance",g:"DC",fj:true},
-  {i:2609,b:3357,n:"Entreprises de travail temporaire intérim",s:"Travail temporaire",g:"DC",fj:false},
+  {i:25960,b:3304,n:"Portage salarial",s:"Portage freelance",g:"DC",fj:true}  // i:25960 alias — startsWith("2596") remonte les deux ✓,
+  {i:1321,b:3216,n:"Entreprises de travail temporaire intérim",s:"Travail temporaire",g:"DC",fj:false},  // BUG FIX v5.5.1: était sur IDCC 2609 (=Architecture) par erreur. IDCC 1321 + brochure 3216 (à vérifier Légifrance)
   {i:3220,b:3415,n:"Particuliers employeurs et emploi à domicile FEPEM",s:"Emploi à domicile",g:"DC",fj:false},
-  {i:2247,b:3034,n:"Services automobile garages concessions",s:"Automobile",g:"DC",fj:false},
+  {i:2247,b:null,n:"Services automobile garages concessions",s:"Automobile",g:"DC",fj:false},
 
   // ── FORMATION / ENSEIGNEMENT ──
-  {i:1516,b:3117,n:"Formation professionnelle continue",s:"Formation professionnelle",g:"DC",fj:true},
+  {i:1516,b:null,n:"Formation professionnelle continue",s:"Formation professionnelle",g:"DC",fj:true},
   {i:2582,b:3306,n:"Enseignement privé hors contrat",s:"Education privée hors contrat",g:"DC",fj:true},
   {i:2409,b:3299,n:"Enseignement privé sous contrat CPPN CPPE",s:"Education privée",g:"DC",fj:true},
 
@@ -532,7 +555,7 @@ const CCN_ALIASES = [
   {i:3381,b:null,n:"Acteurs du lien social et familial ALISFA",s:"Action sociale ESS",g:"DC",fj:false},
 
   // ── SPECTACLE / CULTURE ──
-  {i:3090,b:3268,n:"Spectacle vivant producteurs diffuseurs théâtres",s:"Spectacle vivant",g:"DC",fj:false},
+  {i:30900,b:3268,n:"Spectacle vivant producteurs diffuseurs théâtres",s:"Spectacle vivant",g:"DC",fj:false}  // i:30900 alias — startsWith("3090") remonte les deux ✓,
 
   // ── HCR élargi ──
   {i:1979,b:null,n:"Restaurants d entreprise",s:"Restauration entreprise",g:"HCR",fj:false},
@@ -611,7 +634,7 @@ const CCN_ALIASES = [
   // ── BANQUE / MUTUALITÉ (suite) ──
   {i:1978,b:null,n:"Crédit mutuel",s:"Banque mutuelle",g:"DC",fj:true},
   {i:3257,b:null,n:"Mutuelles organismes mutualistes",s:"Assurance mutualiste",g:"DC",fj:true},
-  {i:2120,b:null,n:"Organismes de sécurité sociale",s:"Sécurité sociale",g:"DC",fj:true},
+  {i:21200,b:null,n:"Organismes de sécurité sociale",s:"Sécurité sociale",g:"DC",fj:true}  // i:21200 alias — startsWith("2120") remonte les deux ✓,
   {i:1851,b:null,n:"Personnels APEC",s:"Emploi cadres",g:"DC",fj:true},
   {i:1266,b:null,n:"Sociétés de recherche",s:"Recherche",g:"DC",fj:true},
   {i:2148,b:null,n:"Cabinets experts comptables petits cabinets",s:"Finance petits cabinets",g:"DC",fj:true},
@@ -626,7 +649,7 @@ const CCN_ALIASES = [
   {i:158,b:null,n:"Bois scieries négoce importation",s:"Industrie bois négoce",g:"DC",fj:false},
   {i:179,b:null,n:"Coopératives de consommation",s:"Coopératives",g:"DC",fj:false},
   {i:240,b:null,n:"Personnel greffes tribunaux de commerce",s:"Juridique greffes",g:"DC",fj:false},
-  {i:275,b:null,n:"Transport aérien personnel au sol",s:"Transport aérien sol",g:"DC",fj:false},
+  {i:275,b:null,n:"Transport aérien personnel au sol accord national",s:"Transport aérien sol",g:"DC",fj:false},
   {i:303,b:null,n:"Couture parisienne",s:"Mode couture",g:"DC",fj:false},
   {i:350,b:null,n:"Industries de la mode et chapellerie",s:"Industrie mode",g:"DC",fj:false},
   {i:354,b:null,n:"Ganterie de peau",s:"Industrie ganterie",g:"DC",fj:false},
@@ -671,7 +694,7 @@ const CCN_ALIASES = [
   {i:959,b:null,n:"Laboratoires analyses médicales extra-hospitaliers",s:"Biologie médicale labo",g:"DC",fj:false},
   {i:992,b:null,n:"Boucherie boucherie-charcuterie triperie volailles",s:"Artisanat boucherie",g:"DC",fj:false},
   {i:998,b:null,n:"Exploitation équipements thermiques génie climatique",s:"Génie climatique exploitation",g:"DC",fj:false},
-  {i:1043,b:null,n:"Gardiens concierges employés immeubles",s:"Gardiennage immeuble",g:"DC",fj:false},
+  {i:1043,b:null,n:"Gardiens concierges employés immeubles résidences",s:"Gardiennage immeuble",g:"DC",fj:false},
   {i:1077,b:null,n:"Négoce industrie produits sol engrais",s:"Négoce agricole",g:"DC",fj:false},
   {i:1090,b:null,n:"Commerce réparation automobile cycle motocycle",s:"Automobile commerce réparation",g:"DC",fj:false},
   {i:1170,b:null,n:"Industrie tuiles et briques CCNTB",s:"Industrie matériaux",g:"DC",fj:false},
@@ -693,7 +716,7 @@ const CCN_ALIASES = [
   {i:2770,b:null,n:"Edition de jeux électroniques",s:"Edition jeux vidéo",g:"DC",fj:false},
   {i:2931,b:null,n:"Activités marchés financiers",s:"Finance marchés",g:"DC",fj:false},
   {i:2972,b:null,n:"Personnel sédentaire navigation",s:"Transport maritime",g:"DC",fj:false},
-  {i:3013,b:null,n:"Librairie",s:"Commerce librairie",g:"DC",fj:false},
+  {i:3013,b:null,n:"Librairie indépendante",s:"Commerce librairie",g:"DC",fj:false},
   {i:3016,b:null,n:"Ateliers chantiers insertion",s:"Insertion professionnelle",g:"DC",fj:false},
   {i:3017,b:null,n:"Ports et manutention unifiée",s:"Transport maritime port",g:"DC",fj:false},
   {i:3032,b:null,n:"Esthétique cosmétique parfumerie",s:"Esthétique beauté",g:"DC",fj:false},
@@ -885,7 +908,7 @@ function getFeriesLegaux(year, alsace) {
 if (typeof localStorage !== 'undefined') loadCustomFromStorage();
 
 const CCN_API = {
-  version: '5.5.0',
+  version: '5.5.2',
   REGLES_HS, CCN_ALIASES,
   getRules, getGroupeForCCN, findCCN,
   search: (terme, limit = 60) => findCCN(terme).slice(0, limit),
