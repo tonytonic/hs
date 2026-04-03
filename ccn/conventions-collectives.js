@@ -391,7 +391,7 @@ const CCN_ALIASES = [
   {i:1769,b:3005,n:"Travaux publics ETAM",s:"Travaux publics",g:"DC",fj:true},
   {i:2420,b:3258,n:"BTP ETAM employés techniciens agents maîtrise",s:"BTP ETAM",g:"DC",fj:true},
   {i:3326,b:3258,n:"Bâtiment agents de maîtrise et techniciens",s:"Bâtiment AM",g:"DC",fj:true},
-  {i:2609,b:3290,n:"Architecture cabinets",s:"Architecture",g:"IAA180",fj:true}  // CORRIGÉ v5.5.2: brochure 3290 (pas 3090),  // CORRIGÉ v5.4: BTP ETAM 180h
+  {i:2609,b:3290,n:"Architecture cabinets",s:"Architecture",g:"IAA180",fj:true},  // CORRIGÉ v5.5.2: brochure 3290 (pas 3090)
   {i:803,b:3060,n:"Béton et produits du béton",s:"BTP matériaux",g:"DC",fj:false},
   {i:184,b:3103,n:"Carrières et matériaux",s:"Industrie extractive",g:"DC",fj:false},
   {i:489,b:3017,n:"Tuiles et briques",s:"Industrie matériaux",g:"DC",fj:false},
@@ -413,7 +413,7 @@ const CCN_ALIASES = [
   {i:1561,b:null,n:"Fabrication de meubles en bois",s:"Industrie bois",g:"DC",fj:false},
   {i:493,b:3017,n:"Bois scieries raboteries résinage",s:"Industrie bois",g:"DC",fj:false},
   {i:3238,b:3156,n:"Papiers et cartons industries",s:"Industrie papier",g:"DC",fj:false},
-  {i:4890,b:3135,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",fj:false}  // i:4890 alias (IDCC réel à vérifier Légifrance) — startsWith("489") remonte les deux ✓,
+  {i:4890,b:3135,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",fj:false},  // i:4890 alias (IDCC réel à vérifier Légifrance) — startsWith("489") remonte les deux ✓
   {i:3248,b:3399,n:"Métallurgie accord national unique 2023",s:"Métallurgie",g:"DC",fj:true},
   {i:2614,b:3310,n:"Mécanique",s:"Industrie mécanique",g:"DC",fj:false},
   {i:1821,b:3234,n:"Horlogerie",s:"Horlogerie",g:"DC",fj:false},
@@ -539,7 +539,7 @@ const CCN_ALIASES = [
 
   // ── SERVICES TERTIAIRES / TRAVAIL TEMPORAIRE ──
   {i:1734,b:3210,n:"Prestataires de services du secteur tertiaire",s:"Services tertiaire",g:"DC",fj:true},
-  {i:25960,b:3304,n:"Portage salarial",s:"Portage freelance",g:"DC",fj:true}  // i:25960 alias — startsWith("2596") remonte les deux ✓,
+  {i:25960,b:3304,n:"Portage salarial",s:"Portage freelance",g:"DC",fj:true},  // i:25960 alias — startsWith("2596") remonte les deux ✓
   {i:1321,b:3216,n:"Entreprises de travail temporaire intérim",s:"Travail temporaire",g:"DC",fj:false},  // BUG FIX v5.5.1: était sur IDCC 2609 (=Architecture) par erreur. IDCC 1321 + brochure 3216 (à vérifier Légifrance)
   {i:3220,b:3415,n:"Particuliers employeurs et emploi à domicile FEPEM",s:"Emploi à domicile",g:"DC",fj:false},
   {i:2247,b:null,n:"Services automobile garages concessions",s:"Automobile",g:"DC",fj:false},
@@ -555,7 +555,7 @@ const CCN_ALIASES = [
   {i:3381,b:null,n:"Acteurs du lien social et familial ALISFA",s:"Action sociale ESS",g:"DC",fj:false},
 
   // ── SPECTACLE / CULTURE ──
-  {i:30900,b:3268,n:"Spectacle vivant producteurs diffuseurs théâtres",s:"Spectacle vivant",g:"DC",fj:false}  // i:30900 alias — startsWith("3090") remonte les deux ✓,
+  {i:30900,b:3268,n:"Spectacle vivant producteurs diffuseurs théâtres",s:"Spectacle vivant",g:"DC",fj:false},  // i:30900 alias — startsWith("3090") remonte les deux ✓
 
   // ── HCR élargi ──
   {i:1979,b:null,n:"Restaurants d entreprise",s:"Restauration entreprise",g:"HCR",fj:false},
@@ -634,7 +634,7 @@ const CCN_ALIASES = [
   // ── BANQUE / MUTUALITÉ (suite) ──
   {i:1978,b:null,n:"Crédit mutuel",s:"Banque mutuelle",g:"DC",fj:true},
   {i:3257,b:null,n:"Mutuelles organismes mutualistes",s:"Assurance mutualiste",g:"DC",fj:true},
-  {i:21200,b:null,n:"Organismes de sécurité sociale",s:"Sécurité sociale",g:"DC",fj:true}  // i:21200 alias — startsWith("2120") remonte les deux ✓,
+  {i:21200,b:null,n:"Organismes de sécurité sociale",s:"Sécurité sociale",g:"DC",fj:true},  // i:21200 alias — startsWith("2120") remonte les deux ✓
   {i:1851,b:null,n:"Personnels APEC",s:"Emploi cadres",g:"DC",fj:true},
   {i:1266,b:null,n:"Sociétés de recherche",s:"Recherche",g:"DC",fj:true},
   {i:2148,b:null,n:"Cabinets experts comptables petits cabinets",s:"Finance petits cabinets",g:"DC",fj:true},
