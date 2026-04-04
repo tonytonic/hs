@@ -2,21 +2,40 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Simulateur HS</title>
 
-  <link rel="manifest" href="/manifest.json">
-  <link rel="apple-touch-icon" href="/icon-192.png">
-  <meta name="theme-color" content="#4FB3C2">
+  <link rel="manifest" href="./manifest.json">
+
+  <!-- iOS PWA — requis pour installation Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Heures Sup">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
+
+  <!-- Android / PWA général -->
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Heures Sup">
+  <meta name="theme-color" content="#4FB3C2">
+  <meta name="msapplication-TileColor" content="#4FB3C2">
+  <meta name="msapplication-TileImage" content="./icon-192.png">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Simulateur Heures Supplémentaires">
+  <meta property="og:description" content="Suivi et calcul de vos heures supplémentaires — gratuit, privé, offline.">
+  <meta property="og:image" content="https://simulateurheuressupfrance.pages.dev/icon-512.png">
+  <meta property="og:url" content="https://simulateurheuressupfrance.pages.dev/menu.html">
+  <meta property="og:type" content="website">
 
   <script>
-    const APP_VERSION = "6.0.2"; 
+    const APP_VERSION = "7.0.0";
 
     async function registerSW() {
       if ('serviceWorker' in navigator) {
         try {
-          const reg = await navigator.serviceWorker.register('/sw.js');
+          const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
           console.log("✅ Service Worker enregistré");
 
           if ('periodicSync' in reg) {
@@ -37,19 +56,15 @@
 
     async function initApp() {
       await registerSW();
-
       const stored = localStorage.getItem("APP_VERSION");
-
       if (stored !== APP_VERSION) {
         localStorage.setItem("APP_VERSION", APP_VERSION);
-
-        // 🔥 FIX iOS : reload propre
-        window.location.href = "/";
-        return;
+        location.reload(true);
+      } else {
+        setTimeout(() => {
+          location.replace("./menu.html");
+        }, 1500);
       }
-
-      // 🔥 FIX iOS : redirection propre sans conflit SW
-      window.location.href = "/menu.html";
     }
 
     window.addEventListener('DOMContentLoaded', initApp);
@@ -65,15 +80,13 @@
       align-items: center;
       height: 100vh;
       margin: 0;
-      overflow: hidden;
     }
   </style>
 </head>
 <body>
   <div style="text-align: center;">
-    <div class="loader"></div>
-    <p>Lancement du simulateur RPG...</p>
-    <small>Version v6.0.2</small>
+    <p>Chargement du simulateur...</p>
+    <small>Version v7.0.0</small>
   </div>
 </body>
 </html>
