@@ -56,15 +56,12 @@
 
     async function initApp() {
       await registerSW();
-      const stored = localStorage.getItem("APP_VERSION");
-      if (stored !== APP_VERSION) {
-        localStorage.setItem("APP_VERSION", APP_VERSION);
-        location.reload(true);
-      } else {
-        setTimeout(() => {
-          location.replace("./menu.html");
-        }, 1500);
-      }
+      // Pas de reload — Safari PWA crée une boucle infinie avec location.reload()
+      // Le SW gère les mises à jour du cache en arrière-plan
+      localStorage.setItem("APP_VERSION", APP_VERSION);
+      setTimeout(() => {
+        location.replace("./menu.html");
+      }, 800);
     }
 
     window.addEventListener('DOMContentLoaded', initApp);

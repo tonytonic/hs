@@ -1,7 +1,6 @@
 # Cloudflare Pages — _redirects
-# URLs propres sans .html (pretty URLs)
+# Uniquement pour les modules sans .html dans l'URL
 
-/menu        /menu.html        200
 /heures      /heures/index.html  200
 /paye        /paye/index.html    200
 /fox         /fox/index.html     200
