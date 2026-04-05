@@ -670,6 +670,14 @@ function forceMonday(dateStr){
 function saveClosures(){
   let adj=false;
   closures=[...document.querySelectorAll("#closuresInputs input")].map(i=>{const f=forceSunday(i.value);if(i.value&&i.value!==f)adj=true;return f;}).filter(v=>v).sort();
+  // S'assurer que la dernière clôture = annualDate si définie
+  if(annualDate && closures.length>0){
+    if(closures[closures.length-1]!==annualDate){
+      closures=closures.filter(c=>c<=annualDate);
+      if(!closures.includes(annualDate))closures.push(annualDate);
+      closures.sort();
+    }
+  }
   localStorage.setItem(STORAGE.closures,JSON.stringify(closures));
   if(adj)toast("ℹ️ Dates ajustées au dernier jour de la semaine","info");
   buildPeriods();closeClosures();
@@ -1863,8 +1871,26 @@ async function finishWiz(){
   if(wizClosureMode==="auto"){closures=[];const _sd=new Date(sd+'T12:00:00');const _startDay=_sd.getDate();const _sm=_sd.getMonth(),_sy=_sd.getFullYear();// Si l'exercice ne commence pas le 1er du mois, on saute le mois de départ
 const _skipFirst=_startDay>1;let _i=_skipFirst?1:0,_count=0;while(_count<12&&_i<50){const _m=(_sm+_i)%12;const _y=_sy+Math.floor((_sm+_i)/12);closures.push(wizLastSunday(_y,_m));_count++;_i++;}}
   else{closures=[];for(let m=0;m<12;m++){const v=document.getElementById("wizManDate_"+m)?.value;if(v)closures.push(forceSunday(v));}closures=closures.filter(Boolean).sort();}
+  // La dernière clôture = date de fin d'exercice (annualDate)
+  const ra=document.getElementById("wizAnnualDate").value;
+  if(ra){
+    annualDate=forceSunday(ra);
+    localStorage.setItem(STORAGE.annualDate,annualDate);
+    // Remplacer ou ajouter la dernière clôture = clôture annuelle
+    if(closures.length>0){
+      closures[closures.length-1]=annualDate; // remplacer la dernière
+    } else {
+      closures.push(annualDate);
+    }
+    // Si la clôture annuelle est inférieure aux autres → trier
+    closures=closures.filter(Boolean).sort();
+    // S'assurer que annualDate est bien la dernière
+    if(closures[closures.length-1]!==annualDate){
+      closures=closures.filter(c=>c<annualDate);
+      closures.push(annualDate);
+    }
+  }
   localStorage.setItem(STORAGE.closures,JSON.stringify(closures));
-  const ra=document.getElementById("wizAnnualDate").value;if(ra){annualDate=forceSunday(ra);localStorage.setItem(STORAGE.annualDate,annualDate);}
   annualRate=Number(document.getElementById("wizHourlyRate").value)||10;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);
   AUTO_FERIE=document.getElementById("wizAutoFerie").checked;localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);
   if(document.getElementById("wizImportFeries").checked){try{const years=[by-1,by,by+1];for(const y of years){const res=await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`);const f=await res.json();Object.keys(f).forEach(d=>{if(!specialDays[d])specialDays[d]="ferie";});}localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));}catch(e){console.warn("Import jours fériés échoué:",e);}}
