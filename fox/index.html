@@ -8,11 +8,23 @@
   <meta name="theme-color" content="#0a0e1a">
   <meta name="format-detection" content="telephone=no">
   <title>🦊 FOX Engine — Heures Sup' Ultimate</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../images/foxplayer.PNG">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="gaming-mode">
 
 <img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<script>
+// Appliquer la bonne saison IMMÉDIATEMENT (avant rendu) — évite flash hiver→printemps
+(function(){
+  const _bgs=['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+  const q=Math.floor(new Date().getMonth()/3);
+  const bg=_bgs[q]||_bgs[0];
+  const el=document.getElementById('bg-decor');
+  if(el && bg!==el.src.split('/').pop() && el.src!==new URL(bg,location.href).href) el.src=bg;
+})();
+</script>
 
 <div id="burnout-overlay"></div>
 <div id="storm-overlay"></div>
@@ -32,7 +44,7 @@
 <div id="burnout-popup">
   <span class="burnout-icon">🔥</span>
   <div class="score-display" id="burnout-score-val">--</div>
-  <h2>Signal Burn-Out Détecté</h2>
+  <h2>Pénalité Détectée</h2>
   <p id="burnout-popup-msg">Votre situation présente des signaux de risque élevés.</p>
   <button class="btn-close-burnout" onclick="closeBurnoutPopup()">Voir mes droits →</button>
 </div>
@@ -84,8 +96,8 @@ window._fox_pre = (function() {
   </div>
   <div class="hud-stats">
     <div class="hud-stat" onclick="openPopup('popup-modules')" title="Voir les données heures sup" style="cursor:pointer;"><div class="hud-stat-icon">⏱️</div><div class="hud-stat-val" id="hud-hours"><script>document.write(window._fox_pre.hrs||0)</script></div><div class="hud-stat-lbl">H.SUP</div></div>
-    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir l'énergie et burn-out" style="cursor:pointer;"><div class="hud-stat-icon">❤️</div><div class="hud-stat-val" id="hud-energy">100</div><div class="hud-stat-lbl">ÉNERGIE</div></div>
-    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir le risque burn-out" style="cursor:pointer;"><div class="hud-stat-icon">🔥</div><div class="hud-stat-val" id="hud-burnout"><script>document.write(window._fox_pre.bo||0)</script></div><div class="hud-stat-lbl">RISQUE</div></div>
+    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir mon énergie" style="cursor:pointer;"><div class="hud-stat-icon">❤️</div><div class="hud-stat-val" id="hud-energy">100</div><div class="hud-stat-lbl">ÉNERGIE</div></div>
+    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir mes pénalités" style="cursor:pointer;"><div class="hud-stat-icon">🔥</div><div class="hud-stat-val" id="hud-burnout"><script>document.write(window._fox_pre.bo||0)</script></div><div class="hud-stat-lbl">PÉNALITÉ</div></div>
     <div class="hud-stat" onclick="openPopup('popup-badges')" title="Voir mes badges" style="cursor:pointer;"><div class="hud-stat-icon">🏅</div><div class="hud-stat-val" id="hud-badges"><script>document.write(window._fox_pre.rwds||0)</script></div><div class="hud-stat-lbl">BADGES</div></div>
   </div>
   <div id="hud-buttons">
@@ -114,7 +126,7 @@ window._fox_pre = (function() {
 
   <!-- Renard central -->
   <div id="kitsune-center" onclick="openPopup('popup-fox')">
-    <img id="kitsune-svg" src="../images/foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune" onerror="this.style.display='none'">
+    <img id="kitsune-svg" src="../images/foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune">
     <div id="kitsune-tap-hint">Appuie sur moi !</div>
   </div>
 
@@ -135,7 +147,7 @@ window._fox_pre = (function() {
     <button class="dock-btn" onclick="openPopup('popup-glossaire');closeSubs()"><span class="dock-icon">📚</span><span class="dock-label">Glossaire</span></button>
   </div>
   <div id="subdock-suivi" class="subdock" style="display:none;">
-    <button class="dock-btn" onclick="openPopup('popup-burnout');closeSubs()"><span class="dock-icon">🔥</span><span class="dock-label">Burn-Out</span></button>
+    <button class="dock-btn" onclick="openPopup('popup-burnout');closeSubs()"><span class="dock-icon">🔥</span><span class="dock-label">Pénalité</span></button>
     <button class="dock-btn" onclick="openPopup('popup-violations');closeSubs()"><span class="dock-icon">⚠️</span><span class="dock-label">Violations</span></button>
     <button class="dock-btn" onclick="openPopup('popup-xp-history');closeSubs()"><span class="dock-icon">📊</span><span class="dock-label">XP</span></button>
   </div>
@@ -290,7 +302,7 @@ window._fox_pre = (function() {
 <div class="fox-popup-backdrop" id="popup-burnout">
   <div class="fox-popup">
     <div class="fox-popup-header">
-      <h2 class="fox-popup-title">🔥 Score Burn-Out</h2>
+      <h2 class="fox-popup-title">🔥 Pénalités</h2>
       <button class="fox-popup-close" onclick="closePopup('popup-burnout')">✕</button>
     </div>
     <div id="burnout-popup-content" style="color:#ccc;"></div>
@@ -2388,6 +2400,31 @@ function _analyzeLegalSituation() {
         m2Days[dk] = { extra: hrs, recup: 0, absent: 0 };
       });
     });
+    // ── M4 vacances & absences M1 — exclure de l'analyse violation ──────────
+    // DTE_VACANCES_ : jours saisis comme "vacances" dans M4 (clé = YYYY-MM-DD)
+    // absent/recup M1 : jours de repos déclarés dans M1 (recup>=7h ou absent>=7h)
+    // → ces jours ne doivent PAS générer de violation "Semaine chargée"
+    const m4Vac = {};
+    try {
+      const rawVac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + year) || '{}');
+      Object.keys(rawVac).forEach(dk => { m4Vac[dk] = true; });
+    } catch(e) {}
+    // Construire le Set des semaines avec au moins 1 jour off (vacances M4 ou repos M1)
+    const weeksWithDayOff = new Set();
+    const _isoWk = dk => {
+      const d = new Date(dk), dow = (d.getDay()+6)%7;
+      const thu = new Date(d); thu.setDate(d.getDate()-dow+3);
+      const yS = new Date(thu.getFullYear(),0,4);
+      return thu.getFullYear()+'-W'+String(1+Math.round(((thu-yS)/86400000-3+((yS.getDay()+6)%7))/7)).padStart(2,'0');
+    };
+    // Vacances M4
+    Object.keys(m4Vac).forEach(dk => weeksWithDayOff.add(_isoWk(dk)));
+    // Absences/récup M1 (≥7h = jour off)
+    Object.entries(rawM1).forEach(([dk, val]) => {
+      if (typeof val !== 'object') return;
+      if ((Number(val.absent||0) >= 7) || (Number(val.recup||0) >= 7)) weeksWithDayOff.add(_isoWk(dk));
+    });
+
     // M1 prioritaire si même jour
     const allDays = Object.assign({}, m2Days, rawM1);
 
@@ -2442,9 +2479,9 @@ function _analyzeLegalSituation() {
       maxWeekTotal: Math.round(maxWeekTotal * 100) / 100,
       maxWeekMon, weeksOver48, weeksOver44,
       maxAvg12:     Math.round(maxAvg12 * 100) / 100,
-      hasWeekViol:  maxWeekTotal >= 48,
+      hasWeekViol:  maxWeekTotal >= 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
       hasAvgViol:   maxAvg12 >= 44,
-      hasWeekAlert: maxWeekTotal >= 44 && maxWeekTotal < 48,
+      hasWeekAlert: maxWeekTotal >= 44 && maxWeekTotal < 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
       totalWeeks:   weekArr.length,
     };
 
@@ -3881,6 +3918,42 @@ function _buildDailyLoop5(s, h, todayOT) {
   const pr   = name ? name + '\u00a0: ' : '';
   const bo   = (typeof gameState !== 'undefined' ? (gameState.burnout || 0) : 0);
 
+  // ── Détection semaine vacances M4 courante ───────────────────────
+  // Si aujourd'hui est en vacances → message vacances prioritaire
+  function _isoWeekKey(d) {
+    const dow = (d.getDay()+6)%7;
+    const thu = new Date(d); thu.setDate(d.getDate()-dow+3);
+    const yS = new Date(thu.getFullYear(),0,4);
+    return thu.getFullYear()+'-W'+String(1+Math.round(((thu-yS)/86400000-3+((yS.getDay()+6)%7))/7)).padStart(2,'0');
+  }
+  const _todayKey = now.toISOString().slice(0,10);
+  const _curWk = _isoWeekKey(now);
+  let _isVacWeek = false;
+  try {
+    const year = now.getFullYear().toString();
+    const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+year)||'{}');
+    const m1Raw = JSON.parse(localStorage.getItem('DATA_REPORT_'+year)||'{}');
+    // Vérifier si un jour de cette semaine est en vacances M4 ou absent M1
+    for (let d=0; d<7; d++) {
+      const dt = new Date(now); dt.setDate(now.getDate()-((now.getDay()+6)%7)+d);
+      const dk = dt.toISOString().slice(0,10);
+      if (m4Vac[dk]) { _isVacWeek = true; break; }
+      const e = m1Raw[dk];
+      if (e && ((e.absent>=7)||(e.recup>=7))) { _isVacWeek = true; break; }
+    }
+  } catch(e) {}
+
+  // Message vacances prioritaire — remplace toutes les alertes
+  if (_isVacWeek) {
+    const vacMsgs = [
+      `🦊 [${jr}] Tu es en congé cette semaine — profites-en ! Les heures passées restent dans ton historique et ton contingent est mis en pause. Déconnecte vraiment (Art. L3141-3).`,
+      `🦊 [${jr}] Semaine de vacances détectée. Kitsune surveille ton historique mais te laisse souffler. Aucun seuil légal à surveiller cette semaine.`,
+      `🦊 [${jr}] Repos en cours ! Ton contingent annuel ne bouge pas pendant les congés. C'est le moment de récupérer avant de reprendre.`,
+    ];
+    const seed = now.getDate() % vacMsgs.length;
+    return [vacMsgs[seed], vacMsgs[(seed+1)%vacMsgs.length], vacMsgs[(seed+2)%vacMsgs.length], vacMsgs[seed], vacMsgs[(seed+1)%vacMsgs.length]];
+  }
+
   // ── Flags violations (lus directement depuis s) ─────────────────
   const vCrit    = s.daily.hasDailyCrit;                    // jour > 12h
   const vRisk    = s.daily.hasDailyRisk;                    // jour >= 10h
@@ -4563,7 +4636,6 @@ function syncModulesAndAwardXP(source) {
     
     // === PÉNALITÉS POUR VIOLATIONS ===
     const situation = _analyzeLegalSituation();
-    console.log('🔍 Analyse situation légale:', situation);
     let xpPenalty = 0;
     let burnoutIncrease = 0;
 
@@ -4600,7 +4672,6 @@ function syncModulesAndAwardXP(source) {
       const _todayStr = new Date().toDateString();
       const _penDateStr = lastPenaltyLS > 0 ? _lastPenDate.toDateString() : '';
       if (_penDateStr === _todayStr) {
-        console.log('⏸️ Pénalité XP skippée — déjà appliquée aujourd\'hui');
         xpPenalty = 0; // Skip uniquement la pénalité, pas le reste du sync
       }
       
@@ -4612,7 +4683,6 @@ function syncModulesAndAwardXP(source) {
         xpSystem.currentXP = Math.max(0, xpSystem.currentXP - xpPenalty);
         xpSystem.level = xpSystem.calculateLevel();
         xpSystem.saveToStorage();
-        console.log('💥 Pénalité XP appliquée:', oldXP, '→', xpSystem.currentXP, '(-' + xpPenalty + ')');
         if (typeof addRewardToHistory === 'function') {
           addRewardToHistory('⚠️ Violation : -' + xpPenalty + ' XP', 'danger');
         }
@@ -4638,7 +4708,6 @@ function syncModulesAndAwardXP(source) {
         }
         if (typeof refreshHUD === 'function') refreshHUD();
       } else {
-        console.log('⏸️ Pénalité XP cooldown — aucune animation');
       }
     }
     
@@ -4656,18 +4725,15 @@ function syncModulesAndAwardXP(source) {
         const oldBurnout = gameState.burnout || 0;
         gameState.burnout = Math.min(100, oldBurnout + burnoutIncrease);
         localStorage.setItem(_boUpdateKey, _boTodayStr);
-        console.log('🔥 Burn-out +' + burnoutIncrease + ' (1x/jour):', oldBurnout, '→', gameState.burnout);
-      } else {
+        } else {
         // Récupération : 3 pts par jour sans violation
         if ((gameState.burnout || 0) > 0) {
           const oldBurnout = gameState.burnout || 0;
           gameState.burnout = Math.max(0, oldBurnout - 3);
           localStorage.setItem(_boUpdateKey, _boTodayStr);
-          console.log('💚 Burn-out -3 (récup jour):', oldBurnout, '→', gameState.burnout);
         }
       }
     } else {
-      console.log('⏸️ Burn-out skippé — déjà mis à jour aujourd\'hui (' + (gameState.burnout||0) + ')');
     }
     // Sauvegarder
     try {
@@ -4975,7 +5041,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = Math.floor(now.getMonth() / 3);
     const nextQ = q < 3 ? new Date(now.getFullYear(), (q+1)*3, 1, 0, 5, 0) : new Date(now.getFullYear()+1, 0, 1, 0, 5, 0);
     const msToNext = nextQ - now;
-    console.log('🌿 Prochain changement décor:', nextQ.toLocaleDateString('fr-FR'), '(dans', Math.round(msToNext/86400000), 'jours)');
     setTimeout(() => { updateSeasonalBg(); _scheduleSeasonal(); }, msToNext);
   })();
   // ── Nouvelles features ──
@@ -7270,14 +7335,26 @@ function updateSeasonalBg() {
   const current = _base(bgEl.getAttribute('src') || bgEl.src);
   const target  = _base(bg);
   if (current === target) return; // Déjà la bonne saison
-  console.log('🌿 Changement décor :', seasonNames[q], '→', bg);
-  bgEl.style.opacity = '0';
-  bgEl.style.transition = 'opacity 1.5s ease';
-  setTimeout(() => {
-    bgEl.src = bg;
-    bgEl.onload  = () => { bgEl.style.opacity = '1'; };
-    bgEl.onerror = () => { bgEl.style.opacity = '1'; bgEl.src = _bgs[0]; };
-  }, 800);
+  // Crossfade invisible : précharger → fade in par-dessus → supprimer l'ancienne
+  const _preload = new Image();
+  _preload.onload = () => {
+    // Créer une 2e image par-dessus, fade in → swap → supprimer overlay
+    const overlay = document.createElement('img');
+    overlay.src = bg;
+    overlay.style.cssText = bgEl.style.cssText + ';opacity:0;transition:opacity 1.2s ease;';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0'; overlay.style.left = '0';
+    overlay.style.width = '100vw'; overlay.style.height = '100vh';
+    overlay.style.objectFit = 'cover'; overlay.style.zIndex = '-998';
+    bgEl.parentNode.insertBefore(overlay, bgEl.nextSibling);
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    setTimeout(() => {
+      bgEl.src = bg; bgEl.style.opacity = '1';
+      overlay.remove();
+    }, 1300);
+  };
+  _preload.onerror = () => {}; // image absente → garder l'actuelle silencieusement
+  _preload.src = bg;
 }
 
 // \u2500\u2500 PNJ \u2014 \u00E9volution tous les 5 niveaux jusqu'au niveau 50 \u2500
@@ -7285,7 +7362,7 @@ function updateSeasonalBg() {
 function updatePNJLevel(level) {
   const lvl  = Math.max(1, level || 1);           // Pas de cap — Légende progression infinie
   const tier = Math.min(10, Math.ceil(Math.min(lvl, 50) / 5)); // tier 1-10 basé sur min(lvl,50)
-  console.log('🦊 updatePNJLevel : niveau', lvl, '→ tier', tier);
+  // Pas de log — appelé toutes les 5s via refreshHUD
   const img  = tier === 1 ? '../images/foxplayer.PNG' : '../images/foxplayer-' + tier + '.PNG';
   const pnj  = document.getElementById('kitsune-svg');
   const foxImgPopup = document.querySelector('#popup-fox img[src*="foxplayer"]');
@@ -7295,16 +7372,36 @@ function updatePNJLevel(level) {
     foxImgPopup.style.mixBlendMode = 'screen';
     foxImgPopup.style.background = 'transparent';
   }
-  if (pnj) { pnj.setAttribute('data-tier', tier); pnj.src = img; }
+  const _fallbackImg = '../images/foxplayer.PNG';
+  // Précharger l'image une seule fois — puis appliquer aux deux éléments
+  const _tryLoad = new Image();
+  const _applyPNJ = (src) => {
+    if (pnj) {
+      const curSrc = (pnj.getAttribute('src') || '').split('/').pop();
+      const newSrc = src.split('/').pop();
+      if (curSrc === newSrc) { pnj.style.display = ''; return; } // déjà la bonne image
+      // Crossfade invisible via opacity
+      pnj.style.transition = 'opacity 0.25s ease';
+      pnj.style.opacity = '0';
+      setTimeout(() => {
+        pnj.src = src;
+        pnj.onload = () => { pnj.style.display = ''; pnj.style.opacity = '1'; };
+        pnj.onerror = () => { pnj.style.display = ''; pnj.style.opacity = '1'; };
+      }, 260);
+    }
+    if (foxImgPopup) foxImgPopup.src = src;
+  };
+  _tryLoad.onload  = () => _applyPNJ(img);
+  _tryLoad.onerror = () => _applyPNJ(_fallbackImg);
+  if (pnj) { pnj.setAttribute('data-tier', tier); }
   if (foxImgPopup) {
-    foxImgPopup.src = img;
-    // Augmenter la taille selon le tier (niveaux 4+ sont trop petits)
-    let size = 90; // tier 1-3 : taille de base
-    if (tier >= 7) size = 130; // tier 7-10 : grande taille
-    else if (tier >= 4) size = 110; // tier 4-6 : taille moyenne
+    let size = 90;
+    if (tier >= 7) size = 130;
+    else if (tier >= 4) size = 110;
     foxImgPopup.style.width = size + 'px';
     foxImgPopup.style.height = size + 'px';
   }
+  _tryLoad.src = img; // déclenche le chargement
 }
 
 // \u2500\u2500 Animation Level-Up \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -7916,7 +8013,7 @@ function showMonthlySummary(forceMonth) {
       <span class="ms-val" style="color:${violations > 0 ? '#E53935' : '#4CAF50'};">${violations}</span>
     </div>
     <div class="monthly-stat">
-      <span class="ms-label">🔥 Score burn-out</span>
+      <span class="ms-label">⚡ Pénalités accumulées</span>
       <span class="ms-val" style="color:${burnoutScore >= 60 ? '#E53935' : burnoutScore >= 40 ? '#FF8C42' : '#4CAF50'};">${burnoutScore}/100</span>
     </div>
     <div style="margin-top:14px;padding:12px;background:rgba(255,140,66,0.06);border:1px solid rgba(255,140,66,0.15);border-radius:10px;color:#aaa;font-size:0.82rem;line-height:1.6;">
@@ -8036,10 +8133,20 @@ const JOURS_FR = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Same
 
 function _loadAllDays(weeksBack) {
   // Charge les jours des N dernières semaines depuis M1+M2
+  // Exclut les jours de vacances M4 et absences M1 (recup/absent ≥7h)
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - weeksBack * 7);
   const years = [new Date().getFullYear()];
   if (cutoff.getFullYear() < years[0]) years.push(cutoff.getFullYear());
+
+  // Charger les vacances M4 pour toutes les années concernées
+  const m4VacDays = new Set();
+  years.forEach(yr => {
+    try {
+      const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yr) || '{}');
+      Object.keys(vac).forEach(dk => m4VacDays.add(dk));
+    } catch(e) {}
+  });
 
   const allDays = {}; // { 'YYYY-MM-DD': totalExtra }
   years.forEach(yr => {
@@ -8048,6 +8155,8 @@ function _loadAllDays(weeksBack) {
       Object.entries(rawM1).forEach(([dk, v]) => {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
         if (new Date(dk) < cutoff) return;
+        if (m4VacDays.has(dk)) return; // jour vacances M4 → ignoré
+        if ((Number(v.absent)||0) >= 7 || (Number(v.recup)||0) >= 7) return; // absence M1
         allDays[dk] = (allDays[dk] || 0) + (Number(v.extra) || 0);
       });
     } catch(e) {}
@@ -8059,7 +8168,7 @@ function _loadAllDays(weeksBack) {
           const d = parseInt(ds); if (!d) return;
           const dk = mk + '-' + String(d).padStart(2,'0');
           if (new Date(dk) < cutoff) return;
-          // M1 prioritaire
+          if (m4VacDays.has(dk)) return; // jour vacances M4 → ignoré
           if (!allDays[dk]) allDays[dk] = (Number(hrs) || 0);
         });
       });
@@ -14133,7 +14242,7 @@ function _recordViolation(situation) {
   try {
     const hist = JSON.parse(localStorage.getItem(_VIOLATIONS_KEY) || '[]');
     // Dédoublonner : même titre dans les 2h → skip
-    const twoHoursAgo = new Date(Date.now() - 2*3600*1000).toISOString();
+    const twoHoursAgo = new Date(Date.now() - 24*3600*1000).toISOString(); // PATCH : fenêtre 24h (vs 2h) — évite doublons inter-sessions
     let newViols = 0;
     viols.forEach(v => {
       const isDupe = hist.some(h2 => h2.titre === v.titre && h2.ts > twoHoursAgo);
@@ -14629,11 +14738,11 @@ function _getBadgeImagePath(badge) {
   // Badges 51+ : retirer underscores ET espaces
   if (badge.id >= 51) {
     const fileName = name.replace(/[_\s]/g, '');  // Retire underscores et espaces
-    return '../images/badges/' + fileName + '.PNG';
+    return '../images/' + fileName + '.PNG';
   }
   
   // Badges 1-50 : garder le nom tel quel
-  return '../images/badges/' + name + '.PNG';
+  return '../images/' + name + '.PNG';
 }
 
 function buildBadgeStats() {
