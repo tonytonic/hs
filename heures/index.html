@@ -78,9 +78,15 @@ button,input,textarea{width:100%;padding:8px;margin:5px 0}
 .wiz-check-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:#f9f9f9;border:1px solid #eee;margin-bottom:10px;cursor:pointer}
 .wiz-check-row input[type=checkbox]{width:18px;height:18px;margin:0;flex-shrink:0;cursor:pointer}
 .wiz-step input[type="date"],.wiz-step input[type="number"],.wiz-step input[type="text"]{
-  width:100%;box-sizing:border-box;padding:14px 16px;font-size:17px;
+  width:100%;box-sizing:border-box;padding:16px;font-size:17px;
   border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#222;
   -webkit-appearance:none;appearance:none;margin-bottom:4px;display:block;
+  min-height:56px;line-height:1.4;
+}
+/* Fix champ date iOS — affichage pleine largeur */
+.wiz-step input[type="date"]::-webkit-date-and-time-value {
+  text-align:left;
+  min-height:24px;
 }
 .wiz-step input[type="date"]:focus,.wiz-step input[type="number"]:focus{
   border-color:#4FB3C2;outline:none;
@@ -322,7 +328,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
     <select id="monthSelect"></select>
     <select id="yearSelect"></select>
   </div>
-  <div class="weekdays">
+  <div class="weekdays" id="calWeekdays">
     <div class="weekday">Lun</div><div class="weekday">Mar</div><div class="weekday">Mer</div>
     <div class="weekday">Jeu</div><div class="weekday">Ven</div><div class="weekday">Sam</div><div class="weekday">Dim</div>
   </div>
@@ -631,19 +637,33 @@ function initSelectors(){
 function openClosures(){const box=document.getElementById("closuresInputs");box.innerHTML="";for(let i=0;i<13;i++){const inp=document.createElement("input");inp.type="date";inp.value=closures[i]||"";box.appendChild(inp);}document.getElementById("popupClosures").style.display="flex";}
 function closeClosures(){document.getElementById("popupClosures").style.display="none";}
 
+// Retourne le dernier jour de la semaine CCN contenant dateStr
+// Si debutSemaine=2 (mar), la fin de semaine = lundi suivant
 function forceSunday(dateStr){
   if(!dateStr)return dateStr;
+  const rules=getCCNRules();
+  const ds=(rules.debutSemaine||1); // 1=lun..7=dim
+  const dsJS=ds===7?0:ds; // JS: 0=dim..6=sam
+  const finJS=(dsJS+6)%7; // dernier jour de la semaine CCN en JS
   const d=new Date(dateStr+'T12:00:00');
   const day=d.getDay();
-  if(day!==0)d.setDate(d.getDate()-day);
+  // Avancer jusqu'au dernier jour de la semaine CCN
+  let diff=(finJS-day+7)%7;
+  if(diff!==0)d.setDate(d.getDate()+diff);
+  // Si on est déjà sur le bon jour → diff=0 → pas de changement
   return dateKeyLocal(d);
 }
 
+// Retourne le premier jour de la semaine CCN contenant dateStr
 function forceMonday(dateStr){
   if(!dateStr)return dateStr;
+  const rules=getCCNRules();
+  const ds=(rules.debutSemaine||1);
+  const dsJS=ds===7?0:ds;
   const d=new Date(dateStr+'T12:00:00');
   const day=d.getDay();
-  if(day!==1){const diff=day===0?1:(8-day);d.setDate(d.getDate()+diff);}
+  let diff=(day-dsJS+7)%7;
+  if(diff!==0)d.setDate(d.getDate()-diff);
   return dateKeyLocal(d);
 }
 
@@ -701,9 +721,25 @@ function generateCalendar(){
     calendar.appendChild(guide);
   }
   const firstDay=new Date(viewYear,viewMonth,1).getDay();
-  const offset=firstDay===0?6:firstDay-1;
   const days=new Date(viewYear,viewMonth+1,0).getDate();
-  for(let i=0;i<offset;i++)calendar.appendChild(document.createElement("div"));
+  // Adapter l'offset selon le jour de début de semaine CCN (1=lun..7=dim, JS: 0=dim..6=sam)
+  const _rules=getCCNRules();
+  const _ds=(_rules.debutSemaine||1); // 1=lun par défaut
+  const _dsJS=_ds===7?0:_ds; // convertir en JS (0=dim,1=lun..6=sam)
+  // Mettre à jour l'en-tête des jours selon le début de semaine
+  const _JOURS_COURTS=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const _wdEl=document.getElementById('calWeekdays');
+  if(_wdEl){
+    _wdEl.innerHTML='';
+    for(let i=0;i<7;i++){
+      const div=document.createElement('div');div.className='weekday';
+      div.textContent=_JOURS_COURTS[(_dsJS+i)%7];
+      _wdEl.appendChild(div);
+    }
+  }
+  // Calculer offset : combien de cases vides avant le 1er du mois
+  let _offset=(firstDay-_dsJS+7)%7;
+  for(let i=0;i<_offset;i++)calendar.appendChild(document.createElement("div"));
   const period=getCurrentPeriod();
   let pStartKey=null,pEndKey=null;
   if(period){
@@ -1805,7 +1841,18 @@ function wizBuildManualGrid(){
     wrap.appendChild(lbl);wrap.appendChild(inp);grid.appendChild(wrap);
   }
 }
-function wizLastSunday(year,month){const last=new Date(year,month+1,0,12,0,0);const dow=last.getDay();if(dow!==0)last.setDate(last.getDate()-dow);return dateKeyLocal(last);}
+function wizLastSunday(year,month){
+  const rules=getCCNRules();
+  const ds=(rules.debutSemaine||1);
+  const dsJS=ds===7?0:ds;
+  const finJS=(dsJS+6)%7; // dernier jour de semaine CCN
+  const last=new Date(year,month+1,0,12,0,0); // dernier jour du mois
+  const dow=last.getDay();
+  // Reculer jusqu'au dernier "finJS" du mois
+  let diff=(dow-finJS+7)%7;
+  if(diff!==0)last.setDate(last.getDate()-diff);
+  return dateKeyLocal(last);
+}
 function wizShowSummary(){const sd=document.getElementById("wizStartDate").value;const ad=document.getElementById("wizAnnualDate").value;const rate=document.getElementById("wizHourlyRate").value||"—";const feries=document.getElementById("wizImportFeries").checked?"Oui":"Non";const autoF=document.getElementById("wizAutoFerie").checked?"Oui":"Non";const cm=wizClosureMode==="auto"?"Automatique (derniers jours de mois)":"Manuel (12 dates saisies)";document.getElementById("wizSummaryContent").innerHTML=`📅 Début d'exercice : <b>${sd?new Date(sd).toLocaleDateString():"Non définie"}</b><br>🏁 Clôture annuelle : <b>${ad?new Date(ad).toLocaleDateString():"Non définie"}</b><br>📆 Clôtures : <b>${cm}</b><br>⏱️ Base hebdomadaire : <b>35 h</b><br>🎌 Jours fériés importés : <b>${feries}</b><br>⚙️ Mode auto-férié : <b>${autoF}</b><br>💶 Taux horaire : <b>${rate} €/h</b>`;document.getElementById("wizSummary").style.display="block";document.getElementById("wizSummaryBtn").style.display="none";document.getElementById("wizFinishBtn").style.display="inline-block";}
 async function finishWiz(){
   let sd=document.getElementById("wizStartDate").value;if(!sd){toast("❌ Date de début manquante","error");return;}
