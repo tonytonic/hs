@@ -172,10 +172,13 @@ function renderSemaine(year, vacData, weeks, JOURS, MOIS) {
         // Compter les jours réellement cochés dans cette semaine
         const days = getDaysOfWeek(monday, vacData);
         const checked = days.filter(d=>d.present).length;
-        return `<div style="background:rgba(255,179,0,0.06);border:1px solid rgba(255,179,0,0.2);
+        // Détection semaine complète (tous les jours ouvrés = lun-ven cochés)
+        const ouvrés = days.filter(d=>d.dow!==0&&d.dow!==6);
+        const isFullWeek = ouvrés.every(d=>d.present);
+        return `<div style="background:rgba(255,179,0,0.06);border:1px solid rgba(255,179,0,${isFullWeek?'0.45':'0.2'});
           border-radius:8px;padding:8px 10px;margin-bottom:6px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-            <span style="font-size:12px;color:#ffb300;">🏖 ${label}</span>
+            <span style="font-size:12px;color:#ffb300;">🏖 ${label}${isFullWeek?' <span style="font-size:9px;background:rgba(255,179,0,0.2);border:1px solid rgba(255,179,0,0.4);padding:1px 5px;border-radius:3px;color:#ffb300;">✅ semaine complète</span>':''}</span>
             <button onclick="window._vacancesRemoveWeek('${monday}')"
               style="background:none;border:none;color:rgba(255,100,100,0.7);
               font-size:16px;cursor:pointer;padding:0 4px;line-height:1;width:auto;margin:0;">✕</button>
@@ -205,7 +208,13 @@ function renderSemaine(year, vacData, weeks, JOURS, MOIS) {
       style="background:rgba(255,179,0,0.15);border:1px solid rgba(255,179,0,0.4);
       border-radius:6px;padding:8px 12px;color:#ffb300;font-size:12px;
       cursor:pointer;white-space:nowrap;width:auto;margin:0;">+ Semaine</button>
-  </div>`;
+  </div>
+  <button onclick="window._vacancesAddCurrentWeek()"
+    style="background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.25);
+    border-radius:6px;padding:7px 12px;color:rgba(255,179,0,0.8);font-size:11px;
+    cursor:pointer;width:100%;margin-top:6px;text-align:left;">
+    📅 Ajouter la semaine en cours (lun–dim)
+  </button>`;
 }
 
 function renderJour(year, vacData, feries, JOURS, MOIS) {
@@ -280,6 +289,16 @@ global._openVacances = open;
 global._importFeriesM4 = importFeriesM4;
 
 global._vacancesSetTab = (tab) => { _tab = tab; refresh(); };
+
+global._vacancesAddCurrentWeek = () => {
+  // Calcule le lundi de la semaine courante et ajoute les 7 jours (lun-dim)
+  const today = new Date();
+  const dow   = today.getDay() || 7; // 1=lun … 7=dim
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow - 1));
+  addWeek(localDK(monday));
+  syncAndRefresh();
+};
 
 global._vacancesAddWeek = () => {
   const inp = document.getElementById('vacances-week-picker');
