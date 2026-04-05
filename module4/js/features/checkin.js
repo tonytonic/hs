@@ -113,7 +113,13 @@ class Checkin {
   }
 
   open(){
-    this._step = 0; this._answers = {}; this._editMode = false;
+    this._step = 0; this._editMode = false;
+    // Si check-in déjà fait aujourd'hui, pré-remplir les réponses
+    const today = new Date().toISOString().slice(0,10);
+    const history = _safeLS.json('DTE_CHECKIN_HISTORY', []);
+    const existing = history.find(h => h.date === today);
+    this._answers = existing ? {...existing} : {};
+    delete this._answers.date;
     this._buildSequence(); this._render();
     if(this._modal) this._modal.classList.remove('hidden');
   }
@@ -183,14 +189,14 @@ class Checkin {
       } catch(_){}
     }
 
-    // Appliquer créneau horaire au schedule M4
+    // Appliquer créneau horaire → DTE_SETTINGS (clé lue par dte-engine.js)
     const slot = this._answers.timeSlot;
     if(slot && SLOT_REGIME[slot]){
       const r = SLOT_REGIME[slot];
       try {
-        const settings = JSON.parse(localStorage.getItem('M4_SCHEDULE_SETTINGS')||'{}');
+        const settings = JSON.parse(localStorage.getItem('DTE_SETTINGS')||'{}');
         settings.startH = r.startH; settings.endH = r.endH; settings.regimeType = r.regimeType;
-        localStorage.setItem('M4_SCHEDULE_SETTINGS', JSON.stringify(settings));
+        localStorage.setItem('DTE_SETTINGS', JSON.stringify(settings));
       } catch(_){}
     }
 

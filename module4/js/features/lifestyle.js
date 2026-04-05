@@ -326,6 +326,7 @@ class LifestylePanel {
       document.body.appendChild(this._modal);
     }
     this._step = 0;
+    this._data = this._load(); // Toujours recharger depuis localStorage à l'ouverture
     this._render();
     this._modal.classList.remove('hidden');
   }
