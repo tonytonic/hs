@@ -180,19 +180,46 @@
 
             <!-- Jours de repos -->
             <div style="padding:8px 9px;background:rgba(0,10,25,.8);
-              border:1px solid rgba(255,255,255,0.1);">
+              border:1px solid rgba(255,255,255,0.1);text-align:center;">
               <div style="font-family:var(--font-mono);font-size:9px;color:rgba(255,255,255,0.5);
                 letter-spacing:.08em;margin-bottom:6px;">⏰ MES JOURS DE REPOS</div>
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;margin-bottom:5px;">
-                <input type="checkbox" id="dte-rest-sat" onchange="window._updateRestDays()"
-                  style="width:14px;height:14px;accent-color:var(--sync);">
-                <span style="font-size:11px;color:#fff;">Samedi repos</span>
-              </label>
-              <label style="display:flex;align-items:center;gap:7px;cursor:pointer;">
-                <input type="checkbox" id="dte-rest-sun" onchange="window._updateRestDays()"
-                  style="width:14px;height:14px;accent-color:var(--sync);">
-                <span style="font-size:11px;color:#fff;">Dimanche repos</span>
-              </label>
+              <div style="display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:center;">
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-0" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Dim</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-1" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Lun</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-2" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Mar</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-3" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Mer</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-4" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Jeu</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-5" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Ven</span>
+                </label>
+                <label style="display:flex;align-items:center;gap:5px;cursor:pointer;">
+                  <input type="checkbox" id="dte-rest-6" onchange="window._updateRestDays()"
+                    style="width:14px;height:14px;accent-color:var(--sync);">
+                  <span style="font-size:11px;color:#fff;">Sam</span>
+                </label>
+              </div>
             </div>
 
             <!-- Vacances & Fériés -->
