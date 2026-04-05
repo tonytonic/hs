@@ -1,20 +1,17 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 7.2.0 — Cloudflare Pages
- * Logique identique à l'original GitHub qui fonctionne
+ * Version : 7.3.0-DEBUG — Cloudflare Pages
  */
 
-const CACHE_NAME = "heuressup-cache-v7.2.0";
+const CACHE_NAME = "heuressup-cache-v7.3.0-debug";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
   "./", "./index.html", "./menu.html", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
   "./glossaire.js", "./ccn/conventions-collectives.js",
-
   "./heures/index.html",
   "./paye/index.html",
-
   "./fox/index.html", "./fox/css/style.css",
   "./fox/js/config.js", "./fox/js/assets-config.js", "./fox/js/safety.js",
   "./fox/js/modes.js", "./fox/js/xp-system.js", "./fox/js/leagues.js",
@@ -26,7 +23,6 @@ const FILES_TO_CACHE = [
   "./fox/js/snapshot-system.js", "./fox/js/export-rtf.js",
   "./fox/js/ai-integration.js", "./fox/js/main-rpg.js",
   "./fox/js/vue-pro.js", "./fox/js/articles-loi.js",
-
   "./module4/index.html", "./module4/js/app.js",
   "./module4/js/core/dte-engine.js", "./module4/js/core/dte-simulator.js",
   "./module4/js/core/dte-risks.js", "./module4/js/core/dte-learning.js",
@@ -42,90 +38,144 @@ const FILES_TO_CACHE = [
   "./module4/css/main.css", "./module4/css/dashboard.css",
   "./module4/css/components.css", "./module4/css/charts.css",
   "./module4/css/twin-body.css",
-
   "./images/renard-annuel.png.jpg", "./images/renard-mensuel.png.jpg",
   "./images/renard-central.png.jpg"
 ];
 
-// INSTALLATION — identique à l'original
+// ── INSTALL ───────────────────────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
+  console.log("🔧 [SW INSTALL] Démarrage installation — cache:", CACHE_NAME);
+  
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return Promise.all(
-        FILES_TO_CACHE.map((url) => {
-          return cache.add(url).catch((err) => {
-            console.warn("⚠️ Échec mise en cache :", url);
-          });
-        })
-      );
+    caches.open(CACHE_NAME).then(async (cache) => {
+      console.log("📦 [SW INSTALL] Cache ouvert, mise en cache de", FILES_TO_CACHE.length, "fichiers...");
+      
+      let ok = 0, fail = 0;
+      for (const url of FILES_TO_CACHE) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            await cache.put(url, res);
+            ok++;
+            console.log("  ✅ [CACHE OK]", url, "— status:", res.status, "— Cache-Control:", res.headers.get("Cache-Control"));
+          } else {
+            fail++;
+            console.warn("  ⚠️ [CACHE SKIP]", url, "— status HTTP:", res.status);
+          }
+        } catch(err) {
+          fail++;
+          console.error("  ❌ [CACHE FAIL]", url, "— erreur:", err.message);
+        }
+      }
+      
+      console.log("📊 [SW INSTALL] Résultat:", ok, "OK,", fail, "échecs sur", FILES_TO_CACHE.length);
+      
+      // Lister le contenu du cache après installation
+      const keys = await cache.keys();
+      console.log("🗂️ [SW INSTALL] Contenu cache final:", keys.length, "entrées");
+      keys.forEach(req => console.log("   →", req.url));
     })
   );
   self.skipWaiting();
 });
 
-// ACTIVATION — identique à l'original
+// ── ACTIVATE ──────────────────────────────────────────────────────────────────
 self.addEventListener("activate", (event) => {
+  console.log("🚀 [SW ACTIVATE] Activation — nettoyage anciens caches...");
+  
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
+    caches.keys().then(async (keys) => {
+      console.log("🗑️ [SW ACTIVATE] Caches existants:", keys);
+      for (const key of keys) {
+        if (key !== CACHE_NAME) {
+          await caches.delete(key);
+          console.log("  🗑️ Supprimé:", key);
+        }
+      }
+      console.log("✅ [SW ACTIVATE] Nettoyage terminé — cache actif:", CACHE_NAME);
     })
   );
   self.clients.claim();
 });
 
-// FETCH — Network First + Cache Fallback — identique à l'original
+// ── FETCH ─────────────────────────────────────────────────────────────────────
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
+
+  const url = event.request.url;
+  const shortUrl = url.replace(self.location.origin, '');
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200) {
+        const status = networkResponse.status;
+        const cc = networkResponse.headers.get("Cache-Control") || "aucun";
+        
+        if (status === 200) {
           const cacheCopy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy));
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, cacheCopy);
+            // Log uniquement les HTML/JS/CSS pour ne pas polluer
+            if (shortUrl.match(/\.(html|js|css|json)$/)) {
+              console.log("📡 [FETCH NET→CACHE]", shortUrl, "| status:", status, "| Cache-Control:", cc);
+            }
+          });
+        } else {
+          console.warn("⚠️ [FETCH NET NON-200]", shortUrl, "| status:", status);
         }
         return networkResponse;
       })
-      .catch(() => {
+      .catch((netErr) => {
+        console.log("📴 [FETCH OFFLINE] Réseau indisponible pour:", shortUrl, "— recherche dans cache...");
+        
         return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-          if (event.request.headers.get("accept") &&
-              event.request.headers.get("accept").includes("text/html")) {
-            return caches.match(OFFLINE_URL);
+          if (cachedResponse) {
+            console.log("✅ [FETCH CACHE HIT]", shortUrl);
+            return cachedResponse;
+          }
+          
+          console.error("❌ [FETCH CACHE MISS]", shortUrl, "— non trouvé dans le cache !");
+          
+          // Fallback HTML
+          const isNav = event.request.mode === "navigate" ||
+            event.request.headers.get("accept")?.includes("text/html");
+          
+          if (isNav) {
+            console.log("🔄 [FETCH FALLBACK] Retour vers menu.html offline");
+            return caches.match(OFFLINE_URL).then(r => {
+              if (r) { console.log("✅ [FETCH FALLBACK OK] menu.html servi"); return r; }
+              console.error("💥 [FETCH FALLBACK FAIL] menu.html absent du cache !");
+            });
           }
         });
       })
   );
 });
 
-self.addEventListener("sync", (event) => {
-  if (event.tag === "sync-punches") console.log("🔄 Synchronisation...");
+// ── SYNC ──────────────────────────────────────────────────────────────────────
+self.addEventListener("sync", (e) => {
+  console.log("🔄 [SYNC]", e.tag);
 });
 
-self.addEventListener("periodicsync", (event) => {
-  if (event.tag === "update-cache") {
-    event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) =>
-        Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})))
+self.addEventListener("periodicsync", (e) => {
+  if (e.tag === "update-cache") {
+    console.log("🔁 [PERIODIC SYNC] Mise à jour cache...");
+    e.waitUntil(
+      caches.open(CACHE_NAME).then((c) =>
+        Promise.all(FILES_TO_CACHE.map((u) => c.add(u).catch(() => {})))
       )
     );
   }
 });
 
-self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Nouvelle notification" };
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body, icon: "./icon-192.png", badge: "./icon-192.png"
-    })
-  );
+self.addEventListener("push", (e) => {
+  const d = e.data?.json() ?? { title: "Heures Sup", body: "Notification" };
+  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "./icon-192.png" }));
 });
 
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "GEO_NOTIFY") {
-    const { action, distance } = event.data;
+self.addEventListener("message", (e) => {
+  if (e.data?.type === "GEO_NOTIFY") {
+    const { action, distance } = e.data;
     self.registration.showNotification(action === "in" ? "📍 Arrivée" : "🏁 Départ", {
       body: action === "in" ? `Zone à ${Math.round(distance)}m` : "Sortie de zone",
       icon: "./icon-192.png", tag: "geo-punch",
@@ -135,16 +185,15 @@ self.addEventListener("message", (event) => {
   }
 });
 
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  if (event.action === "dismiss") return;
-  event.waitUntil(
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  if (e.action === "dismiss") return;
+  e.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-      const action = event.notification.data?.action || "in";
+      const action = e.notification.data?.action || "in";
       for (const c of list) {
         if (c.url.includes("paye/index.html") && "focus" in c) {
-          c.postMessage({ type: "DO_PUNCH", action });
-          return c.focus();
+          c.postMessage({ type: "DO_PUNCH", action }); return c.focus();
         }
       }
       return clients.openWindow("./paye/index.html").then((w) => {
