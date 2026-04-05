@@ -12,7 +12,7 @@
 </head>
 <body class="gaming-mode">
 
-<img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<img id="bg-decor" src="../fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
 
 <div id="burnout-overlay"></div>
 <div id="storm-overlay"></div>
@@ -32,7 +32,7 @@
 <div id="burnout-popup">
   <span class="burnout-icon">🔥</span>
   <div class="score-display" id="burnout-score-val">--</div>
-  <h2>Signal Burn-Out Détecté</h2>
+  <h2>Pénalité Détectée</h2>
   <p id="burnout-popup-msg">Votre situation présente des signaux de risque élevés.</p>
   <button class="btn-close-burnout" onclick="closeBurnoutPopup()">Voir mes droits →</button>
 </div>
@@ -84,8 +84,8 @@ window._fox_pre = (function() {
   </div>
   <div class="hud-stats">
     <div class="hud-stat" onclick="openPopup('popup-modules')" title="Voir les données heures sup" style="cursor:pointer;"><div class="hud-stat-icon">⏱️</div><div class="hud-stat-val" id="hud-hours"><script>document.write(window._fox_pre.hrs||0)</script></div><div class="hud-stat-lbl">H.SUP</div></div>
-    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir l'énergie et burn-out" style="cursor:pointer;"><div class="hud-stat-icon">❤️</div><div class="hud-stat-val" id="hud-energy">100</div><div class="hud-stat-lbl">ÉNERGIE</div></div>
-    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir le risque burn-out" style="cursor:pointer;"><div class="hud-stat-icon">🔥</div><div class="hud-stat-val" id="hud-burnout"><script>document.write(window._fox_pre.bo||0)</script></div><div class="hud-stat-lbl">RISQUE</div></div>
+    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir mon énergie" style="cursor:pointer;"><div class="hud-stat-icon">❤️</div><div class="hud-stat-val" id="hud-energy">100</div><div class="hud-stat-lbl">ÉNERGIE</div></div>
+    <div class="hud-stat" onclick="openPopup('popup-burnout')" title="Voir mes pénalités" style="cursor:pointer;"><div class="hud-stat-icon">🔥</div><div class="hud-stat-val" id="hud-burnout"><script>document.write(window._fox_pre.bo||0)</script></div><div class="hud-stat-lbl">PÉNALITÉ</div></div>
     <div class="hud-stat" onclick="openPopup('popup-badges')" title="Voir mes badges" style="cursor:pointer;"><div class="hud-stat-icon">🏅</div><div class="hud-stat-val" id="hud-badges"><script>document.write(window._fox_pre.rwds||0)</script></div><div class="hud-stat-lbl">BADGES</div></div>
   </div>
   <div id="hud-buttons">
@@ -114,7 +114,7 @@ window._fox_pre = (function() {
 
   <!-- Renard central -->
   <div id="kitsune-center" onclick="openPopup('popup-fox')">
-    <img id="kitsune-svg" src="../images/foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune" onerror="this.style.display='none'">
+    <img id="kitsune-svg" src="../foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune">
     <div id="kitsune-tap-hint">Appuie sur moi !</div>
   </div>
 
@@ -135,7 +135,7 @@ window._fox_pre = (function() {
     <button class="dock-btn" onclick="openPopup('popup-glossaire');closeSubs()"><span class="dock-icon">📚</span><span class="dock-label">Glossaire</span></button>
   </div>
   <div id="subdock-suivi" class="subdock" style="display:none;">
-    <button class="dock-btn" onclick="openPopup('popup-burnout');closeSubs()"><span class="dock-icon">🔥</span><span class="dock-label">Burn-Out</span></button>
+    <button class="dock-btn" onclick="openPopup('popup-burnout');closeSubs()"><span class="dock-icon">🔥</span><span class="dock-label">Pénalité</span></button>
     <button class="dock-btn" onclick="openPopup('popup-violations');closeSubs()"><span class="dock-icon">⚠️</span><span class="dock-label">Violations</span></button>
     <button class="dock-btn" onclick="openPopup('popup-xp-history');closeSubs()"><span class="dock-icon">📊</span><span class="dock-label">XP</span></button>
   </div>
@@ -168,7 +168,7 @@ window._fox_pre = (function() {
       <button class="fox-popup-close" onclick="closePopup('popup-fox')">✕</button>
     </div>
     <div style="text-align:center;margin-bottom:12px;">
-      <img src="../images/foxplayer.PNG" alt="Kitsune" style="width:90px;height:90px;object-fit:contain;">
+      <img src="../foxplayer.PNG" alt="Kitsune" style="width:90px;height:90px;object-fit:contain;">
     </div>
     <div style="font-size:0.65rem;color:#555;text-align:center;margin-bottom:6px;letter-spacing:0.5px;">
       🦊 Je te parle comme un ami — pas comme un avocat. En cas de doute, consulte un pro !
@@ -290,7 +290,7 @@ window._fox_pre = (function() {
 <div class="fox-popup-backdrop" id="popup-burnout">
   <div class="fox-popup">
     <div class="fox-popup-header">
-      <h2 class="fox-popup-title">🔥 Score Burn-Out</h2>
+      <h2 class="fox-popup-title">🔥 Pénalités</h2>
       <button class="fox-popup-close" onclick="closePopup('popup-burnout')">✕</button>
     </div>
     <div id="burnout-popup-content" style="color:#ccc;"></div>
@@ -2388,6 +2388,31 @@ function _analyzeLegalSituation() {
         m2Days[dk] = { extra: hrs, recup: 0, absent: 0 };
       });
     });
+    // ── M4 vacances & absences M1 — exclure de l'analyse violation ──────────
+    // DTE_VACANCES_ : jours saisis comme "vacances" dans M4 (clé = YYYY-MM-DD)
+    // absent/recup M1 : jours de repos déclarés dans M1 (recup>=7h ou absent>=7h)
+    // → ces jours ne doivent PAS générer de violation "Semaine chargée"
+    const m4Vac = {};
+    try {
+      const rawVac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + year) || '{}');
+      Object.keys(rawVac).forEach(dk => { m4Vac[dk] = true; });
+    } catch(e) {}
+    // Construire le Set des semaines avec au moins 1 jour off (vacances M4 ou repos M1)
+    const weeksWithDayOff = new Set();
+    const _isoWk = dk => {
+      const d = new Date(dk), dow = (d.getDay()+6)%7;
+      const thu = new Date(d); thu.setDate(d.getDate()-dow+3);
+      const yS = new Date(thu.getFullYear(),0,4);
+      return thu.getFullYear()+'-W'+String(1+Math.round(((thu-yS)/86400000-3+((yS.getDay()+6)%7))/7)).padStart(2,'0');
+    };
+    // Vacances M4
+    Object.keys(m4Vac).forEach(dk => weeksWithDayOff.add(_isoWk(dk)));
+    // Absences/récup M1 (≥7h = jour off)
+    Object.entries(rawM1).forEach(([dk, val]) => {
+      if (typeof val !== 'object') return;
+      if ((Number(val.absent||0) >= 7) || (Number(val.recup||0) >= 7)) weeksWithDayOff.add(_isoWk(dk));
+    });
+
     // M1 prioritaire si même jour
     const allDays = Object.assign({}, m2Days, rawM1);
 
@@ -2442,9 +2467,9 @@ function _analyzeLegalSituation() {
       maxWeekTotal: Math.round(maxWeekTotal * 100) / 100,
       maxWeekMon, weeksOver48, weeksOver44,
       maxAvg12:     Math.round(maxAvg12 * 100) / 100,
-      hasWeekViol:  maxWeekTotal >= 48,
+      hasWeekViol:  maxWeekTotal >= 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
       hasAvgViol:   maxAvg12 >= 44,
-      hasWeekAlert: maxWeekTotal >= 44 && maxWeekTotal < 48,
+      hasWeekAlert: maxWeekTotal >= 44 && maxWeekTotal < 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
       totalWeeks:   weekArr.length,
     };
 
@@ -7015,7 +7040,7 @@ function devSetSeason(q) {
   if (bgEl) {
     const idx = q >= 0 ? q : Math.floor(new Date().getMonth() / 3);
     const bgs = typeof _SEASONAL_BG !== 'undefined' ? _SEASONAL_BG :
-      ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+      ['../fox-bg.PNG','../fox-bg-2.jpg','../fox-bg-3.jpg','../fox-bg-4.jpg'];
     const target = bgs[idx] || bgs[0];
     bgEl.style.opacity = '0';
     bgEl.style.transition = 'opacity 1.2s ease';
@@ -7248,10 +7273,10 @@ function emuSimDays(nDays, withViolation) {
 
 // \u2500\u2500 D\u00E9cor saisonnier (4 backgrounds par trimestre) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const _SEASONAL_BG = [
-  '../images/fox-bg.PNG',     // Q1 : hiver (jan-mar)
-  '../images/fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
-  '../images/fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
-  '../images/fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
+  '../fox-bg.PNG',     // Q1 : hiver (jan-mar)
+  '../fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
+  '../fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
+  '../fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
 ];
 function updateSeasonalBg() {
   const m    = new Date().getMonth(); // 0-11
@@ -7261,7 +7286,7 @@ function updateSeasonalBg() {
   // Défaut fallback si _SEASONAL_BG non défini globalement
   const _bgs = (typeof _SEASONAL_BG !== 'undefined' && Array.isArray(_SEASONAL_BG))
     ? _SEASONAL_BG
-    : ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+    : ['../fox-bg.PNG','../fox-bg-2.jpg','../fox-bg-3.jpg','../fox-bg-4.jpg'];
   const bg   = _bgs[q] || _bgs[0];
   const bgEl = document.getElementById('bg-decor');
   if (!bgEl) return;
@@ -7271,13 +7296,19 @@ function updateSeasonalBg() {
   const target  = _base(bg);
   if (current === target) return; // Déjà la bonne saison
   console.log('🌿 Changement décor :', seasonNames[q], '→', bg);
-  bgEl.style.opacity = '0';
-  bgEl.style.transition = 'opacity 1.5s ease';
-  setTimeout(() => {
-    bgEl.src = bg;
-    bgEl.onload  = () => { bgEl.style.opacity = '1'; };
-    bgEl.onerror = () => { bgEl.style.opacity = '1'; bgEl.src = _bgs[0]; };
-  }, 800);
+  // FIX : précharger l'image avant de swapper → pas de fond noir visible
+  const _preload = new Image();
+  _preload.onload = () => {
+    bgEl.style.transition = 'opacity 0.5s ease';
+    bgEl.style.opacity = '0';
+    setTimeout(() => {
+      bgEl.src = bg;
+      bgEl.style.transition = 'opacity 0.8s ease';
+      bgEl.style.opacity = '1';
+    }, 250); // swap pendant le fade-out, pas après
+  };
+  _preload.onerror = () => {}; // image absente → on garde l'actuelle
+  _preload.src = bg;
 }
 
 // \u2500\u2500 PNJ \u2014 \u00E9volution tous les 5 niveaux jusqu'au niveau 50 \u2500
@@ -7286,7 +7317,7 @@ function updatePNJLevel(level) {
   const lvl  = Math.max(1, level || 1);           // Pas de cap — Légende progression infinie
   const tier = Math.min(10, Math.ceil(Math.min(lvl, 50) / 5)); // tier 1-10 basé sur min(lvl,50)
   console.log('🦊 updatePNJLevel : niveau', lvl, '→ tier', tier);
-  const img  = tier === 1 ? '../images/foxplayer.PNG' : '../images/foxplayer-' + tier + '.PNG';
+  const img  = tier === 1 ? '../foxplayer.PNG' : '../foxplayer-' + tier + '.PNG';
   const pnj  = document.getElementById('kitsune-svg');
   const foxImgPopup = document.querySelector('#popup-fox img[src*="foxplayer"]');
   // Masquer fond noir : filter brightness + contrast
@@ -7295,16 +7326,27 @@ function updatePNJLevel(level) {
     foxImgPopup.style.mixBlendMode = 'screen';
     foxImgPopup.style.background = 'transparent';
   }
-  if (pnj) { pnj.setAttribute('data-tier', tier); pnj.src = img; }
+  const _fallbackImg = '../foxplayer.PNG';
+  // Précharger l'image une seule fois — puis appliquer aux deux éléments
+  const _tryLoad = new Image();
+  _tryLoad.onload = () => {
+    if (pnj)         { pnj.style.display = ''; pnj.src = img; }
+    if (foxImgPopup) { foxImgPopup.src = img; }
+  };
+  _tryLoad.onerror = () => {
+    // Image du tier absente → fallback tier 1 sur les deux éléments
+    if (pnj)         { pnj.style.display = ''; pnj.src = _fallbackImg; }
+    if (foxImgPopup) { foxImgPopup.src = _fallbackImg; }
+  };
+  if (pnj) { pnj.setAttribute('data-tier', tier); }
   if (foxImgPopup) {
-    foxImgPopup.src = img;
-    // Augmenter la taille selon le tier (niveaux 4+ sont trop petits)
-    let size = 90; // tier 1-3 : taille de base
-    if (tier >= 7) size = 130; // tier 7-10 : grande taille
-    else if (tier >= 4) size = 110; // tier 4-6 : taille moyenne
+    let size = 90;
+    if (tier >= 7) size = 130;
+    else if (tier >= 4) size = 110;
     foxImgPopup.style.width = size + 'px';
     foxImgPopup.style.height = size + 'px';
   }
+  _tryLoad.src = img; // déclenche le chargement
 }
 
 // \u2500\u2500 Animation Level-Up \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -7916,7 +7958,7 @@ function showMonthlySummary(forceMonth) {
       <span class="ms-val" style="color:${violations > 0 ? '#E53935' : '#4CAF50'};">${violations}</span>
     </div>
     <div class="monthly-stat">
-      <span class="ms-label">🔥 Score burn-out</span>
+      <span class="ms-label">⚡ Pénalités accumulées</span>
       <span class="ms-val" style="color:${burnoutScore >= 60 ? '#E53935' : burnoutScore >= 40 ? '#FF8C42' : '#4CAF50'};">${burnoutScore}/100</span>
     </div>
     <div style="margin-top:14px;padding:12px;background:rgba(255,140,66,0.06);border:1px solid rgba(255,140,66,0.15);border-radius:10px;color:#aaa;font-size:0.82rem;line-height:1.6;">
@@ -14133,7 +14175,7 @@ function _recordViolation(situation) {
   try {
     const hist = JSON.parse(localStorage.getItem(_VIOLATIONS_KEY) || '[]');
     // Dédoublonner : même titre dans les 2h → skip
-    const twoHoursAgo = new Date(Date.now() - 2*3600*1000).toISOString();
+    const twoHoursAgo = new Date(Date.now() - 24*3600*1000).toISOString(); // PATCH : fenêtre 24h (vs 2h) — évite doublons inter-sessions
     let newViols = 0;
     viols.forEach(v => {
       const isDupe = hist.some(h2 => h2.titre === v.titre && h2.ts > twoHoursAgo);
@@ -14629,11 +14671,11 @@ function _getBadgeImagePath(badge) {
   // Badges 51+ : retirer underscores ET espaces
   if (badge.id >= 51) {
     const fileName = name.replace(/[_\s]/g, '');  // Retire underscores et espaces
-    return '../images/badges/' + fileName + '.PNG';
+    return '../images/' + fileName + '.PNG';
   }
   
   // Badges 1-50 : garder le nom tel quel
-  return '../images/badges/' + name + '.PNG';
+  return '../images/' + name + '.PNG';
 }
 
 function buildBadgeStats() {
