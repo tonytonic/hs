@@ -77,6 +77,14 @@ button,input,textarea{width:100%;padding:8px;margin:5px 0}
 .wiz-closures-grid input{margin:0;font-size:13px;padding:6px}
 .wiz-check-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:#f9f9f9;border:1px solid #eee;margin-bottom:10px;cursor:pointer}
 .wiz-check-row input[type=checkbox]{width:18px;height:18px;margin:0;flex-shrink:0;cursor:pointer}
+.wiz-step input[type="date"],.wiz-step input[type="number"],.wiz-step input[type="text"]{
+  width:100%;box-sizing:border-box;padding:14px 16px;font-size:17px;
+  border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#222;
+  -webkit-appearance:none;appearance:none;margin-bottom:4px;display:block;
+}
+.wiz-step input[type="date"]:focus,.wiz-step input[type="number"]:focus{
+  border-color:#4FB3C2;outline:none;
+}
 .wiz-check-row span{font-size:14px;font-weight:500}
 .wiz-summary{background:#f1f8e9;border:1px solid #aed581;border-radius:10px;padding:14px;font-size:13px;line-height:1.8;margin-bottom:16px}
 .wiz-summary b{color:#33691e}
