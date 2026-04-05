@@ -3,7 +3,7 @@
  * Version : 7.3.0-DEBUG — Cloudflare Pages
  */
 
-const CACHE_NAME = "heuressup-cache-v7.5.0";
+const CACHE_NAME = "heuressup-cache-v7.6.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -63,6 +63,10 @@ self.addEventListener("install", (event) => {
                 headers.append(key, val);
               }
             });
+            // Forcer Content-Length avec la vraie taille du body décompressé
+            headers.set('content-length', body.byteLength.toString());
+            headers.delete('content-encoding'); // supprimer gzip/br — body déjà décompressé
+            headers.delete('transfer-encoding');
             const cleanRes = new Response(body, { status: res.status, statusText: res.statusText, headers });
             await cache.put(url, cleanRes);
             ok++;
@@ -129,6 +133,9 @@ self.addEventListener("fetch", (event) => {
               headers.append(key, val);
             }
           });
+          headers.set('content-length', body.byteLength.toString());
+          headers.delete('content-encoding');
+          headers.delete('transfer-encoding');
           const cleanResponse = new Response(body, {
             status: networkResponse.status,
             statusText: networkResponse.statusText,
