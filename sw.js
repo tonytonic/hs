@@ -3,7 +3,7 @@
  * Version : 7.3.0-DEBUG — Cloudflare Pages
  */
 
-const CACHE_NAME = "heuressup-cache-v7.6.0";
+const CACHE_NAME = "heuressup-cache-v7.7.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -39,7 +39,28 @@ const FILES_TO_CACHE = [
   "./module4/css/components.css", "./module4/css/charts.css",
   "./module4/css/twin-body.css",
   "./images/renard-annuel.png.jpg", "./images/renard-mensuel.png.jpg",
-  "./images/renard-central.png.jpg"
+  "./images/renard-central.png.jpg",
+
+  // Décors saisonniers Fox (dans images/)
+  "./images/fox-bg.PNG",
+  "./images/fox-bg-2.jpg",
+  "./images/fox-bg-3.jpg",
+  "./images/fox-bg-4.jpg",
+
+  // PNJ Fox (dans images/)
+  "./images/foxplayer.PNG",
+  "./images/foxplayer-2.PNG",
+  "./images/foxplayer-3.PNG",
+  "./images/foxplayer-4.PNG",
+  "./images/foxplayer-5.PNG",
+  "./images/foxplayer-6.PNG",
+  "./images/foxplayer-7.PNG",
+  "./images/foxplayer-8.PNG",
+  "./images/foxplayer-9.PNG",
+  "./images/foxplayer-10.PNG",
+
+  // Images Fox (dans images/)
+  "./images/foxpredit.jpg"
 ];
 
 // ── INSTALL ───────────────────────────────────────────────────────────────────
