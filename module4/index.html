@@ -471,7 +471,10 @@ window._openProfilPopup = function() {
   const modal = document.getElementById('profil-modal');
   if (!modal) return;
   modal.classList.remove('hidden');
-  _renderProfilStep(0, {});
+  // Charger les données sauvegardées pour pré-remplir le popup
+  let saved = {};
+  try { saved = JSON.parse(localStorage.getItem('M4_USER_PROFILE') || '{}'); } catch(_) {}
+  _renderProfilStep(0, saved);
 };
 
 const PROFIL_QUESTIONS = [
@@ -548,14 +551,17 @@ function _renderProfilStep(step, answers) {
   if (step >= PROFIL_QUESTIONS.length) {
     // Sauvegarder + fermer
     try {
+      // Tout dans DTE_SETTINGS — clé lue par dte-engine.js
+      const dte = JSON.parse(localStorage.getItem('DTE_SETTINGS') || '{}');
+      if (_profilAnswers.workType) dte.posteType = _profilAnswers.workType;
+      if (_profilAnswers.commute !== undefined) dte.commuteH = _profilAnswers.commute / 60;
+      // Télétravail → pas d'impact direct moteur mais stocké pour futur usage
+      dte._telework  = _profilAnswers.telework;
+      dte._noise     = _profilAnswers.noise;
+      dte._seniority = _profilAnswers.seniority;
+      localStorage.setItem('DTE_SETTINGS', JSON.stringify(dte));
+      // Conserver aussi un profil lisible
       localStorage.setItem('M4_USER_PROFILE', JSON.stringify(_profilAnswers));
-      // Appliquer le type de poste au schedule
-      if (_profilAnswers.workType) {
-        const s = JSON.parse(localStorage.getItem('M4_SCHEDULE_SETTINGS') || '{}');
-        s.posteType = _profilAnswers.workType;
-        s.commuteH  = (_profilAnswers.commute || 0) / 60;
-        localStorage.setItem('M4_SCHEDULE_SETTINGS', JSON.stringify(s));
-      }
     } catch(_) {}
 
     content.innerHTML = `
