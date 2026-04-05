@@ -716,7 +716,38 @@
     popup.id = 'license-popup';
     popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
     popup.addEventListener('click', e => { if(e.target===popup) window.closeLicensePopup(); });
-    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h2 style="color:#00c8ff;margin:0;font-size:17px;">📄 Licence</h2><button onclick="window.closeLicensePopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button></div><div style="color:#ccc;line-height:1.7;font-size:13px;"><p style="color:#fff;font-weight:700;margin-bottom:4px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p><p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Droits accordés</p><p>Utilisation à titre personnel et non commercial uniquement.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Interdictions</p><p>Toute utilisation commerciale, revente, ou redistribution est interdite sans accord écrit.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Données</p><p>Aucune donnée personnelle collectée ni transmise.</p><div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">Contact : appareils.treves6g@icloud.com</div></div></div>`;
+    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;max-height:85vh;overflow-y:auto;" onclick="event.stopPropagation()">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="color:#00c8ff;margin:0;font-size:17px;">📄 Licence</h2>
+    <button onclick="window.closeLicensePopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
+  </div>
+  <div style="color:#ccc;line-height:1.8;font-size:13px;">
+    <p style="color:#fff;font-weight:700;margin-bottom:2px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p>
+    <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">1. Droits accordés</p>
+    <p>L'auteur accorde à tout utilisateur le droit d'utiliser l'application à titre <strong style="color:#fff">personnel et non commercial</strong>, de consulter le code source à des fins d'information, et de signaler des bugs via GitHub.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">2. Interdictions explicites</p>
+    <p>Sont strictement interdits sans autorisation écrite préalable : toute utilisation commerciale, vente, location ou monétisation ; toute intégration dans un produit commercial ; toute modification et redistribution sous un autre nom ; toute suppression des mentions de copyright ; tout déploiement en entreprise sans accord écrit.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">3. Données utilisateur</p>
+    <p>L'application traite les données localement sur l'appareil. Aucune donnée personnelle n'est collectée ni transmise par l'auteur.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">4. Sources scientifiques</p>
+    <p>Les références scientifiques (OMS, INRS, HAS, Lancet, etc.) sont citées à titre informatif. L'application ne constitue pas un avis médical. Seuls les documents officiels de l'employeur et le droit applicable font foi.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">5. Limitation de responsabilité</p>
+    <p>L'application est fournie "telle quelle", sans garantie d'aucune sorte. L'auteur ne pourra être tenu responsable de décisions prises sur la base des résultats affichés.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">6. Cession commerciale</p>
+    <p>Toute cession commerciale, rachat ou partenariat fait l'objet d'un contrat distinct négocié avec l'auteur.</p>
+
+    <div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
+      Contact : appareils.treves6g@icloud.com
+    </div>
+  </div>
+</div>`;
     document.body.appendChild(popup); lockScroll();
   }
   window.closeLicensePopup = function() { const p = document.getElementById('license-popup'); if(p) p.remove(); unlockScroll(); }
@@ -726,7 +757,35 @@
     popup.id = 'privacy-popup';
     popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
     popup.addEventListener('click', e => { if(e.target===popup) window.closePrivacyPopup(); });
-    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h2 style="color:#00c8ff;margin:0;font-size:17px;">🔒 Confidentialité</h2><button onclick="window.closePrivacyPopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button></div><div style="color:#ccc;line-height:1.7;font-size:13px;"><p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Dernière mise à jour : 28 février 2026</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Absence de collecte</p><p>Aucune donnée personnelle collectée, stockée ou transmise vers des serveurs externes.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Stockage local</p><p>Toutes les données restent exclusivement sur votre appareil (localStorage).</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Pas de tracking</p><p>Aucun cookie publicitaire, aucun outil d'analyse tiers.</p><div style="margin-top:8px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">Email : appareils.treves6g@icloud.com</div></div></div>`;
+    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;max-height:85vh;overflow-y:auto;" onclick="event.stopPropagation()">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <h2 style="color:#00c8ff;margin:0;font-size:17px;">🔒 Politique de Confidentialité</h2>
+    <button onclick="window.closePrivacyPopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
+  </div>
+  <div style="color:#ccc;line-height:1.8;font-size:13px;">
+    <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Dernière mise à jour : 28 février 2026</p>
+    <p>Cette politique décrit comment l'application <strong style="color:#fff">Simulateur Heures Sup</strong> traite vos informations. Votre vie privée est notre priorité absolue.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">1. Absence de collecte de données</p>
+    <p>L'application est conçue pour fonctionner de manière totalement autonome. <strong style="color:#fff">Nous ne collectons, ne stockons, ni ne transmettons aucune donnée personnelle</strong> vers des serveurs externes ou des tiers.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">2. Stockage local (LocalStorage)</p>
+    <p>Toutes vos données sont conservées exclusivement sur votre appareil. Vous pouvez les effacer à tout moment en vidant le cache ou en désinstallant l'application.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">3. Pas de suivi ni analytics</p>
+    <p>Aucun outil de suivi, cookie publicitaire ou service d'analyse tiers n'est utilisé. Votre utilisation reste totalement anonyme.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">4. Sécurité</p>
+    <p>Aucune donnée n'est transmise sur Internet. La sécurité de vos données dépend uniquement de la sécurité de votre appareil.</p>
+
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">5. Modifications</p>
+    <p>Toute modification de cette politique sera publiée dans l'application.</p>
+
+    <div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
+      Contact : appareils.treves6g@icloud.com
+    </div>
+  </div>
+</div>`;
     document.body.appendChild(popup); lockScroll();
   }
   window.closePrivacyPopup = function() { const p = document.getElementById('privacy-popup'); if(p) p.remove(); unlockScroll(); }
