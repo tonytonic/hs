@@ -3,7 +3,7 @@
  * Version : 7.3.0-DEBUG — Cloudflare Pages
  */
 
-const CACHE_NAME = "heuressup-cache-v7.4.0";
+const CACHE_NAME = "heuressup-cache-v7.5.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -55,9 +55,18 @@ self.addEventListener("install", (event) => {
         try {
           const res = await fetch(url);
           if (res.ok) {
-            await cache.put(url, res);
+            // Lire le body complet avant de mettre en cache (fix Cloudflare content-length:0)
+            const body = await res.arrayBuffer();
+            const headers = new Headers();
+            res.headers.forEach((val, key) => {
+              if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                headers.append(key, val);
+              }
+            });
+            const cleanRes = new Response(body, { status: res.status, statusText: res.statusText, headers });
+            await cache.put(url, cleanRes);
             ok++;
-            console.log("  ✅ [CACHE OK]", url, "— status:", res.status, "— Cache-Control:", res.headers.get("Cache-Control"));
+            console.log("  ✅ [CACHE OK]", url, "| taille:", body.byteLength, "octets");
           } else {
             fail++;
             console.warn("  ⚠️ [CACHE SKIP]", url, "— status HTTP:", res.status);
