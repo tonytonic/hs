@@ -7287,22 +7287,25 @@ function updateSeasonalBg() {
   const current = _base(bgEl.getAttribute('src') || bgEl.src);
   const target  = _base(bg);
   if (current === target) return; // Déjà la bonne saison
-  console.log('🌿 Changement décor :', seasonNames[q], '→', bg);
-  // FIX : précharger l'image avant de swapper → pas de fond noir visible
+  // Crossfade invisible : précharger → fade in par-dessus → supprimer l'ancienne
   const _preload = new Image();
   _preload.onload = () => {
-    bgEl.style.transition = 'opacity 0.5s ease';
-    bgEl.style.opacity = '0';
+    // Créer une 2e image par-dessus, fade in → swap → supprimer overlay
+    const overlay = document.createElement('img');
+    overlay.src = bg;
+    overlay.style.cssText = bgEl.style.cssText + ';opacity:0;transition:opacity 1.2s ease;';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0'; overlay.style.left = '0';
+    overlay.style.width = '100vw'; overlay.style.height = '100vh';
+    overlay.style.objectFit = 'cover'; overlay.style.zIndex = '-998';
+    bgEl.parentNode.insertBefore(overlay, bgEl.nextSibling);
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
     setTimeout(() => {
-      bgEl.src = bg;
-      bgEl.style.transition = 'opacity 0.8s ease';
-      bgEl.style.opacity = '1';
-    }, 250); // swap pendant le fade-out, pas après
+      bgEl.src = bg; bgEl.style.opacity = '1';
+      overlay.remove();
+    }, 1300);
   };
-  _preload.onerror = () => {
-    // Image saisonnière absente → rester sur le décor par défaut
-    if (bgEl) { bgEl.style.opacity = '1'; }
-  };
+  _preload.onerror = () => {}; // image absente → garder l'actuelle silencieusement
   _preload.src = bg;
 }
 
@@ -7324,15 +7327,24 @@ function updatePNJLevel(level) {
   const _fallbackImg = '../images/foxplayer.PNG';
   // Précharger l'image une seule fois — puis appliquer aux deux éléments
   const _tryLoad = new Image();
-  _tryLoad.onload = () => {
-    if (pnj)         { pnj.style.display = ''; pnj.src = img; }
-    if (foxImgPopup) { foxImgPopup.src = img; }
+  const _applyPNJ = (src) => {
+    if (pnj) {
+      // Ne changer que si l'image est différente
+      const curSrc = (pnj.getAttribute('src') || '').split('/').pop();
+      const newSrc = src.split('/').pop();
+      if (curSrc === newSrc) { pnj.style.display = ''; return; }
+      // Fade out → swap → fade in
+      pnj.style.transition = 'opacity 0.3s ease';
+      pnj.style.opacity = '0';
+      setTimeout(() => {
+        pnj.src = src; pnj.style.display = '';
+        pnj.style.opacity = '1';
+      }, 300);
+    }
+    if (foxImgPopup) foxImgPopup.src = src;
   };
-  _tryLoad.onerror = () => {
-    // Image du tier absente → fallback tier 1 sur les deux éléments
-    if (pnj)         { pnj.style.display = ''; pnj.src = _fallbackImg; }
-    if (foxImgPopup) { foxImgPopup.src = _fallbackImg; }
-  };
+  _tryLoad.onload  = () => _applyPNJ(img);
+  _tryLoad.onerror = () => _applyPNJ(_fallbackImg);
   if (pnj) { pnj.setAttribute('data-tier', tier); }
   if (foxImgPopup) {
     let size = 90;
