@@ -330,7 +330,17 @@ class LifestylePanel {
     this._modal.classList.remove('hidden');
   }
 
-  close() { this._modal?.classList.add('hidden'); }
+  close() {
+    // BUG 2 FIX : si le profil a des données, toujours resync en fermant
+    // (couvre le cas fermeture via overlay ✕ sans cliquer "FERMER ET METTRE À JOUR")
+    this._modal?.classList.add('hidden');
+    if (LifestylePanel.hasData()) {
+      setTimeout(() => {
+        if (window._fullSync) window._fullSync();
+        else if (window._forcSync) window._forcSync();
+      }, 80);
+    }
+  }
 
   _render() {
     const q   = QUESTIONS[this._step];

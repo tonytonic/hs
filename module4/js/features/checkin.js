@@ -40,15 +40,48 @@ class Checkin {
   checkIfNeeded(){
     const today=new Date().toISOString().slice(0,10);
     const last=localStorage.getItem('DTE_CHECKIN_DATE');
-    // Ouvrir à l'ouverture du module si pas encore fait aujourd'hui (toute la journée)
     if(last!==today){
       setTimeout(()=>this.open(),800);
+    } else {
+      // BUG 1 FIX : check-in déjà fait → afficher badge "Modifier"
+      setTimeout(()=>this._showEditBadge(),1000);
     }
+  }
+
+  // BUG 1 FIX : ouvrir le modal pré-rempli avec les réponses du jour
+  openForEdit(){
+    const today=new Date().toISOString().slice(0,10);
+    const history=JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY')||'[]');
+    const existing=history.find(h=>h.date===today);
+    this._step=0;
+    this._answers=existing ? {...existing} : {};
+    delete this._answers.date;
+    this._editMode=true;
+    this._render();
+    if(this._modal) this._modal.classList.remove('hidden');
+  }
+
+  // BUG 1 FIX : afficher un badge discret "✏️ Modifier le check-in"
+  _showEditBadge(){
+    const existing=document.getElementById('checkin-edit-badge');
+    if(existing) return;
+    // Chercher le bouton check-in dans le dashboard
+    const btn=document.querySelector('[onclick*="checkin"],[data-action="checkin"],.btn-checkin');
+    if(!btn) return;
+    const badge=document.createElement('span');
+    badge.id='checkin-edit-badge';
+    badge.title='Modifier le check-in du jour';
+    badge.style.cssText='font-size:10px;color:rgba(0,255,204,0.6);cursor:pointer;'+
+      'margin-left:6px;border:1px solid rgba(0,255,204,0.25);padding:1px 5px;border-radius:3px;';
+    badge.textContent='✅ fait · ✏️';
+    badge.addEventListener('click',(e)=>{e.stopPropagation();this.openForEdit();});
+    btn.parentNode.insertBefore(badge,btn.nextSibling);
   }
 
   open(){
     this._step=0;
     this._answers={};
+    this._editMode=false;
     this._render();
     if(this._modal) this._modal.classList.remove('hidden');
   }
@@ -118,9 +151,15 @@ class Checkin {
     const today=new Date().toISOString().slice(0,10);
     localStorage.setItem('DTE_CHECKIN_DATE',today);
     const history=JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY')||'[]');
-    history.push({date:today,...this._answers});
+    // BUG 1 FIX : si déjà soumis aujourd'hui → remplacer (pas dupliquer)
+    const existingIdx=history.findIndex(h=>h.date===today);
+    const entry={date:today,...this._answers};
+    if(existingIdx>=0) history[existingIdx]=entry;
+    else history.push(entry);
     if(history.length>90) history.shift();
     localStorage.setItem('DTE_CHECKIN_HISTORY',JSON.stringify(history));
+    // Retirer le badge "modifier" s'il existe
+    document.getElementById('checkin-edit-badge')?.remove();
     // Apply to analysis
     if(window.DTE&&window.DTE.learning&&window.DTE.engine){
       const st=window.DTE.engine.getState();
