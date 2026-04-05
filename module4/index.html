@@ -118,7 +118,7 @@
       <nav class="header-nav">
         <button class="nav-btn active" data-view="dashboard">MON ÉTAT</button>
         <button class="nav-btn" data-view="predictions">PRÉVISIONS</button>
-        <button class="nav-btn" data-view="schedule">HORAIRES</button>
+        <!-- Onglet HORAIRES masqué — géré via Mon Profil + Check-in -->
         <button class="nav-btn" data-view="whatif">SIMULATION</button>
         <button class="nav-btn" data-view="heatmap">CALENDRIER</button>
       </nav>
@@ -175,6 +175,17 @@
               <div class="abtn-text">
                 <div class="abtn-label">SYNCHRONISER</div>
                 <div class="abtn-sub">Forcer la mise à jour</div>
+              </div>
+            </button>
+
+            <!-- MON PROFIL -->
+            <button class="action-block-btn" id="btn-profil"
+              onclick="window._openProfilPopup&&window._openProfilPopup()"
+              style="background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.25);">
+              <span class="abtn-icon">👤</span>
+              <div class="abtn-text">
+                <div class="abtn-label" style="color:#FFB300;">MON PROFIL</div>
+                <div class="abtn-sub">Type de travail & rythme</div>
               </div>
             </button>
 
@@ -440,6 +451,164 @@ document.addEventListener('DOMContentLoaded', function(){
     showApp();
   }
 });
+</script>
+
+
+<!-- ── MODAL PROFIL TRAVAIL ─────────────────────────────────── -->
+<div id="profil-modal" class="modal-overlay hidden" style="z-index:9000;">
+  <div class="modal-panel" style="max-width:420px;">
+    <div class="modal-header">
+      <span style="font-family:var(--font-h);font-size:14px;font-weight:700;letter-spacing:.08em;">👤 MON PROFIL DE TRAVAIL</span>
+      <button class="modal-close" onclick="document.getElementById('profil-modal').classList.add('hidden')">✕</button>
+    </div>
+    <div id="profil-content" style="padding:var(--gap);"></div>
+  </div>
+</div>
+
+<script>
+// ── Popup profil travail ──────────────────────────────────────────
+window._openProfilPopup = function() {
+  const modal = document.getElementById('profil-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  _renderProfilStep(0, {});
+};
+
+const PROFIL_QUESTIONS = [
+  {
+    id: 'workType',
+    text: 'Quel est votre type de travail ?',
+    emoji: '🏢',
+    opts: [
+      {v:'standard',         e:'💻', l:'Bureau / Télétravail', key:'standard'},
+      {v:'travail_physique', e:'💪', l:'Travail physique / Terrain', key:'travail_physique'},
+      {v:'poste_3x8',        e:'🔄', l:'Travail posté (3×8 / nuit)', key:'poste_3x8'},
+      {v:'poste_2x8',        e:'↔️', l:'Travail posté (2×8)', key:'poste_2x8'},
+      {v:'astreinte',        e:'📱', l:'Astreinte / On-call', key:'astreinte'},
+      {v:'cadre_dirigeant',  e:'📊', l:'Cadre / Dirigeant', key:'cadre_dirigeant'},
+    ]
+  },
+  {
+    id: 'commute',
+    text: 'Temps de trajet aller-retour ?',
+    emoji: '🚗',
+    opts: [
+      {v:0,   e:'🏠', l:'Aucun (télétravail)'},
+      {v:30,  e:'🚶', l:'Moins de 30 min'},
+      {v:60,  e:'🚌', l:'30 min à 1h'},
+      {v:120, e:'🚆', l:'Plus de 1h'},
+    ]
+  },
+  {
+    id: 'telework',
+    text: 'Fréquence du télétravail ?',
+    emoji: '🏡',
+    opts: [
+      {v:0,   e:'🏢', l:'Jamais — 100% présentiel'},
+      {v:1,   e:'🔀', l:'Parfois (1-2j/sem)'},
+      {v:3,   e:'🏡', l:'Souvent (3-4j/sem)'},
+      {v:5,   e:'💻', l:'Toujours — 100% remote'},
+    ]
+  },
+  {
+    id: 'noise',
+    text: 'Niveau de contraintes physiques / bruit ?',
+    emoji: '🔊',
+    opts: [
+      {v:0, e:'🔇', l:'Aucune contrainte'},
+      {v:1, e:'🔉', l:'Modérée (bruit, posture)'},
+      {v:2, e:'🔊', l:'Forte (vibrations, chaleur, bruit)'},
+    ]
+  },
+  {
+    id: 'seniority',
+    text: 'Depuis combien de temps dans ce rythme ?',
+    emoji: '📅',
+    opts: [
+      {v:0, e:'🌱', l:'Moins de 1 an'},
+      {v:1, e:'📈', l:'1 à 3 ans'},
+      {v:3, e:'⚙️', l:'Plus de 3 ans'},
+    ]
+  },
+];
+
+let _profilAnswers = {};
+
+function _renderProfilStep(step, answers) {
+  _profilAnswers = answers;
+  const content = document.getElementById('profil-content');
+  if (!content) return;
+
+  // Charger les réponses existantes
+  try {
+    const saved = JSON.parse(localStorage.getItem('M4_USER_PROFILE') || '{}');
+    if (!Object.keys(_profilAnswers).length) _profilAnswers = {...saved};
+  } catch(_) {}
+
+  if (step >= PROFIL_QUESTIONS.length) {
+    // Sauvegarder + fermer
+    try {
+      localStorage.setItem('M4_USER_PROFILE', JSON.stringify(_profilAnswers));
+      // Appliquer le type de poste au schedule
+      if (_profilAnswers.workType) {
+        const s = JSON.parse(localStorage.getItem('M4_SCHEDULE_SETTINGS') || '{}');
+        s.posteType = _profilAnswers.workType;
+        s.commuteH  = (_profilAnswers.commute || 0) / 60;
+        localStorage.setItem('M4_SCHEDULE_SETTINGS', JSON.stringify(s));
+      }
+    } catch(_) {}
+
+    content.innerHTML = `
+      <div style="text-align:center;padding:var(--gap-xl);">
+        <div style="font-size:48px;">✅</div>
+        <div style="font-family:var(--font-h);font-size:18px;font-weight:700;margin:var(--gap) 0;">Profil enregistré !</div>
+        <div style="color:var(--text-dim);font-size:13px;">Vos scores biométriques sont maintenant calibrés selon votre profil de travail.</div>
+        <button class="btn btn--cyan" style="margin-top:var(--gap-l);"
+          onclick="document.getElementById('profil-modal').classList.add('hidden');
+                   if(window._fullSync) window._fullSync();">
+          Fermer
+        </button>
+      </div>`;
+    return;
+  }
+
+  const q   = PROFIL_QUESTIONS[step];
+  const pct = Math.round((step / PROFIL_QUESTIONS.length) * 100);
+
+  content.innerHTML = `
+    <div style="padding:0 4px;">
+      <div style="display:flex;align-items:center;margin-bottom:14px;gap:8px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.4);font-family:var(--font-mono);">${step+1} / ${PROFIL_QUESTIONS.length}</span>
+        <div style="flex:1;height:3px;background:rgba(255,255,255,0.1);">
+          <div style="height:100%;width:${pct}%;background:#FFB300;transition:width .3s;"></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:32px;margin-bottom:8px;">${q.emoji}</div>
+      <div style="font-size:14px;font-weight:600;color:#fff;text-align:center;margin-bottom:16px;line-height:1.4;">${q.text}</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${q.opts.map(o => `
+          <button data-val="${o.v}" style="display:flex;align-items:center;gap:12px;padding:11px 14px;
+            background:rgba(0,10,25,.85);
+            border:1px solid ${_profilAnswers[q.id]===o.v?'rgba(255,179,0,0.6)':'rgba(255,255,255,0.12)'};
+            ${_profilAnswers[q.id]===o.v?'background:rgba(255,179,0,0.08);':''}
+            cursor:pointer;transition:all .15s;text-align:left;width:100%;">
+            <span style="font-size:20px;flex-shrink:0;">${o.e}</span>
+            <span style="font-size:13px;color:#fff;">${o.l}</span>
+          </button>`).join('')}
+      </div>
+      ${step > 0 ? `<button onclick="_renderProfilStep(${step-1}, _profilAnswers)"
+        style="margin-top:12px;background:none;border:none;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;">
+        ← Retour</button>` : ''}
+    </div>`;
+
+  content.querySelectorAll('button[data-val]').forEach(el => {
+    el.addEventListener('click', () => {
+      const val = el.dataset.val;
+      _profilAnswers[q.id] = isNaN(val) ? val : Number(val);
+      setTimeout(() => _renderProfilStep(step + 1, _profilAnswers), 200);
+    });
+  });
+}
 </script>
 
 </body>
