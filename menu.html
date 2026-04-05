@@ -322,12 +322,17 @@
   #ios-install-banner h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: #1a1a1a; }
   #ios-install-banner p { margin: 0 0 14px; font-size: 14px; color: #444; line-height: 1.5; }
   #ios-install-banner .ios-banner-steps {
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; flex-direction: column; gap: 10px;
     text-align: left; background: #f5f9fa;
-    border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
     font-size: 14px; color: #333;
   }
-  #ios-install-banner .ios-banner-steps span { display: flex; align-items: center; gap: 8px; }
+  #ios-install-banner .ios-banner-steps span {
+    display: flex; align-items: center; gap: 10px; line-height: 1.4;
+  }
+  #ios-install-banner .ios-banner-steps span em {
+    flex-shrink: 0; font-style: normal; font-size: 20px;
+  }
   #ios-install-banner button {
     background: #4FB3C2; color: #fff; border: none;
     border-radius: 22px; padding: 11px 32px;
@@ -484,9 +489,9 @@
   <h3>Installer l'application</h3>
   <p>Accédez à l'app directement depuis votre écran d'accueil, sans navigateur.</p>
   <div class="ios-banner-steps">
-    <span>1️⃣ Appuyez sur <strong>le bouton Partager</strong> ↑ en bas de Safari</span>
-    <span>2️⃣ Faites défiler et appuyez sur <strong>« Sur l'écran d'accueil »</strong></span>
-    <span>3️⃣ Appuyez sur <strong>« Ajouter »</strong> en haut à droite</span>
+    <span><em>1️⃣</em><div>Appuyez sur <strong>Partager</strong> (icône ↑ en bas de Safari)</div></span>
+    <span><em>2️⃣</em><div>Faites défiler et choisissez <strong>« Sur l'écran d'accueil »</strong></div></span>
+    <span><em>3️⃣</em><div>Appuyez sur <strong>« Ajouter »</strong> en haut à droite</div></span>
   </div>
   <button onclick="dismissIOSBanner()">J'ai compris ✓</button>
 </div>
