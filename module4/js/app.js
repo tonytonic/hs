@@ -575,12 +575,25 @@ document.addEventListener('DOMContentLoaded', function () {
       DTE.notifs.show('Analyse actualisée', 'info', '↺');
     });
 
-    // Jours de repos — charger l'état sauvegardé
-    const _savedRest = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || '{"sat":true,"sun":true}');
+    // Jours de repos — charger les 7 cases (migration depuis ancien format sat/sun)
+    const _savedRest7 = JSON.parse(localStorage.getItem('DTE_REST_DAYS_7') || 'null');
+    // Fallback : lire DTE_REST_DAYS (tableau [0,6]) si DTE_REST_DAYS_7 absent
+    const _savedRestArray = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || 'null');
+    const _restState = _savedRest7 || (
+      Array.isArray(_savedRestArray)
+        ? Object.fromEntries([0,1,2,3,4,5,6].map(d => [d, _savedRestArray.includes(d)]))
+        : {0:true,1:false,2:false,3:false,4:false,5:false,6:true}
+    );
+    // Appliquer aux 7 cases (id: dte-rest-0 à dte-rest-6)
+    for (let d = 0; d < 7; d++) {
+      const cb = document.getElementById('dte-rest-' + d);
+      if (cb) cb.checked = !!_restState[d];
+    }
+    // Compatibilité anciens IDs sat/sun
     const satCb = document.getElementById('dte-rest-sat');
     const sunCb = document.getElementById('dte-rest-sun');
-    if (satCb) satCb.checked = _savedRest.sat !== false;
-    if (sunCb) sunCb.checked = _savedRest.sun !== false;
+    if (satCb) satCb.checked = !!_restState[6];
+    if (sunCb) sunCb.checked = !!_restState[0];
 
     // PDF désactivé
   }
@@ -722,18 +735,31 @@ document.addEventListener('DOMContentLoaded', function () {
   window._getRestDays = () => {
     const sat = document.getElementById('dte-rest-sat')?.checked !== false;
     const sun = document.getElementById('dte-rest-sun')?.checked !== false;
+    const state7 = JSON.parse(localStorage.getItem('DTE_REST_DAYS_7') || 'null');
+    if (state7) {
+      const days = Object.entries(state7).filter(([,v]) => v).map(([k]) => parseInt(k));
+      return days.length ? days : [0];
+    }
+    // Fallback ancien format
     const days = [];
-    if (sun) days.push(0);   // 0 = dimanche en JS
-    if (sat) days.push(6);   // 6 = samedi en JS
-    return days.length ? days : [0]; // au minimum dimanche
+    if (sun) days.push(0);
+    if (sat) days.push(6);
+    return days.length ? days : [0];
   };
 
   window._updateRestDays = () => {
-    const sat = document.getElementById('dte-rest-sat')?.checked;
-    const sun = document.getElementById('dte-rest-sun')?.checked;
-    localStorage.setItem('DTE_REST_DAYS', JSON.stringify({sat:!!sat, sun:!!sun}));
-    // Re-lancer les prédictions avec les nouveaux jours de repos
-    if (DTE._state) renderPredictions(DTE._state);
+    // Sauvegarder les 7 cases
+    const state7 = {};
+    for (let d = 0; d < 7; d++) {
+      const cb = document.getElementById('dte-rest-' + d);
+      if (cb) state7[d] = cb.checked;
+    }
+    localStorage.setItem('DTE_REST_DAYS_7', JSON.stringify(state7));
+    // DTE_REST_DAYS = tableau [0,1,6...] — FORMAT ATTENDU PAR dte-engine.js
+    const daysArray = Object.entries(state7).filter(([,v]) => v).map(([k]) => parseInt(k));
+    localStorage.setItem('DTE_REST_DAYS', JSON.stringify(daysArray.length ? daysArray : [0]));
+    if (window._fullSync) window._fullSync();
+    else if (DTE._state) renderPredictions(DTE._state);
     DTE.notifs.show('Jours de repos mis à jour', 'info', '📅');
   };
 
