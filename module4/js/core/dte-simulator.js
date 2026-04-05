@@ -94,6 +94,12 @@ const BIO = {
   RISQUE:   75,
   CRITIQUE: 85,
   URGENCE:  95,
+
+  // ── PLANCHERS BIOLOGIQUES (Sonnentag 2003, INRS) ─────────────────
+  // Même au repos complet, le corps maintient un niveau de base
+  FAT_FLOOR:   0.05,  // 5% — fatigue basale incompressible
+  STR_FLOOR:   0.03,  // 3% — cortisol basal incompressible
+  PERF_CEIL:   0.96,  // 96% — performance maximale humaine (Pencavel 2014)
 };
 
 /* ── PHASES PHYSIOLOGIQUES ──────────────────────────────────────── */
@@ -235,17 +241,17 @@ class DTESimulator {
         const sommeilReel  = _isNight ? sommeilDispo * 0.70 : Math.min(sommeilDispo, 10.5);
         const detteSommeil = Math.max(0, 8 - sommeilReel);
         const fatSommeil   = detteSommeil * 0.035 * cumulF; // Thompson 2022 : +14%/nuit
-        fat = Math.min(1, fat + fatLoad + fatSommeil - D.RECOVERY);
+        fat = Math.min(1, Math.max(BIO.FAT_FLOOR, fat + fatLoad + fatSommeil - D.RECOVERY));
       }
 
       // ── STRESS/CORTISOL (Thompson 2022 + ANACT + IARC 2019) ─────────────────
       if (isRest || isVacance) {
         // Nuit : cortisol ne redescend pas autant au repos (IARC 2019)
         const strRec = _isNight ? BIO.STR_REC_REST * 0.70 : BIO.STR_REC_REST;
-        str = Math.max(0, str - strRec);
+        str = Math.max(BIO.STR_FLOOR, str - strRec);
       } else {
         const strLoad = hsH * BIO.STR_PER_HS * _nightFactor + fat * BIO.STR_FAT_AMP * cumulF;
-        str = Math.min(1, str + strLoad - BIO.STR_REC_DAY);
+        str = Math.min(1, Math.max(BIO.STR_FLOOR, str + strLoad - BIO.STR_REC_DAY));
       }
 
       // ── PERFORMANCE (Pencavel 2014) ──────────────────────────────
@@ -255,7 +261,7 @@ class DTESimulator {
       const cogDeg   = weeklyH >= BIO.H_CEREBRAL
         ? Math.min(0.30, (weeklyH - BIO.H_CEREBRAL) * 0.015 * (1 + cumulWeeks / 12))
         : 0;
-      perf = Math.max(0.05, Math.min(1, perfBase * (1 - cogDeg) - perfDeg));
+      perf = Math.max(0.05, Math.min(BIO.PERF_CEIL, perfBase * (1 - cogDeg) - perfDeg));
 
       // ── RISQUES SPÉCIFIQUES ──────────────────────────────────────
       // CV : majoré par nightFactor (Kivimäki 2015 : nuit × RR 1.4-1.7)
@@ -307,9 +313,9 @@ class DTESimulator {
         maxFatigue:    Math.round(maxFat * 100),
         avgStress:     Math.max(0, avg(totStr)),
         avgPerformance:avg(totPerf),
-        finalFatigue:  Math.round(Math.max(0, fat) * 100),
-        finalStress:   Math.round(Math.max(0, str) * 100),
-        finalPerf:     Math.round(perf * 100),
+        finalFatigue:  Math.round(Math.max(BIO.FAT_FLOOR, fat) * 100),
+        finalStress:   Math.round(Math.max(BIO.STR_FLOOR, str) * 100),
+        finalPerf:     Math.round(Math.min(BIO.PERF_CEIL, perf) * 100),
         finalCvRisk:   Math.round(Math.min(BIO.CV_MAX, cvAcc + fat * 0.12) * 100),
         daysAlert, daysCrit, daysBurnout,
         finalPhase,
