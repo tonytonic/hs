@@ -3,7 +3,7 @@
  * Version : 6.0.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "heuressup-cache-v6.0.0";
+const CACHE_NAME = "heuressup-cache-v6.1.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -67,8 +67,42 @@ const FILES_TO_CACHE = [
   "./fox/js/module-reader.js",
   "./fox/js/snapshot-system.js", 
   "./fox/js/export-rtf.js",
-  "./fox/js/ai-integration.js", 
-  "./fox/js/main-rpg.js"
+  "./fox/js/ai-integration.js",
+  "./fox/js/main-rpg.js",
+
+  // Fox — fichiers manquants
+  "./fox/js/vue-pro.js",
+  "./fox/js/articles-loi.js",
+
+  // M4 — fichiers manquants
+  "./module4/js/features/schedule.js",
+  "./module4/js/features/vacances.js",
+  "./module4/js/features/pdf-report.js",
+  "./module4/js/ui/radar-chart.js",
+  "./module4/js/ui/timeline-chart.js",
+
+  // CCN
+  "./ccn/conventions-collectives.js",
+
+  // Glossaire
+  "./glossaire.js",
+
+  // Images Fox décors & PNJ
+  "./images/fox-bg.PNG",
+  "./images/fox-bg-2.jpg",
+  "./images/fox-bg-3.jpg",
+  "./images/fox-bg-4.jpg",
+  "./images/foxplayer.PNG",
+  "./images/foxplayer-2.PNG",
+  "./images/foxplayer-3.PNG",
+  "./images/foxplayer-4.PNG",
+  "./images/foxplayer-5.PNG",
+  "./images/foxplayer-6.PNG",
+  "./images/foxplayer-7.PNG",
+  "./images/foxplayer-8.PNG",
+  "./images/foxplayer-9.PNG",
+  "./images/foxplayer-10.PNG",
+  "./foxpredit.jpg",
 ];
 
 // --- INSTALLATION : Mise en cache fichier par fichier ---
