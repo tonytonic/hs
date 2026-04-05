@@ -2655,6 +2655,26 @@ function _nextMsgIdx(arr) {
 }
 
 function _generateDynamicMessage(situation, deltaH, burnoutScore) {
+  // Si semaine vacances M4 courante → message vacances prioritaire pour le popup aussi
+  try {
+    const now = new Date();
+    const yr = now.getFullYear().toString();
+    const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yr) || '{}');
+    const m1Raw = JSON.parse(localStorage.getItem('DATA_REPORT_' + yr) || '{}');
+    for (let d = 0; d < 7; d++) {
+      const dt = new Date(now); dt.setDate(now.getDate() - ((now.getDay()+6)%7) + d);
+      const dk = dt.toISOString().slice(0, 10);
+      const e = m1Raw[dk];
+      if (m4Vac[dk] || (e && ((e.absent>=7)||(e.recup>=7)))) {
+        return {
+          titre: '🌴 Semaine de congés en cours',
+          message: 'Kitsune a détecté que tu es en congé cette semaine. Ton contingent annuel ne progresse pas pendant les congés. Profite du repos — les données passées restent intactes.',
+          actions: ['Déconnecte vraiment (Art. L3141-3)', 'Aucun seuil à surveiller cette semaine'],
+          alerte: { niveau: 'ok', texte: '✅ Semaine de congés — aucune violation' }
+        };
+      }
+    }
+  } catch(e) {}
   const s = situation;
   const h = Math.round((deltaH || 0) * 100) / 100;
   const bo = burnoutScore || 0;
@@ -8057,7 +8077,11 @@ function addJournalEntry(entry) {
   try {
     const journal = JSON.parse(localStorage.getItem(_JOURNAL_KEY) || '[]');
     entry.ts = entry.ts || new Date().toISOString();
-    journal.unshift(entry); // plus récent en 1er
+    // Déduplication : même titre dans les 2 dernières minutes → ignorer
+    const twoMinAgo = new Date(Date.now() - 2*60*1000).toISOString();
+    const isDupe = journal.some(j => j.titre === entry.titre && j.ts > twoMinAgo);
+    if (isDupe) return;
+    journal.unshift(entry);
     if (journal.length > _JOURNAL_MAX) journal.length = _JOURNAL_MAX;
     localStorage.setItem(_JOURNAL_KEY, JSON.stringify(journal));
   } catch(e) {}
@@ -8294,12 +8318,27 @@ function detectPatterns() {
   }
 
   // ── 5. Aucun repos récupérateur après semaines chargées ────────
+  // Charger les semaines vacances M4 pour ne pas les compter comme surcharge
+  const vacWeekSet = new Set();
+  try {
+    const yr = new Date().getFullYear();
+    const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yr) || '{}');
+    Object.keys(vac).forEach(dk => {
+      const d = new Date(dk + 'T12:00:00');
+      const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()||7) - 1));
+      vacWeekSet.add(mon.toISOString().slice(0,10));
+    });
+  } catch(e) {}
+
   if (weekSorted.length >= 3) {
-    const overweeks = weekSorted.filter(w => (byWeek[w]||0) > 8);
+    const overweeks = weekSorted.filter(w => !vacWeekSet.has(w) && (byWeek[w]||0) > 8);
     const lightFollowing = overweeks.filter(w => {
       const nextIdx = weekSorted.indexOf(w) + 1;
       if (nextIdx >= weekSorted.length) return false;
-      return (byWeek[weekSorted[nextIdx]] || 0) > 5; // pas de répit
+      const nextWk = weekSorted[nextIdx];
+      // Semaine vacances = semaine de repos
+      if (vacWeekSet.has(nextWk)) return false;
+      return (byWeek[nextWk] || 0) > 5; // pas de répit
     });
     if (lightFollowing.length >= 2) {
       patterns.push({
