@@ -5000,7 +5000,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = Math.floor(now.getMonth() / 3);
     const nextQ = q < 3 ? new Date(now.getFullYear(), (q+1)*3, 1, 0, 5, 0) : new Date(now.getFullYear()+1, 0, 1, 0, 5, 0);
     const msToNext = nextQ - now;
-    console.log('🌿 Prochain changement décor:', nextQ.toLocaleDateString('fr-FR'), '(dans', Math.round(msToNext/86400000), 'jours)');
     setTimeout(() => { updateSeasonalBg(); _scheduleSeasonal(); }, msToNext);
   })();
   // ── Nouvelles features ──
@@ -7316,7 +7315,7 @@ function updateSeasonalBg() {
 function updatePNJLevel(level) {
   const lvl  = Math.max(1, level || 1);           // Pas de cap — Légende progression infinie
   const tier = Math.min(10, Math.ceil(Math.min(lvl, 50) / 5)); // tier 1-10 basé sur min(lvl,50)
-  console.log('🦊 updatePNJLevel : niveau', lvl, '→ tier', tier);
+  // Pas de log — appelé toutes les 5s via refreshHUD
   const img  = tier === 1 ? '../foxplayer.PNG' : '../foxplayer-' + tier + '.PNG';
   const pnj  = document.getElementById('kitsune-svg');
   const foxImgPopup = document.querySelector('#popup-fox img[src*="foxplayer"]');
@@ -7338,6 +7337,8 @@ function updatePNJLevel(level) {
     if (pnj)         { pnj.style.display = ''; pnj.src = _fallbackImg; }
     if (foxImgPopup) { foxImgPopup.src = _fallbackImg; }
   };
+  // Ne recharger que si le tier change — évite rechargement image toutes les 5s
+  if (pnj && pnj.getAttribute('data-tier') === String(tier)) return;
   if (pnj) { pnj.setAttribute('data-tier', tier); }
   if (foxImgPopup) {
     let size = 90;
