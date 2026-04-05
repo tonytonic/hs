@@ -107,13 +107,30 @@ self.addEventListener("fetch", (event) => {
 
   event.respondWith(
     fetch(event.request)
-      .then((networkResponse) => {
+      .then(async (networkResponse) => {
         const status = networkResponse.status;
         if (status === 200) {
-          const cacheCopy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, cacheCopy);
+          // Lire le body COMPLET avant de cloner — fix Cloudflare content-length:0
+          const body = await networkResponse.arrayBuffer();
+          // Reconstruire une réponse propre sans les headers qui bloquent le cache
+          const headers = new Headers();
+          networkResponse.headers.forEach((val, key) => {
+            // Exclure les headers qui empêchent la mise en cache
+            if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+              headers.append(key, val);
+            }
           });
+          const cleanResponse = new Response(body, {
+            status: networkResponse.status,
+            statusText: networkResponse.statusText,
+            headers
+          });
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, cleanResponse);
+            console.log("✅ [CACHE OK]", shortUrl, "| taille:", body.byteLength, "octets");
+          });
+          // Retourner une nouvelle réponse avec le même body
+          return new Response(body, { status, statusText: networkResponse.statusText, headers: networkResponse.headers });
         } else {
           console.warn("⚠️ [FETCH NET NON-200]", shortUrl, "| status:", status);
         }
