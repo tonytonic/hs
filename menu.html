@@ -303,6 +303,38 @@
   body { overscroll-behavior-y: none; }
   input, select, textarea { font-size: 16px !important; }
   </style>
+<style>
+  #ios-install-banner {
+    display: none;
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom) + 16px);
+    left: 16px; right: 16px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 9999;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  #ios-install-banner .ios-banner-icon { font-size: 36px; margin-bottom: 8px; }
+  #ios-install-banner h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: #1a1a1a; }
+  #ios-install-banner p { margin: 0 0 14px; font-size: 14px; color: #444; line-height: 1.5; }
+  #ios-install-banner .ios-banner-steps {
+    display: flex; flex-direction: column; gap: 8px;
+    text-align: left; background: #f5f9fa;
+    border-radius: 12px; padding: 12px 14px; margin-bottom: 14px;
+    font-size: 14px; color: #333;
+  }
+  #ios-install-banner .ios-banner-steps span { display: flex; align-items: center; gap: 8px; }
+  #ios-install-banner button {
+    background: #4FB3C2; color: #fff; border: none;
+    border-radius: 22px; padding: 11px 32px;
+    font-size: 15px; font-weight: 600; cursor: pointer; width: 100%;
+  }
+</style>
+
 </head>
 
 <body>
@@ -444,6 +476,19 @@
     <p>Toutes les données sont stockées <b>localement</b> sur votre appareil. Aucun serveur, aucune transmission externe.</p>
     <button class="close-btn" onclick="closePresentation()">Fermer</button>
   </div>
+</div>
+
+
+<div id="ios-install-banner">
+  <div class="ios-banner-icon">📲</div>
+  <h3>Installer l'application</h3>
+  <p>Accédez à l'app directement depuis votre écran d'accueil, sans navigateur.</p>
+  <div class="ios-banner-steps">
+    <span>1️⃣ Appuyez sur <strong>le bouton Partager</strong> ↑ en bas de Safari</span>
+    <span>2️⃣ Faites défiler et appuyez sur <strong>« Sur l'écran d'accueil »</strong></span>
+    <span>3️⃣ Appuyez sur <strong>« Ajouter »</strong> en haut à droite</span>
+  </div>
+  <button onclick="dismissIOSBanner()">J'ai compris ✓</button>
 </div>
 
 <button class="info-btn" onclick="reopenWizard()" style="background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
@@ -784,6 +829,26 @@
   }
 
   window.addEventListener('DOMContentLoaded', initCCNBadge);
+
+  // ── Bannière installation iOS ──────────────────────────────────
+  (function() {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = ('standalone' in navigator) && navigator.standalone;
+    const dismissed = localStorage.getItem('ios_banner_dismissed');
+    if (isIOS && !isStandalone && !dismissed) {
+      setTimeout(function() {
+        const el = document.getElementById('ios-install-banner');
+        if (el) el.style.display = 'block';
+      }, 1500);
+    }
+  })();
+
+  function dismissIOSBanner() {
+    const el = document.getElementById('ios-install-banner');
+    if (el) el.style.display = 'none';
+    try { localStorage.setItem('ios_banner_dismissed', '1'); } catch(e) {}
+  }
+
 </script>
 </body>
 </html>
