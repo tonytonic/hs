@@ -38,13 +38,11 @@ class WhatIfPanel {
 
           <div style="margin-bottom:10px;">
             <div style="font-family:var(--font-mono);font-size:8px;color:var(--animus);letter-spacing:.12em;margin-bottom:6px;">JOURS DE REPOS</div>
-            <div style="display:flex;gap:10px;">
-              <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-dim);cursor:crosshair;">
-                <input type="checkbox" id="wi-sun" checked style="accent-color:var(--animus);"> Dimanche
-              </label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text-dim);cursor:crosshair;">
-                <input type="checkbox" id="wi-sat" style="accent-color:var(--animus);"> Samedi
-              </label>
+            <div style="display:flex;flex-wrap:wrap;gap:3px 8px;">
+              ${['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'].map((n,i) => `
+              <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text-dim);cursor:crosshair;">
+                <input type="checkbox" id="wi-rest-${i}" style="accent-color:var(--animus);"> ${n}
+              </label>`).join('')}
             </div>
           </div>
         </div>
@@ -55,13 +53,13 @@ class WhatIfPanel {
           <div class="panel-corner-br"></div>
           <div style="display:flex;flex-direction:column;gap:4px;">
             ${[
-              {hs:0,   days:30, sun:1, sat:1, emoji:'🛡', label:'Récupération',  sub:'0 HS + WE complets'},
-              {hs:0,   days:14, sun:1, sat:0, emoji:'⚖', label:'Équilibre',      sub:'35h/sem OMS optimal'},
-              {hs:1,   days:14, sun:1, sat:0, emoji:'⚡', label:'Optimisé -1h',  sub:'OCDE productif'},
-              {hs:2.5, days:14, sun:1, sat:0, emoji:'📦', label:'Rush projet',   sub:'+2.5h/j, dim off'},
-              {hs:4,   days:7,  sun:0, sat:0, emoji:'🔥', label:'Urgence max',   sub:'+4h/j, 7j/7'},
+              {hs:0,   days:30, rest:'all',  emoji:'🛡', label:'Récupération',  sub:'0 HS + repos complet'},
+              {hs:0,   days:14, rest:'user', emoji:'⚖', label:'Équilibre',      sub:'35h/sem OMS optimal'},
+              {hs:1,   days:14, rest:'user', emoji:'⚡', label:'Optimisé -1h',  sub:'OCDE productif'},
+              {hs:2.5, days:14, rest:'user', emoji:'📦', label:'Rush projet',   sub:'+2.5h/j, repos perso'},
+              {hs:4,   days:7,  rest:'none', emoji:'🔥', label:'Urgence max',   sub:'+4h/j, 7j/7'},
             ].map(p => `
-              <button class="wi-preset" data-hs="${p.hs}" data-days="${p.days}" data-sun="${p.sun}" data-sat="${p.sat}"
+              <button class="wi-preset" data-hs="${p.hs}" data-days="${p.days}" data-rest="${p.rest}"
                 style="display:flex;align-items:center;gap:8px;background:rgba(0,10,25,.8);
                 border:1px solid rgba(0,200,255,0.1);padding:6px 9px;cursor:crosshair;
                 text-align:left;transition:all .15s;width:100%;">
@@ -100,19 +98,44 @@ class WhatIfPanel {
       document.getElementById('wi-days-val').textContent = e.target.value;
       run();
     });
-    document.getElementById('wi-sun')?.addEventListener('change', () => { this._updateRest(); run(); });
-    document.getElementById('wi-sat')?.addEventListener('change', () => { this._updateRest(); run(); });
+    // 7 jours de repos — sync depuis localStorage au démarrage
+    const savedRest = (() => {
+      try { const r = JSON.parse(localStorage.getItem('DTE_REST_DAYS')); return Array.isArray(r) ? r : [0,6]; }
+      catch(_) { return [0,6]; }
+    })();
+    for (let d = 0; d < 7; d++) {
+      const cb = document.getElementById('wi-rest-' + d);
+      if (cb) {
+        cb.checked = savedRest.includes(d);
+        cb.addEventListener('change', () => {
+          this._updateRest();
+          // Sync vers Mon État et localStorage
+          const mainCb = document.getElementById('dte-rest-' + d);
+          if (mainCb) mainCb.checked = cb.checked;
+          if (typeof window._updateRestDays === 'function') window._updateRestDays();
+          run();
+        });
+      }
+    }
+    this._updateRest();
+
     document.querySelectorAll('.wi-preset').forEach(btn => {
       btn.addEventListener('mouseenter', () => btn.style.borderColor='rgba(0,200,255,0.4)');
       btn.addEventListener('mouseleave', () => btn.style.borderColor='rgba(0,200,255,0.1)');
       btn.addEventListener('click', () => {
         const hs = parseFloat(btn.dataset.hs), days = parseInt(btn.dataset.days);
+        const restMode = btn.dataset.rest;
         document.getElementById('wi-hs').value    = hs;
         document.getElementById('wi-hs-val').textContent = hs;
         document.getElementById('wi-days').value  = days;
         document.getElementById('wi-days-val').textContent = days;
-        document.getElementById('wi-sun').checked = btn.dataset.sun === '1';
-        document.getElementById('wi-sat').checked = btn.dataset.sat === '1';
+        // Presets : 'all' = tout coché, 'none' = tout décoché, 'user' = garder les choix utilisateur
+        if (restMode === 'all') {
+          for (let d = 0; d < 7; d++) { const cb = document.getElementById('wi-rest-'+d); if(cb) cb.checked = true; }
+        } else if (restMode === 'none') {
+          for (let d = 0; d < 7; d++) { const cb = document.getElementById('wi-rest-'+d); if(cb) cb.checked = false; }
+        }
+        // 'user' : on ne touche pas aux checkboxes
         this._plan = { days, hoursPerDay: hs, restDays:[] };
         this._updateRest(); run();
       });
@@ -121,8 +144,9 @@ class WhatIfPanel {
 
   _updateRest(){
     const rest = [];
-    if(document.getElementById('wi-sun')?.checked) rest.push(0);
-    if(document.getElementById('wi-sat')?.checked) rest.push(6);
+    for (let d = 0; d < 7; d++) {
+      if (document.getElementById('wi-rest-' + d)?.checked) rest.push(d);
+    }
     this._plan.restDays = rest;
   }
 
