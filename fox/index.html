@@ -12,7 +12,7 @@
 </head>
 <body class="gaming-mode">
 
-<img id="bg-decor" src="../fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
 
 <div id="burnout-overlay"></div>
 <div id="storm-overlay"></div>
@@ -114,7 +114,7 @@ window._fox_pre = (function() {
 
   <!-- Renard central -->
   <div id="kitsune-center" onclick="openPopup('popup-fox')">
-    <img id="kitsune-svg" src="../foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune">
+    <img id="kitsune-svg" src="../images/foxplayer.PNG" loading="eager" style="filter:brightness(1.2) contrast(1.1);mix-blend-mode:screen;" alt="Kitsune">
     <div id="kitsune-tap-hint">Appuie sur moi !</div>
   </div>
 
@@ -168,7 +168,7 @@ window._fox_pre = (function() {
       <button class="fox-popup-close" onclick="closePopup('popup-fox')">✕</button>
     </div>
     <div style="text-align:center;margin-bottom:12px;">
-      <img src="../foxplayer.PNG" alt="Kitsune" style="width:90px;height:90px;object-fit:contain;">
+      <img src="../images/foxplayer.PNG" alt="Kitsune" style="width:90px;height:90px;object-fit:contain;">
     </div>
     <div style="font-size:0.65rem;color:#555;text-align:center;margin-bottom:6px;letter-spacing:0.5px;">
       🦊 Je te parle comme un ami — pas comme un avocat. En cas de doute, consulte un pro !
@@ -7032,7 +7032,7 @@ function devSetSeason(q) {
   if (bgEl) {
     const idx = q >= 0 ? q : Math.floor(new Date().getMonth() / 3);
     const bgs = typeof _SEASONAL_BG !== 'undefined' ? _SEASONAL_BG :
-      ['../fox-bg.PNG','../fox-bg-2.jpg','../fox-bg-3.jpg','../fox-bg-4.jpg'];
+      ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
     const target = bgs[idx] || bgs[0];
     bgEl.style.opacity = '0';
     bgEl.style.transition = 'opacity 1.2s ease';
@@ -7265,10 +7265,10 @@ function emuSimDays(nDays, withViolation) {
 
 // \u2500\u2500 D\u00E9cor saisonnier (4 backgrounds par trimestre) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const _SEASONAL_BG = [
-  '../fox-bg.PNG',     // Q1 : hiver (jan-mar)
-  '../fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
-  '../fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
-  '../fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
+  '../images/fox-bg.PNG',     // Q1 : hiver (jan-mar)
+  '../images/fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
+  '../images/fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
+  '../images/fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
 ];
 function updateSeasonalBg() {
   const m    = new Date().getMonth(); // 0-11
@@ -7278,7 +7278,7 @@ function updateSeasonalBg() {
   // Défaut fallback si _SEASONAL_BG non défini globalement
   const _bgs = (typeof _SEASONAL_BG !== 'undefined' && Array.isArray(_SEASONAL_BG))
     ? _SEASONAL_BG
-    : ['../fox-bg.PNG','../fox-bg-2.jpg','../fox-bg-3.jpg','../fox-bg-4.jpg'];
+    : ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
   const bg   = _bgs[q] || _bgs[0];
   const bgEl = document.getElementById('bg-decor');
   if (!bgEl) return;
@@ -7312,7 +7312,7 @@ function updatePNJLevel(level) {
   const lvl  = Math.max(1, level || 1);           // Pas de cap — Légende progression infinie
   const tier = Math.min(10, Math.ceil(Math.min(lvl, 50) / 5)); // tier 1-10 basé sur min(lvl,50)
   // Pas de log — appelé toutes les 5s via refreshHUD
-  const img  = tier === 1 ? '../foxplayer.PNG' : '../foxplayer-' + tier + '.PNG';
+  const img  = tier === 1 ? '../images/foxplayer.PNG' : '../images/foxplayer-' + tier + '.PNG';
   const pnj  = document.getElementById('kitsune-svg');
   const foxImgPopup = document.querySelector('#popup-fox img[src*="foxplayer"]');
   // Masquer fond noir : filter brightness + contrast
@@ -7321,7 +7321,7 @@ function updatePNJLevel(level) {
     foxImgPopup.style.mixBlendMode = 'screen';
     foxImgPopup.style.background = 'transparent';
   }
-  const _fallbackImg = '../foxplayer.PNG';
+  const _fallbackImg = '../images/foxplayer.PNG';
   // Précharger l'image une seule fois — puis appliquer aux deux éléments
   const _tryLoad = new Image();
   _tryLoad.onload = () => {
