@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#4FB3C2">
-  <link rel="apple-touch-icon" href="/hs/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
   <script src="ccn/conventions-collectives.js"></script>
@@ -33,21 +33,19 @@
       width: 90%;
       max-width: 250px;
       border-radius: 28px;
-      overflow: visible;          /* ← était hidden : coupait les titres */
+      overflow: visible;
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
       cursor: pointer;
       transition: transform .15s ease;
       background: rgba(255,255,255,0.1);
     }
     .btn:active { transform: scale(0.96); }
-    /* Image : coins arrondis en haut, titre en dessous */
     .btn img {
       width: 100%;
       height: auto;
       display: block;
-      border-radius: 28px 28px 0 0;  /* arrondi en haut seulement */
+      border-radius: 28px 28px 0 0;
     }
-    /* Bouton sans image (ex: module4) */
     .btn-no-img {
       display: flex;
       align-items: center;
@@ -79,9 +77,6 @@
       color: rgba(255,255,255,0.8);
     }
 
-    /* =====================
-       POPUP GÉNÉRIQUE
-    ===================== */
     .overlay {
       position: fixed;
       inset: 0;
@@ -113,9 +108,6 @@
     }
     .popup-box p { margin: 8px 0; line-height: 1.5; }
 
-    /* =====================
-       WIZARD BIENVENUE
-    ===================== */
     .wiz-step { display: none; }
     .wiz-step.active { display: block; }
 
@@ -192,9 +184,6 @@
       line-height: 1.4;
     }
 
-    /* =====================
-       POPUP PRÉSENTATION
-    ===================== */
     .presentation-box {
       background: #fff;
       color: #000;
@@ -243,7 +232,6 @@
     .info-btn:hover { background: rgba(255,255,255,0.15); }
     hr { border: 0; border-top: 1px solid #eee; margin: 15px 0; }
 
-    /* === CCN BADGE === */
     #ccn-badge {
       display:flex; align-items:center; gap:8px; flex-wrap:wrap;
       background:rgba(255,255,255,0.12);
@@ -257,7 +245,6 @@
     #ccn-badge .ccn-name { font-weight:600; white-space:normal; word-break:break-word; flex:1; min-width:0; }
     #ccn-badge .ccn-edit { font-size:11px; color:rgba(255,255,255,0.6); white-space:nowrap; }
 
-    /* === CCN MODAL === */
     #ccnModal {
       display:none; position:fixed; inset:0; z-index:9999;
       background:rgba(0,0,0,0.55); align-items:center; justify-content:center;
@@ -310,30 +297,21 @@
       background:transparent; border:1px solid #ddd; border-radius:10px;
       padding:10px; font-size:13px; cursor:pointer; color:#555;
     }
-  /* ── COMPATIBILITY FIXES ─────────────────────────────── */
   * { -webkit-tap-highlight-color: transparent; }
   button, [onclick] { -webkit-user-select: none; user-select: none; }
   .overlay { overscroll-behavior: contain; }
   body { overscroll-behavior-y: none; }
-  /* ── ANTI-ZOOM iOS ───────────────────────────────────────────────
-     Safari zoome si font-size < 16px sur un input au focus         */
   input, select, textarea { font-size: 16px !important; }
   </style>
 </head>
 
 <body>
 
-<!-- =====================
-     WIZARD BIENVENUE (1ère ouverture)
-===================== -->
 <div class="overlay" id="welcomeWizard">
   <div class="popup-box">
-
     <div class="wiz-progress">
       <div class="wiz-progress-fill" id="wizProg" style="width:33%"></div>
     </div>
-
-    <!-- Étape 1 : Bienvenue -->
     <div class="wiz-step active" id="wStep1">
       <h2>👋 Bienvenue !</h2>
       <p style="text-align:center;color:#555;font-size:13px;margin:8px 0">
@@ -347,12 +325,8 @@
       </p>
       <button class="wiz-btn primary" onclick="goStep(2)" style="margin-top:10px">Commencer →</button>
     </div>
-
-    <!-- Étape 2 : CCN + Mode -->
-    <!-- Étape 2 : Configuration -->
     <div class="wiz-step" id="wStep2">
       <h2>⚙️ Ton contrat de travail</h2>
-
       <div style="margin-bottom:16px;">
         <p style="font-size:12px;color:#666;margin-bottom:10px;">
           Les règles sur les heures sup varient selon ton secteur. Choisis ce qui correspond à ta situation :
@@ -372,55 +346,43 @@
           </button>
         </div>
       </div>
-
       <div>
         <h3 style="font-size:14px;margin-bottom:8px;">🔧 Quel profil es-tu ?</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <button class="wiz-btn" id="wizModeDebutant" onclick="wizChooseMode('debutant')" style="background:rgba(0,200,255,0.1);border:2px solid rgba(0,200,255,0.3);">
-            🎓 Débutant<br>
-            <span style="font-size:10px;">Termes simplifiés</span>
+            🎓 Débutant<br><span style="font-size:10px;">Termes simplifiés</span>
           </button>
           <button class="wiz-btn" id="wizModeExpert" onclick="wizChooseMode('expert')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
-            ⚡ Expert<br>
-            <span style="font-size:10px;">Termes techniques</span>
+            ⚡ Expert<br><span style="font-size:10px;">Termes techniques</span>
           </button>
         </div>
       </div>
-
       <button class="wiz-btn primary" onclick="goStep(3)" style="margin-top:16px">Continuer →</button>
     </div>
-
-    <!-- Étape 3 : Découverte M3 et M4 -->
     <div class="wiz-step" id="wStep3">
       <h2>🎁 Deux modules bonus</h2>
       <p style="text-align:center;font-size:12px;color:#666;margin-bottom:16px;">En plus du suivi des heures, tu as accès à deux expériences uniques :</p>
-
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
         <div style="background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.25);border-radius:12px;padding:14px;">
           <div style="font-size:15px;font-weight:700;margin-bottom:6px;">🦊 Mon compagnon d'analyse</div>
           <div style="font-size:12px;color:#555;line-height:1.6;">
-            Imagine un ami renard qui lit le Code du travail et ta convention collective à ta place. Il célèbre quand tu gères bien, il te prévient quand ça dépasse les seuils légaux, et il te récompense avec des badges et du XP. Pas de jargon — juste ton compagnon qui te dit <em>"hey, cette semaine t'as assuré !"</em> ou <em>"doucement, là tu dépasses ce que la loi autorise..."</em> 🎮
+            Imagine un ami renard qui lit le Code du travail et ta convention collective à ta place. Il célèbre quand tu gères bien, il te prévient quand ça dépasse les seuils légaux, et il te récompense avec des badges et du XP. 🎮
           </div>
         </div>
-
         <div style="background:rgba(0,200,100,0.06);border:1px solid rgba(0,200,100,0.2);border-radius:12px;padding:14px;">
           <div style="font-size:15px;font-weight:700;margin-bottom:6px;">🩺 Ma prédiction santé</div>
           <div style="font-size:12px;color:#555;line-height:1.6;">
-            Ton jumeau numérique : un double virtuel de toi qui absorbe le même rythme de travail. Ses calculs s'appuient sur de vraies études scientifiques — OMS, INRS, Lancet, Stanford — pour mesurer l'impact réel sur ta fatigue, ton stress et ta santé à long terme. Présenté simplement, sans rapport médical.
+            Ton jumeau numérique : un double virtuel de toi qui absorbe le même rythme de travail. Calculs basés sur OMS, INRS, Lancet, Stanford.
           </div>
         </div>
       </div>
-
       <button class="wiz-btn primary" onclick="goStep(4)">C'est parti ! →</button>
     </div>
-
-    <!-- Étape 3 : Quelle situation ? -->
     <div class="wiz-step" id="wStep4">
       <h2>🎯 Votre situation</h2>
       <p style="text-align:center;color:#555;font-size:13px;margin-bottom:4px">
         Comment sont payées vos heures supplémentaires ?
       </p>
-
       <div class="choice-grid">
         <div class="choice-card" id="cardAnnuel" onclick="selectMode('annuel')">
           <div class="icon">📊</div>
@@ -433,47 +395,24 @@
           Heures payées chaque mois, avec report automatique
         </div>
       </div>
-
-      <!-- Explication annuel -->
       <div class="explain-box annuel" id="explainAnnuel">
         <h3>📊 Compteur annuel</h3>
-        <p>
-          Vos heures s'accumulent sur toute une année (exercice).
-          Le solde est soldé ou payé en fin d'exercice.<br><br>
-          ✅ Adapté si votre entreprise utilise un <strong>compteur de modulation annuelle</strong>
-          ou si vos heures sup ne sont pas payées chaque mois.
-        </p>
-        <button class="wiz-btn go-annuel" onclick="goApp('heures')">
-          Ouvrir le compteur annuel →
-        </button>
+        <p>Vos heures s'accumulent sur toute une année (exercice). Le solde est soldé ou payé en fin d'exercice.<br><br>
+        ✅ Adapté si votre entreprise utilise un <strong>compteur de modulation annuelle</strong>.</p>
+        <button class="wiz-btn go-annuel" onclick="goApp('heures')">Ouvrir le compteur annuel →</button>
       </div>
-
-      <!-- Explication mensuel -->
       <div class="explain-box mensuel" id="explainMensuel">
         <h3>📅 Simulateur mensuel</h3>
-        <p>
-          Chaque mois a sa propre clôture (ex : dernier dimanche).
-          Les heures non payées sont reportées au mois suivant.<br><br>
-          ✅ Adapté si vous êtes <strong>salarié payé chaque fin de mois</strong>
-          avec règlement partiel ou total des heures supplémentaires.
-        </p>
-        <button class="wiz-btn go-mensuel" onclick="goApp('paye')">
-          Ouvrir le simulateur mensuel →
-        </button>
+        <p>Chaque mois a sa propre clôture. Les heures non payées sont reportées au mois suivant.<br><br>
+        ✅ Adapté si vous êtes <strong>salarié payé chaque fin de mois</strong>.</p>
+        <button class="wiz-btn go-mensuel" onclick="goApp('paye')">Ouvrir le simulateur mensuel →</button>
       </div>
-
-      <button class="wiz-btn secondary" onclick="goStep(5)" style="margin-top:16px">
-        Je veux voir les deux outils →
-      </button>
+      <button class="wiz-btn secondary" onclick="goStep(5)" style="margin-top:16px">Je veux voir les deux outils →</button>
       <p class="legal-note">Vous pourrez changer d'outil à tout moment depuis ce menu.</p>
     </div>
-
-    <!-- Étape 4 : Voir les deux -->
     <div class="wiz-step" id="wStep5">
       <h2>✅ Tout est prêt</h2>
-      <p style="text-align:center;font-size:13px;color:#555">
-        Les deux simulateurs sont accessibles depuis le menu principal.
-      </p>
+      <p style="text-align:center;font-size:13px;color:#555">Les deux simulateurs sont accessibles depuis le menu principal.</p>
       <div style="background:#f0fbfc;border-radius:12px;padding:14px;margin-top:10px;font-size:13px">
         <p style="margin:0 0 8px"><strong>📊 Compteur annuel</strong><br>Accumulation sur l'exercice, solde en fin d'année.</p>
         <hr>
@@ -481,13 +420,9 @@
       </div>
       <button class="wiz-btn primary" onclick="closeWizard()">Accéder au menu →</button>
     </div>
-
   </div>
 </div>
 
-<!-- =====================
-     POPUP PRÉSENTATION
-===================== -->
 <div class="overlay" id="presentationPopup" style="display:none;" onclick="closePresentation()">
   <div class="presentation-box" onclick="event.stopPropagation()">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
@@ -498,13 +433,12 @@
     <hr>
     <h3>🎯 Objectif général</h3>
     <p>Outil personnel de simulation permettant de visualiser et organiser des heures supplémentaires à titre <b>strictement indicatif</b>.</p>
-    <p>Il ne s'agit ni d'un logiciel de paie, ni d'un document officiel.</p>
     <hr>
     <h3>📊 Compteur annuel</h3>
-    <p>Suivi sur un exercice complet. Idéal pour les modulations annuelles ou les compteurs d'heures soldés en fin d'exercice.</p>
+    <p>Suivi sur un exercice complet. Idéal pour les modulations annuelles.</p>
     <hr>
     <h3>📅 Simulateur mensuel</h3>
-    <p>Clôture mensuelle avec report automatique. Idéal pour les salariés payés chaque mois avec règlement partiel des heures supplémentaires.</p>
+    <p>Clôture mensuelle avec report automatique.</p>
     <hr>
     <h3>💾 Données & fonctionnement</h3>
     <p>Toutes les données sont stockées <b>localement</b> sur votre appareil. Aucun serveur, aucune transmission externe.</p>
@@ -512,12 +446,8 @@
   </div>
 </div>
 
-<!-- =====================
-     MENU PRINCIPAL
-===================== -->
 <button class="info-btn" onclick="reopenWizard()" style="background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
 
-<!-- CCN BADGE en haut -->
 <div id="ccn-badge" onclick="openCCNModal()" title="Changer de convention collective">
   <span>⚖️</span>
   <span class="ccn-name" id="ccn-badge-name">Mon contrat de travail</span>
@@ -546,15 +476,11 @@
 
 <button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
 
-
-<!-- MODAL CCN -->
 <div id="ccnModal">
   <div class="ccn-box">
     <h2>⚖️ Convention collective applicable</h2>
     <input id="ccn-search" type="text" placeholder="🔍 Rechercher par nom ou N° IDCC..." oninput="ccnSearch(this.value)" autocomplete="off">
     <div id="ccn-results"></div>
-
-    <!-- Formulaire accord personnalisé -->
     <div class="ccn-custom-form" id="ccnCustomForm">
       <hr style="margin:0">
       <div style="font-size:13px;font-weight:600;color:#2196a6">⚙️ Accord d'entreprise / de branche</div>
@@ -588,14 +514,12 @@
       </div>
       <p style="font-size:11px;color:#888;margin:0">Art. L3121-32 C.trav. — Un accord peut fixer n'importe quelle période de 7 jours consécutifs comme semaine HS.</p>
     </div>
-
     <div style="display:flex;gap:8px;margin-top:4px">
       <button class="ccn-cancel-btn" style="flex:1" onclick="closeCCNModal()">Annuler</button>
       <button class="ccn-save-btn" style="flex:2" onclick="saveCCN()">✅ Appliquer</button>
     </div>
   </div>
 </div>
-
 
 <div style="display:flex;gap:12px;justify-content:center;padding:8px 0;font-size:11px;opacity:0.7;">
   <button onclick="window.openLicensePopup()" style="background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:11px;padding:0;margin:0;text-decoration:underline;">📄 Licence</button>
@@ -604,26 +528,41 @@
 </div>
 
 <footer>
-  <div style="margin-bottom: 8px;">Développé par C. Anthony v6.0.0</div>
+  <div style="margin-bottom: 8px;">Développé par C. Anthony v7.2.0</div>
 </footer>
 
 <script>
-  /* ── SAFE localStorage (iOS Navigation Privée) ───────────────
-   * Sur iPhone en navigation privée, localStorage lance une
-   * SecurityError. Ce wrapper absorbe l'erreur silencieusement.  */
   const _safeLS = {
     get:  (k, d='')  => { try { return localStorage.getItem(k) ?? d; }    catch(_) { return d; } },
     set:  (k, v)     => { try { localStorage.setItem(k, v); }              catch(_) {} },
     del:  (k)        => { try { localStorage.removeItem(k); }              catch(_) {} },
     json: (k, d={})  => { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch(_) { return d; } },
   };
+
+  // ── SERVICE WORKER — attendre activation complète (fix offline Safari) ──
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch(err => console.log("SW erreur", err));
+    window.addEventListener("load", async () => {
+      try {
+        const reg = await navigator.serviceWorker.register("./sw.js");
+        // Attendre que le SW soit actif avant de continuer (critique Safari PWA)
+        const sw = reg.installing || reg.waiting;
+        if (sw) {
+          await new Promise(resolve => {
+            sw.addEventListener("statechange", function handler() {
+              if (this.state === "activated") {
+                this.removeEventListener("statechange", handler);
+                resolve();
+              }
+            });
+          });
+        }
+        console.log("✅ SW actif — cache offline prêt");
+      } catch(err) {
+        console.error("❌ SW:", err);
+      }
     });
   }
 
-  // Scroll lock iOS
   let _scrollY = 0;
   function lockScroll() {
     _scrollY = window.scrollY;
@@ -640,7 +579,6 @@
     window.scrollTo(0, _scrollY);
   }
 
-  // Afficher le wizard seulement à la première ouverture
   if (_safeLS.get("menuWizardDone") === "1") {
     document.getElementById("welcomeWizard").style.display = "none";
   } else {
@@ -648,71 +586,41 @@
   }
 
   let selectedMode = null;
-  let selectedGlossaireMode = 'debutant'; // Par défaut débutant
+  let selectedGlossaireMode = 'debutant';
 
   function wizChooseCCN(choice) {
     if (choice === 'search') {
-      // Ouvrir le modal CCN
-      if (typeof openCCNModal === 'function') {
-        openCCNModal();
-      }
+      if (typeof openCCNModal === 'function') openCCNModal();
     } else if (choice === 'default') {
-      _safeLS.del('CCN_IDCC');
-      _safeLS.del('CCN_NOM');
-      _safeLS.del('CCN_CUSTOM');
-      // Feedback : juste une coche verte sur le bouton, rien d'autre
+      _safeLS.del('CCN_IDCC'); _safeLS.del('CCN_NOM'); _safeLS.del('CCN_CUSTOM');
       document.querySelectorAll('#wStep2 .wiz-btn.secondary').forEach(b => {
-        b.style.background = '';
-        b.style.border = '';
-        b.style.color = '';
-        const chk = b.querySelector('.wiz-ccn-check');
-        if (chk) chk.remove();
+        b.style.background = ''; b.style.border = ''; b.style.color = '';
+        const chk = b.querySelector('.wiz-ccn-check'); if (chk) chk.remove();
       });
       const btns = document.querySelectorAll('#wStep2 .wiz-btn.secondary');
-      if (btns[1]) {
-        const check = document.createElement('span');
-        check.className = 'wiz-ccn-check';
-        check.textContent = ' ✅';
-        btns[1].appendChild(check);
-      }
-      // Scroll vers le choix du mode
-      setTimeout(() => {
-        const modeDiv = document.querySelector('#wStep2 #wizModeDebutant');
-        if (modeDiv) modeDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
+      if (btns[1]) { const check = document.createElement('span'); check.className = 'wiz-ccn-check'; check.textContent = ' ✅'; btns[1].appendChild(check); }
     } else if (choice === 'custom') {
-      // Ouvrir le formulaire personnalisé
       if (typeof openCCNModal === 'function') {
         openCCNModal();
-        setTimeout(() => {
-          if (typeof toggleCustomForm === 'function') toggleCustomForm();
-        }, 300);
+        setTimeout(() => { if (typeof toggleCustomForm === 'function') toggleCustomForm(); }, 300);
       }
     }
   }
 
   function wizChooseMode(mode) {
     selectedGlossaireMode = mode;
-    // Sauvegarder dans localStorage pour le glossaire
-    _safeLS.set('APP_MODE', mode); // clé utilisée par glossaire.js
+    _safeLS.set('APP_MODE', mode);
     _safeLS.set('GLOSSAIRE_MODE', mode);
-    // Propager en temps réel à tous les modules ouverts
     try { const bc = new BroadcastChannel('glossaire_mode'); bc.postMessage({type:'MODE_CHANGE',mode}); bc.close(); } catch(_) {}
-    
-    // Mettre à jour l'UI
     const btnDebutant = document.getElementById('wizModeDebutant');
     const btnExpert = document.getElementById('wizModeExpert');
     if (btnDebutant && btnExpert) {
       if (mode === 'debutant') {
-        btnDebutant.style.background = 'rgba(0,200,255,0.2)';
-        btnDebutant.style.border = '2px solid rgba(0,200,255,0.5)';
-        btnExpert.style.background = 'rgba(255,255,255,0.05)';
-        btnExpert.style.border = '1px solid rgba(255,255,255,0.1)';
+        btnDebutant.style.background = 'rgba(0,200,255,0.2)'; btnDebutant.style.border = '2px solid rgba(0,200,255,0.5)';
+        btnExpert.style.background = 'rgba(255,255,255,0.05)'; btnExpert.style.border = '1px solid rgba(255,255,255,0.1)';
       } else {
-        btnExpert.style.background = 'rgba(0,200,255,0.2)';
-        btnExpert.style.border = '2px solid rgba(0,200,255,0.5)';
-        btnDebutant.style.background = 'rgba(255,255,255,0.05)';
-        btnDebutant.style.border = '1px solid rgba(255,255,255,0.1)';
+        btnExpert.style.background = 'rgba(0,200,255,0.2)'; btnExpert.style.border = '2px solid rgba(0,200,255,0.5)';
+        btnDebutant.style.background = 'rgba(255,255,255,0.05)'; btnDebutant.style.border = '1px solid rgba(255,255,255,0.1)';
       }
     }
   }
@@ -739,8 +647,7 @@
   }
 
   function reopenWizard() {
-    lockScroll();
-    selectedMode = null;
+    lockScroll(); selectedMode = null;
     document.getElementById("cardAnnuel").classList.remove("selected");
     document.getElementById("cardMensuel").classList.remove("selected");
     document.getElementById("explainAnnuel").style.display = "none";
@@ -749,136 +656,36 @@
     document.getElementById("welcomeWizard").style.display = "flex";
   }
 
-  function goApp(app) {
-    closeWizard();
-    go(app);
-  }
+  function goApp(app) { closeWizard(); go(app); }
 
-  function openPresentation() {
-    document.getElementById("presentationPopup").style.display = "flex";
-    lockScroll();
-  }
+  function openPresentation() { document.getElementById("presentationPopup").style.display = "flex"; lockScroll(); }
+  function closePresentation() { document.getElementById("presentationPopup").style.display = "none"; unlockScroll(); }
 
-  function closePresentation() {
-    document.getElementById("presentationPopup").style.display = "none";
-    unlockScroll();
-  }
-
-  window.openLicensePopup = function openLicensePopup() {
+  window.openLicensePopup = function() {
     const popup = document.createElement('div');
     popup.id = 'license-popup';
     popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
     popup.addEventListener('click', e => { if(e.target===popup) window.closeLicensePopup(); });
-    popup.innerHTML = `
-      <div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h2 style="color:#00c8ff;margin:0;font-size:17px;">📄 Licence</h2>
-          <button onclick="window.closeLicensePopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
-        </div>
-        <div style="color:#ccc;line-height:1.7;font-size:13px;">
-          <p style="color:#fff;font-weight:700;margin-bottom:4px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p>
-          <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Droits accordés</p>
-          <p>L'auteur accorde à tout utilisateur le droit :</p>
-          <ul style="margin:6px 0 12px 16px;padding:0;">
-            <li>D'utiliser l'application à titre <strong>personnel et non commercial</strong></li>
-            <li>De consulter le code source à des fins d'information et de vérification</li>
-            <li>De signaler des bugs et proposer des améliorations via GitHub</li>
-          </ul>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Droits réservés — Interdictions explicites</p>
-          <p>Sont <strong>strictement interdits</strong> sans autorisation écrite préalable :</p>
-          <ul style="margin:6px 0 12px 16px;padding:0;">
-            <li>Toute utilisation commerciale, directe ou indirecte</li>
-            <li>Toute vente, revente, location ou monétisation</li>
-            <li>Toute intégration dans un produit ou service commercial</li>
-            <li>Toute modification et redistribution sous un autre nom</li>
-            <li>Toute suppression des mentions de copyright</li>
-            <li>Tout déploiement sur des infrastructures d'entreprise sans accord écrit</li>
-            <li>Toute création d'œuvre dérivée à des fins commerciales</li>
-          </ul>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Données utilisateur</p>
-          <p>Cette application traite les données localement. Aucune donnée personnelle n'est collectée ni transmise par l'auteur.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">4. Sources scientifiques</p>
-          <p>Les références scientifiques (OMS, INRS, HAS, Lancet, etc.) sont citées à titre informatif. L'application ne constitue pas un avis médical.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">5. Limitation de responsabilité</p>
-          <p>L'application est fournie "telle quelle". L'auteur ne pourra être tenu responsable de décisions prises sur la base des résultats affichés. Seuls les documents officiels de l'employeur et le droit applicable font foi.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">6. Cession commerciale</p>
-          <p>Toute cession commerciale fait l'objet d'un contrat distinct négocié avec l'auteur.</p>
-
-          <div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
-            Contact : appareils.treves6g@icloud.com
-          </div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(popup);
-    lockScroll();
+    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h2 style="color:#00c8ff;margin:0;font-size:17px;">📄 Licence</h2><button onclick="window.closeLicensePopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button></div><div style="color:#ccc;line-height:1.7;font-size:13px;"><p style="color:#fff;font-weight:700;margin-bottom:4px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p><p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Droits accordés</p><p>Utilisation à titre personnel et non commercial uniquement.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Interdictions</p><p>Toute utilisation commerciale, revente, ou redistribution est interdite sans accord écrit.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Données</p><p>Aucune donnée personnelle collectée ni transmise.</p><div style="margin-top:16px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">Contact : appareils.treves6g@icloud.com</div></div></div>`;
+    document.body.appendChild(popup); lockScroll();
   }
+  window.closeLicensePopup = function() { const p = document.getElementById('license-popup'); if(p) p.remove(); unlockScroll(); }
 
-    window.closeLicensePopup = function closeLicensePopup() {
-    const popup = document.getElementById('license-popup');
-    if (popup) popup.remove();
-    unlockScroll();
-  }
-
-  window.openPrivacyPopup = function openPrivacyPopup() {
+  window.openPrivacyPopup = function() {
     const popup = document.createElement('div');
     popup.id = 'privacy-popup';
     popup.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:10000;display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;padding:env(safe-area-inset-top,20px) 16px 20px;';
     popup.addEventListener('click', e => { if(e.target===popup) window.closePrivacyPopup(); });
-    popup.innerHTML = `
-      <div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h2 style="color:#00c8ff;margin:0;font-size:17px;">🔒 Confidentialité</h2>
-          <button onclick="window.closePrivacyPopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button>
-        </div>
-        <div style="color:#ccc;line-height:1.7;font-size:13px;">
-          <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Dernière mise à jour : 28 février 2026</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">1. Absence de collecte de données</p>
-          <p>L'Application est conçue pour fonctionner de manière totalement autonome. Nous ne collectons, ne stockons, ni ne transmettons aucune donnée personnelle vers des serveurs externes ou vers des tiers.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">2. Stockage local (LocalStorage)</p>
-          <p>Toutes les données saisies sont conservées <strong>exclusivement sur votre appareil</strong>. Ces données ne nous sont jamais envoyées et restent sous votre contrôle exclusif. Vous pouvez les effacer à tout moment en vidant le cache de votre navigateur.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">3. Pas de services de suivi</p>
-          <p>Nous n'utilisons aucun outil de suivi, de cookies publicitaires ou de services d'analyse tiers. Votre utilisation reste totalement anonyme.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">4. Sécurité</p>
-          <p>Puisque aucune donnée n'est transmise sur Internet, les risques liés à la sécurité des serveurs tiers sont inexistants. La sécurité de vos données dépend de la sécurité de votre propre appareil.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">5. Modifications</p>
-          <p>Nous pouvons mettre à jour cette politique de temps à autre. Toute modification sera publiée sur cette page.</p>
-
-          <p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">6. Contact</p>
-          <div style="margin-top:8px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">
-            Email : appareils.treves6g@icloud.com
-          </div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(popup);
-    lockScroll();
+    popup.innerHTML = `<div style="background:#0d1117;border:1px solid rgba(0,200,255,0.25);border-radius:12px;width:100%;max-width:600px;padding:20px;margin:auto;" onclick="event.stopPropagation()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h2 style="color:#00c8ff;margin:0;font-size:17px;">🔒 Confidentialité</h2><button onclick="window.closePrivacyPopup()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;font-size:18px;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;padding:0;margin:0;flex-shrink:0;">✕</button></div><div style="color:#ccc;line-height:1.7;font-size:13px;"><p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Dernière mise à jour : 28 février 2026</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Absence de collecte</p><p>Aucune donnée personnelle collectée, stockée ou transmise vers des serveurs externes.</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Stockage local</p><p>Toutes les données restent exclusivement sur votre appareil (localStorage).</p><p style="color:#00c8ff;font-weight:600;margin-bottom:6px;">Pas de tracking</p><p>Aucun cookie publicitaire, aucun outil d'analyse tiers.</p><div style="margin-top:8px;padding:12px;background:rgba(0,200,255,0.05);border:1px solid rgba(0,200,255,0.15);border-radius:8px;font-size:11px;color:rgba(255,255,255,0.5);">Email : appareils.treves6g@icloud.com</div></div></div>`;
+    document.body.appendChild(popup); lockScroll();
   }
-
-    window.closePrivacyPopup = function closePrivacyPopup() {
-    const popup = document.getElementById('privacy-popup');
-    if (popup) popup.remove();
-    unlockScroll();
-  }
+  window.closePrivacyPopup = function() { const p = document.getElementById('privacy-popup'); if(p) p.remove(); unlockScroll(); }
 
   function go(app) {
     _safeLS.set("lastApp", app);
     window.location.href = app + "/index.html";
   }
 
-  /* ===================== CCN ===================== */
   let _ccnSelected = null;
   let _ccnCustom = false;
 
@@ -887,17 +694,13 @@
     const nom    = _safeLS.get('CCN_NOM');
     const custom = _safeLS.get('CCN_CUSTOM');
     let label = 'Convention collective — cliquer pour choisir';
-    if (custom) {
-      try { const c = JSON.parse(custom); label = '⚙️ ' + (c.nom || 'Accord personnalisé'); } catch(e){}
-    } else if (idcc && nom) {
-      label = nom + ' · IDCC ' + idcc;
-    }
+    if (custom) { try { const c = JSON.parse(custom); label = '⚙️ ' + (c.nom || 'Accord personnalisé'); } catch(e){} }
+    else if (idcc && nom) { label = nom + ' · IDCC ' + idcc; }
     document.getElementById('ccn-badge-name').textContent = label;
   }
 
   function openCCNModal() {
-    _ccnSelected = null;
-    _ccnCustom = false;
+    _ccnSelected = null; _ccnCustom = false;
     document.getElementById('ccnCustomForm').classList.remove('open');
     document.getElementById('ccn-search').value = '';
     ccnSearch('');
@@ -906,34 +709,26 @@
     document.getElementById('ccnModal').classList.add('open');
   }
 
-  function closeCCNModal() {
-    document.getElementById('ccnModal').classList.remove('open');
-  }
+  function closeCCNModal() { document.getElementById('ccnModal').classList.remove('open'); }
 
   function ccnSearch(q) {
     const results = document.getElementById('ccn-results');
     if (typeof CCN_API === 'undefined') {
-      results.innerHTML = '<div style="padding:12px;color:#c00;font-size:13px">❌ Fichier CCN non chargé</div>';
-      return;
+      results.innerHTML = '<div style="padding:12px;color:#c00;font-size:13px">❌ Fichier CCN non chargé</div>'; return;
     }
     const items = CCN_API.search(q, 60);
     const activeIdcc = _ccnSelected ? _ccnSelected.idcc : parseInt(_safeLS.get('CCN_IDCC') || '0');
     let html = items.map(it => {
       const isActive = it.i === activeIdcc;
-      return `<div class="ccn-item${isActive?' active':''}" onclick="selectCCN(${it.i},this)">
-        <div>${it.n}</div>
-        <div class="ccn-item-idcc">IDCC ${it.i} · ${it.g}</div>
-      </div>`;
+      return `<div class="ccn-item${isActive?' active':''}" onclick="selectCCN(${it.i},this)"><div>${it.n}</div><div class="ccn-item-idcc">IDCC ${it.i} · ${it.g}</div></div>`;
     }).join('');
     html += `<div class="ccn-item-custom" onclick="toggleCustomForm()">⚙️ Accord d'entreprise / personnalisé…</div>`;
     results.innerHTML = html;
-    // Récupérer nom depuis DOM
     results.querySelectorAll('.ccn-item').forEach(el => {
       el.addEventListener('click', function() {
         const idccVal = parseInt(this.querySelector('.ccn-item-idcc').textContent.split(' ')[1]);
         const nomVal  = this.querySelector('div:first-child').textContent;
-        _ccnSelected = { idcc: idccVal, nom: nomVal };
-        _ccnCustom = false;
+        _ccnSelected = { idcc: idccVal, nom: nomVal }; _ccnCustom = false;
         document.getElementById('ccnCustomForm').classList.remove('open');
         results.querySelectorAll('.ccn-item').forEach(e => e.classList.remove('active'));
         this.classList.add('active');
@@ -941,169 +736,54 @@
     });
   }
 
-  function selectCCN(idcc, el) { /* handled above via addEventListener */ }
+  function selectCCN(idcc, el) {}
 
   function toggleCustomForm() {
-    _ccnCustom = true;
-    _ccnSelected = null;
+    _ccnCustom = true; _ccnSelected = null;
     document.getElementById('ccnCustomForm').classList.toggle('open');
     const saved = _safeLS.get('CCN_CUSTOM');
     if (saved) {
       try {
         const c = JSON.parse(saved);
-        document.getElementById('cc-nom').value         = c.nom || '';
-        document.getElementById('cc-seuil').value       = c.seuil || 35;
-        document.getElementById('cc-taux1').value       = c.taux1 || 25;
-        document.getElementById('cc-palier1').value     = c.palier1 || 8;
-        document.getElementById('cc-taux-inter').value  = c.taux_inter || '';
-        document.getElementById('cc-palier-inter').value= c.palier_inter || '';
-        document.getElementById('cc-taux2').value       = c.taux2 || 50;
-        document.getElementById('cc-contingent').value  = c.contingent || 220;
-        document.getElementById('cc-debut').value       = c.debutSemaine || 1;
+        document.getElementById('cc-nom').value          = c.nom || '';
+        document.getElementById('cc-seuil').value        = c.seuil || 35;
+        document.getElementById('cc-taux1').value        = c.taux1 || 25;
+        document.getElementById('cc-palier1').value      = c.palier1 || 8;
+        document.getElementById('cc-taux-inter').value   = c.taux_inter || '';
+        document.getElementById('cc-palier-inter').value = c.palier_inter || '';
+        document.getElementById('cc-taux2').value        = c.taux2 || 50;
+        document.getElementById('cc-contingent').value   = c.contingent || 220;
+        document.getElementById('cc-debut').value        = c.debutSemaine || 1;
       } catch(e){}
     }
   }
 
   function saveCCN() {
     if (_ccnCustom) {
-      const nom          = document.getElementById('cc-nom').value.trim() || 'Accord personnalisé';
-      const seuil        = parseInt(document.getElementById('cc-seuil').value) || 35;
-      const taux1        = parseInt(document.getElementById('cc-taux1').value) || 25;
-      const palier1      = parseInt(document.getElementById('cc-palier1').value) || 8;
-      const tiRaw        = document.getElementById('cc-taux-inter').value;
-      const piRaw        = document.getElementById('cc-palier-inter').value;
-      const taux_inter   = tiRaw ? parseInt(tiRaw) : null;
+      const nom = document.getElementById('cc-nom').value.trim() || 'Accord personnalisé';
+      const seuil = parseInt(document.getElementById('cc-seuil').value) || 35;
+      const taux1 = parseInt(document.getElementById('cc-taux1').value) || 25;
+      const palier1 = parseInt(document.getElementById('cc-palier1').value) || 8;
+      const tiRaw = document.getElementById('cc-taux-inter').value;
+      const piRaw = document.getElementById('cc-palier-inter').value;
+      const taux_inter = tiRaw ? parseInt(tiRaw) : null;
       const palier_inter = piRaw ? parseInt(piRaw) : null;
-      const taux2        = parseInt(document.getElementById('cc-taux2').value) || 50;
-      const contingent   = parseInt(document.getElementById('cc-contingent').value) || 220;
+      const taux2 = parseInt(document.getElementById('cc-taux2').value) || 50;
+      const contingent = parseInt(document.getElementById('cc-contingent').value) || 220;
       const debutSemaine = parseInt(document.getElementById('cc-debut').value) || 1;
-      if (seuil < 35)  { alert('⚠️ Le seuil ne peut pas être inférieur à 35h'); return; }
-      if (taux1 < 10)  { alert('⚠️ Taux minimum légal : 10% (Art. L3121-33)'); return; }
+      if (seuil < 35) { alert('⚠️ Le seuil ne peut pas être inférieur à 35h'); return; }
+      if (taux1 < 10) { alert('⚠️ Taux minimum légal : 10% (Art. L3121-33)'); return; }
       CCN_API.setCustom({ nom, seuil, taux1, palier1, taux_inter, palier_inter, taux2, contingent, debutSemaine });
-      _safeLS.del('CCN_IDCC');
-      _safeLS.set('CCN_NOM', nom);
+      _safeLS.del('CCN_IDCC'); _safeLS.set('CCN_NOM', nom);
     } else if (_ccnSelected) {
       CCN_API.resetCustom();
       _safeLS.set('CCN_IDCC', _ccnSelected.idcc);
       _safeLS.set('CCN_NOM', _ccnSelected.nom);
-    } else {
-      closeCCNModal();
-      return;
-    }
-    initCCNBadge();
-    closeCCNModal();
+    } else { closeCCNModal(); return; }
+    initCCNBadge(); closeCCNModal();
   }
 
   window.addEventListener('DOMContentLoaded', initCCNBadge);
 </script>
-
-<!-- ═══════════════════════════════════════════
-     BANNIÈRE IOS — AJOUTER À L'ÉCRAN D'ACCUEIL
-     Affichée uniquement :
-       • sur iOS (iPhone/iPad)
-       • pas déjà installée en PWA (standalone)
-       • première ouverture uniquement (localStorage)
-     ═══════════════════════════════════════════ -->
-<style>
-  #ios-install-banner {
-    display: none;
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    z-index: 9999;
-    background: #fff;
-    border-top: 3px solid #4FB3C2;
-    border-radius: 18px 18px 0 0;
-    box-shadow: 0 -4px 24px rgba(0,0,0,.18);
-    padding: 18px 20px calc(env(safe-area-inset-bottom) + 18px);
-    text-align: center;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    animation: slideUp .35s ease;
-  }
-  @keyframes slideUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
-  #ios-install-banner .ios-banner-icon {
-    font-size: 38px;
-    margin-bottom: 6px;
-  }
-  #ios-install-banner h3 {
-    margin: 0 0 8px;
-    font-size: 17px;
-    font-weight: 700;
-    color: #1a1a1a;
-  }
-  #ios-install-banner p {
-    margin: 0 0 14px;
-    font-size: 14px;
-    color: #444;
-    line-height: 1.5;
-  }
-  #ios-install-banner .ios-banner-steps {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    text-align: left;
-    background: #f5f9fa;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    font-size: 14px;
-    color: #333;
-  }
-  #ios-install-banner .ios-banner-steps span {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  #ios-install-banner button {
-    background: #4FB3C2;
-    color: #fff;
-    border: none;
-    border-radius: 22px;
-    padding: 11px 32px;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-  }
-</style>
-
-<div id="ios-install-banner">
-  <div class="ios-banner-icon">📲</div>
-  <h3>Installer l'application</h3>
-  <p>Accédez à l'app directement depuis votre écran d'accueil, sans navigateur.</p>
-  <div class="ios-banner-steps">
-    <span>1️⃣ Appuyez sur <strong>le bouton Partager</strong> <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234FB3C2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8'/%3E%3Cpolyline points='16 6 12 2 8 6'/%3E%3Cline x1='12' y1='2' x2='12' y2='15'/%3E%3C/svg%3E" style="vertical-align:middle;margin-left:2px"></span>
-    <span>2️⃣ Faites défiler et appuyez sur <strong>« Sur l'écran d'accueil »</strong></span>
-    <span>3️⃣ Appuyez sur <strong>« Ajouter »</strong> en haut à droite</span>
-  </div>
-  <button onclick="dismissIOSBanner()">J'ai compris ✓</button>
-</div>
-
-<script>
-  (function() {
-    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-    const isStandalone = ('standalone' in navigator) && navigator.standalone;
-    const dismissed = localStorage.getItem('ios_banner_dismissed');
-
-    if (isIOS && !isStandalone && !dismissed) {
-      // Petit délai pour ne pas bloquer le rendu initial
-      setTimeout(function() {
-        document.getElementById('ios-install-banner').style.display = 'block';
-      }, 1500);
-    }
-  })();
-
-  function dismissIOSBanner() {
-    document.getElementById('ios-install-banner').style.display = 'none';
-    try { localStorage.setItem('ios_banner_dismissed', '1'); } catch(e) {}
-  }
-</script>
-
-<!-- Glossaire mode débutant/expert -->
-<!-- Glossaire désactivé pour l'instant -->
-<!-- <script src="./glossaire.js"></script> -->
-
 </body>
 </html>
