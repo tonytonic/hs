@@ -109,16 +109,10 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((networkResponse) => {
         const status = networkResponse.status;
-        const cc = networkResponse.headers.get("Cache-Control") || "aucun";
-        
         if (status === 200) {
           const cacheCopy = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, cacheCopy);
-            // Log uniquement les HTML/JS/CSS pour ne pas polluer
-            if (shortUrl.match(/\.(html|js|css|json)$/)) {
-              console.log("📡 [FETCH NET→CACHE]", shortUrl, "| status:", status, "| Cache-Control:", cc);
-            }
           });
         } else {
           console.warn("⚠️ [FETCH NET NON-200]", shortUrl, "| status:", status);
