@@ -1,0 +1,18 @@
+# Cloudflare Pages — _headers
+# Offline Safari fix : pas de must-revalidate sur les HTML
+
+# SW : jamais en cache navigateur
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+  Content-Type: application/javascript; charset=utf-8
+
+# Manifest
+/manifest.json
+  Cache-Control: no-cache
+  Content-Type: application/manifest+json; charset=utf-8
+
+# Tout le reste : le SW gère le cache lui-même
+/*
+  Cache-Control: public, max-age=0
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
