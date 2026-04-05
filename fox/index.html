@@ -4588,7 +4588,6 @@ function syncModulesAndAwardXP(source) {
     
     // === PÉNALITÉS POUR VIOLATIONS ===
     const situation = _analyzeLegalSituation();
-    console.log('🔍 Analyse situation légale:', situation);
     let xpPenalty = 0;
     let burnoutIncrease = 0;
 
@@ -4625,7 +4624,6 @@ function syncModulesAndAwardXP(source) {
       const _todayStr = new Date().toDateString();
       const _penDateStr = lastPenaltyLS > 0 ? _lastPenDate.toDateString() : '';
       if (_penDateStr === _todayStr) {
-        console.log('⏸️ Pénalité XP skippée — déjà appliquée aujourd\'hui');
         xpPenalty = 0; // Skip uniquement la pénalité, pas le reste du sync
       }
       
@@ -4637,7 +4635,6 @@ function syncModulesAndAwardXP(source) {
         xpSystem.currentXP = Math.max(0, xpSystem.currentXP - xpPenalty);
         xpSystem.level = xpSystem.calculateLevel();
         xpSystem.saveToStorage();
-        console.log('💥 Pénalité XP appliquée:', oldXP, '→', xpSystem.currentXP, '(-' + xpPenalty + ')');
         if (typeof addRewardToHistory === 'function') {
           addRewardToHistory('⚠️ Violation : -' + xpPenalty + ' XP', 'danger');
         }
@@ -4663,7 +4660,6 @@ function syncModulesAndAwardXP(source) {
         }
         if (typeof refreshHUD === 'function') refreshHUD();
       } else {
-        console.log('⏸️ Pénalité XP cooldown — aucune animation');
       }
     }
     
@@ -4681,18 +4677,15 @@ function syncModulesAndAwardXP(source) {
         const oldBurnout = gameState.burnout || 0;
         gameState.burnout = Math.min(100, oldBurnout + burnoutIncrease);
         localStorage.setItem(_boUpdateKey, _boTodayStr);
-        console.log('🔥 Burn-out +' + burnoutIncrease + ' (1x/jour):', oldBurnout, '→', gameState.burnout);
-      } else {
+        } else {
         // Récupération : 3 pts par jour sans violation
         if ((gameState.burnout || 0) > 0) {
           const oldBurnout = gameState.burnout || 0;
           gameState.burnout = Math.max(0, oldBurnout - 3);
           localStorage.setItem(_boUpdateKey, _boTodayStr);
-          console.log('💚 Burn-out -3 (récup jour):', oldBurnout, '→', gameState.burnout);
         }
       }
     } else {
-      console.log('⏸️ Burn-out skippé — déjà mis à jour aujourd\'hui (' + (gameState.burnout||0) + ')');
     }
     // Sauvegarder
     try {
@@ -7306,7 +7299,10 @@ function updateSeasonalBg() {
       bgEl.style.opacity = '1';
     }, 250); // swap pendant le fade-out, pas après
   };
-  _preload.onerror = () => {}; // image absente → on garde l'actuelle
+  _preload.onerror = () => {
+    // Image saisonnière absente → rester sur le décor par défaut
+    if (bgEl) { bgEl.style.opacity = '1'; }
+  };
   _preload.src = bg;
 }
 
@@ -7337,8 +7333,6 @@ function updatePNJLevel(level) {
     if (pnj)         { pnj.style.display = ''; pnj.src = _fallbackImg; }
     if (foxImgPopup) { foxImgPopup.src = _fallbackImg; }
   };
-  // Ne recharger que si le tier change — évite rechargement image toutes les 5s
-  if (pnj && pnj.getAttribute('data-tier') === String(tier)) return;
   if (pnj) { pnj.setAttribute('data-tier', tier); }
   if (foxImgPopup) {
     let size = 90;
