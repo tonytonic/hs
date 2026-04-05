@@ -3918,6 +3918,42 @@ function _buildDailyLoop5(s, h, todayOT) {
   const pr   = name ? name + '\u00a0: ' : '';
   const bo   = (typeof gameState !== 'undefined' ? (gameState.burnout || 0) : 0);
 
+  // ── Détection semaine vacances M4 courante ───────────────────────
+  // Si aujourd'hui est en vacances → message vacances prioritaire
+  function _isoWeekKey(d) {
+    const dow = (d.getDay()+6)%7;
+    const thu = new Date(d); thu.setDate(d.getDate()-dow+3);
+    const yS = new Date(thu.getFullYear(),0,4);
+    return thu.getFullYear()+'-W'+String(1+Math.round(((thu-yS)/86400000-3+((yS.getDay()+6)%7))/7)).padStart(2,'0');
+  }
+  const _todayKey = now.toISOString().slice(0,10);
+  const _curWk = _isoWeekKey(now);
+  let _isVacWeek = false;
+  try {
+    const year = now.getFullYear().toString();
+    const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+year)||'{}');
+    const m1Raw = JSON.parse(localStorage.getItem('DATA_REPORT_'+year)||'{}');
+    // Vérifier si un jour de cette semaine est en vacances M4 ou absent M1
+    for (let d=0; d<7; d++) {
+      const dt = new Date(now); dt.setDate(now.getDate()-((now.getDay()+6)%7)+d);
+      const dk = dt.toISOString().slice(0,10);
+      if (m4Vac[dk]) { _isVacWeek = true; break; }
+      const e = m1Raw[dk];
+      if (e && ((e.absent>=7)||(e.recup>=7))) { _isVacWeek = true; break; }
+    }
+  } catch(e) {}
+
+  // Message vacances prioritaire — remplace toutes les alertes
+  if (_isVacWeek) {
+    const vacMsgs = [
+      `🦊 [${jr}] Tu es en congé cette semaine — profites-en ! Les heures passées restent dans ton historique et ton contingent est mis en pause. Déconnecte vraiment (Art. L3141-3).`,
+      `🦊 [${jr}] Semaine de vacances détectée. Kitsune surveille ton historique mais te laisse souffler. Aucun seuil légal à surveiller cette semaine.`,
+      `🦊 [${jr}] Repos en cours ! Ton contingent annuel ne bouge pas pendant les congés. C'est le moment de récupérer avant de reprendre.`,
+    ];
+    const seed = now.getDate() % vacMsgs.length;
+    return [vacMsgs[seed], vacMsgs[(seed+1)%vacMsgs.length], vacMsgs[(seed+2)%vacMsgs.length], vacMsgs[seed], vacMsgs[(seed+1)%vacMsgs.length]];
+  }
+
   // ── Flags violations (lus directement depuis s) ─────────────────
   const vCrit    = s.daily.hasDailyCrit;                    // jour > 12h
   const vRisk    = s.daily.hasDailyRisk;                    // jour >= 10h
