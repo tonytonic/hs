@@ -8,11 +8,23 @@
   <meta name="theme-color" content="#0a0e1a">
   <meta name="format-detection" content="telephone=no">
   <title>🦊 FOX Engine — Heures Sup' Ultimate</title>
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../images/foxplayer.PNG">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="gaming-mode">
 
 <img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<script>
+// Appliquer la bonne saison IMMÉDIATEMENT (avant rendu) — évite flash hiver→printemps
+(function(){
+  const _bgs=['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+  const q=Math.floor(new Date().getMonth()/3);
+  const bg=_bgs[q]||_bgs[0];
+  const el=document.getElementById('bg-decor');
+  if(el && bg!==el.src.split('/').pop() && el.src!==new URL(bg,location.href).href) el.src=bg;
+})();
+</script>
 
 <div id="burnout-overlay"></div>
 <div id="storm-overlay"></div>
@@ -7329,17 +7341,17 @@ function updatePNJLevel(level) {
   const _tryLoad = new Image();
   const _applyPNJ = (src) => {
     if (pnj) {
-      // Ne changer que si l'image est différente
       const curSrc = (pnj.getAttribute('src') || '').split('/').pop();
       const newSrc = src.split('/').pop();
-      if (curSrc === newSrc) { pnj.style.display = ''; return; }
-      // Fade out → swap → fade in
-      pnj.style.transition = 'opacity 0.3s ease';
+      if (curSrc === newSrc) { pnj.style.display = ''; return; } // déjà la bonne image
+      // Crossfade invisible via opacity
+      pnj.style.transition = 'opacity 0.25s ease';
       pnj.style.opacity = '0';
       setTimeout(() => {
-        pnj.src = src; pnj.style.display = '';
-        pnj.style.opacity = '1';
-      }, 300);
+        pnj.src = src;
+        pnj.onload = () => { pnj.style.display = ''; pnj.style.opacity = '1'; };
+        pnj.onerror = () => { pnj.style.display = ''; pnj.style.opacity = '1'; };
+      }, 260);
     }
     if (foxImgPopup) foxImgPopup.src = src;
   };
