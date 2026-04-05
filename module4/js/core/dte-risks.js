@@ -32,10 +32,26 @@ const RISK_DEFS=[
   {
     id:'STRESS_ELEVE', level:'DANGER', emoji:'😰',
     titre:'Stress psychosocial élevé',
-    condition:(sc,n)=>sc.stress>=70,
+    condition:(sc,n)=>sc.stress>=60, // abaissé de 70 à 60
     message:(sc)=>`Stress ${sc.stress}/100. Risques psychosociaux détectés.`,
     article:'Art. L4121-1 + Accord ANI 2008 sur le stress au travail',
     actions:['Vérifier le DUERP (Document Unique)','Informer les représentants du personnel','Consulter le médecin du travail'],
+  },
+  {
+    id:'SURCHARGE_RECUP', level:'DANGER', emoji:'⚡',
+    titre:'Surcharge + récupération insuffisante',
+    condition:(sc,n)=>sc.fatigue>=50&&sc.recovery<=50,
+    message:(sc)=>`Fatigue ${sc.fatigue}/100, Récupération ${sc.recovery}/100. Combinaison critique.`,
+    article:'INRS — Phases P2/P3 de fatigue chronique',
+    actions:['Prendre 2 jours consécutifs de repos','Réduire les heures cette semaine','Consulter si les symptômes persistent'],
+  },
+  {
+    id:'FATIGUE_STRESS_COMBINEE', level:'DANGER', emoji:'🔴',
+    titre:'Fatigue et/ou stress en zone rouge',
+    condition:(sc,n)=>sc.fatigue>=55||sc.stress>=55,
+    message:(sc)=>`Fatigue ${sc.fatigue}/100, Stress ${sc.stress}/100. Risque de surmenage.`,
+    article:'OMS/OIT 2021 — Surcharge psychosociale',
+    actions:['Réduction immédiate de la charge','Entretien avec l\'employeur ou médecin du travail'],
   },
   {
     id:'SURCHARGE_STRUCT', level:'ALERTE', emoji:'📊',
@@ -94,6 +110,25 @@ class DTERisks {
       }))
       .sort((a,b)=>(order[a.level]??3)-(order[b.level]??3));
   }
+
+  // Phases physiologiques INRS — fatigue, recovery et stress en entrée (valeurs 0-100)
+  // Phase 4 testée AVANT phase 3 (conditions chevauchantes — seuils plus stricts en priorité)
+  getPhase(fatigue, recovery, stress) {
+    if (fatigue < 25 && recovery > 80) {
+      return { phase: 1, label: 'Forme optimale', color: '#00ffcc' };
+    }
+    if (fatigue < 45 && recovery > 60) {
+      return { phase: 2, label: 'Fatigue modérée', color: '#ffb300' };
+    }
+    if (fatigue >= 60 || recovery < 45 || stress > 55) {
+      return { phase: 4, label: 'Fatigue élevée', color: '#c82838' };
+    }
+    if (fatigue >= 45 || recovery < 60 || stress > 40) {
+      return { phase: 3, label: 'Surcharge', color: '#ff6b35' };
+    }
+    return { phase: 1, label: 'Forme optimale', color: '#00ffcc' };
+  }
+
   getAll(){ return RISK_DEFS; }
 }
 
