@@ -65,11 +65,9 @@ const FILES_TO_CACHE = [
 
 // ── INSTALL ───────────────────────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
-  console.log("🔧 [SW INSTALL] Démarrage installation — cache:", CACHE_NAME);
   
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      console.log("📦 [SW INSTALL] Cache ouvert, mise en cache de", FILES_TO_CACHE.length, "fichiers...");
       
       let ok = 0, fail = 0;
       for (const url of FILES_TO_CACHE) {
@@ -91,10 +89,8 @@ self.addEventListener("install", (event) => {
             const cleanRes = new Response(body, { status: res.status, statusText: res.statusText, headers });
             await cache.put(url, cleanRes);
             ok++;
-            console.log("  ✅ [CACHE OK]", url, "| taille:", body.byteLength, "octets");
           } else {
             fail++;
-            console.warn("  ⚠️ [CACHE SKIP]", url, "— status HTTP:", res.status);
           }
         } catch(err) {
           fail++;
@@ -102,12 +98,9 @@ self.addEventListener("install", (event) => {
         }
       }
       
-      console.log("📊 [SW INSTALL] Résultat:", ok, "OK,", fail, "échecs sur", FILES_TO_CACHE.length);
       
       // Lister le contenu du cache après installation
       const keys = await cache.keys();
-      console.log("🗂️ [SW INSTALL] Contenu cache final:", keys.length, "entrées");
-      keys.forEach(req => console.log("   →", req.url));
     })
   );
   self.skipWaiting();
@@ -115,18 +108,14 @@ self.addEventListener("install", (event) => {
 
 // ── ACTIVATE ──────────────────────────────────────────────────────────────────
 self.addEventListener("activate", (event) => {
-  console.log("🚀 [SW ACTIVATE] Activation — nettoyage anciens caches...");
   
   event.waitUntil(
     caches.keys().then(async (keys) => {
-      console.log("🗑️ [SW ACTIVATE] Caches existants:", keys);
       for (const key of keys) {
         if (key !== CACHE_NAME) {
           await caches.delete(key);
-          console.log("  🗑️ Supprimé:", key);
         }
       }
-      console.log("✅ [SW ACTIVATE] Nettoyage terminé — cache actif:", CACHE_NAME);
     })
   );
   self.clients.claim();
@@ -164,21 +153,17 @@ self.addEventListener("fetch", (event) => {
           });
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, cleanResponse);
-            console.log("✅ [CACHE OK]", shortUrl, "| taille:", body.byteLength, "octets");
           });
           // Retourner une nouvelle réponse avec le même body
           return new Response(body, { status, statusText: networkResponse.statusText, headers: networkResponse.headers });
         } else {
-          console.warn("⚠️ [FETCH NET NON-200]", shortUrl, "| status:", status);
         }
         return networkResponse;
       })
       .catch((netErr) => {
-        console.log("📴 [FETCH OFFLINE] Réseau indisponible pour:", shortUrl, "— recherche dans cache...");
         
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) {
-            console.log("✅ [FETCH CACHE HIT]", shortUrl);
             return cachedResponse;
           }
           
@@ -189,9 +174,7 @@ self.addEventListener("fetch", (event) => {
             event.request.headers.get("accept")?.includes("text/html");
           
           if (isNav) {
-            console.log("🔄 [FETCH FALLBACK] Retour vers menu.html offline");
             return caches.match(OFFLINE_URL).then(r => {
-              if (r) { console.log("✅ [FETCH FALLBACK OK] menu.html servi"); return r; }
               console.error("💥 [FETCH FALLBACK FAIL] menu.html absent du cache !");
             });
           }
@@ -202,12 +185,10 @@ self.addEventListener("fetch", (event) => {
 
 // ── SYNC ──────────────────────────────────────────────────────────────────────
 self.addEventListener("sync", (e) => {
-  console.log("🔄 [SYNC]", e.tag);
 });
 
 self.addEventListener("periodicsync", (e) => {
   if (e.tag === "update-cache") {
-    console.log("🔁 [PERIODIC SYNC] Mise à jour cache...");
     e.waitUntil(
       caches.open(CACHE_NAME).then((c) =>
         Promise.all(FILES_TO_CACHE.map((u) => c.add(u).catch(() => {})))
