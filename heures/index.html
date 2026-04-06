@@ -211,11 +211,29 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
     </div>
     <hr class="settings-divider">
     <div class="settings-group">
-      <span class="settings-group-label">&#x1F38C; Jours f&eacute;ri&eacute;s</span>
-      <button onclick="importFeries()">&#x1F1EB;&#x1F1F7; Importer jours f&eacute;ri&eacute;s officiels</button>
-      <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:14px;cursor:pointer;">
+      <span class="settings-group-label">🎌 Jours fériés</span>
+
+      <!-- Toggle import API -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f8f9fa;border-radius:10px;border:1px solid #e0e0e0;margin-bottom:8px;">
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#2c3e50;">🇫🇷 Import API Gouvernement</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">Importer automatiquement les jours fériés officiels</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;">
+          <input type="checkbox" id="autoImportFeriesToggle" style="width:18px;height:18px;accent-color:#4FB3C2;margin:0;">
+          <span id="autoImportFeriesLabel" style="font-size:12px;font-weight:600;color:#888;">OFF</span>
+        </label>
+      </div>
+
+      <!-- Bouton import manuel (toujours disponible) -->
+      <button onclick="importFeries()" id="btnImportFeries" style="width:100%;margin-bottom:8px;">
+        🇫🇷 Importer maintenant les jours fériés
+      </button>
+
+      <!-- Toggle mode auto-férié -->
+      <label style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:14px;cursor:pointer;">
         <input type="checkbox" id="autoFerieToggle" style="width:auto;margin:0;">
-        Mode f&eacute;ri&eacute; automatique (&minus;7h en semaine)
+        Mode férié automatique (−7h en semaine)
       </label>
     </div>
     <hr class="settings-divider">
@@ -565,6 +583,10 @@ let exerciseStart=localStorage.getItem(STORAGE.exerciseStart)||"";
 let periodMeta=JSON.parse(localStorage.getItem(STORAGE.periodMeta))||{};
 let BASE_HEBDO=Number(localStorage.getItem("BASE_HEBDO_"+currentSuffix))||35;
 let AUTO_FERIE=localStorage.getItem("AUTO_FERIE_"+currentSuffix)==="true";
+// Auto-import fériés au démarrage si l'option est activée
+if(localStorage.getItem('AUTO_IMPORT_FERIES')==='true'){
+  setTimeout(()=>{ if(typeof importFeries==='function') importFeries(); }, 2000);
+}
 const DAILY_WORK_HOURS=7,ALLOW_RECUP_FREE=true;
 
 /* ── CCN : règles actives ── */
@@ -1040,6 +1062,21 @@ function update(){
   const _adi=document.getElementById("annualDateInput");if(_adi)_adi.value=annualDate;
   const aft=document.getElementById("autoFerieToggle");
   if(aft){aft.checked=AUTO_FERIE;aft.onchange=()=>{AUTO_FERIE=aft.checked;localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);update();};}
+  // Toggle auto-import fériés
+  const _aitEl=document.getElementById('autoImportFeriesToggle');
+  const _ailEl=document.getElementById('autoImportFeriesLabel');
+  const _autoImport=localStorage.getItem('AUTO_IMPORT_FERIES')==='true';
+  if(_aitEl){
+    _aitEl.checked=_autoImport;
+    if(_ailEl)_ailEl.textContent=_autoImport?'ON':'OFF';
+    if(_ailEl)_ailEl.style.color=_autoImport?'#4FB3C2':'#888';
+    _aitEl.onchange=()=>{
+      const v=_aitEl.checked;
+      localStorage.setItem('AUTO_IMPORT_FERIES',v);
+      if(_ailEl){_ailEl.textContent=v?'ON':'OFF';_ailEl.style.color=v?'#4FB3C2':'#888';}
+      if(v){importFeries();} // importer immédiatement si on active
+    };
+  }
   const banner=document.getElementById("activePeriodBanner"),period=getCurrentPeriod();
   if(banner){if(period&&exerciseStart){const s=period.start.toLocaleDateString(),e=period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString();banner.innerHTML=`📘 Période ${period.index+1} : ${s} \u2192 ${e}`;}else banner.innerHTML="";}
 }
