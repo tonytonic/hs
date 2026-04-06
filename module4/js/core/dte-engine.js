@@ -546,15 +546,37 @@ class DTEEngine {
         const fk = Object.keys(d)[0] || '';
         if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(fk)) days = d;
       }
-      for (const [date, e] of Object.entries(days)) {
+      // Fusionner N-1 + N pour la continuité biologique inter-années
+      const allDays = {};
+      const yearN = parseInt(year) || new Date().getFullYear();
+      for (const yn of [yearN - 1, yearN]) {
+        try {
+          const rawPrev = localStorage.getItem('DATA_REPORT_' + yn);
+          if (!rawPrev || rawPrev === '{}') continue;
+          const dPrev = JSON.parse(rawPrev);
+          let daysPrev = dPrev.days || dPrev.jours || {};
+          if (!Object.keys(daysPrev).length && typeof dPrev === 'object') {
+            const fk = Object.keys(dPrev)[0] || '';
+            if (/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/.test(fk)) daysPrev = dPrev;
+          }
+          Object.assign(allDays, daysPrev); // N-1 d'abord, N écrase si doublon
+        } catch(_) {}
+      }
+      // Compléter avec la variable `days` déjà parsée (année active)
+      Object.assign(allDays, days);
+
+      for (const [date, e] of Object.entries(allDays)) {
         if (!e || typeof e !== 'object') continue;
         const extra  = parseHours(e.extra ?? e.hs ?? 0);
         const recup  = parseHours(e.recup ?? e.repos ?? 0);
         const absent = parseFloat(e.absent || 0);
         r.days[date] = { extra, recup, absent };
-        r.totalExtra += extra;
-        r.totalRecup += recup;
-        if (!absent) r.totalWorkedDays++;
+        // totalExtra/totalWorkedDays sur l'année active seulement
+        if (date.startsWith(year)) {
+          r.totalExtra += extra;
+          r.totalRecup += recup;
+          if (!absent) r.totalWorkedDays++;
+        }
       }
       r.violations = d.violations || [];
     } catch(e) { console.warn('[DTE-E] m1:', e); }
@@ -566,7 +588,12 @@ class DTEEngine {
     try {
       // M2 stocke CA_HS_TRACKER_V1_DATA_{year}
       // Structure : { "2026-03": { days:{"14":2.5,"15":1}, paid:0, carry:0, closing:28 }, ... }
-      const keys = [ 'CA_HS_TRACKER_V1_DATA_' + year ];
+      const yearN2 = parseInt(year) || new Date().getFullYear();
+      // Inclure N-1 pour la continuité biologique inter-années
+      const keys = [
+        'CA_HS_TRACKER_V1_DATA_' + (yearN2 - 1),
+        'CA_HS_TRACKER_V1_DATA_' + yearN2
+      ];
       try {
         for(let i=0; i<localStorage.length; i++){
           const k=localStorage.key(i);
