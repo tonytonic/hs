@@ -599,6 +599,18 @@ function getCCNRules() {
   return { seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50, contingent:220, debutSemaine:1 };
 }
 // Retourne le premier jour (ou debut CCN) de la semaine contenant 'date'
+
+// Vérifie si un jour (JS getDay()) est un jour de repos selon la CCN
+function _isCCNRestDay(dow) {
+  const rules = getCCNRules();
+  const ds = (rules.debutSemaine || 1); // 1=lun..7=dim
+  const dsJS = ds === 7 ? 0 : ds;
+  // Jours ouvrés = debutSemaine + 5 jours consécutifs
+  // Jours repos = les 2 jours restants
+  const workedDays = new Set();
+  for (let i = 0; i < 5; i++) workedDays.add((dsJS + i) % 7);
+  return !workedDays.has(dow);
+}
 function getWeekStart(date){
   const rules=getCCNRules();
   const ds=rules.debutSemaine||1; // 1=lun..7=dim
@@ -816,7 +828,7 @@ function calculate(){
       // Si la CCN ne chôme que le 1er mai, ignorer les autres fériés
       if(_fr.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);if(d<pStart||d>pEnd)return;
-      const dow=d.getDay();if(dow===0||dow===6)return;
+      const dow=d.getDay();if(_isCCNRestDay(dow))return;
       // Appliquer -7h virtuel SAUF si l'utilisateur a explicitement saisi une absence
       // (si data[date].absent > 0 = saisi manuellement → on ne double-compte pas)
       // (si data[date] a seulement extra → le férié continue d'être chômé)
@@ -841,7 +853,7 @@ function calculate(){
     const iso=dow===0?7:dow;
     const wk=getWeekKey(dd);
     weeks[wk]=(weeks[wk]||0)+(v.extra||0);
-    if(dow!==0&&dow!==6)absences[wk]=(absences[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dow))absences[wk]=(absences[wk]||0)+(v.absent||0);
     recups[wk]=(recups[wk]||0)+(v.recup||0);
     totalRecup+=v.recup||0;
   });
@@ -1004,7 +1016,7 @@ function updateContingent(){
       if(type!=="ferie")return;
       if(_fr2.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);const dow=d.getDay();
-      if(dow===0||dow===6)return;
+      if(_isCCNRestDay(dow))return;
       const _hmA4 = data[date] && (data[date].absent||0) > 0;
       if(!_hmA4){ const wk=getWeekKey(d);
         absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
@@ -1017,7 +1029,7 @@ function updateContingent(){
     const dd=new Date(y,m-1,d);const dow=dd.getDay();
     const wk=getWeekKey(dd);
     weeks[wk]=(weeks[wk]||0)+(v.extra||0);
-    if(dow!==0&&dow!==6)absences[wk]=(absences[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dow))absences[wk]=(absences[wk]||0)+(v.absent||0);
   });
   let total=0;
   Object.entries(weeks).forEach(([wk,extra])=>{
@@ -1331,7 +1343,7 @@ function calcPeriodWeeks(pStart,pEnd){
       if(type!=="ferie")return;
       if(_fr3.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);if(d<pS||d>pE)return;
-      const dow=d.getDay();if(dow===0||dow===6)return;
+      const dow=d.getDay();if(_isCCNRestDay(dow))return;
       const _hmA5 = data[date] && (data[date].absent||0) > 0;
       if(!_hmA5){
         const wk=getWeekKey(d);
