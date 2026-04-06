@@ -822,8 +822,11 @@ function calculate(){
       // (si data[date] a seulement extra → le férié continue d'être chômé)
       const _hasManualAbsent = data[date] && (data[date].absent || 0) > 0;
       if(!_hasManualAbsent){
-        const iso=dow===0?7:dow;const monday=new Date(d);monday.setDate(monday.getDate()-(iso-1));
-        const wk=dateKeyLocal(monday);absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
+        // Utiliser getWeekKey() = même clé que la boucle data → cohérence garantie
+        const wk=getWeekKey(d);
+        absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
+        // S'assurer que la semaine existe dans weeks même sans extra (pour que absent soit pris en compte)
+        if(!weeks[wk])weeks[wk]=0;
       }
     });
   }
@@ -871,7 +874,7 @@ function openNotice(){document.getElementById("popupNotice").style.display="flex
 function closeNotice(){document.getElementById("popupNotice").style.display="none";}
 function openPopup(date){
   selectedDate=date;
-  if(specialDays[date]==="ferie"&&!AUTO_FERIE){if(!data[date])data[date]={extra:0,recup:0,absent:0};data[date].absent=DAILY_WORK_HOURS;}
+  // NE PAS écrire absent automatiquement — le bloc AUTO_FERIE dans calculate() gère les -7h
   const d=data[date]||{extra:0,recup:0,absent:0};
   // Afficher bannière info si c'est un férié avec AUTO_FERIE actif
   const _ferieInfo=document.getElementById('popup-ferie-info');
@@ -1330,18 +1333,19 @@ function calcPeriodWeeks(pStart,pEnd){
       const d=new Date(date);if(d<pS||d>pE)return;
       const dow=d.getDay();if(dow===0||dow===6)return;
       const _hmA5 = data[date] && (data[date].absent||0) > 0;
-      if(!_hmA5){ const iso=dow===0?7:dow;const mon=new Date(d);mon.setDate(mon.getDate()-(iso-1));
-        const wk=dateKeyLocal(mon);abs[wk]=(abs[wk]||0)+DAILY_WORK_HOURS;
+      if(!_hmA5){
+        const wk=getWeekKey(d);
+        abs[wk]=(abs[wk]||0)+DAILY_WORK_HOURS;
+        if(!wks[wk])wks[wk]=0; // s'assurer que la semaine existe
       }
     });
   }
   Object.entries(data).forEach(([date,v])=>{
     const[y,m,d]=date.split("-").map(Number);
     const dd=new Date(y,m-1,d);if(dd<pS||dd>pE)return;
-    const dow=dd.getDay(),iso=dow===0?7:dow;
-    const mon=new Date(dd);mon.setDate(mon.getDate()-(iso-1));
-    if(mon<pS||mon>pE)return;
-    const wk=dateKeyLocal(mon);
+    const dow=dd.getDay();
+    const wk=getWeekKey(dd);
+    if(getWeekStart(dd)<pS||getWeekStart(dd)>pE)return;
     wks[wk]=(wks[wk]||0)+(v.extra||0);
     rec[wk]=(rec[wk]||0)+(v.recup||0);
     if(dow!==0&&dow!==6)abs[wk]=(abs[wk]||0)+(v.absent||0);
