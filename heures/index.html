@@ -368,6 +368,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   <div class="popup-content">
     <div class="sheet-handle"></div>
     <h3 id="popupDate"></h3>
+    <div id="popup-ferie-info" style="display:none;background:#e3f2fd;border:1px solid #1976d2;border-radius:8px;padding:10px;font-size:13px;color:#1565c0;margin-bottom:10px;line-height:1.5;"></div>
 
     <!-- MODE TOGGLE -->
     <div class="saisie-toggle">
@@ -816,7 +817,11 @@ function calculate(){
       if(_fr.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);if(d<pStart||d>pEnd)return;
       const dow=d.getDay();if(dow===0||dow===6)return;
-      if(!data[date]||!data[date].absent){
+      // Appliquer -7h virtuel SAUF si l'utilisateur a explicitement saisi une absence
+      // (si data[date].absent > 0 = saisi manuellement → on ne double-compte pas)
+      // (si data[date] a seulement extra → le férié continue d'être chômé)
+      const _hasManualAbsent = data[date] && (data[date].absent || 0) > 0;
+      if(!_hasManualAbsent){
         const iso=dow===0?7:dow;const monday=new Date(d);monday.setDate(monday.getDate()-(iso-1));
         const wk=dateKeyLocal(monday);absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
       }
@@ -868,6 +873,18 @@ function openPopup(date){
   selectedDate=date;
   if(specialDays[date]==="ferie"&&!AUTO_FERIE){if(!data[date])data[date]={extra:0,recup:0,absent:0};data[date].absent=DAILY_WORK_HOURS;}
   const d=data[date]||{extra:0,recup:0,absent:0};
+  // Afficher bannière info si c'est un férié avec AUTO_FERIE actif
+  const _ferieInfo=document.getElementById('popup-ferie-info');
+  if(_ferieInfo){
+    const _isFerie=specialDays[date]==="ferie";
+    _ferieInfo.style.display=_isFerie&&AUTO_FERIE?'block':'none';
+    if(_isFerie&&AUTO_FERIE){
+      const _hasAbsent=d.absent>0;
+      _ferieInfo.innerHTML=_hasAbsent
+        ?'🎌 <b>Jour férié</b> — Absence manuelle saisie (−'+d.absent+'h). Le mode automatique −7h ne s\'applique pas.'
+        :'🎌 <b>Jour férié chômé</b> — Mode automatique actif : <b>−7h</b> appliquées sur la semaine. Vous pouvez ajouter des HS si vous avez travaillé ce jour.';
+    }
+  }
   popupDate.textContent=date;manualExtra.value=d.extra;manualRecup.value=d.recup;
   absentHours.value=d.absent||0;isAbsent.checked=(d.absent||0)>0;
   // Restore saisie mode
@@ -985,8 +1002,8 @@ function updateContingent(){
       if(_fr2.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);const dow=d.getDay();
       if(dow===0||dow===6)return;
-      if(!data[date]||!data[date].absent){
-        const wk=getWeekKey(d);
+      const _hmA4 = data[date] && (data[date].absent||0) > 0;
+      if(!_hmA4){ const wk=getWeekKey(d);
         absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
       }
     });
@@ -1312,8 +1329,8 @@ function calcPeriodWeeks(pStart,pEnd){
       if(_fr3.seul1erMaiChome && !date.endsWith('-05-01'))return;
       const d=new Date(date);if(d<pS||d>pE)return;
       const dow=d.getDay();if(dow===0||dow===6)return;
-      if(!data[date]||!data[date].absent){
-        const iso=dow===0?7:dow;const mon=new Date(d);mon.setDate(mon.getDate()-(iso-1));
+      const _hmA5 = data[date] && (data[date].absent||0) > 0;
+      if(!_hmA5){ const iso=dow===0?7:dow;const mon=new Date(d);mon.setDate(mon.getDate()-(iso-1));
         const wk=dateKeyLocal(mon);abs[wk]=(abs[wk]||0)+DAILY_WORK_HOURS;
       }
     });
