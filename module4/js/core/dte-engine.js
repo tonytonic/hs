@@ -795,24 +795,29 @@ class DTEEngine {
     //   Avant : countWorkDays28 >= 5 → 28j écrasait la semaine courante →
     //   progression lun→ven invisible (weeklyExtra constant = moyenne historique).
     let weeklyExtra;
+    // Calculer la semaine précédente complète — prioritaire le lundi matin
+    let prevExtra = 0, prevCount = 0;
+    for (let dd = 0; dd < workDaysPerWeek; dd++) {
+      const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() - 7 + dd);
+      const k = localDK(dt);
+      const e = days[k];
+      if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
+    }
+    const prevWeekFull = prevCount >= 3 ? prevExtra : null; // semaine précédente si au moins 3j saisis
+
     if (count7 >= 1) {
       // Semaine en cours avec données → HS réelles faites (progression jour par jour visible)
-      // Lun +2h → 37h | Mar +4h → 39h | Mer +6h → 41h | Jeu +8h → 43h | Ven +10h → 45h
-      // En repos/vacances en cours de semaine → weeklyExtra descend progressivement
       weeklyExtra = sumExtra7;
+    } else if (todayDowA === 1 && prevWeekFull !== null) {
+      // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
+      // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
+      weeklyExtra = prevWeekFull;
     } else if (countWorkDays28 >= 5) {
-      // Aucune saisie cette semaine → fallback sur historique 28j (début de semaine ou vacances)
+      // Milieu de semaine sans saisie → moyenne 28j
       weeklyExtra = weeklyExtra28;
     } else {
-      // Fallback : semaine précédente (démarrage, peu de données)
-      let prevExtra = 0, prevCount = 0;
-      for (let dd = 0; dd < workDaysPerWeek; dd++) {
-        const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() - 7 + dd);
-        const k = localDK(dt);
-        const e = days[k];
-        if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
-      }
-      weeklyExtra = prevCount >= 3 ? prevExtra : 0;
+      // Fallback démarrage
+      weeklyExtra = prevWeekFull !== null ? prevWeekFull : 0;
     }
     const avgExtra7    = weeklyExtra / workDaysPerWeek; // FIX CCN : workDaysPerWeek au lieu de 5 fixe
     const _ccnR        = _dteGetCCNRules();
