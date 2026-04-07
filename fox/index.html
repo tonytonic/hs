@@ -3961,14 +3961,17 @@ function _buildDailyLoop5(s, h, todayOT) {
     const year = now.getFullYear().toString();
     const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+year)||'{}');
     const m1Raw = JSON.parse(localStorage.getItem('DATA_REPORT_'+year)||'{}');
-    // Vérifier si un jour de cette semaine est en vacances M4 ou absent M1
+    // Vérifier si AU MOINS 5 jours sur 7 sont en vacances/repos (M4 ou absent M1)
+    // Moins de 5 jours = pas une vraie semaine de vacances (ex: férié isolé)
+    let _vacDaysCount = 0;
     for (let d=0; d<7; d++) {
       const dt = new Date(now); dt.setDate(now.getDate()-((now.getDay()+6)%7)+d);
       const dk = dt.toISOString().slice(0,10);
-      if (m4Vac[dk]) { _isVacWeek = true; break; }
+      if (m4Vac[dk]) { _vacDaysCount++; continue; }
       const e = m1Raw[dk];
-      if (e && ((e.absent>=7)||(e.recup>=7))) { _isVacWeek = true; break; }
+      if (e && ((e.absent>=7)||(e.recup>=7))) { _vacDaysCount++; }
     }
+    _isVacWeek = _vacDaysCount >= 5;
   } catch(e) {}
 
   // Message vacances prioritaire — remplace toutes les alertes
