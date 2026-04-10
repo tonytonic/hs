@@ -4523,8 +4523,9 @@ function _cappedHoursForXP(years) {
       cumM1 += Math.min(CAP_YEAR, annualNet);
     } catch(e) {}
 
-    // ── M2 : CA_HS_TRACKER_V1_DATA_YYYY → { "YYYY-MM": { days: { "15": 2.5 } } } ──
+    // ── M2 : CA_HS_TRACKER_V1_DATA_YYYY — exclure jours déjà couverts par M1 ──
     try {
+      const rawM1 = JSON.parse(localStorage.getItem('DATA_REPORT_' + year) || '{}');
       const raw = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + year) || '{}');
 
       // 1. Grouper par semaine avec plafond journalier
@@ -4537,7 +4538,10 @@ function _cappedHoursForXP(years) {
           if (hours <= 0) return;
           const d = parseInt(dayStr);
           if (!d || d < 1 || d > 31) return;
-          const wk = weekKey(y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0'));
+          const dk = y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+          // M1 prioritaire : si ce jour existe dans M1, on l'ignore dans M2
+          if (rawM1[dk] !== undefined) return;
+          const wk = weekKey(dk);
           if (!weeks[wk]) weeks[wk] = 0;
           weeks[wk] += hours;
         });
@@ -4646,25 +4650,22 @@ function syncModulesAndAwardXP(source) {
     const deltaM1 = cumM1Cap - Math.max(0, _lastM1Net);
     const deltaM2 = cumM2Cap - Math.max(0, _lastM2Tot);
 
-    // Anti double-comptage : si M1 et M2 ont les mêmes jours, on prend le MAX
-    // pour éviter de créditer 2× les mêmes heures (même logique que module-reader fusion)
-    // On utilise la source primaire pour déterminer le delta pertinent
-    let totalDelta;
-    if (primary === 'M2') {
-      totalDelta = deltaM2;
-    } else if (deltaM1 !== 0) {
-      totalDelta = deltaM1;
-    } else {
-      totalDelta = deltaM2;
-    }
+    // Anti double-comptage : prendre le MAX des deux deltas
+    // M1 et M2 peuvent progresser indépendamment — on récompense le plus grand écart
+    // sans jamais cumuler les deux (évite double-crédit si même heures dans les deux modules)
+    let totalDelta = Math.max(deltaM1, deltaM2);
 
     // Sécurité : le delta ne peut jamais être négatif à cause du plafonnement
-    // (les retraits volontaires d'heures sont détectés via cumM1Cap < _lastM1Net
-    //  UNIQUEMENT si la réduction est significative ET confirmée dans les deux sources)
-    const _isHoursRemoved = (cumM1Cap < (oldM1 - 0.5) && primary !== 'M2') ||
-                            (cumM2Cap < (oldM2 - 0.5) && primary === 'M2');
-    if (totalDelta < -0.09 && !_isHoursRemoved) {
-      totalDelta = 0; // faux négatif lié au plafonnement ou rechargement → ignorer
+    // Détection suppression : indépendante par module
+    const _isM1Removed = cumM1Cap < (oldM1 - 0.5);
+    const _isM2Removed = cumM2Cap < (oldM2 - 0.5);
+    const _isHoursRemoved = _isM1Removed || _isM2Removed;
+
+    // Si suppression M1 : appliquer le delta M1 négatif même si M2 ne bouge pas
+    if (_isM1Removed && deltaM1 < -0.09) totalDelta = deltaM1;
+    else if (_isM2Removed && deltaM2 < -0.09) totalDelta = deltaM2;
+    else if (totalDelta < -0.09 && !_isHoursRemoved) {
+      totalDelta = 0; // faux négatif → ignorer
     }
 
     console.log('🦊 XP delta : M1='+deltaM1.toFixed(2)+'h M2='+deltaM2.toFixed(2)+'h → '+totalDelta.toFixed(2)+'h (src:'+primary+')');
@@ -4975,7 +4976,12 @@ function startSyncPolling() {
     const year = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
     const m1 = localStorage.getItem('DATA_REPORT_' + year) || '';
     const m2 = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + year) || '';
-    return m1.length + '|' + m2.length;
+    // Checksum simple sur le contenu (pas seulement la longueur)
+    // évite de rater les modifications de valeurs sans changement de taille
+    let h = 0;
+    const s = m1 + '|' + m2;
+    for (let i = 0; i < s.length; i++) { h = ((h << 5) - h + s.charCodeAt(i)) | 0; }
+    return h;
   }
   let _lastDataHash = _m1m2Hash();
   setInterval(() => {
