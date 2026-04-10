@@ -8546,10 +8546,14 @@ function renderEvolutionChart(mode) {
     // En mode semaine : seuils directs (HS/sem)
     // En mode mois    : normaliser par 4.33 semaines avant de comparer
     const valNorm = mode === 'month' ? p.val / 4.33 : p.val;
-    const col = valNorm >= 13 ? '#E53935' : valNorm >= 8 ? '#FF8C42' : '#4CAF50';
-    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.val > 0 ? 3 : 2}" fill="${col}" stroke="#0d0d1a" stroke-width="1.5">
-      <title>${p.fullLabel} : ${_fmtH(p.val)} sup</title>
-    </circle>`;
+    const col = p.isVac ? '#1D9E75' : valNorm >= 13 ? '#E53935' : valNorm >= 8 ? '#FF8C42' : '#4CAF50';
+    const title = p.isVac
+      ? `${p.fullLabel} : 🌴 Congé / Vacances${p.val > 0 ? ' (+' + _fmtH(p.val) + ' sup)' : ''}`
+      : `${p.fullLabel} : ${_fmtH(p.val)} sup`;
+    const shape = p.isVac
+      ? `<rect x="${(p.x - 3.5).toFixed(1)}" y="${(p.y - 3.5).toFixed(1)}" width="7" height="7" rx="1" fill="${col}" stroke="#0d0d1a" stroke-width="1.5"><title>${title}</title></rect>`
+      : `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${p.val > 0 ? 3 : 2}" fill="${col}" stroke="#0d0d1a" stroke-width="1.5"><title>${title}</title></circle>`;
+    return shape;
   }).join('')}
 
   <!-- Labels X -->
@@ -8561,11 +8565,12 @@ function renderEvolutionChart(mode) {
   // Légende
   if (legend) {
     legend.innerHTML = [
-      { col:'#4CAF50', label:'Normal (<8h sup)' },
-      { col:'#FF8C42', label:'Vigilance (8-13h sup)' },
-      { col:'#E53935', label:'Alerte (>13h sup)' },
+      { col:'#4CAF50', label:'Normal (<8h sup)', shape:'circle' },
+      { col:'#FF8C42', label:'Vigilance (8-13h sup)', shape:'circle' },
+      { col:'#E53935', label:'Alerte (>13h sup)', shape:'circle' },
+      { col:'#1D9E75', label:'Congé / Vacances', shape:'square' },
     ].map(l => `<span style="display:flex;align-items:center;gap:4px;font-size:0.65rem;color:#666;">
-      <span style="width:8px;height:8px;border-radius:50%;background:${l.col};flex-shrink:0;"></span>${l.label}
+      <span style="width:8px;height:8px;border-radius:${l.shape==='square'?'2px':'50%'};background:${l.col};flex-shrink:0;"></span>${l.label}
     </span>`).join('');
   }
 }
@@ -8593,10 +8598,18 @@ function _buildMonthData() {
         });
       }
     } catch(e) {}
+    // Compter les jours vacances M4 pour ce mois
+    let vacDays = 0;
+    try {
+      const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + y) || '{}');
+      Object.keys(vac).forEach(dk => { if (dk.startsWith(mk)) vacDays++; });
+    } catch(e) {}
     points.push({
       val: Math.round(total * 10) / 10,
       label: d.toLocaleDateString('fr-FR', {month:'short'}),
-      fullLabel: d.toLocaleDateString('fr-FR', {month:'long', year:'numeric'})
+      fullLabel: d.toLocaleDateString('fr-FR', {month:'long', year:'numeric'}),
+      isVac: vacDays >= 5,
+      vacDays
     });
   }
   return { points };
@@ -8615,14 +8628,40 @@ function _buildWeekData() {
     const wk = mon.toISOString().slice(0,10);
     byWeek[wk] = (byWeek[wk] || 0) + extra;
   });
+  // Ajouter les semaines vacances M4 (même si 0 HS)
+  const vacWeeksSet = new Set();
+  try {
+    const yr2 = new Date().getFullYear();
+    for (let yy = yr2 - 1; yy <= yr2; yy++) {
+      const vac2 = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yy) || '{}');
+      Object.keys(vac2).forEach(dk => {
+        const dv = new Date(dk + 'T12:00:00');
+        const monv = new Date(dv); monv.setDate(dv.getDate() - ((dv.getDay()||7) - 1));
+        const wkv = monv.toISOString().slice(0,10);
+        vacWeeksSet.add(wkv);
+        if (!byWeek[wkv]) byWeek[wkv] = 0;
+      });
+    }
+  } catch(e) {}
   const weeks = Object.keys(byWeek).sort().slice(-12);
   weeks.forEach(wk => {
     const d = new Date(wk + 'T12:00:00');
     const weekNum = Math.ceil((((d - new Date(d.getFullYear(),0,1))/86400000)+1)/7);
+    // Compter jours vacances dans cette semaine
+    let wkVacDays = 0;
+    try {
+      const vw = JSON.parse(localStorage.getItem('DTE_VACANCES_' + d.getFullYear()) || '{}');
+      for (let dd = 0; dd < 7; dd++) {
+        const dt = new Date(d); dt.setDate(d.getDate() + dd);
+        if (vw[dt.toISOString().slice(0,10)]) wkVacDays++;
+      }
+    } catch(e) {}
     points.push({
       val: Math.round((byWeek[wk]||0) * 10) / 10,
       label: 'S' + weekNum,
-      fullLabel: 'Sem. ' + weekNum + ' ' + d.getFullYear()
+      fullLabel: 'Sem. ' + weekNum + ' ' + d.getFullYear(),
+      isVac: wkVacDays >= 5,
+      vacDays: wkVacDays
     });
   });
   return { points };
@@ -14637,6 +14676,12 @@ function renderHeatmap(year) {
         if (!dayData[dk]) dayData[dk] = { extra: Number(hrs)||0, hasData: true };
       });
     });
+    // M4 — jours vacances/congés
+    const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + year) || '{}');
+    Object.keys(m4Vac).forEach(dk => {
+      if (!dayData[dk]) dayData[dk] = { extra: 0, hasData: false };
+      dayData[dk].isVac = true;
+    });
   } catch(e) {}
 
   // Stats
@@ -14658,6 +14703,7 @@ function renderHeatmap(year) {
 
   // Couleur d'un jour
   function dayColor(dk) {
+    if (dayData[dk]?.isVac) return '#0F6E56'; // vacances M4
     if (!dayData[dk]?.hasData) return '#1a1a2e'; // vide
     const extra = dayData[dk].extra || 0;
     const total = 7 + extra;
@@ -14732,8 +14778,11 @@ function renderHeatmap(year) {
       else               { fill = dayColor(d.dk); opacity = 1; }
 
       const extra = dayData[d.dk]?.extra || 0;
+      const isVacDay = !!dayData[d.dk]?.isVac;
       const ttip = d.inYear && !d.future
-        ? `${d.dk} : ${extra > 0 ? '+' + extra + 'h sup (total ' + (7+extra) + 'h)' : 'Jour saisi — 0h sup'}`
+        ? isVacDay
+          ? `${d.dk} : 🌴 Congé / Vacances (M4)`
+          : `${d.dk} : ${extra > 0 ? '+' + extra + 'h sup (total ' + (7+extra) + 'h)' : 'Jour saisi — 0h sup'}`
         : d.dk;
 
       svg += `<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="2" fill="${fill}" opacity="${opacity}"
@@ -14747,11 +14796,12 @@ function renderHeatmap(year) {
   container.innerHTML = '<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">' + svg + '</div>';
 
   // Stats
+  const vacDays = Object.keys(dayData).filter(dk => dk.startsWith(year) && dayData[dk]?.isVac).length;
   if (statsEl) {
     const cols = [
       { icon:'📅', val: daysWithData + ' j', label: 'avec données' },
       { icon:'⏱', val: _fmtH(totalHS), label: 'sup totales' },
-      { icon:'📊', val: pctFilled + '%', label: 'suivi ' + year },
+      { icon:'🌴', val: vacDays + ' j', label: 'congés M4' },
     ];
     statsEl.innerHTML = cols.map(c => `
       <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center;">
