@@ -4154,7 +4154,17 @@ function kitsuneNarrateOvertime(deltaH, source) {
     // ── Popup verrouillé sur la journée (recalculé seulement si HS changent ou nouveau jour) ──
     const _now2       = new Date();
     const _todayStr   = _now2.getFullYear() + '-' + String(_now2.getMonth()+1).padStart(2,'0') + '-' + String(_now2.getDate()).padStart(2,'0');
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10);
+    let _vacKeyCount = 0;
+    try {
+      const _vkYr = new Date().getFullYear().toString();
+      const _vkData = JSON.parse(localStorage.getItem('DTE_VACANCES_' + _vkYr) || '{}');
+      const _vkNow = new Date();
+      for (let _d = 0; _d < 7; _d++) {
+        const _dt = new Date(_vkNow); _dt.setDate(_vkNow.getDate() - ((_vkNow.getDay()+6)%7) + _d);
+        if (_vkData[_dt.toISOString().slice(0,10)]) _vacKeyCount++;
+      }
+    } catch(e) {}
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount;
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
