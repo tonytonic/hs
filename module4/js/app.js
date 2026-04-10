@@ -689,6 +689,9 @@ document.addEventListener('DOMContentLoaded', function () {
   runAnalysis();
   scheduleEndOfDaySync();
   showWelcomeIfNeeded();
+  if (localStorage.getItem('DTE_WELCOMED')) {
+    setTimeout(() => { if (DTE.checkin) DTE.checkin.checkIfNeeded(); }, 1200);
+  }
 
   // ── LIVE SYNC — re-analyse toutes les 3s
   let _syncHash = '';
