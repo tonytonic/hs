@@ -2672,7 +2672,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const isAbsM1 = !!(e && ((e.absent>=7)||(e.recup>=7)));
       if (isVacM4 || isAbsM1) { _vacCount++; }
     }
-    const vacFound = _vacCount >= 5;
+    const vacFound = _vacCount >= 1;
     if (vacFound) {
       return {
         titre: '🌴 Semaine de congés en cours',
@@ -4354,10 +4354,8 @@ function openPopup(id) {
     // Forcer mise à jour taille PNJ
     const lvl = typeof xpSystem !== 'undefined' ? (xpSystem.level || 1) : 1;
     if (typeof updatePNJLevel === 'function') updatePNJLevel(lvl);
-    
-    // Lire le cache tel quel — le poll 1s le maintient à jour
-    // Pas de re-narration ici (évite d'écraser la dernière narration avec delta=0)
-    refreshKitsunePopup();
+    // Recalcul complet à chaque ouverture (évite contenu périmé après suppression congé)
+    try { kitsuneNarrateOvertime(0, 'popup-open'); } catch(_e) { refreshKitsunePopup(); }
     refreshPatternsSection();
     renderEvolutionChart(_chartMode);
     renderAnnualComparison(); 
