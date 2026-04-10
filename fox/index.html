@@ -2672,7 +2672,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const isAbsM1 = !!(e && ((e.absent>=7)||(e.recup>=7)));
       if (isVacM4 || isAbsM1) { _vacCount++; }
     }
-    const vacFound = _vacCount >= 1;
+    const vacFound = _vacCount >= 5;
     if (vacFound) {
       return {
         titre: '🌴 Semaine de congés en cours',
@@ -8354,7 +8354,14 @@ function detectPatterns() {
       const nextIdx = weekSorted.indexOf(w) + 1;
       if (nextIdx >= weekSorted.length) return false;
       const nextWk = weekSorted[nextIdx];
-      // Semaine vacances = semaine de repos
+      // Vérifier si une semaine vacances est intercalée entre w et nextWk
+      const wDate = new Date(w + 'T12:00:00');
+      const nextDate = new Date(nextWk + 'T12:00:00');
+      for (let d = new Date(wDate); d < nextDate; d.setDate(d.getDate() + 7)) {
+        const wkKey = new Date(d).toISOString().slice(0,10);
+        if (vacWeekSet.has(wkKey)) return false; // vacances intercalées = repos
+      }
+      // Semaine vacances directe = repos
       if (vacWeekSet.has(nextWk)) return false;
       return (byWeek[nextWk] || 0) > 5; // pas de répit
     });
