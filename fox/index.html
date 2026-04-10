@@ -8601,8 +8601,9 @@ function _buildMonthData() {
     // Compter les jours vacances M4 pour ce mois
     let vacDays = 0;
     try {
+      const _mdToday = new Date().toISOString().slice(0,10);
       const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + y) || '{}');
-      Object.keys(vac).forEach(dk => { if (dk.startsWith(mk)) vacDays++; });
+      Object.keys(vac).forEach(dk => { if (dk.startsWith(mk) && dk <= _mdToday) vacDays++; });
     } catch(e) {}
     points.push({
       val: Math.round(total * 10) / 10,
@@ -8633,8 +8634,10 @@ function _buildWeekData() {
   try {
     const yr2 = new Date().getFullYear();
     for (let yy = yr2 - 1; yy <= yr2; yy++) {
+      const _wdToday = new Date().toISOString().slice(0,10);
       const vac2 = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yy) || '{}');
       Object.keys(vac2).forEach(dk => {
+        if (dk > _wdToday) return;
         const dv = new Date(dk + 'T12:00:00');
         const monv = new Date(dv); monv.setDate(dv.getDate() - ((dv.getDay()||7) - 1));
         const wkv = monv.toISOString().slice(0,10);
@@ -8650,10 +8653,12 @@ function _buildWeekData() {
     // Compter jours vacances dans cette semaine
     let wkVacDays = 0;
     try {
+      const _wkToday = new Date().toISOString().slice(0,10);
       const vw = JSON.parse(localStorage.getItem('DTE_VACANCES_' + d.getFullYear()) || '{}');
       for (let dd = 0; dd < 7; dd++) {
         const dt = new Date(d); dt.setDate(d.getDate() + dd);
-        if (vw[dt.toISOString().slice(0,10)]) wkVacDays++;
+        const dtk = dt.toISOString().slice(0,10);
+        if (vw[dtk] && dtk <= _wkToday) wkVacDays++;
       }
     } catch(e) {}
     points.push({
@@ -14676,9 +14681,11 @@ function renderHeatmap(year) {
         if (!dayData[dk]) dayData[dk] = { extra: Number(hrs)||0, hasData: true };
       });
     });
-    // M4 — jours vacances/congés
+    // M4 — jours vacances/congés (passés et aujourd'hui uniquement)
+    const _hmToday = new Date().toISOString().slice(0,10);
     const m4Vac = JSON.parse(localStorage.getItem('DTE_VACANCES_' + year) || '{}');
     Object.keys(m4Vac).forEach(dk => {
+      if (dk > _hmToday) return;
       if (!dayData[dk]) dayData[dk] = { extra: 0, hasData: false };
       dayData[dk].isVac = true;
     });
