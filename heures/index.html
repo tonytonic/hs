@@ -1851,7 +1851,19 @@ function protectFunctions(){
       <div class="wiz-question">🇫🇷 Configurer pour la France ?</div>
       <p class="wiz-hint">Ces options sont recommandées pour les contrats relevant du droit français.</p>
       <label class="wiz-check-row"><input type="checkbox" id="wizImportFeries" checked><span>🎌 Importer les jours fériés officiels (API Gouvernement)</span></label>
-      <label class="wiz-check-row"><input type="checkbox" id="wizAutoFerie" checked><span>⚙️ Mode férié automatique : appliquer −7h les jours fériés en semaine</span></label>
+
+      <div style="background:#f8f9fa;border-radius:12px;border:1px solid #e0e0e0;overflow:hidden;margin-top:4px;">
+        <label class="wiz-check-row" style="border-bottom:1px solid #e0e0e0;margin:0;padding:12px 14px;cursor:pointer;">
+          <input type="checkbox" id="wizAutoFerie" checked>
+          <span>
+            <b>Calcul basé sur les heures réellement travaillées (hors jours fériés)</b>
+            <span style="display:block;font-size:12px;color:#888;margin-top:3px;">👉 Selon le Code du travail — Art. L3121-29 : les heures supplémentaires se calculent sur les heures réellement travaillées.</span>
+          </span>
+        </label>
+        <div style="padding:10px 14px;font-size:12px;color:#aaa;background:#f0f0f0;">
+          <b style="color:#555;">Si décoché :</b> La semaine est considérée comme complète même les jours fériés — selon la jurisprudence Cass. Soc. 2012 : certains accords d'entreprise peuvent intégrer les jours fériés chômés dans l'assiette de calcul des HS.
+        </div>
+      </div>
       <div class="wiz-nav">
         <button onclick="wizGoTo(3)" style="flex:0 0 auto;width:auto;padding:8px 16px;">← Retour</button>
         <button class="kitsune-btn" onclick="wizGoTo(5)">Suivant →</button>
