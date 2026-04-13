@@ -1296,7 +1296,11 @@ class DTEEngine {
         }
         // Stress ressenti → stress +
         if (ci.stress !== undefined) {
-          checkinBoost.stress += (ci.stress / 4) * 0.15;  // ANACT — atténué : subjectif, ne remplace pas le modèle biologique
+          // FIX : centré sur 2 ("Modéré" = baseline neutre)
+          // Avant : (ci.stress/4)*0.15 → toujours ≥ 0 → "Aucun"=0 (aucun effet), "Léger"=+0.04 (monte le stress !)
+          // Après : ((ci.stress-2)/4)*0.15 → "Aucun"=-0.075, "Léger"=-0.04, "Modéré"=0, "Élevé"=+0.04, "Critique"=+0.075
+          // Active aussi checkinStressFactor=0.75 pour "Aucun" et "Léger" (réduction multiplicative en cascade)
+          checkinBoost.stress += ((ci.stress - 2) / 4) * 0.15;  // ANACT — bidirectionnel, centré sur Modéré
         }
         // Douleurs → fatigue musculo +
         if (ci.pain !== undefined && ci.pain > 0) {
