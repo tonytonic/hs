@@ -1108,13 +1108,16 @@ class DTEEngine {
           hasRealEntry = true;
         }
       }
-      // FIX SIGMA : semaine courante (w=0) incomplète → seuil + HS réelles faites
-      // Cohérent avec weeklyExtra conservative : pas d'extrapolation agressive
-      // Lundi +2h → 37h (pas 45h), mercredi +6h → 41h — sigma réaliste
+      // FIX SIGMA : toute semaine incomplète → seuil + HS réelles faites
+      // FIX BUG VARIAB : le correctif était limité à w=0 (semaine en cours)
+      // → les semaines passées avec 3-4 jours de données donnaient wt = baseJourCCN × daysInWeek
+      //   ex : 3 × 7.8h = 23.4h au lieu de ~41h → sigma artificiellement gonflé (7.8h → irréaliste)
+      // Principe ANACT : jours sans entrée = heures contractuelles sans HS (pas d'absence connue)
+      // → pour toute semaine partielle : wtFinal = seuil CCN + HS réelles cumulées
       let wtFinal = wt;
-      if (w === 0 && daysInWeek > 0 && daysInWeek < workDaysPerWeek && hasRealEntry) {
+      if (daysInWeek > 0 && daysInWeek < workDaysPerWeek && hasRealEntry) {
         // wt contient baseJourCCN × daysInWeek + HS réelles
-        // On recalcule : seuil CCN + HS réelles uniquement (jours restants à 0 HS)
+        // On recalcule : seuil CCN + HS réelles uniquement (jours sans entrée → 0 HS assumé)
         const hsReelles = wt - (baseJourCCN * daysInWeek);
         wtFinal = _ccnSeuilW + hsReelles;
       }
