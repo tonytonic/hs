@@ -954,19 +954,34 @@ class DTEEngine {
       if (w === 0 && count7 >= 1 && count7 < workDaysPerWeek) {
         weekH = _ccnSeuilW + weeklyExtraEffective; // weeklyExtraEffective = sumExtra7 (HS réelles)
       }
-      // Détecter si la semaine est une semaine de repos M1 (recup/absent ≥ 7h sur tous jours)
-      // → traiter comme semaine vacances pour la réduction de cumulWeeks
-      const isM1RestWeekP1 = Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
-        const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
-        const ek = localDK(dt2); const ev = days[ek];
-        return ev && ((ev.absent >= 7) || (ev.recup >= 7));
-      });
+      // FIX PROPORTIONNEL (Meijman & Mulder 1998 / INRS) :
+      // Avant : isM1RestWeekP1 avec .some() → 1 jour absent = toute la semaine = vacances (faux)
+      // Avant : contribution binaire +1 → semaine avec férié+3j HS = même que semaine normale
+      // Après : isM1RestWeekP1 requiert majorité des jours absents (≥ ceil(workDays/2))
+      // Après : contribution proportionnelle aux HS réelles → semaine courte avec HS ≠ semaine normale
+      const isM1RestWeekP1 = (() => {
+        let restDays = 0;
+        for (let dd2 = 0; dd2 < workDaysPerWeek; dd2++) {
+          const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd2);
+          const ek = localDK(dt2); const ev = days[ek];
+          if (ev && ((ev.absent >= 7) || (ev.recup >= 7))) restDays++;
+        }
+        return restDays >= Math.ceil(workDaysPerWeek / 2); // majorité = repos réel
+      })();
       const isVacWeekP1 = isM1RestWeekP1 || Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
         const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
         return vacances[localDK(dt2)];
       });
-      if (hasAnyDay && !isVacWeekP1 && weekH > D.H_OPTIMAL) {
-        cumulWeeks = Math.round((cumulWeeks + 1) * 1e9) / 1e9;
+      if (hasAnyDay && !isVacWeekP1) {
+        // Contribution proportionnelle aux HS réelles de la semaine
+        // hsReelles = heures au-delà du contrat sur les jours effectivement travaillés
+        // Normalisé sur 7h HS/sem = contribution max (forte surcharge : 5j × 1.4h)
+        // Exemples : 3j × 2h HS = 6h → 0.86 | 5j × 2h = 10h → 1.0 | 0 HS = 0
+        const hsReelles = Math.max(0, weekH - (daysLogged > 0 ? daysLogged * baseJourCCN : _ccnSeuilW));
+        const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20)); // 35×0.20=7h = surcharge max normalisée
+        if (contribution > 0) {
+          cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
+        }
       }
     }
 
@@ -987,12 +1002,17 @@ class DTEEngine {
         weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
         hasAnyDay = true;
       }
-      // Détecter repos M1 (recup/absent ≥ 7h) comme vacances pour la réduction cumulWeeks
-      const isM1RestWeekP2 = Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
-        const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
-        const ek = localDK(dt2); const ev = days[ek];
-        return ev && ((ev.absent >= 7) || (ev.recup >= 7));
-      });
+      // FIX : isM1RestWeekP2 requiert majorité des jours absents (même logique que Passe 1)
+      // 1 jour absent seul (ex: lundi férié marqué absent) ne = pas semaine de vacances
+      const isM1RestWeekP2 = (() => {
+        let restDays = 0;
+        for (let dd2 = 0; dd2 < workDaysPerWeek; dd2++) {
+          const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd2);
+          const ek = localDK(dt2); const ev = days[ek];
+          if (ev && ((ev.absent >= 7) || (ev.recup >= 7))) restDays++;
+        }
+        return restDays >= Math.ceil(workDaysPerWeek / 2);
+      })();
       const isVacWeekP2 = isM1RestWeekP2 || Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
         const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
         return vacances[localDK(dt2)];
