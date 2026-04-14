@@ -188,7 +188,9 @@ class DTESimulator {
     const _cvNow = (s.cvRisk || 0) / 100;
     let cvAcc = Math.max(0, _cvNow - (s._f||0) * 0.12 - (s._s||0) * 0.08);
 
-    const weeklyH = (D.BASE_JOUR + hoursPerDay) * 5;
+    // FIX VERSIONING : workDays depuis la config actuelle (pas hardcodé 5)
+    const _simWorkDays = restDays ? (7 - restDays.length) : 5;
+    const weeklyH = (D.BASE_JOUR + hoursPerDay) * _simWorkDays;
     const today   = new Date();
     const timeline = [];
     let totFat = 0, totStr = 0, totPerf = 0;
@@ -204,10 +206,17 @@ class DTESimulator {
       const hsH       = (isRest || isVacance) ? 0 : hoursPerDay;
       const totalH    = (isRest || isVacance) ? 0 : D.BASE_JOUR + hsH;
 
-      // Mise à jour semaines cumulées (J.Occup.Health : 6 mois)
+      // Mise à jour semaines cumulées — FIX proportionnel (aligné sur dte-engine.js)
+      // Avant : +1 binaire si weeklyH > seuil → semaine courte = même poids que semaine pleine
+      // Après : contribution proportionnelle aux HS réelles (hsH × _simWorkDays / 7h normalisé)
       if (i > 0 && i % 7 === 0) {
-        if (weeklyH > BIO.H_OPTIMAL) cumulWeeks++;
-        else cumulWeeks = Math.max(0, cumulWeeks - 0.3); // décroissance lente
+        if (weeklyH > BIO.H_OPTIMAL) {
+          const _hsReellesSim = Math.max(0, weeklyH - BIO.H_OPTIMAL);
+          const _contribSim   = Math.min(1, _hsReellesSim / (BIO.H_OPTIMAL * 0.20));
+          cumulWeeks += _contribSim;
+        } else {
+          cumulWeeks = Math.max(0, cumulWeeks - 0.12); // décroissance lente (aligné engine)
+        }
       }
 
       // Facteur cumulatif — J.Occup.Health 2021, aligné sur dte-engine.js
