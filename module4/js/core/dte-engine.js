@@ -67,21 +67,68 @@ function _dteGetCCNRules() {
   return { seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50, contingent:220, debutSemaine:1 };
 }
 
-/* ── Jours de repos configurés (HCR : lun/mar, BTP : sam/dim, etc.) ── */
+/* ── Jours de repos configurés — système versionné ── */
+// DTE_REST_DAYS_VERSIONED : [{depuis:"YYYY-MM-DD", jours:[0,6]}, ...]
+// Chaque entrée s'applique à partir de sa date jusqu'à la suivante.
+// Garantit que l'historique passé n'est pas recalculé quand on change la config.
 let _restDaysCache = null;
+let _restDaysVersionedCache = null;
+
 function _getRestDaysSet() {
   if (_restDaysCache) return _restDaysCache;
   try {
-    const raw = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || 'null');
-    if (Array.isArray(raw) && raw.length > 0) {
-      _restDaysCache = new Set(raw);
-      return _restDaysCache;
-    }
+    // Lire la config courante (dernière entrée versionnée ou DTE_REST_DAYS)
+    const versioned = _getRestDaysVersioned();
+    const current = versioned[versioned.length - 1].jours;
+    _restDaysCache = new Set(current);
+    return _restDaysCache;
   } catch(_) {}
-  _restDaysCache = new Set([0, 6]); // défaut : dim + sam
+  _restDaysCache = new Set([0, 6]);
   return _restDaysCache;
 }
+
+function _getRestDaysVersioned() {
+  if (_restDaysVersionedCache) return _restDaysVersionedCache;
+  try {
+    const raw = JSON.parse(localStorage.getItem('DTE_REST_DAYS_VERSIONED') || 'null');
+    if (Array.isArray(raw) && raw.length > 0) {
+      // Trier par date croissante
+      raw.sort((a,b) => a.depuis.localeCompare(b.depuis));
+      _restDaysVersionedCache = raw;
+      return _restDaysVersionedCache;
+    }
+  } catch(_) {}
+  // Fallback : lire DTE_REST_DAYS (format ancien) comme config unique depuis toujours
+  try {
+    const legacy = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || 'null');
+    if (Array.isArray(legacy) && legacy.length > 0) {
+      _restDaysVersionedCache = [{ depuis: '2000-01-01', jours: legacy }];
+      return _restDaysVersionedCache;
+    }
+  } catch(_) {}
+  _restDaysVersionedCache = [{ depuis: '2000-01-01', jours: [0, 6] }];
+  return _restDaysVersionedCache;
+}
+
+// Retourne les jours de repos actifs à une date donnée (objet Date)
+function _getRestDaysAt(date) {
+  const versioned = _getRestDaysVersioned();
+  const dk = date.toISOString().slice(0,10);
+  let active = versioned[0].jours;
+  for (const entry of versioned) {
+    if (entry.depuis <= dk) active = entry.jours;
+    else break;
+  }
+  return new Set(active);
+}
+
+// Nombre de jours ouvrés par semaine à une date donnée
+function _workDaysAt(date) {
+  return 7 - _getRestDaysAt(date).size;
+}
+
 function _isRestDow(dow) { return _getRestDaysSet().has(dow); }
+function _isRestDowAt(dow, date) { return _getRestDaysAt(date).has(dow); }
 
 /* ── CONSTANTES DE BASE ─────────────────────────────────────────── */
 const D = {
@@ -478,6 +525,7 @@ class DTEEngine {
 
   analyze() {
     _restDaysCache = null; // re-lire les jours de repos à chaque analyse
+    _restDaysVersionedCache = null; // invalider le cache versionné
     const raw    = this._readAll();
     const norm   = this._normalize(raw);
     const scores = this._scores(norm, raw);
@@ -741,7 +789,7 @@ class DTEEngine {
     for (let i = 0; i < 28; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      if (_isRestDow(dow)) continue; // ignorer jours de repos configurés
+      if (_isRestDowAt(dow, d)) continue; // FIX VERSIONING : config active à cette date historique
       const k = localDK(d);
       if (specialDays[k] === 'ferie') continue;
       const e = days[k];
@@ -754,9 +802,14 @@ class DTEEngine {
       sumExtra += isVacDay ? 0 : (e ? (e.extra || 0) : 0);
       countWorkDays28++;
     }
-    // avgExtraPerDay28 = HS/jour moyen sur 4 semaines → weeklyExtra = HS/sem = avg × jours ouvrés/sem
+    // avgExtraPerDay28 = HS/jour moyen sur 4 semaines
+    // FIX VERSIONING : projection sur 5j standard (pas workDaysPerWeek courant)
+    // Évite que changer de config (ex: 5j→3j) gonfle la moyenne historique
     const avgExtraPerDay28 = countWorkDays28 > 0 ? sumExtra / countWorkDays28 : 0;
-    const weeklyExtra28 = avgExtraPerDay28 * workDaysPerWeek;
+    const _stdDays = Math.max(3, Math.min(7, countWorkDays28 > 0
+      ? Math.round(countWorkDays28 / 4) // jours ouvrés réels/semaine sur 4 sem
+      : workDaysPerWeek));
+    const weeklyExtra28 = avgExtraPerDay28 * _stdDays;
 
     // Semaine civile courante (lun → aujourd'hui)
     // CORRECTION : on ne compte un jour que s'il a une ENTRÉE RÉELLE dans M1/M2
@@ -805,8 +858,11 @@ class DTEEngine {
     }
     const prevWeekFull = prevCount >= 3 ? prevExtra : null; // semaine précédente si au moins 3j saisis
 
-    if (count7 >= 1) {
-      // Semaine en cours avec données → HS réelles faites (progression jour par jour visible)
+    if (count7 >= 1 || sumExtra7 > 0) {
+      // FIX BUG 1 : des HS saisies cette semaine → utiliser sumExtra7
+      // Avant : count7=0 (pas de saisie aujourd'hui) → tombait sur weeklyExtra28 (moyenne 28j)
+      // → score chutait de 72 à 54 même si lundi et mardi avaient des HS saisies
+      // Après : sumExtra7 > 0 suffit — les jours passés de la semaine sont pris en compte
       weeklyExtra = sumExtra7;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
@@ -819,7 +875,12 @@ class DTEEngine {
       // Fallback démarrage
       weeklyExtra = prevWeekFull !== null ? prevWeekFull : 0;
     }
-    const avgExtra7    = weeklyExtra / workDaysPerWeek; // FIX CCN : workDaysPerWeek au lieu de 5 fixe
+    // FIX BUG 2 : avgExtra7 normalisé sur workDaysPerWeek STANDARD (5j)
+    // Avant : avgExtra7 = weeklyExtra / workDaysPerWeek → avec 3j ouvrés configurés,
+    // même HS → avgExtra7 plus élevé → fatigue gonflée artificiellement
+    // Après : toujours divisé par 5 (semaine standard) pour comparabilité entre configs
+    const _stdWorkDays = 5; // base standard pour normalisation
+    const avgExtra7    = weeklyExtra / _stdWorkDays;
     const _ccnR        = _dteGetCCNRules();
     const _baseJourCCN = _ccnR.seuil / workDaysPerWeek; // 35/5=7h ou 39/5=7.8h selon accord
     const avgH7        = _baseJourCCN + avgExtra7;
