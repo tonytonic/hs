@@ -852,15 +852,16 @@ class DTEEngine {
       consec++;
     }
     // [2] consecOT (médical chronique) : jours ouvrés AVEC heures sup
-    //     LOGIQUE DE RÉCUPÉRATION GRADUÉE (Sonnentag 2003 / Meijman & Mulder 1998) :
-    //     - Weekend (sam+dim) → −1 par jour (−2 total) — symétrique avec 1 récup
-    //     - 1 récup / absent  → −1 (réduction partielle, pas reset : 1j < 2j WE)
-    //     - 2+ récups consécutifs → reset complet
-    //     - Vacances déclarées    → reset complet
-    //     - 2 semaines sans HS   → reset complet
+    //     LOGIQUE DE RÉCUPÉRATION (Sonnentag 2003 / Meijman & Mulder 1998) :
+    //     - Weekend         → continue (traversé sans casser ni soustraire)
+    //     - Férié           → continue (pause neutre)
+    //     - 1 récup/absent  → continue (1j seul insuffisant pour reset — symétrique weekend)
+    //     - 2 récups consécutifs → break (reset complet : 2j récup + 2j WE = 4j repos total)
+    //     - Vacances déclarées   → break (reset complet)
+    //     - 2 semaines sans HS   → break (reset complet)
     let consecOT = 0;
-    let blankWeeks   = 0;
-    let consecRest   = 0; // jours récup/absent consécutifs
+    let blankWeeks = 0;
+    let consecRest = 0; // compteur récup/absent consécutifs (hors weekend)
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
@@ -870,22 +871,17 @@ class DTEEngine {
       // Vacances déclarées = reset complet
       if (vacances[k]) break;
 
-      // Weekend : réduction partielle −1 par jour
-      if (_isRestDow(dow)) {
-        consecOT = Math.max(0, consecOT - 1);
-        consecRest = 0;
-        continue;
-      }
+      // Weekend = traversé sans effet sur le compteur
+      if (_isRestDow(dow)) { continue; }
 
       // Férié = pause neutre
       if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
 
-      // Récup / absent : réduction graduée
+      // Récup / absent : 1j seul = continue, 2j consécutifs = reset
       if (e && (e.absent > 0 || e.recup > 0)) {
         consecRest++;
         if (consecRest >= 2) break; // 2j consécutifs = reset complet
-        consecOT = Math.max(0, consecOT - 1); // 1 seul jour = −1
-        continue;
+        continue; // 1 seul jour = traversé (comme un jour de weekend supplémentaire)
       }
       consecRest = 0;
 
