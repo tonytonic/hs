@@ -764,6 +764,15 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window._fullSync) window._fullSync();
     else if (DTE._state) renderPredictions(DTE._state);
     DTE.notifs.show('Jours de repos mis à jour', 'info', '📅');
+    // Avertissement : modification rétroactive sur tout l'historique biologique
+    setTimeout(() => {
+      DTE.notifs.show(
+        '⚠️ Impact historique',
+        'warning',
+        '⚠️',
+        'Ces jours s\'appliquent à tout votre historique. À modifier uniquement si votre contrat de travail a changé.'
+      );
+    }, 800);
   };
 
   window._forcSync = () => {
