@@ -584,16 +584,18 @@ document.addEventListener('DOMContentLoaded', function () {
         ? Object.fromEntries([0,1,2,3,4,5,6].map(d => [d, _savedRestArray.includes(d)]))
         : {0:true,1:false,2:false,3:false,4:false,5:false,6:true}
     );
-    // Appliquer aux 7 cases (id: dte-rest-0 à dte-rest-6)
+    // Appliquer aux 7 cases cachées (compatibilité moteur)
     for (let d = 0; d < 7; d++) {
       const cb = document.getElementById('dte-rest-' + d);
       if (cb) cb.checked = !!_restState[d];
     }
-    // Compatibilité anciens IDs sat/sun
-    const satCb = document.getElementById('dte-rest-sat');
-    const sunCb = document.getElementById('dte-rest-sun');
-    if (satCb) satCb.checked = !!_restState[6];
-    if (sunCb) sunCb.checked = !!_restState[0];
+    // Migrer vers DTE_REST_DAYS_VERSIONED si absent
+    if (!localStorage.getItem('DTE_REST_DAYS_VERSIONED')) {
+      const legacyJours = Object.entries(_restState).filter(([,v])=>v).map(([k])=>parseInt(k)).sort((a,b)=>a-b);
+      localStorage.setItem('DTE_REST_DAYS_VERSIONED', JSON.stringify([{depuis:'2000-01-01', jours:legacyJours}]));
+    }
+    // Afficher lecture seule
+    setTimeout(() => window._renderRestDisplay && window._renderRestDisplay(), 100);
 
     // PDF désactivé
   }
@@ -750,31 +752,183 @@ document.addEventListener('DOMContentLoaded', function () {
     return days.length ? days : [0];
   };
 
-  window._updateRestDays = () => {
-    // Sauvegarder les 7 cases
-    const state7 = {};
+  // ── WIZARD JOURS DE REPOS ────────────────────────────────────────
+  const _DAYS_LABELS = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  let _rwizSelection = new Set(); // jours de repos sélectionnés dans le wizard
+
+  // Lire la config courante (dernière entrée versionnée)
+  function _getCurrentRestDays() {
+    try {
+      const v = JSON.parse(localStorage.getItem('DTE_REST_DAYS_VERSIONED') || 'null');
+      if (Array.isArray(v) && v.length > 0) return new Set(v[v.length-1].jours);
+    } catch(_) {}
+    try {
+      const legacy = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || 'null');
+      if (Array.isArray(legacy)) return new Set(legacy);
+    } catch(_) {}
+    return new Set([0, 6]);
+  }
+
+  // Mettre à jour l'affichage lecture seule
+  function _renderRestDisplay() {
+    const current = _getCurrentRestDays();
+    const display = document.getElementById('dte-rest-display');
+    if (!display) return;
+    display.innerHTML = _DAYS_LABELS.map((label, dow) => {
+      const isRest = current.has(dow);
+      return `<span style="font-size:11px;padding:2px 6px;border-radius:3px;
+        background:${isRest ? 'rgba(0,255,150,0.12)' : 'rgba(255,255,255,0.04)'};
+        border:1px solid ${isRest ? 'rgba(0,255,150,0.3)' : 'rgba(255,255,255,0.1)'};
+        color:${isRest ? 'var(--sync)' : 'rgba(255,255,255,0.4)'};">
+        ${label}${isRest ? ' ✓' : ''}
+      </span>`;
+    }).join('');
+    // Sync les checkboxes cachées pour compatibilité
     for (let d = 0; d < 7; d++) {
       const cb = document.getElementById('dte-rest-' + d);
-      if (cb) state7[d] = cb.checked;
+      if (cb) cb.checked = current.has(d);
     }
-    localStorage.setItem('DTE_REST_DAYS_7', JSON.stringify(state7));
-    // DTE_REST_DAYS = tableau [0,1,6...] — FORMAT ATTENDU PAR dte-engine.js
-    const daysArray = Object.entries(state7).filter(([,v]) => v).map(([k]) => parseInt(k));
-    localStorage.setItem('DTE_REST_DAYS', JSON.stringify(daysArray.length ? daysArray : [0]));
-    if (window._fullSync) window._fullSync();
-    else if (DTE._state) renderPredictions(DTE._state);
-    DTE.notifs.show('Jours de repos mis à jour', 'info', '📅');
-    // Avertissement : modification rétroactive sur tout l'historique biologique
-    setTimeout(() => {
-      DTE.notifs.show(
-        '⚠️ Impact historique',
-        'warning',
-        '⚠️',
-        'Ces jours s\'appliquent à tout votre historique. À modifier uniquement si votre contrat de travail a changé.'
-      );
-    }, 800);
+  }
+
+  // Calculer alerte légale
+  function _rwizLegalCheck(restSet) {
+    const workDays = 7 - restSet.size;
+    if (workDays < 1) return { ok: false, msg: 'Au moins 1 jour travaillé requis.' };
+    if (workDays > 6) return { ok: false, msg: 'Au moins 1 jour de repos requis (L3132-1).' };
+    const hoursPerDay = 35 / workDays;
+    if (hoursPerDay > 10) {
+      return {
+        ok: true, warn: true,
+        msg: `⚠️ Avec ${workDays} jour${workDays>1?'s':''} travaillé${workDays>1?'s':''}, le seuil de 35h implique ${hoursPerDay.toFixed(1)}h/j — au-delà de la limite légale de 10h (L3121-18). Vérifiez votre accord d'entreprise ou votre CCN.`
+      };
+    }
+    return { ok: true, warn: false };
+  }
+
+  window._openRestWizard = () => {
+    _rwizSelection = new Set(_getCurrentRestDays());
+    const overlay = document.getElementById('rest-wizard-overlay');
+    if (overlay) overlay.style.display = 'flex';
+    _rwizGoTo(1);
   };
 
+  window._closeRestWizard = () => {
+    const overlay = document.getElementById('rest-wizard-overlay');
+    if (overlay) overlay.style.display = 'none';
+  };
+
+  window._rwizGoTo = (screen) => {
+    [1,2,3,4].forEach(s => {
+      const el = document.getElementById('rwiz-screen-' + s);
+      if (el) el.style.display = s === screen ? 'block' : 'none';
+    });
+    if (screen === 2) _rwizRenderDays();
+    if (screen === 3) {
+      // Pré-remplir date avec aujourd'hui
+      const inp = document.getElementById('rwiz-date-input');
+      if (inp && !inp.value) inp.value = new Date().toISOString().slice(0,10);
+    }
+    if (screen === 4) _rwizRenderSummary();
+  };
+
+  function _rwizRenderDays() {
+    const grid = document.getElementById('rwiz-days-grid');
+    if (!grid) return;
+    grid.innerHTML = _DAYS_LABELS.map((label, dow) => {
+      const isRest = _rwizSelection.has(dow);
+      return `<button onclick="window._rwizToggleDay(${dow})" id="rwiz-day-${dow}"
+        style="padding:6px 10px;border-radius:4px;cursor:pointer;font-size:12px;
+        font-family:var(--font-mono);letter-spacing:.05em;
+        background:${isRest ? 'rgba(0,255,150,0.15)' : 'rgba(255,255,255,0.05)'};
+        border:1px solid ${isRest ? 'rgba(0,255,150,0.4)' : 'rgba(255,255,255,0.15)'};
+        color:${isRest ? 'var(--sync)' : 'rgba(255,255,255,0.6)'};">
+        ${label}${isRest ? ' ✓' : ''}
+      </button>`;
+    }).join('');
+    _rwizUpdateDaySummary();
+  }
+
+  window._rwizToggleDay = (dow) => {
+    if (_rwizSelection.has(dow)) _rwizSelection.delete(dow);
+    else _rwizSelection.add(dow);
+    _rwizRenderDays();
+  };
+
+  function _rwizUpdateDaySummary() {
+    const workDays = 7 - _rwizSelection.size;
+    const summary = document.getElementById('rwiz-days-summary');
+    const warn = document.getElementById('rwiz-legal-warn');
+    const btn = document.getElementById('rwiz-btn-step2');
+    if (summary) summary.textContent = `${workDays} jour${workDays>1?'s':''} travaillé${workDays>1?'s':''} / semaine`;
+    const check = _rwizLegalCheck(_rwizSelection);
+    if (warn) {
+      warn.style.display = check.warn ? 'block' : 'none';
+      if (check.warn) warn.textContent = check.msg;
+    }
+    if (btn) btn.disabled = !check.ok;
+  }
+
+  function _rwizRenderSummary() {
+    const current = _getCurrentRestDays();
+    const newRest = Array.from(_rwizSelection).sort();
+    const oldRest = Array.from(current).sort();
+    const date = document.getElementById('rwiz-date-input')?.value || new Date().toISOString().slice(0,10);
+    const workDays = 7 - _rwizSelection.size;
+    const hoursPerDay = (35 / workDays).toFixed(1);
+    const oldLabels = oldRest.map(d => _DAYS_LABELS[d]).join(', ') || 'Aucun';
+    const newLabels = newRest.map(d => _DAYS_LABELS[d]).join(', ') || 'Aucun';
+    const dateFormatted = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {day:'numeric',month:'long',year:'numeric'});
+    const summary = document.getElementById('rwiz-summary');
+    if (summary) summary.innerHTML = `
+      <div style="margin-bottom:6px;"><span style="color:rgba(255,255,255,0.4);">Ancienne config :</span> <span style="color:#fff;">${oldLabels}</span></div>
+      <div style="margin-bottom:6px;"><span style="color:rgba(255,255,255,0.4);">Nouvelle config :</span> <span style="color:var(--sync);">${newLabels}</span></div>
+      <div style="margin-bottom:6px;"><span style="color:rgba(255,255,255,0.4);">Jours travaillés :</span> <span style="color:#fff;">${workDays}j → ${hoursPerDay}h/j au seuil légal</span></div>
+      <div><span style="color:rgba(255,255,255,0.4);">Applicable à partir du :</span> <span style="color:var(--animus);">${dateFormatted}</span></div>
+    `;
+  }
+
+  window._rwizConfirm = () => {
+    const date = document.getElementById('rwiz-date-input')?.value || new Date().toISOString().slice(0,10);
+    const newJours = Array.from(_rwizSelection).sort((a,b) => a-b);
+
+    // Lire l'historique existant
+    let versioned = [];
+    try {
+      const raw = JSON.parse(localStorage.getItem('DTE_REST_DAYS_VERSIONED') || 'null');
+      if (Array.isArray(raw)) versioned = raw;
+    } catch(_) {}
+
+    // Si aucun historique, initialiser avec la config actuelle depuis le début
+    if (versioned.length === 0) {
+      const current = Array.from(_getCurrentRestDays()).sort((a,b) => a-b);
+      versioned = [{ depuis: '2000-01-01', jours: current }];
+    }
+
+    // Ajouter la nouvelle entrée (ou remplacer si même date)
+    const existing = versioned.findIndex(e => e.depuis === date);
+    if (existing >= 0) versioned[existing].jours = newJours;
+    else versioned.push({ depuis: date, jours: newJours });
+    versioned.sort((a,b) => a.depuis.localeCompare(b.depuis));
+
+    // Sauvegarder
+    localStorage.setItem('DTE_REST_DAYS_VERSIONED', JSON.stringify(versioned));
+    // Mettre à jour DTE_REST_DAYS (config courante) pour compatibilité moteur
+    localStorage.setItem('DTE_REST_DAYS', JSON.stringify(newJours));
+    // DTE_REST_DAYS_7
+    const state7 = Object.fromEntries([0,1,2,3,4,5,6].map(d => [d, _rwizSelection.has(d)]));
+    localStorage.setItem('DTE_REST_DAYS_7', JSON.stringify(state7));
+
+    window._closeRestWizard();
+    _renderRestDisplay();
+    if (window._fullSync) window._fullSync();
+    DTE.notifs.show('Jours de repos mis à jour', 'info', '📅');
+    setTimeout(() => DTE.notifs.show('Historique passé préservé — nouvelle config active à partir du ' + date, 'ok', '✓', 5000), 600);
+  };
+
+  // Ancienne fonction conservée pour compat (ne fait plus rien d'impactant)
+  window._updateRestDays = () => { _renderRestDisplay(); };
+
+  window._renderRestDisplay = _renderRestDisplay;
   window._forcSync = () => {
     try {
       _syncHash = ''; // forcer la re-analyse
