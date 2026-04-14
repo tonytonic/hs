@@ -862,6 +862,7 @@ class DTEEngine {
     let consecOT = 0;
     let blankWeeks = 0;
     let consecRest = 0; // compteur récup/absent consécutifs (hors weekend)
+    let lastBlankWeekMon = null; // FIX : évite de compter la même semaine plusieurs fois
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
@@ -885,16 +886,27 @@ class DTEEngine {
       }
       consecRest = 0;
 
-      // Semaine sans HS
+      // Semaine sans HS — FIX blankWeeks : compter par semaine, pas par jour
+      // Bug : chaque jour d'une semaine sans HS incrémentait blankWeeks → break prématuré
       const wMon = new Date(d); wMon.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+      const wMonKey = localDK(wMon);
       let weekHasOT = false;
       for (let dd = 0; dd < 5; dd++) {
         const wd = new Date(wMon); wd.setDate(wMon.getDate() + dd);
         const ek = localDK(wd);
         if (days[ek] && days[ek].extra > 0) { weekHasOT = true; break; }
       }
-      if (!weekHasOT) { blankWeeks++; if (blankWeeks >= 2) break; continue; }
+      if (!weekHasOT) {
+        // N'incrémenter blankWeeks qu'une fois par semaine
+        if (wMonKey !== lastBlankWeekMon) {
+          lastBlankWeekMon = wMonKey;
+          blankWeeks++;
+        }
+        if (blankWeeks >= 2) break;
+        continue;
+      }
       blankWeeks = 0;
+      lastBlankWeekMon = null;
       if (e && e.extra > 0) consecOT++;
     }
 
