@@ -414,6 +414,9 @@ class Dashboard {
             </div>
           </div>
 
+          <!-- Note explicative (optionnelle) -->
+          ${meta.note ? `<div style="font-size:10px;color:rgba(255,255,255,0.45);padding:7px 8px;margin-bottom:6px;background:rgba(255,255,255,0.04);border-left:2px solid rgba(0,200,255,0.3);">ℹ️ ${meta.note}</div>` : ''}
+
           <!-- Source -->
           <div style="font-size:10px;color:rgba(255,255,255,0.35);padding:6px 0;font-style:italic;">
             📚 ${meta.source}
