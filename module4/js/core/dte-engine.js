@@ -819,7 +819,10 @@ class DTEEngine {
       // Fallback démarrage
       weeklyExtra = prevWeekFull !== null ? prevWeekFull : 0;
     }
-    const avgExtra7    = weeklyExtra / workDaysPerWeek; // FIX CCN : workDaysPerWeek au lieu de 5 fixe
+    // FIX avgExtra7 : diviser par count7 (jours réels cette semaine) si disponible
+    // Sinon workDaysPerWeek — évite l'inflation artificielle quand workDaysPerWeek diminue
+    // Ex : 4h HS / 2j travaillés = 2h/j réel, pas 4/3 = 1.33h/j (si 3j ouvrés configurés)
+    const avgExtra7    = count7 >= 1 ? weeklyExtra / count7 : weeklyExtra / workDaysPerWeek;
     const _ccnR        = _dteGetCCNRules();
     const _baseJourCCN = _ccnR.seuil / workDaysPerWeek; // 35/5=7h ou 39/5=7.8h selon accord
     const avgH7        = _baseJourCCN + avgExtra7;
