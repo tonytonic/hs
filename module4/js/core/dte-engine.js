@@ -851,22 +851,45 @@ class DTEEngine {
       if (vacances[k]) break;
       consec++;
     }
-    // [2] consecOT (médical chronique) : jours ouvrés AVEC heures sup, en ignorant
-    //     les week-ends car ils ne permettent pas la récupération après surcharge chronique
-    //     (Sonnentag 2003 : détachement psychologique rompu ; Thompson 2022 : cortisol cumulatif)
-    //     → reset uniquement sur : absence, récup, ferie, vacances, OU semaine entière sans HS
+    // [2] consecOT (médical chronique) : jours ouvrés AVEC heures sup
+    //     LOGIQUE DE RÉCUPÉRATION GRADUÉE (Sonnentag 2003 / Meijman & Mulder 1998) :
+    //     - Weekend (sam+dim) → −1 par jour (−2 total) — symétrique avec 1 récup
+    //     - 1 récup / absent  → −1 (réduction partielle, pas reset : 1j < 2j WE)
+    //     - 2+ récups consécutifs → reset complet
+    //     - Vacances déclarées    → reset complet
+    //     - 2 semaines sans HS   → reset complet
     let consecOT = 0;
-    let blankWeeks = 0; // semaines sans aucune HS → seul vrai "reset" biologique
+    let blankWeeks   = 0;
+    let consecRest   = 0; // jours récup/absent consécutifs
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      if (_isRestDow(dow)) continue; // passer le week-end sans casser le compteur
       const k = localDK(d);
       const e = days[k];
-      if (vacances[k]) break; // vacances = récupération réelle
-      if (specialDays[k] === 'ferie') { continue; } // férié ouvré = pause, ne casse pas
-      if (e && (e.absent > 0 || e.recup > 0)) break; // repos compensateur = reset
-      // Vérifier si toute la semaine de ce jour était sans HS (récupération complète)
+
+      // Vacances déclarées = reset complet
+      if (vacances[k]) break;
+
+      // Weekend : réduction partielle −1 par jour
+      if (_isRestDow(dow)) {
+        consecOT = Math.max(0, consecOT - 1);
+        consecRest = 0;
+        continue;
+      }
+
+      // Férié = pause neutre
+      if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
+
+      // Récup / absent : réduction graduée
+      if (e && (e.absent > 0 || e.recup > 0)) {
+        consecRest++;
+        if (consecRest >= 2) break; // 2j consécutifs = reset complet
+        consecOT = Math.max(0, consecOT - 1); // 1 seul jour = −1
+        continue;
+      }
+      consecRest = 0;
+
+      // Semaine sans HS
       const wMon = new Date(d); wMon.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
       let weekHasOT = false;
       for (let dd = 0; dd < 5; dd++) {
@@ -876,7 +899,7 @@ class DTEEngine {
       }
       if (!weekHasOT) { blankWeeks++; if (blankWeeks >= 2) break; continue; }
       blankWeeks = 0;
-      if (e && e.extra > 0) consecOT++; // jour ouvré avec HS → compte
+      if (e && e.extra > 0) consecOT++;
     }
 
     // ── CUMUL SEMAINES DE SURCHARGE — 2 passes pour éviter le bug d'ordre ────
