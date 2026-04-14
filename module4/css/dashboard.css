@@ -23,7 +23,7 @@
   display: flex; align-items: center; gap: 8px;
   width: 100%; background: rgba(0,10,25,0.8);
   border: 1px solid rgba(0,200,255,0.12); padding: 7px 8px;
-  cursor: crosshair; transition: all .2s; text-align: left;
+  cursor: crosshair; transition: all .2s; text-align: center; justify-content: center;
   clip-path: polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
 }
 .action-block-btn:hover {
