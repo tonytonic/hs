@@ -954,11 +954,11 @@ class DTEEngine {
       if (w === 0 && count7 >= 1 && count7 < workDaysPerWeek) {
         weekH = _ccnSeuilW + weeklyExtraEffective; // weeklyExtraEffective = sumExtra7 (HS réelles)
       }
-      // FIX PROPORTIONNEL (Meijman & Mulder 1998 / INRS) :
-      // Avant : isM1RestWeekP1 avec .some() → 1 jour absent = toute la semaine = vacances (faux)
-      // Avant : contribution binaire +1 → semaine avec férié+3j HS = même que semaine normale
-      // Après : isM1RestWeekP1 requiert majorité des jours absents (≥ ceil(workDays/2))
-      // Après : contribution proportionnelle aux HS réelles → semaine courte avec HS ≠ semaine normale
+      // FIX PROPORTIONNEL v2 (Meijman & Mulder 1998 / INRS) :
+      // isM1RestWeekP1 : majorité des jours absents pour M1 (1 seul absent ≠ semaine repos)
+      // MAIS vacances[] garde .some() — 1 jour vacances déclaré = semaine hors calcul
+      // Contribution proportionnelle : HS réelles = weekH - seuil CCN (pas daysLogged×base)
+      // Normalisé sur seuil×0.20 (7h pour 35h contrat) → cap à 1.0
       const isM1RestWeekP1 = (() => {
         let restDays = 0;
         for (let dd2 = 0; dd2 < workDaysPerWeek; dd2++) {
@@ -972,16 +972,13 @@ class DTEEngine {
         const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
         return vacances[localDK(dt2)];
       });
-      if (hasAnyDay && !isVacWeekP1) {
-        // Contribution proportionnelle aux HS réelles de la semaine
-        // hsReelles = heures au-delà du contrat sur les jours effectivement travaillés
-        // Normalisé sur 7h HS/sem = contribution max (forte surcharge : 5j × 1.4h)
-        // Exemples : 3j × 2h HS = 6h → 0.86 | 5j × 2h = 10h → 1.0 | 0 HS = 0
-        const hsReelles = Math.max(0, weekH - (daysLogged > 0 ? daysLogged * baseJourCCN : _ccnSeuilW));
-        const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20)); // 35×0.20=7h = surcharge max normalisée
-        if (contribution > 0) {
-          cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
-        }
+      if (hasAnyDay && !isVacWeekP1 && weekH > _ccnSeuilW) {
+        // Contribution proportionnelle : HS réelles vs seuil CCN
+        // FIX v2 : weekH - _ccnSeuilW (pas daysLogged×base qui gonflait hsReelles)
+        // Exemples (seuil 35h) : +6h HS → 0.86 | +2h HS → 0.29 | +10h HS → 1.0 (cap)
+        const hsReelles = weekH - _ccnSeuilW;
+        const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20));
+        cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
       }
     }
 
