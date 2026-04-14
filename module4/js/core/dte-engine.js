@@ -869,11 +869,12 @@ class DTEEngine {
       const k = localDK(d);
       const e = days[k];
 
-      // Vacances déclarées = reset complet
-      if (vacances[k]) break;
-
-      // Weekend = traversé sans effet sur le compteur
+      // Jour de repos configuré (sam/dim ou autre) = toujours traversé en priorité
+      // FIX : doit être AVANT vacances[k] sinon check-in "congé" le weekend = break erroné
       if (_isRestDow(dow)) { continue; }
+
+      // Vacances déclarées = reset complet (jours ouvrés uniquement)
+      if (vacances[k]) break;
 
       // Férié = pause neutre
       if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
