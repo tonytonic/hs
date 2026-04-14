@@ -859,21 +859,23 @@ class DTEEngine {
     const prevWeekFull = prevCount >= 3 ? prevExtra : null; // semaine précédente si au moins 3j saisis
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // FIX BUG 1 : des HS saisies cette semaine → utiliser sumExtra7
-      // Avant : count7=0 (pas de saisie aujourd'hui) → tombait sur weeklyExtra28 (moyenne 28j)
-      // → score chutait de 72 à 54 même si lundi et mardi avaient des HS saisies
-      // Après : sumExtra7 > 0 suffit — les jours passés de la semaine sont pris en compte
+      // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
       weeklyExtra = sumExtra7;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
       weeklyExtra = prevWeekFull;
     } else if (countWorkDays28 >= 5) {
-      // Milieu de semaine sans saisie → moyenne 28j
-      weeklyExtra = weeklyExtra28;
+      // FIX no-entry mid-week : estimation PROPORTIONNELLE au jour de semaine
+      // Avant : weeklyExtra28 plein → score chute de 72→54 en milieu de semaine sans saisie
+      // Après : weeklyExtra28 × (jours écoulés / semaine) → estimation progressive
+      // Ex: mardi sans saisie → 2/5 × historique → estimation légère, pas alarmiste
+      // Sonnentag 2003 : la charge biologique s'accumule progressivement dans la semaine
+      const _dayRatio = Math.min(1, todayDowA / Math.max(1, workDaysPerWeek));
+      weeklyExtra = weeklyExtra28 * _dayRatio;
     } else {
       // Fallback démarrage
-      weeklyExtra = prevWeekFull !== null ? prevWeekFull : 0;
+      weeklyExtra = prevWeekFull !== null ? prevWeekFull * Math.min(1, todayDowA / Math.max(1, workDaysPerWeek)) : 0;
     }
     // FIX BUG 2 : avgExtra7 normalisé sur workDaysPerWeek STANDARD (5j)
     // Avant : avgExtra7 = weeklyExtra / workDaysPerWeek → avec 3j ouvrés configurés,
@@ -904,7 +906,7 @@ class DTEEngine {
     for (let i = 0; i < 60; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      if (_isRestDow(dow)) break; // weekend = repos légal
+      if (_isRestDowAt(dow, d)) break; // FIX VERSIONING : config active à cette date
       const k = localDK(d);
       const e = days[k];
       if (e && (e.absent > 0 || e.recup > 0)) break;
@@ -995,7 +997,10 @@ class DTEEngine {
 
     for (let w = 51; w >= 0; w--) { // chronologique : w=51 (passé) → w=0 (maintenant)
       let weekH = 0, hasAnyDay = false, daysLogged = 0;
-      for (let dd = 0; dd < workDaysPerWeek; dd++) { // FIX CCN : workDaysPerWeek au lieu de 5
+      // FIX VERSIONING : utiliser le nombre de jours ouvrés à cette semaine historique
+      const _wDate = new Date(todayMonday); _wDate.setDate(todayMonday.getDate() - w * 7);
+      const _wDaysCount = _workDaysAt(_wDate);
+      for (let dd = 0; dd < _wDaysCount; dd++) { // FIX CCN : workDays historiques
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
@@ -1046,7 +1051,10 @@ class DTEEngine {
     // Passe 2 : réductions de récupération (même ordre chronologique)
     for (let w = 51; w >= 0; w--) {
       let weekH = 0, hasAnyDay = false;
-      for (let dd = 0; dd < workDaysPerWeek; dd++) { // FIX CCN
+      // FIX VERSIONING : jours ouvrés à cette semaine historique
+      const _wDate2 = new Date(todayMonday); _wDate2.setDate(todayMonday.getDate() - w * 7);
+      const _wDaysCount2 = _workDaysAt(_wDate2);
+      for (let dd = 0; dd < _wDaysCount2; dd++) { // FIX CCN
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
@@ -1128,7 +1136,7 @@ class DTEEngine {
       const isVac   = vacances[k];
       const isFerie = specialDays[k] === 'ferie';
       const dow     = d.getDay();
-      const isWE    = _isRestDow(dow);
+      const isWE    = _isRestDowAt(dow, d); // FIX VERSIONING
 
       // M1→M4 : absent ≥ 7h OU recup ≥ 7h dans M1 = jour de repos complet pour M4
       // Le salarié n'a pas travaillé ce jour → traité comme vacances/WE pour la récupération
@@ -1161,7 +1169,7 @@ class DTEEngine {
       const k = localDK(d);
       const e = days[k];
       const dow = d.getDay();
-      const isWE = _isRestDow(dow);
+      const isWE = _isRestDowAt(dow, d); // FIX VERSIONING
       const isVac = !!vacances[k];
       // M1→M4 : recup ≥ 7h = repos → ne casse pas le compteur consecNonOT (Meijman & Mulder 1998)
       const isM1Rest = !!(e && ((e.absent >= 7) || (e.recup >= 7)));
