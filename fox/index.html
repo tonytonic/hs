@@ -3508,9 +3508,27 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Des dépassements légaux sont présents dans tes heures enregistrées. Consulte l\'onglet Violations pour le détail complet.',
         actions: ['Ouvre l\'historique des violations', 'Vérifie les semaines concernées', 'Compare avec tes bulletins de paie'] };
     } else {
-      return { titre: '🦊 Situation à surveiller',
-        message: 'Certains seuils légaux sont approchés. Rien d\'urgent, mais reste attentif à ta charge hebdomadaire.',
-        actions: ['Consulte l\'analyse complète', 'Surveille les prochaines semaines', 'Vérifie ton contingent annuel'] };
+      // Phase de récupération : si les 3 dernières semaines sont propres,
+      // ne pas afficher "Situation à surveiller" basée sur l'historique ancien
+      let _fbRecovery = false;
+      try {
+        const _fbDays = _loadAllDays(3);
+        const _fbByWeek = {};
+        Object.entries(_fbDays).forEach(([dk, extra]) => {
+          if (extra <= 0) return;
+          const d = new Date(dk + 'T12:00:00');
+          const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()||7) - 1));
+          const wk = mon.toISOString().slice(0,10);
+          _fbByWeek[wk] = (_fbByWeek[wk] || 0) + extra;
+        });
+        _fbRecovery = !Object.values(_fbByWeek).some(v => v > 8);
+      } catch(_e) {}
+      if (!_fbRecovery) {
+        return { titre: '🦊 Situation à surveiller',
+          message: 'Certains seuils légaux sont approchés. Rien d\'urgent, mais reste attentif à ta charge hebdomadaire.',
+          actions: ['Consulte l\'analyse complète', 'Surveille les prochaines semaines', 'Vérifie ton contingent annuel'] };
+      }
+      // Sinon : laisser tomber dans les messages positifs ci-dessous
     }
   }
   else {
