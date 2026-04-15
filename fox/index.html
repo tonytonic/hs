@@ -3061,7 +3061,35 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   // ── Moyenne 12 sem > 44h (20 variations) ──
   else if (s.weekly?.hasAvgViol) {
     const avg = s.weekly.maxAvg12;
-    
+
+    // ── Phase de récupération : 3 dernières semaines sans surcharge ──
+    // Si la moyenne historique est > 44h MAIS les semaines récentes sont propres
+    // (vacances + réduite + normale...) → ne pas alarmer, montrer l'amélioration
+    let _inRecovery = false;
+    try {
+      const _recentDays = _loadAllDays(3);
+      const _recentByWeek = {};
+      Object.entries(_recentDays).forEach(([dk, extra]) => {
+        if (extra <= 0) return;
+        const d = new Date(dk + 'T12:00:00');
+        const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()||7) - 1));
+        const wk = mon.toISOString().slice(0,10);
+        _recentByWeek[wk] = (_recentByWeek[wk] || 0) + extra;
+      });
+      _inRecovery = !Object.values(_recentByWeek).some(v => v > 8);
+    } catch(_e) {}
+
+    if (_inRecovery) {
+      msg = {
+        titre: `📉 Tendance en amélioration — moy. ${_fmtH(avg)}/sem`,
+        message: `Ta moyenne sur 12 semaines est encore de ${_fmtH(avg)} (plafond légal : 44h), mais tes semaines récentes sont en dessous du seuil. Continue sur cette lancée — la moyenne glissante redescendra progressivement.`,
+        actions: [
+          'Maintenir ce rythme les prochaines semaines',
+          'La moyenne 12 sem. se recalcule automatiquement chaque semaine',
+          'Bonne trajectoire — Kitsune surveille la tendance'
+        ]
+      };
+    } else {
     const msgs = [
       { titre: 'Moyenne 12 semaines : '+_fmtH(avg),
         message: 'Sur 12 semaines, ta moyenne est de '+avg+'h/semaine. La limite légale est de 44h (Art. L3121-22). C\'est un signal fort à anticiper avec ton responsable.',
@@ -3132,6 +3160,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       { titre: '🔴 '+avg+'h/sem en moyenne sur 12 semaines', message: 'La limite de 44h/sem en moyenne est dépassée. Avec '+wk+' semaines analysées, cette tendance est fiable et documentable. C\'est le moment d\'en parler à ton responsable.', actions: ['Génère et sauvegarde le rapport FOX complet', 'Prépare un point avec ton responsable', 'Consulte le médecin du travail'] },
     ];
     msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
+    } // fin else _inRecovery
   }
   
   // ── Contingent dépassé (20 variations) ──
@@ -4164,7 +4193,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
         if (_vkData[_dt.toISOString().slice(0,10)]) _vacKeyCount++;
       }
     } catch(e) {}
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount;
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_r2';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
@@ -8324,7 +8353,10 @@ function detectPatterns() {
     heavyDaysByWeek[wk] = (heavyDaysByWeek[wk] || 0) + 1;
   });
   const heavyWeeks = Object.keys(heavyDaysByWeek).sort().filter(w => heavyDaysByWeek[w] >= 3);
-  if (heavyWeeks.length >= 3) {
+  // Ne déclencher que si la situation est encore active : au moins 1 heavy week dans les 3 dernières semaines
+  const _3wAgo = new Date(); _3wAgo.setDate(_3wAgo.getDate() - 21);
+  const burnoutOngoing = heavyWeeks.some(w => new Date(w + 'T12:00:00') >= _3wAgo);
+  if (heavyWeeks.length >= 3 && burnoutOngoing) {
     patterns.push({
       id: 'burnout_risk',
       level: 'danger',
@@ -8371,7 +8403,10 @@ function detectPatterns() {
       if (vacWeekSet.has(nextWk)) return false;
       return (byWeek[nextWk] || 0) > 5; // pas de répit
     });
-    if (lightFollowing.length >= 2) {
+    // Ne déclencher que si la surcharge est encore active dans les 3 dernières semaines
+    const _3wAgoPat = new Date(); _3wAgoPat.setDate(_3wAgoPat.getDate() - 21);
+    const recentOverweeks = overweeks.filter(w => new Date(w + 'T12:00:00') >= _3wAgoPat);
+    if (lightFollowing.length >= 2 && recentOverweeks.length > 0) {
       patterns.push({
         id: 'no_recovery',
         level: 'warning',
