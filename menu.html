@@ -45,6 +45,7 @@
       height: auto;
       display: block;
       border-radius: 28px 28px 0 0;
+      aspect-ratio: 4 / 3; /* réserve l'espace avant chargement — ratio naturel rétabli après */
     }
     .btn-no-img {
       display: flex;
@@ -342,7 +343,7 @@
 
 </head>
 
-<body>
+<body><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
 
 <div class="overlay" id="welcomeWizard">
   <div class="popup-box">
@@ -505,17 +506,17 @@
 </div>
 
 <div class="btn" onclick="go('heures')">
-  <img src="images/renard-annuel.png.jpg" loading="lazy" alt="Compteur annuel">
+  <img src="images/renard-annuel.png.jpg" loading="eager" alt="Compteur annuel">
   <div class="title">Simulateur de compteur annuel</div>
 </div>
 
 <div class="btn" onclick="go('paye')">
-  <img src="images/renard-mensuel.png.jpg" loading="lazy" alt="Paye mensuelle">
+  <img src="images/renard-mensuel.png.jpg" loading="eager" alt="Paye mensuelle">
   <div class="title">Simulateur d'heures mensualisées</div>
 </div>
 
 <div class="btn" onclick="go('fox')">
-  <img src="images/renard-central.png.jpg" loading="lazy" alt="Module central">
+  <img src="images/renard-central.png.jpg" loading="eager" alt="Module central">
   <div class="title">Mon compagnon d'analyse</div>
 </div>
 
