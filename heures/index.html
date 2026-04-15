@@ -150,7 +150,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   input, select, textarea { font-size: 16px !important; }
 </style>
 </head>
-<body>
+<body><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
 <div class="top-nav-bar">
   <button class="menu-btn" onclick="goMenu()">&#8592; Retour au menu</button>
   <button class="kitsune-btn" onclick="window.location.href='../fox/index.html'" title="Mon compagnon d'analyse — suit tes heures et te récompense">&#x1F98A; Mon compagnon</button>
