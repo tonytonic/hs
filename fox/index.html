@@ -4040,8 +4040,24 @@ function _buildDailyLoop5(s, h, todayOT) {
   const vCont    = s.annual.hasContingentDanger;            // contingent dépassé
   const vContA   = s.annual.hasContingentAlert;             // contingent > 75%
 
-  const hasViol  = vCrit || vRisk || vWeek48 || vAvg44;    // violation réelle
-  const hasAlert = vAlert44 || vCont || vContA;             // alerte non-bloquante
+  // Phase de récupération : si les 3 dernières semaines sont propres,
+  // vAvg44 et vAlert44 basées sur l'historique ne déclenchent plus d'alerte bulle
+  let _bubbleRecovery = false;
+  try {
+    const _bDays = _loadAllDays(3);
+    const _bByWeek = {};
+    Object.entries(_bDays).forEach(([dk, extra]) => {
+      if (extra <= 0) return;
+      const d = new Date(dk + 'T12:00:00');
+      const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()||7) - 1));
+      const wk = mon.toISOString().slice(0,10);
+      _bByWeek[wk] = (_bByWeek[wk] || 0) + extra;
+    });
+    _bubbleRecovery = !Object.values(_bByWeek).some(v => v > 8);
+  } catch(_e) {}
+
+  const hasViol  = vCrit || vRisk || vWeek48 || (!_bubbleRecovery && vAvg44); // violation réelle
+  const hasAlert = (!_bubbleRecovery && vAlert44) || vCont || vContA;          // alerte non-bloquante
 
   // ── Construire la violation la plus grave (sera slot 0 si présente) ──
   let violMsg = null;
