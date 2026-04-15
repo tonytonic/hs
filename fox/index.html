@@ -4884,76 +4884,7 @@ function syncModulesAndAwardXP(source) {
     _saveLastCumul(cumM1Cap !== undefined ? cumM1Cap : cumM1Net,
                    cumM2Cap !== undefined ? cumM2Cap : cumM2Tot);
 
-    // ── Bonus XP nuit / week-end ──────────────────────────────────────
-    if (totalDelta > 0.09 && typeof xpSystem !== 'undefined') {
-      var _nowHour = new Date().getHours();
-      var _isNightEntry = (_nowHour >= 21 || _nowHour < 6);  // nuit légale 21h-5h59
-      // Détection WE : aujourd'hui = sam/dim OU une date saisie récente (7 derniers jours) est sam/dim
-      var _isWE = (function() {
-        var _nowDow = new Date().getDay();
-        if (_nowDow === 0 || _nowDow === 6) return true; // aujourd'hui = WE → bonus immédiat
-        // Sinon : vérifier si des HS ont été saisies un sam/dim dans les 7 derniers jours
-        try {
-          var _limit = new Date(); _limit.setDate(_limit.getDate() - 7);
-          var _limitStr = _limit.toISOString().slice(0,10);
-          var _yr = (localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear()));
-          var _r1 = JSON.parse(localStorage.getItem('DATA_REPORT_' + _yr) || '{}');
-          var _k1 = Object.keys(_r1);
-          for (var _j = 0; _j < _k1.length; _j++) {
-            var _dk = _k1[_j]; var _dv = _r1[_dk];
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(_dk) || _dk < _limitStr || (_dv.extra || 0) <= 0) continue;
-            var _dow = new Date(_dk + 'T12:00:00').getDay();
-            if (_dow === 0 || _dow === 6) return true;
-          }
-          var _mk = _yr + '-' + String(new Date().getMonth()+1).padStart(2,'0');
-          var _r2 = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr) || '{}');
-          var _mv = _r2[_mk];
-          if (_mv && _mv.days) {
-            var _dk2 = Object.keys(_mv.days);
-            for (var _l = 0; _l < _dk2.length; _l++) {
-              var _h = _mv.days[_dk2[_l]]; if ((_h || 0) <= 0) continue;
-              var _dow2 = new Date(parseInt(_yr), new Date().getMonth(), parseInt(_dk2[_l])).getDay();
-              if (_dow2 === 0 || _dow2 === 6) return true;
-            }
-          }
-        } catch(e) {}
-        return false;
-      })();
-      var _xpBonus = 0; var _bonusLabel = '';
-      if (_isNightEntry && _isWE) {
-        _xpBonus = Math.round(totalDelta * 100 * 0.75);
-        _bonusLabel = '🌙⚡ Nuit + Week-end';
-        localStorage.setItem('FOX_NIGHT_WEEKEND_COUNT', String(parseInt(localStorage.getItem('FOX_NIGHT_WEEKEND_COUNT') || '0') + 1));
-        // Accumuler les heures réelles nuit ET WE gérées par FOX
-        localStorage.setItem('FOX_NIGHT_HOURS',   String(Math.round((parseFloat(localStorage.getItem('FOX_NIGHT_HOURS')   || '0') + totalDelta) * 100) / 100));
-        localStorage.setItem('FOX_WEEKEND_HOURS', String(Math.round((parseFloat(localStorage.getItem('FOX_WEEKEND_HOURS') || '0') + totalDelta) * 100) / 100));
-      } else if (_isNightEntry) {
-        _xpBonus = Math.round(totalDelta * 100 * 0.5);
-        _bonusLabel = '🌙 Travail de nuit';
-        localStorage.setItem('FOX_NIGHT_COUNT', String(parseInt(localStorage.getItem('FOX_NIGHT_COUNT') || '0') + 1));
-        // Accumuler les heures réelles de nuit gérées par FOX
-        localStorage.setItem('FOX_NIGHT_HOURS', String(Math.round((parseFloat(localStorage.getItem('FOX_NIGHT_HOURS') || '0') + totalDelta) * 100) / 100));
-      } else if (_isWE) {
-        _xpBonus = Math.round(totalDelta * 100 * 0.5);
-        _bonusLabel = '🏖️ Week-end travaillé';
-        localStorage.setItem('FOX_WEEKEND_COUNT', String(parseInt(localStorage.getItem('FOX_WEEKEND_COUNT') || '0') + 1));
-        // Accumuler les heures réelles de WE gérées par FOX
-        localStorage.setItem('FOX_WEEKEND_HOURS', String(Math.round((parseFloat(localStorage.getItem('FOX_WEEKEND_HOURS') || '0') + totalDelta) * 100) / 100));
-      }
-      if (_xpBonus > 0) {
-        xpSystem.currentXP += _xpBonus;
-        xpSystem.level = xpSystem.calculateLevel ? xpSystem.calculateLevel() : xpSystem.level;
-        xpSystem.saveToStorage();
-        console.log('🌙 Bonus XP ' + _bonusLabel + ' : +' + _xpBonus + ' XP');
-        if (typeof addRewardToHistory === 'function')
-          addRewardToHistory(_bonusLabel + ' : +' + _xpBonus + ' XP', 'info');
-        if (typeof foxToast === 'function')
-          foxToast(_bonusLabel + '\n+' + _xpBonus + ' XP bonus !');
-      }
-    }
-
-    // Rafra\u00EEchir tout l'affichage
-    refreshHUD();
+        refreshHUD();
     if (typeof updateAllDisplays === 'function') {
       try { updateAllDisplays(); } catch(e) {}
     }
