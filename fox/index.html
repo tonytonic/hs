@@ -3108,8 +3108,12 @@ function _isInRecoveryPhase() {
       });
     });
 
-    // Récupération active si aucune semaine > 9h extra sur les 3 dernières semaines
-    return !Object.values(extraByWeek).some(v => v > 9);
+    // Exclure la semaine en cours (incomplète) — ne regarder que les semaines passées
+    const _curMon = new Date(now);
+    _curMon.setDate(now.getDate() - ((now.getDay()+6)%7));
+    const _curWk = _curMon.toISOString().slice(0,10);
+    // Récupération active si aucune semaine PASSÉE > 9h extra sur les 3 dernières semaines
+    return !Object.entries(extraByWeek).some(([wk, v]) => wk !== _curWk && v > 9);
   } catch(_e) { return false; }
 }
 
