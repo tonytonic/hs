@@ -3058,74 +3058,14 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
   }
   
-  // ── Moyenne 12 sem > 44h (20 variations) ──
+  // ── Moyenne 12 sem > 44h ──
   else if (s.weekly?.hasAvgViol) {
     const avg = s.weekly.maxAvg12;
-
-    // ── Phase de récupération : 3 dernières semaines sans surcharge ──
-
-// ── Helper : détecte phase de récupération (3 dernières semaines propres) ──
-// M1 : v.extra = heures extra directement
-// M2 : hrs = heures extra directement (l'utilisateur saisit "+2h", pas le total)
-// Seuil 9h extra/sem ≈ 44h total sur base 35h
-function _isInRecoveryPhase() {
-  try {
-    const yr   = new Date().getFullYear();
-    const now  = new Date();
-    const cutoff = new Date(now); cutoff.setDate(now.getDate() - 21);
-    const rawM1 = JSON.parse(localStorage.getItem('DATA_REPORT_' + yr) || '{}');
-    const rawM2 = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '{}');
-    const vac   = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yr) || '{}');
-
-    const extraByWeek = {};
-    const m1Days = new Set();
-
-    // M1 : heures extra (v.extra)
-    Object.entries(rawM1).forEach(([dk, v]) => {
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
-      if (new Date(dk) < cutoff) return;
-      if (vac[dk]) return;
-      if ((Number(v.absent)||0) >= 7 || (Number(v.recup)||0) >= 7) return;
-      m1Days.add(dk);
-      const d = new Date(dk + 'T12:00:00');
-      const mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay()||7) - 1));
-      const wk = mon.toISOString().slice(0,10);
-      extraByWeek[wk] = (extraByWeek[wk] || 0) + (Number(v.extra) || 0);
-    });
-
-    // M2 : heures extra saisies directement (hrs = "+2h" etc.) — M1 prioritaire
-    Object.entries(rawM2).forEach(([mk, mv]) => {
-      if (!/^\d{4}-\d{2}$/.test(mk) || !mv || !mv.days) return;
-      Object.entries(mv.days).forEach(([ds, hrs]) => {
-        const d = parseInt(ds); if (!d) return;
-        const dk = mk + '-' + String(d).padStart(2,'0');
-        if (new Date(dk) < cutoff) return;
-        if (vac[dk] || m1Days.has(dk)) return;
-        const dt = new Date(dk + 'T12:00:00');
-        const mon = new Date(dt); mon.setDate(dt.getDate() - ((dt.getDay()||7) - 1));
-        const wk = mon.toISOString().slice(0,10);
-        extraByWeek[wk] = (extraByWeek[wk] || 0) + (Number(hrs) || 0);
-      });
-    });
-
-    // Exclure la semaine en cours (incomplète) — ne regarder que les semaines passées
-    const _curMon = new Date(now);
-    _curMon.setDate(now.getDate() - ((now.getDay()+6)%7));
-    const _curWk = _curMon.toISOString().slice(0,10);
-    // Récupération active si aucune semaine PASSÉE > 9h extra sur les 3 dernières semaines
-    return !Object.entries(extraByWeek).some(([wk, v]) => wk !== _curWk && v > 9);
-  } catch(_e) { return false; }
-}
-
     if (_isInRecoveryPhase()) {
       msg = {
         titre: `📉 Tendance en amélioration — moy. ${_fmtH(avg)}/sem`,
-        message: `Ta moyenne sur 12 semaines est encore de ${_fmtH(avg)} (plafond légal : 44h), mais tes semaines récentes sont en dessous du seuil. Continue sur cette lancée — la moyenne glissante redescendra progressivement.`,
-        actions: [
-          'Maintenir ce rythme les prochaines semaines',
-          'La moyenne 12 sem. se recalcule automatiquement chaque semaine',
-          'Bonne trajectoire — Kitsune surveille la tendance'
-        ]
+        message: `Ta moyenne sur 12 semaines est encore de ${_fmtH(avg)} mais tes semaines récentes sont en dessous du seuil. Continue — la moyenne redescendra progressivement.`,
+        actions: ['Maintenir ce rythme', 'La moyenne 12 sem. se recalcule chaque semaine', 'Bonne trajectoire !']
       };
     } else {
     const msgs = [
@@ -3198,7 +3138,7 @@ function _isInRecoveryPhase() {
       { titre: '🔴 '+avg+'h/sem en moyenne sur 12 semaines', message: 'La limite de 44h/sem en moyenne est dépassée. Avec '+wk+' semaines analysées, cette tendance est fiable et documentable. C\'est le moment d\'en parler à ton responsable.', actions: ['Génère et sauvegarde le rapport FOX complet', 'Prépare un point avec ton responsable', 'Consulte le médecin du travail'] },
     ];
     msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
-    } // fin else _inRecovery
+    } // fin else recovery
   }
   
   // ── Contingent dépassé (20 variations) ──
@@ -3546,13 +3486,12 @@ function _isInRecoveryPhase() {
         message: 'Des dépassements légaux sont présents dans tes heures enregistrées. Consulte l\'onglet Violations pour le détail complet.',
         actions: ['Ouvre l\'historique des violations', 'Vérifie les semaines concernées', 'Compare avec tes bulletins de paie'] };
     } else {
-      // Phase de récupération : si les 3 dernières semaines sont propres → message positif
       if (!_isInRecoveryPhase()) {
         return { titre: '🦊 Situation à surveiller',
           message: 'Certains seuils légaux sont approchés. Rien d\'urgent, mais reste attentif à ta charge hebdomadaire.',
           actions: ['Consulte l\'analyse complète', 'Surveille les prochaines semaines', 'Vérifie ton contingent annuel'] };
       }
-      // Sinon : laisser tomber dans les messages positifs ci-dessous
+      // Recovery actif → laisser tomber vers messages positifs
     }
   }
   else {
@@ -4064,11 +4003,9 @@ function _buildDailyLoop5(s, h, todayOT) {
   const vCont    = s.annual.hasContingentDanger;            // contingent dépassé
   const vContA   = s.annual.hasContingentAlert;             // contingent > 75%
 
-  // Phase de récupération : si les 3 dernières semaines sont propres → pas d'alerte historique
-  const _bubbleRecovery = _isInRecoveryPhase();
-
-  const hasViol  = vCrit || vRisk || vWeek48 || (!_bubbleRecovery && vAvg44); // violation réelle
-  const hasAlert = (!_bubbleRecovery && vAlert44) || vCont || vContA;          // alerte non-bloquante
+  const _recovery = _isInRecoveryPhase();
+  const hasViol  = vCrit || vRisk || vWeek48 || (!_recovery && vAvg44);
+  const hasAlert = (!_recovery && vAlert44) || vCont || vContA;
 
   // ── Construire la violation la plus grave (sera slot 0 si présente) ──
   let violMsg = null;
@@ -4238,7 +4175,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
         if (_vkData[_dt.toISOString().slice(0,10)]) _vacKeyCount++;
       }
     } catch(e) {}
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_r2';
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_r3';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
@@ -8299,6 +8236,59 @@ function _loadAllDays(weeksBack) {
   return allDays;
 }
 
+
+function _isInRecoveryPhase() {
+  try {
+    const yr  = new Date().getFullYear();
+    const now = new Date();
+    // Lundi de la semaine courante (exclue du calcul)
+    const _curMon = new Date(now);
+    _curMon.setDate(now.getDate() - ((now.getDay()+6)%7));
+    _curMon.setHours(0,0,0,0);
+    const _curWk  = _curMon.toISOString().slice(0,10);
+    // Cutoff : 3 semaines passées
+    const cutoff  = new Date(_curMon); cutoff.setDate(_curMon.getDate() - 21);
+    const rawM1   = JSON.parse(localStorage.getItem('DATA_REPORT_' + yr) || '{}');
+    const rawM2   = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '{}');
+    const vac     = JSON.parse(localStorage.getItem('DTE_VACANCES_' + yr) || '{}');
+    const byWeek  = {};
+    const m1Days  = new Set();
+
+    // M1 — heures extra directes
+    Object.entries(rawM1).forEach(([dk, v]) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
+      const d = new Date(dk + 'T12:00:00');
+      if (d < cutoff) return;
+      const mon = new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
+      const wk  = mon.toISOString().slice(0,10);
+      if (wk === _curWk) return;        // semaine courante ignorée
+      if (vac[dk]) return;
+      if ((Number(v.absent)||0)>=7||(Number(v.recup)||0)>=7) return;
+      m1Days.add(dk);
+      byWeek[wk] = (byWeek[wk]||0) + (Number(v.extra)||0);
+    });
+
+    // M2 — heures extra directes (l'utilisateur saisit "+2h"), M1 prioritaire
+    Object.entries(rawM2).forEach(([mk, mv]) => {
+      if (!/^\d{4}-\d{2}$/.test(mk)||!mv||!mv.days) return;
+      Object.entries(mv.days).forEach(([ds, hrs]) => {
+        const d2 = parseInt(ds); if (!d2) return;
+        const dk  = mk+'-'+String(d2).padStart(2,'0');
+        const d   = new Date(dk + 'T12:00:00');
+        if (d < cutoff) return;
+        const mon = new Date(d); mon.setDate(d.getDate()-((d.getDay()+6)%7));
+        const wk  = mon.toISOString().slice(0,10);
+        if (wk === _curWk) return;      // semaine courante ignorée
+        if (vac[dk]||m1Days.has(dk)) return;
+        byWeek[wk] = (byWeek[wk]||0) + (Number(hrs)||0);
+      });
+    });
+
+    // Recovery si aucune semaine passée complète > 9h extra
+    return !Object.values(byWeek).some(v => v > 9);
+  } catch(_e) { return false; }
+}
+
 function detectPatterns() {
   const WEEKS = 8;
   const BASE  = 7; // heures base journalière
@@ -8398,9 +8388,7 @@ function detectPatterns() {
     heavyDaysByWeek[wk] = (heavyDaysByWeek[wk] || 0) + 1;
   });
   const heavyWeeks = Object.keys(heavyDaysByWeek).sort().filter(w => heavyDaysByWeek[w] >= 3);
-  // Ne déclencher que si la situation est encore active (pas en phase de récupération)
-  const burnoutOngoing = !_isInRecoveryPhase();
-  if (heavyWeeks.length >= 3 && burnoutOngoing) {
+  if (heavyWeeks.length >= 3 && !_isInRecoveryPhase()) {
     patterns.push({
       id: 'burnout_risk',
       level: 'danger',
@@ -8447,7 +8435,6 @@ function detectPatterns() {
       if (vacWeekSet.has(nextWk)) return false;
       return (byWeek[nextWk] || 0) > 5; // pas de répit
     });
-    // Ne déclencher que si la situation est encore active (pas en phase de récupération)
     if (lightFollowing.length >= 2 && !_isInRecoveryPhase()) {
       patterns.push({
         id: 'no_recovery',
