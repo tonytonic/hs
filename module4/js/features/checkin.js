@@ -179,15 +179,19 @@ class Checkin {
     _safeLS.set('DTE_CHECKIN_DATE', today);
 
     // Écrire DTE_VACANCES_ si repos/congé/maladie
+    // Si correction vers "work" : supprimer la date des vacances si elle y était
     const status = this._answers.dayStatus;
-    if(status === 'holiday' || status === 'sick' || status === 'rest'){
-      const yr = today.slice(0,4);
-      try {
-        const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+yr)||'{}');
+    const yr = today.slice(0,4);
+    try {
+      const vac = JSON.parse(localStorage.getItem('DTE_VACANCES_'+yr)||'{}');
+      if(status === 'holiday' || status === 'sick' || status === 'rest'){
         vac[today] = true;
-        localStorage.setItem('DTE_VACANCES_'+yr, JSON.stringify(vac));
-      } catch(_){}
-    }
+      } else {
+        // Statut travail → retirer du registre vacances si erreur précédente
+        delete vac[today];
+      }
+      localStorage.setItem('DTE_VACANCES_'+yr, JSON.stringify(vac));
+    } catch(_){}
 
     // Appliquer créneau horaire → DTE_SETTINGS (clé lue par dte-engine.js)
     const slot = this._answers.timeSlot;
