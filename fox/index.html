@@ -4175,7 +4175,8 @@ function kitsuneNarrateOvertime(deltaH, source) {
         if (_vkData[_dt.toISOString().slice(0,10)]) _vacKeyCount++;
       }
     } catch(e) {}
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_r3';
+    const _recoveryKey = _isInRecoveryPhase() ? 'r1' : 'r0';
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_r4';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
