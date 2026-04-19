@@ -1153,9 +1153,11 @@ class DTEEngine {
                      || (isCurrentWeek && !isWE && !hasOverload && noWorkThisWeek);
 
       if (hasOverload) break; // HS réelles (hors vacances/repos) → stop définitif
-      // Jour ouvré sans aucun signal de repos → stop
-      if (!isWE && !isVac && !isFerie && !isM1FullRest
-          && !(isCurrentWeek && noWorkThisWeek)) break;
+      // Jour ouvré sans données M1 = pas de HS connue → traité comme jour normal (pas de repos complet)
+      // Ne casse PAS consecRestDays — mais ne l'incrémente pas non plus (isRestDay = false)
+      // Seul hasOverload casse le compteur (Sonnentag 2003 : seul le surmenage bloque la récupération)
+      const hasNoData = !e && !isWE && !isVac && !isFerie;
+      if (hasNoData) continue; // jour sans données = ni repos ni surcharge → on continue
 
       if (isRestDay) consecRestDays++;
     }
@@ -1175,6 +1177,7 @@ class DTEEngine {
       const isM1Rest = !!(e && ((e.absent >= 7) || (e.recup >= 7)));
       // FIX BUG VACANCES : un jour vacances ne casse pas le compteur même avec entrées M1/M2
       if (e && e.extra > 0 && !isWE && !isVac && !isM1Rest) break;
+      // Jour sans données M1 = pas de HS → contribue à la récupération (Meijman & Mulder 1998)
       consecNonOTDays++;
     }
 
