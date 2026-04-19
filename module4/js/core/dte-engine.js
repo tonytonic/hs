@@ -1043,8 +1043,17 @@ class DTEEngine {
         // FIX v2 : weekH - _ccnSeuilW (pas daysLogged×base qui gonflait hsReelles)
         // Exemples (seuil 35h) : +6h HS → 0.86 | +2h HS → 0.29 | +10h HS → 1.0 (cap)
         const hsReelles = weekH - _ccnSeuilW;
-        const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20));
-        cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
+        // SEUIL MINIMUM : < 5h extra/sem = semaine légèrement chargée, pas de surcharge cumulative
+        // INRS (guide RPS) : fatigue chronique à partir de ~40h/sem sur base 35h = 5h extra
+        // J.Occup.Health 2021 : effets dose-temps significatifs à partir de >43h/sem
+        // < 5h : pas de contribution | 5h-7h : contribution linéaire | >7h : contribution pleine
+        if (hsReelles < 5) {
+          // Semaine légère (<5h extra = <40h) : pas de contribution, réduction partielle
+          if (cumulWeeks > 0) cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.06) * 1e9) / 1e9;
+        } else {
+          const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20));
+          cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
+        }
       }
     }
 
@@ -1094,6 +1103,9 @@ class DTEEngine {
         // Semaine normale (0 HS) — PATCH : -0.12/sem (vs -0.10) — différenciation vacances/repos claire
         // Meijman & Mulder 1998 : récupération partielle active dès retour à charge normale
         cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.12) * 1e9) / 1e9;
+      } else if (!isVacWeekP2 && weekH > _ccnSeuilW && (weekH - _ccnSeuilW) < 5 && cumulWeeks > 0) {
+        // Semaine légère (<5h extra = <40h) : légère réduction (entre semaine normale et surcharge)
+        cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.06) * 1e9) / 1e9;
       }
     }
 
