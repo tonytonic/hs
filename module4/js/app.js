@@ -703,7 +703,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
       const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
       const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '';
-      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr;
+      // Inclure la date du jour dans le hash → recalcul automatique chaque nouveau jour
+      // sans ça, consecRestDays/consecNonOTDays ne progressent pas sans nouvelle saisie
+      const _today = new Date().toISOString().slice(0,10);
+      const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
+      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr + '|' + _today + '|' + _ciDate;
       if (hash === _syncHash) return; // rien changé → pas de re-analyse
       _syncHash = hash;
 
