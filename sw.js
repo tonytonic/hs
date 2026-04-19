@@ -3,7 +3,7 @@
  * Version : 6.0.0 (Le Parfait - Offline Solide + Periodic Sync)
  */
 
-const CACHE_NAME = "heuressup-cache-v6.1.1";
+const CACHE_NAME = "heuressup-cache-v6.2.1";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
