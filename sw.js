@@ -3,7 +3,7 @@
  * Version : 7.3.0-DEBUG — Cloudflare Pages
  */
 
-const CACHE_NAME = "heuressup-cache-v7.7.0";
+const CACHE_NAME = "heuressup-cache-v7.7.1";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
