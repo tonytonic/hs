@@ -88,7 +88,8 @@ class Checkin {
   }
 
   openForEdit(){
-    const today = new Date().toISOString().slice(0,10);
+    const _ldk = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const today = _ldk(new Date()); // date locale, pas UTC
     // Lundi : réinitialiser la confirmation N-1 pour permettre la re-modification
     const dow = new Date().getDay();
     if(dow === 1) _safeLS.del('DTE_N1_CONFIRMED');
@@ -140,18 +141,48 @@ class Checkin {
   }
 
   _mondayN1Question(){
-    // Afficher uniquement le lundi, une fois par semaine, si N-1 non encore confirmé
+    // Helper : date locale YYYY-MM-DD (évite le bug UTC en France)
+    const localDK = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+
+    // Lire le début de semaine dynamique depuis la CCN ou DTE_SETTINGS
+    // debutSemaine : 1=lun, 2=mar, 3=mer, 4=jeu, 5=ven, 6=sam, 7=dim
+    // getDay() JS : 0=dim, 1=lun, 2=mar... → conversion nécessaire
+    const _getWeekStartDow = () => {
+      try {
+        // Priorité : CCN_API si disponible
+        if(typeof CCN_API !== 'undefined') {
+          const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
+          const rules = CCN_API.getGroupeForCCN(idcc) || CCN_API.getGroupeForCCN(0);
+          if(rules && rules.debutSemaine) {
+            // debutSemaine CCN : 1=lun...7=dim → JS getDay : 0=dim,1=lun...6=sam
+            const ds = rules.debutSemaine;
+            return ds === 7 ? 0 : ds; // 7(dim)→0, 1(lun)→1, 2(mar)→2...
+          }
+        }
+        // Fallback : DTE_SETTINGS
+        const s = JSON.parse(localStorage.getItem('DTE_SETTINGS') || '{}');
+        if(s.debutSemaine) {
+          const ds = s.debutSemaine;
+          return ds === 7 ? 0 : ds;
+        }
+      } catch(_) {}
+      return 1; // défaut : lundi
+    };
+    const weekStartDow = _getWeekStartDow(); // jour JS de début de semaine (0=dim,1=lun...)
+
+    // Afficher le premier jour de la semaine de travail, pas forcément le lundi civil
     const today = new Date();
-    const dow = today.getDay(); // 0=dim, 1=lun
-    if(dow !== 1) return null; // pas lundi
-    const todayKey = today.toISOString().slice(0,10);
+    const todayDow = today.getDay();
+    if(todayDow !== weekStartDow) return null; // pas le premier jour de semaine
+    const todayKey = localDK(today);
     if(_safeLS.get('DTE_N1_CONFIRMED') === todayKey) return null; // déjà confirmé aujourd'hui
 
     // Lire la semaine précédente depuis M1 (DATA_REPORT)
     try {
       const yr = today.getFullYear();
-      const prevMonday = new Date(today); prevMonday.setDate(today.getDate() - 7);
-      const prevMondayKey = prevMonday.toISOString().slice(0,10);
+      // Début de la semaine précédente = aujourd'hui - 7 jours (même jour de semaine)
+      const prevWeekStart = new Date(today); prevWeekStart.setDate(today.getDate() - 7);
+      const prevMondayKey = localDK(prevWeekStart); // clé locale ✓
 
       // Chercher dans DATA_REPORT_yr et DATA_REPORT_(yr-1)
       let prevExtra = null;
@@ -159,18 +190,24 @@ class Checkin {
         const raw = localStorage.getItem('DATA_REPORT_'+y);
         if(!raw || raw === '{}') continue;
         const d = JSON.parse(raw);
-        const days = d.days || d.jours || (Object.keys(d)[0]?.match(/^\d{4}-\d{2}-\d{2}$/) ? d : {});
+        let days = d.days || d.jours || {};
+        // Détecter si la racine contient directement des clés dates
+        if(!Object.keys(days).length) {
+          const fk = Object.keys(d).find(k => /^\d{4}-\d{2}-\d{2}$/.test(k));
+          if(fk) days = d;
+        }
         // Mode hebdomadaire : entrée sur le lundi de la semaine précédente
         if(days[prevMondayKey]) {
-          prevExtra = days[prevMondayKey].extra || days[prevMondayKey].hs || 0;
+          prevExtra = parseFloat(days[prevMondayKey].extra || days[prevMondayKey].hs || 0);
           break;
         }
-        // Mode journalier : sommer les 5 jours
+        // Mode journalier : sommer les jours de la semaine précédente
         let sum = 0, found = false;
-        for(let dd = 0; dd < 5; dd++) {
-          const dt = new Date(prevMonday); dt.setDate(prevMonday.getDate() + dd);
-          const k = dt.toISOString().slice(0,10);
-          if(days[k]) { sum += days[k].extra || 0; found = true; }
+        for(let dd = 0; dd < 7; dd++) {
+          const dt = new Date(prevWeekStart); dt.setDate(prevWeekStart.getDate() + dd);
+          if(dt >= today) break; // ne pas dépasser aujourd'hui
+          const k = localDK(dt); // clé locale ✓
+          if(days[k]) { sum += parseFloat(days[k].extra || 0); found = true; }
         }
         if(found) { prevExtra = sum; break; }
       }
@@ -239,7 +276,8 @@ class Checkin {
         // Traitement spécial pour la confirmation N-1
         if(q.id === 'n1confirm') {
           const today = new Date().toISOString().slice(0,10);
-          _safeLS.set('DTE_N1_CONFIRMED', today);
+          const _ldkN1 = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+          _safeLS.set('DTE_N1_CONFIRMED', _ldkN1(new Date()));
           if(val === 'ok') {
             // Valider N-1 tel quel → écrire dans DATA_REPORT si absent
             this._saveN1Confirmed(q._prevMondayKey, q._prevExtra, q._seuil);
@@ -264,7 +302,8 @@ class Checkin {
   }
 
   _submit(){
-    const today = new Date().toISOString().slice(0,10);
+    const _ldk2 = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const today = _ldk2(new Date()); // date locale ✓
     _safeLS.set('DTE_CHECKIN_DATE', today);
 
     // Écrire DTE_VACANCES_ si repos/congé/maladie
