@@ -856,7 +856,13 @@ class DTEEngine {
       const e = days[k];
       if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
     }
-    const prevWeekFull = prevCount >= 3 ? prevExtra : null; // semaine précédente si au moins 3j saisis
+    // FIX MODE HEBDOMADAIRE : M1 en mode "total semaine" stocke UNE seule entrée
+    // sous la date du lundi de la semaine. prevCount = 1 → la condition >=3 échouait
+    // → prevWeekFull = null → fallback lundi ignoré → rolling 28j × dayRatio = valeur amortie
+    // Détection : si 1 seule entrée ET elle est sur le lundi de la semaine précédente
+    const prevMondayKey = localDK(new Date(weekMondayA.getTime() - 7*86400000));
+    const isWeeklyMode  = prevCount === 1 && !!days[prevMondayKey] && !days[prevMondayKey]?.absent;
+    const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
       // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
@@ -864,6 +870,7 @@ class DTEEngine {
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
+      // Mode hebdomadaire : une seule entrée Monday = la semaine entière → traité comme semaine complète
       weeklyExtra = prevWeekFull;
     } else if (countWorkDays28 >= 5) {
       // FIX no-entry mid-week : estimation PROPORTIONNELLE au jour de semaine
