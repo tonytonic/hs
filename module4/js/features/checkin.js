@@ -89,6 +89,9 @@ class Checkin {
 
   openForEdit(){
     const today = new Date().toISOString().slice(0,10);
+    // Lundi : réinitialiser la confirmation N-1 pour permettre la re-modification
+    const dow = new Date().getDay();
+    if(dow === 1) _safeLS.del('DTE_N1_CONFIRMED');
     const history = _safeLS.json('DTE_CHECKIN_HISTORY', []);
     const existing = history.find(h => h.date === today);
     this._step = 0;
