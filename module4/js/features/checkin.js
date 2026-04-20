@@ -118,12 +118,17 @@ class Checkin {
 
   open(){
     this._step = 0; this._editMode = false;
+    // Lundi : toujours réinitialiser la confirmation N-1
+    // → la question réapparaît à chaque ouverture du check-in ce jour-là
+    if(new Date().getDay() === 1) _safeLS.del('DTE_N1_CONFIRMED');
     // Si check-in déjà fait aujourd'hui, pré-remplir les réponses
-    const today = new Date().toISOString().slice(0,10);
+    const _ldk0 = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const today = _ldk0(new Date());
     const history = _safeLS.json('DTE_CHECKIN_HISTORY', []);
     const existing = history.find(h => h.date === today);
     this._answers = existing ? {...existing} : {};
     delete this._answers.date;
+    delete this._answers.n1confirm; // toujours reposer la question N-1
     this._buildSequence(); this._render();
     if(this._modal) this._modal.classList.remove('hidden');
   }
@@ -212,14 +217,60 @@ class Checkin {
         if(found) { prevExtra = sum; break; }
       }
 
-      if(prevExtra === null) return null; // pas de données → on ne demande rien
-
       const seuil = (() => {
         try {
           const s = JSON.parse(localStorage.getItem('DTE_SETTINGS') || '{}');
           return s.seuil || 35;
         } catch(_){ return 35; }
       })();
+
+      // Pas de données M1 → question ouverte (saisie libre)
+      // Si pas trouvé dans M1 → chercher dans M2 (CA_HS_TRACKER_V1_DATA)
+      // M2 structure : { "2026-03": { days: {"14": 2.5, "15": 1}, closing: 28 } }
+      if(prevExtra === null) {
+        try {
+          for(const y of [yr, yr-1]) {
+            const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_'+y);
+            if(!m2raw || m2raw === '{}') continue;
+            const m2d = JSON.parse(m2raw);
+            let sum = 0, found = false;
+            // Parcourir les jours de la semaine précédente dans M2
+            for(let dd = 0; dd < 7; dd++) {
+              const dt = new Date(prevWeekStart); dt.setDate(prevWeekStart.getDate() + dd);
+              if(dt >= today) break;
+              const mk = localDK(dt).slice(0,7); // "2026-04"
+              const dayNum = String(dt.getDate()); // "13"
+              const monthData = m2d[mk];
+              if(monthData && monthData.days && monthData.days[dayNum] !== undefined) {
+                sum += parseFloat(monthData.days[dayNum] || 0);
+                found = true;
+              }
+            }
+            if(found) { prevExtra = sum; break; }
+          }
+        } catch(_) {}
+      }
+
+      if(prevExtra === null) {
+        return {
+          id: 'n1confirm',
+          text: 'Combien d\'heures avez-vous travaillé la semaine passée ?',
+          emoji: '📋',
+          _prevExtra: null,
+          _prevMondayKey: prevMondayKey,
+          _seuil: seuil,
+          _freeInput: true, // mode saisie libre
+          opts: [
+            {v: 'seuil',   e: '✅', l: `${seuil}h — semaine normale`},
+            {v: 'seuil1',  e: '🔵', l: `${seuil+1}h`},
+            {v: 'seuil2',  e: '🟡', l: `${seuil+2}h`},
+            {v: 'seuil3',  e: '🟠', l: `${seuil+3}h`},
+            {v: 'seuil5',  e: '🔴', l: `${seuil+5}h ou plus`},
+            {v: 'skip',    e: '⏭️', l: 'Passer'},
+          ]
+        };
+      }
+
       const totalH = seuil + prevExtra;
       const heuresLabel = prevExtra === 0
         ? `${totalH}h (aucune heure sup)`
@@ -275,18 +326,24 @@ class Checkin {
 
         // Traitement spécial pour la confirmation N-1
         if(q.id === 'n1confirm') {
-          const today = new Date().toISOString().slice(0,10);
           const _ldkN1 = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
           _safeLS.set('DTE_N1_CONFIRMED', _ldkN1(new Date()));
           if(val === 'ok') {
-            // Valider N-1 tel quel → écrire dans DATA_REPORT si absent
-            this._saveN1Confirmed(q._prevMondayKey, q._prevExtra, q._seuil);
+            this._saveN1Confirmed(q._prevMondayKey, q._prevExtra || 0, q._seuil);
           } else if(val === 'moins' || val === 'plus') {
-            // Afficher un input numérique pour corriger
-            this._renderN1Edit(q._prevMondayKey, q._prevExtra, q._seuil, val);
+            this._renderN1Edit(q._prevMondayKey, q._prevExtra || 0, q._seuil, val);
             return;
+          } else if(val && val.startsWith('seuil')) {
+            // Mode saisie libre (pas de données M1)
+            const extras = {'seuil':0,'seuil1':1,'seuil2':2,'seuil3':3,'seuil5':5};
+            const extra = extras[val] !== undefined ? extras[val] : 0;
+            if(val === 'seuil5') {
+              this._renderN1Edit(q._prevMondayKey, q._seuil + 5, q._seuil, 'plus');
+              return;
+            }
+            this._saveN1Confirmed(q._prevMondayKey, extra, q._seuil);
           }
-          // skip ou ok → continuer normalement
+          // skip → continuer sans sauvegarder
           this._buildSequence();
         }
 
