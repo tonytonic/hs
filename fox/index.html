@@ -2464,14 +2464,38 @@ function _analyzeLegalSituation() {
       return { wk, mon: w.mon, total, ot };
     }).sort((a, b) => a.mon.localeCompare(b.mon));
 
+    // Lire les vacances M4 pour les exclure du calcul
+    const _m4Vac = (() => {
+      try { return JSON.parse(localStorage.getItem('DTE_VACANCES_' + year) || '{}'); } catch(_) { return {}; }
+    })();
+    // Vérifier si une semaine est une semaine de vacances M4 (≥5 jours déclarés)
+    const _isVacWeekM4 = (monStr) => {
+      if (!monStr) return false;
+      let cnt = 0;
+      for (let d = 0; d < 7; d++) {
+        const dt = new Date(monStr + 'T12:00:00'); dt.setDate(dt.getDate() + d);
+        const dk = dt.getFullYear() + '-' + String(dt.getMonth()+1).padStart(2,'0') + '-' + String(dt.getDate()).padStart(2,'0');
+        if (_m4Vac[dk]) cnt++;
+      }
+      return cnt >= 3; // au moins 3 jours vacances = semaine considérée vacances
+    };
+
     let maxWeekTotal = 0, maxWeekMon = '', weeksOver48 = 0, weeksOver44 = 0, maxAvg12 = 0;
     weekArr.forEach(w => {
-      if (w.total > maxWeekTotal) { maxWeekTotal = w.total; maxWeekMon = w.mon; }
-      if (w.total >= 48) weeksOver48++;
-      if (w.total >= 44) weeksOver44++;
+      const isVac = _isVacWeekM4(w.mon) || weeksWithDayOff.has(isoWeekKey(w.mon || ''));
+      if (!isVac && w.total > maxWeekTotal) { maxWeekTotal = w.total; maxWeekMon = w.mon; }
+      if (!isVac && w.total >= 48) weeksOver48++;
+      if (!isVac && w.total >= 44) weeksOver44++;
     });
-    for (let i = 0; i < weekArr.length; i++) {
-      const win = weekArr.slice(Math.max(0, i - 11), i + 1);
+    // Moyenne 12 semaines — les semaines vacances comptent comme baseHebdo (35h)
+    // Elles font baisser la moyenne naturellement, sans être exclues
+    // Seul maxWeekTotal exclut les semaines vacances (pic ponctuel non représentatif)
+    const weekArrAvg = weekArr.map(w => {
+      const isVac = _isVacWeekM4(w.mon) || weeksWithDayOff.has(isoWeekKey(w.mon || ''));
+      return isVac ? { ...w, total: baseHebdo } : w; // vacances = semaine normale 35h
+    });
+    for (let i = 0; i < weekArrAvg.length; i++) {
+      const win = weekArrAvg.slice(Math.max(0, i - 11), i + 1);
       const avg = win.reduce((s, w) => s + w.total, 0) / win.length;
       if (avg > maxAvg12) maxAvg12 = avg;
     }
@@ -2479,9 +2503,11 @@ function _analyzeLegalSituation() {
       maxWeekTotal: Math.round(maxWeekTotal * 100) / 100,
       maxWeekMon, weeksOver48, weeksOver44,
       maxAvg12:     Math.round(maxAvg12 * 100) / 100,
-      hasWeekViol:  maxWeekTotal >= 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
+      hasWeekViol:  maxWeekTotal >= 48,
       hasAvgViol:   maxAvg12 >= 44,
-      hasWeekAlert: maxWeekTotal >= 44 && maxWeekTotal < 48 && !weeksWithDayOff.has(isoWeekKey(maxWeekMon || new Date().toISOString().slice(0,10))),
+      // OPTION 1 : hasWeekAlert basé sur la MOYENNE 12 sem (L3121-22) et non sur le max ponctuel
+      // Exclut les semaines vacances M4 — conforme à l'esprit de la loi
+      hasWeekAlert: maxAvg12 >= 42 && maxAvg12 < 44,
       totalWeeks:   weekArr.length,
     };
 
