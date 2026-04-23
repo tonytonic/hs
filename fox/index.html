@@ -4138,7 +4138,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
     const _dayNow  = new Date().getDay();
     const _seed2   = new Date().getFullYear()*10000 + (new Date().getMonth()+1)*100
                    + new Date().getDate() + Math.round((_todayOT ? _todayOT.extra : 0)*10)
-                   + _hourNow + 7;
+                   + _hourNow;
     const _extMsg  = (typeof _getExtendedBubble === 'function')
       ? [
           _getExtendedBubble(_hourNow, _dayNow, _todayOT, _seed2),
