@@ -329,7 +329,7 @@ const CCN_ALIASES = [
   {i:9711,b:null,n:"Exploitations agricoles Sarthe",s:"Agriculture",g:"DC",fj:false},
   {i:9721,b:null,n:"Exploitations agricoles Savoie",s:"Agriculture",g:"DC",fj:false},
   {i:9731,b:null,n:"Exploitations agricoles Haute-Savoie",s:"Agriculture",g:"DC",fj:false},
-  {i:9741,b:null,n:"Exploitations agricoles Paris Seine Seine-et-Marne",s:"Agriculture",g:"DC",fj:false},
+  {i:9741,b:null,n:"Exploitations agricoles Seine-et-Marne",s:"Agriculture",g:"DC",fj:false},
   {i:9751,b:null,n:"Exploitations agricoles Seine-Maritime",s:"Agriculture",g:"DC",fj:false},
   {i:9761,b:null,n:"Exploitations agricoles Deux-Sèvres",s:"Agriculture",g:"DC",fj:false},
   {i:9771,b:null,n:"Exploitations agricoles Somme",s:"Agriculture",g:"DC",fj:false},
@@ -798,7 +798,7 @@ function verifierConformite(weeklyH, idcc) {
   if (weeklyH > 60) w.push('Dépassement absolu 60h (L3121-20 — interdit sans exception)');
   if (weeklyH > 48) w.push('Dépassement légal 48h (dérogation préfectorale requise)');
   if (weeklyH > (r.maxHebdo||48)) w.push('Dépassement max CCN '+r.maxHebdo+'h');
-  if (weeklyH > 44) w.push('Surveiller moyenne 12 semaines (max 44h L3121-23)');
+  if (weeklyH > 44) w.push('Surveiller moyenne 12 semaines (max 44h L3121-22)');
   return { ok: w.length === 0, warnings: w };
 }
 
