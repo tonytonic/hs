@@ -4,11 +4,14 @@
 <link rel="manifest" href="../manifest.json">
 <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
 <meta name="theme-color" content="#4FB3C2">
+<meta name="color-scheme" content="dark light">
 <meta charset="UTF-8">
 <title>Simulateur d'heures mensualisé</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 .kitsune-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:24px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:auto;margin:0;box-shadow:0 2px 8px rgba(79,179,194,0.35);transition:transform .15s,box-shadow .15s;line-height:1}
@@ -19,7 +22,8 @@
 
 :root{--bg:#0f1115;--card:#1c1f26;--text:#e6e6e6;--muted:#9aa0a6;--accent:#4FB3C2;--accent2:#2196a6;--danger:#c0392b;--success:#2ecc71}
 #versionBadge{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 14px);right:calc(env(safe-area-inset-right) + 14px);font-size:11px;opacity:.55;color:#9aa0a6;z-index:99999;user-select:none;pointer-events:none}
-html{background:var(--bg)}body{margin:0;min-height: 100vh; min-height: 100dvh; height: 100dvh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;overflow-x:hidden}
+html{background:var(--bg)}body{margin:0;min-height: 100vh; min-height: 100dvh; height: 100dvh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;overflow-x:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+@media (min-width: 900px) { .container, .main { max-width: 900px; margin: 0 auto; } }
 .main{padding:12px;padding-top:70px;overflow-x:hidden}
 h1,h2,h3{text-align:center}
 button{width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:15px;margin-top:6px}
@@ -54,7 +58,7 @@ input,select{width:100%;max-width:100%;padding:8px;margin-top:6px;background:#26
 .badge.ok{background:#1a3a4a;color:#4FB3C2}
 .badge.file{background:#283593}
 input[type="month"]{text-align:center;padding-right:0;appearance:none;-webkit-appearance:none}
-input[type="number"]{text-align:center;appearance:none;-webkit-appearance:none;-moz-appearance:textfield;padding-left:0;padding-right:0}
+input[type="number" inputmode="decimal"]{text-align:center;appearance:none;-webkit-appearance:none;-moz-appearance:textfield;padding-left:0;padding-right:0}
 
 /* === MODALE PDF UNIFIÉE === */
 .pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid #333}
@@ -123,8 +127,69 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="../ccn/conventions-collectives.js"></script>
+
+<style id="landscape-blocker-style">
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
+  body > *:not(#landscape-blocker) { display: none !important; }
+  #landscape-blocker {
+    position: fixed; inset: 0; z-index: 2147483647;
+    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
+    color: #fff;
+    display: flex !important; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  #landscape-blocker .lb-icon {
+    font-size: 64px; margin-bottom: 24px;
+    animation: lb-rotate 2s ease-in-out infinite;
+  }
+  #landscape-blocker .lb-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 12px;
+    color: #4FB3C2;
+  }
+  #landscape-blocker .lb-msg {
+    font-size: 15px; color: #ccd; line-height: 1.5; max-width: 320px;
+  }
+  @keyframes lb-rotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+}
+@media screen and (orientation: portrait) {
+  #landscape-blocker { display: none !important; }
+}
+</style>
+<script>
+(function(){
+  // Tentative de verrouillage orientation portrait quand supporté (Android, PWA)
+  function tryLockPortrait(){
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('portrait').catch(function(){});
+      }
+    } catch(_) {}
+  }
+  // Au chargement et à chaque changement de visibilité
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryLockPortrait);
+  } else {
+    tryLockPortrait();
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) tryLockPortrait();
+  });
+  // Au premier tap utilisateur (certains navigateurs exigent un geste utilisateur)
+  document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
+})();
+</script>
 </head>
 <body>
+<div id="landscape-blocker" aria-hidden="true">
+  <div class="lb-icon">📱</div>
+  <div class="lb-title">Tournez votre téléphone</div>
+  <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
+</div><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
 
 <div class="topbar">
   <button class="menu-btn" onclick="goMenu()">&#x2B05; Menu</button>
@@ -141,7 +206,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
     <div id="yearsList" style="display:flex;flex-direction:column;gap:8px;margin:12px 0"></div>
     <hr style="border-color:#2a2f3a;margin:12px 0">
     <label style="font-size:13px">Créer / ouvrir un nouvel exercice</label>
-    <input type="number" id="newYearInput" placeholder="Ex : 2027" min="2000" max="2099" style="margin-top:6px">
+    <input type="number" inputmode="decimal" id="newYearInput" placeholder="Ex : 2027" min="2000" max="2099" style="margin-top:6px">
     <div style="display:flex;gap:8px;margin-top:8px">
       <button onclick="confirmSwitchYear()">Ouvrir</button>
       <button class="secondary" onclick="closeYearsPopup()">Annuler</button>
@@ -222,9 +287,9 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
     <p style="font-size:14px;color:var(--muted)">Ces valeurs pré-remplissent la zone €. Modifiables à tout moment.</p>
     <div style="background:#262a33;border-radius:10px;padding:14px;margin-top:10px">
       <label style="font-size:13px;color:var(--muted)">Taux horaire de base (€/h)</label>
-      <input type="number" id="wizRate" step="0.5" placeholder="Ex: 12.50">
+      <input type="number" inputmode="decimal" id="wizRate" step="0.5" placeholder="Ex: 12.50">
       <label style="font-size:13px;color:var(--muted);margin-top:10px;display:block">Coefficient brut → net <span style="font-size:11px;opacity:0.6;">(facultatif)</span></label>
-      <input type="number" id="wizCoefNet" step="0.01" placeholder="Ex: 0.93">
+      <input type="number" inputmode="decimal" id="wizCoefNet" step="0.01" placeholder="Ex: 0.93">
       <p style="font-size:11px;color:#9aa0a6;margin-top:6px">Les heures supplémentaires sont défiscalisées (exonération impôt + cotisations salariales depuis 2019). Le coefficient est en général autour de <b style="color:#4FB3C2">0.93</b>. Laisse vide si tu n'es pas sûr.</p>
     </div>
     <div class="wiz-nav">
@@ -262,7 +327,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   <div id="m2SaisieWorked" style="display:none">
     <div class="saisie-worked">
       <label>&#x1F551; Total heures travaill&eacute;es ce jour</label>
-      <input id="m2WorkedHours" type="number" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcM2FromWorked()">
+      <input id="m2WorkedHours" type="number" inputmode="decimal" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcM2FromWorked()">
       <div class="calc-result" id="m2WorkedResult"></div>
     </div>
     <button onclick="confirmM2Worked()">Valider</button>
@@ -272,7 +337,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   <div id="m2SaisieHS">
     <div id="hoursChoices"></div>
     <label>Saisie manuelle</label>
-    <input type="number" id="manualHours" step="0.25">
+    <input type="number" inputmode="decimal" id="manualHours" step="0.25">
     <button onclick="confirmManual()">Valider</button>
   </div>
 
@@ -337,7 +402,7 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   <div class="pdf-panel" id="panel-annuel">
     <p style="font-size:13px;color:var(--muted);margin:10px 0 6px">Bilan complet de l'année : tableau mensuel avec périodes, heures 25%/50%, payées, reliquats et sous-totaux trimestriels.</p>
     <label style="font-size:12px;color:var(--muted)">Année à exporter</label>
-    <input type="number" id="pdfYearPicker" min="2020" max="2099" step="1" style="text-align:left">
+    <input type="number" inputmode="decimal" id="pdfYearPicker" min="2020" max="2099" step="1" style="text-align:left">
     <div style="background:#262a33;border-radius:8px;padding:12px;margin-top:10px">
       <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:8px">Options</label>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px">
@@ -420,20 +485,20 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
       <p>Heures à 50 % : <b id="hours50">0.00</b></p>
     </div>
     <p style="font-size:12px;color:#aaa;margin-top:8px" id="calcInfoText"></p>
-    <p>Heures payées : <input type="number" id="paidHours" step="0.25"></p>
+    <p>Heures payées : <input type="number" inputmode="decimal" id="paidHours" step="0.25"></p>
     <p>Reliquat reporté : <b id="carryOver">0.00</b></p>
   </div>
 
   <div class="card">
     <h3>&#x1F4B0; Valeur €</h3>
     <div id="euroBox" class="blur">
-      <label>Taux horaire (€)</label><input type="number" id="rate">
-      <label id="coef25Label">Coef 25 %</label><input type="number" id="coef25">
+      <label>Taux horaire (€)</label><input type="number" inputmode="decimal" id="rate">
+      <label id="coef25Label">Coef 25 %</label><input type="number" inputmode="decimal" id="coef25">
       <div id="coefInterContainer" style="display:none;">
-        <label id="coefInterLabel">Coef 10 %</label><input type="number" id="coefInter">
+        <label id="coefInterLabel">Coef 10 %</label><input type="number" inputmode="decimal" id="coefInter">
       </div>
-      <label id="coef50Label">Coef 50 %</label><input type="number" id="coef50">
-      <label>Coef brut &#x2192; net</label><input type="number" id="coefNet">
+      <label id="coef50Label">Coef 50 %</label><input type="number" inputmode="decimal" id="coef50">
+      <label>Coef brut &#x2192; net</label><input type="number" inputmode="decimal" id="coefNet">
       <p><b id="euroResult">0.00 €</b></p>
       <p id="euroDetail" style="font-size:12px;color:#aaa;margin-top:8px"></p>
       <p style="font-size:12px;color:#9aa0a6;margin-top:10px;line-height:1.4">
@@ -555,24 +620,11 @@ const STORAGE_PREFIX="CA_HS_TRACKER_V1",APP_VERSION="1.5.0",SNAP_KEY=`${STORAGE_
 
 /* ── CCN : règles actives ── */
 function getCCNRules() {
-  console.log('[M2 getCCNRules] Début');
-  console.log('[M2] window.CCN_API:', typeof window.CCN_API);
-  console.log('[M2] window.CCN:', typeof window.CCN);
-  
   if (typeof window.CCN_API !== 'undefined') {
     const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
-    console.log('[M2] IDCC lu:', idcc);
-    
     const rules = window.CCN_API.getGroupeForCCN(idcc);
-    console.log('[M2] Rules retournées:', rules);
-    
-    if (rules && rules.taux1) {
-      console.log('[M2] ✅ CCN chargée:', rules.nom || 'Sans nom', '- taux1:', rules.taux1, '%, contingent:', rules.contingent, 'h');
-      return rules;
-    }
+    if (rules && rules.taux1) return rules;
   }
-  
-  console.log('[M2] ❌ Fallback droit commun');
   return { seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50, contingent:220, debutSemaine:1 };
 }
 function getWeekKeyM2(date){
@@ -1797,7 +1849,7 @@ function closeClosuresModal(){
 
 </script>
 
-<div id="toastContainer"></div>
+<div id="toastContainer" aria-live="polite" aria-atomic="true" role="status"></div>
 <div id="confirmModal"><div class="cm-box"><p class="cm-msg" id="cmMsg"></p><div class="cm-btns"><button class="secondary" id="cmCancel">Annuler</button><button id="cmOk">Confirmer</button></div></div></div>
 
 <!-- DT: Accès discret Module 4 -->
@@ -1839,7 +1891,7 @@ const TIPS={
   seuil:{
     title:'⏱️ Seuil de déclenchement des HS',
     body:'La durée légale du travail est fixée à 35 heures par semaine. Toute heure travaillée au-delà de ce seuil est une heure supplémentaire.\n\nLa semaine de référence commence selon le jour fixé par votre accord d\'entreprise ou votre CCN.\n\nCertaines CCN prévoient un seuil différent (ex. : 37h, 39h) avec des compensations intégrées dans le salaire de base.',
-    ref:'Art. L3121-27 · Art. L3121-32 Code du travail'
+    ref:'Art. L3121-27 · Art. L3121-28 Code du travail'
   }
 };
 function showTip(key){
