@@ -2,17 +2,80 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="only light">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="theme-color" content="#0a0e1a">
   <meta name="format-detection" content="telephone=no">
   <title>🦊 FOX Engine — Heures Sup' Ultimate</title>
   <link rel="manifest" href="../manifest.json">
   <link rel="apple-touch-icon" href="../images/foxplayer.PNG">
   <link rel="stylesheet" href="css/style.css">
+
+<style id="landscape-blocker-style">
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
+  body > *:not(#landscape-blocker) { display: none !important; }
+  #landscape-blocker {
+    position: fixed; inset: 0; z-index: 2147483647;
+    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
+    color: #fff;
+    display: flex !important; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  #landscape-blocker .lb-icon {
+    font-size: 64px; margin-bottom: 24px;
+    animation: lb-rotate 2s ease-in-out infinite;
+  }
+  #landscape-blocker .lb-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 12px;
+    color: #4FB3C2;
+  }
+  #landscape-blocker .lb-msg {
+    font-size: 15px; color: #ccd; line-height: 1.5; max-width: 320px;
+  }
+  @keyframes lb-rotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+}
+@media screen and (orientation: portrait) {
+  #landscape-blocker { display: none !important; }
+}
+</style>
+<script>
+(function(){
+  // Tentative de verrouillage orientation portrait quand supporté (Android, PWA)
+  function tryLockPortrait(){
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('portrait').catch(function(){});
+      }
+    } catch(_) {}
+  }
+  // Au chargement et à chaque changement de visibilité
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryLockPortrait);
+  } else {
+    tryLockPortrait();
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) tryLockPortrait();
+  });
+  // Au premier tap utilisateur (certains navigateurs exigent un geste utilisateur)
+  document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
+})();
+</script>
 </head>
 <body class="gaming-mode">
+<div id="landscape-blocker" aria-hidden="true">
+  <div class="lb-icon">📱</div>
+  <div class="lb-title">Tournez votre téléphone</div>
+  <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
+</div>
 
 <img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
 <script>
@@ -2504,10 +2567,12 @@ function _analyzeLegalSituation() {
       maxWeekMon, weeksOver48, weeksOver44,
       maxAvg12:     Math.round(maxAvg12 * 100) / 100,
       hasWeekViol:  maxWeekTotal >= 48,
-      hasAvgViol:   maxAvg12 >= 44,
-      // OPTION 1 : hasWeekAlert basé sur la MOYENNE 12 sem (L3121-22) et non sur le max ponctuel
-      // Exclut les semaines vacances M4 — conforme à l'esprit de la loi
-      hasWeekAlert: maxAvg12 >= 42 && maxAvg12 < 44,
+      // Art. L3121-22 : moyenne sur 12 sem CONSECUTIVES — il faut au moins 12 sem effectives
+      // Sans cette protection, 1 seule semaine à 45h déclenche l'alerte (faux positif)
+      hasAvgViol:   weekArr.length >= 12 && maxAvg12 >= 44,
+      // Alerte uniquement à partir de 44h moyenne 12 sem (Art. L3121-22)
+      // Pas d'alerte sous-seuil — le seuil légal est 44h, point.
+      hasWeekAlert: false,
       totalWeeks:   weekArr.length,
     };
 
@@ -2549,10 +2614,16 @@ function _analyzeLegalSituation() {
     };
 
     // 5. NIVEAU GLOBAL
+    // - 'danger' : violation absolue (>10h/jour, >48h/sem, contingent dépassé)
+    // - 'warning' : risque réel (>12h/jour ponctuel, moyenne 12 sem >44h, contingent proche)
+    // - 'alert'  : alerte sous-seuil — RETIRÉ (hasWeekAlert est false par défaut)
+    //   NB : weeksOver44 > 0 NE déclenche PAS d'alerte car 44-48h est LÉGAL en ponctuel
+    //        (la limite ponctuelle absolue est 48h Art. L3121-20 → hasWeekViol)
+    //        (le seuil 44h ne s'applique qu'en MOYENNE sur 12 sem Art. L3121-22 → hasAvgViol)
     let globalLevel = 'ok';
     if (daily.hasDailyCrit || weekly.hasWeekViol || annual.hasContingentDanger) globalLevel = 'danger';
     else if (daily.hasDailyRisk || weekly.hasAvgViol || annual.hasContingentAlert) globalLevel = 'warning';
-    else if (weekly.hasWeekAlert || weekly.weeksOver44 > 0) globalLevel = 'alert';
+    // 'alert' supprimé — pas d'alerte ponctuelle sous-seuil légal
 
     return { daily, weekly, period, annual, globalLevel, baseHebdo, baseJour, year };
 
@@ -2893,7 +2964,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: _fmtH(extra)+' supplémentaires documentées pour cette journée. Elles s\'ajoutent à ton compteur hebdomadaire de '+_fmtH(h)+' sup totales cette semaine.',
         actions: ['Vérifier le total de la semaine', 'Anticiper les prochains jours', 'Surveiller la moyenne 12 semaines'] },
       { titre: 'Journée à '+_fmtH(total)+' : tes droits',
-        message: 'Pour '+_fmtH(extra)+' sup, ta majoration est de +25% (si total semaine ≤ 43h) ou +50% (si > 43h). Vérifie ton bulletin de paie (Art. L3121-22).',
+        message: 'Pour '+_fmtH(extra)+' sup, ta majoration est de +25% (si total semaine ≤ 43h) ou +50% (si > 43h). Vérifie ton bulletin de paie (Art. L3121-36).',
         actions: ['Calculer tes majorations théoriques', 'Comparer avec ta fiche de paie', 'Demander un correctif si besoin'] },
       { titre: _fmtH(total)+' — fatigue à surveiller',
         message: 'Une journée de '+_fmtH(total)+' est physiquement exigeante. L\'Art. L4121-1 impose à ton employeur de prévenir les risques liés à la charge de travail.',
@@ -2984,7 +3055,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: '48h/semaine est le maximum absolu du droit du travail français. '+_fmtH(total)+' dépasse ce seuil. En 12 semaines la moyenne ne peut excéder 44h (Art. L3121-22).',
         actions: ['Note le détail de cette semaine dans FOX', 'En parler à ton responsable', 'Vérifie tes heures des semaines précédentes'] },
       { titre: 'Record hebdo : '+_fmtH(total)+'',
-        message: 'Semaine exceptionnelle à '+_fmtH(total)+'. Ces heures doivent être rémunérées avec les majorations appropriées (+25% puis +50%) (Art. L3121-22).',
+        message: 'Semaine exceptionnelle à '+_fmtH(total)+'. Ces heures doivent être rémunérées avec les majorations appropriées (+25% puis +50%) (Art. L3121-36).',
         actions: ['Calcule les heures à +25% et à +50%', 'Vérifie le calcul sur ta prochaine fiche de paie', 'Demande un correctif si besoin'] },
       { titre: _fmtH(total)+' : semaine hors norme',
         message: 'Avec '+_fmtH(total)+' cette semaine, tu dépasses le plafond légal de 8h. En logistique/transport, les contingents sont parfois plus élevés — vérifie ton accord.',
@@ -3059,7 +3130,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Semaine à '+_fmtH(total)+' enregistrée. Si la semaine prochaine est aussi chargée, tu approches la limite légale de 44h en moyenne sur 12 semaines.',
         actions: ['Note la charge anticipée de la semaine prochaine', 'Parle à ton responsable si tendance lourde', 'Consulte FOX pour la moyenne glissante'] },
       { titre: '⏰ Semaine à '+_fmtH(total)+'',
-        message: 'Total hebdomadaire dépassant 48h. Rappel: les heures sup au-delà de 8h/sem (43h+) sont majorées à +50% (Art. L3121-22). Vérifie la majoration sur ta fiche.',
+        message: 'Total hebdomadaire dépassant 48h. Rappel: les heures sup au-delà de 8h/sem (43h+) sont majorées à +50% (Art. L3121-36). Vérifie la majoration sur ta fiche.',
         actions: ['Calcule tes heures à +50%', 'Compare avec ton bulletin', 'Demande un correctif si nécessaire'] },
       { titre: 'Semaine : '+_fmtH(total)+' — note importante',
         message: 'En secteur transport-logistique, le contingent peut être relevé à 320h par accord. Mais même avec dérogation, 48h/semaine reste le plafond absolu (Art. L3121-20).',
@@ -3067,7 +3138,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     
       { titre: '🚨 Semaine à '+_fmtH(total)+' : situation à surveiller', message: 'La semaine du '+sem+' dépasse 48h avec '+_fmtH(total)+' enregistrées. La limite légale de 48h est fixée par l\'Art. L3121-20 — surveille la tendance.', actions: ['Note la date et le total précis dans FOX', 'En parler à ton responsable', 'Vérifie les heures sur ton prochain bulletin'] },
       { titre: _fmtH(total)+' cette semaine : plafond légal dépassé', message: 'Le plafond de 48h/semaine est dépassé : '+_fmtH(total)+' enregistrées. Même avec accord collectif, 60h reste le maximum absolu en France (Art. L3121-20).', actions: ['Note ce dépassement dans FOX', 'Vérifie que les heures sont bien sur ta fiche de paie', 'En parler à ton responsable'] },
-      { titre: 'Semaine chargée : '+_fmtH(total)+' au total', message: '+48h cette semaine ('+_fmtH(total)+'). Les articles L3121-20 et L3121-23 fixent 48h comme plafond hebdomadaire. Même ponctuelle, cette situation doit rester exceptionnelle.', actions: ['Identifie la cause : surcharge soudaine, urgence…', 'Parle-en à ton manager pour éviter la récurrence', 'Garde le détail journalier de cette semaine'] },
+      { titre: 'Semaine chargée : '+_fmtH(total)+' au total', message: '+48h cette semaine ('+_fmtH(total)+'). L\'article L3121-20 fixe 48h comme plafond hebdomadaire absolu, et L3121-22 fixe 44h en moyenne sur 12 semaines. Même ponctuelle, cette situation doit rester exceptionnelle.', actions: ['Identifie la cause : surcharge soudaine, urgence…', 'Parle-en à ton manager pour éviter la récurrence', 'Garde le détail journalier de cette semaine'] },
       { titre: '48h dépassées : repos compensateur ?', message: 'Avec '+_fmtH(total)+' semaine du '+sem+', tu as droit à un repos compensateur selon ton accord collectif. Au-delà du contingent de 220h/an, ce repos est obligatoire (Art. L3121-30).', actions: ['Vérifie ton accord d\'entreprise', 'Demande le récapitulatif de tes compteurs HS', 'Si > 220h/an : le repos compensateur s\'applique'] },
       { titre: _fmtH(total)+' : impact sur le contingent annuel', message: 'Cette semaine à '+_fmtH(total)+' ajoute des heures significatives à ton contingent annuel. Surveille le cumul pour anticiper le repos compensateur obligatoire.', actions: ['Consulte ton cumul annuel dans FOX', 'Anticipe si tu approches 165h (alerte 75%)', 'Prévois avec ton employeur si tu approches 220h'] },
       { titre: 'Semaine à '+_fmtH(total)+' : vérification fiche de paie', message: 'Ces '+_fmtH(total)+' cette semaine représentent des heures supplémentaires à majorer (+25% ou +50%). Elles doivent figurer sur ta prochaine fiche de paie.', actions: ['Prépare le calcul des majorations dues', 'Compare avec ta fiche de paie suivante', 'Conteste par écrit si omission constatée'] },
@@ -3077,7 +3148,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       { titre: _fmtH(total)+' travaillées — impact moy. 12 sem', message: 'Cette semaine à '+_fmtH(total)+' fait monter ta moyenne sur 12 semaines. Si elle dépasse 44h/sem en moyenne, c\'est un second signal fort à surveiller (Art. L3121-22).', actions: ['Vérifie ta moyenne 12 sem dans FOX', 'Si > 44h : deux seuils franchis', 'En parler à ton responsable'] },
       { titre: 'Semaine record : '+_fmtH(total)+' — récupération', message: 'Le repos hebdomadaire minimum de 35h consécutives (Art. L3132-2) doit suivre cette semaine. Prévois un week-end de récupération.', actions: ['Assure-toi d\'avoir au minimum 35h consécutives de repos', 'Si travail ce week-end : parle-en à ton manager', 'Planifie un vrai temps de récupération'] },
       { titre: '🚨 '+_fmtH(total)+'/sem : alerte immédiate', message: _fmtH(total)+' cette semaine. Le plafond légal de 48h est dépassé (Art. L3121-20). C\'est un signal à prendre en compte dans l\'organisation de la charge.', actions: ['Note les détails dans FOX', 'En parler à ton responsable', 'Surveille la tendance les prochaines semaines'] },
-      { titre: 'Semaine à '+_fmtH(total)+' : fréquence à surveiller', message: 'Ce dépassement de 48h est-il isolé ou récurrent ? Un dépassement ponctuel reste exceptionnel — la tendance sur 12 semaines est l\'indicateur fiable (Art. L3121-23).', actions: ['Consulte l\'historique FOX sur les 12 dernières semaines', 'Si récurrent (>4 fois) : en parler à ton responsable', 'Consulte le médecin du travail si fatigue'] },
+      { titre: 'Semaine à '+_fmtH(total)+' : fréquence à surveiller', message: 'Ce dépassement de 48h est-il isolé ou récurrent ? Un dépassement ponctuel reste exceptionnel — la tendance sur 12 semaines est l\'indicateur fiable (Art. L3121-22).', actions: ['Consulte l\'historique FOX sur les 12 dernières semaines', 'Si récurrent (>4 fois) : en parler à ton responsable', 'Consulte le médecin du travail si fatigue'] },
       { titre: _fmtH(total)+' : tes droits cette semaine', message: 'Pour toutes les heures au-delà de 35h/sem, tu as droit à des majorations. Au-delà de 48h, la situation dépasse le cadre habituel (Art. L3121-20).', actions: ['Calcule les majorations dues', 'Vérifie sur ta prochaine fiche de paie', 'Parle à un représentant si ces droits ne sont pas respectés'] },
       { titre: 'Semaine '+sem+' — ce que dit la loi', message: 'Plafond de 48h semaine dépassé (Art. L3121-20). La loi fixe cette limite pour protéger la santé des salariés — surveille la tendance dans FOX.', actions: ['Documente cette semaine dans FOX', 'En parler à ton responsable', 'Consulte le médecin du travail si besoin'] },
     ];
@@ -3370,7 +3441,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Ces '+_fmtH(h)+' s\'ajoutent à ton total mensuel. Combien as-tu enregistré ce mois-ci au total ? FOX calcule tout automatiquement.',
         actions: ['Consulter le total mensuel dans FOX', 'Vérifier la trajectoire vers le contingent', 'Anticiper les prochaines semaines'] },
       { titre: _fmtH(h)+' sup : majoration due',
-        message: '+'+_fmtH(h)+' ce jour. Si la semaine dépasse 43h, ces heures passent à +50% de majoration (Art. L3121-22). Surveille ton total hebdomadaire.',
+        message: '+'+_fmtH(h)+' ce jour. Si la semaine dépasse 43h, ces heures passent à +50% de majoration (Art. L3121-36). Surveille ton total hebdomadaire.',
         actions: ['Calcule le total de la semaine', 'Applique le bon taux de majoration', 'Vérifie sur ta fiche de paie'] },
       { titre: 'Journée chargée : '+_fmtH(h)+' en plus',
         message: _fmtH(h)+' supplémentaires. Ces heures participent à ta moyenne sur 12 semaines. Si la moyenne dépasse 44h, c\'est une situation à signaler.',
@@ -4202,7 +4273,18 @@ function kitsuneNarrateOvertime(deltaH, source) {
       }
     } catch(e) {}
     const _recoveryKey = _isInRecoveryPhase() ? 'r1' : 'r0';
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_r4';
+    // Hash global M1+M2 pour invalider le cache popup si modification dans le passé
+    let _globalHash = 0;
+    try {
+      const _yr = new Date().getFullYear().toString();
+      const _m1raw = localStorage.getItem('DATA_REPORT_' + _yr) || '';
+      const _m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr) || '';
+      const _s = _m1raw + '|' + _m2raw;
+      for (let _i = 0; _i < _s.length; _i++) {
+        _globalHash = ((_globalHash << 5) - _globalHash + _s.charCodeAt(_i)) | 0;
+      }
+    } catch(e) {}
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_r4';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
@@ -6110,7 +6192,7 @@ async function sendToKitsune() {
         </div>
         <div class="dev-section-label">INJECTER HEURES M1</div>
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
-          <input id="dev-inject-hours" type="number" min="0" max="500" value="50" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:7px;padding:5px 8px;font-size:0.82rem;">
+          <input id="dev-inject-hours" type="number" inputmode="decimal" min="0" max="500" value="50" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:7px;padding:5px 8px;font-size:0.82rem;">
           <span style="color:#666;font-size:0.75rem;">h sup</span>
           <button class="demo-btn" onclick="devInjectHours()">Injecter</button>
         </div>
@@ -6152,7 +6234,7 @@ async function sendToKitsune() {
       <!-- ── ONGLET : SCÉNARIOS ─────────────────────────────── -->
       <div id="dev-tab-scenarios" class="dev-tab-content" style="display:none;">
         <div style="display:flex;gap:6px;margin-bottom:6px;">
-          <input id="dev-sc-search" type="number" min="1" max="600" placeholder="N&#xb0; sc&#xe9;nario 1&#x2013;600" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:7px;padding:5px 8px;font-size:0.8rem;">
+          <input id="dev-sc-search" type="number" inputmode="decimal" min="1" max="600" placeholder="N&#xb0; sc&#xe9;nario 1&#x2013;600" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:7px;padding:5px 8px;font-size:0.8rem;">
           <button class="demo-btn" onclick="devPlayScenarioById()">Jouer</button>
         </div>
         <div class="dev-section-label" style="margin-bottom:5px;">FILTRER PAR CAT&#xc9;GORIE</div>
@@ -6308,7 +6390,7 @@ async function sendToKitsune() {
         <div class="dev-section-label" style="color:#7DF9FF;">⏱ SIMULER HEURES SUP</div>
         <div style="font-size:0.72rem;color:#555;margin-bottom:6px;">Injecte un delta d'heures → déclenche sync + XP + burnout</div>
         <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px;">
-          <input type="number" id="emu-hours-input" value="10" min="0" max="500" step="0.5"
+          <input type="number" inputmode="decimal" id="emu-hours-input" value="10" min="0" max="500" step="0.5"
             style="width:70px;background:rgba(125,249,255,0.07);border:1px solid rgba(125,249,255,0.3);color:#7DF9FF;border-radius:7px;padding:6px;font-size:1rem;text-align:center;">
           <span style="color:#666;font-size:0.78rem;">heures sup</span>
           <select id="emu-source" style="flex:1;background:rgba(125,249,255,0.07);border:1px solid rgba(125,249,255,0.3);color:#7DF9FF;border-radius:7px;padding:6px;font-size:0.8rem;">
@@ -7614,7 +7696,11 @@ function refreshKitsunePopup() {
         // Il y a des données, déclencher une analyse
         try { kitsuneNarrateOvertime(0, 'POPUP'); } catch(e){}
         foxText.textContent = '🦊 Analyse en cours...';
-        setTimeout(() => {
+        // Retry plusieurs fois pour laisser le temps à la narration async d'écrire dans localStorage
+        let _try = 0;
+        const _maxTry = 6;
+        const _checkNarr = () => {
+          _try++;
           const n = localStorage.getItem('FOX_LAST_NARRATION');
           if (n) {
             try {
@@ -7625,10 +7711,21 @@ function refreshKitsunePopup() {
               let html = '';
               if (narr.titre) html += '<div style="color:#FF8C42;font-weight:900;font-size:0.95rem;margin-bottom:8px;">'+narr.titre+'</div>';
               if (narr.message) html += '<div style="color:#ccc;line-height:1.7;font-size:0.88rem;">'+narr.message+'</div>';
-              foxText.innerHTML = html || '🦊 Analyse terminée';
+              if (html) {
+                foxText.innerHTML = html;
+                return; // narration trouvée et affichée → stop
+              }
             } catch(e){}
           }
-        }, 500);
+          // Narration pas encore prête → retry jusqu'à _maxTry
+          if (_try < _maxTry) {
+            setTimeout(_checkNarr, 500);
+          } else {
+            // Fallback après 6 retries (3 secondes) — afficher message générique
+            foxText.innerHTML = '<div style="color:#FF8C42;font-weight:700;margin-bottom:6px;">🦊 Pas d\'analyse disponible</div><div style="color:#ccc;font-size:0.88rem;">Continue la saisie pour générer un historique fiable.</div>';
+          }
+        };
+        setTimeout(_checkNarr, 500);
       }
     }
   }
@@ -14359,10 +14456,8 @@ function _recordViolation(situation) {
   } else if (situation.weekly?.hasAvgViol) {
     viols.push({ ts: now, niveau:'danger', titre:'Moyenne 12 sem. > 44h',
       detail: 'Moyenne : ' + _fmtH(situation.weekly.maxAvg12), art: 'Art. L3121-22' });
-  } else if (situation.weekly?.hasWeekAlert) {
-    viols.push({ ts: now, niveau:'warning', titre:'Semaine chargée',
-      detail: situation.weekly.maxWeekTotal + 'h cette semaine', art: 'Art. L3121-10' });
   }
+  // Plus d'alerte sous-seuil — la limite légale est 44h moyenne, en dessous = conforme
   if (situation.annual?.hasContingentDanger) {
     viols.push({ ts: now, niveau:'danger', titre:'Contingent annuel dépassé',
       detail: _fmtH(situation.annual.annualOT)+' / '+_fmtH(situation.annual.contingentMax),
