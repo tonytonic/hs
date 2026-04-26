@@ -784,10 +784,31 @@ const GLOSSAIRE = {
   },
   
   "Art. L3121-22": {
-    simple: "article de loi",
+    simple: "moyenne 44h sur 12 semaines",
     expert: "Art. L3121-22",
-    def: "Article du Code du Travail qui définit les règles sur les heures supplémentaires.",
-    exemple: "L3121-22 = règle sur la durée légale du travail (35h)"
+    def: "Article du Code du Travail qui fixe la durée maximale moyenne : la durée hebdomadaire de travail calculée sur 12 semaines consécutives ne peut pas dépasser 44 heures.",
+    exemple: "L3121-22 = moyenne max 44h/semaine sur 12 semaines consécutives"
+  },
+  
+  "Art. L3121-27": {
+    simple: "durée légale 35h",
+    expert: "Art. L3121-27",
+    def: "Article du Code du Travail qui fixe la durée légale du travail effectif à 35 heures par semaine pour un salarié à temps complet.",
+    exemple: "L3121-27 = durée légale du travail (35h/semaine en France)"
+  },
+  
+  "Art. L3121-28": {
+    simple: "définition d'une heure sup",
+    expert: "Art. L3121-28",
+    def: "Toute heure accomplie au-delà de la durée légale hebdomadaire (35h) ou de la durée considérée comme équivalente est une heure supplémentaire.",
+    exemple: "L3121-28 = définition de l'heure supplémentaire (au-delà de 35h/sem)"
+  },
+  
+  "Art. L3121-36": {
+    simple: "majoration +25% / +50%",
+    expert: "Art. L3121-36",
+    def: "À défaut d'accord, la majoration des heures supplémentaires est de 25% pour les 8 premières heures (36e à 43e) et 50% au-delà (à partir de la 44e heure).",
+    exemple: "L3121-36 = +25% pour les 8 premières HS, puis +50% au-delà"
   },
   
   "accord d'entreprise": {
