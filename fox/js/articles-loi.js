@@ -24,9 +24,9 @@ const ARTICLES_LOI = [
     ]
   },
   {
-    art: 'Art. L3121-10',
+    art: 'Art. L3121-27',
     titre: 'Durée légale hebdomadaire — 35h',
-    def: 'La durée légale du travail est fixée à 35 heures par semaine civile. Toute heure travaillée au-delà est une heure supplémentaire.',
+    def: 'La durée légale du travail effectif des salariés à temps complet est fixée à 35 heures par semaine civile. Toute heure travaillée au-delà est une heure supplémentaire.',
     ex: 'Si tu travailles 38h dans la semaine, tu as 3h supplémentaires.',
     mots: ['35h', 'durée légale', 'semaine', 'temps plein'],
     liens: [
@@ -68,13 +68,24 @@ const ARTICLES_LOI = [
     ]
   },
   {
-    art: 'Art. L3121-30',
-    titre: 'Heures supplémentaires — définition et majorations',
-    def: 'Heures accomplies au-delà de la durée légale de 35h. Elles ouvrent droit à une majoration de salaire (25% pour les 8 premières, 50% au-delà) ou à un repos compensateur.',
-    ex: 'De la 36e à la 43e heure : +25%. De la 44e heure et au-delà : +50%.',
-    mots: ['heures sup', 'majoration', '25%', '50%', 'compensation', 'HS'],
+    art: 'Art. L3121-28',
+    titre: 'Heures supplémentaires — définition',
+    def: 'Toute heure accomplie au-delà de la durée légale hebdomadaire (35h) ou de la durée considérée comme équivalente est une heure supplémentaire qui ouvre droit à une majoration salariale ou à un repos compensateur équivalent.',
+    ex: 'La 36e heure de la semaine est ta 1ère heure supplémentaire.',
+    mots: ['heures sup', 'HS', 'définition', 'au-delà 35h'],
     liens: [
-      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006178009' },
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020376' },
+      { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
+    ]
+  },
+  {
+    art: 'Art. L3121-36',
+    titre: 'Heures supplémentaires — majorations 25% / 50%',
+    def: 'À défaut d\'accord, la majoration des heures supplémentaires est de 25% pour les 8 premières heures (36e à 43e) et 50% au-delà (à partir de la 44e heure). Un accord collectif peut prévoir un taux différent, sans descendre sous 10%.',
+    ex: 'De la 36e à la 43e heure : +25%. De la 44e heure et au-delà : +50%.',
+    mots: ['majoration', '25%', '50%', 'HS', 'taux'],
+    liens: [
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020384' },
       { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
     ]
   },
@@ -90,13 +101,13 @@ const ARTICLES_LOI = [
     ]
   },
   {
-    art: 'Art. L3121-38',
+    art: 'Art. L3121-37',
     titre: 'Repos compensateur de remplacement (RCR)',
-    def: 'Alternative à la majoration financière des heures supplémentaires. L\'employeur peut, avec accord collectif, remplacer le paiement majoré par un repos de durée équivalente.',
+    def: 'Dans les entreprises dépourvues de délégué syndical, l\'employeur peut remplacer, en tout ou partie, le paiement des heures supplémentaires (et des majorations) par un repos compensateur équivalent, à condition que le CSE (s\'il existe) ne s\'y oppose pas.',
     ex: '1h sup à 25% = 1h15 de repos compensateur.',
     mots: ['RCR', 'récup', 'repos compensateur', 'remplacement', 'récupération'],
     liens: [
-      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006178009' },
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020386' },
       { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
     ]
   },
@@ -145,35 +156,35 @@ const ARTICLES_LOI = [
     ]
   },
   {
-    art: 'Art. L3121-27',
+    art: 'Art. L3121-28 (alinéa 2)',
     titre: 'Heures supplémentaires — Paiement ou repos compensateur',
-    def: 'Les heures supplémentaires donnent lieu soit à un paiement majoré, soit à un repos compensateur équivalent majoré. Le choix appartient à l\'employeur, sauf disposition conventionnelle contraire.',
-    ex: '10h supplémentaires → soit 12.5h en paiement (majoration 25%), soit 12.5h de repos compensateur.',
+    def: 'Les heures supplémentaires ouvrent droit à une majoration salariale ou, le cas échéant, à un repos compensateur équivalent. L\'arbitrage entre les deux s\'opère selon l\'accord collectif applicable ou les règles supplétives (L3121-37).',
+    ex: '10h supplémentaires → soit paiement majoré (25%), soit 12.5h de repos compensateur équivalent.',
     mots: ['paiement', 'repos compensateur', 'équivalent', 'choix employeur'],
     liens: [
-      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006178009' },
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020376' },
       { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
     ]
   },
   {
-    art: 'Art. L3121-34',
+    art: 'Art. L3121-30',
     titre: 'Contingent annuel d\'heures supplémentaires',
-    def: 'Volume d\'heures supplémentaires qu\'un salarié peut effectuer au-delà de la durée légale sans autorisation de l\'inspecteur du travail. Au-delà du contingent, une contrepartie obligatoire en repos (COR) est due.',
-    ex: 'Contingent 220h : au-delà, chaque heure donne droit à 50% de repos (1h travaillée = 0.5h repos).',
-    mots: ['contingent', 'autorisation', 'COR', 'contrepartie obligatoire'],
+    def: 'Volume d\'heures supplémentaires qu\'un salarié peut effectuer au-delà de la durée légale. Défini par accord collectif (L3121-33) ou à défaut par décret à 220h (D3121-24). Au-delà du contingent, une contrepartie obligatoire en repos (COR) est due (L3121-38).',
+    ex: 'Contingent 220h : au-delà, chaque heure donne droit à 50% de repos (≤20 sal.) ou 100% (>20 sal.).',
+    mots: ['contingent', 'COR', 'contrepartie obligatoire', '220h'],
     liens: [
-      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006178009' },
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020378' },
       { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
     ]
   },
   {
-    art: 'Art. L3121-41',
+    art: 'Art. L3121-9',
     titre: 'Astreinte',
     def: 'Période pendant laquelle le salarié, sans être sur son lieu de travail et sans être à la disposition permanente de l\'employeur, doit être en mesure d\'intervenir pour accomplir un travail. Seul le temps d\'intervention est du temps de travail effectif.',
-    ex: 'Astreinte le week-end : si intervention de 2h, seules ces 2h comptent comme temps de travail.',
+    ex: 'Astreinte le week-end : si intervention de 2h, seules ces 2h comptent comme temps de travail effectif.',
     mots: ['astreinte', 'disponibilité', 'intervention', 'temps effectif'],
     liens: [
-      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/section_lc/LEGITEXT000006072050/LEGISCTA000006178009' },
+      { label: 'Code du travail - Légifrance', url: 'https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000033020331' },
       { label: 'Ministère du Travail', url: 'https://travail-emploi.gouv.fr/droit-du-travail/temps-de-travail/' }
     ]
   },
@@ -274,9 +285,9 @@ const ARTICLES_LOI = [
     mots: ["déplacement", "trajet", "domicile", "mission", "contrepartie", "professionnel"]
   },
   {
-    art: "Art. L3121-11", titre: "Heures supplémentaires — refus",
-    def: "Dans la limite du contingent annuel, l'accomplissement d'heures supplémentaires est à l'initiative de l'employeur. Le salarié ne peut en principe pas les refuser, sauf en cas de délai de prévenance insuffisant ou de disposition conventionnelle contraire.",
-    ex: "Un salarié peut légitimement refuser des HS imposées 5 minutes avant la fin du poste si aucun accord collectif ne l'impose.",
+    art: "Art. L3121-28 + Jurisprudence Cass. Soc.", titre: "Heures supplémentaires — refus",
+    def: "Dans la limite du contingent annuel, l'accomplissement d'heures supplémentaires est à l'initiative de l'employeur. Le salarié ne peut en principe pas les refuser, sauf en cas de délai de prévenance insuffisant, d'atteinte disproportionnée à sa vie personnelle, ou de disposition conventionnelle contraire (Cass. Soc. jurisprudence constante).",
+    ex: "Un salarié peut légitimement refuser des HS imposées 5 minutes avant la fin du poste si aucun accord collectif ne l'impose, ou si cela porte atteinte à sa vie personnelle.",
     mots: ["heures supplémentaires", "refus", "obligation", "initiative employeur", "contingent"]
   },
   {
@@ -340,15 +351,15 @@ const ARTICLES_LOI = [
     mots: ["travailleur de nuit", "statut", "270h", "deux fois par semaine", "trois heures"]
   },
   {
-    art: "Art. L3122-7", titre: "Durée maximale du travail de nuit",
-    def: "La durée quotidienne du travail de nuit ne peut excéder 8 heures. La durée hebdomadaire, calculée sur une période de 12 semaines consécutives, ne peut dépasser 40 heures.",
-    ex: "Un poste de nuit de 10h contrevient à la durée maximale légale de 8h — une dérogation accordée par l'inspection du travail est nécessaire.",
+    art: "Art. L3122-6", titre: "Durée maximale quotidienne du travail de nuit",
+    def: "La durée quotidienne du travail accomplie par un travailleur de nuit ne peut excéder 8 heures. La durée hebdomadaire moyenne, calculée sur 12 semaines consécutives, ne peut dépasser 40 heures (Art. L3122-7).",
+    ex: "Un poste de nuit de 10h contrevient à la durée maximale légale de 8h — une dérogation par accord collectif ou inspection du travail est nécessaire.",
     mots: ["nuit", "8 heures", "durée maximale", "40 heures", "12 semaines", "plafond"]
   },
   {
-    art: "Art. L3122-9", titre: "Contreparties travail de nuit",
-    def: "Les travailleurs de nuit bénéficient de contreparties fixées par accord collectif, sous forme de repos compensateur et, le cas échéant, de compensation salariale. En l'absence d'accord, des contreparties minimales doivent quand même être accordées.",
-    ex: "Sans accord collectif précisant les contreparties nuit, l'employeur doit verser a minima une compensation financière pour les heures de nuit effectuées.",
+    art: "Art. L3122-8", titre: "Contreparties travail de nuit",
+    def: "Les travailleurs de nuit bénéficient de contreparties au titre des périodes de nuit pendant lesquelles ils sont employés, sous forme de repos compensateur et, le cas échéant, de compensation salariale. Ces contreparties sont fixées par accord collectif (L3122-15 et suiv.).",
+    ex: "Sans accord collectif précisant les contreparties nuit, l'employeur doit a minima accorder des repos compensateurs équivalents.",
     mots: ["contreparties", "nuit", "repos compensateur", "compensation salariale", "accord"]
   },
   {
@@ -676,8 +687,8 @@ const ARTICLES_LOI = [
     mots: ["expression des salariés", "droit d'expression", "contenu du travail", "organisation", "liberté"]
   },
   {
-    art: "Art. L2311-1", titre: "Comité Social et Economique — seuils",
-    def: "Le comité social et économique est mis en place dans les entreprises d'au moins 11 salariés. Ses attributions varient selon l'effectif : elles sont plus étendues au-dessus de 50 salariés.",
+    art: "Art. L2311-2", titre: "Comité Social et Economique — seuils",
+    def: "Un comité social et économique est mis en place dans les entreprises d'au moins 11 salariés. Sa mise en place n'est obligatoire que si l'effectif d'au moins 11 salariés est atteint pendant 12 mois consécutifs. Ses attributions varient selon l'effectif : elles sont plus étendues au-dessus de 50 salariés.",
     ex: "En dessous de 11 salariés, il n'y a pas de CSE obligatoire. Entre 11 et 49, le CSE a des attributions réduites (pas de CSSCT, pas de consultation obligatoire sur la stratégie).",
     mots: ["CSE", "seuils", "11 salariés", "50 salariés", "comité social économique"]
   },
@@ -688,8 +699,8 @@ const ARTICLES_LOI = [
     mots: ["délégation", "heures CSE", "élu", "temps de travail", "rémunération"]
   },
   {
-    art: "Art. L2323-1", titre: "Information et consultation du CSE",
-    def: "L'employeur informe et consulte le CSE sur les questions intéressant l'organisation, la gestion et la marche générale de l'entreprise, notamment sur les conditions de travail. La consultation doit être préalable à toute décision importante.",
+    art: "Art. L2312-8", titre: "Information et consultation du CSE",
+    def: "Le CSE a pour mission d'assurer une expression collective des salariés permettant la prise en compte permanente de leurs intérêts dans les décisions relatives à la gestion et à l'évolution économique et financière de l'entreprise, à l'organisation du travail, à la formation professionnelle et aux techniques de production. La consultation doit être préalable à toute décision importante.",
     ex: "Une restructuration, un plan social, une modification importante des conditions de travail nécessitent la consultation préalable du CSE. Ne pas le consulter peut entraîner la suspension de la décision.",
     mots: ["CSE", "consultation", "information", "organisation", "décision", "préalable"]
   },
@@ -724,8 +735,8 @@ const ARTICLES_LOI = [
     mots: ["contingent", "220 heures", "accord collectif", "dérogation", "annuel"]
   },
   {
-    art: "Art. L3121-31", titre: "Dépassement du contingent",
-    def: "Les heures supplémentaires accomplies au-delà du contingent annuel ouvrent droit, en plus de la majoration salariale, à une contrepartie obligatoire sous forme de repos. Les modalités de ce repos sont définies par accord collectif ou, à défaut, par décret.",
+    art: "Art. L3121-33", titre: "Dépassement du contingent — contrepartie obligatoire en repos",
+    def: "Les heures supplémentaires accomplies au-delà du contingent annuel ouvrent droit à une contrepartie obligatoire en repos. La durée de ce repos ne peut être inférieure à 50% des HS hors contingent pour les entreprises ≤20 salariés, et 100% pour les entreprises >20 salariés (Art. L3121-33 al.3 + L3121-30 al.2).",
     ex: "Au-delà de 220h de HS dans l'année, chaque heure supplémentaire génère automatiquement un droit à repos compensateur, en plus de la majoration de salaire.",
     mots: ["dépassement contingent", "contrepartie repos", "220h", "repos compensateur obligatoire"]
   },
@@ -748,10 +759,10 @@ const ARTICLES_LOI = [
     mots: ["travail de nuit", "accord collectif", "obligation", "justification", "mise en place"]
   },
   {
-    art: "Art. L3122-13", titre: "Travail de nuit — repos quotidien",
-    def: "Le repos quotidien des travailleurs de nuit est de 11 heures. Il doit être pris dans les conditions prévues aux articles L3131-1 et suivants. Aucune dérogation n'est possible pour les travailleurs de nuit.",
-    ex: "Un travailleur de nuit finissant à 6h du matin ne peut pas reprendre son poste avant 17h. Le repos de 11h est incompressible, y compris pour le travail de nuit.",
-    mots: ["travail de nuit", "repos quotidien", "11 heures", "incompressible"]
+    art: "Art. L3131-1 (+ L3122-13)", titre: "Travail de nuit — repos quotidien",
+    def: "Le repos quotidien des travailleurs de nuit relève du droit commun : 11 heures consécutives minimum (Art. L3131-1). L'article L3122-13 distinct organise la priorité d'accès à un poste de jour pour les travailleurs de nuit. Aucune dérogation automatique au repos de 11h n'est prévue spécifiquement pour les travailleurs de nuit.",
+    ex: "Un travailleur de nuit finissant à 6h du matin ne peut pas reprendre son poste avant 17h. Le repos de 11h est dû, comme pour les autres salariés.",
+    mots: ["travail de nuit", "repos quotidien", "11 heures", "L3131-1", "priorité poste jour"]
   },
   {
     art: "Art. L3133-3", titre: "Jours fériés — chômage",
@@ -772,8 +783,8 @@ const ARTICLES_LOI = [
     mots: ["congés payés", "assimilation", "accident du travail", "maternité", "acquisition"]
   },
   {
-    art: "Art. L3141-13", titre: "Ordre des départs en congés",
-    def: "A l'intérieur de la période des congés, l'ordre et les dates de départ sont fixés par l'employeur après avis du CSE, en tenant compte de la situation de famille des bénéficiaires et de leur ancienneté.",
+    art: "Art. L3141-15 + L3141-16", titre: "Ordre des départs en congés",
+    def: "L'ordre des départs en congé est fixé par accord d'entreprise ou de branche (Art. L3141-15). À défaut, l'employeur le détermine après avis du CSE, en tenant compte de la situation de famille (présence d'enfants/personne à charge, congés du conjoint), de l'ancienneté et de l'activité chez d'autres employeurs (Art. L3141-16).",
     ex: "L'employeur peut imposer les dates de départ en congés mais doit tenir compte des enfants scolarisés et de la situation familiale (conjoint travaillant dans la même entreprise, etc.).",
     mots: ["congés payés", "ordre de départ", "dates", "famille", "ancienneté", "CSE"]
   },
