@@ -149,53 +149,8 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   /* Anti-zoom iOS — font-size < 16px déclenche zoom au focus */
   input, select, textarea { font-size: 16px !important; }
 </style>
-
-<style id="landscape-blocker-style">
-@media screen and (orientation: landscape) and (max-device-width: 1024px) {
-  body > *:not(#landscape-blocker) { display: none !important; }
-  #landscape-blocker {
-    position: fixed; inset: 0; z-index: 2147483647;
-    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
-    color: #fff;
-    display: flex !important; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; padding: 24px;
-    font-family: -apple-system, system-ui, sans-serif;
-  }
-  #landscape-blocker .lb-icon { font-size: 64px; margin-bottom: 24px; animation: lb-rotate 2s ease-in-out infinite; }
-  #landscape-blocker .lb-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; color: #4FB3C2; }
-  #landscape-blocker .lb-msg { font-size: 15px; color: #ccd; line-height: 1.5; max-width: 320px; }
-  @keyframes lb-rotate { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
-}
-@media screen and (orientation: portrait) {
-  #landscape-blocker { display: none !important; }
-}
-</style>
-<script>
-(function(){
-  function tryLockPortrait(){
-    try {
-      if (screen.orientation && typeof screen.orientation.lock === 'function') {
-        screen.orientation.lock('portrait').catch(function(){});
-      }
-    } catch(_) {}
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', tryLockPortrait);
-  } else {
-    tryLockPortrait();
-  }
-  document.addEventListener('visibilitychange', function(){ if (!document.hidden) tryLockPortrait(); });
-  document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
-})();
-</script>
 </head>
-<body>
-<div id="landscape-blocker" aria-hidden="true">
-  <div class="lb-icon">📱</div>
-  <div class="lb-title">Tournez votre téléphone</div>
-  <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
-</div><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
+<body><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
 <div class="top-nav-bar">
   <button class="menu-btn" onclick="goMenu()">&#8592; Retour au menu</button>
   <button class="kitsune-btn" onclick="window.location.href='../fox/index.html'" title="Mon compagnon d'analyse — suit tes heures et te récompense">&#x1F98A; Mon compagnon</button>
@@ -968,25 +923,7 @@ function exportJSON(){createSnapshot("before_export");const blob=new Blob([JSON.
     if(e.name!=="AbortError"){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
   });return;
 }const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);localStorage.setItem("FILE_SAVE_DATE_"+currentSuffix,new Date().toISOString());updateSaveBadges();}
-function importJSON(){
-  // iOS Safari supporte parfaitement <input type="file"> depuis iOS 13+
-  // File picker plus pratique que coller du texte
-  const inp=document.createElement("input");
-  inp.type="file";
-  inp.accept=".json,application/json";
-  inp.style.display="none";
-  inp.onchange=e=>{
-    const file=e.target.files[0];
-    if(!file)return;
-    const r=new FileReader();
-    r.onload=()=>{ try{ loadJSON(r.result); } catch(err){ toast("❌ Fichier JSON invalide","error"); } };
-    r.onerror=()=>toast("❌ Lecture du fichier impossible","error");
-    r.readAsText(file);
-  };
-  document.body.appendChild(inp);
-  inp.click();
-  setTimeout(()=>{ try{ document.body.removeChild(inp); }catch(_){} }, 5000);
-}
+function importJSON(){if(isIOS()){jsonTitle.textContent="Collez le texte JSON (Import)";jsonArea.value="";popupJSON.style.display="flex";}else{const inp=document.createElement("input");inp.type="file";inp.accept=".json";inp.onchange=e=>{const r=new FileReader();r.onload=()=>loadJSON(r.result);r.readAsText(e.target.files[0]);};inp.click();}}
 function updateSaveBadges(){const ae=document.getElementById("autoSaveBadge"),fe=document.getElementById("fileSaveBadge");if(!ae||!fe)return;const a=localStorage.getItem("AUTO_SAVE_DATE_"+currentSuffix);const f=localStorage.getItem("FILE_SAVE_DATE_"+currentSuffix);ae.textContent=a?"🟢 Dans l'application : "+new Date(a).toLocaleString():"🟢 Dans l'application : —";fe.textContent=f?"💾 Sauvegarde fichier : "+new Date(f).toLocaleString():"💾 Sauvegarde fichier : —";}
 function confirmImportJSON(){loadJSON(jsonArea.value);closeJSONPopup();}
 function loadJSON(text){let obj;try{obj=JSON.parse(text);}catch(e){toast("❌ JSON invalide","error");return;}if(obj.version!==1){toast("❌ Version incompatible","error");return;}if(obj.exercise&&String(obj.exercise)!==String(currentSuffix)){confirmModal(`Ce fichier appartient à l'exercice ${obj.exercise}.\nBasculer dessus ?`,()=>{loadExercise(obj.exercise);},"Basculer");return;}if(!obj.data||!obj.closures){toast("❌ Sauvegarde invalide","error");return;}createSnapshot("before_import");data=obj.data;closures=obj.closures;reports=obj.reports||{};periodMeta=obj.periodMeta||{};exerciseStart=obj.exerciseStart||"";annualDate=obj.annualDate||"";specialDays=obj.specialDays||{};BASE_HEBDO=Number(obj.BASE_HEBDO)||35;annualRate=Number(obj.annualRate)||10;localStorage.setItem(STORAGE.data,JSON.stringify(data));localStorage.setItem(STORAGE.closures,JSON.stringify(closures));localStorage.setItem(STORAGE.reports,JSON.stringify(reports));localStorage.setItem(STORAGE.periodMeta,JSON.stringify(periodMeta));localStorage.setItem(STORAGE.exerciseStart,exerciseStart);localStorage.setItem(STORAGE.annualDate,annualDate);localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));localStorage.setItem("BASE_HEBDO_"+currentSuffix,BASE_HEBDO);localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);if(typeof update==="function")update();toast("✅ Import réussi","success");}
@@ -1111,7 +1048,7 @@ function updateContingent(){
   txt.textContent=fmtH(total)+" / "+LIMIT+"h";
   if(pct>=100&&!sessionStorage.getItem("cont_full")){sessionStorage.setItem("cont_full","1");toast("⚠️ Contingent annuel de "+LIMIT+"h atteint !","warn",5000);}
   else if(pct>=90&&!sessionStorage.getItem("cont_warn")){sessionStorage.setItem("cont_warn","1");toast("⚠️ Contingent : "+Math.round(pct)+"% atteint","warn",4000);}
-  // RCO — Art. L3121-33 : 50% au-delà du contingent (≤20 sal.) ou 100% (>20 sal.)
+  // RCO — Art. L3121-38 : 50% au-delà du contingent (≤20 sal.) ou 100% (>20 sal.)
   const rcoWrap=document.getElementById("rcoWrap");
   const rcoText=document.getElementById("rcoText");
   const rcoDetail=document.getElementById("rcoDetail");
@@ -1122,7 +1059,7 @@ function updateContingent(){
       const rco100=depassement;
       rcoWrap.classList.add("visible");
       rcoText.textContent=fmtH(rco50)+" à "+fmtH(rco100);
-      rcoDetail.textContent=fmtH(depassement)+" au-delà du contingent · "+fmtH(rco50)+" (≤20 sal.) ou "+fmtH(rco100)+" (>20 sal.) · Art. L3121-33";
+      rcoDetail.textContent=fmtH(depassement)+" au-delà du contingent · "+fmtH(rco50)+" (≤20 sal.) ou "+fmtH(rco100)+" (>20 sal.) · Art. L3121-38";
       if(!sessionStorage.getItem("rco_warn")){sessionStorage.setItem("rco_warn","1");toast("🛌 RCO dû : "+fmtH(rco50)+" à "+fmtH(rco100)+" de repos compensateur","warn",6000);}
     }else{rcoWrap.classList.remove("visible");}
   }
@@ -1272,15 +1209,6 @@ const PDF_JOURS=["Dim","Lun","Mar","Mer","Jeu","Ven","Sam"];
 function pdfStr(s){
   if(s===null||s===undefined)return"";
   return String(s)
-    .replace(/\u{1F38C}/gu,"[F]")
-    .replace(/\u26A0\uFE0F?/g,"[!]")
-    .replace(/\u2705/g,"[ok]")
-    .replace(/\u274C/g,"[x]")
-    .replace(/\u{1F4C5}|\u{1F4C6}|\u{1F4B6}|\u{1F4B0}|\u{1F3C1}|\u{1F3AF}|\u{1F512}|\u{1F4CA}|\u{1F4C8}|\u{1F4E5}|\u{1F4CB}/gu,"")
-    .replace(/\u{1F1EB}\u{1F1F7}/gu,"FR")
-    .replace(/[\u{1F300}-\u{1FAFF}]/gu,"")
-    .replace(/[\u2600-\u27BF]/g,"")
-    .replace(/[\uFE00-\uFE0F]/g,"")
     .replace(/[àáâãäå]/g,"a").replace(/[ÀÁÂÃÄÅ]/g,"A")
     .replace(/[éèêë]/g,"e").replace(/[ÉÈÊË]/g,"E")
     .replace(/[îï]/g,"i").replace(/[ÎÏ]/g,"I")
@@ -1293,10 +1221,9 @@ function pdfStr(s){
     .replace(/→/g,"->").replace(/←/g,"<-").replace(/↔/g,"<->")
     .replace(/×/g,"x").replace(/÷/g,"/")
     .replace(/€/g,"EUR").replace(/£/g,"GBP")
-    .replace(/°/g," deg").replace(/ /g," ").replace(/\u2019/g,"'")
+    .replace(/°/g," deg").replace(/ /g," ").replace(/’/g,"'")
     .replace(/¹/g,"1").replace(/²/g,"2").replace(/³/g,"3")
-    .replace(/[^ -~]/g,"?")
-    .replace(/\s+/g," ").trim();
+    .replace(/[^ -~]/g,"?");
 }
 
 function fmtH(h){
@@ -1493,7 +1420,7 @@ function exportPeriodPDF(){
 
   // Tableau semaines
   const C={WK:PDF_M+1,EXTRA:PDF_M+42,ABS:PDF_M+62,REC:PDF_M+80,H25:PDF_M+98,H50:PDF_M+118,COEF:PDF_M+136,BRUT:PDF_M+156};
-  function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;y=pdfTableHeader(pdf,y,[["Semaine",C.WK],["Extras",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],[mRules.taux1+"%",C.H25],[mRules.taux2+"%",C.H50]]);;}}
+  function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;y=pdfTableHeader(pdf,y,[["Semaine",C.WK],["Extras",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],["25%",C.H25],["50%",C.H50]]);;}}
 
   y=pdfSectionTitle(pdf,y,"Détail par semaine");
   y=pdfTableHeader(pdf,y,[
@@ -1591,25 +1518,20 @@ function exportMonthlyFullPDF(){
     `Généré le ${new Date().toLocaleDateString("fr-FR")}`
   );
 
-  // Récap principal — taux dynamiques CCN (HCR : 10/20/50, défaut : 25/50)
-  const _recap = [
+  y=pdfRecapBox(pdf,y,[
     ["Semaines analysées",weekRows.length],
     ["Heures supplémentaires",fmtH(tExtra)],
-    ["Total à "+mRules.taux1+"%",fmtH(t25)],
-  ];
-  if(mRules.taux_inter){
-    _recap.push(["Total à "+mRules.taux_inter+"%",fmtH(tInter2||0)]);
-  }
-  _recap.push(["Total à "+mRules.taux2+"%",fmtH(t50)]);
-  if(inclAbs)_recap.push(["Absences du mois",fmtH(tAbs)]);
-  if(inclRec)_recap.push(["Récupérations",fmtH(tR)]);
-  _recap.push(["Solde brut pondéré",fmtH(brut25+brutI2+brut50)]);
-  _recap.push(["Solde net",fmtH(net)]);
-  y=pdfRecapBox(pdf,y,_recap);
+    ["Total à 25%",fmtH(t25)],
+    ["Total à 50%",fmtH(t50)],
+    ["Absences du mois",fmtH(tAbs)],
+    ["Récupérations",fmtH(tR)],
+    ["Solde brut pondéré",fmtH(brut25+brut50)],
+    ["Solde net",fmtH(net)],
+  ]);
 
   const C={WK:PDF_M+1,EXTRA:PDF_M+44,ABS:PDF_M+64,REC:PDF_M+84,H25:PDF_M+104,H50:PDF_M+124};
   function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;
-    y=pdfTableHeader(pdf,y,[["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],["H. "+mRules.taux1+"%",C.H25],["H. "+mRules.taux2+"%",C.H50]]);
+    y=pdfTableHeader(pdf,y,[["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],["H. 25%",C.H25],["H. 50%",C.H50]]);
   }}
 
   y=pdfSectionTitle(pdf,y,"Détail semaine par semaine – "+months[viewMonth]+" "+viewYear);
@@ -1725,11 +1647,11 @@ function exportAnnualPDF(){
   // Tableau synthèse des périodes
   const CP={IDX:PDF_M+1,DATES:PDF_M+14,EXTRA:PDF_M+82,H25:PDF_M+100,H50:PDF_M+118,REC:PDF_M+136,NET:PDF_M+154};
   function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;
-    y=pdfTableHeader(pdf,y,[["N°",CP.IDX],["Période",CP.DATES],["H.Sup",CP.EXTRA],[(aRules.taux1||25)+"%",CP.H25],[(aRules.taux2||50)+"%",CP.H50],["Récup",CP.REC],["Solde net",CP.NET]]);
+    y=pdfTableHeader(pdf,y,[["N°",CP.IDX],["Période",CP.DATES],["H.Sup",CP.EXTRA],["25%",CP.H25],["50%",CP.H50],["Récup",CP.REC],["Solde net",CP.NET]]);
   }}
 
   y=pdfSectionTitle(pdf,y,"Synthèse par période");
-  y=pdfTableHeader(pdf,y,[["N°",CP.IDX],["Période",CP.DATES],["H.Sup",CP.EXTRA],[(aRules.taux1||25)+"%",CP.H25],[(aRules.taux2||50)+"%",CP.H50],["Récup.",CP.REC],["Solde net",CP.NET]]);
+  y=pdfTableHeader(pdf,y,[["N°",CP.IDX],["Période",CP.DATES],["H.Sup",CP.EXTRA],["25%",CP.H25],["50%",CP.H50],["Récup.",CP.REC],["Solde net",CP.NET]]);
 
   periodResults.forEach(({idx,start,end,tExtra,t25,t50,tR,net},i)=>{
     chk();
@@ -1782,9 +1704,9 @@ function exportAnnualPDF(){
       ]);
       const DW={WK:PDF_M+1,EXTRA:PDF_M+44,ABS:PDF_M+64,REC:PDF_M+84,H25:PDF_M+104,H50:PDF_M+124};
       function chkD(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;
-        y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],[(aRules.taux1||25)+"%",DW.H25],[(aRules.taux2||50)+"%",DW.H50]]);
+        y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],["25%",DW.H25],["50%",DW.H50]]);
       }}
-      y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],["H. "+(aRules.taux1||25)+"%",DW.H25],["H. "+(aRules.taux2||50)+"%",DW.H50]]);
+      y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],["H. 25%",DW.H25],["H. 50%",DW.H50]]);
       weekRows.forEach(({wk,extra,absent,recup,h25,h50},i)=>{
         chkD();
         if(i%2===0){pdf.setFillColor(240,248,250);pdf.rect(PDF_M,y-4,PDF_W-PDF_M*2,PDF_LINE-0.5,"F");}
@@ -2093,7 +2015,7 @@ const TIPS={
   rco:{
     title:'🛌 Repos Compensateur Obligatoire (RCO)',
     body:'Le RCO est un droit à repos qui s\'ouvre dès que le contingent annuel d\'heures supplémentaires est dépassé. Il s\'ajoute aux majorations salariales.\n\n• Entreprises ≤ 20 salariés : 50 % de chaque heure au-delà du contingent\n• Entreprises > 20 salariés : 100 % de chaque heure au-delà du contingent\n\nExemple : 30h au-delà du contingent dans une entreprise de 50 salariés → 30h de RCO.\n\nLe RCO doit être pris dans les 2 mois suivant l\'ouverture du droit, par journée ou demi-journée.',
-    ref:'Art. L3121-33 · Art. L3121-30 Code du travail'
+    ref:'Art. L3121-38 · Art. L3121-30 Code du travail'
   },
   majoration:{
     title:'💰 Majorations des heures supplémentaires',
@@ -2103,7 +2025,7 @@ const TIPS={
   seuil:{
     title:'⏱️ Seuil de déclenchement des HS',
     body:'La durée légale du travail est fixée à 35 heures par semaine. Toute heure travaillée au-delà de ce seuil est une heure supplémentaire.\n\nLa semaine de référence commence selon le jour fixé par votre accord d\'entreprise ou votre CCN.\n\nCertaines CCN prévoient un seuil différent (ex. : 37h, 39h) avec des compensations intégrées dans le salaire de base.',
-    ref:'Art. L3121-27 · Art. L3121-28 Code du travail'
+    ref:'Art. L3121-27 · Art. L3121-32 Code du travail'
   }
 };
 function showTip(key){
