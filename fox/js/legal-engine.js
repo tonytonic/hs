@@ -86,7 +86,7 @@ const FOX_VIOLATIONS = {
   V02: { code: 'V02', label: 'Moyenne 44h/12 sem.',       severity: 'élevé',   article: 'L3121-22' },
   V03: { code: 'V03', label: 'Repos quotidien < 11h',     severity: 'critique', article: 'L3131-1'  },
   V04: { code: 'V04', label: 'Repos hebdo < 35h',         severity: 'élevé',   article: 'L3132-2'  },
-  V05: { code: 'V05', label: 'Journée > 10h',             severity: 'moyen',   article: 'L3121-19' },
+  V05: { code: 'V05', label: 'Journée > 10h',             severity: 'moyen',   article: 'L3121-18' },
   get V06() {
     const limit = FOX_LEGAL_LIMITS.CONTINGENT_ANNUEL;
     return { code: 'V06', label: `Contingent annuel > ${limit}h`, severity: 'élevé', article: 'D3121-24' };
@@ -207,9 +207,12 @@ function _analyzeCurrentWeek(ctx, v, sc) {
   }
 }
 
-// ─── Moyenne 12 semaines ──────────────────────────────────────────
+// ─── Moyenne 12 semaines (Art. L3121-22) ─────────────────────────
+// L'alerte ne se déclenche qu'à partir de 12 semaines de données
+// (impossible de calculer une moyenne sur 12 semaines avec moins de 12 semaines)
 function _analyzeRollingAverage(ctx, v, sc) {
-  if (ctx.rolling.weeksAnalyzed < 2) return;
+  // Minimum 12 semaines requis pour évaluer la moyenne 12 sem (L3121-22)
+  if (ctx.rolling.weeksAnalyzed < 12) return;
   const avg = ctx.rolling.avgTotal;
 
   if (avg >= FOX_LEGAL_LIMITS.HEBDO_MAX_MOYENNE_12) {
