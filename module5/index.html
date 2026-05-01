@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mizuki — Temps partiel">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#7B4FD4">
+<meta name="color-scheme" content="only light">
+<meta charset="UTF-8">
+<title>Temps Partiel — Mizuki</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&display=swap">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="preload" as="image" href="../images/Mizuki.PNG" fetchpriority="high">
+
+<style id="landscape-blocker-style">
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
+  body > *:not(#landscape-blocker) { display: none !important; }
+  #landscape-blocker {
+    position: fixed; inset: 0; z-index: 2147483647;
+    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
+    color: #fff;
+    display: flex !important; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  #landscape-blocker .lb-icon {
+    font-size: 64px; margin-bottom: 24px;
+    animation: lb-rotate 2s ease-in-out infinite;
+  }
+  #landscape-blocker .lb-title {
+    font-size: 22px; font-weight: 700; margin-bottom: 12px;
+    color: #4FB3C2;
+  }
+  #landscape-blocker .lb-msg {
+    font-size: 15px; color: #ccd; line-height: 1.5; max-width: 320px;
+  }
+  @keyframes lb-rotate {
+    0%, 100% { transform: rotate(0deg); }
+    50% { transform: rotate(-90deg); }
+  }
+}
+@media screen and (orientation: portrait) {
+  #landscape-blocker { display: none !important; }
+}
+</style>
+<script>
+(function(){
+  // Tentative de verrouillage orientation portrait quand supporté (Android, PWA)
+  function tryLockPortrait(){
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('portrait').catch(function(){});
+      }
+    } catch(_) {}
+  }
+  // Au chargement et à chaque changement de visibilité
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryLockPortrait);
+  } else {
+    tryLockPortrait();
+  }
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) tryLockPortrait();
+  });
+  // Au premier tap utilisateur (certains navigateurs exigent un geste utilisateur)
+  document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
+})();
+</script>
+</head>
+<body>
+<script>
+// Anti-flash : déterminer immédiatement quelle vue afficher AVANT le rendu
+// Évite de voir le wizard "Pas de contrat" puis switcher vers la vue principale
+// IMPORTANT : ce style est SUPPRIMÉ dès que refreshUI() peut prendre la main,
+//             sinon il bloque les transitions wizard → vue principale après "Commencer"
+(function(){
+  try {
+    var contractRaw = localStorage.getItem('M5_CONTRACT');
+    var hasContract = false;
+    if (contractRaw) {
+      var c = JSON.parse(contractRaw);
+      hasContract = !!(c && c.hoursBase);
+    }
+    // Injecter le CSS d'état initial AVANT le premier paint
+    var style = document.createElement('style');
+    style.id = 'm5-antiflash-style';
+    style.textContent = hasContract
+      ? '#view-no-contract{display:none!important}#view-main{display:block!important}'
+      : '#view-no-contract{display:block!important}#view-main{display:none!important}';
+    document.head.appendChild(style);
+    // Supprimer le style anti-flash dès que JS principal a pu s'exécuter
+    // refreshUI() prend alors le relais avec ses styles inline normaux
+    function _removeAntiFlash(){
+      var s = document.getElementById('m5-antiflash-style');
+      if(s && s.parentNode) s.parentNode.removeChild(s);
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function(){
+        // Attendre 1 frame supplémentaire pour laisser refreshUI() s'exécuter
+        requestAnimationFrame(function(){ requestAnimationFrame(_removeAntiFlash); });
+      });
+    } else {
+      requestAnimationFrame(function(){ requestAnimationFrame(_removeAntiFlash); });
+    }
+  } catch(e) {}
+})();
+</script>
+<div id="landscape-blocker" aria-hidden="true">
+  <div class="lb-icon">📱</div>
+  <div class="lb-title">Tournez votre téléphone</div>
+  <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
+</div>
+
+<!-- ── HEADER ──────────────────────────────────────────────────── -->
+<header class="m5-header">
+  <div style="flex:1">
+    <div class="m5-header-title">🦊 Mizuki — Temps partiel</div>
+    <div class="m5-header-sub">Heures complémentaires &amp; droits</div>
+  <div id="header-contract-badge" class="m5-contract-badge" style="display:none;"></div>
+  </div>
+  <button class="m5-nav-btn" onclick="openYearsPopup()" id="year-badge" title="Changer d'exercice" aria-label="Changer l'année d'exercice" style="font-weight:700;min-width:52px;">2026</button>
+  <a href="../menu.html" class="m5-nav-btn" aria-label="Retour au menu principal">← Menu</a>
+  <button class="m5-nav-btn" onclick="openContractModal()" aria-label="Paramètres de mon contrat">⚙️</button>
+</header>
+
+<!-- ── BULLE MIZUKI ─────────────────────────────────────────────── -->
+<div class="mizuki-bubble-wrap" onclick="openMizukiPopup()">
+  <img src="../images/Mizuki.PNG" alt="Mizuki" class="mizuki-avatar"
+    loading="eager" decoding="async" fetchpriority="high"
+    onerror="this.src='assets/mizuki.svg'">
+  <div class="mizuki-bubble-text" id="mizuki-bubble-text">
+    🦊 Bonjour ! Je suis Mizuki. Configure ton contrat pour commencer.
+  </div>
+  <span class="mizuki-bubble-chevron">›</span>
+</div>
+
+
+
+<!-- ══ VUE : PAS DE CONTRAT ══════════════════════════════════════ -->
+<!-- ══ WIZARD BIENVENUE ══════════════════════════════════════════ -->
+<div id="view-no-contract" class="wiz-dark-bg" style="display:none;">
+
+  <!-- Barre de progression -->
+  <div id="wiz-progress" style="padding:16px 16px 0;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span id="wiz-step-label" style="font-size:11px;color:var(--miz-text3);font-weight:600;">Étape 1 sur 6</span>
+      <button onclick="wizSkip()" style="background:none;border:none;font-size:11px;color:var(--miz-text3);cursor:pointer;padding:0;">Passer ›</button>
+    </div>
+    <div style="height:4px;background:var(--miz-border);border-radius:2px;">
+      <div id="wiz-progress-bar" style="height:100%;background:var(--miz-primary);border-radius:2px;transition:width .3s;width:20%;"></div>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 1 : Bienvenue -->
+  <div class="wiz-step active" id="wStep1">
+    <div style="text-align:center;padding:20px 16px 8px;">
+      <img src="../images/Mizuki.PNG" alt="Mizuki"
+        style="width:130px;margin:0 auto 12px;display:block;"
+        onerror="this.src='assets/mizuki.svg'">
+      <div style="font-size:22px;font-weight:800;color:#E9D5FF;margin-bottom:8px;">Bonjour ! Je suis Mizuki 🦊</div>
+      <div style="font-size:14px;color:var(--miz-text2);line-height:1.7;margin-bottom:20px;">
+        Je suis là pour surveiller tes heures complémentaires et t'informer de tes droits en tant que salariée à temps partiel.
+      </div>
+    </div>
+    <div style="padding:0 16px;">
+      <div class="m5-card" style="margin-bottom:16px;">
+        <div class="m5-card-body" style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+            <span style="font-size:20px;">⏱️</span>
+            <div><strong>Je compte tes heures complémentaires</strong><br><span style="color:var(--miz-text3);font-size:12px;">Et je t'alerte si tu dépasses ce qui est légal</span></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+            <span style="font-size:20px;">⚖️</span>
+            <div><strong>Je t'explique tes droits</strong><br><span style="color:var(--miz-text3);font-size:12px;">En langage simple, pas en jargon juridique</span></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:13px;">
+            <span style="font-size:20px;">💰</span>
+            <div><strong>J'estime ce que tu devrais toucher</strong><br><span style="color:var(--miz-text3);font-size:12px;">Majorations +10% et +25% calculées automatiquement</span></div>
+          </div>
+        </div>
+      </div>
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizNext(2)">C'est parti ! →</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 2 : Prénom + Heures contrat -->
+  <div class="wiz-step" id="wStep2">
+    <div style="padding:20px 16px 8px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">📋</div>
+      <div style="font-size:18px;font-weight:700;color:var(--miz-primary);margin-bottom:6px;">Ton contrat de travail</div>
+      <div style="font-size:13px;color:var(--miz-text3);margin-bottom:20px;">C'est la seule info obligatoire.</div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
+      <div class="m5-input-group">
+        <label class="m5-label">Ton prénom (optionnel)</label>
+        <input type="text" class="m5-input" id="wiz-name" placeholder="ex : Sophie" autocomplete="given-name">
+      </div>
+      <div class="m5-input-group">
+        <label class="m5-label">Combien d'heures par semaine selon ton contrat ?</label>
+        <input type="number" inputmode="decimal" class="m5-input" id="wiz-hours"
+          min="1" max="34.5" step="0.5" placeholder="ex : 25"
+          style="font-size:24px;font-weight:700;text-align:center;"
+          oninput="wizUpdateHoursPreview()">
+        <div id="wiz-hours-preview" style="font-size:12px;color:var(--miz-text3);margin-top:4px;text-align:center;"></div>
+      </div>
+      <div class="m5-input-group">
+        <label class="m5-label">Ton taux horaire brut (optionnel, pour estimer tes gains)</label>
+        <input type="number" inputmode="decimal" class="m5-input" id="wiz-rate"
+          min="0" step="0.01" placeholder="ex : 11.88 (SMIC 2026)"
+          style="font-size:18px;text-align:center;">
+      </div>
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizNext(3)">Continuer →</button>
+      <button class="m5-btn m5-btn-outline m5-btn-full m5-btn-sm" onclick="wizPrev(1)">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : Convention collective -->
+  <div class="wiz-step" id="wStep3">
+    <div style="padding:20px 16px 8px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">🏢</div>
+      <div style="font-size:18px;font-weight:700;color:var(--miz-primary);margin-bottom:6px;">Dans quel secteur tu travailles ?</div>
+      <div style="font-size:13px;color:var(--miz-text3);margin-bottom:20px;">Ça détermine combien d'heures complémentaires ton employeur peut te demander.</div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px;">
+      <div class="m5-input-group">
+        <input type="text" class="m5-input" id="wiz-ccn-search"
+          placeholder="🔍 Cherche : hôtel, commerce, aide à domicile..."
+          oninput="wizSearchCCN(this.value)"
+          style="font-size:14px;">
+        <div id="wiz-ccn-results" style="display:none;border:1px solid var(--miz-border);border-radius:8px;max-height:180px;overflow-y:auto;margin-top:4px;background:var(--miz-bg);"></div>
+        <div id="wiz-ccn-selected" style="display:none;margin-top:8px;padding:10px;background:var(--miz-accent);border-radius:8px;font-size:13px;"></div>
+      </div>
+      <button class="m5-btn m5-btn-outline m5-btn-full" onclick="wizSelectDC()">
+        📋 Je ne sais pas / Droit commun (plafond 10%)
+      </button>
+      <div style="font-size:11px;color:var(--miz-text3);text-align:center;">
+        Si tu travailles en hôtellerie, commerce alimentaire, aide à domicile, restauration... tu as probablement droit à 33% d'heures complémentaires au lieu de 10%.
+      </div>
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizNext(4)" id="wiz-ccn-btn">Continuer →</button>
+      <button class="m5-btn m5-btn-outline m5-btn-full m5-btn-sm" onclick="wizPrev(2)">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 4 : Mode de calcul + Début de semaine -->
+  <div class="wiz-step" id="wStep4">
+    <div style="padding:20px 16px 8px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">📅</div>
+      <div style="font-size:18px;font-weight:700;color:var(--miz-primary);margin-bottom:6px;">Comment on compte ?</div>
+      <div style="font-size:13px;color:var(--miz-text3);margin-bottom:20px;">Le mode hebdomadaire convient à 95% des salariées à temps partiel.</div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px;">
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--miz-text);margin-bottom:8px;">Mode de calcul</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <label class="wiz-radio-card" id="wiz-mode-hebdo" onclick="wizSelectMode('HEBDO')">
+            <input type="radio" name="wiz-mode" value="HEBDO" checked style="display:none;">
+            <div style="font-weight:700;font-size:14px;">📊 Par semaine</div>
+            <div style="font-size:12px;color:var(--miz-text3);margin-top:2px;">Chaque semaine est comptée séparément. Le plus courant.</div>
+          </label>
+          <label class="wiz-radio-card" id="wiz-mode-mensuel" onclick="wizSelectMode('MENSUEL')">
+            <input type="radio" name="wiz-mode" value="MENSUEL" style="display:none;">
+            <div style="font-weight:700;font-size:14px;">📆 Par mois de paie</div>
+            <div style="font-size:12px;color:var(--miz-text3);margin-top:2px;">Si ton contrat parle d'heures mensuelles (ex : 86,67h/mois).</div>
+          </label>
+          <label class="wiz-radio-card" id="wiz-mode-annuel" onclick="wizSelectMode('ANNUEL')">
+            <input type="radio" name="wiz-mode" value="ANNUEL" style="display:none;">
+            <div style="font-weight:700;font-size:14px;">📈 Sur l'année (annualisation)</div>
+            <div style="font-size:12px;color:var(--miz-text3);margin-top:2px;">Les semaines chargées et légères se compensent sur l'année.</div>
+          </label>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--miz-text);margin-bottom:8px;">Quel est le premier jour de ta semaine de travail ?</div>
+        <select class="m5-select" id="wiz-start-day">
+          <option value="0">Lundi (le plus courant)</option>
+          <option value="1">Mardi</option>
+          <option value="2">Mercredi</option>
+          <option value="3">Jeudi</option>
+          <option value="4">Vendredi</option>
+          <option value="5">Samedi</option>
+          <option value="6">Dimanche</option>
+        </select>
+      </div>
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizNext(5)">Continuer →</button>
+      <button class="m5-btn m5-btn-outline m5-btn-full m5-btn-sm" onclick="wizPrev(3)">← Retour</button>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 5 : Jours fériés + Résumé -->
+  <div class="wiz-step" id="wStep5">
+    <div style="padding:20px 16px 8px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">🎌</div>
+      <div style="font-size:18px;font-weight:700;color:var(--miz-primary);margin-bottom:6px;">Les jours fériés</div>
+      <div style="font-size:13px;color:var(--miz-text3);margin-bottom:16px;">Quand tu ne travailles pas un jour férié, ça réduit le seuil à partir duquel tes heures sont "complémentaires".</div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:12px;">
+      <label class="wiz-radio-card active" id="wiz-feries-oui" onclick="wizSelectFeries(true)" style="display:flex;gap:12px;align-items:flex-start;">
+        <input type="radio" name="wiz-feries" value="true" checked style="margin-top:3px;accent-color:var(--miz-primary);">
+        <div>
+          <div style="font-weight:700;font-size:13px;">✅ Oui, neutraliser les fériés chômés</div>
+          <div style="font-size:11px;color:var(--miz-text3);margin-top:2px;">Art. L3133-3 + jurisprudence — Le seuil est abaissé. Recommandé dans la plupart des cas.</div>
+        </div>
+      </label>
+      <label class="wiz-radio-card" id="wiz-feries-non" onclick="wizSelectFeries(false)" style="display:flex;gap:12px;align-items:flex-start;">
+        <input type="radio" name="wiz-feries" value="false" style="margin-top:3px;accent-color:var(--miz-primary);">
+        <div>
+          <div style="font-weight:700;font-size:13px;">⬜ Non, les fériés sont dans l'assiette</div>
+          <div style="font-size:11px;color:var(--miz-text3);margin-top:2px;">Cass. Soc. 2012 — Certains accords d'entreprise appliquent cette règle.</div>
+        </div>
+      </label>
+
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizNext(6)">Continuer →</button>
+      <button class="m5-btn m5-btn-outline m5-btn-full m5-btn-sm" onclick="wizPrev(4)">← Retour</button>
+    </div>
+  </div>
+
+
+  <!-- ÉTAPE 6 : Exercice + Clôtures + Résumé -->
+  <div class="wiz-step" id="wStep6">
+    <div style="padding:20px 16px 8px;text-align:center;">
+      <div style="font-size:32px;margin-bottom:8px;">📆</div>
+      <div style="font-size:18px;font-weight:700;color:#E9D5FF;margin-bottom:6px;">Ton calendrier de paie</div>
+      <div style="font-size:13px;color:var(--miz-text3);margin-bottom:16px;">Indique quand commence ton année de paie — c'est nécessaire pour calculer tes périodes.</div>
+    </div>
+    <div style="padding:0 16px;display:flex;flex-direction:column;gap:14px;">
+
+      <!-- Date de début d'exercice -->
+      <div class="m5-input-group">
+        <label class="m5-label">Date de début de ton exercice de paie <span style="color:#F87171;">*</span></label>
+        <input type="date" class="m5-input" id="wiz-exercice"
+          style="font-size:15px;" required>
+        <div style="font-size:11px;color:var(--miz-text3);margin-top:3px;">
+          Ex : 08/12/2025 si ta paie commence en décembre. Regarde ton bulletin de salaire.
+        </div>
+      </div>
+
+      <!-- Clôtures mensuelles — pour TOUS les modes -->
+      <div id="wiz-clotures-bloc">
+        <div class="m5-label" style="margin-bottom:6px;">Tes dates de clôture de paie</div>
+        <div style="font-size:12px;color:var(--miz-text3);margin-bottom:10px;">
+          C'est la date où ton employeur ferme le mois pour calculer ta paie.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button type="button" class="m5-quick-btn selected" id="wiz-cloture-auto-card"
+            onclick="wizSetClotureMode('auto')"
+            style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;">
+            <span style="font-size:20px;">📅</span>
+            <span style="font-size:13px;font-weight:700;">Fin de mois</span>
+            <span style="font-size:11px;font-weight:400;opacity:.75;">31 jan, 28 fév…</span>
+          </button>
+          <button type="button" class="m5-quick-btn" id="wiz-cloture-manual-card"
+            onclick="wizSetClotureMode('manual')"
+            style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 8px;">
+            <span style="font-size:20px;">✏️</span>
+            <span style="font-size:13px;font-weight:700;">Dates exactes</span>
+            <span style="font-size:11px;font-weight:400;opacity:.75;">Le 15, ou variables</span>
+          </button>
+        </div>
+        <!-- Jour de clôture si Fin de mois -->
+        <div id="wiz-cloture-jour-bloc" style="margin-bottom:10px;">
+          <label class="m5-label" style="margin-bottom:5px;">Quel jour se clôture ton mois de paie ?</label>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="number" inputmode="decimal" id="wiz-cloture-jour" class="m5-input"
+              min="1" max="28" placeholder="ex: 25"
+              style="width:80px;flex-shrink:0;">
+            <span style="font-size:12px;color:rgba(196,168,255,0.65);">Laisse vide si c'est le dernier jour du mois (31, 28…)</span>
+          </div>
+        </div>
+        <div id="wiz-clotures-grid-bloc" style="display:none;">
+          <div style="font-size:11px;color:var(--miz-text3);margin-bottom:8px;">
+            Saisis la date de fin de chaque période de paie
+          </div>
+          <div id="wiz-clotures-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;"></div>
+        </div>
+      </div>
+
+      <!-- Résumé -->
+      <div id="wiz-summary" class="m5-card">
+        <div class="m5-card-body" style="font-size:12px;display:flex;flex-direction:column;gap:6px;">
+          <div style="font-weight:700;color:var(--miz-primary);margin-bottom:4px;">✅ Récapitulatif</div>
+          <div id="wiz-sum-hours"></div>
+          <div id="wiz-sum-ccn"></div>
+          <div id="wiz-sum-mode"></div>
+          <div id="wiz-sum-feries"></div>
+          <div id="wiz-sum-exercice"></div>
+        </div>
+      </div>
+
+      <button class="m5-btn m5-btn-primary m5-btn-full" onclick="wizFinish()" style="font-size:16px;padding:14px;">
+        🚀 Commencer avec Mizuki !
+      </button>
+      <button class="m5-btn m5-btn-outline m5-btn-full m5-btn-sm" onclick="wizPrev(5)">← Retour</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ VUE PRINCIPALE ════════════════════════════════════════════ -->
+<div id="view-main" style="display:none;">
+
+  <!-- Section ACCUEIL -->
+  <div id="sec-accueil" class="m5-section active">
+
+    <!-- ══ BLOC SEMAINE : fond sombre immersif ══ -->
+    <div class="acc-week-hero">
+      <!-- Saisie rapide -->
+      <div class="acc-quick-saisie" id="acc-quick-saisie">
+        <span class="acc-quick-label">⚡ Saisie rapide (heures travaillées cette semaine)</span>
+        <div class="acc-quick-btns" id="acc-quick-btns"></div>
+      </div>
+      <!-- Nav semaine -->
+      <div class="acc-week-nav">
+        <button class="acc-nav-btn" onclick="calPrev()">‹</button>
+        <span id="cal-week-label" class="acc-week-label"></span>
+        <button class="acc-nav-btn" onclick="calNext()">›</button>
+        <button class="acc-today-btn" onclick="calToday()">Auj.</button>
+      </div>
+      <!-- Calendrier -->
+      <div id="calendar-grid" style="padding:0 2px;"></div>
+      <div id="week-total-bar" style="margin-top:6px;display:none;"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding:0 2px;">
+        <span id="cal-saved-badge" class="acc-saved-badge"></span>
+      </div>
+    </div>
+
+    <!-- ══ NAVIGATION PÉRIODE : pill sombre ══ -->
+    <div class="acc-periode-bar" id="periode-nav">
+      <select id="periode-select" class="acc-periode-sel"
+        onchange="goToPeriode(this.value)">
+        <option value="">— Période —</option>
+      </select>
+      <select id="periode-year-sel" class="acc-periode-year"
+        onchange="calChangeYear(this.value)"></select>
+    </div>
+
+    <!-- ══ ALERTES SEMAINE ══ -->
+    <div id="week-summary" class="acc-alerts"></div>
+
+    <!-- ══ BILAN / STATS : card glassmorphisme violet ══ -->
+    <div class="acc-stats-card" id="card-quick-stats">
+      <div class="acc-stats-header">
+        <span class="acc-stats-title" id="quick-stats-title">📊 Cette année</span>
+      </div>
+      <div id="quick-stats" class="acc-stats-body"></div>
+    </div>
+
+    <!-- ══ DROITS EN BREF : fond sombre ══ -->
+    <div class="acc-droits-card">
+      <div class="acc-droits-title">⚖️ Tes droits</div>
+      <div class="acc-droits-grid">
+        <div class="acc-droit-item">
+          <span class="acc-droit-icon">📌</span>
+          <span>Plafond <strong>10%</strong> (ou <strong>33%</strong> avec accord)</span>
+        </div>
+        <div class="acc-droit-item">
+          <span class="acc-droit-icon">💰</span>
+          <span>Majoration <strong>+10%</strong> puis <strong>+25%</strong></span>
+        </div>
+        <div class="acc-droit-item">
+          <span class="acc-droit-icon">🚫</span>
+          <span>Limite absolue : jamais <strong>35h</strong></span>
+        </div>
+        <div class="acc-droit-item">
+          <span class="acc-droit-icon">📅</span>
+          <span><strong>12 sem.</strong> consécutives → révision contrat</span>
+        </div>
+      </div>
+      <button class="acc-prevenance-btn" onclick="openModal('modal-prevenance')">
+        ⏰ Vérifier mon délai de prévenance
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Section HISTORIQUE -->
+  <div id="sec-historique" class="m5-section">
+    <div class="m5-card" style="margin-top:12px;">
+      <div class="m5-card-header">
+        <span class="m5-card-title">📋 Historique</span>
+        <button class="m5-btn m5-btn-outline m5-btn-sm" onclick="openYearsPopup()" id="hist-year-btn">2026</button>
+      </div>
+      <div id="historique-list"></div>
+    </div>
+    <!-- Sauvegarde / Import -->
+    <div class="m5-card" style="margin:12px 0;">
+      <div class="m5-card-header">
+        <span class="m5-card-title">💾 Mes données</span>
+      </div>
+      <div class="m5-card-body" style="display:flex;flex-direction:column;gap:8px;">
+        <div style="font-size:12px;color:var(--miz-text3);margin-bottom:4px;">
+          Exporte ou importe toutes tes semaines et ton contrat au format JSON.
+        </div>
+        <button class="m5-btn m5-btn-outline m5-btn-full" onclick="exportDataJSON()" style="display:flex;align-items:center;justify-content:center;gap:8px;">
+          <span>⬇️</span><span>Exporter mes données (JSON)</span>
+        </button>
+        <label class="m5-btn m5-btn-outline m5-btn-full" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin:0;">
+          <span>⬆️</span><span>Importer des données (JSON)</span>
+          <input type="file" accept=".json,application/json" onchange="importDataJSON(this)" style="display:none;">
+        </label>
+        <div id="import-status" style="font-size:11px;color:var(--miz-text3);text-align:center;min-height:16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section STATS -->
+  <div id="sec-stats" class="m5-section">
+    <div style="padding:12px 16px;" id="stats-content"></div>
+
+    <!-- Bloc bien-être -->
+    <div class="m5-card" style="margin:0 12px 16px;">
+      <div class="m5-card-header">
+        <span class="m5-card-title">🧬 Bien-être au travail</span>
+      </div>
+      <div class="m5-card-body" id="wellbeing-content">
+        <div class="m5-empty">
+          <div class="m5-empty-icon">🧬</div>
+          <div class="m5-empty-text">Saisis au moins 2 semaines pour voir ton analyse.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Section GLOSSAIRE -->
+  <div id="sec-glossaire" class="m5-section">
+    <div class="m5-card" style="margin-top:12px;">
+      <div class="m5-card-header">
+        <span class="m5-card-title">⚖️ Glossaire juridique</span>
+      </div>
+      <div class="m5-card-body" style="padding:10px 12px;">
+        <input type="text" class="m5-glos-search" id="glos-search"
+          placeholder="Rechercher un terme ou un article..."
+          oninput="filterGlossaire(this.value)"
+          autocomplete="off">
+      </div>
+      <div id="glossaire-list"></div>
+    </div>
+    <div style="padding:8px 16px 4px;font-size:11px;color:var(--miz-text3);text-align:center;">
+      Source : Code du travail — Légifrance. À titre informatif uniquement.
+    </div>
+  </div>
+
+</div><!-- /view-main -->
+
+<!-- ── DISCLAIMER GLOBAL ───────────────────────────────────────── -->
+<div id="m5-global-disclaimer" style="
+  padding: 10px 16px 80px;
+  background: linear-gradient(180deg, rgba(108,63,197,0.04) 0%, rgba(108,63,197,0.08) 100%);
+  border-top: 1px solid rgba(108,63,197,0.15);
+  font-size: 10px;
+  color: var(--miz-text3);
+  text-align: center;
+  line-height: 1.5;">
+  ⚠️ <strong>Outil informatif</strong> — ne constitue pas un conseil juridique. En cas de litige (requalification CDI, HC impayées…), consultez un avocat en droit du travail, l'inspection du travail ou un syndicat.
+  <br>🔒 Données 100% locales — rien n'est transmis.
+</div>
+
+<!-- ── BOTTOM NAV ────────────────────────────────────────────── -->
+<nav class="m5-bottom-nav">
+  <button class="m5-bottom-btn active" id="nav-accueil" onclick="showSection('accueil')">
+    <span class="icon">🏠</span>Accueil
+  </button>
+  <button class="m5-bottom-btn" id="nav-historique" onclick="showSection('historique')">
+    <span class="icon">📋</span>Historique
+  </button>
+  <button class="m5-bottom-btn" id="nav-stats" onclick="showSection('stats')">
+    <span class="icon">📊</span>Stats
+  </button>
+  <button class="m5-bottom-btn" id="nav-glossaire" onclick="showSection('glossaire')">
+    <span class="icon">⚖️</span>Droits
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- MODALES ─────────────────────────────────────────────────────── -->
+
+<!-- Modale saisie journalière -->
+<div class="m5-modal-backdrop" id="modal-day-saisie" onclick="if(event.target===this)saveDaySaisieOrClose()">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title" id="day-saisie-title">Saisir mes heures</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-day-saisie')">✕</button>
+    </div>
+    <input type="hidden" id="day-saisie-date">
+
+    <div class="m5-input-group">
+      <label class="m5-label">Heures travaillées ce jour</label>
+      <input type="number" inputmode="decimal" class="m5-input" id="day-saisie-hours"
+        min="0" max="24" step="0.5" placeholder="ex: 5.5"
+        oninput="updateDayPreview()"
+        style="font-size:26px;font-weight:700;text-align:center;">
+    </div>
+
+    <div class="m5-label" style="margin-bottom:8px;">Saisie rapide</div>
+    <div id="day-quick-hours" class="m5-quick-grid"></div>
+
+    <div id="day-saisie-preview" style="margin:10px 0;min-height:24px;"></div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="m5-btn m5-btn-outline m5-btn-sm" style="flex:0 0 auto" onclick="deleteDaySaisie()">🗑️</button>
+      <button class="m5-btn m5-btn-primary" style="flex:1" onclick="saveDaySaisie()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale saisie hebdomadaire -->
+<div class="m5-modal-backdrop" id="modal-week-saisie" onclick="if(event.target===this)saveWeeklySaisieOrClose()">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title">📊 Total semaine</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-week-saisie')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--miz-text2);margin-bottom:14px;" id="week-saisie-title"></div>
+    <input type="hidden" id="week-saisie-monday">
+
+    <div class="m5-input-group">
+      <label class="m5-label">Total heures travaillées cette semaine</label>
+      <input type="number" inputmode="decimal" class="m5-input" id="week-saisie-hours"
+        min="0" max="34.5" step="0.5" placeholder="ex: 28"
+        oninput="updateWeekPreview()"
+        style="font-size:26px;font-weight:700;text-align:center;">
+    </div>
+
+    <div class="m5-label" style="margin-bottom:8px;">Saisie rapide</div>
+    <div id="week-quick-hours" class="m5-quick-grid"></div>
+
+    <!-- Complément d'heures par avenant -->
+    <div style="margin:12px 0;padding:10px 12px;background:var(--miz-bg2);border-radius:var(--miz-radius-sm);border:1px solid var(--miz-border2);">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;font-weight:600;color:var(--miz-text);">
+        <input type="checkbox" id="week-avenant-toggle" onchange="toggleAvenat()" style="width:18px;height:18px;accent-color:var(--miz-primary);">
+        📋 Avenant complément d'heures (Art. L3123-22)
+      </label>
+      <div style="font-size:11px;color:var(--miz-text3);margin:4px 0 0 28px;">Augmentation temporaire — les heures dans l'avenant ne sont pas majorées</div>
+      <div id="week-avenant-section" style="display:none;margin-top:10px;">
+        <div class="m5-label">Heures prévues par l'avenant</div>
+        <input type="number" inputmode="decimal" class="m5-input" id="week-avenant-hours"
+          min="0" max="34.5" step="0.5" placeholder="ex: 28"
+          oninput="updateWeekPreview()"
+          style="font-size:18px;font-weight:700;text-align:center;">
+        <div id="avenant-counter" style="font-size:11px;color:var(--miz-text3);margin-top:4px;text-align:right;"></div>
+        <div class="m5-alert info" style="margin-top:8px;font-size:12px;padding:6px 10px;">
+          <span>ℹ️</span>
+          <div>Les heures entre ton contrat et l'avenant → taux normal.<br>Les heures au-delà de l'avenant → +25% obligatoire.</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="week-saisie-preview" style="margin:10px 0;min-height:24px;"></div>
+
+    <div style="display:flex;gap:8px;">
+      <button class="m5-btn m5-btn-outline m5-btn-sm" style="flex:0 0 auto" onclick="deleteWeeklySaisie()">🗑️</button>
+      <button class="m5-btn m5-btn-primary" style="flex:1" onclick="saveWeeklySaisie()">✅ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale changement d'année -->
+<div class="m5-modal-backdrop" id="modal-years" onclick="if(event.target===this)closeModal('modal-years')">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title">📅 Mes exercices</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-years')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--miz-text2);margin-bottom:12px;">
+      Sélectionne un exercice pour naviguer dans ton historique.<br>
+      Chaque exercice a ses propres semaines, indépendant des autres.
+    </div>
+    <div id="years-list" style="border:1px solid var(--miz-border);border-radius:var(--miz-radius-sm);overflow:hidden;"></div>
+  </div>
+</div>
+
+<!-- Modale délai de prévenance -->
+<div class="m5-modal-backdrop" id="modal-prevenance" onclick="if(event.target===this)closeModal('modal-prevenance')">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title">⏰ Délai de prévenance</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-prevenance')">✕</button>
+    </div>
+    <div style="font-size:13px;color:var(--miz-text2);margin-bottom:14px;">
+      Vérifie si ton employeur t'a prévenu à temps. <strong>Défaut légal : 7 jours ouvrés</strong> (Art. L3123-31). Réductible à <strong>3 jours minimum</strong> uniquement par accord collectif avec contreparties (Art. L3123-24).
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Date de la demande de l'employeur</label>
+      <input type="date" class="m5-input" id="prev-date-demande">
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Date prévue pour travailler</label>
+      <input type="date" class="m5-input" id="prev-date-travail">
+    </div>
+    <button class="m5-btn m5-btn-primary m5-btn-full" onclick="checkPrevenance()" style="margin-bottom:12px;">
+      Vérifier le délai
+    </button>
+    <div id="prevenance-result" style="min-height:40px;"></div>
+    <div style="font-size:11px;color:var(--miz-text3);margin-top:12px;line-height:1.6;">
+      ⚖️ En cas de non-respect du délai contractuel, tu peux refuser ces heures sans que ce soit considéré comme une faute (Art. L3123-10 du Code du travail).
+    </div>
+  </div>
+</div>
+
+<!-- Modale PDF période -->
+<div class="m5-modal-backdrop" id="modal-pdf" onclick="closeModal('modal-pdf')">
+  <div class="m5-modal" onclick="event.stopPropagation()">
+    <div class="m5-modal-title" style="font-size:16px;font-weight:700;color:var(--miz-primary);margin-bottom:16px;">📄 Exporter en PDF</div>
+    <div class="m5-input-group">
+      <label class="m5-label">Période</label>
+      <select class="m5-select" id="pdf-periode" onchange="updatePDFPreview()">
+        <option value="ANNUEL">Année complète</option>
+        <option value="MENSUEL">Mois spécifique</option>
+        <option value="CUSTOM">Période personnalisée</option>
+      </select>
+    </div>
+    <div id="pdf-mensuel-opts" style="display:none;">
+      <div class="m5-input-group">
+        <label class="m5-label">Mois</label>
+        <select class="m5-select" id="pdf-mois">
+          <option value="1">Janvier</option><option value="2">Février</option>
+          <option value="3">Mars</option><option value="4">Avril</option>
+          <option value="5">Mai</option><option value="6">Juin</option>
+          <option value="7">Juillet</option><option value="8">Août</option>
+          <option value="9">Septembre</option><option value="10">Octobre</option>
+          <option value="11">Novembre</option><option value="12">Décembre</option>
+        </select>
+      </div>
+    </div>
+    <div id="pdf-custom-opts" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <div class="m5-input-group">
+          <label class="m5-label">Du</label>
+          <input type="date" class="m5-input" id="pdf-date-debut">
+        </div>
+        <div class="m5-input-group">
+          <label class="m5-label">Au</label>
+          <input type="date" class="m5-input" id="pdf-date-fin">
+        </div>
+      </div>
+    </div>
+    <div id="pdf-preview-info" style="font-size:12px;color:var(--miz-text3);padding:6px 0;"></div>
+    <div style="display:flex;gap:8px;margin-top:8px;">
+      <button class="m5-btn m5-btn-outline m5-btn-sm" style="flex:0 0 auto" onclick="closeModal('modal-pdf')">Annuler</button>
+      <button class="m5-btn m5-btn-primary" style="flex:1" onclick="launchPDF()">📄 Générer le PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modale Mizuki -->
+<div class="m5-modal-backdrop" id="modal-mizuki" onclick="if(event.target===this)closeModal('modal-mizuki')">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title">🦊 Mizuki — Mon analyse</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-mizuki')">✕</button>
+    </div>
+    <div id="mizuki-popup-body"></div>
+    <button class="m5-btn m5-btn-outline m5-btn-full" style="margin-top:16px" onclick="closeModal('modal-mizuki')">Fermer</button>
+  </div>
+</div>
+
+<!-- Modale contrat -->
+<div class="m5-modal-backdrop" id="modal-contract" onclick="if(event.target===this)closeModal('modal-contract')">
+  <div class="m5-modal">
+    <div class="m5-modal-header">
+      <div class="m5-modal-title">⚙️ Mon contrat</div>
+      <button class="m5-modal-close" onclick="closeModal('modal-contract')">✕</button>
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Ton prénom (optionnel)</label>
+      <input type="text" class="m5-input" id="contract-name" placeholder="Prénom" autocomplete="given-name">
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Durée contractuelle (h/semaine) *</label>
+      <input type="number" inputmode="decimal" class="m5-input" id="contract-hours" min="1" max="34" step="0.5" placeholder="ex: 25">
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Taux horaire brut (€/h)</label>
+      <input type="number" inputmode="decimal" class="m5-input" id="contract-rate" min="0" step="0.01" placeholder="ex: 11.88">
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Convention collective</label>
+      <input type="text" class="m5-input" id="contract-ccn-search"
+        placeholder="Rechercher par nom ou IDCC..." autocomplete="off"
+        oninput="searchCCN(this.value)"
+        style="margin-bottom:4px;">
+      <input type="hidden" id="contract-ccn" value="0">
+      <div id="contract-ccn-results" style="display:none;max-height:180px;overflow-y:auto;border:1.5px solid var(--miz-border2);border-radius:8px;background:var(--miz-bg);"></div>
+      <div id="contract-ccn-selected" style="font-size:12px;color:var(--miz-primary);margin-top:4px;"></div>
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Date de début d'exercice</label>
+      <input type="date" class="m5-input" id="contract-exercice" style="font-size:15px;">
+      <div style="font-size:11px;color:var(--miz-text3);margin-top:3px;">Ex : 01/01/2026 ou 15/06/2025 selon ton contrat</div>
+    </div>
+
+    <div class="m5-input-group">
+      <label class="m5-label" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Dates de clôture de paie (12 mois)</span>
+        <button type="button" class="m5-btn m5-btn-outline m5-btn-sm" onclick="autofillClotures()" style="font-size:11px;padding:2px 8px;">Fin de mois</button>
+      </label>
+      <div id="clotures-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:4px;"></div>
+      <div style="font-size:11px;color:var(--miz-text3);margin-top:4px;">Saisir la date de clôture de chaque mois de paie</div>
+    </div>
+
+    <div class="m5-input-group">
+      <label class="m5-label">Mode de calcul des heures complémentaires</label>
+      <select class="m5-select" id="contract-mode">
+        <option value="HEBDO">Hebdomadaire (par semaine)</option>
+        <option value="MENSUEL">Mensuel (par mois de paie)</option>
+        <option value="ANNUEL">Annuel (compteur glissant)</option>
+      </select>
+    </div>
+
+    <div style="margin:12px 0;padding:10px 12px;background:var(--miz-bg2);border-radius:var(--miz-radius-sm);border:1px solid var(--miz-border2);">
+      <div style="font-size:13px;font-weight:700;color:var(--miz-text);margin-bottom:8px;">📅 Jours fériés chômés</div>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="contract-feries" style="width:18px;height:18px;margin-top:2px;accent-color:var(--miz-primary);" checked onchange="toggleFeriesLabel(this.checked)">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--miz-text);">Neutraliser les jours fériés chômés</div>
+          <div id="feries-mode-label" style="font-size:11px;color:var(--miz-text3);margin-top:3px;line-height:1.5;">
+            ✅ Art. L3133-3 + jurisprudence — Le chômage d'un jour férié ne peut entraîner de perte, donc le seuil de déclenchement est abaissé de la valeur du jour férié. Les heures complémentaires ne sont comptées que sur les jours réellement travaillés.
+          </div>
+        </div>
+      </label>
+      <div id="feries-alt-label" style="font-size:11px;color:var(--miz-text3);margin-top:8px;padding:6px 8px;background:var(--miz-bg);border-radius:6px;display:none;">
+        ⬜ Cass. Soc. 2012 — Certains accords d'entreprise intègrent les jours fériés chômés dans l'assiette de calcul. Le seuil reste inchangé.
+      </div>
+      <div style="margin-top:10px;border-top:1px solid var(--miz-border);padding-top:10px;">
+        <button id="btn-import-feries" class="m5-btn m5-btn-outline m5-btn-sm m5-btn-full"
+          onclick="importFeriesAPI()" style="margin-bottom:6px;">
+          📅 Importer les jours fériés (API gouvernement)
+        </button>
+        <div id="feries-import-status" style="font-size:11px;color:var(--miz-text3);text-align:center;min-height:16px;">
+          Données locales (calcul automatique)
+        </div>
+        <div style="font-size:10px;color:var(--miz-text3);text-align:center;margin-top:3px;">
+          Source : calendrier.api.gouv.fr — N-1, N, N+1 · Nécessite une connexion
+        </div>
+      </div>
+    </div>
+
+    <div class="m5-input-group">
+      <label class="m5-label">Premier jour de ta semaine de travail</label>
+      <select class="m5-select" id="contract-start-day">
+        <option value="0">Lundi (défaut)</option>
+        <option value="1">Mardi</option>
+        <option value="2">Mercredi</option>
+        <option value="3">Jeudi</option>
+        <option value="4">Vendredi</option>
+        <option value="5">Samedi</option>
+        <option value="6">Dimanche</option>
+      </select>
+    </div>
+    <div class="m5-input-group">
+      <label class="m5-label">Nombre de jours travaillés par semaine</label>
+      <select class="m5-select" id="contract-jours-ouvres">
+        <option value="3">3 jours/semaine</option>
+        <option value="4">4 jours/semaine</option>
+        <option value="5" selected>5 jours/semaine (défaut)</option>
+        <option value="6">6 jours/semaine</option>
+      </select>
+      <div style="font-size:11px;color:var(--miz-text3);margin-top:3px;">Utilisé pour répartir les jours fériés chômés sur les bons jours de travail.</div>
+    </div>
+
+    <div style="margin:12px 0;padding:10px 12px;background:var(--miz-bg2);border-radius:var(--miz-radius-sm);border:1px solid var(--miz-border2);">
+      <div style="font-size:13px;font-weight:700;color:var(--miz-text);margin-bottom:8px;">⏰ Délai de prévenance</div>
+      <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+        <input type="checkbox" id="contract-accord-prev" style="width:18px;height:18px;margin-top:2px;accent-color:var(--miz-primary);">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--miz-text);">Un accord collectif réduit mon délai à 3 jours ouvrés</div>
+          <div style="font-size:11px;color:var(--miz-text3);margin-top:3px;line-height:1.5;">
+            🔵 À cocher uniquement si <strong>ton accord d'entreprise ou ta CCN étendue</strong> le prévoit explicitement avec des contreparties (Art. L3123-24). Par défaut, le délai est de <strong>7 jours ouvrés</strong> (Art. L3123-31).
+          </div>
+        </div>
+      </label>
+    </div>
+
+    <div class="m5-input-group">
+      <label class="m5-label">Plafond heures complémentaires</label>
+      <select class="m5-select" id="contract-cap">
+        <option value="0.10">10% — Droit commun</option>
+        <option value="0.33">33% — Avec accord de branche</option>
+      </select>
+    </div>
+    <div class="m5-alert info" style="margin-bottom:14px;">
+      <span>🔒</span><div style="font-size:12px;">Données 100% locales — rien n'est envoyé à un serveur.</div>
+    </div>
+    <button class="m5-btn m5-btn-primary m5-btn-full" onclick="saveContract()">💾 Enregistrer</button>
+  </div>
+</div>
+
+<!-- ── TOAST ──────────────────────────────────────────────────── -->
+<div class="m5-toast-container" id="m5-toast-container" aria-live="polite" aria-atomic="true" role="status"></div>
+
+<!-- ── SCRIPTS ────────────────────────────────────────────────── -->
+<script>
+function toggleFeriesLabel(checked) {
+  const main=document.getElementById('feries-mode-label');
+  const alt=document.getElementById('feries-alt-label');
+  if(main) main.style.display=checked?'block':'none';
+  if(alt)  alt.style.display=checked?'none':'block';
+}
+</script>
+<script src="js/data/ccn-partiel.js"></script>
+<script src="js/core/calc-engine.js"></script>
+<script src="js/features/saisie.js"></script>
+<script src="js/features/mizuki.js"></script>
+<script src="js/features/pdf-report.js"></script>
+<script src="js/features/glossaire.js"></script>
+<script src="js/features/wellbeing.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
