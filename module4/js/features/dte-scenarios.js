@@ -727,7 +727,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -748,7 +748,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -769,7 +769,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -790,7 +790,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -811,7 +811,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -832,7 +832,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -853,7 +853,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -874,7 +874,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -895,7 +895,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -916,7 +916,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 1,
 "question": "Comment gérer cette fatigue légère ?"
@@ -937,7 +937,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -958,7 +958,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -979,7 +979,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -1000,7 +1000,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -1021,7 +1021,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -1042,7 +1042,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-20 C. trav. — Durée max hebdomadaire 48h",
-"Art. L3121-23 — Moyenne sur 12 semaines (44h)"
+"Art. L3121-22 — Moyenne sur 12 semaines (44h)"
 ],
 "urgence": 2,
 "question": "Comment gérer cette fatigue légère ?"
@@ -9003,7 +9003,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9024,7 +9024,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9045,7 +9045,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9066,7 +9066,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9087,7 +9087,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9108,7 +9108,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9129,7 +9129,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9150,7 +9150,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9171,7 +9171,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9192,7 +9192,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9213,7 +9213,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9234,7 +9234,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9255,7 +9255,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9276,7 +9276,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9297,7 +9297,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9318,7 +9318,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9339,7 +9339,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9360,7 +9360,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -9381,7 +9381,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — RCO",
-"Art. L3121-38 — Taux du RCO (100% des heures)"
+"Art. L3121-33 — Taux du RCO (100% des heures)"
 ],
 "urgence": 3,
 "question": "Que faire en zone de risque élevé ?"
@@ -12580,8 +12580,8 @@ const DTE_SCENARIOS = [
 "Récurrence = droit à requalification en CDI temps plein"
 ],
 "refs": [
-"Art. L3123-9 C. trav. — Heures complémentaires",
-"Art. L3123-17 — Majoration 10% à 25%"
+"Art. L3123-28 C. trav. — Heures complémentaires",
+"Art. L3123-29 — Majoration 10% à 25%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -12601,8 +12601,8 @@ const DTE_SCENARIOS = [
 "Récurrence = droit à requalification en CDI temps plein"
 ],
 "refs": [
-"Art. L3123-9 C. trav. — Heures complémentaires",
-"Art. L3123-17 — Majoration 10% à 25%"
+"Art. L3123-28 C. trav. — Heures complémentaires",
+"Art. L3123-29 — Majoration 10% à 25%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -12622,8 +12622,8 @@ const DTE_SCENARIOS = [
 "Récurrence = droit à requalification en CDI temps plein"
 ],
 "refs": [
-"Art. L3123-9 C. trav. — Heures complémentaires",
-"Art. L3123-17 — Majoration 10% à 25%"
+"Art. L3123-28 C. trav. — Heures complémentaires",
+"Art. L3123-29 — Majoration 10% à 25%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -12643,8 +12643,8 @@ const DTE_SCENARIOS = [
 "Récurrence = droit à requalification en CDI temps plein"
 ],
 "refs": [
-"Art. L3123-9 C. trav. — Heures complémentaires",
-"Art. L3123-17 — Majoration 10% à 25%"
+"Art. L3123-28 C. trav. — Heures complémentaires",
+"Art. L3123-29 — Majoration 10% à 25%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -12664,8 +12664,8 @@ const DTE_SCENARIOS = [
 "Récurrence = droit à requalification en CDI temps plein"
 ],
 "refs": [
-"Art. L3123-9 C. trav. — Heures complémentaires",
-"Art. L3123-17 — Majoration 10% à 25%"
+"Art. L3123-28 C. trav. — Heures complémentaires",
+"Art. L3123-29 — Majoration 10% à 25%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -13071,7 +13071,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — Contingent annuel",
-"Art. L3121-38 — Taux RCO 100%"
+"Art. L3121-33 — Taux RCO 100%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -13092,7 +13092,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — Contingent annuel",
-"Art. L3121-38 — Taux RCO 100%"
+"Art. L3121-33 — Taux RCO 100%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -13113,7 +13113,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — Contingent annuel",
-"Art. L3121-38 — Taux RCO 100%"
+"Art. L3121-33 — Taux RCO 100%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -13134,7 +13134,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — Contingent annuel",
-"Art. L3121-38 — Taux RCO 100%"
+"Art. L3121-33 — Taux RCO 100%"
 ],
 "urgence": 1,
 "question": "Question spécifique"
@@ -13155,7 +13155,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3121-33 C. trav. — Contingent annuel",
-"Art. L3121-38 — Taux RCO 100%"
+"Art. L3121-33 — Taux RCO 100%"
 ],
 "urgence": 1,
 "question": "Question spécifique"

@@ -8,7 +8,7 @@
  * Références légales :
  *   Art. L3131-1  — 11h repos obligatoire entre deux journées
  *   Art. L3122-2  — travailleur de nuit : ≥3h entre 21h-6h, ≥2×/sem
- *   Art. L3121-34 — durée max journalière : 10h (dérogatoire 12h)
+ *   Art. L3121-18 — durée max journalière : 10h (dérogatoire 12h)
  *
  * Références scientifiques :
  *   IARC 2019 Groupe 2A — travail de nuit cancérogène probable
@@ -405,7 +405,7 @@ function renderSchedulePanel(containerId) {
         font-size:9px;color:var(--text-dim);font-family:var(--font-mono);line-height:1.7;">
         L3131-1 · 11h repos entre journées<br>
         L3122-2 · Nuit = ≥3h entre 21h-6h, ≥2×/sem<br>
-        L3121-34 · Max journalier : 10h (dérogatoire 12h)<br>
+        L3121-18 · Max journalier : 10h (dérogatoire 12h)<br>
         IARC 2019 · Travail nuit = cancérogène probable (Groupe 2A)
       </div>
       <!-- ROULEMENT -->
