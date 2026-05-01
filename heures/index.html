@@ -914,7 +914,11 @@ function calculate(){
     const total=base+extra;
     const p=calcHsPaliers(total,rules);
     h1+=p.h1;hInter+=p.hInter;h2+=p.h2;
-    const[y,m,d]=week.split("-");
+    // FIX BUG 1 : ignorer les clés invalides (sécurité)
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(week))return;
+    // FIX BUG 2 : afficher la semaine UNIQUEMENT si elle contient des HS effectives
+    if(p.h1<=0 && p.hInter<=0 && p.h2<=0)return;
+    const[y,m,d]=week.split("-").map(Number);
     const t1lbl=rules.taux1+'%',t2lbl=rules.taux2+'%';
     const interPart=rules.taux_inter?` / ${fmtH(p.hInter)} à ${rules.taux_inter}%`:'';
     details.push(`Semaine du ${new Date(y,m-1,d).toLocaleDateString()} : ${fmtH(p.h1)} à ${t1lbl}${interPart} / ${fmtH(p.h2)} à ${t2lbl}`);
