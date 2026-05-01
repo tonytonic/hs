@@ -237,7 +237,7 @@ const ARTICLES_LOI = [
     mots: ["démission", "rupture", "préavis", "volontaire", "chômage", "légitime"]
   },
   {
-    art: "Art. L1237-19", titre: "Rupture conventionnelle",
+    art: "Art. L1237-11", titre: "Rupture conventionnelle individuelle",
     def: "La rupture conventionnelle permet à l'employeur et au salarié de convenir en commun des conditions de la rupture du CDI. Elle donne droit à l'allocation chômage et à une indemnité spécifique au moins égale à l'indemnité légale de licenciement.",
     ex: "La rupture conventionnelle nécessite un entretien, un formulaire homologué par la DREETS et un délai de rétractation de 15 jours calendaires.",
     mots: ["rupture conventionnelle", "commun accord", "chômage", "indemnité", "homologation"]
@@ -597,7 +597,7 @@ const ARTICLES_LOI = [
     mots: ["CDD", "contrat durée déterminée", "définition", "exception", "temporaire", "requalification"]
   },
   {
-    art: "Art. L1244-1", titre: "CDD — indemnité de fin de contrat",
+    art: "Art. L1243-8", titre: "CDD — indemnité de fin de contrat (10% précarité)",
     def: "À l'issue d'un CDD, le salarié a droit à une indemnité de fin de contrat (prime de précarité) de 10% de la rémunération brute totale perçue, sauf dans certains cas (emploi saisonnier, CDD conclu avec un jeune en formation, CDD transformé en CDI).",
     ex: "Un CDD de 6 mois avec un salaire mensuel de 1800 euros bruts donne droit à 6 x 1800 x 10% = 1080 euros d'indemnité de précarité à la fin.",
     mots: ["CDD", "indemnité fin de contrat", "prime de précarité", "10%", "fin de mission"]
@@ -819,7 +819,7 @@ const ARTICLES_LOI = [
     mots: ["SMIC", "salaire minimum", "rémunération", "revalorisation", "plancher"]
   },
   {
-    art: "Art. L3231-1", titre: "Principe d'égalité de rémunération",
+    art: "Art. L3221-2", titre: "Égalité de rémunération entre femmes et hommes",
     def: "Tout employeur assure, pour un même travail ou pour un travail de valeur égale, l'égalité de rémunération entre les femmes et les hommes. Sont considérés comme ayant une valeur égale les travaux qui exigent des salariés un ensemble comparable de connaissances et de capacités.",
     ex: "Si deux salariés (homme et femme) occupent le même poste avec la même expérience et les mêmes résultats, leur salaire doit être identique. Tout écart doit être justifié par des éléments objectifs.",
     mots: ["égalité salariale", "homme femme", "même travail", "valeur égale", "discrimination salariale"]
@@ -831,7 +831,7 @@ const ARTICLES_LOI = [
     mots: ["garantie de rémunération", "réduction horaires", "allocation complémentaire", "35h"]
   },
   {
-    art: "Art. L3242-1", titre: "Bulletins de paie — conservation",
+    art: "Art. L3243-4", titre: "Bulletin de paie — conservation",
     def: "L'employeur est tenu de remettre au salarié, lors du paiement du salaire, un bulletin de paie. L'employeur conserve les bulletins de paie pendant 5 ans. Le salarié n'est soumis à aucune obligation de conservation vis-à-vis de l'employeur.",
     ex: "Le salarié a intérêt à conserver ses bulletins de paie sans limitation de durée car ils peuvent servir de preuve dans des litiges sur les retraites, les HS, ou les rappels de salaire.",
     mots: ["bulletin de paie", "conservation", "5 ans", "employeur", "preuve"]
@@ -891,7 +891,7 @@ const ARTICLES_LOI = [
     mots: ["machines", "équipements", "maintenance", "sécurité", "obligation employeur"]
   },
   {
-    art: "Art. L4351-1", titre: "Agents chimiques dangereux",
+    art: "Art. L4411-6", titre: "Agents chimiques dangereux — prévention",
     def: "L'employeur évalue les risques que peuvent présenter les agents chimiques dangereux pour la santé et la sécurité des travailleurs lors du travail, y compris les risques liés aux agents chimiques cancérogènes, mutagènes ou toxiques pour la reproduction.",
     ex: "Toute exposition à des produits chimiques (peintures, solvants, pesticides, amiante) doit être évaluée et minimisée. L'employeur doit tenir un registre des expositions.",
     mots: ["agents chimiques", "dangereux", "cancérogènes", "exposition", "évaluation des risques"]
@@ -939,7 +939,7 @@ const ARTICLES_LOI = [
     mots: ["travailleurs handicapés", "OETH", "Agefiph", "6%", "obligation d'emploi", "contribution"]
   },
   {
-    art: "Art. L5331-1", titre: "Travail illégal — définition",
+    art: "Art. L8221-1", titre: "Travail dissimulé — interdictions",
     def: "Est qualifié de travail illégal : le travail dissimulé, le marchandage, le prêt illicite de main-d'oeuvre, l'emploi d'étrangers sans titre de travail, les fraudes aux revenus de remplacement et la fausse déclaration.",
     ex: "Un employeur qui embauche un salarié sans le déclarer à l'URSSAF commet du travail dissimulé, passible de 3 ans d'emprisonnement et 45 000 euros d'amende.",
     mots: ["travail illégal", "travail dissimulé", "marchandage", "sanction", "URSSAF"]
@@ -951,7 +951,7 @@ const ARTICLES_LOI = [
     mots: ["formation professionnelle", "droit à la formation", "tout au long de la vie", "compétences"]
   },
   {
-    art: "Art. L6111-5", titre: "Compte personnel de formation — CPF",
+    art: "Art. L6323-1", titre: "Compte personnel de formation — CPF (création)",
     def: "Toute personne dispose, dès son entrée sur le marché du travail et jusqu'à son départ à la retraite, d'un compte personnel de formation. Ce compte est alimenté en euros chaque année selon la durée du travail accomplie.",
     ex: "Le CPF est alimenté à hauteur de 500 euros par an pour un salarié à temps plein (800 euros pour les non-qualifiés), dans la limite d'un plafond de 5000 euros (8000 euros pour les non-qualifiés).",
     mots: ["CPF", "compte personnel de formation", "euros", "formation", "financement"]
@@ -969,7 +969,7 @@ const ARTICLES_LOI = [
     mots: ["CPF", "utilisation", "formation certifiante", "qualification", "reconversion"]
   },
   {
-    art: "Art. L6341-1", titre: "Plan de formation — hors temps de travail",
+    art: "Art. L6321-6", titre: "Formation hors temps de travail — accord salarié",
     def: "Lorsque les formations sont dispensées hors du temps de travail, elles font l'objet d'un accord entre le salarié et l'employeur, et donnent lieu au versement d'une allocation de formation égale à 50% de la rémunération nette de référence.",
     ex: "Si un employeur demande à un salarié de se former le soir ou le week-end, il doit lui verser 50% de son salaire net pour ces heures de formation hors temps de travail.",
     mots: ["formation hors temps de travail", "accord", "allocation formation", "50%"]
