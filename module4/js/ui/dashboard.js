@@ -125,11 +125,37 @@ class Dashboard {
       desc: 'Votre niveau d\'épuisement cumulé, calculé selon INRS et J.Occup.Health 2021.',
       source: 'INRS · J.Occup.Health 2021 (Taiwan, 6 mois) · Thompson 2022',
       facteurs_heures: [
-        { label:'Heures supplémentaires/sem', key:'_avgExtra7', fmt: v => v>0 ? '+'+v.toFixed(1)+'h/j × 0.09' : '0h supp.' },
-        { label:'Jours consécutifs',          key:'_consecOT',  fmt: v => v > 10 ? v+'j ouvrés de surcharge ⚠️' : v > 5 ? v+'j ouvrés de surcharge' : v+'j ouvrés avec HS' },
-        { label:'Semaines de surcharge', key:'_cumulWeeks', fmt: v => {
+        { label:'Heures supp. cette semaine', key:'_currentWeekExtra', fmt: (v, get) => {
+            const hasData = get && get('_hasCurrentWeekData');
+            if (!hasData) return 'Aucune saisie cette semaine';
+            if (!v || v <= 0) return '0h sup. cette semaine';
+            return '+'+v.toFixed(1)+'h sup. cette semaine';
+        }},
+        { label:'Moyenne quotidienne (28j)', key:'_avgExtra7', fmt: (v, get) => {
+            if (v <= 0) return '0h/j — rythme légal';
+            const isProj = get && get('_isProjection');
+            const impact = v < 1 ? 'impact léger' : v < 2 ? 'impact modéré' : 'impact élevé';
+            const suffix = isProj ? ' — projection historique' : '';
+            return '+'+v.toFixed(1)+'h/jour ('+impact+')'+suffix;
+        }},
+        { label:'Jours consécutifs avec HS', key:'_consecOT',  fmt: v => v > 10 ? v+'j (WE non comptés) ⚠️ surcharge prolongée' : v > 5 ? v+'j (WE non comptés) — vigilance' : v+'j ouvrés avec HS' },
+        { label:'Semaines de surcharge cumulées', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
-            return vR > 0 ? vR+' sem. cumulées (×'+(vR>=24?'1.55':vR>=16?'1.40':vR>=8?'1.25':vR>=4?'1.12':'1.00')+')' : 'Pas de cumul';
+            if (vR <= 0) return 'Aucun cumul (rythme normal)';
+            // Échelle :
+            //  - < 1   : effet partiel d'une seule semaine (charge légère ponctuelle)
+            //  - 1-3   : 1 à 3 semaines en surcharge — phase de vigilance
+            //  - 4-7   : phase P2 INRS — fatigue chronique modérée
+            //  - 8-15  : phase P3 INRS — surmenage installé
+            //  - 16+   : phase P4 INRS — risque burn-out
+            let phase, multiplier;
+            if (vR < 1)        { phase = 'effet partiel (semaine légère)'; multiplier = '×1.00'; }
+            else if (vR < 4)   { phase = 'phase P1 — vigilance';            multiplier = '×1.00'; }
+            else if (vR < 8)   { phase = 'phase P2 — fatigue chronique';   multiplier = '×1.12'; }
+            else if (vR < 16)  { phase = 'phase P3 — surmenage';            multiplier = '×1.25'; }
+            else if (vR < 24)  { phase = 'phase P4 — risque burn-out';     multiplier = '×1.40'; }
+            else               { phase = 'phase P4+ — épuisement critique';multiplier = '×1.55'; }
+            return vR.toFixed(1)+' sem. — '+phase+' '+multiplier;
         }},
       ],
       facteurs_vie: [
@@ -151,7 +177,15 @@ class Dashboard {
       facteurs_heures: [
         { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: v => v.toFixed(0)+'h/sem (optimal : 35h)' },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
-        { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => v>0 ? v+' semaines de surcharge' : 'Première semaine' },
+        { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => {
+            const vR = Math.round(v * 10) / 10;
+            if (vR <= 0) return 'Première semaine — pas d\'historique';
+            if (vR < 1) return 'Effet partiel d\'1 semaine légère';
+            if (vR < 4) return vR.toFixed(1)+' sem. — vigilance';
+            if (vR < 8) return vR.toFixed(1)+' sem. — fatigue chronique';
+            if (vR < 16) return vR.toFixed(1)+' sem. — surmenage';
+            return vR.toFixed(1)+' sem. — risque burn-out';
+        }},
       ],
       facteurs_vie: [
         { label:'Stress ressenti (check-in)',     key:'ci_stress', fmt: v => v!==undefined ? ['Aucun','Léger','Modéré','Élevé','Critique'][v]||'—' : 'Non renseigné' },
@@ -383,7 +417,7 @@ class Dashboard {
               ${meta.facteurs_heures.map(f=>`
                 <div style="margin-bottom:7px;">
                   <div style="font-size:10px;color:rgba(255,255,255,0.5);">${f.label}</div>
-                  <div style="font-size:12px;color:#fff;font-weight:600;margin-top:1px;">${f.fmt(normVal(f.key))}</div>
+                  <div style="font-size:12px;color:#fff;font-weight:600;margin-top:1px;">${f.fmt(normVal(f.key), normVal)}</div>
                 </div>`).join('')}
             </div>
             <!-- Colonne droite : Facteur RYTHME DE VIE -->
