@@ -166,7 +166,7 @@ const M5_Wellbeing = {
     const messages = this._buildMessages(
       scoreGlobal, niveau, ecartType, ratioMoyen,
       ratioRecup, ratioSubi, contractH, mean,
-      worked, semainesProchePlafond
+      worked, semainesProchePlafond, contract
     );
 
     // Score global fiable = calculé uniquement sur les scores non-neutralisés
@@ -202,7 +202,7 @@ const M5_Wellbeing = {
     };
   },
 
-  _buildMessages(global, niveau, ecartType, ratioMoyen, ratioRecup, ratioSubi, contractH, mean, worked=[], semainesProchePlafond=0) {
+  _buildMessages(global, niveau, ecartType, ratioMoyen, ratioRecup, ratioSubi, contractH, mean, worked=[], semainesProchePlafond=0, contract=null) {
     const msgs = [];
 
     // Message principal
@@ -258,11 +258,11 @@ const M5_Wellbeing = {
         'sécurité','gardiennage','animation','aide','accompagnement','soins','commerce de détail',
         'grande distribution','restauration','blanchisserie'];
       const _secteurContraint = (() => {
-        const nom = (contract.ccnNom||'').toLowerCase();
+        const nom = (contract && contract.ccnNom || '').toLowerCase();
         return _contraintKeywords.some(k => nom.includes(k));
       })();
       const txtSecteur = _secteurContraint
-        ? `Ton secteur (${contract.ccnNom?.split(' ').slice(0,3).join(' ')||'secteur contraint'}) est reconnu comme à temps partiel structurellement imposé — la recherche Voydanoff 2005 montre que l'absence de choix amplifie l'impact sur la santé.`
+        ? `Ton secteur (${(contract && contract.ccnNom)?.split(' ').slice(0,3).join(' ')||'secteur contraint'}) est reconnu comme à temps partiel structurellement imposé — la recherche Voydanoff 2005 montre que l'absence de choix amplifie l'impact sur la santé.`
         : `Voydanoff distingue le temps partiel choisi du temps partiel contraint — si ces heures te sont imposées, c'est utile à noter pour toi.`;
       msgs.push({ type:'warn', ref:'Voydanoff 2005', text:`Plusieurs semaines approchent le plafond légal. ${txtSecteur}` });
     }
