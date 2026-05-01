@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#4FB3C2">
 <meta charset="UTF-8">
 <title>Simulateur de compteur annuel</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 .popup-content input[type=number]{box-sizing:border-box;width:100%;}
 .saisie-toggle{display:flex;gap:0;margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid #ddd}
@@ -871,7 +871,9 @@ function calculate(){
     Object.entries(specialDays).forEach(([date,type])=>{
       if(type!=='ferie')return;
       // Si la CCN ne chôme que le 1er mai, ignorer les autres fériés
-      if(_fr.seul1erMaiChome && !date.endsWith('-05-01'))return;
+      // CCN restreintes (HCR, gardiennage...) : seul 1er mai chômé
+      // Mais si AUTO_FERIE coché par l'utilisateur, on respecte SON choix
+      // (le toggle existe = l'utilisateur veut TOUS ses fériés)
       const d=new Date(date);if(d<pStart||d>pEnd)return;
       const dow=d.getDay();if(_isCCNRestDay(dow))return;
       // Appliquer -7h virtuel SAUF si l'utilisateur a explicitement saisi une absence
@@ -1077,7 +1079,7 @@ function updateContingent(){
     const _fr2=typeof window.CCN_API!=='undefined'?window.CCN_API.getCCNFeriesRules(parseInt(localStorage.getItem('CCN_IDCC')||'0')):{feriesChomes:11,seul1erMaiChome:false};
     Object.entries(specialDays).forEach(([date,type])=>{
       if(type!=="ferie")return;
-      if(_fr2.seul1erMaiChome && !date.endsWith('-05-01'))return;
+      // CCN restreintes : seul 1er mai chômé — override par AUTO_FERIE actif
       const d=new Date(date);const dow=d.getDay();
       if(_isCCNRestDay(dow))return;
       const _hmA4 = data[date] && (data[date].absent||0) > 0;
@@ -1414,7 +1416,7 @@ function calcPeriodWeeks(pStart,pEnd){
     const _fr3=typeof window.CCN_API!=='undefined'?window.CCN_API.getCCNFeriesRules(parseInt(localStorage.getItem('CCN_IDCC')||'0')):{feriesChomes:11,seul1erMaiChome:false};
     Object.entries(specialDays).forEach(([date,type])=>{
       if(type!=="ferie")return;
-      if(_fr3.seul1erMaiChome && !date.endsWith('-05-01'))return;
+      // CCN restreintes : seul 1er mai chômé — override par AUTO_FERIE actif
       const d=new Date(date);if(d<pS||d>pE)return;
       const dow=d.getDay();if(_isCCNRestDay(dow))return;
       const _hmA5 = data[date] && (data[date].absent||0) > 0;
@@ -2103,7 +2105,7 @@ const TIPS={
   seuil:{
     title:'⏱️ Seuil de déclenchement des HS',
     body:'La durée légale du travail est fixée à 35 heures par semaine. Toute heure travaillée au-delà de ce seuil est une heure supplémentaire.\n\nLa semaine de référence commence selon le jour fixé par votre accord d\'entreprise ou votre CCN.\n\nCertaines CCN prévoient un seuil différent (ex. : 37h, 39h) avec des compensations intégrées dans le salaire de base.',
-    ref:'Art. L3121-27 · Art. L3121-28 Code du travail'
+    ref:'Art. L3121-27 · Art. L3121-32 Code du travail'
   }
 };
 function showTip(key){
