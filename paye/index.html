@@ -1705,7 +1705,7 @@ function updateContingent(){
   txt.textContent=fmtH(total)+" / "+LIMIT+"h";
   if(pct>=100)toast("⚠️ Contingent annuel de "+LIMIT+"h atteint !","warn",5000);
   else if(pct>=90&&!sessionStorage.getItem("contingent_warned")){sessionStorage.setItem("contingent_warned","1");toast("⚠️ Contingent annuel : "+Math.round(pct)+"% atteint","warn",4000);}
-  // RCO — Art. L3121-38
+  // RCO — Art. L3121-33
   const rcoWrap=document.getElementById("rcoWrap");
   const rcoText=document.getElementById("rcoText");
   const rcoDetail=document.getElementById("rcoDetail");
@@ -1716,7 +1716,7 @@ function updateContingent(){
       const rco100=depassement;
       rcoWrap.classList.add("visible");
       rcoText.textContent=fmtH(rco50)+" à "+fmtH(rco100);
-      rcoDetail.textContent=fmtH(depassement)+" au-delà du contingent · "+fmtH(rco50)+" (≤20 sal.) ou "+fmtH(rco100)+" (>20 sal.) · Art. L3121-38";
+      rcoDetail.textContent=fmtH(depassement)+" au-delà du contingent · "+fmtH(rco50)+" (≤20 sal.) ou "+fmtH(rco100)+" (>20 sal.) · Art. L3121-33";
       if(!sessionStorage.getItem("rco_warn")){sessionStorage.setItem("rco_warn","1");toast("🛌 RCO dû : "+fmtH(rco50)+" à "+fmtH(rco100)+" de repos compensateur","warn",6000);}
     }else{rcoWrap.classList.remove("visible");}
   }
@@ -1881,7 +1881,7 @@ const TIPS={
   rco:{
     title:'🛌 Repos Compensateur Obligatoire (RCO)',
     body:'Le RCO est un droit à repos qui s\'ouvre dès que le contingent annuel d\'heures supplémentaires est dépassé. Il s\'ajoute aux majorations salariales.\n\n• Entreprises ≤ 20 salariés : 50 % de chaque heure au-delà du contingent\n• Entreprises > 20 salariés : 100 % de chaque heure au-delà du contingent\n\nExemple : 30h au-delà du contingent dans une entreprise de 50 salariés → 30h de RCO.\n\nLe RCO doit être pris dans les 2 mois suivant l\'ouverture du droit, par journée ou demi-journée.',
-    ref:'Art. L3121-38 · Art. L3121-30 Code du travail'
+    ref:'Art. L3121-33 · Art. L3121-30 Code du travail'
   },
   majoration:{
     title:'💰 Majorations des heures supplémentaires',
