@@ -1,6 +1,6 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 7.9.4 — Cloudflare Pages (audit articles juridiques 5 modules)
+ * Version : 8.0.0 — Cloudflare Pages (M4 heatmap : DTE_REST_DAYS multi-format + WE en OFF)
  */
 
 const CACHE_NAME = "heuressup-cache-v8.0.0";
