@@ -359,7 +359,8 @@ function calPrev() {
   const d=new Date(calendarMonday+'T12:00:00');
   d.setDate(d.getDate()-7);
   calendarMonday=M5_localDK(d);
-  refreshUI();
+  // Différer refreshUI au prochain frame → INP nettement réduit (le tap répond instantanément)
+  requestAnimationFrame(refreshUI);
 }
 function calNext() {
   const today=M5_getCurrentMonday();
@@ -368,11 +369,11 @@ function calNext() {
   const next=M5_localDK(d);
   if(next>today) return; // pas dans le futur
   calendarMonday=next;
-  refreshUI();
+  requestAnimationFrame(refreshUI);
 }
 function calToday() {
   calendarMonday=M5_getCurrentMonday();
-  refreshUI();
+  requestAnimationFrame(refreshUI);
 }
 
 // ── Popup saisie journalière ───────────────────────────────────────
