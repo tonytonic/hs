@@ -1,9 +1,9 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 8.0.0 — Cloudflare Pages (M4 heatmap : DTE_REST_DAYS multi-format + WE en OFF)
+ * Version : 8.0.1 — Cloudflare Pages (offline complet : 4 fichiers fox + 3 assets M4 ajoutés)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.0.0";
+const CACHE_NAME = "heuressup-cache-v8.0.1";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -18,8 +18,10 @@ const FILES_TO_CACHE = [
   "./fox/js/badges.js", "./fox/js/milestones.js", "./fox/js/rpg-system.js",
   "./fox/js/quests.js", "./fox/js/combat.js", "./fox/js/skills.js",
   "./fox/js/inventory.js", "./fox/js/module-loader.js",
-  "./fox/js/scenarios-fox-data.js", "./fox/js/scenarios-ai.js",
+  "./fox/js/scenarios-fox-data.js", "./fox/js/scenarios-fox.js",
+  "./fox/js/scenarios-ai.js",
   "./fox/js/legal-engine.js", "./fox/js/module-reader.js",
+  "./fox/js/module3.js", "./fox/js/data-bridge.js", "./fox/js/storage.js",
   "./fox/js/snapshot-system.js", "./fox/js/export-rtf.js",
   "./fox/js/ai-integration.js", "./fox/js/main-rpg.js",
   "./fox/js/vue-pro.js", "./fox/js/articles-loi.js",
@@ -38,6 +40,8 @@ const FILES_TO_CACHE = [
   "./module4/css/main.css", "./module4/css/dashboard.css",
   "./module4/css/components.css", "./module4/css/charts.css",
   "./module4/css/twin-body.css",
+  "./module4/assets/favicon.svg", "./module4/assets/icon-192.svg",
+  "./module4/assets/logo-dte.svg",
   // === Module 5 — Temps partiel (Mizuki) ===
   "./module5/index.html",
   "./module5/css/main.css",
