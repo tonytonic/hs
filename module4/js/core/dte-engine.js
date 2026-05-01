@@ -1316,7 +1316,7 @@ class DTEEngine {
 
     // Contingent
     const contingentPct = (m1.netOvertime / D.CONTINGENT_MAX) * 100;
-    // RCO — Art. L3121-38
+    // RCO — Art. L3121-33
     const rcoDepassement = Math.max(0, m1.netOvertime - D.CONTINGENT_MAX);
     const rcoH50  = rcoDepassement * 0.5;
     const rcoH100 = rcoDepassement;
@@ -1381,6 +1381,9 @@ class DTEEngine {
       sleepDebt:      sleepDebtVal,
       // Valeurs brutes pour les calculs
       _avgExtra7:     avgExtra7,
+      _currentWeekExtra: sumExtra7, // HS RÉELLES saisies cette semaine (pas projection historique)
+      _hasCurrentWeekData: hasAnyEntryThisWeek, // true si saisie réelle cette semaine
+      _isProjection: !hasAnyEntryThisWeek && (count7 === 0), // avgExtra7 = projection 28j historique
       _avgH7:         avgH7,
       _weeklyH7:      weeklyH7Effective,
       _recentWeeklyH: recentWeeklyH,
