@@ -346,17 +346,27 @@ body::before {
 /* ── MODALES ─────────────────────────────────────────────────── */
 .m5-modal-backdrop {
   position: fixed; inset: 0;
-  background: rgba(18,10,40,0.60);
-  backdrop-filter: blur(4px);
+  /* Fond plus opaque (sans blur) → compense l'absence de backdrop-filter
+     qui causait un flash Android au moment du calcul GPU du blur */
+  background: rgba(18,10,40,0.78);
   z-index: 200;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .22s;
+  visibility: hidden;
+  transition: opacity .18s ease-out, visibility 0s linear .18s;
+  will-change: opacity;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
-.m5-modal-backdrop.open { opacity: 1; pointer-events: auto; }
+.m5-modal-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transition: opacity .18s ease-out, visibility 0s linear 0s;
+}
 .m5-modal {
   background: var(--miz-bg);
   border-radius: var(--miz-radius-lg) var(--miz-radius-lg) 0 0;
@@ -364,11 +374,16 @@ body::before {
   max-height: 90vh;
   overflow-y: auto;
   padding: 22px 20px 36px;
-  transform: translateY(40px);
-  transition: transform .26s cubic-bezier(.17,.67,.28,1.2);
+  transform: translateY(40px) translateZ(0);
+  -webkit-transform: translateY(40px) translateZ(0);
+  transition: transform .22s cubic-bezier(.17,.67,.28,1.2);
   box-shadow: 0 -8px 40px rgba(60,30,140,0.18);
+  will-change: transform;
 }
-.m5-modal-backdrop.open .m5-modal { transform: translateY(0); }
+.m5-modal-backdrop.open .m5-modal {
+  transform: translateY(0) translateZ(0);
+  -webkit-transform: translateY(0) translateZ(0);
+}
 /* Handle de glisse */
 .m5-modal::before {
   content: '';
@@ -528,8 +543,7 @@ body::before {
   pointer-events: none;
 }
 .m5-toast {
-  background: rgba(24,16,46,0.92);
-  backdrop-filter: blur(10px);
+  background: rgba(24,16,46,0.96);
   color: #fff;
   padding: 11px 20px;
   border-radius: var(--miz-radius-sm);
