@@ -54,19 +54,37 @@ function localDK(dt) {
   return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
 }
 
+// Récupère le 1er jour de la semaine selon la CCN active (1=lundi, 0=dimanche, etc.)
+// Par défaut : 1 (lundi ISO) si CCN_API absente
+function _getCCNWeekStart() {
+  try {
+    if (typeof window.CCN_API !== 'undefined') {
+      const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
+      const grp = window.CCN_API.getGroupeForCCN(idcc);
+      if (grp && typeof grp.debutSemaine === 'number') return grp.debutSemaine;
+    }
+  } catch(_){}
+  return 1; // défaut lundi
+}
+
+// Renvoie la date "début de semaine" pour une date donnée selon CCN
+// dateStr = 'YYYY-MM-DD' ou Date
 function getMondayOfWeek(dateStr) {
   const d = new Date(dateStr+'T12:00:00');
-  const dow = d.getDay() || 7;
-  d.setDate(d.getDate() - (dow - 1));
+  const ws = _getCCNWeekStart(); // 0=dim, 1=lun, ..., 6=sam
+  const dow = d.getDay(); // 0=dim, 1=lun, ..., 6=sam
+  // Calculer le décalage négatif vers le 1er jour de la semaine CCN
+  const offset = (dow - ws + 7) % 7;
+  d.setDate(d.getDate() - offset);
   return localDK(d);
 }
 
-function addWeek(mondayStr) {
-  const year = parseInt(mondayStr.slice(0,4));
+function addWeek(weekStartStr) {
+  const year = parseInt(weekStartStr.slice(0,4));
   const data = getVacances(year);
-  const monday = new Date(mondayStr+'T12:00:00');
+  const start = new Date(weekStartStr+'T12:00:00');
   for (let i = 0; i < 7; i++) {
-    const dt = new Date(monday); dt.setDate(monday.getDate()+i);
+    const dt = new Date(start); dt.setDate(start.getDate()+i);
     data[localDK(dt)] = true;
   }
   saveVacances(year, data);
@@ -201,19 +219,21 @@ function renderSemaine(year, vacData, weeks, JOURS, MOIS) {
   }
 
   <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
-    <input type="week" id="vacances-week-picker"
+    <input type="date" id="vacances-week-picker"
       style="flex:1;background:#1a1f2b;color:#fff;border:1px solid rgba(255,179,0,0.3);
-      border-radius:6px;padding:7px;font-size:16px;min-width:0;">
+      border-radius:6px;padding:7px;font-size:16px;min-width:0;"
+      title="Choisis n'importe quelle date — la semaine entière sera ajoutée">
     <button onclick="window._vacancesAddWeek()"
       style="background:rgba(255,179,0,0.15);border:1px solid rgba(255,179,0,0.4);
       border-radius:6px;padding:8px 12px;color:#ffb300;font-size:12px;
       cursor:pointer;white-space:nowrap;width:auto;margin:0;">+ Semaine</button>
   </div>
+  <div style="font-size:10px;color:rgba(255,179,0,0.6);margin-top:4px;">📅 Choisis une date dans la semaine à ajouter (semaine alignée sur ta CCN)</div>
   <button onclick="window._vacancesAddCurrentWeek()"
     style="background:rgba(255,179,0,0.08);border:1px solid rgba(255,179,0,0.25);
     border-radius:6px;padding:7px 12px;color:rgba(255,179,0,0.8);font-size:11px;
     cursor:pointer;width:100%;margin-top:6px;text-align:left;">
-    📅 Ajouter la semaine en cours (lun–dim)
+    📅 Ajouter la semaine en cours (selon CCN)
   </button>`;
 }
 
@@ -291,23 +311,38 @@ global._importFeriesM4 = importFeriesM4;
 global._vacancesSetTab = (tab) => { _tab = tab; refresh(); };
 
 global._vacancesAddCurrentWeek = () => {
-  // Calcule le lundi de la semaine courante et ajoute les 7 jours (lun-dim)
+  // Calcule le 1er jour de la semaine en cours selon la CCN active
+  // Ex: CCN debutSemaine=1 (lun) → ajoute lun→dim
+  //     CCN debutSemaine=3 (mer) → ajoute mer→mar (semaine décalée)
   const today = new Date();
-  const dow   = today.getDay() || 7; // 1=lun … 7=dim
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dow - 1));
-  addWeek(localDK(monday));
+  const ws = _getCCNWeekStart();
+  const offset = (today.getDay() - ws + 7) % 7;
+  const start = new Date(today);
+  start.setDate(today.getDate() - offset);
+  addWeek(localDK(start));
   syncAndRefresh();
 };
 
 global._vacancesAddWeek = () => {
   const inp = document.getElementById('vacances-week-picker');
   if (!inp || !inp.value) return;
-  const [y, w] = inp.value.split('-W').map(Number);
-  const jan4 = new Date(y, 0, 4);
-  const monday = new Date(jan4);
-  monday.setDate(jan4.getDate() - (jan4.getDay()||7) + 1 + (w-1)*7);
-  addWeek(localDK(monday));
+  let weekStart;
+  if (inp.value.includes('-W')) {
+    // Ancien format type="week" → numéro de semaine ISO (lundi obligatoire)
+    // On l'aligne ensuite sur la CCN si nécessaire via getMondayOfWeek
+    const [y, w] = inp.value.split('-W').map(Number);
+    const jan4 = new Date(y, 0, 4);
+    const isoMonday = new Date(jan4);
+    isoMonday.setDate(jan4.getDate() - (jan4.getDay()||7) + 1 + (w-1)*7);
+    // Réaligner sur le début de semaine CCN si différent
+    weekStart = getMondayOfWeek(localDK(isoMonday));
+  } else if (/^\d{4}-\d{2}-\d{2}$/.test(inp.value)) {
+    // type="date" — convertir n'importe quelle date en début de semaine CCN
+    weekStart = getMondayOfWeek(inp.value);
+  } else {
+    return;
+  }
+  addWeek(weekStart);
   syncAndRefresh();
 };
 

@@ -500,7 +500,7 @@ const STUDIES = [
     resultats:[
       'Art. L3121-18 : durée quotidienne max 10h (sauf dérogation)',
       'Art. L3121-20 : durée hebdomadaire maximale ABSOLUE 48h/sem',
-      'Art. L3121-23 : moyenne sur 12 semaines consécutives ≤ 44h',
+      'Art. L3121-22 : moyenne sur 12 semaines consécutives ≤ 44h',
       'Art. L3121-28 : majorations HS — 25% (8 premières/sem) puis 50%',
       'Art. L3121-33 : contingent annuel HS = '+(typeof CCN_API!=='undefined'?CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')).contingent:220)+'h (accord collectif possible)',
       'Art. L3121-38 : Repos Compensateur Obligatoire (RCO) 100% au-delà',
