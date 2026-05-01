@@ -181,12 +181,12 @@ class Heatmap {
       <!-- Stats rapides -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;">
         ${[
-          ['JOURS TRAV.',     daysWorked + (daysOff>0 ? '<span style="font-size:10px;color:var(--text-muted);"> / -'+daysOff+'</span>' : ''), 'var(--animus)'],
+          ['JOURS TRAV.',     daysWorked + (daysOff>0 ? '<span style="font-size:10px;color:var(--text-muted);"> (-'+daysOff+' off)</span>' : ''), 'var(--animus)'],
           ['JOURS AVEC HS',    daysHS,     daysHS>50?'var(--orange)':daysHS>20?'var(--amber)':'var(--sync)'],
           ['TOTAL HS',         fmtH(totalHS), totalHS>_heatLimit?'var(--red)':totalHS>(_heatLimit*0.68)?'var(--orange)':'var(--animus)'],
           ['CONTINGENT',       Math.round(contingentPct)+'%', contingentPct>100?'var(--red)':contingentPct>75?'var(--amber)':'var(--sync)'],
           ['PIC HS/JOUR',      maxExtraDay.v ? '+'+fmtH(maxExtraDay.v) : '—', maxExtraDay.v>=4?'var(--red)':maxExtraDay.v>=2?'var(--amber)':'var(--sync)'],
-        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;" title="${l==='JOURS TRAV.' ? daysWorked+' jours travaillés depuis début exercice (-'+daysOff+' jours hors travail : repos/fériés/vacances/absences)' : ''}">
+        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;" title="${l==='JOURS TRAV.' ? daysWorked+' jours réellement travaillés depuis début exercice. (-'+daysOff+' jours OFF : fériés / vacances / absences saisies). Les week-ends ne sont pas comptabilisés.' : ''}">
           <div style="font-family:var(--font-hud);font-size:16px;font-weight:700;color:${col};">${v}</div>
           <div style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);">${l}</div>
         </div>`).join('')}
