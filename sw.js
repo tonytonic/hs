@@ -3,7 +3,7 @@
  * Version : 7.9.4 — Cloudflare Pages (audit articles juridiques 5 modules)
  */
 
-const CACHE_NAME = "heuressup-cache-v7.9.4";
+const CACHE_NAME = "heuressup-cache-v8.0.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
