@@ -16,8 +16,53 @@
   <link rel="stylesheet" href="css/twin-body.css">
   <link rel="stylesheet" href="css/charts.css">
   <link rel="stylesheet" href="css/components.css">
+
+<style id="landscape-blocker-style">
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
+  body > *:not(#landscape-blocker) { display: none !important; }
+  #landscape-blocker {
+    position: fixed; inset: 0; z-index: 2147483647;
+    background: linear-gradient(135deg, #0f1729 0%, #1a2340 100%);
+    color: #fff;
+    display: flex !important; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 24px;
+    font-family: -apple-system, system-ui, sans-serif;
+  }
+  #landscape-blocker .lb-icon { font-size: 64px; margin-bottom: 24px; animation: lb-rotate 2s ease-in-out infinite; }
+  #landscape-blocker .lb-title { font-size: 22px; font-weight: 700; margin-bottom: 12px; color: #4FB3C2; }
+  #landscape-blocker .lb-msg { font-size: 15px; color: #ccd; line-height: 1.5; max-width: 320px; }
+  @keyframes lb-rotate { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
+}
+@media screen and (orientation: portrait) {
+  #landscape-blocker { display: none !important; }
+}
+</style>
+<script>
+(function(){
+  function tryLockPortrait(){
+    try {
+      if (screen.orientation && typeof screen.orientation.lock === 'function') {
+        screen.orientation.lock('portrait').catch(function(){});
+      }
+    } catch(_) {}
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tryLockPortrait);
+  } else {
+    tryLockPortrait();
+  }
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) tryLockPortrait(); });
+  document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
+})();
+</script>
 </head>
 <body>
+<div id="landscape-blocker" aria-hidden="true">
+  <div class="lb-icon">📱</div>
+  <div class="lb-title">Tournez votre téléphone</div>
+  <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
+</div>
 
 <!-- ANIMUS BOOT SCREEN -->
 <div id="animus-boot">
@@ -480,11 +525,11 @@
   </main>
 
   <!-- Disclaimer bande -->
-  <div style="background:rgba(255,179,0,0.04);border-top:1px solid rgba(255,179,0,0.15);
-    padding:5px 16px;font-family:var(--font-mono);font-size:8px;color:rgba(255,255,255,0.38);
-    letter-spacing:.04em;line-height:1.6;text-align:center;">
-    ⚠ Outil préventif — estimations statistiques. Peut ne pas refléter exactement votre réalité.
-    Consultez un médecin du travail pour tout problème de santé.
+  <div style="background:rgba(255,179,0,0.06);border-top:1px solid rgba(255,179,0,0.20);
+    padding:8px 16px;font-family:var(--font-mono);font-size:10px;color:rgba(255,255,255,0.55);
+    letter-spacing:.03em;line-height:1.6;text-align:center;">
+    ⚠ <strong>Outil informatif et préventif</strong> — estimations statistiques basées sur la littérature scientifique (INRS, OMS/OIT 2021, Pencavel 2014, Sonnentag 2003).
+    <strong>Ne constitue pas un diagnostic médical.</strong> Consultez un médecin du travail ou votre médecin traitant pour tout problème de santé réel.
     &nbsp;·&nbsp; 🔒 Données 100% locales — rien n'est transmis.
   </div>
   <footer class="app-footer">
