@@ -183,13 +183,28 @@ input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: n
   document.addEventListener('click', function(){ tryLockPortrait(); }, { once: true, passive: true });
 })();
 </script>
+<script>
+/* Anti-CLS : applique mode-expert AVANT le rendu pour éviter layout shift au chargement */
+(function(){
+  try {
+    var _m = localStorage.getItem("APP_MODE") || localStorage.getItem("GLOSSAIRE_MODE");
+    if (_m === "expert") document.documentElement.classList.add("mode-expert");
+  } catch(_e) {}
+})();
+/* Une fois body parsé, transférer la classe sur body si présente sur html */
+document.addEventListener("DOMContentLoaded", function(){
+  if (document.documentElement.classList.contains("mode-expert")) {
+    document.body.classList.add("mode-expert");
+  }
+});
+</script>
 </head>
 <body>
 <div id="landscape-blocker" aria-hidden="true">
   <div class="lb-icon">📱</div>
   <div class="lb-title">Tournez votre téléphone</div>
   <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
-</div><script>try{var _m=localStorage.getItem("APP_MODE")||localStorage.getItem("GLOSSAIRE_MODE");if(_m==="expert")document.body.classList.add("mode-expert");}catch(_e){}</script>
+</div>
 
 <div class="topbar">
   <button class="menu-btn" onclick="goMenu()">&#x2B05; Menu</button>
