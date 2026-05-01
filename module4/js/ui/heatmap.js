@@ -64,29 +64,50 @@ class Heatmap {
     const totalHS    = allEntries.reduce((s,[,e]) => s + (e.extra||0), 0);
     const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
     // Jours travaillés = tous les jours ouvrés depuis le 1er janvier jusqu'à aujourd'hui
-    // Exclut : jours de repos configurés, absences, fériés M1, vacances module4
+    // Exclut : jours de repos configurés (CCN ou DTE), absences, fériés M1, vacances module4
     const _restDays = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || '{"sat":true,"sun":true}');
     const _restSet = new Set();
     if (_restDays.sat) _restSet.add(6);
     if (_restDays.sun) _restSet.add(0);
-    // Charger fériés et vacances
+    // Compléter avec les jours de repos hebdo issus de la CCN active (si différents)
+    try {
+      if (typeof window.CCN_API !== 'undefined') {
+        const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
+        const grp = window.CCN_API.getGroupeForCCN(idcc);
+        if (grp && Array.isArray(grp.joursReposHebdo)) {
+          // joursReposHebdo : [0,6] pour dim+sam, [1] pour lundi seul, etc.
+          grp.joursReposHebdo.forEach(d => { if (typeof d === 'number') _restSet.add(d); });
+        }
+      }
+    } catch(_) {}
+    // Charger fériés et vacances (M1, M4, M5)
     const _feries = {};
     const _vacances = {};
     for (const y of [year-1, year, year+1]) {
       try { const sd=JSON.parse(localStorage.getItem('SPECIAL_DAYS_'+y)||'{}'); Object.entries(sd).forEach(([d,t])=>{ if(t==='ferie') _feries[d]=true; }); } catch(_){}
       try { const fd=JSON.parse(localStorage.getItem('DTE_FERIES_'+y)||'{}'); Object.keys(fd).forEach(d=>{ _feries[d]=true; }); } catch(_){}
       try { const vac=JSON.parse(localStorage.getItem('DTE_VACANCES_'+y)||'{}'); Object.keys(vac).forEach(d=>{ _vacances[d]=true; }); } catch(_){}
+      // M5 (Mizuki temps partiel) — partage les vacances avec M4 si présentes
+      try { const vac5=JSON.parse(localStorage.getItem('M5_VACANCES_'+y)||'{}'); Object.keys(vac5).forEach(d=>{ _vacances[d]=true; }); } catch(_){}
     }
-    const _startYear = new Date(year, 0, 1);
+    // Date de début exercice — depuis EXERCISE_START_<year> (M1) ou défaut au 1er janvier
+    const _exStartRaw = localStorage.getItem('EXERCISE_START_'+year) || '';
+    let _startYear;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(_exStartRaw)) {
+      _startYear = new Date(_exStartRaw + 'T00:00:00');
+    } else {
+      _startYear = new Date(year, 0, 1);
+    }
     const _today = new Date(); _today.setHours(0,0,0,0);
     let daysWorked = 0;
+    let daysOff    = 0; // jours non travaillés (repos+férié+vacances+absence)
     for (let d = new Date(_startYear); d <= _today; d.setDate(d.getDate()+1)) {
       const dow = d.getDay();
-      if (_restSet.has(dow)) continue;
+      if (_restSet.has(dow)) { daysOff++; continue; } // jour de repos hebdo CCN exclu
       const dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-      if (_feries[dk] || _vacances[dk]) continue; // férié ou vacances
+      if (_feries[dk] || _vacances[dk]) { daysOff++; continue; } // férié ou vacances exclus
       const e = days[dk];
-      if (e && e.absent) continue;
+      if (e && e.absent) { daysOff++; continue; } // absence saisie exclue
       daysWorked++;
     }
     // Calculer depuis totalHS local (inclut M1+M2 mergés) — plus fiable que norm
@@ -160,12 +181,12 @@ class Heatmap {
       <!-- Stats rapides -->
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:10px;">
         ${[
-          ['JOURS TRAVAILLÉS', daysWorked, 'var(--animus)'],
+          ['JOURS TRAV.',     daysWorked + (daysOff>0 ? '<span style="font-size:10px;color:var(--text-muted);"> / -'+daysOff+'</span>' : ''), 'var(--animus)'],
           ['JOURS AVEC HS',    daysHS,     daysHS>50?'var(--orange)':daysHS>20?'var(--amber)':'var(--sync)'],
           ['TOTAL HS',         fmtH(totalHS), totalHS>_heatLimit?'var(--red)':totalHS>(_heatLimit*0.68)?'var(--orange)':'var(--animus)'],
           ['CONTINGENT',       Math.round(contingentPct)+'%', contingentPct>100?'var(--red)':contingentPct>75?'var(--amber)':'var(--sync)'],
           ['PIC HS/JOUR',      maxExtraDay.v ? '+'+fmtH(maxExtraDay.v) : '—', maxExtraDay.v>=4?'var(--red)':maxExtraDay.v>=2?'var(--amber)':'var(--sync)'],
-        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;">
+        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;" title="${l==='JOURS TRAV.' ? daysWorked+' jours travaillés depuis début exercice (-'+daysOff+' jours hors travail : repos/fériés/vacances/absences)' : ''}">
           <div style="font-family:var(--font-hud);font-size:16px;font-weight:700;color:${col};">${v}</div>
           <div style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);">${l}</div>
         </div>`).join('')}
