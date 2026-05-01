@@ -65,17 +65,52 @@ class Heatmap {
     const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
     // Jours travaillés = tous les jours ouvrés depuis le 1er janvier jusqu'à aujourd'hui
     // Exclut : jours de repos configurés (CCN ou DTE), absences, fériés M1, vacances module4
-    const _restDays = JSON.parse(localStorage.getItem('DTE_REST_DAYS') || '{"sat":true,"sun":true}');
+    // FIX format compat : DTE_REST_DAYS peut être stocké soit en Array [0,6] (whatif-panel)
+    // soit en Object {sat:true,sun:true} (autres modules) — on accepte les deux + versionné
     const _restSet = new Set();
-    if (_restDays.sat) _restSet.add(6);
-    if (_restDays.sun) _restSet.add(0);
+    try {
+      // 1) Tenter d'abord la version versionnée (DTE_REST_DAYS_VERSIONED) — la plus récente
+      const _versionedRaw = localStorage.getItem('DTE_REST_DAYS_VERSIONED');
+      if (_versionedRaw) {
+        const _versions = JSON.parse(_versionedRaw);
+        if (Array.isArray(_versions) && _versions.length > 0) {
+          // Prendre la dernière version (la plus récente)
+          const _last = _versions[_versions.length - 1];
+          if (_last && Array.isArray(_last.jours)) {
+            _last.jours.forEach(d => { if (typeof d === 'number') _restSet.add(d); });
+          }
+        }
+      }
+    } catch(_){}
+    // 2) Si pas trouvé, fallback sur DTE_REST_DAYS (format Array OU Object)
+    if (_restSet.size === 0) {
+      try {
+        const _raw = localStorage.getItem('DTE_REST_DAYS');
+        if (_raw) {
+          const _parsed = JSON.parse(_raw);
+          if (Array.isArray(_parsed)) {
+            // Format Array [0,6]
+            _parsed.forEach(d => { if (typeof d === 'number') _restSet.add(d); });
+          } else if (_parsed && typeof _parsed === 'object') {
+            // Format Object {sat:true, sun:true, mon:false, ...}
+            const _map = {sun:0, mon:1, tue:2, wed:3, thu:4, fri:5, sat:6};
+            Object.entries(_parsed).forEach(([k,v]) => {
+              if (v && _map.hasOwnProperty(k)) _restSet.add(_map[k]);
+            });
+          }
+        }
+      } catch(_){}
+    }
+    // 3) Fallback final : sat+dim par défaut si toujours vide
+    if (_restSet.size === 0) {
+      _restSet.add(0); _restSet.add(6);
+    }
     // Compléter avec les jours de repos hebdo issus de la CCN active (si différents)
     try {
       if (typeof window.CCN_API !== 'undefined') {
         const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
         const grp = window.CCN_API.getGroupeForCCN(idcc);
         if (grp && Array.isArray(grp.joursReposHebdo)) {
-          // joursReposHebdo : [0,6] pour dim+sam, [1] pour lundi seul, etc.
           grp.joursReposHebdo.forEach(d => { if (typeof d === 'number') _restSet.add(d); });
         }
       }
@@ -131,7 +166,9 @@ class Heatmap {
         const dateKey = `${year}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
         const entry   = days[dateKey];
         const dow     = new Date(year, m, day).getDay();
-        const isWE    = dow === 0 || dow === 6;
+        // Jour de repos hebdo selon configuration utilisateur (DTE_REST_DAYS) ou CCN active
+        // _restSet est calculé en début de fonction → respecte le choix dynamique de l'utilisateur
+        const isRestDay = _restSet.has(dow);
         const dateObj  = new Date(year, m, day);
         const isPast   = dateObj <= new Date();
         const isFerie  = _feries[dateKey];
@@ -140,16 +177,19 @@ class Heatmap {
         if (entry) {
           level    = riskLevel(entry.extra, entry.absent);
           titleTxt = entry.absent ? `J${day} : Absence` : `J${day} : +${entry.extra||0}h HS`;
-        } else if (isWE) {
+        } else if (isRestDay) {
           level    = 'absent';
-          titleTxt = `J${day} : Weekend`;
+          // Libellé selon le jour : "Weekend" si sam/dim, "Repos hebdo" sinon
+          const dayName = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][dow];
+          const isClassicWE = (dow === 0 || dow === 6);
+          titleTxt = isClassicWE ? `J${day} : Weekend (${dayName})` : `J${day} : Repos hebdo (${dayName})`;
         } else if (isFerie) {
           level    = 'absent';
           titleTxt = `J${day} : Jour férié`;
         } else if (isVac) {
           level    = 'absent';
           titleTxt = `J${day} : Vacances`;
-        } else if (isPast && !_restSet.has(dow)) {
+        } else if (isPast) {
           level    = 'ok';  // jour ouvré passé sans HS = journée normale
           titleTxt = `J${day} : Journée normale`;
         } else {
@@ -186,7 +226,7 @@ class Heatmap {
           ['TOTAL HS',         fmtH(totalHS), totalHS>_heatLimit?'var(--red)':totalHS>(_heatLimit*0.68)?'var(--orange)':'var(--animus)'],
           ['CONTINGENT',       Math.round(contingentPct)+'%', contingentPct>100?'var(--red)':contingentPct>75?'var(--amber)':'var(--sync)'],
           ['PIC HS/JOUR',      maxExtraDay.v ? '+'+fmtH(maxExtraDay.v) : '—', maxExtraDay.v>=4?'var(--red)':maxExtraDay.v>=2?'var(--amber)':'var(--sync)'],
-        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;" title="${l==='JOURS TRAV.' ? daysWorked+' jours réellement travaillés depuis début exercice. (-'+daysOff+' jours OFF : fériés / vacances / absences saisies). Les week-ends ne sont pas comptabilisés.' : ''}">
+        ].map(([l,v,col]) => `<div style="background:rgba(0,10,25,.9);border:1px solid rgba(0,200,255,0.1);padding:6px;text-align:center;" title="${l==='JOURS TRAV.' ? daysWorked+' jours réellement travaillés depuis début exercice. (-'+daysOff+' jours OFF : repos hebdo / fériés / vacances / absences). Total : '+(daysWorked+daysOff)+' jours calendaires écoulés.' : ''}">
           <div style="font-family:var(--font-hud);font-size:16px;font-weight:700;color:${col};">${v}</div>
           <div style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);">${l}</div>
         </div>`).join('')}
