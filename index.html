@@ -2,49 +2,30 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulateur HS</title>
 
   <link rel="manifest" href="./manifest.json">
-
-  <!-- iOS PWA — requis pour installation Safari -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Heures Sup">
   <link rel="apple-touch-icon" href="./icon-192.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="./icon-192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="./icon-512.png">
-
-  <!-- Android / PWA général -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="application-name" content="Heures Sup">
   <meta name="theme-color" content="#4FB3C2">
-  <meta name="msapplication-TileColor" content="#4FB3C2">
-  <meta name="msapplication-TileImage" content="./icon-192.png">
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Simulateur Heures Supplémentaires">
-  <meta property="og:description" content="Suivi et calcul de vos heures supplémentaires — gratuit, privé, offline.">
-  <meta property="og:image" content="https://simulateurheuressupfrance.pages.dev/icon-512.png">
-  <meta property="og:url" content="https://simulateurheuressupfrance.pages.dev/menu.html">
-  <meta property="og:type" content="website">
 
   <script>
-    const APP_VERSION = "7.0.0";
+    const APP_VERSION = "3.0.0"; 
 
     async function registerSW() {
       if ('serviceWorker' in navigator) {
         try {
-          const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+          const reg = await navigator.serviceWorker.register('./sw.js');
           console.log("✅ Service Worker enregistré");
 
+          // --- TON SYSTÈME DE PERIODIC SYNC ---
           if ('periodicSync' in reg) {
             const status = await navigator.permissions.query({
               name: 'periodic-background-sync',
             });
             if (status.state === 'granted') {
               await reg.periodicSync.register('update-cache', {
-                minInterval: 24 * 60 * 60 * 1000,
+                minInterval: 24 * 60 * 60 * 1000, // 24h
               });
             }
           }
@@ -54,14 +35,24 @@
       }
     }
 
+    // Gestion de la version et redirection
     async function initApp() {
       await registerSW();
-      // Pas de reload — Safari PWA crée une boucle infinie avec location.reload()
-      // Le SW gère les mises à jour du cache en arrière-plan
-      localStorage.setItem("APP_VERSION", APP_VERSION);
-      setTimeout(() => {
-        location.replace("./menu.html");
-      }, 800);
+
+      const stored = localStorage.getItem("APP_VERSION");
+
+      if (stored !== APP_VERSION) {
+        localStorage.setItem("APP_VERSION", APP_VERSION);
+        // On force le rafraîchissement pour vider le cache navigateur
+        location.reload(true); 
+      } else {
+        // --- MODIFICATION CRUCIALE POUR PWABUILDER ---
+        // On laisse 1.5 seconde pour que le Service Worker ait le temps 
+        // de mettre en cache le menu.html avant de rediriger.
+        setTimeout(() => {
+          location.replace("./menu.html");
+        }, 1500);
+      }
     }
 
     window.addEventListener('DOMContentLoaded', initApp);
@@ -82,8 +73,8 @@
 </head>
 <body>
   <div style="text-align: center;">
-    <p>Chargement du simulateur...</p>
-    <small>Version v7.0.0</small>
+    <p>Chargement du simulateur RPG...</p>
+    <small>Version v3.0.0</small>
   </div>
 </body>
 </html>

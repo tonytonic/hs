@@ -12,7 +12,7 @@
   ],
   "background_color": "#4FB3C2",
   "theme_color": "#4FB3C2",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "categories": [
     "productivity",
     "finance",
@@ -120,6 +120,39 @@
           "sizes": "192x192"
         }
       ]
+    },
+    {
+      "name": "Kitsune — Compagnon légal",
+      "short_name": "Kitsune",
+      "url": "https://simulateurheuressupfrance.pages.dev/fox/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "DTE — Jumeau biologique",
+      "short_name": "DTE",
+      "url": "https://simulateurheuressupfrance.pages.dev/module4/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Temps partiel — Mizuki",
+      "short_name": "Temps partiel",
+      "url": "https://simulateurheuressupfrance.pages.dev/module5/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ],
   "screenshots": [
@@ -173,5 +206,6 @@
       "label": "Vue large"
     }
   ],
-  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "screen_orientation": "portrait"
 }

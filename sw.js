@@ -1,9 +1,9 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 7.3.0-DEBUG — Cloudflare Pages
+ * Version : 7.9.4 — Cloudflare Pages (audit articles juridiques 5 modules)
  */
 
-const CACHE_NAME = "heuressup-cache-v7.7.1";
+const CACHE_NAME = "heuressup-cache-v7.9.4";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -38,6 +38,20 @@ const FILES_TO_CACHE = [
   "./module4/css/main.css", "./module4/css/dashboard.css",
   "./module4/css/components.css", "./module4/css/charts.css",
   "./module4/css/twin-body.css",
+  // === Module 5 — Temps partiel (Mizuki) ===
+  "./module5/index.html",
+  "./module5/css/main.css",
+  "./module5/assets/mizuki.svg",
+  "./module5/js/app.js",
+  "./module5/js/core/calc-engine.js",
+  "./module5/js/data/ccn-partiel.js",
+  "./module5/js/features/glossaire.js",
+  "./module5/js/features/mizuki.js",
+  "./module5/js/features/pdf-report.js",
+  "./module5/js/features/saisie.js",
+  "./module5/js/features/wellbeing.js",
+  // Image Mizuki (préchargée pour M5)
+  "./images/Mizuki.PNG",
   "./images/renard-annuel.png.jpg", "./images/renard-mensuel.png.jpg",
   "./images/renard-central.png.jpg",
 
