@@ -43,7 +43,7 @@ function getFeriesLocal(year) {
 }
 
 function getFeriesYear(year) {
-  // Priorité : données API gouvernement si disponibles
+  // Priorité : données API publique calendrier.api.gouv.fr si disponibles
   try {
     const stored=localStorage.getItem('M5_FERIES_API_'+year);
     if(stored) {
