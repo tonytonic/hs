@@ -1576,7 +1576,7 @@ function toggleVacSemaine() {
 }
 
 
-// ── Import jours fériés API gouvernement ──────────────────────────
+// ── Import jours fériés (API publique calendrier.api.gouv.fr) ──────
 // Source : https://calendrier.api.gouv.fr — Etalab (données ouvertes)
 
 // ── Gestion des années ────────────────────────────────────────────
