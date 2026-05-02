@@ -1,9 +1,9 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 8.0.1 — Cloudflare Pages (offline complet : 4 fichiers fox + 3 assets M4 ajoutés)
+ * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.0.1";
+const CACHE_NAME = "heuressup-cache-v8.1.0";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
