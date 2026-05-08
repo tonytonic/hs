@@ -655,10 +655,17 @@ class DTEEngine {
           if(k && k.startsWith('CA_HS_TRACKER_V1_DATA_') && !keys.includes(k)) keys.push(k);
         }
       } catch(_) {}
-      let raw = null;
-      for(const k of keys){ raw = localStorage.getItem(k); if(raw && raw !== '{}') break; }
-      if (!raw || raw === '{}') return r;
-      const d = JSON.parse(raw);
+      // FIX MULTI-ANNÉES : merger TOUS les fichiers M2 (pas break au 1er trouvé)
+      // Ex: exercice 2025→2026 → DATA_2025=Nov-Déc + DATA_2026=Jan-Mai → les 2 lus
+      const d = {};
+      let hasAny = false;
+      for(const k of keys){
+        const raw = localStorage.getItem(k);
+        if(raw && raw !== '{}' && raw !== 'null'){
+          try { Object.assign(d, JSON.parse(raw)); hasAny = true; } catch(_) {}
+        }
+      }
+      if (!hasAny) return r;
       // M2 n'a pas contractHours dans le stockage, utiliser SETTINGS
       try {
         const sets = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_SETTINGS') || '{}');
@@ -1321,10 +1328,29 @@ class DTEEngine {
     const overCount = allDays.filter(d => (D.BASE_JOUR + d.extra) > D.BASE_JOUR + 2).length;
     const overRatio = allDays.length ? overCount / allDays.length : 0;
 
+    // Contingent légal — reset au 1er janvier (Art. L3121-30)
+    // Calculé sur l'année courante UNIQUEMENT depuis le days fusionné M1+M2
+    // (m1.netOvertime n'était jamais assigné dans _m1() → NaN → remplacé ici)
+    const _currentYear = String(raw.year || new Date().getFullYear());
+    let netOvertimeYear = m1.totalExtra || 0; // base M1 (déjà filtré par année dans _m1)
+    // Ajouter les HS M2 de l'année courante non couvertes par M1
+    if (m2 && m2.months) {
+      for (const [mk, monthData] of Object.entries(m2.months)) {
+        if (!mk.startsWith(_currentYear)) continue; // autre année → continuité bio seulement
+        const rawDays = monthData.rawDays || {};
+        for (const [day, hs] of Object.entries(rawDays)) {
+          const dk = mk + '-' + String(day).padStart(2, '0');
+          if (!m1.days[dk]) { // M1 prioritaire : éviter double comptage
+            netOvertimeYear += parseHours(hs);
+          }
+        }
+      }
+    }
+
     // Contingent
-    const contingentPct = (m1.netOvertime / D.CONTINGENT_MAX) * 100;
+    const contingentPct = (netOvertimeYear / D.CONTINGENT_MAX) * 100;
     // RCO — Art. L3121-33
-    const rcoDepassement = Math.max(0, m1.netOvertime - D.CONTINGENT_MAX);
+    const rcoDepassement = Math.max(0, netOvertimeYear - D.CONTINGENT_MAX);
     const rcoH50  = rcoDepassement * 0.5;
     const rcoH100 = rcoDepassement;
 
