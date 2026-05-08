@@ -836,17 +836,15 @@ class DTEEngine {
       if (d > today) break;
       const k = localDK(d);
       const e = days[k];
-      // FIX : M2/M1 heures réelles priment sur vacation déclarée dans M4.
-      // Si M2 dit qu'il y a eu du travail ce jour (extra > 0), la semaine est travaillée
-      // même si ce jour est marqué vacances (ex : férié travaillé, jour off isolé avec HS).
-      // sumExtra7 respecte quand même la déclaration vacances (0 HS si vacances) —
-      // on ne sur-estime pas la charge, mais on ne masque pas non plus la semaine.
+      // FIX : M2/M1 heures réelles priment TOUJOURS sur vacation déclarée dans M4.
+      // Si M2 dit que tu as travaillé (extra > 0), ces heures sont réelles —
+      // la déclaration vacances dans M4 ne doit pas les effacer.
+      // Cas typique : utilisateur marque "semaine off" par erreur alors qu'il a travaillé lun-jeu.
+      // → sumExtra7, count7 et hasAnyEntryThisWeek reflètent les vraies heures M2/M1.
       if (e && e.extra > 0) {
         hasAnyEntryThisWeek = true;
-        if (!vacances[k] && specialDays[k] !== 'ferie') {
-          sumExtra7 += e.extra;
-          count7++;
-        }
+        sumExtra7 += e.extra;
+        count7++;
         continue;
       }
       // Ignorer jours fériés et vacances sans heures réelles
