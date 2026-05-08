@@ -293,10 +293,10 @@ body::before {
   transition: transform .12s, box-shadow .15s;
   text-decoration: none;
   letter-spacing: 0.01em;
-  /* Supprime le délai 300ms Android entre tap et réaction */
+  /* Supprime le délai 300ms entre tap et réaction (iOS + Android) */
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  user-select: none; -webkit-user-select: none;
+  /* user-select: none retiré — bloque les onclick sur iOS Safari */
 }
 .m5-btn:active { transform: scale(.97); }
 .m5-btn-primary {
@@ -719,6 +719,8 @@ body::before {
   padding: 20px; text-align: center; cursor: pointer;
   background: rgba(108,63,197,0.04);
   transition: background .15s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .m5-cal-week-total-cell:active { background: var(--miz-accent); }
 .m5-cal-week-total-val {
@@ -741,7 +743,6 @@ body::before {
   transition: background .12s, border-color .12s, color .12s, transform .1s;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
-  user-select: none; -webkit-user-select: none;
 }
 .m5-quick-btn:active { transform: scale(.95); }
 .m5-quick-btn.selected {
