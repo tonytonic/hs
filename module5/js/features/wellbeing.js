@@ -33,7 +33,26 @@ const M5_Wellbeing = {
       return { available: false, reason: 'Saisis au moins 2 semaines pour voir ton analyse bien-être.' };
     }
 
-    const worked = weeks.map(w => w.worked || 0);
+    // Bug fix : exclure la semaine en cours si elle n'est pas TERMINÉE
+    // Une semaine est "en cours" si son lundi = cette semaine ET qu'on n'est pas encore dimanche
+    // → l'écart-type et la variance ne doivent être calculés que sur des semaines COMPLÈTES
+    const todayDate = new Date();
+    const todayStr = todayDate.getFullYear()+'-'+String(todayDate.getMonth()+1).padStart(2,'0')+'-'+String(todayDate.getDate()).padStart(2,'0');
+    // Trouver le lundi de la semaine en cours
+    const todayDow = todayDate.getDay(); // 0=dim, 1=lun ... 6=sam
+    const daysFromMon = todayDow === 0 ? 6 : todayDow - 1;
+    const thisMon = new Date(todayDate); thisMon.setDate(todayDate.getDate() - daysFromMon);
+    const thisMonStr = thisMon.getFullYear()+'-'+String(thisMon.getMonth()+1).padStart(2,'0')+'-'+String(thisMon.getDate()).padStart(2,'0');
+    // Dimanche de la semaine en cours
+    const thisSun = new Date(thisMon); thisSun.setDate(thisMon.getDate()+6);
+    const thisSunStr = thisSun.getFullYear()+'-'+String(thisSun.getMonth()+1).padStart(2,'0')+'-'+String(thisSun.getDate()).padStart(2,'0');
+    // Si on n'est pas encore dimanche → semaine en cours = incomplète → l'exclure des calculs
+    const weekIsComplete = todayStr >= thisSunStr;
+    const weeksForStats = weekIsComplete ? weeks : weeks.filter(w => w.monday < thisMonStr);
+    // Garder au moins 2 semaines pour les calculs
+    const weeksToUse = weeksForStats.length >= 2 ? weeksForStats : weeks;
+
+    const worked = weeksToUse.map(w => w.worked || 0);
     const n = worked.length;
 
     // ── 1. SCORE STABILITÉ (Higgins 2010) ────────────────────────
@@ -65,9 +84,34 @@ const M5_Wellbeing = {
     }
 
     // ── 3. SCORE RÉCUPÉRATION (Sonnentag 2003) ───────────────────
-    // Proportion de semaines réellement sous le contrat (vraies semaines légères)
-    const semainesLegeres = worked.filter(h => h < contractH).length;
-    const ratioRecup = semainesLegeres / n;
+    // Semaine "légère" = travail ≤ contrat (pas d'heures complémentaires)
+    // Une semaine exactement au contrat = pas de dépassement = récupération possible
+    // Sonnentag 2003 : c'est l'ABSENCE de surcharge qui permet la récupération, pas d'être
+    // strictement EN DESSOUS du contrat
+    const semainesLegeres = worked.filter(h => h <= contractH).length;
+    // Aussi compter les semaines de vacances/repos qui n'apparaissent pas dans worked
+    // (semaines sans saisie dans la fenêtre = repos présumé → récupération active)
+    // Bug 4b : décroissance → les congés et repos doivent être comptés comme récupération
+    let vacSemaines = 0;
+    try {
+      const year = new Date().getFullYear();
+      const vacData = JSON.parse(localStorage.getItem('M5_VACANCES_'+year)||'{}');
+      // Compter les semaines lundi distincts dans les vacances
+      const vacLundis = new Set();
+      Object.keys(vacData).forEach(dk => {
+        const d = new Date(dk+'T12:00:00');
+        const dow = d.getDay() === 0 ? 6 : d.getDay()-1;
+        const lun = new Date(d); lun.setDate(d.getDate()-dow);
+        vacLundis.add(lun.getFullYear()+'-'+String(lun.getMonth()+1).padStart(2,'0')+'-'+String(lun.getDate()).padStart(2,'0'));
+      });
+      // N'ajouter que les semaines de vacances dans la fenêtre wellbeing (12 sem)
+      if (weeksToUse.length > 0) {
+        const firstW = weeksToUse[0].monday;
+        const lastW = weeksToUse[weeksToUse.length-1].monday;
+        vacLundis.forEach(vl => { if (vl >= firstW && vl <= lastW) vacSemaines++; });
+      }
+    } catch(_) {}
+    const ratioRecup = Math.min(1, (semainesLegeres + vacSemaines) / Math.max(1, n + vacSemaines));
     // Minimum 4 semaines pour que la récupération soit mesurable
     const scoreRecup = n < 4 ? 50 : Math.min(100, Math.round(
       (ratioRecup / SONNENTAG_RECOVERY_MIN) * 100
@@ -176,11 +220,23 @@ const M5_Wellbeing = {
       ? Math.round(scores.filter(s=>!s.limited).reduce((sum,s)=>sum+s.val,0)/nbFiables)
       : scoreGlobal;
 
+    // Détecter si les données s'étendent sur plusieurs années calendaires
+    // (pour informer l'utilisateur que la mémoire biologique traverse les exercices)
+    const years = new Set(weeks.map(w => w.monday ? w.monday.substring(0,4) : null).filter(Boolean));
+    const isMultiYear = years.size > 1;
+    const yearsSpanned = [...years].sort();
+
     return {
       available: true,
       donneesLimitees: n < 4,
+      isMultiYear,
+      yearsSpanned,
       nbSemaines: n,
-      noteMin: n < 4 ? `Analyse basée sur ${n} semaine${n>1?'s':''} — les scores en italique seront plus précis avec 4+ semaines.` : null,
+      noteMin: n < 4
+        ? `Analyse basée sur ${n} semaine${n>1?'s':''} — les scores en italique seront plus précis avec 4+ semaines.`
+        : isMultiYear
+          ? `Analyse sur ${n} semaines (${yearsSpanned[0]}–${yearsSpanned[yearsSpanned.length-1]}) — la mémoire biologique traverse les exercices (Sonnentag 2003).`
+          : null,
       scoreGlobal,
       scoreGlobalFiable,
       niveau,

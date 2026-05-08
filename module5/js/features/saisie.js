@@ -181,6 +181,35 @@ const DataStore = {
 
   getLast12Weeks(year) { return this.getWeeksSorted(year).slice(-12); },
 
+  // ── MULTI-ANNÉE pour les calculs biologiques ─────────────────────
+  // Le corps ne repart pas de zéro en janvier : la fatigue et le niveau
+  // de récupération se portent d'une année sur l'autre.
+  // Renvoie les N dernières semaines renseignées, en puisant dans les
+  // années précédentes si l'année en cours n'en a pas assez.
+  // Sonnentag 2003, Kivimäki 2015 : fenêtre de 12 semaines recommandée.
+  getWeeksMultiYear(currentYear, maxWeeks=16) {
+    const cy = parseInt(currentYear || this.getYear());
+    let weeks = [];
+    // Parcourir l'année en cours + les 2 années précédentes
+    for (let y = cy; y >= cy-2; y--) {
+      const yw = this.getWeeksSorted(String(y));
+      weeks = [...yw, ...weeks]; // antéchronologique → on préfixe
+    }
+    // Dédupliquer (au cas où une semaine chevauchant jan/déc serait comptée 2 fois)
+    const seen = new Set();
+    weeks = weeks.filter(w => {
+      if (seen.has(w.monday)) return false;
+      seen.add(w.monday); return true;
+    });
+    // Trier par date croissante
+    weeks.sort((a,b) => a.monday < b.monday ? -1 : 1);
+    // Ne garder que les semaines passées
+    const todayStr = new Date().toISOString().split('T')[0];
+    weeks = weeks.filter(w => w.monday <= todayStr);
+    // Retourner les N dernières
+    return weeks.slice(-maxWeeks);
+  },
+
   getAnnualStats(year, contractH, ccnRules) {
     const weeks=this.getWeeksSorted(year);
     if(!weeks.length) return null;
