@@ -869,6 +869,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   background-size: 40px 40px, 25px 25px;
   background-position: 0 0, 12px 12px;
   opacity: 0.4;
+  pointer-events: none; /* ← décoratif uniquement, ne doit pas intercepter les clics */
 }
 /* Halo lumineux */
 .acc-week-hero::after {
@@ -878,6 +879,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   transform: translateX(-50%);
   width: 200px; height: 80px;
   background: radial-gradient(ellipse, rgba(139,92,246,0.30) 0%, transparent 70%);
+  pointer-events: none; /* ← décoratif uniquement */
 }
 
 /* Nav semaine */
@@ -919,6 +921,11 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 }
 
 /* Cellules calendrier sur fond sombre */
+#calendar-grid {
+  position: relative;
+  z-index: 1; /* passe au-dessus des ::before et ::after décoratifs */
+}
+
 .acc-week-hero .m5-cal-day {
   background: rgba(255,255,255,0.11);
   border: 1.5px solid rgba(255,255,255,0.14);
