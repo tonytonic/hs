@@ -974,16 +974,27 @@ class DTEEngine {
     // la base biologique réelle est réduite (ex : vendredi férié → base = 4×7h = 28h, pas 35h).
     // weeklyH7 = heures RÉELLEMENT travaillées cette semaine, pas base théorique + HS.
     // Impact : 35h+6h=41h (faux) → 28h+6h=34h (correct biologiquement).
+    // Pré-charger le check-in history pour détecter les jours travaillés déclarés
+    let _checkinWorkedDays = {};
+    try {
+      const _ch = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY') || '[]');
+      _ch.forEach(e => { if (e.date && e.activity === 'work') _checkinWorkedDays[e.date] = true; });
+    } catch(_) {}
+
     let feriesInCurrentWeek = 0;
     for (let _fd = 0; _fd < workDaysPerWeek; _fd++) {
       const _fdt = new Date(weekMondayA); _fdt.setDate(weekMondayA.getDate() + _fd);
       if (_fdt > today) break;
       const _fk = localDK(_fdt);
       if (specialDays[_fk] !== 'ferie') continue;
-      // FIX FERIE TRAVAILLÉ : si M2/M1 a des heures pour ce jour férié,
-      // l'utilisateur a travaillé → on ne déduit pas 7h de la base hebdo.
+      // FIX FERIE TRAVAILLÉ : 3 sources prouvent que l'utilisateur a travaillé :
+      // 1) M2/M1 a des heures (extra > 0)
+      // 2) Check-in du jour = 'work'
+      // 3) Journée normale sans HS (e existe mais extra=0 et count7 inclut ce jour)
+      // → dans ces cas, ne pas déduire 7h de la base hebdo.
       const _fe = days[_fk];
-      if (_fe && _fe.extra > 0) continue;
+      if (_fe && _fe.extra > 0) continue;           // M2/M1 : HS confirmées
+      if (_checkinWorkedDays[_fk]) continue;         // check-in : journée normale déclarée
       feriesInCurrentWeek++;
     }
     const _seuilEffective = Math.max(0, _ccnR.seuil - feriesInCurrentWeek * _baseJourCCN);
