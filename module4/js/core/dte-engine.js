@@ -655,14 +655,26 @@ class DTEEngine {
           if(k && k.startsWith('CA_HS_TRACKER_V1_DATA_') && !keys.includes(k)) keys.push(k);
         }
       } catch(_) {}
-      // FIX MULTI-ANNÉES : merger TOUS les fichiers M2 (pas break au 1er trouvé)
-      // Ex: exercice 2025→2026 → DATA_2025=Nov-Déc + DATA_2026=Jan-Mai → les 2 lus
+      // FIX MULTI-ANNÉES : merger TOUS les fichiers M2 sans écraser les données réelles.
+      // Problème Object.assign naïf : DATA_2026 peut contenir des mois vides créés par
+      // navigation (ex: '2026-05': {days:{}} ) qui écrasent les vraies données de DATA_2025.
+      // Règle : pour chaque mois, conserver la version avec le plus de jours réels.
       const d = {};
       let hasAny = false;
       for(const k of keys){
         const raw = localStorage.getItem(k);
         if(raw && raw !== '{}' && raw !== 'null'){
-          try { Object.assign(d, JSON.parse(raw)); hasAny = true; } catch(_) {}
+          try {
+            const parsed = JSON.parse(raw);
+            for (const [mk, mv] of Object.entries(parsed)) {
+              if (!mv || typeof mv !== 'object') continue;
+              const newDays  = Object.keys(mv.days || {}).length;
+              const prevDays = Object.keys((d[mk] || {}).days || {}).length;
+              if (newDays > prevDays) d[mk] = mv; // préférer le mois avec plus de données
+              else if (!d[mk]) d[mk] = mv;         // ou prendre si absent
+            }
+            hasAny = true;
+          } catch(_) {}
         }
       }
       if (!hasAny) return r;
