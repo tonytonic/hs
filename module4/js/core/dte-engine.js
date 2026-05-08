@@ -546,10 +546,13 @@ class DTEEngine {
 
   _year() {
     try {
+      // ACTIVE_YEAR_SUFFIX = année active M1 (navigation M1)
       const s1 = localStorage.getItem('ACTIVE_YEAR_SUFFIX');
       if (s1) return s1;
-      const s2 = localStorage.getItem('CA_HS_TRACKER_V1_ACTIVE_YEAR');
-      if (s2) return s2;
+      // NE PAS utiliser CA_HS_TRACKER_V1_ACTIVE_YEAR :
+      // c'est l'année de NAVIGATION UI de M2 (consultation historique).
+      // Quand l'utilisateur consulte 2025 dans M2, cette clé vaut '2025'
+      // mais les données biologiques actives sont bien sur l'année courante.
     } catch(_) {}
     return String(new Date().getFullYear());
   }
@@ -636,7 +639,11 @@ class DTEEngine {
     try {
       // M2 stocke CA_HS_TRACKER_V1_DATA_{year}
       // Structure : { "2026-03": { days:{"14":2.5,"15":1}, paid:0, carry:0, closing:28 }, ... }
-      const yearN2 = parseInt(year) || new Date().getFullYear();
+      // FIX : utiliser l'année réelle courante comme ancre, pas `year`
+      // (year peut valoir '2025' si l'utilisateur a navigué vers 2025 dans M2,
+      //  mais les données biologiques actives sont sur l'année calendaire réelle)
+      const realYear = new Date().getFullYear();
+      const yearN2 = realYear;
       // Inclure N-1 pour la continuité biologique inter-années
       const keys = [
         'CA_HS_TRACKER_V1_DATA_' + (yearN2 - 1),
