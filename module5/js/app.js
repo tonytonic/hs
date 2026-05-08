@@ -537,15 +537,9 @@ function openWeeklySaisie() {
   });
   document.getElementById('week-quick-hours').innerHTML=quickHtml;
   openModal('modal-week-saisie');
-  // Différer updateWeekPreview APRÈS que le modal soit visible (évite le freeze Android)
-  // Bloquer le clavier virtuel Android pendant l'animation d'ouverture (cause principale du freeze)
-  const _inp = document.getElementById('week-saisie-hours');
-  if (_inp) { _inp.setAttribute('readonly', 'true'); }
-  requestAnimationFrame(() => {
-    updateWeekPreview();
-    // Retirer readonly après la transition (180ms) pour permettre la saisie
-    setTimeout(() => { if (_inp) _inp.removeAttribute('readonly'); }, 220);
-  });
+  // Différer updateWeekPreview au frame suivant (modal déjà visible)
+  // → évite le freeze Android sans bloquer l'input (readonly trop agressif sur iOS)
+  requestAnimationFrame(updateWeekPreview);
 }
 
 function toggleAvenat() {
