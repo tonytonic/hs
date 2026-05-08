@@ -541,7 +541,19 @@ class DTEEngine {
   /* ── Sources de données (READ ONLY) ─────────────────────────── */
   _readAll() {
     const year = this._year();
-    return { year, m1: this._m1(year), m2: this._m2(year), rpg: this._rpg() };
+    const m1 = this._m1(year);
+    const m2 = this._m2(year);
+    const rpg = this._rpg();
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] _readAll', 'color:#0af;font-weight:bold', { year });
+      console.log('[DTE-DBG] M1 days count:', Object.keys(m1.days || {}).length, 'totalExtra:', m1.totalExtra);
+      console.log('[DTE-DBG] M2 months count:', Object.keys(m2.months || {}).length);
+      // Détail mois courant
+      const yk = year + '-' + String(new Date().getMonth()+1).padStart(2,'0');
+      if (m2.months[yk]) console.log('[DTE-DBG] M2 mois courant', yk, ':', m2.months[yk]);
+      else console.log('[DTE-DBG] M2 mois courant', yk, ': ABSENT');
+    }
+    return { year, m1, m2, rpg };
   }
 
   _year() {
@@ -655,6 +667,22 @@ class DTEEngine {
           if(k && k.startsWith('CA_HS_TRACKER_V1_DATA_') && !keys.includes(k)) keys.push(k);
         }
       } catch(_) {}
+      if (window.__DTE_DEBUG !== false) {
+        console.log('%c[DTE-DBG] _m2 keys testés:', 'color:#fa0', keys);
+        keys.forEach(k => {
+          const v = localStorage.getItem(k);
+          if (v && v !== '{}' && v !== 'null') {
+            try {
+              const p = JSON.parse(v);
+              const monthKeys = Object.keys(p).filter(mk => /^\d{4}-\d{2}$/.test(mk));
+              console.log('  ', k, '→', monthKeys.length, 'mois:',
+                monthKeys.map(mk => mk + '(' + Object.keys((p[mk] || {}).days || {}).length + 'j)').join(', '));
+            } catch(_) { console.log('  ', k, '→ JSON invalide'); }
+          } else {
+            console.log('  ', k, '→ vide ou absent');
+          }
+        });
+      }
       // FIX MULTI-ANNÉES : merger TOUS les fichiers M2 sans écraser les données réelles.
       // Problème Object.assign naïf : DATA_2026 peut contenir des mois vides créés par
       // navigation (ex: '2026-05': {days:{}} ) qui écrasent les vraies données de DATA_2025.
@@ -868,6 +896,22 @@ class DTEEngine {
       // Jour travaillé sans HS
       if (e) { count7++; hasAnyEntryThisWeek = true; }
     }
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] semaine courante', 'color:#0fa;font-weight:bold');
+      console.log('  weekMonday:', localDK(weekMondayA), 'today:', localDK(today), 'todayDowA:', todayDowA);
+      console.log('  hasAnyEntryThisWeek:', hasAnyEntryThisWeek, '| count7:', count7, '| sumExtra7:', sumExtra7);
+      // Détail jour par jour
+      for (let dd = 0; dd < todayDowA && dd < workDaysPerWeek; dd++) {
+        const d = new Date(weekMondayA); d.setDate(weekMondayA.getDate() + dd);
+        if (d > today) break;
+        const k = localDK(d);
+        const e = days[k];
+        const isFerie = specialDays[k] === 'ferie';
+        const isVac = !!vacances[k];
+        console.log('   ', k, '|', e ? ('extra='+e.extra) : 'NO M2/M1',
+          '| ferie=', isFerie, '| vacances=', isVac);
+      }
+    }
 
     // weeklyExtra : priorité à la semaine courante pour la progression jour par jour
     //
@@ -938,6 +982,11 @@ class DTEEngine {
     }
     const _seuilEffective = Math.max(0, _ccnR.seuil - feriesInCurrentWeek * _baseJourCCN);
     const weeklyH7        = _seuilEffective + weeklyExtra;
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] weeklyH7', 'color:#f0f;font-weight:bold',
+        { seuilCCN: _ccnR.seuil, feriesInCurrentWeek, baseJourCCN: _baseJourCCN,
+          seuilEffective: _seuilEffective, weeklyExtra, weeklyH7 });
+    }
 
     // Signal "semaine sans travail" : aucune entrée M1/M2 cette semaine
     // FIX LUNDI : le 1er jour de semaine CCN sans saisie ≠ vacances (c'est juste le début de semaine)
@@ -1032,6 +1081,10 @@ class DTEEngine {
       blankWeeks = 0;
       lastBlankWeekMon = null;
       if (e && e.extra > 0) consecOT++;
+    }
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] consecOT final:', 'color:#fa0;font-weight:bold', consecOT,
+        '| consecRest:', consecRest, '| blankWeeks:', blankWeeks);
     }
 
     // ── CUMUL SEMAINES DE SURCHARGE — 2 passes pour éviter le bug d'ordre ────
