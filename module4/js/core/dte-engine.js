@@ -978,7 +978,8 @@ class DTEEngine {
     let _checkinWorkedDays = {};
     try {
       const _ch = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY') || '[]');
-      _ch.forEach(e => { if (e.date && e.activity === 'work') _checkinWorkedDays[e.date] = true; });
+      // FIX : le champ est dayStatus (pas activity) — valeur 'work' = Je travaille
+      _ch.forEach(e => { if (e.date && e.dayStatus === 'work') _checkinWorkedDays[e.date] = true; });
     } catch(_) {}
 
     let feriesInCurrentWeek = 0;
