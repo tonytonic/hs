@@ -978,7 +978,8 @@ class DTEEngine {
     let _checkinWorkedDays = {};
     try {
       const _ch = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY') || '[]');
-      _ch.forEach(e => { if (e.date && e.activity === 'work') _checkinWorkedDays[e.date] = true; });
+      // FIX : le champ est dayStatus (pas activity) — valeur 'work' = Je travaille
+      _ch.forEach(e => { if (e.date && e.dayStatus === 'work') _checkinWorkedDays[e.date] = true; });
     } catch(_) {}
 
     let feriesInCurrentWeek = 0;
@@ -1504,7 +1505,16 @@ class DTEEngine {
     // Signal 1 : DTE_VACANCES déclaré (M4)
     // Signal 2 : noWorkThisWeek (aucune entrée M1/M2 cette semaine)
     // Signal 3 : weeklyH7 ≤ seuil ET aucune donnée récente
-    const isCurrentWeekVacation = isVacFromDTE || noWorkThisWeek || belowBaseThisWeek;
+    // FIX belowBaseThisWeek : ne pas forcer vacances si la semaine a du travail réel (count7>0)
+    // ou si le check-in du jour courant dit 'work'.
+    // belowBaseThisWeek est conçu pour détecter les semaines sans saisie du tout (nouveaux utilisateurs).
+    // Il ne doit pas s'appliquer quand on a des jours travaillés confirmés cette semaine.
+    const _todayCheckin = (() => { try {
+      const _ch = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY')||'[]');
+      return _ch.find(e => e.date === localDK(today)) || null;
+    } catch(_) { return null; }})();
+    const _hasWorkThisWeek = count7 > 0 || (_todayCheckin && _todayCheckin.dayStatus === 'work');
+    const isCurrentWeekVacation = !_hasWorkThisWeek && (isVacFromDTE || noWorkThisWeek || belowBaseThisWeek);
 
     // avgH7 déjà déclaré plus haut — fatHS forcé à 0 en vacances dans _scores()
 
