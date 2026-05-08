@@ -978,7 +978,13 @@ class DTEEngine {
     for (let _fd = 0; _fd < workDaysPerWeek; _fd++) {
       const _fdt = new Date(weekMondayA); _fdt.setDate(weekMondayA.getDate() + _fd);
       if (_fdt > today) break;
-      if (specialDays[localDK(_fdt)] === 'ferie') feriesInCurrentWeek++;
+      const _fk = localDK(_fdt);
+      if (specialDays[_fk] !== 'ferie') continue;
+      // FIX FERIE TRAVAILLÉ : si M2/M1 a des heures pour ce jour férié,
+      // l'utilisateur a travaillé → on ne déduit pas 7h de la base hebdo.
+      const _fe = days[_fk];
+      if (_fe && _fe.extra > 0) continue;
+      feriesInCurrentWeek++;
     }
     const _seuilEffective = Math.max(0, _ccnR.seuil - feriesInCurrentWeek * _baseJourCCN);
     const weeklyH7        = _seuilEffective + weeklyExtra;
