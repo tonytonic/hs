@@ -826,6 +826,29 @@ function renderWellbeing(analysis) {
     </div>`;
   }
 
+  // ⚠️ Bannière semaine en cours exclue (si elle a des HC significatifs)
+  // → l'utilisateur comprend pourquoi le score ne reflète pas encore cette semaine
+  if(wb.currentWeekExcluded && wb.currentWeekH > 0) {
+    const contract = analysis && analysis.contract;
+    const contractH = contract ? contract.hoursBase : 0;
+    const hasHC = contractH > 0 && wb.currentWeekH > contractH;
+    const diffH = contractH > 0 ? (wb.currentWeekH - contractH).toFixed(1) : 0;
+    // Calculer combien de jours jusqu'à dimanche
+    const todayDow = new Date().getDay(); // 0=dim, 1=lun ... 6=sam
+    const daysLeft = todayDow === 0 ? 0 : 7 - todayDow;
+    const joursRestants = daysLeft === 1 ? 'demain (samedi)' : daysLeft === 0 ? 'ce soir' : `dans ${daysLeft} jours (dimanche)`;
+    html+=`<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.40);border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:14px;">⏳</span>
+      <div>
+        <strong>Semaine en cours : ${wb.currentWeekH}h${hasHC ? ` (+${diffH}h HC)` : ''}</strong><br>
+        ${hasHC
+          ? `Ces ${diffH}h d'heures complémentaires seront intégrées au score bio <strong>${joursRestants}</strong> quand la semaine sera complète.`
+          : `La semaine en cours est exclue des calculs jusqu'à dimanche — seules les semaines complètes alimentent l'analyse.`
+        }
+      </div>
+    </div>`;
+  }
+
   // Si score global disponible, afficher une aide à la lecture
   if(!wb.donneesLimitees) {
     html+=`<div style="font-size:11px;color:var(--miz-text3);padding:4px 2px 8px;text-align:center;">
