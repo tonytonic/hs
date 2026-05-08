@@ -3,7 +3,7 @@
  * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.1.0";
+const CACHE_NAME = "heuressup-cache-v8.1.1";
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
