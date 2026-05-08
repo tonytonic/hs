@@ -52,7 +52,7 @@ const M5_PdfReport = {
     doc.rect(0,22,210,6,'F');
     doc.setTextColor(255,255,255);
     doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text('🦊 Mizuki — Rapport Heures Complémentaires',M,12);
+    doc.text('Mizuki - Rapport Heures Complementaires',M,12);
     doc.setFontSize(9); doc.setFont('helvetica','normal');
     doc.text('Simulateur Heures Sup France · Module Temps Partiel',M,19);
     doc.setTextColor(196,168,255);
@@ -81,7 +81,7 @@ const M5_PdfReport = {
     h1('2. Bilan de la période');
     if(mode==='ANNUEL' && analysis && analysis.annuelResult) {
       const ar=analysis.annuelResult;
-      row('Exercice',`${ar.debutEx} → ${ar.finEx}`);
+      row('Exercice',`${ar.debutEx} au ${ar.finEx}`);
       row('Avancement',`${ar.pctAvancement}% (${ar.joursEcoules} j / ${ar.nbJoursEx} j)`);
       row('Objectif annuel',`${ar.objectifAnnuel}h`);
       row('Théorique cumulé',`${ar.theoriqueCumule}h`);
@@ -182,11 +182,11 @@ const M5_PdfReport = {
           doc.text(c2>0?`${c2.toFixed(1)}h`:'--',cols[4],y);
           doc.text(montant>0?`${montant.toFixed(2)}€`:'--',cols[5],y);
           doc.setTextColor(wh>=35?180:0,0,0);
-          doc.text(wh>=35?'⚠️ 35h':' ',cols[6],y);
+          doc.text(wh>=35?'! 35h':' ',cols[6],y);
           doc.setTextColor(0,0,0);
         } else {
           doc.setTextColor(180,180,180);
-          ['--','--','--','--','✓'].forEach((t,i)=>doc.text(t,cols[i+2],y));
+          ['--','--','--','--','OK'].forEach((t,i)=>doc.text(t,cols[i+2],y));
           doc.setTextColor(0,0,0);
         }
         y+=5.5;
