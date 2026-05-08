@@ -51,6 +51,10 @@ const M5_Wellbeing = {
     const weeksForStats = weekIsComplete ? weeks : weeks.filter(w => w.monday < thisMonStr);
     // Garder au moins 2 semaines pour les calculs
     const weeksToUse = weeksForStats.length >= 2 ? weeksForStats : weeks;
+    // Détecter si la semaine en cours est exclue ET si elle a des HC (pour alerter l'utilisateur)
+    const currentWeekExcluded = !weekIsComplete && weeks.some(w => w.monday === thisMonStr);
+    const currentWeekData = currentWeekExcluded ? weeks.find(w => w.monday === thisMonStr) : null;
+    const currentWeekH = currentWeekData ? (currentWeekData.worked || 0) : 0;
 
     const worked = weeksToUse.map(w => w.worked || 0);
     const n = worked.length;
@@ -231,6 +235,8 @@ const M5_Wellbeing = {
       donneesLimitees: n < 4,
       isMultiYear,
       yearsSpanned,
+      currentWeekExcluded,  // semaine en cours exclue car incomplète
+      currentWeekH,          // heures saisies cette semaine (pour info)
       nbSemaines: n,
       noteMin: n < 4
         ? `Analyse basée sur ${n} semaine${n>1?'s':''} — les scores en italique seront plus précis avec 4+ semaines.`
