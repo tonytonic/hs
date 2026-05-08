@@ -111,13 +111,19 @@ function runAnalysis() {
   }
 
   // Score bien-être (Higgins, Karasek, Sonnentag, Voydanoff)
+  // ── MULTI-ANNÉE : la fatigue biologique traverse les changements d'exercice ──
+  // Sonnentag 2003 / Kivimäki 2015 : la charge se cumule sur plusieurs semaines
+  // successives, sans remise à zéro au 1er janvier.
+  // On utilise getWeeksMultiYear() qui puise dans les 3 dernières années.
   let wellbeing=null;
-  if(typeof M5_Wellbeing!=='undefined' && allWeeks.length>=2) {
-    // Bien-être = fenêtre glissante des 12 dernières semaines réelles
-    // (le corps ne se souvient pas de janvier — Sonnentag, Karasek mesurent sur cycles courts)
-    const todayStr=M5_localDK(new Date());
-    const weeksPassees=allWeeks.filter(w=>w.monday<=todayStr);
-    const weeksWellbeing=weeksPassees.slice(-12); // 12 dernières semaines MAX
+  if(typeof M5_Wellbeing!=='undefined') {
+    const weeksWellbeing=typeof M5_DataStore.getWeeksMultiYear==='function'
+      ? M5_DataStore.getWeeksMultiYear(year, 16)   // 16 sem max = ~4 mois de mémoire bio
+      : (() => {
+          // Fallback si méthode absente : année en cours uniquement
+          const todayStr=M5_localDK(new Date());
+          return allWeeks.filter(w=>w.monday<=todayStr).slice(-12);
+        })();
     if(weeksWellbeing.length>=2) {
       wellbeing=M5_Wellbeing.compute(weeksWellbeing, contract.hoursBase, contract);
     }
@@ -495,16 +501,22 @@ function openWeeklySaisie() {
   const inp=document.getElementById('week-saisie-hours');
   inp.value=wk.total!==null?wk.total:contract.hoursBase;
 
-  // Avenant — ne s'affiche que si la CCN le permet (L3123-22 nécessite accord de branche étendu)
+  // Avenant — affichage selon CCN (L3123-22) OU si un avenant existe déjà sauvegardé
+  // (on ne peut pas masquer une coche déjà cochée et sauvegardée par l'utilisateur)
   const avenantBloc=document.getElementById('week-avenant-bloc');
   const avenantAllowed = typeof M5_DataStore.isAvenantAllowed==='function' && M5_DataStore.isAvenantAllowed();
-  if(avenantBloc) avenantBloc.style.display = avenantAllowed ? 'block' : 'none';
+  // Toujours afficher le bloc si : CCN autorise OU si un avenant existe déjà pour cette semaine
+  const showAvenantBloc = avenantAllowed || (av && av.avenatH > 0);
+  if(avenantBloc) avenantBloc.style.display = showAvenantBloc ? 'block' : 'none';
 
   const toggleAv=document.getElementById('week-avenant-toggle');
   const avSection=document.getElementById('week-avenant-section');
   const avInp=document.getElementById('week-avenant-hours');
-  if(av && avenantAllowed) {
-    toggleAv.checked=true; avSection.style.display='block'; avInp.value=av.avenatH;
+  if(av && av.avenatH > 0 && showAvenantBloc) {
+    // Avenant existant → restaurer la coche et la valeur
+    if(toggleAv) { toggleAv.checked=true; }
+    if(avSection) avSection.style.display='block';
+    if(avInp) avInp.value=av.avenatH;
   } else {
     if(toggleAv) toggleAv.checked=false;
     if(avSection) avSection.style.display='none';
@@ -524,8 +536,16 @@ function openWeeklySaisie() {
     quickHtml+=`<button class="m5-quick-btn" onclick="selectWeekQuick(${h})">${h}h</button>`;
   });
   document.getElementById('week-quick-hours').innerHTML=quickHtml;
-  updateWeekPreview();
   openModal('modal-week-saisie');
+  // Différer updateWeekPreview APRÈS que le modal soit visible (évite le freeze Android)
+  // Bloquer le clavier virtuel Android pendant l'animation d'ouverture (cause principale du freeze)
+  const _inp = document.getElementById('week-saisie-hours');
+  if (_inp) { _inp.setAttribute('readonly', 'true'); }
+  requestAnimationFrame(() => {
+    updateWeekPreview();
+    // Retirer readonly après la transition (180ms) pour permettre la saisie
+    setTimeout(() => { if (_inp) _inp.removeAttribute('readonly'); }, 220);
+  });
 }
 
 function toggleAvenat() {
@@ -568,7 +588,7 @@ function updateWeekPreview() {
       result.alerts.forEach(a=>{
         html+=`<div class="m5-alert ${a.level}" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>${a.level==='critique'?'🚨':'ℹ️'}</span> ${a.msg}</div>`;
       });
-      if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Majoration : <strong>${_c.toFixed(2)} €</strong> brut sur les heures comp.</div>`;}
+      if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${result.totalCompH}h comp. cette semaine).</div>`;}
     }
   } else {
     result=CalcEngine.calcWeek(contract.hoursBase,worked,contract,contract.hourlyRate||0);
@@ -579,7 +599,7 @@ function updateWeekPreview() {
     result.alerts.forEach(a=>{
       html+=`<div class="m5-alert ${a.level}" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>${a.level==='critique'?'🚨':'⚠️'}</span> ${a.msg}</div>`;
     });
-    if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Majoration : <strong>${_c.toFixed(2)} €</strong> brut sur les heures comp.</div>`;}
+    if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${result.totalCompH}h comp. cette semaine).</div>`;}
   }
   prev.innerHTML=html;
 }
@@ -677,7 +697,7 @@ function renderWeekSummary(analysis) {
   });
   if(weekResult.totalCompH>0&&contract.hourlyRate>0&&!prevenanceAlert) {
     const _cw=(weekResult.comp1Amount||0)+(weekResult.comp2Amount||0);
-    html+=`<div class="m5-alert info"><span>💰</span><div>Majoration estimée : <strong>${_cw.toFixed(2)} € brut</strong> sur ${weekResult.totalCompH}h comp.</div></div>`;
+    html+=`<div class="m5-alert info"><span>💰</span><div>Majoration estimée cette semaine : <strong>${_cw.toFixed(2)} € brut</strong> (${weekResult.totalCompH}h comp. × taux majoré). Estimation brute basée sur votre taux horaire contractuel.</div></div>`;
   }
   el.innerHTML=html;
 }
@@ -802,13 +822,13 @@ function renderWellbeing(analysis) {
     return;
   }
 
-  // Note données limitées — bannière proéminente
+  // Bannière données limitées — affichée seulement si pas de badge multi-année
   let html='';
-  if(wb.donneesLimitees && wb.noteMin) {
+  if(wb.donneesLimitees && wb.noteMin && !wb.isMultiYear) {
     html+=`<div style="background:#fff3e0;border:2px solid #ff9800;border-radius:10px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;">
       <span style="font-size:16px;">📊</span>
       <div><strong>Analyse en cours de construction</strong><br>${wb.noteMin}<br>
-      <span style="font-size:11px;opacity:0.8;">Les scores en 0/100 avec peu de semaines sont normaux — ils reflètent que tu n'as pas encore de semaines de récupération.</span></div>
+      <span style="font-size:11px;opacity:0.8;">Les scores avec peu de semaines sont provisoires — ils s'améliorent au fil des semaines saisies.</span></div>
     </div>`;
   }
 
@@ -816,6 +836,26 @@ function renderWellbeing(analysis) {
   if(!wb.donneesLimitees) {
     html+=`<div style="font-size:11px;color:var(--miz-text3);padding:4px 2px 8px;text-align:center;">
       Basé sur ${wb.stats.n} semaines de données
+    </div>`;
+  }
+
+  // Badge multi-année — affiché si les données traversent un changement d'exercice
+  if(wb.isMultiYear && wb.yearsSpanned && wb.yearsSpanned.length > 1) {
+    html+=`<div style="background:rgba(108,63,197,0.08);border:1px solid rgba(108,63,197,0.25);border-radius:8px;padding:8px 12px;font-size:11px;color:#6c3fc5;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:14px;">🧬</span>
+      <div><strong>Mémoire biologique multi-année active</strong><br>
+      Données de ${wb.yearsSpanned.join(' + ')} — le changement d'exercice ne remet pas le corps à zéro.
+      La fatigue et la récupération sont continues (Sonnentag 2003, Kivimäki 2015).
+      </div>
+    </div>`;
+  }
+
+  // Note si données limitées mais issues d'une année précédente (début d'exercice)
+  if(!wb.isMultiYear && wb.noteMin) {
+    html+=`<div style="background:#fff3e0;border:2px solid #ff9800;border-radius:10px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;">
+      <span style="font-size:16px;">📊</span>
+      <div><strong>Analyse en cours de construction</strong><br>${wb.noteMin}<br>
+      <span style="font-size:11px;opacity:0.8;">Les scores avec peu de semaines sont provisoires — les données des semaines précédentes alimentent déjà l'analyse.</span></div>
     </div>`;
   }
 
