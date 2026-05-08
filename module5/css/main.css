@@ -293,6 +293,10 @@ body::before {
   transition: transform .12s, box-shadow .15s;
   text-decoration: none;
   letter-spacing: 0.01em;
+  /* Supprime le délai 300ms Android entre tap et réaction */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
 }
 .m5-btn:active { transform: scale(.97); }
 .m5-btn-primary {
@@ -313,8 +317,8 @@ body::before {
 .m5-btn-primary:hover::after { transform: translateX(150%); }
 .m5-btn-primary:hover { box-shadow: 0 6px 22px rgba(108,63,197,0.45); }
 .m5-btn-outline {
-  background: var(--miz-glass);
-  backdrop-filter: blur(8px);
+  background: rgba(108,63,197,0.06); /* glass sans blur → pas de freeze Android */
+  /* backdrop-filter: blur(8px) retiré — cause freeze Android au tap (calcul GPU) */
   color: var(--miz-primary);
   border: 1.5px solid var(--miz-border2);
 }
@@ -735,6 +739,9 @@ body::before {
   font-size: 14px; font-weight: 600;
   color: var(--miz-text2); cursor: pointer;
   transition: background .12s, border-color .12s, color .12s, transform .1s;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none; -webkit-user-select: none;
 }
 .m5-quick-btn:active { transform: scale(.95); }
 .m5-quick-btn.selected {
@@ -890,6 +897,8 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   display: flex; align-items: center; justify-content: center;
   transition: background .15s;
   flex-shrink: 0;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .acc-nav-btn:active { background: rgba(255,255,255,0.22); }
 .acc-week-label {
