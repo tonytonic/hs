@@ -1464,7 +1464,12 @@ class DTEEngine {
     // Meijman & Mulder 1998 : l'absence de surcharge = début de récupération,
     // qu'elle soit déclarée "vacances" ou non.
 
-    const isVacFromDTE = [0,1,2,3,4].some(dd => {
+    // FIX SEMAINE MIXTE : isVacFromDTE ne doit être true que si la semaine
+    // n'a AUCUNE heure M2/M1 réelle. Sinon un seul jour off marqué vacances
+    // (ex: férié) bascule toute la semaine en mode "vacances" et écrase le
+    // travail effectif des autres jours.
+    // count7 = nombre de jours avec entrée réelle M2/M1 (hors vacances/féries) cette semaine
+    const isVacFromDTE = (count7 === 0) && [0,1,2,3,4].some(dd => {
       const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() + dd);
       if (dt > today) return false;
       return !!vacances[localDK(dt)];
@@ -1491,9 +1496,17 @@ class DTEEngine {
     // INTERDIT : useGlobalAverage() — règle d'or de l'architecture de référence.
     // Avant : si weeklyH7 ≤ seuil, fallback sur mean → 39h fantôme après 10 sem à 45h.
     // Après : toujours la semaine en cours. En vacances → seuil CCN (35h = perf 100%).
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] vacation flags', 'color:#fa0;font-weight:bold',
+        { isVacFromDTE, noWorkThisWeek, belowBaseThisWeek, isCurrentWeekVacation,
+          weeklyH7Effective, count7 });
+    }
     const recentWeeklyH = isCurrentWeekVacation
       ? _seuil
       : weeklyH7Effective;
+    if (window.__DTE_DEBUG !== false) {
+      console.log('%c[DTE-DBG] recentWeeklyH final:', 'color:#0fa;font-weight:bold', recentWeeklyH);
+    }
 
     return {
       heures:         clamp(avgH7, 0, 14),
