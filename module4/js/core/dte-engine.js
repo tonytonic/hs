@@ -836,19 +836,27 @@ class DTEEngine {
       if (d > today) break;
       const k = localDK(d);
       const e = days[k];
-      // Ignorer jours fériés et vacances déclarées dans le compteur
+      // FIX : M2/M1 heures réelles priment sur vacation déclarée dans M4.
+      // Si M2 dit qu'il y a eu du travail ce jour (extra > 0), la semaine est travaillée
+      // même si ce jour est marqué vacances (ex : férié travaillé, jour off isolé avec HS).
+      // sumExtra7 respecte quand même la déclaration vacances (0 HS si vacances) —
+      // on ne sur-estime pas la charge, mais on ne masque pas non plus la semaine.
+      if (e && e.extra > 0) {
+        hasAnyEntryThisWeek = true;
+        if (!vacances[k] && specialDays[k] !== 'ferie') {
+          sumExtra7 += e.extra;
+          count7++;
+        }
+        continue;
+      }
+      // Ignorer jours fériés et vacances sans heures réelles
       if (specialDays[k] === 'ferie' || vacances[k]) continue;
       // Ignorer jours absents
       if (e && e.absent > 0) continue;
       // M1→M4 : recup ≥ 7h dans M1 = jour de repos → exclu du compteur heures semaine
       if (e && (e.recup >= 7)) continue;
-      // Ne compter QUE les jours avec une entrée réelle (e existe)
-      if (e) {
-        sumExtra7 += (e.extra || 0);
-        count7++;
-        hasAnyEntryThisWeek = true;
-      }
-      // Un jour sans entrée (e=undefined) = vacances non déclarées ou repos → PAS compté
+      // Jour travaillé sans HS
+      if (e) { count7++; hasAnyEntryThisWeek = true; }
     }
 
     // weeklyExtra : priorité à la semaine courante pour la progression jour par jour
@@ -907,7 +915,19 @@ class DTEEngine {
     const _ccnR        = _dteGetCCNRules();
     const _baseJourCCN = _ccnR.seuil / workDaysPerWeek; // 35/5=7h ou 39/5=7.8h selon accord
     const avgH7        = _baseJourCCN + avgExtra7;
-    const weeklyH7     = _ccnR.seuil + weeklyExtra;
+
+    // FIX FERIES SEMAINE : si un ou plusieurs fériés tombent dans la semaine courante,
+    // la base biologique réelle est réduite (ex : vendredi férié → base = 4×7h = 28h, pas 35h).
+    // weeklyH7 = heures RÉELLEMENT travaillées cette semaine, pas base théorique + HS.
+    // Impact : 35h+6h=41h (faux) → 28h+6h=34h (correct biologiquement).
+    let feriesInCurrentWeek = 0;
+    for (let _fd = 0; _fd < workDaysPerWeek; _fd++) {
+      const _fdt = new Date(weekMondayA); _fdt.setDate(weekMondayA.getDate() + _fd);
+      if (_fdt > today) break;
+      if (specialDays[localDK(_fdt)] === 'ferie') feriesInCurrentWeek++;
+    }
+    const _seuilEffective = Math.max(0, _ccnR.seuil - feriesInCurrentWeek * _baseJourCCN);
+    const weeklyH7        = _seuilEffective + weeklyExtra;
 
     // Signal "semaine sans travail" : aucune entrée M1/M2 cette semaine
     // FIX LUNDI : le 1er jour de semaine CCN sans saisie ≠ vacances (c'est juste le début de semaine)
@@ -957,8 +977,17 @@ class DTEEngine {
       // FIX : doit être AVANT vacances[k] sinon check-in "congé" le weekend = break erroné
       if (_isRestDow(dow)) { continue; }
 
-      // Vacances déclarées = reset complet (jours ouvrés uniquement)
-      if (vacances[k]) break;
+      // Vacances déclarées :
+      // FIX : 1 jour isolé ≠ reset complet (Sonnentag : récupération partielle, pas totale).
+      // - Avec heures réelles M2 (ex : férié travaillé) → traiter comme jour HS
+      // - Jour isolé (consecRest < 2) → traversé comme un récup simple
+      // - 2+ jours consécutifs → break (vrai repos = reset biologique justifié)
+      if (vacances[k]) {
+        if (e && e.extra > 0) { consecRest = 0; consecOT++; continue; } // M2 dit travaillé
+        consecRest++;
+        if (consecRest >= 2) break;
+        continue; // 1 seul jour off isolé = traversé, pas reset
+      }
 
       // Férié = pause neutre
       if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
