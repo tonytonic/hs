@@ -1182,34 +1182,33 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 /* Inputs dans les modals */
 .m5-modal .m5-input,
 .m5-modal .m5-select {
-  background: #fff;
-  border-color: rgba(139,92,246,0.30);
-  color: var(--miz-text);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(167,139,250,0.30);
+  color: #fff;
 }
 .m5-modal .m5-input:focus,
 .m5-modal .m5-select:focus {
   border-color: #A78BFA;
   box-shadow: 0 0 0 3px rgba(167,139,250,0.18);
 }
-.m5-modal .m5-input::placeholder { color: var(--miz-text3); }
-.m5-modal .m5-label { color: var(--miz-text2); }
+.m5-modal .m5-input::placeholder { color: rgba(255,255,255,0.30); }
+.m5-modal .m5-label { color: rgba(196,168,255,0.80); }
 
 /* Éléments de formulaire dans les modals */
-.m5-modal .m5-input-group > div[style*="font-size:11px"] { color: var(--miz-text3); }
-.m5-modal .m5-alert.ok      { background: rgba(16,185,129,0.10); color: #065F46; border-color: #34D399; }
-/* Dans le modal (fond clair #FAFAF9), les alertes doivent être lisibles */
-.m5-modal .m5-alert.info    { background: rgba(59,130,246,0.08);  color: #1E40AF; border-color: #3B82F6; }
-.m5-modal .m5-alert.warn    { background: rgba(245,158,11,0.10);  color: #92400E; border-color: #FBBF24; }
-.m5-modal .m5-alert.alerte  { background: rgba(249,115,22,0.10);  color: #7C2D12; border-color: #FB923C; }
-.m5-modal .m5-alert.critique{ background: rgba(239,68,68,0.10);   color: #7F1D1D; border-color: #F87171; }
+.m5-modal .m5-input-group > div[style*="font-size:11px"] { color: rgba(255,255,255,0.40); }
+.m5-modal .m5-alert.ok      { background: rgba(16,185,129,0.15); color: #A7F3D0; border-color: #34D399; }
+.m5-modal .m5-alert.info    { background: rgba(59,130,246,0.14); color: #BFDBFE; border-color: #60A5FA; }
+.m5-modal .m5-alert.warn    { background: rgba(245,158,11,0.14); color: #FDE68A; border-color: #FBBF24; }
+.m5-modal .m5-alert.alerte  { background: rgba(249,115,22,0.14); color: #FED7AA; border-color: #FB923C; }
+.m5-modal .m5-alert.critique{ background: rgba(239,68,68,0.15);  color: #FECACA; border-color: #F87171; }
 
-/* Textes généraux dans modals — fond clair, texte sombre */
+/* Textes généraux dans modals */
 .m5-modal p,
-.m5-modal div { color: var(--miz-text); }
-.m5-modal strong { color: var(--miz-primary); }
+.m5-modal div { color: rgba(255,255,255,0.75); }
+.m5-modal strong { color: #E9D5FF; }
 .m5-modal .m5-btn-outline {
-  background: transparent;
-  border-color: var(--miz-border2);
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(167,139,250,0.35);
   color: #DDD6FE;
 }
 .m5-modal .m5-btn-outline:hover { background: rgba(167,139,250,0.18); }
@@ -1246,8 +1245,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 .m5-modal [style*="border-top"] { border-color: rgba(167,139,250,0.15) !important; }
 .m5-modal [style*="background:#fff8e1"] { background: rgba(245,158,11,0.14) !important; color: #FDE68A !important; }
 .m5-modal [style*="background:#e8f5e9"] { background: rgba(16,185,129,0.14) !important; color: #A7F3D0 !important; }
-/* Supprimé : ne plus forcer la couleur blanche sur les éléments avec style inline
-   — le modal a un fond clair, --miz-text est déjà la bonne couleur sombre */
+.m5-modal [style*="color:var(--miz-text)"] { color: rgba(255,255,255,0.80) !important; }
 .m5-modal [style*="color:var(--miz-text2)"] { color: rgba(196,168,255,0.70) !important; }
 .m5-modal [style*="color:var(--miz-text3)"] { color: rgba(196,168,255,0.50) !important; }
 .m5-modal [style*="background:var(--miz-bg2)"] { background: rgba(255,255,255,0.06) !important; }
