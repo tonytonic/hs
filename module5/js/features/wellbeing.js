@@ -374,7 +374,7 @@ const M5_Wellbeing = {
       return `🦊 ${n}Bien-être moyen — point à surveiller : ${plusFaible.nom.toLowerCase()} (${plusFaible.ref}).`;
     }
     if (niveau === 'tendu') return `🦊 ${n}Rythme sous tension : ${stats.ecartType}h d'écart-type et ${stats.ratioVariations}% de semaines avec variation soudaine. Higgins 2010 et Janssen 2004 identifient ce profil comme à risque.`;
-    return `🦊 ${n}Signal critique bien-être. Ton temps partiel ressemble à un temps plein non déclaré — risque dépression ×1.5 selon Bambra 2008. Garde cet historique.`;
+    return `🦊 ${n}Signal critique bien-être. Ton temps partiel ressemble à un temps plein non déclaré — risque de dépression ×1.5 selon Bambra 2008. Garde cet historique.`;
   }
 };
 

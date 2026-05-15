@@ -118,7 +118,10 @@ const Mizuki = {
   getPopupContent(analysis) {
     const {weekResult, rule12, isVacWeek} = analysis || {};
     const name = _get(K.USER_NAME,'');
-    const pr = name || 'toi';
+    // pr = prénom si disponible (3e pers.), sinon 'tu' (2e pers.)
+    // v(v3, v2) retourne la bonne conjugaison selon le cas
+    const pr = name || 'tu';
+    const v = (v3, v2) => name ? v3 : v2;
 
     const today = new Date().toISOString().slice(0,10);
     const workedKey = weekResult ? Math.round((weekResult.workedH||0)*10) : 0;
@@ -141,14 +144,14 @@ const Mizuki = {
       msg = {
         titre: '🌴 Semaine de congés',
         icon: '🌴', level: 'ok',
-        message: `Mizuki détecte que ${pr} est en congé cette semaine. Les heures complémentaires ne s'accumulent pas pendant les vacances. Profite du repos — tes données restent intactes.`,
+        message: `Mizuki détecte que ${pr} ${v('est','es')} en congé cette semaine. Les heures complémentaires ne s'accumulent pas pendant les vacances. Profite du repos — tes données restent intactes.`,
         actions: ['Déconnecte vraiment', 'Reviens reposée !'],
       };
     } else if (!weekResult || weekResult.workedH <= weekResult.contractH) {
       msg = {
         titre: '✅ Semaine conforme',
         icon: '✅', level: 'ok',
-        message: `Cette semaine, ${pr} respecte les heures prévues au contrat. Aucune heure complémentaire détectée. Continue à saisir chaque semaine — 12 semaines de données permettent à Mizuki de détecter la règle des 12 semaines automatiquement.`,
+        message: `Cette semaine, ${pr} ${v('respecte','respectes')} les heures prévues au contrat. Aucune heure complémentaire détectée. Continue à saisir chaque semaine — 12 semaines de données permettent à Mizuki de détecter la règle des 12 semaines automatiquement.`,
         actions: ['Saisir la semaine prochaine', 'Voir le glossaire juridique'],
       };
     } else {
@@ -162,7 +165,7 @@ const Mizuki = {
         msg = {
           titre: '🚨 Risque de requalification',
           icon: '🚨', level: 'critique',
-          message: `Cette semaine tu as atteint ${weekResult.workedH}h — le seuil légal du temps plein. Un contrat à temps partiel ne peut jamais atteindre 35h (Art. L3123-9). Garde une trace de cette semaine, elle peut être utile.`,
+          message: `Cette semaine, tu as atteint ${weekResult.workedH}h — le seuil légal du temps plein. Un contrat à temps partiel ne peut jamais atteindre 35h (Art. L3123-9). Garde une trace de cette semaine, elle peut être utile.`,
           actions: ['Garder une trace écrite', 'Comparer avec la fiche de paie', 'Consulter un délégué du personnel', 'Voir l\'Art. L3123-9'],
         };
       } else if (has12sem) {
