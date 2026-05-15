@@ -1042,7 +1042,9 @@ class DTEEngine {
     //     - 2 semaines sans HS   → break (reset complet)
     let consecOT = 0;
     let blankWeeks = 0;
-    let consecRest = 0; // compteur récup/absent consécutifs (hors weekend)
+    let consecRest = 0;      // compteur récup/absent consécutifs (hors WE/fériés)
+    let consecRestTotal = 0; // FIX : cumule TOUS les jours repos (WE + fériés + récup/absent)
+                             // → détecte blocs 3j+ : ex. Ven-férié + Sam + Dim = reset
     let lastBlankWeekMon = null; // FIX : évite de compter la même semaine plusieurs fois
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
@@ -1052,30 +1054,45 @@ class DTEEngine {
 
       // Jour de repos configuré (sam/dim ou autre) = toujours traversé en priorité
       // FIX : doit être AVANT vacances[k] sinon check-in "congé" le weekend = break erroné
-      if (_isRestDow(dow)) { continue; }
+      // FIX2 : cumule dans consecRestTotal pour détecter les blocs WE+férié >= 3j
+      if (_isRestDow(dow)) {
+        consecRestTotal++;
+        if (consecRestTotal >= 3) break outer_loop;
+        continue;
+      }
 
       // Vacances déclarées :
       // FIX : 1 jour isolé ≠ reset complet (Sonnentag : récupération partielle, pas totale).
       // - Avec heures réelles M2 (ex : férié travaillé) → traiter comme jour HS
-      // - Jour isolé (consecRest < 2) → traversé comme un récup simple
-      // - 2+ jours consécutifs → break (vrai repos = reset biologique justifié)
+      // - Jour isolé (consecRest < 2 et consecRestTotal < 3) → traversé comme récup simple
+      // - 2+ jours consécutifs OU bloc total >= 3j → break (vrai repos = reset biologique)
       if (vacances[k]) {
-        if (e && e.extra > 0) { consecRest = 0; consecOT++; continue; } // M2 dit travaillé
+        if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // M2 dit travaillé
         consecRest++;
-        if (consecRest >= 2) break;
+        consecRestTotal++;
+        if (consecRest >= 2 || consecRestTotal >= 3) break;
         continue; // 1 seul jour off isolé = traversé, pas reset
       }
 
-      // Férié = pause neutre
-      if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
+      // Férié : compte dans le bloc repos total (peut combiner avec WE pour déclencher reset)
+      // Ex : Ven-férié + Sam + Dim → consecRestTotal = 3 → break
+      if (specialDays[k] === 'ferie') {
+        consecRest = 0; // un férié seul ne compte pas comme "2 récups consécutifs"
+        consecRestTotal++;
+        if (consecRestTotal >= 3) break;
+        continue;
+      }
 
-      // Récup / absent : 1j seul = continue, 2j consécutifs = reset
+      // Récup / absent : 1j seul = continue, 2j consécutifs OU bloc >= 3j = reset
       if (e && (e.absent > 0 || e.recup > 0)) {
         consecRest++;
-        if (consecRest >= 2) break; // 2j consécutifs = reset complet
+        consecRestTotal++;
+        if (consecRest >= 2 || consecRestTotal >= 3) break; // reset complet
         continue; // 1 seul jour = traversé (comme un jour de weekend supplémentaire)
       }
+      // Jour travaillé → reset tous les compteurs repos
       consecRest = 0;
+      consecRestTotal = 0;
 
       // Semaine sans HS — FIX blankWeeks : compter par semaine, pas par jour
       // Bug : chaque jour d'une semaine sans HS incrémentait blankWeeks → break prématuré
@@ -1102,7 +1119,7 @@ class DTEEngine {
     }
     if (window.__DTE_DEBUG !== false) {
       console.log('%c[DTE-DBG] consecOT final:', 'color:#fa0;font-weight:bold', consecOT,
-        '| consecRest:', consecRest, '| blankWeeks:', blankWeeks);
+        '| consecRest:', consecRest, '| consecRestTotal:', consecRestTotal, '| blankWeeks:', blankWeeks);
     }
 
     // ── CUMUL SEMAINES DE SURCHARGE — 2 passes pour éviter le bug d'ordre ────
