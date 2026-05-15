@@ -2057,7 +2057,7 @@ function wizFinish() {
   if(name) localStorage.setItem('M5_USER_NAME', name);
   calendarMonday=M5_getCurrentMonday();
   Mizuki.clearCache();
-  toast('Bienvenue '+(name?name+'! ':'')+'Mizuki est prête 🦊','success');
+  toast('Bienvenue'+(name?' '+name+' !':'')+'! Mizuki est prête 🦊','success');
   // FIX : supprimer le style anti-flash qui bloquait le switch wizard → vue principale
   // (avec !important, il empêchait refreshUI() de modifier display)
   try {
