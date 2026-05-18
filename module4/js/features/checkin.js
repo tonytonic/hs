@@ -436,44 +436,15 @@ class Checkin {
   }
 
   _saveN1Confirmed(mondayKey, extraH, seuil){
-    // REFACTOR : la déclaration subjective N-1 NE TOUCHE PLUS aux saisies M1/M2.
-    // Avant : écrasait days[mondayKey] dans DATA_REPORT → destruction silencieuse
-    //         des saisies détaillées (ex: LMMJ 2h chacun écrasés par Lun=0h).
-    // Après : stockage dans DTE_N1_DECLARED, lu par dte-engine pour moduler fatHS
-    //         (charge biologique effective) sans toucher au brut contractuel.
-    //
-    // Conforme Meijman & Mulder 1998 : l'effort biologique réel ≠ heures contractuelles.
-    // Conforme Sonnentag 2003 : la dose effective S-1 module la récupération de S.
+    // Écrire la semaine confirmée dans DATA_REPORT si elle n'y est pas déjà
+    // ou si on veut consolider une saisie hebdomadaire
     try {
-      const decl = JSON.parse(localStorage.getItem('DTE_N1_DECLARED') || '{}');
-      decl[mondayKey] = {
-        declaredH: seuil + extraH,   // total heures travaillées tel que déclaré
-        baseline: seuil,              // seuil CCN au moment de la déclaration
-        savedAt: new Date().toISOString()
-      };
-      // Garder seulement les 8 dernières semaines pour éviter accumulation infinie
-      const keys = Object.keys(decl).sort().slice(-8);
-      const trimmed = {};
-      keys.forEach(k => trimmed[k] = decl[k]);
-      localStorage.setItem('DTE_N1_DECLARED', JSON.stringify(trimmed));
-
-      // FALLBACK historique : si pas de saisies M1/M2 du tout pour la semaine,
-      // créer une entrée lundi (cas utilisateur sans M1/M2 qui utilise seulement N-1)
       const yr = parseInt(mondayKey.slice(0,4));
       const raw = localStorage.getItem('DATA_REPORT_'+yr);
       const d = raw && raw !== '{}' ? JSON.parse(raw) : {};
       const days = d.days || d.jours || {};
-      // N'écrire QUE si aucune entrée n'existe pour la semaine entière
-      const _hasAnyEntryInWeek = (() => {
-        for (let dd = 0; dd < 7; dd++) {
-          const dt = new Date(mondayKey + 'T00:00:00');
-          dt.setDate(dt.getDate() + dd);
-          const k = dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');
-          if (days[k]) return true;
-        }
-        return false;
-      })();
-      if (!_hasAnyEntryInWeek) {
+      // Écrire uniquement si l'entrée n'existe pas déjà (ne pas écraser une saisie manuelle)
+      if(!days[mondayKey]) {
         days[mondayKey] = { extra: extraH, recup: 0, absent: 0 };
         d.days = days;
         localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
@@ -523,10 +494,17 @@ class Checkin {
     });
     document.getElementById('n1-confirm').addEventListener('click', () => {
       const newExtra = Math.max(0, current - seuil);
-      // _saveN1Confirmed gère désormais à la fois la déclaration subjective
-      // (DTE_N1_DECLARED) ET le fallback DATA_REPORT si aucune saisie n'existe.
-      // → Plus d'écrasement aveugle des saisies M1/M2 détaillées.
       this._saveN1Confirmed(mondayKey, newExtra, seuil);
+      // Écraser avec la valeur corrigée
+      try {
+        const yr = parseInt(mondayKey.slice(0,4));
+        const raw = localStorage.getItem('DATA_REPORT_'+yr);
+        const d = raw && raw !== '{}' ? JSON.parse(raw) : {};
+        const days = d.days || {};
+        days[mondayKey] = { extra: newExtra, recup: 0, absent: 0 };
+        d.days = days;
+        localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+      } catch(_) {}
       this._step++;
       this._render();
     });
