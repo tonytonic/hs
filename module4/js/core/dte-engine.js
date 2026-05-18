@@ -845,23 +845,15 @@ class DTEEngine {
       const dow = d.getDay();
       if (_isRestDowAt(dow, d)) continue; // FIX VERSIONING : config active à cette date historique
       const k = localDK(d);
+      if (specialDays[k] === 'ferie') continue;
       const e = days[k];
-      // FIX BUG : férié/absent avec heures M2 réelles → compter comme jour travaillé
-      // (cohérent avec consecOT, vacances, et le principe "M2 prime sur M1")
-      // Cas typique : Ascension travaillée 2h, marquée ferie dans specialDays
-      const _extraRealHere = e ? (e.extra || 0) : 0;
-      if (specialDays[k] === 'ferie' && _extraRealHere === 0) continue;
-      if (e && e.absent > 0 && _extraRealHere === 0) continue;
+      if (e && e.absent > 0) continue;
       // M1→M4 : recup ≥ 7h dans M1 = jour de repos complet → exclu des heures (comme absent)
       if (e && (e.recup >= 7)) continue;
-      // FIX BUG : les jours de vacances comptent comme jours ouvrés
-      // — à 0h HS si pas d'heures saisies (dénominateur correct, pas de gonflage moyenne)
-      // — aux heures réelles si extra > 0 (M2 prime sur M1, cohérent avec consecOT/ferie/absent)
-      // Sinon : LMMJ vacances + 2h chacun → avgExtra = 0 → fatHS = 0 → fatigue = 0
-      // alors que consecOT compte bien 4j de HS → incohérence visible utilisateur
+      // FIX : les jours de vacances comptent comme jours ouvrés à 0h HS
+      // (pas exclus du dénominateur — sinon la moyenne/jour gonfle artificiellement)
       const isVacDay = !!vacances[k];
-      const _extraReal = e ? (e.extra || 0) : 0;
-      sumExtra += (isVacDay && _extraReal === 0) ? 0 : _extraReal;
+      sumExtra += isVacDay ? 0 : (e ? (e.extra || 0) : 0);
       countWorkDays28++;
     }
     // avgExtraPerDay28 = HS/jour moyen sur 4 semaines
@@ -949,17 +941,8 @@ class DTEEngine {
     const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // Des HS saisies cette semaine → utiliser les HS réelles + projection biologique
-      // FIX BUG : la mémoire biologique ne disparaît pas à la 1ère saisie de la semaine.
-      // Avant : saisir 2h lundi → weeklyExtra = 2h → score chute violemment vs lundi 0h (qui prenait prevWeekFull=8h).
-      // Après : saisies réelles + projection du reste de semaine sur historique (Sonnentag 2003).
-      // Ex lundi avec 2h, prevWeekFull=8h : 2h saisies + 8h×(4/5) projetés = 8.4h ≈ continuité biologique.
-      // En fin de semaine : projection ≈ 0 → on prend juste les saisies réelles.
-      const _dayRatio = Math.min(1, todayDowA / Math.max(1, workDaysPerWeek));
-      const _projectedRemainder = prevWeekFull !== null
-        ? prevWeekFull * (1 - _dayRatio)
-        : (countWorkDays28 >= 5 ? weeklyExtra28 * (1 - _dayRatio) : 0);
-      weeklyExtra = sumExtra7 + _projectedRemainder;
+      // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
+      weeklyExtra = sumExtra7;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
@@ -1059,9 +1042,11 @@ class DTEEngine {
     //     - 2 semaines sans HS   → break (reset complet)
     let consecOT = 0;
     let blankWeeks = 0;
-    let consecRest = 0;      // compteur récup/absent consécutifs (hors WE/fériés)
-    let consecRestTotal = 0; // FIX : cumule TOUS les jours repos (WE + fériés + récup/absent)
-                             // → détecte blocs 3j+ : ex. Ven-férié + Sam + Dim = reset
+    let consecRest = 0; // compteur récup/absent consécutifs (hors weekend)
+    let consecRestTotal = 0; // FIX UNIQUE : cumule TOUS types de repos (WE+férié+vac+récup)
+                             // Détecte les blocs de 3j+ qui doivent casser la chaîne consecOT
+                             // Ex : WE + Ven férié = 3j repos → break (cohérent Meijman 1998)
+                             // Reset uniquement quand on rencontre un jour OT effectif
     let lastBlankWeekMon = null; // FIX : évite de compter la même semaine plusieurs fois
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
@@ -1071,7 +1056,7 @@ class DTEEngine {
 
       // Jour de repos configuré (sam/dim ou autre) = toujours traversé en priorité
       // FIX : doit être AVANT vacances[k] sinon check-in "congé" le weekend = break erroné
-      // FIX2 : cumule dans consecRestTotal pour détecter les blocs WE+férié >= 3j
+      // FIX UNIQUE : cumule dans consecRestTotal pour détecter blocs ≥3j
       if (_isRestDow(dow)) {
         consecRestTotal++;
         if (consecRestTotal >= 3) break outer_loop;
@@ -1081,8 +1066,8 @@ class DTEEngine {
       // Vacances déclarées :
       // FIX : 1 jour isolé ≠ reset complet (Sonnentag : récupération partielle, pas totale).
       // - Avec heures réelles M2 (ex : férié travaillé) → traiter comme jour HS
-      // - Jour isolé (consecRest < 2 et consecRestTotal < 3) → traversé comme récup simple
-      // - 2+ jours consécutifs OU bloc total >= 3j → break (vrai repos = reset biologique)
+      // - Jour isolé (consecRest < 2) → traversé comme un récup simple
+      // - 2+ jours consécutifs → break (vrai repos = reset biologique justifié)
       if (vacances[k]) {
         if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // M2 dit travaillé
         consecRest++;
@@ -1091,34 +1076,27 @@ class DTEEngine {
         continue; // 1 seul jour off isolé = traversé, pas reset
       }
 
-      // Férié : compte dans le bloc repos total (peut combiner avec WE pour déclencher reset)
-      // Ex : Ven-férié + Sam + Dim → consecRestTotal = 3 → break
-      // FIX3 : si des heures ont été saisies sur un férié (ex : Ascension travaillée)
-      //        → traiter comme jour HS, cohérent avec le bloc vacances (Meijman 1998)
+      // Férié = pause neutre, cumule dans consecRestTotal
+      // FIX UNIQUE : si extra saisi → M2 prime sur férié (cohérent avec vacances)
       if (specialDays[k] === 'ferie') {
         if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // férié travaillé
-        consecRest = 0; // un férié seul ne compte pas comme "2 récups consécutifs"
+        consecRest = 0;
         consecRestTotal++;
-        if (consecRestTotal >= 3) break;
+        if (consecRestTotal >= 3) break outer_loop;
         continue;
       }
 
-      // Récup / absent : 1j seul = continue, 2j consécutifs OU bloc >= 3j = reset
-      // FIX4 : si des heures extra sont saisies sur un jour absent/recup (M2 prime sur M1)
-      //        → traiter comme jour HS, cohérent avec vacances et ferie (Meijman 1998)
+      // Récup / absent : 1j seul = continue, 2j consécutifs OU bloc total ≥3j = reset
+      // M2 prime sur M1 : si extra saisi malgré absent/recup, compter comme OT (cohérent avec férié et vacances)
       if (e && (e.absent > 0 || e.recup > 0)) {
-        if (e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // absent mais travaillé (M2 prime)
+        if (e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // absent/recup mais travaillé
         consecRest++;
         consecRestTotal++;
-        if (consecRest >= 2 || consecRestTotal >= 3) break; // reset complet
+        if (consecRest >= 2 || consecRestTotal >= 3) break; // 2j consécutifs ou bloc 3j = reset complet
         continue; // 1 seul jour = traversé (comme un jour de weekend supplémentaire)
       }
-      // Jour travaillé normal : reset consecRest (pas de récup/absent)
-      // FIX2 : NE PAS resetter consecRestTotal ici — un vendredi sans HS doit laisser
-      // le bloc WE+fériés antérieur intact.
-      // Exemple : Ven(no OT) + Sam + Dim → consecRestTotal=3 → break correct.
-      // consecRestTotal n'est resetté QUE par un jour avec HS effectif.
       consecRest = 0;
+      // consecRestTotal n'est PAS resetté ici (jour normal sans HS préserve le bloc repos antérieur)
 
       // Semaine sans HS — FIX blankWeeks : compter par semaine, pas par jour
       // Bug : chaque jour d'une semaine sans HS incrémentait blankWeeks → break prématuré
@@ -1141,10 +1119,7 @@ class DTEEngine {
       }
       blankWeeks = 0;
       lastBlankWeekMon = null;
-      if (e && e.extra > 0) {
-        consecRestTotal = 0; // OT actif → reset du bloc repos (on repart en surcharge)
-        consecOT++;
-      }
+      if (e && e.extra > 0) { consecRestTotal = 0; consecOT++; } // OT effectif → reset bloc repos
     }
     if (window.__DTE_DEBUG !== false) {
       console.log('%c[DTE-DBG] consecOT final:', 'color:#fa0;font-weight:bold', consecOT,
@@ -1593,7 +1568,6 @@ class DTEEngine {
       // Valeurs brutes pour les calculs
       _avgExtra7:     avgExtra7,
       _currentWeekExtra: sumExtra7, // HS RÉELLES saisies cette semaine (pas projection historique)
-      _prevWeekExtra: prevExtra,    // HS brut M1/M2 semaine N-1 (pour modulation déclaration N-1)
       _hasCurrentWeekData: hasAnyEntryThisWeek, // true si saisie réelle cette semaine
       _isProjection: !hasAnyEntryThisWeek && (count7 === 0), // avgExtra7 = projection 28j historique
       _avgH7:         avgH7,
@@ -1725,56 +1699,7 @@ class DTEEngine {
     const consecOT      = norm._consecOT || 0;
     // En vacances M4 : pas de HS actives → fatHS = 0 (la moyenne historique ne compte pas)
     const isVacWeekNow = norm._isVacationWeek || false;
-    let fatHS           = isVacWeekNow ? 0 : norm._avgExtra7 * 0.130 * c.fh; // INRS phases
-
-    // ── MODULATION N-1 SUBJECTIVE (Meijman & Mulder 1998, Sonnentag 2003) ──────
-    // L'utilisateur peut déclarer ses heures réelles de la semaine précédente via check-in.
-    // Si la déclaration diverge du brut M1/M2 (ex: récup non saisies, journées light),
-    // on module la charge biologique SANS toucher aux saisies contractuelles.
-    // - declaredH < seuil légal → sous-charge → décroissance accentuée (récup active)
-    // - declaredH < bruteH       → atténuation proportionnelle
-    // - declaredH >= bruteH      → pas de modulation (confirmation/dépassement)
-    try {
-      const _decl = JSON.parse(localStorage.getItem('DTE_N1_DECLARED') || '{}');
-      // Trouver la déclaration de la semaine précédente la plus récente
-      const _today = new Date();
-      const _prevMon = new Date(_today); _prevMon.setDate(_today.getDate() - 7);
-      // chercher la déclaration correspondant à la semaine N-1 (clé = lundi N-1)
-      const _candidates = Object.keys(_decl).sort().reverse();
-      const _declEntry = _candidates.length ? _decl[_candidates[0]] : null;
-      // Appliquer seulement si la déclaration est récente (≤ 8 jours) — sinon obsolète
-      if (_declEntry) {
-        const _savedAt = new Date(_declEntry.savedAt);
-        const _ageDays = (_today - _savedAt) / 86400000;
-        if (_ageDays <= 8) {
-          const _seuilN1 = _declEntry.baseline || 35;
-          const _declaredH = _declEntry.declaredH || _seuilN1;
-          // Brut estimé : prevWeekFull + seuil (heures totales semaine N-1)
-          const _bruteH = (norm._prevWeekExtra || 0) + _seuilN1;
-          if (_bruteH > 0 && _declaredH > 0) {
-            const _ratio = _declaredH / _bruteH;
-            let _modulator;
-            if (_declaredH < _seuilN1) {
-              // Sous le seuil légal : récupération active (Meijman)
-              _modulator = _ratio * 0.85;
-            } else if (_declaredH < _bruteH) {
-              // Entre seuil et brut : atténuation linéaire
-              _modulator = _ratio;
-            } else {
-              // Déclaration confirme ou dépasse le brut : pas d'atténuation
-              _modulator = 1.0;
-            }
-            _modulator = Math.max(0.4, Math.min(1.3, _modulator)); // bornes sécurité
-            fatHS = fatHS * _modulator;
-            if (window.__DTE_DEBUG !== false) {
-              console.log('%c[DTE-DBG] N-1 modulation', 'color:#0af;font-weight:bold',
-                { declaredH: _declaredH, bruteH: _bruteH, ratio: _ratio.toFixed(2),
-                  modulator: _modulator.toFixed(2), fatHS_modulated: fatHS.toFixed(3) });
-            }
-          }
-        }
-      }
-    } catch(_) {}
+    const fatHS         = isVacWeekNow ? 0 : norm._avgExtra7 * 0.130 * c.fh; // INRS phases
     const fatSommeil    = norm.sleepDebt * 0.35;           // Thompson 2022 : +14% cortisol/nuit courte
     const fatSurchar    = norm.surcharge * 0.12;
     const fatBurnout    = norm.burnout * 0.22;
