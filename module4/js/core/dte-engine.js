@@ -1090,9 +1090,12 @@ class DTEEngine {
         if (consecRest >= 2 || consecRestTotal >= 3) break; // reset complet
         continue; // 1 seul jour = traversé (comme un jour de weekend supplémentaire)
       }
-      // Jour travaillé → reset tous les compteurs repos
+      // Jour travaillé normal : reset consecRest (pas de récup/absent)
+      // FIX2 : NE PAS resetter consecRestTotal ici — un vendredi sans HS doit laisser
+      // le bloc WE+fériés antérieur intact.
+      // Exemple : Ven(no OT) + Sam + Dim → consecRestTotal=3 → break correct.
+      // consecRestTotal n'est resetté QUE par un jour avec HS effectif.
       consecRest = 0;
-      consecRestTotal = 0;
 
       // Semaine sans HS — FIX blankWeeks : compter par semaine, pas par jour
       // Bug : chaque jour d'une semaine sans HS incrémentait blankWeeks → break prématuré
@@ -1115,7 +1118,10 @@ class DTEEngine {
       }
       blankWeeks = 0;
       lastBlankWeekMon = null;
-      if (e && e.extra > 0) consecOT++;
+      if (e && e.extra > 0) {
+        consecRestTotal = 0; // OT actif → reset du bloc repos (on repart en surcharge)
+        consecOT++;
+      }
     }
     if (window.__DTE_DEBUG !== false) {
       console.log('%c[DTE-DBG] consecOT final:', 'color:#fa0;font-weight:bold', consecOT,
