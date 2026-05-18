@@ -138,7 +138,6 @@ class Dashboard {
             const suffix = isProj ? ' — projection historique' : '';
             return '+'+v.toFixed(1)+'h/jour ('+impact+')'+suffix;
         }},
-        { label:'Jours consécutifs avec HS', key:'_consecOT',  fmt: v => v > 10 ? v+'j (WE non comptés) ⚠️ surcharge prolongée' : v > 5 ? v+'j (WE non comptés) — vigilance' : v+'j ouvrés avec HS' },
         { label:'Semaines de surcharge cumulées', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             if (vR <= 0) return 'Aucun cumul (rythme normal)';
