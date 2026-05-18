@@ -845,9 +845,13 @@ class DTEEngine {
       const dow = d.getDay();
       if (_isRestDowAt(dow, d)) continue; // FIX VERSIONING : config active à cette date historique
       const k = localDK(d);
-      if (specialDays[k] === 'ferie') continue;
       const e = days[k];
-      if (e && e.absent > 0) continue;
+      // FIX BUG : férié/absent avec heures M2 réelles → compter comme jour travaillé
+      // (cohérent avec consecOT, vacances, et le principe "M2 prime sur M1")
+      // Cas typique : Ascension travaillée 2h, marquée ferie dans specialDays
+      const _extraRealHere = e ? (e.extra || 0) : 0;
+      if (specialDays[k] === 'ferie' && _extraRealHere === 0) continue;
+      if (e && e.absent > 0 && _extraRealHere === 0) continue;
       // M1→M4 : recup ≥ 7h dans M1 = jour de repos complet → exclu des heures (comme absent)
       if (e && (e.recup >= 7)) continue;
       // FIX BUG : les jours de vacances comptent comme jours ouvrés
@@ -945,8 +949,17 @@ class DTEEngine {
     const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
-      weeklyExtra = sumExtra7;
+      // Des HS saisies cette semaine → utiliser les HS réelles + projection biologique
+      // FIX BUG : la mémoire biologique ne disparaît pas à la 1ère saisie de la semaine.
+      // Avant : saisir 2h lundi → weeklyExtra = 2h → score chute violemment vs lundi 0h (qui prenait prevWeekFull=8h).
+      // Après : saisies réelles + projection du reste de semaine sur historique (Sonnentag 2003).
+      // Ex lundi avec 2h, prevWeekFull=8h : 2h saisies + 8h×(4/5) projetés = 8.4h ≈ continuité biologique.
+      // En fin de semaine : projection ≈ 0 → on prend juste les saisies réelles.
+      const _dayRatio = Math.min(1, todayDowA / Math.max(1, workDaysPerWeek));
+      const _projectedRemainder = prevWeekFull !== null
+        ? prevWeekFull * (1 - _dayRatio)
+        : (countWorkDays28 >= 5 ? weeklyExtra28 * (1 - _dayRatio) : 0);
+      weeklyExtra = sumExtra7 + _projectedRemainder;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
