@@ -941,8 +941,17 @@ class DTEEngine {
     const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
-      weeklyExtra = sumExtra7;
+      // Des HS saisies cette semaine → combiner réel + mémoire biologique semaine N-1
+      // Sonnentag 2003 : la charge de la semaine précédente persiste biologiquement.
+      // Avant ce fix : saisir 2h lundi écrasait la mémoire N-1 → score chutait absurdement.
+      // Maintenant : sumExtra7 (réel) + projection N-1 résiduelle pondérée par jour de semaine.
+      // Lun → 1/5 réel + 4/5 projeté ; Ven → 5/5 réel + 0/5 projeté.
+      if (todayDowA >= 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
+        const _ratio = todayDowA / workDaysPerWeek;
+        weeklyExtra = sumExtra7 + prevWeekFull * (1 - _ratio);
+      } else {
+        weeklyExtra = sumExtra7;
+      }
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
@@ -1713,11 +1722,15 @@ class DTEEngine {
 
     // Sonnentag 2003 — dégradation du détachement psychologique
     // FIX BUG 4 : en vacances, sonnentagMult = 1.0 (pas d'amplification — détachement actif)
+    // FIX SIMPLIFICATION : utilisation de cumW au lieu de consecOT.
+    //   cumW (semaines de surcharge cumulées sur 28j) est plus fiable et déjà utilisé partout.
+    //   consecOT comptait les jours consécutifs avec HS et avait des bugs sur les blocs de repos.
+    //   Mapping équivalent : 5j ≈ 1 sem, 12j ≈ 2.4 sem, 20j ≈ 4 sem
     const sonnentagMult = isVacWeekNow ? 1.0
-                        : consecOT >= 20 ? 1.15   // >4 sem HS : détachement sévèrement compromis
-                        : consecOT >= 12 ? 1.10   // >2.4 sem HS : détachement partiellement compromis
-                        : consecOT >= 5  ? 1.05   // >1 sem HS : premier signal Sonnentag
-                        : 1.0;                    // <5j : récupération weekend normale (baseline)
+                        : cumW >= 4.0 ? 1.15    // ≥4 sem surcharge : détachement sévèrement compromis
+                        : cumW >= 2.5 ? 1.10    // ≥2.5 sem surcharge : détachement partiellement compromis
+                        : cumW >= 1.0 ? 1.05    // ≥1 sem surcharge : premier signal Sonnentag
+                        : 1.0;                  // <1 sem : récupération weekend normale (baseline)
 
     const _pf      = norm._posteFactors || { fatF:1, strF:1, cvF:1, cogF:1 };
     // FIX BUG 4 : en vacances, atténuer fatSurchar et fatBurnout (repos actif)
