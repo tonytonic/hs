@@ -850,10 +850,14 @@ class DTEEngine {
       if (e && e.absent > 0) continue;
       // M1→M4 : recup ≥ 7h dans M1 = jour de repos complet → exclu des heures (comme absent)
       if (e && (e.recup >= 7)) continue;
-      // FIX : les jours de vacances comptent comme jours ouvrés à 0h HS
-      // (pas exclus du dénominateur — sinon la moyenne/jour gonfle artificiellement)
+      // FIX BUG : les jours de vacances comptent comme jours ouvrés
+      // — à 0h HS si pas d'heures saisies (dénominateur correct, pas de gonflage moyenne)
+      // — aux heures réelles si extra > 0 (M2 prime sur M1, cohérent avec consecOT/ferie/absent)
+      // Sinon : LMMJ vacances + 2h chacun → avgExtra = 0 → fatHS = 0 → fatigue = 0
+      // alors que consecOT compte bien 4j de HS → incohérence visible utilisateur
       const isVacDay = !!vacances[k];
-      sumExtra += isVacDay ? 0 : (e ? (e.extra || 0) : 0);
+      const _extraReal = e ? (e.extra || 0) : 0;
+      sumExtra += (isVacDay && _extraReal === 0) ? 0 : _extraReal;
       countWorkDays28++;
     }
     // avgExtraPerDay28 = HS/jour moyen sur 4 semaines
