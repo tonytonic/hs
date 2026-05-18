@@ -1593,6 +1593,7 @@ class DTEEngine {
       // Valeurs brutes pour les calculs
       _avgExtra7:     avgExtra7,
       _currentWeekExtra: sumExtra7, // HS RÉELLES saisies cette semaine (pas projection historique)
+      _prevWeekExtra: prevExtra,    // HS brut M1/M2 semaine N-1 (pour modulation déclaration N-1)
       _hasCurrentWeekData: hasAnyEntryThisWeek, // true si saisie réelle cette semaine
       _isProjection: !hasAnyEntryThisWeek && (count7 === 0), // avgExtra7 = projection 28j historique
       _avgH7:         avgH7,
@@ -1724,7 +1725,56 @@ class DTEEngine {
     const consecOT      = norm._consecOT || 0;
     // En vacances M4 : pas de HS actives → fatHS = 0 (la moyenne historique ne compte pas)
     const isVacWeekNow = norm._isVacationWeek || false;
-    const fatHS         = isVacWeekNow ? 0 : norm._avgExtra7 * 0.130 * c.fh; // INRS phases
+    let fatHS           = isVacWeekNow ? 0 : norm._avgExtra7 * 0.130 * c.fh; // INRS phases
+
+    // ── MODULATION N-1 SUBJECTIVE (Meijman & Mulder 1998, Sonnentag 2003) ──────
+    // L'utilisateur peut déclarer ses heures réelles de la semaine précédente via check-in.
+    // Si la déclaration diverge du brut M1/M2 (ex: récup non saisies, journées light),
+    // on module la charge biologique SANS toucher aux saisies contractuelles.
+    // - declaredH < seuil légal → sous-charge → décroissance accentuée (récup active)
+    // - declaredH < bruteH       → atténuation proportionnelle
+    // - declaredH >= bruteH      → pas de modulation (confirmation/dépassement)
+    try {
+      const _decl = JSON.parse(localStorage.getItem('DTE_N1_DECLARED') || '{}');
+      // Trouver la déclaration de la semaine précédente la plus récente
+      const _today = new Date();
+      const _prevMon = new Date(_today); _prevMon.setDate(_today.getDate() - 7);
+      // chercher la déclaration correspondant à la semaine N-1 (clé = lundi N-1)
+      const _candidates = Object.keys(_decl).sort().reverse();
+      const _declEntry = _candidates.length ? _decl[_candidates[0]] : null;
+      // Appliquer seulement si la déclaration est récente (≤ 8 jours) — sinon obsolète
+      if (_declEntry) {
+        const _savedAt = new Date(_declEntry.savedAt);
+        const _ageDays = (_today - _savedAt) / 86400000;
+        if (_ageDays <= 8) {
+          const _seuilN1 = _declEntry.baseline || 35;
+          const _declaredH = _declEntry.declaredH || _seuilN1;
+          // Brut estimé : prevWeekFull + seuil (heures totales semaine N-1)
+          const _bruteH = (norm._prevWeekExtra || 0) + _seuilN1;
+          if (_bruteH > 0 && _declaredH > 0) {
+            const _ratio = _declaredH / _bruteH;
+            let _modulator;
+            if (_declaredH < _seuilN1) {
+              // Sous le seuil légal : récupération active (Meijman)
+              _modulator = _ratio * 0.85;
+            } else if (_declaredH < _bruteH) {
+              // Entre seuil et brut : atténuation linéaire
+              _modulator = _ratio;
+            } else {
+              // Déclaration confirme ou dépasse le brut : pas d'atténuation
+              _modulator = 1.0;
+            }
+            _modulator = Math.max(0.4, Math.min(1.3, _modulator)); // bornes sécurité
+            fatHS = fatHS * _modulator;
+            if (window.__DTE_DEBUG !== false) {
+              console.log('%c[DTE-DBG] N-1 modulation', 'color:#0af;font-weight:bold',
+                { declaredH: _declaredH, bruteH: _bruteH, ratio: _ratio.toFixed(2),
+                  modulator: _modulator.toFixed(2), fatHS_modulated: fatHS.toFixed(3) });
+            }
+          }
+        }
+      }
+    } catch(_) {}
     const fatSommeil    = norm.sleepDebt * 0.35;           // Thompson 2022 : +14% cortisol/nuit courte
     const fatSurchar    = norm.surcharge * 0.12;
     const fatBurnout    = norm.burnout * 0.22;
