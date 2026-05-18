@@ -1043,10 +1043,6 @@ class DTEEngine {
     let consecOT = 0;
     let blankWeeks = 0;
     let consecRest = 0; // compteur récup/absent consécutifs (hors weekend)
-    let consecRestTotal = 0; // FIX UNIQUE : cumule TOUS types de repos (WE+férié+vac+récup)
-                             // Détecte les blocs de 3j+ qui doivent casser la chaîne consecOT
-                             // Ex : WE + Ven férié = 3j repos → break (cohérent Meijman 1998)
-                             // Reset uniquement quand on rencontre un jour OT effectif
     let lastBlankWeekMon = null; // FIX : évite de compter la même semaine plusieurs fois
     outer_loop: for (let i = 0; i < 90; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
@@ -1056,12 +1052,7 @@ class DTEEngine {
 
       // Jour de repos configuré (sam/dim ou autre) = toujours traversé en priorité
       // FIX : doit être AVANT vacances[k] sinon check-in "congé" le weekend = break erroné
-      // FIX UNIQUE : cumule dans consecRestTotal pour détecter blocs ≥3j
-      if (_isRestDow(dow)) {
-        consecRestTotal++;
-        if (consecRestTotal >= 3) break outer_loop;
-        continue;
-      }
+      if (_isRestDow(dow)) { continue; }
 
       // Vacances déclarées :
       // FIX : 1 jour isolé ≠ reset complet (Sonnentag : récupération partielle, pas totale).
@@ -1069,34 +1060,22 @@ class DTEEngine {
       // - Jour isolé (consecRest < 2) → traversé comme un récup simple
       // - 2+ jours consécutifs → break (vrai repos = reset biologique justifié)
       if (vacances[k]) {
-        if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // M2 dit travaillé
+        if (e && e.extra > 0) { consecRest = 0; consecOT++; continue; } // M2 dit travaillé
         consecRest++;
-        consecRestTotal++;
-        if (consecRest >= 2 || consecRestTotal >= 3) break;
+        if (consecRest >= 2) break;
         continue; // 1 seul jour off isolé = traversé, pas reset
       }
 
-      // Férié = pause neutre, cumule dans consecRestTotal
-      // FIX UNIQUE : si extra saisi → M2 prime sur férié (cohérent avec vacances)
-      if (specialDays[k] === 'ferie') {
-        if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // férié travaillé
-        consecRest = 0;
-        consecRestTotal++;
-        if (consecRestTotal >= 3) break outer_loop;
-        continue;
-      }
+      // Férié = pause neutre
+      if (specialDays[k] === 'ferie') { consecRest = 0; continue; }
 
-      // Récup / absent : 1j seul = continue, 2j consécutifs OU bloc total ≥3j = reset
-      // M2 prime sur M1 : si extra saisi malgré absent/recup, compter comme OT (cohérent avec férié et vacances)
+      // Récup / absent : 1j seul = continue, 2j consécutifs = reset
       if (e && (e.absent > 0 || e.recup > 0)) {
-        if (e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // absent/recup mais travaillé
         consecRest++;
-        consecRestTotal++;
-        if (consecRest >= 2 || consecRestTotal >= 3) break; // 2j consécutifs ou bloc 3j = reset complet
+        if (consecRest >= 2) break; // 2j consécutifs = reset complet
         continue; // 1 seul jour = traversé (comme un jour de weekend supplémentaire)
       }
       consecRest = 0;
-      // consecRestTotal n'est PAS resetté ici (jour normal sans HS préserve le bloc repos antérieur)
 
       // Semaine sans HS — FIX blankWeeks : compter par semaine, pas par jour
       // Bug : chaque jour d'une semaine sans HS incrémentait blankWeeks → break prématuré
@@ -1119,11 +1098,11 @@ class DTEEngine {
       }
       blankWeeks = 0;
       lastBlankWeekMon = null;
-      if (e && e.extra > 0) { consecRestTotal = 0; consecOT++; } // OT effectif → reset bloc repos
+      if (e && e.extra > 0) consecOT++;
     }
     if (window.__DTE_DEBUG !== false) {
       console.log('%c[DTE-DBG] consecOT final:', 'color:#fa0;font-weight:bold', consecOT,
-        '| consecRest:', consecRest, '| consecRestTotal:', consecRestTotal, '| blankWeeks:', blankWeeks);
+        '| consecRest:', consecRest, '| blankWeeks:', blankWeeks);
     }
 
     // ── CUMUL SEMAINES DE SURCHARGE — 2 passes pour éviter le bug d'ordre ────
