@@ -1076,7 +1076,10 @@ class DTEEngine {
 
       // Férié : compte dans le bloc repos total (peut combiner avec WE pour déclencher reset)
       // Ex : Ven-férié + Sam + Dim → consecRestTotal = 3 → break
+      // FIX3 : si des heures ont été saisies sur un férié (ex : Ascension travaillée)
+      //        → traiter comme jour HS, cohérent avec le bloc vacances (Meijman 1998)
       if (specialDays[k] === 'ferie') {
+        if (e && e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // férié travaillé
         consecRest = 0; // un férié seul ne compte pas comme "2 récups consécutifs"
         consecRestTotal++;
         if (consecRestTotal >= 3) break;
@@ -1084,7 +1087,10 @@ class DTEEngine {
       }
 
       // Récup / absent : 1j seul = continue, 2j consécutifs OU bloc >= 3j = reset
+      // FIX4 : si des heures extra sont saisies sur un jour absent/recup (M2 prime sur M1)
+      //        → traiter comme jour HS, cohérent avec vacances et ferie (Meijman 1998)
       if (e && (e.absent > 0 || e.recup > 0)) {
+        if (e.extra > 0) { consecRest = 0; consecRestTotal = 0; consecOT++; continue; } // absent mais travaillé (M2 prime)
         consecRest++;
         consecRestTotal++;
         if (consecRest >= 2 || consecRestTotal >= 3) break; // reset complet
