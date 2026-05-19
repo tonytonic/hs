@@ -1293,10 +1293,11 @@ class DTEEngine {
       // Un jour ouvré est repos uniquement si : WE, férié, vacances M4, absence M1, ou recup M1
       // noWorkThisWeek ne s'applique QU'à la semaine courante (i=0..6)
       const isCurrentWeek  = i < 7;
-      // FIX BUG VACANCES : un jour marqué vacances dans M4 EST un jour de repos,
-      // même si M1/M2 a des entrées pour ce jour (déclaration vacances = prioritaire)
-      const hasOverload    = e && (e.extra > 0) && !isWE && !isVac && !isM1FullRest;
-      const isRestDay = isWE || isVac || isFerie || isM1FullRest
+      // FIX FÉRIÉ + M2 : heures saisies sur un férié → jour travaillé (M2 prioritaire)
+      // vacances M4 reste prioritaire (déclaration volontaire), mais férié = automatique
+      const ferieWithHours = isFerie && e && e.extra > 0;
+      const hasOverload    = e && (e.extra > 0) && !isWE && !isVac && !isM1FullRest && (!isFerie || ferieWithHours);
+      const isRestDay = isWE || isVac || (isFerie && !ferieWithHours) || isM1FullRest
                      || (isCurrentWeek && !isWE && !hasOverload && noWorkThisWeek);
 
       if (hasOverload) break; // HS réelles (hors vacances/repos) → stop définitif
@@ -1367,7 +1368,9 @@ class DTEEngine {
         const k = localDK(dt);
         const e = days[k];
         if (e && e.absent) continue;
-        if (specialDays[k] === 'ferie' || vacances[k]) continue;
+        // FIX FÉRIÉ + M2 : heures saisies → jour travaillé
+        if (vacances[k]) continue;
+        if (specialDays[k] === 'ferie' && !(e && e.extra > 0)) continue;
         // FIX BUG 7 : ne compter que les jours avec une vraie entrée M1/M2
         // Un jour sans entrée (e=undefined) = pas de donnée = possible vacances non déclarées
         if (e) {
