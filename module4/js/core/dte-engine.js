@@ -715,16 +715,48 @@ class DTEEngine {
       for (const [mk, monthData] of Object.entries(d)) {
         if (!/^\d{4}-\d{2}$/.test(mk)) continue; // ignorer les clés non-mois
         const days = monthData.days || {};
-        // Calculer total heures travaillées dans ce mois
-        const totalHours = Object.values(days).reduce((s, h) => s + parseHours(h), 0);
-        const worked = totalHours + (r.contract / 4.33); // heures base + HS
+        // Calculer total heures HS dans ce mois (totalHours = HS uniquement, pas base contrat)
+        let totalHours = Object.values(days).reduce((s, h) => s + parseHours(h), 0);
         const daysCount = Object.keys(days).length;
+
+        // FIX M2 SAISIE MENSUELLE : si rawDays vide mais closing/worked renseigné
+        // → distribuer les HS uniformément sur les jours ouvrés du mois
+        // Problème : M2 permet de saisir une moyenne mensuelle sans détail jour par jour
+        //   → rawDays = {} → merge dans days[] = rien → cumulWeeks invisible → scores non impactés
+        // Fix : extraire les HS mensuelles depuis closing (HS totales du mois) ou worked
+        //   → distribuer sur les jours ouvrés → chaque jour visible pour la boucle cumulWeeks
+        let effectiveDays = days;
+        if (daysCount === 0) {
+          // Tenter de récupérer les HS depuis closing (fermeture mensuelle) ou worked brut
+          const closingHS = parseHours(monthData.closing || 0); // HS totales saisies en fermeture
+          const workedHS  = parseHours(monthData.worked  || 0); // alternative
+          const monthlyHS = closingHS > 0 ? closingHS : (workedHS > r.contract / 4.33 ? workedHS - r.contract / 4.33 : 0);
+          if (monthlyHS > 0) {
+            // Compter les jours ouvrés du mois (lun-ven, hors week-end)
+            const [y, m] = mk.split('-').map(Number);
+            const daysInMonth = new Date(y, m, 0).getDate();
+            const ouvreDays = [];
+            for (let d = 1; d <= daysInMonth; d++) {
+              const dow = new Date(y, m - 1, d).getDay();
+              if (dow !== 0 && dow !== 6) ouvreDays.push(String(d));
+            }
+            if (ouvreDays.length > 0) {
+              const hsPerDay = Math.round((monthlyHS / ouvreDays.length) * 100) / 100;
+              if (hsPerDay > 0) {
+                effectiveDays = {};
+                ouvreDays.forEach(d => { effectiveDays[d] = hsPerDay; });
+                totalHours = monthlyHS;
+              }
+            }
+          }
+        }
+
         r.months[mk] = {
           worked:  Math.round(totalHours * 100) / 100,
           daysOff: 0,
           paid:    monthData.paid || 0,
           carry:   monthData.carry || 0,
-          rawDays: days,
+          rawDays: effectiveDays, // FIX : jours distribués si saisie mensuelle sans détail
         };
         r.totalWorked += totalHours;
       }
