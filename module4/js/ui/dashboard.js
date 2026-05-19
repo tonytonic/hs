@@ -138,6 +138,7 @@ class Dashboard {
             const suffix = isProj ? ' — projection historique' : '';
             return '+'+v.toFixed(1)+'h/jour ('+impact+')'+suffix;
         }},
+        { label:'Jours consécutifs avec HS', key:'_consecOT',  fmt: v => v > 10 ? v+'j (WE non comptés) ⚠️ surcharge prolongée' : v > 5 ? v+'j (WE non comptés) — vigilance' : v+'j ouvrés avec HS' },
         { label:'Semaines de surcharge cumulées', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             if (vR <= 0) return 'Aucun cumul (rythme normal)';
@@ -174,7 +175,7 @@ class Dashboard {
       desc: 'Niveau de tension nerveuse et de cortisol estimé. Thompson 2022 : le cortisol monte +14% dès la 1ère nuit courte.',
       source: 'Thompson 2022 (Frontiers) · ANACT/INRS · ANI 2008',
       facteurs_heures: [
-        { label:'Heures hebdo vs optimal', key:'_enteredWeeklyH', fmt: v => (v||0).toFixed(0)+'h/sem (optimal : 35h)' },
+        { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: v => v.toFixed(0)+'h/sem (optimal : 35h)' },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
         { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => {
             const vR = Math.round(v * 10) / 10;
@@ -202,12 +203,12 @@ class Dashboard {
       desc: 'Votre efficacité estimée. Pencavel/Stanford 2014 : chute après 50h/sem, falaise à 55h.',
       source: 'Pencavel 2014 (Stanford) · OEM 2025 (Jang) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Heures hebdo (courbe Pencavel)', key:'_enteredWeeklyH', fmt: v => { v=v||0;
+        { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: v => {
             const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
             if (isRest) return '0h travaillées — potentiel de récupération actif';
             return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%');
         }},
-        { label:'Risque cognitif (≥52h)', key:'_enteredWeeklyH', fmt: v => (v||0)>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
+        { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
       ],
       facteurs_vie: [
         { label:'Énergie (check-in)',    key:'ci_energy', fmt: v => v!==undefined ? ['Épuisé','Fatigué','Neutre','Énergique','Excellent'][v]||'—' : 'Non renseigné' },
@@ -226,7 +227,7 @@ class Dashboard {
       desc: 'Risque relatif d\'AVC et cardiopathie basé sur OMS/OIT 2021. S\'accumule avec la durée d\'exposition.',
       source: 'OMS/OIT 2021 (Pega et al.) · Lancet 2021 (Ervasti) · Kivimäki 2015',
       facteurs_heures: [
-        { label:'Heures hebdo vs seuil OMS (48h)', key:'_enteredWeeklyH', fmt: v => { v=v||0; return v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)'; } },
+        { label:'Heures hebdo vs seuil OMS (48h)', key:'_recentWeeklyH', fmt: v => v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)' },
         { label:'Durée d\'exposition (dose-temps)', key:'_cumulMonths', fmt: v => {
             const vR = Math.round(v * 100) / 100; // 2 décimales pour voir le decay
             const norm3 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
@@ -259,7 +260,7 @@ class Dashboard {
       desc: 'Modifications structurelles cérébrales détectées par IRM à ≥52h/sem (Jang/Yonsei 2025). 17 régions affectées.',
       source: 'OEM 2025 — Jang W. et al., Yonsei University',
       facteurs_heures: [
-        { label:'Seuil ≥52h/sem', key:'_enteredWeeklyH', fmt: v => { v=v||0; return v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)'; } },
+        { label:'Seuil ≥52h/sem', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)' },
         { label:'Durée exposition', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             return vR > 0 ? vR+' sem. → risque ×'+Math.round(Math.min(2.0,(1+vR*0.05))*100)/100 : 'Sous le seuil';
@@ -281,45 +282,25 @@ class Dashboard {
       source: 'INRS · Sonnentag 2003 (J.Applied Psychology) · Nature 2025 (Fan)',
       facteurs_heures: [
         { label:'Fatigue accumulée', key:'_cumulWeeks', fmt: v => {
-            const norm5 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
-            const isVacWeek    = norm5&&norm5._isVacationWeek;
-            // FIX : la restauration active s'applique aussi aux semaines sous le seuil (34h, férié…)
-            // Avant : seules les semaines _isVacationWeek affichaient le message positif.
-            // Après : toute semaine où weeklyH < seuil = récupération active (Meijman & Mulder 1998)
-            const seuil5   = (norm5&&norm5._contract) || 35;
-            const weeklyH5 = (norm5&&norm5._weeklyH7)  || 99;
-            const isRecovering = isVacWeek || (weeklyH5 < seuil5);
+            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
             const vR = Math.round(v * 10) / 10;
-            if (isRecovering && vR > 0) {
+            if (isRest && vR > 0) {
               // Seuil P2 (phase vigilance) = 4 semaines cumulées — INRS phases RPS
               // Objectif : sortir de la zone surcharge (vR → <4 sem), pas atteindre 0
-              // FIX coefficients : alignés sur dte-engine.js (0.45/sem vac, 0.12/sem normal)
-              // Avant : 0.25/sem et 0.10/sem → estimation trop optimiste (sous-estimait le temps)
+              // Vacances : -0.25/sem = -0.25/7j. Semaines normales : -0.10/sem.
               const surplusVersP2 = Math.max(0, vR - 4);
+              const joursVac   = Math.round(surplusVersP2 * 7 / 0.25);  // jours de vacances
+              const semNorm    = Math.round(surplusVersP2 / 0.10);       // semaines normales
               if (surplusVersP2 <= 0) {
-                const label = isVacWeek ? '✓ Sous le seuil P2 — récupération rapide en cours (' + vR + ' sem.)' :
-                              '✓ Sous le seuil P2 — semaine légère, restauration en bonne voie (' + vR + ' sem.)';
-                return label;
+                return '✓ Sous le seuil P2 — restauration en bonne voie (' + vR + ' sem.)';
               }
-              if (isVacWeek) {
-                const joursVac = Math.round(surplusVersP2 / 0.45 * 7); // 0.45/sem = taux vacances
-                return '↓ Restauration active (congés) — ~' + joursVac + 'j de repos' +
-                       ' pour sortir de P2 (' + vR + ' sem. cumulées)';
-              } else {
-                const semNorm = Math.ceil(surplusVersP2 / 0.12); // 0.12/sem = taux semaine normale
-                const joursVac = Math.round(surplusVersP2 / 0.45 * 7);
-                return '↓ Restauration active (charge réduite) — ~' + semNorm + ' sem. légères' +
-                       ' ou ~' + joursVac + 'j de congés' +
-                       ' pour sortir de P2 (' + vR + ' sem. cumulées)';
-              }
+              return '↓ Restauration active — ~' + joursVac + 'j de repos' +
+                     (semNorm > 0 ? ' ou ' + semNorm + ' sem. normales' : '') +
+                     ' pour sortir de surcharge (' + vR + ' sem. cumulées)';
             }
-            if (vR <= 0) return 'Normale : pas de surcharge accumulée';
-            // Semaine chargée : message neutre avec contexte de phase
-            if (vR < 4) return 'Légère : ' + vR + ' sem. (phase P1 — vigilance)';
-            if (vR < 8) return 'Réduite : ' + vR + ' sem. (phase P2 — fatigue chronique)';
-            return 'Critique : ' + vR + ' sem. (phase P3+ — surmenage)';
+            return vR > 0 ? 'Réduite : '+vR+' sem. de surcharge' : 'Normale : pas de surcharge';
         }},
-        { label:'Base de récupération', key:'_enteredWeeklyH', fmt: v => (v||0)>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
+        { label:'Base de récupération', key:'_recentWeeklyH', fmt: v => v>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
       ],
       facteurs_vie: [
         { label:'Sommeil (check-in)',  key:'ci_sleep',  fmt: v => v!==undefined ? ['Très perturbé','Perturbé','Moyen','Bon','Excellent'][v]||'—' : 'Non renseigné' },
