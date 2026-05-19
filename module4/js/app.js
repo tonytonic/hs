@@ -689,6 +689,25 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // ── STORAGE EVENT — détection changements M1/M2 cross-tab ET même onglet ──
+  // LIVE SYNC rate les modifs de clés non surveillées (ex: année passée M2)
+  // ou les changements de même hash. Fix : deux mécanismes complémentaires.
+  const _watchedKeys = ["DATA_REPORT_", "CA_HS_TRACKER_V1_DATA_", "DTE_CHECKIN_", "DTE_VACANCES", "DTE_REST_DAYS"];
+  // 1. Cross-tab : event natif storage (autre onglet écrit)
+  window.addEventListener("storage", (e) => {
+    if (!e.key || !_watchedKeys.some(p => e.key.startsWith(p))) return;
+    _syncHash = "";
+    try { runAnalysis(); } catch(_) {}
+  });
+  // 2. Même onglet : patch setItem pour invalider le hash immédiatement
+  (function() {
+    const _origSet = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(key, value) {
+      _origSet(key, value);
+      if (_watchedKeys.some(p => key.startsWith(p))) _syncHash = "";
+    };
+  })();
+
   runAnalysis();
   scheduleEndOfDaySync();
   showWelcomeIfNeeded();
@@ -703,12 +722,18 @@ document.addEventListener('DOMContentLoaded', function () {
       // Hash rapide des données M1 pour détecter un vrai changement
       const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
       const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
-      const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '';
+      // FIX CONTINGENT : inclure toutes les clés M2 dans le hash (pas seulement l'année active)
+      const _m2AllKeys = [];
+      for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('CA_HS_TRACKER_V1_DATA_'))_m2AllKeys.push(localStorage.getItem(k)||'');}
+      const m2raw = _m2AllKeys.join('|');
       // Inclure la date du jour dans le hash → recalcul automatique chaque nouveau jour
       // sans ça, consecRestDays/consecNonOTDays ne progressent pas sans nouvelle saisie
       const _today = new Date().toISOString().slice(0,10);
       const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
-      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr + '|' + _today + '|' + _ciDate;
+      // FIX HASH : basé sur contenu réel et non longueur — ajouter/supprimer des h
+      // de même longueur ne déclenchait pas de re-analyse
+      const _hashStr = (s) => { let h=0; for(let i=0;i<Math.min(s.length,2000);i++)h=(h*31+s.charCodeAt(i))>>>0; return h+'|'+s.length; };
+      const hash  = _hashStr(m1raw) + '|' + _hashStr(m2raw) + '|' + yr + '|' + _today + '|' + _ciDate;
       if (hash === _syncHash) return; // rien changé → pas de re-analyse
       _syncHash = hash;
 
