@@ -1958,24 +1958,26 @@ class DTEEngine {
     // de vacances de produire un effet visible sur recCeiling.
     // Avant : recCeiling max 85% après 8 sem cumul → perçu comme "plafond"
     // Après : recCeiling max 88% après 8 sem cumul, 91% après 12 sem
-    // ── INERTIE POST-REPOS v3 — progressif dès cumW >= 1 (anti-falaise) ──────
-    // FIX EFFET FALAISE : seuil >= 3 créait un cliff brutal (cumW=2.9 → rien, cumW=3.0 → +40%)
-    // Avant : cumW=2.9 → fatFloor=0%, recCeiling=100% → score 99 irréaliste
-    //         cumW=3.0 → fatFloor=15%, recCeiling=88% → score 74 abrupt
-    // Après : progressif dès 1 sem, multiplicateurs croissants linéairement (P1→P3)
-    //   cumW=1 : fatFloor=1.9%, recCeiling=99% | cumW=2.9 : fat~8%, rec~95% | cumW=8 : fat=40%, rec=68%
-    // Références : Meijman & Mulder 1998 — effet de charge dès la 1ère semaine
-    //              INRS phases RPS : P1 (vigilance) dès 1 sem cumulée
+    // ── INERTIE POST-REPOS v4 — inertia séparée fat/rec ──────────────────────
+    // FIX : recCeiling trop peu sensible à l'historique (cumW=2.9 → plafond 95%, presque aucun effet)
+    // Cause : inertia=cumW/8 trop douce → à 2.9 sem inertia=0.36 → rec reste à 93%
+    // Solution : inertia récup = cumW/4 (sature à P2 entry = 4 sem, pas 8 sem)
+    //   cumW=1  : rec≤98% (1 sem légère, presque pas d'impact)
+    //   cumW=2.9: rec≤89% (surcharge visible, recovery contrainte)
+    //   cumW=4  : rec≤82% (P2 établi, contrainte forte)
+    //   cumW=8  : rec≤68% (identique à avant — calibration P3 préservée)
+    // Référence : INRS phases RPS — P2 entry à 4 sem → récup structurellement limitée
     if (cumW >= 1) {
-      const inertia = Math.min(1, cumW / 8);
-      // Multiplicateurs progressifs : valeur basse en P1 (1-4 sem), valeur pleine en P2+ (4-8 sem)
-      // t = position normalisée entre 1 sem (t=0) et 8 sem (t=1)
       const t = Math.min(1, (cumW - 1) / 7);
-      const fatMult    = 0.15 + t * 0.25;  // 0.15 à 1 sem → 0.40 à 8 sem (P1: léger, P2+: plein)
-      const recMult    = 0.08 + t * 0.24;  // 0.08 à 1 sem → 0.32 à 8 sem
-      const fatFloor   = inertia * fatMult;
+      // Fatigue floor : inertia douce (cumW/8) — progression P1→P3
+      const fatInertia = Math.min(1, cumW / 8);
+      const fatMult    = 0.15 + t * 0.25;  // 0.15 à 1 sem → 0.40 à 8 sem
+      const fatFloor   = fatInertia * fatMult;
       if (fatFinal < fatFloor) fatFinal = fatFloor;
-      const recCeiling = 1.0 - inertia * recMult;
+      // Recovery ceiling : inertia plus agressive (cumW/4) — sature dès P2 entry
+      const recInertia = Math.min(1, cumW / 4);
+      const recMult    = 0.08 + t * 0.24;  // 0.08 à 1 sem → 0.32 à 8 sem
+      const recCeiling = 1.0 - recInertia * recMult;
       if (recFinal > recCeiling) recFinal = recCeiling;
     }
 
