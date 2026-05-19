@@ -174,7 +174,7 @@ class Dashboard {
       desc: 'Niveau de tension nerveuse et de cortisol estimé. Thompson 2022 : le cortisol monte +14% dès la 1ère nuit courte.',
       source: 'Thompson 2022 (Frontiers) · ANACT/INRS · ANI 2008',
       facteurs_heures: [
-        { label:'Heures hebdo vs optimal', key:'_enteredWeeklyH', fmt: v => v.toFixed(0)+'h/sem (optimal : 35h)' },
+        { label:'Heures hebdo vs optimal', key:'_enteredWeeklyH', fmt: v => (v||0).toFixed(0)+'h/sem (optimal : 35h)' },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
         { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => {
             const vR = Math.round(v * 10) / 10;
@@ -202,12 +202,12 @@ class Dashboard {
       desc: 'Votre efficacité estimée. Pencavel/Stanford 2014 : chute après 50h/sem, falaise à 55h.',
       source: 'Pencavel 2014 (Stanford) · OEM 2025 (Jang) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Heures hebdo (courbe Pencavel)', key:'_enteredWeeklyH', fmt: v => {
+        { label:'Heures hebdo (courbe Pencavel)', key:'_enteredWeeklyH', fmt: v => { v=v||0;
             const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
             if (isRest) return '0h travaillées — potentiel de récupération actif';
             return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%');
         }},
-        { label:'Risque cognitif (≥52h)', key:'_enteredWeeklyH', fmt: v => v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
+        { label:'Risque cognitif (≥52h)', key:'_enteredWeeklyH', fmt: v => (v||0)>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
       ],
       facteurs_vie: [
         { label:'Énergie (check-in)',    key:'ci_energy', fmt: v => v!==undefined ? ['Épuisé','Fatigué','Neutre','Énergique','Excellent'][v]||'—' : 'Non renseigné' },
@@ -226,7 +226,7 @@ class Dashboard {
       desc: 'Risque relatif d\'AVC et cardiopathie basé sur OMS/OIT 2021. S\'accumule avec la durée d\'exposition.',
       source: 'OMS/OIT 2021 (Pega et al.) · Lancet 2021 (Ervasti) · Kivimäki 2015',
       facteurs_heures: [
-        { label:'Heures hebdo vs seuil OMS (48h)', key:'_enteredWeeklyH', fmt: v => v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)' },
+        { label:'Heures hebdo vs seuil OMS (48h)', key:'_enteredWeeklyH', fmt: v => { v=v||0; return v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)'; } },
         { label:'Durée d\'exposition (dose-temps)', key:'_cumulMonths', fmt: v => {
             const vR = Math.round(v * 100) / 100; // 2 décimales pour voir le decay
             const norm3 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
@@ -259,7 +259,7 @@ class Dashboard {
       desc: 'Modifications structurelles cérébrales détectées par IRM à ≥52h/sem (Jang/Yonsei 2025). 17 régions affectées.',
       source: 'OEM 2025 — Jang W. et al., Yonsei University',
       facteurs_heures: [
-        { label:'Seuil ≥52h/sem', key:'_enteredWeeklyH', fmt: v => v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)' },
+        { label:'Seuil ≥52h/sem', key:'_enteredWeeklyH', fmt: v => { v=v||0; return v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)'; } },
         { label:'Durée exposition', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             return vR > 0 ? vR+' sem. → risque ×'+Math.round(Math.min(2.0,(1+vR*0.05))*100)/100 : 'Sous le seuil';
@@ -319,7 +319,7 @@ class Dashboard {
             if (vR < 8) return 'Réduite : ' + vR + ' sem. (phase P2 — fatigue chronique)';
             return 'Critique : ' + vR + ' sem. (phase P3+ — surmenage)';
         }},
-        { label:'Base de récupération', key:'_enteredWeeklyH', fmt: v => v>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
+        { label:'Base de récupération', key:'_enteredWeeklyH', fmt: v => (v||0)>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
       ],
       facteurs_vie: [
         { label:'Sommeil (check-in)',  key:'ci_sleep',  fmt: v => v!==undefined ? ['Très perturbé','Perturbé','Moyen','Bon','Excellent'][v]||'—' : 'Non renseigné' },
