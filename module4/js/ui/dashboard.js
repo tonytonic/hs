@@ -281,23 +281,43 @@ class Dashboard {
       source: 'INRS · Sonnentag 2003 (J.Applied Psychology) · Nature 2025 (Fan)',
       facteurs_heures: [
         { label:'Fatigue accumulée', key:'_cumulWeeks', fmt: v => {
-            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
+            const norm5 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
+            const isVacWeek    = norm5&&norm5._isVacationWeek;
+            // FIX : la restauration active s'applique aussi aux semaines sous le seuil (34h, férié…)
+            // Avant : seules les semaines _isVacationWeek affichaient le message positif.
+            // Après : toute semaine où weeklyH < seuil = récupération active (Meijman & Mulder 1998)
+            const seuil5   = (norm5&&norm5._contract) || 35;
+            const weeklyH5 = (norm5&&norm5._weeklyH7)  || 99;
+            const isRecovering = isVacWeek || (weeklyH5 < seuil5);
             const vR = Math.round(v * 10) / 10;
-            if (isRest && vR > 0) {
+            if (isRecovering && vR > 0) {
               // Seuil P2 (phase vigilance) = 4 semaines cumulées — INRS phases RPS
               // Objectif : sortir de la zone surcharge (vR → <4 sem), pas atteindre 0
-              // Vacances : -0.25/sem = -0.25/7j. Semaines normales : -0.10/sem.
+              // FIX coefficients : alignés sur dte-engine.js (0.45/sem vac, 0.12/sem normal)
+              // Avant : 0.25/sem et 0.10/sem → estimation trop optimiste (sous-estimait le temps)
               const surplusVersP2 = Math.max(0, vR - 4);
-              const joursVac   = Math.round(surplusVersP2 * 7 / 0.25);  // jours de vacances
-              const semNorm    = Math.round(surplusVersP2 / 0.10);       // semaines normales
               if (surplusVersP2 <= 0) {
-                return '✓ Sous le seuil P2 — restauration en bonne voie (' + vR + ' sem.)';
+                const label = isVacWeek ? '✓ Sous le seuil P2 — récupération rapide en cours (' + vR + ' sem.)' :
+                              '✓ Sous le seuil P2 — semaine légère, restauration en bonne voie (' + vR + ' sem.)';
+                return label;
               }
-              return '↓ Restauration active — ~' + joursVac + 'j de repos' +
-                     (semNorm > 0 ? ' ou ' + semNorm + ' sem. normales' : '') +
-                     ' pour sortir de surcharge (' + vR + ' sem. cumulées)';
+              if (isVacWeek) {
+                const joursVac = Math.round(surplusVersP2 / 0.45 * 7); // 0.45/sem = taux vacances
+                return '↓ Restauration active (congés) — ~' + joursVac + 'j de repos' +
+                       ' pour sortir de P2 (' + vR + ' sem. cumulées)';
+              } else {
+                const semNorm = Math.ceil(surplusVersP2 / 0.12); // 0.12/sem = taux semaine normale
+                const joursVac = Math.round(surplusVersP2 / 0.45 * 7);
+                return '↓ Restauration active (charge réduite) — ~' + semNorm + ' sem. légères' +
+                       ' ou ~' + joursVac + 'j de congés' +
+                       ' pour sortir de P2 (' + vR + ' sem. cumulées)';
+              }
             }
-            return vR > 0 ? 'Réduite : '+vR+' sem. de surcharge' : 'Normale : pas de surcharge';
+            if (vR <= 0) return 'Normale : pas de surcharge accumulée';
+            // Semaine chargée : message neutre avec contexte de phase
+            if (vR < 4) return 'Légère : ' + vR + ' sem. (phase P1 — vigilance)';
+            if (vR < 8) return 'Réduite : ' + vR + ' sem. (phase P2 — fatigue chronique)';
+            return 'Critique : ' + vR + ' sem. (phase P3+ — surmenage)';
         }},
         { label:'Base de récupération', key:'_recentWeeklyH', fmt: v => v>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
       ],
