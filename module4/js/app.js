@@ -122,7 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - dangers * 5 - alertes * 2))) };
+        // Plancher bio : jamais 100 (Chrousos 2009 — cortisol basal toujours présent)
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - dangers * 5 - alertes * 2))) };
       }
 
       DTE.notifs.checkAndNotify(state, risks);
@@ -242,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const d2 = r2.filter(r => r.level === 'CRITIQUE').length;
         const al = r2.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - d2*5 - al*2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - d2*5 - al*2))) };
       }
       DTE.dashboard.render(s, r2, a2);
       if (DTE.twin) DTE.twin.update(s.scores);
