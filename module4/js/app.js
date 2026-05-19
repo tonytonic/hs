@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - dangers * 5 - alertes * 2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - dangers * 5 - alertes * 2))) };
       }
 
       DTE.notifs.checkAndNotify(state, risks);
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const d2 = r2.filter(r => r.level === 'CRITIQUE').length;
         const al = r2.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - d2*5 - al*2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - d2*5 - al*2))) };
       }
       DTE.dashboard.render(s, r2, a2);
       if (DTE.twin) DTE.twin.update(s.scores);
@@ -688,6 +688,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  // FIX LECTURE PASSÉ — storage events pour détecter modifs M1/M2 instantanément
+  const _watchedPfx = ['DATA_REPORT_', 'CA_HS_TRACKER_V1_DATA_', 'DTE_CHECKIN_', 'DTE_VACANCES', 'DTE_REST_DAYS'];
+  // Cross-tab : autre onglet écrit
+  window.addEventListener('storage', (ev) => {
+    if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
+    _syncHash = ''; try { runAnalysis(); } catch(_) {}
+  });
+  // Même onglet : intercepter setItem
+  (function(){ const _orig = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k,v){ _orig(k,v);
+      if(_watchedPfx.some(p=>k.startsWith(p))) _syncHash='';
+    };
+  })();
+
   runAnalysis();
   scheduleEndOfDaySync();
   showWelcomeIfNeeded();
@@ -702,12 +716,14 @@ document.addEventListener('DOMContentLoaded', function () {
       // Hash rapide des données M1 pour détecter un vrai changement
       const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
       const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
-      const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '';
-      // Inclure la date du jour dans le hash → recalcul automatique chaque nouveau jour
-      // sans ça, consecRestDays/consecNonOTDays ne progressent pas sans nouvelle saisie
+      // FIX : surveiller TOUTES les années M2 (pas seulement yr actif)
+      const _m2keys = []; for(let _i=0;_i<localStorage.length;_i++){const _k=localStorage.key(_i);if(_k&&_k.startsWith('CA_HS_TRACKER_V1_DATA_'))_m2keys.push(localStorage.getItem(_k)||'');}
+      const m2raw = _m2keys.join('|');
       const _today = new Date().toISOString().slice(0,10);
       const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
-      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr + '|' + _today + '|' + _ciDate;
+      // FIX : hash sur contenu réel (pas longueur) — ajouter/supprimer mêmes octets = même longueur
+      const _hs = (s) => { let h=0; for(let i=0;i<Math.min(s.length,4000);i++)h=(h*31+s.charCodeAt(i))>>>0; return h+'_'+s.length; };
+      const hash  = _hs(m1raw) + '|' + _hs(m2raw) + '|' + yr + '|' + _today + '|' + _ciDate;
       if (hash === _syncHash) return; // rien changé → pas de re-analyse
       _syncHash = hash;
 
