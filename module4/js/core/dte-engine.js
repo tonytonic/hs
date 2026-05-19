@@ -698,8 +698,10 @@ class DTEEngine {
               if (!mv || typeof mv !== 'object') continue;
               const newDays  = Object.keys(mv.days || {}).length;
               const prevDays = Object.keys((d[mk] || {}).days || {}).length;
-              if (newDays > prevDays) d[mk] = mv; // préférer le mois avec plus de données
-              else if (!d[mk]) d[mk] = mv;         // ou prendre si absent
+              // FIX : toujours écraser si plus de jours OU si même nombre mais source plus récente
+              // Avant : newDays <= prevDays → ignoré même si données modifiées
+              if (newDays >= prevDays) d[mk] = mv; // >= : prendre la version la plus récente
+              else if (!d[mk]) d[mk] = mv;
             }
             hasAny = true;
           } catch(_) {}
@@ -1143,7 +1145,10 @@ class DTEEngine {
         // FIX VACANCES : jour vacances = 0h HS (même si M1/M2 a des entrées)
         const isVacDay = !!vacances[k];
         weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
-        hasAnyDay = true;
+        // FIX hasAnyDay : true uniquement si entrée M1/M2 réelle sur ce jour
+        // Avant : hasAnyDay=true pour tout jour dans la plage → semaine sans données = seuil exact
+        // → hsReelles=0 → pas de contribution même si M2 a des données non lues
+        if (e) hasAnyDay = true;
         if (e && e.extra > 0 && !isVacDay) daysLogged++;
       }
       // FIX EXTRAPOLATION : semaine courante → weekH réel (HS faites + base jours restants)
@@ -1206,7 +1211,7 @@ class DTEEngine {
         // FIX VACANCES : jour vacances = 0h HS
         const isVacDay = !!vacances[k];
         weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
-        hasAnyDay = true;
+        if (e) hasAnyDay = true; // FIX passe 2 : entrée réelle requise
       }
       // FIX : isM1RestWeekP2 requiert majorité des jours absents (même logique que Passe 1)
       // 1 jour absent seul (ex: lundi férié marqué absent) ne = pas semaine de vacances
