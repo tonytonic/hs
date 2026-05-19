@@ -943,13 +943,18 @@ class DTEEngine {
     if (count7 >= 1 || sumExtra7 > 0) {
       // Des HS saisies cette semaine → combiner réel + mémoire biologique semaine N-1
       // Sonnentag 2003 : la charge de la semaine précédente persiste biologiquement.
-      // Avant ce fix : saisir 2h lundi écrasait la mémoire N-1 → score chutait absurdement.
-      // Maintenant : sumExtra7 (réel) + projection N-1 résiduelle pondérée par jour de semaine.
       // Lun → 1/5 réel + 4/5 projeté ; Ven → 5/5 réel + 0/5 projeté.
-      if (todayDowA >= 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
+      //
+      // FIX LUNDI : todayDowA=1 → _ratio=0.2 → weeklyExtra = sumExtra7 + prevWeekFull*0.8
+      // → incohérent : lundi 2h sup + N-1 10h sup = 10h affichés au lieu de 2h réels.
+      // Sur le SEUL premier jour de semaine, pas de blend N-1 : on affiche les HS réelles.
+      // La mémoire biologique N-1 est déjà capturée via cumulWeeks/cumulMonths/stressExt.
+      if (todayDowA > 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
+        // Mar→Ven : blend progressif réel + résidu N-1 (comportement d'origine)
         const _ratio = todayDowA / workDaysPerWeek;
         weeklyExtra = sumExtra7 + prevWeekFull * (1 - _ratio);
       } else {
+        // Lundi avec saisies : heures réelles uniquement, pas de dilution N-1
         weeklyExtra = sumExtra7;
       }
     } else if (todayDowA === 1 && prevWeekFull !== null) {
@@ -957,6 +962,12 @@ class DTEEngine {
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
       // Mode hebdomadaire : une seule entrée Monday = la semaine entière → traité comme semaine complète
       weeklyExtra = prevWeekFull;
+    } else if (todayDowA === 1 && prevWeekFull === null && countWorkDays28 >= 5) {
+      // FIX LUNDI SANS N-1 : pas de données M1 semaine précédente (< 3 jours enregistrés)
+      // Avant : weeklyExtra28 * (1/5) = historique × 0.2 → ex. 8h/sem → 1.6h affiché → très sous-estimé
+      // Après : weeklyExtra28 complet → meilleure estimation de la semaine précédente
+      // Le scaling progressif est réservé au milieu de semaine (mar→ven), pas au lundi
+      weeklyExtra = weeklyExtra28;
     } else if (countWorkDays28 >= 5) {
       // FIX no-entry mid-week : estimation PROPORTIONNELLE au jour de semaine
       // Avant : weeklyExtra28 plein → score chute de 72→54 en milieu de semaine sans saisie
@@ -1954,17 +1965,24 @@ class DTEEngine {
     // de vacances de produire un effet visible sur recCeiling.
     // Avant : recCeiling max 85% après 8 sem cumul → perçu comme "plafond"
     // Après : recCeiling max 88% après 8 sem cumul, 91% après 12 sem
-    // ── INERTIE POST-REPOS v2 — mémoire biologique renforcée ─────────────────
-    // PATCH calibration : diviseur ÷8 (÷12 trop permissif → récup trop rapide)
-    // fatFloor ×0.40 : à 8 sem → plancher 40% (cible vacances : 40-45%)
-    // recCeiling ×0.32 : à 8 sem → plafond 68% (cible vacances : 60-70%)
-    // Note : recCeiling s'applique APRÈS vacationFloor → l'écrase si nécessaire.
-    // Combiné avec USURE (−12% à cumW=8) → récupération hors vacances ≈ 56% ✓
-    if (cumW >= 3) {
-      const inertia = Math.min(1, cumW / 8); // PATCH ÷8 : INRS P2/P3 réaliste
-      const fatFloor = inertia * 0.40; // PATCH ×0.40 : plancher dette (8 sem → 40%)
+    // ── INERTIE POST-REPOS v3 — progressif dès cumW >= 1 (anti-falaise) ──────
+    // FIX EFFET FALAISE : seuil >= 3 créait un cliff brutal (cumW=2.9 → rien, cumW=3.0 → +40%)
+    // Avant : cumW=2.9 → fatFloor=0%, recCeiling=100% → score 99 irréaliste
+    //         cumW=3.0 → fatFloor=15%, recCeiling=88% → score 74 abrupt
+    // Après : progressif dès 1 sem, multiplicateurs croissants linéairement (P1→P3)
+    //   cumW=1 : fatFloor=1.9%, recCeiling=99% | cumW=2.9 : fat~8%, rec~95% | cumW=8 : fat=40%, rec=68%
+    // Références : Meijman & Mulder 1998 — effet de charge dès la 1ère semaine
+    //              INRS phases RPS : P1 (vigilance) dès 1 sem cumulée
+    if (cumW >= 1) {
+      const inertia = Math.min(1, cumW / 8);
+      // Multiplicateurs progressifs : valeur basse en P1 (1-4 sem), valeur pleine en P2+ (4-8 sem)
+      // t = position normalisée entre 1 sem (t=0) et 8 sem (t=1)
+      const t = Math.min(1, (cumW - 1) / 7);
+      const fatMult    = 0.15 + t * 0.25;  // 0.15 à 1 sem → 0.40 à 8 sem (P1: léger, P2+: plein)
+      const recMult    = 0.08 + t * 0.24;  // 0.08 à 1 sem → 0.32 à 8 sem
+      const fatFloor   = inertia * fatMult;
       if (fatFinal < fatFloor) fatFinal = fatFloor;
-      const recCeiling = 1.0 - inertia * 0.32; // PATCH ×0.32 : plafond récup (8 sem → 68%)
+      const recCeiling = 1.0 - inertia * recMult;
       if (recFinal > recCeiling) recFinal = recCeiling;
     }
 
@@ -1972,12 +1990,14 @@ class DTEEngine {
     // Le cortisol basal reste chroniquement élevé après surcharge prolongée.
     // McEwen 1998 : allostatic load → seuil de stress physiologique durablement rehaussé.
     // Sluiter 2001 : "neuroendocrine recovery from sustained work demands = several weeks"
-    // → stress ne peut pas tomber à 0 dès la 1ère semaine de repos après P2/P3.
-    // Plancher : 28% à 8 sem (cible post-surcharge : 25–40%).
-    // Même logique que fatFloor dans l'inertia block — appliquer même pendant vacances.
-    if (cumW >= 3) {
+    // → stress ne peut pas tomber à 0 dès la 1ère semaine de repos après P1/P2/P3.
+    // FIX EFFET FALAISE : progressif dès cumW >= 1 (vs >= 3 avant)
+    // Plancher : 0.08 à 1 sem → 0.28 à 8 sem (McEwen 1998 — allostatic load progressif)
+    if (cumW >= 1) {
       const stressInertia = Math.min(1, cumW / 8);
-      const stressFloor = stressInertia * 0.28; // 8 sem → 28%, 4 sem → 14%, 3 sem → 10%
+      const t2 = Math.min(1, (cumW - 1) / 7);
+      const stressMult  = 0.08 + t2 * 0.20; // 0.08 à 1 sem → 0.28 à 8 sem
+      const stressFloor = stressInertia * stressMult;
       strFinal = Math.max(strFinal, stressFloor);
     }
 
@@ -1996,7 +2016,11 @@ class DTEEngine {
     // ── DÉGRADATION RÉCUPÉRATION — usure progressive INRS phases P2/P3 ───────────
     // En surcharge active : recovery structurellement plafonnée par la dette accumulée.
     // Seuil 3 sem : entrée P1→P2 (INRS). Seuil 6 sem : P2→P3 établi (dégradation amplifiée).
-    if (cumW >= 3 && !isVacWeekNow) recFinal = Math.max(0, recFinal - 0.02); // −2% dès 3 sem
+    // ── DÉGRADATION RÉCUPÉRATION — usure progressive INRS phases P1→P3 ─────────────
+    // FIX : seuil abaissé à >= 1 (progressif) pour cohérence avec l'inertia block
+    // Avant : rien à cumW=2.9, saut à -2% à cumW=3.0 (effet falaise)
+    // Après : dégradation proportionnelle dès 1 sem (légère en P1, marquée en P2/P3)
+    if (cumW >= 1 && !isVacWeekNow) recFinal = Math.max(0, recFinal - Math.min(0.02, cumW * 0.007)); // ~0.7%/sem → 2% à 3 sem
     if (cumW >= 6 && !isVacWeekNow) recFinal = Math.max(0, recFinal - 0.03); // −3% de plus ≥6 sem
 
     // ── PLAFOND LONG TERME — dette physiologique irréductible (OMS/INRS/McEwen) ──
