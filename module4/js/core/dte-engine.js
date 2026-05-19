@@ -941,23 +941,14 @@ class DTEEngine {
     const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // Des HS saisies cette semaine → combiner réel + mémoire biologique semaine N-1
-      // Sonnentag 2003 : la charge de la semaine précédente persiste biologiquement.
-      // Lun → 1/5 réel + 4/5 projeté ; Ven → 5/5 réel + 0/5 projeté.
+      // Des HS saisies cette semaine → heures réelles UNIQUEMENT (pas de blend N-1)
       //
-      // ARCHITECTURE (fix final) : deux valeurs séparées
-      //   weeklyExtra       → calcul BIOLOGIQUE (blend N-1 inclus) → scores fatigue/stress/perf
-      //   _enteredWeeklyH   → affichage UTILISATEUR (HS réelles saisies uniquement)
-      // Avant : même valeur pour les deux → soit affichage faux (41h au lieu de 39h)
-      //         soit scores insensibles à l'historique (45h sem passée invisible)
-      if (todayDowA > 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
-        // Mar→Ven : blend progressif réel + résidu N-1 (comportement biologique d'origine)
-        const _ratio = todayDowA / workDaysPerWeek;
-        weeklyExtra = sumExtra7 + prevWeekFull * (1 - _ratio);
-      } else {
-        // Lundi : heures réelles + pas de blend (fix lundi)
-        weeklyExtra = sumExtra7;
-      }
+      // FIX ARCHITECTURAL : le blend "sumExtra7 + prevWeekFull*(1-ratio)" était trop agressif.
+      // Ex: N-1=45h (10h extra) + mardi 4h saisis → weeklyH = 35+10 = 45h → score=2 (catastrophe)
+      // La mémoire biologique N-1 est capturée via cumulWeeks/cumulAmp/sonnentagMult/fatCumulative.
+      // On ne la double-compte PAS dans weeklyH.
+      // Sonnentag 2003 : le "carry-over" passe par le compteur de cumul, pas par le recalcul des h.
+      weeklyExtra = sumExtra7;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
