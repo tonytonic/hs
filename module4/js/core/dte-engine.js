@@ -847,13 +847,13 @@ class DTEEngine {
       const dow = d.getDay();
       if (_isRestDowAt(dow, d)) continue; // FIX VERSIONING : config active à cette date historique
       const k = localDK(d);
-      if (specialDays[k] === 'ferie') continue;
       const e = days[k];
       if (e && e.absent > 0) continue;
-      // M1→M4 : recup ≥ 7h dans M1 = jour de repos complet → exclu des heures (comme absent)
       if (e && (e.recup >= 7)) continue;
-      // FIX : les jours de vacances comptent comme jours ouvrés à 0h HS
-      // (pas exclus du dénominateur — sinon la moyenne/jour gonfle artificiellement)
+      // FIX FÉRIÉ + M2 : si des heures sont saisies sur un jour férié → jour travaillé
+      // Le férié déclaré comme repos cède la priorité aux heures réelles saisies
+      const isFerieDay = specialDays[k] === 'ferie';
+      if (isFerieDay && !(e && e.extra > 0)) continue; // férié sans heures → exclu
       const isVacDay = !!vacances[k];
       sumExtra += isVacDay ? 0 : (e ? (e.extra || 0) : 0);
       countWorkDays28++;
@@ -1140,14 +1140,12 @@ class DTEEngine {
         const k = localDK(dt);
         const e = days[k];
         if (e && e.absent) continue;
-        // M1→M4 : recup ≥ 7h = jour de repos → ne compte pas dans les heures de surcharge
         if (e && (e.recup >= 7)) continue;
-        // FIX VACANCES : jour vacances = 0h HS (même si M1/M2 a des entrées)
+        // FIX FÉRIÉ + M2 : heures saisies sur férié → jour travaillé (M2 prioritaire)
+        const isFerieDay2 = specialDays[k] === 'ferie';
+        if (isFerieDay2 && !(e && e.extra > 0)) continue; // férié sans heures → exclu
         const isVacDay = !!vacances[k];
-        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
-        // FIX hasAnyDay : true uniquement si entrée M1/M2 réelle sur ce jour
-        // Avant : hasAnyDay=true pour tout jour dans la plage → semaine sans données = seuil exact
-        // → hsReelles=0 → pas de contribution même si M2 a des données non lues
+        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0));
         if (e) hasAnyDay = true;
         if (e && e.extra > 0 && !isVacDay) daysLogged++;
       }
@@ -1206,11 +1204,12 @@ class DTEEngine {
         const k = localDK(dt);
         const e = days[k];
         if (e && e.absent) continue;
-        // M1→M4 : recup ≥ 7h = jour de repos → ne compte pas dans les heures de surcharge
         if (e && (e.recup >= 7)) continue;
-        // FIX VACANCES : jour vacances = 0h HS
+        // FIX FÉRIÉ + M2 passe 2 : heures saisies → jour travaillé
+        const isFerieDay3 = specialDays[k] === 'ferie';
+        if (isFerieDay3 && !(e && e.extra > 0)) continue;
         const isVacDay = !!vacances[k];
-        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
+        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0));
         hasAnyDay = true; // Passe 2 : semaines vides = repos → décroissance cumulWeeks
       }
       // FIX : isM1RestWeekP2 requiert majorité des jours absents (même logique que Passe 1)
