@@ -1176,7 +1176,10 @@ class DTEEngine {
     const todayMonday = weekMondayA; // FIX CCN : début de semaine CCN (pas forcément lundi civil)
     const baseJourCCN = _baseJourCCN; // réutilise le calcul déjà fait plus haut
 
-    for (let w = 51; w >= 0; w--) { // chronologique : w=51 (passé) → w=0 (maintenant)
+    // FIX : fenêtre 4 semaines (28j) — cohérent avec weeklyExtra rolling 28j
+    // 52 sem trop agressif : une semaine à 45h il y a 6 mois impactait encore les scores
+    // INRS : la charge physiologique pertinente = 4 semaines glissantes (mémoire biologique réelle)
+    for (let w = 3; w >= 0; w--) { // chronologique : w=3 (passé) → w=0 (maintenant)
       let weekH = 0, hasAnyDay = false, daysLogged = 0;
       // FIX VERSIONING : utiliser le nombre de jours ouvrés à cette semaine historique
       const _wDate = new Date(todayMonday); _wDate.setDate(todayMonday.getDate() - w * 7);
@@ -1239,7 +1242,7 @@ class DTEEngine {
     }
 
     // Passe 2 : réductions de récupération (même ordre chronologique)
-    for (let w = 51; w >= 0; w--) {
+    for (let w = 3; w >= 0; w--) { // FIX : 4 semaines glissantes (cohérent passe 1)
       let weekH = 0, hasAnyDay = false;
       // FIX VERSIONING : jours ouvrés à cette semaine historique
       const _wDate2 = new Date(todayMonday); _wDate2.setDate(todayMonday.getDate() - w * 7);
@@ -1495,15 +1498,24 @@ class DTEEngine {
     const _currentYear = String(new Date().getFullYear());
     let netOvertimeYear = m1.totalExtra || 0; // base M1 (déjà filtré par année dans _m1)
     // Ajouter les HS M2 de l'année courante non couvertes par M1
+    // FIX DÉCALAGE 4H : M2 affiche carry (HS reportées) dans son total mais M4 ne les comptait pas
+    // → décalage systématique de carry heures entre M2 et M4
     if (m2 && m2.months) {
       for (const [mk, monthData] of Object.entries(m2.months)) {
-        if (!mk.startsWith(_currentYear)) continue; // autre année → continuité bio seulement
+        if (!mk.startsWith(_currentYear)) continue;
+        // Ajouter les HS saisies jour par jour non couvertes par M1
         const rawDays = monthData.rawDays || {};
         for (const [day, hs] of Object.entries(rawDays)) {
           const dk = mk + '-' + String(day).padStart(2, '0');
-          if (!m1.days[dk]) { // M1 prioritaire : éviter double comptage
+          if (!m1.days[dk]) {
             netOvertimeYear += parseHours(hs);
           }
+        }
+        // FIX : ajouter le carry (HS reportées du mois précédent) si non couvert par rawDays
+        // carry = HS validées par M2 non encore incluses dans les rawDays de ce mois
+        const carryH = parseHours(monthData.carry || 0);
+        if (carryH > 0 && Object.keys(rawDays).length === 0) {
+          netOvertimeYear += carryH;
         }
       }
     }
