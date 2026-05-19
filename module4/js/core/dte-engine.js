@@ -1211,7 +1211,7 @@ class DTEEngine {
         // FIX VACANCES : jour vacances = 0h HS
         const isVacDay = !!vacances[k];
         weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0)); // FIX CCN : baseJourCCN
-        if (e) hasAnyDay = true; // FIX passe 2 : entrée réelle requise
+        hasAnyDay = true; // Passe 2 : semaines vides = repos → décroissance cumulWeeks
       }
       // FIX : isM1RestWeekP2 requiert majorité des jours absents (même logique que Passe 1)
       // 1 jour absent seul (ex: lundi férié marqué absent) ne = pas semaine de vacances
