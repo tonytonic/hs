@@ -688,20 +688,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // FIX LECTURE PASSÉ — storage events pour détecter modifs M1/M2 instantanément
-  const _watchedPfx = ['DATA_REPORT_', 'CA_HS_TRACKER_V1_DATA_', 'DTE_CHECKIN_', 'DTE_VACANCES', 'DTE_REST_DAYS'];
-  // Cross-tab : autre onglet écrit
-  window.addEventListener('storage', (ev) => {
-    if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
-    _syncHash = ''; try { runAnalysis(); } catch(_) {}
-  });
-  // Même onglet : intercepter setItem
-  (function(){ const _orig = localStorage.setItem.bind(localStorage);
-    localStorage.setItem = function(k,v){ _orig(k,v);
-      if(_watchedPfx.some(p=>k.startsWith(p))) _syncHash='';
-    };
-  })();
-
   runAnalysis();
   scheduleEndOfDaySync();
   showWelcomeIfNeeded();
@@ -711,6 +697,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── LIVE SYNC — re-analyse toutes les 3s
   let _syncHash = '';
+
+  // FIX LECTURE PASSÉ — déclaré APRÈS _syncHash pour que les callbacks y aient accès
+  const _watchedPfx = ['DATA_REPORT_', 'CA_HS_TRACKER_V1_DATA_', 'DTE_CHECKIN_', 'DTE_VACANCES', 'DTE_REST_DAYS'];
+  // Cross-tab (M2 dans un autre onglet) : storage event natif
+  window.addEventListener('storage', (ev) => {
+    if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
+    _syncHash = ''; try { runAnalysis(); } catch(_) {}
+  });
+  // Même onglet : patch setItem pour invalider le hash immédiatement
+  (function(){ const _orig = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k,v){ _orig(k,v);
+      if(_watchedPfx.some(p=>k.startsWith(p))) _syncHash='';
+    };
+  })();
+
   setInterval(() => {
     try {
       // Hash rapide des données M1 pour détecter un vrai changement
