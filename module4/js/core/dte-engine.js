@@ -949,12 +949,16 @@ class DTEEngine {
       // → incohérent : lundi 2h sup + N-1 10h sup = 10h affichés au lieu de 2h réels.
       // Sur le SEUL premier jour de semaine, pas de blend N-1 : on affiche les HS réelles.
       // La mémoire biologique N-1 est déjà capturée via cumulWeeks/cumulMonths/stressExt.
-      if (todayDowA > 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
-        // Mar→Ven : blend progressif réel + résidu N-1 (comportement d'origine)
+      if (todayDowA >= 3 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
+        // Mer→Ven : blend progressif réel + résidu N-1 (Sonnentag 2003)
+        // FIX : seuil relevé de >1 à >=3 — lun et mar ont trop peu de données (1-2j)
+        // pour mélanger le N-1 de façon cohérente. Ex: mar 2h+2h saisies → 4h réels,
+        // blend ajoutait N-1*0.6 → 41h au lieu de 39h (confus pour l'utilisateur).
+        // Mer (3/5=0.6) → 40% résidu N-1 ; Jeu (0.8) → 20% ; Ven (1.0) → 0%.
         const _ratio = todayDowA / workDaysPerWeek;
         weeklyExtra = sumExtra7 + prevWeekFull * (1 - _ratio);
       } else {
-        // Lundi avec saisies : heures réelles uniquement, pas de dilution N-1
+        // Lun et Mar : heures réelles uniquement, pas de dilution N-1
         weeklyExtra = sumExtra7;
       }
     } else if (todayDowA === 1 && prevWeekFull !== null) {
