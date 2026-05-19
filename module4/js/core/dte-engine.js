@@ -756,7 +756,8 @@ class DTEEngine {
           daysOff: 0,
           paid:    monthData.paid || 0,
           carry:   monthData.carry || 0,
-          rawDays: effectiveDays, // FIX : jours distribués si saisie mensuelle sans détail
+          rawDays: days,           // ORIGINAL : pour contingent et calculs financiers (M1 prioritaire)
+          _syntheticDays: effectiveDays, // FIX : jours distribués UNIQUEMENT pour cumulWeeks bio
         };
         r.totalWorked += totalHours;
       }
@@ -835,8 +836,13 @@ class DTEEngine {
     if (m2 && m2.months && Object.keys(m2.months).length) {
       for (const [mk, monthData] of Object.entries(m2.months)) {
         if (!/^\d{4}-\d{2}$/.test(mk)) continue;
+        // FIX CONTINGENT : utiliser _syntheticDays (distribution bio) si rawDays vide
+        // rawDays = saisie réelle jour par jour → conservé intact pour contingent
+        // _syntheticDays = HS mensuelles distribuées sur jours ouvrés → bio uniquement
         const rawDays = monthData.rawDays || {};
-        for (const [day, hs] of Object.entries(rawDays)) {
+        const syntheticDays = monthData._syntheticDays || {};
+        const sourceDays = Object.keys(rawDays).length > 0 ? rawDays : syntheticDays;
+        for (const [day, hs] of Object.entries(sourceDays)) {
           const dateKey = mk + '-' + String(day).padStart(2, '0');
           if (!days[dateKey]) { // M1 prioritaire : ne pas écraser
             const h = parseHours(hs);
