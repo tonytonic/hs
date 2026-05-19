@@ -945,20 +945,17 @@ class DTEEngine {
       // Sonnentag 2003 : la charge de la semaine précédente persiste biologiquement.
       // Lun → 1/5 réel + 4/5 projeté ; Ven → 5/5 réel + 0/5 projeté.
       //
-      // FIX LUNDI : todayDowA=1 → _ratio=0.2 → weeklyExtra = sumExtra7 + prevWeekFull*0.8
-      // → incohérent : lundi 2h sup + N-1 10h sup = 10h affichés au lieu de 2h réels.
-      // Sur le SEUL premier jour de semaine, pas de blend N-1 : on affiche les HS réelles.
-      // La mémoire biologique N-1 est déjà capturée via cumulWeeks/cumulMonths/stressExt.
-      if (todayDowA >= 3 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
-        // Mer→Ven : blend progressif réel + résidu N-1 (Sonnentag 2003)
-        // FIX : seuil relevé de >1 à >=3 — lun et mar ont trop peu de données (1-2j)
-        // pour mélanger le N-1 de façon cohérente. Ex: mar 2h+2h saisies → 4h réels,
-        // blend ajoutait N-1*0.6 → 41h au lieu de 39h (confus pour l'utilisateur).
-        // Mer (3/5=0.6) → 40% résidu N-1 ; Jeu (0.8) → 20% ; Ven (1.0) → 0%.
+      // ARCHITECTURE (fix final) : deux valeurs séparées
+      //   weeklyExtra       → calcul BIOLOGIQUE (blend N-1 inclus) → scores fatigue/stress/perf
+      //   _enteredWeeklyH   → affichage UTILISATEUR (HS réelles saisies uniquement)
+      // Avant : même valeur pour les deux → soit affichage faux (41h au lieu de 39h)
+      //         soit scores insensibles à l'historique (45h sem passée invisible)
+      if (todayDowA > 1 && todayDowA <= workDaysPerWeek && prevWeekFull !== null) {
+        // Mar→Ven : blend progressif réel + résidu N-1 (comportement biologique d'origine)
         const _ratio = todayDowA / workDaysPerWeek;
         weeklyExtra = sumExtra7 + prevWeekFull * (1 - _ratio);
       } else {
-        // Lun et Mar : heures réelles uniquement, pas de dilution N-1
+        // Lundi : heures réelles + pas de blend (fix lundi)
         weeklyExtra = sumExtra7;
       }
     } else if (todayDowA === 1 && prevWeekFull !== null) {
@@ -1571,6 +1568,7 @@ class DTEEngine {
       // Valeurs brutes pour les calculs
       _avgExtra7:     avgExtra7,
       _currentWeekExtra: sumExtra7, // HS RÉELLES saisies cette semaine (pas projection historique)
+      _enteredWeeklyH: _ccnR.seuil + sumExtra7, // AFFICHAGE UNIQUEMENT : seuil + HS réelles saisies (sans blend N-1)
       _hasCurrentWeekData: hasAnyEntryThisWeek, // true si saisie réelle cette semaine
       _isProjection: !hasAnyEntryThisWeek && (count7 === 0), // avgExtra7 = projection 28j historique
       _avgH7:         avgH7,
