@@ -715,49 +715,16 @@ class DTEEngine {
       for (const [mk, monthData] of Object.entries(d)) {
         if (!/^\d{4}-\d{2}$/.test(mk)) continue; // ignorer les clés non-mois
         const days = monthData.days || {};
-        // Calculer total heures HS dans ce mois (totalHours = HS uniquement, pas base contrat)
-        let totalHours = Object.values(days).reduce((s, h) => s + parseHours(h), 0);
+        // Calculer total heures travaillées dans ce mois
+        const totalHours = Object.values(days).reduce((s, h) => s + parseHours(h), 0);
+        const worked = totalHours + (r.contract / 4.33); // heures base + HS
         const daysCount = Object.keys(days).length;
-
-        // FIX M2 SAISIE MENSUELLE : si rawDays vide mais closing/worked renseigné
-        // → distribuer les HS uniformément sur les jours ouvrés du mois
-        // Problème : M2 permet de saisir une moyenne mensuelle sans détail jour par jour
-        //   → rawDays = {} → merge dans days[] = rien → cumulWeeks invisible → scores non impactés
-        // Fix : extraire les HS mensuelles depuis closing (HS totales du mois) ou worked
-        //   → distribuer sur les jours ouvrés → chaque jour visible pour la boucle cumulWeeks
-        let effectiveDays = days;
-        if (daysCount === 0) {
-          // Tenter de récupérer les HS depuis closing (fermeture mensuelle) ou worked brut
-          const closingHS = parseHours(monthData.closing || 0); // HS totales saisies en fermeture
-          const workedHS  = parseHours(monthData.worked  || 0); // alternative
-          const monthlyHS = closingHS > 0 ? closingHS : (workedHS > r.contract / 4.33 ? workedHS - r.contract / 4.33 : 0);
-          if (monthlyHS > 0) {
-            // Compter les jours ouvrés du mois (lun-ven, hors week-end)
-            const [y, m] = mk.split('-').map(Number);
-            const daysInMonth = new Date(y, m, 0).getDate();
-            const ouvreDays = [];
-            for (let d = 1; d <= daysInMonth; d++) {
-              const dow = new Date(y, m - 1, d).getDay();
-              if (dow !== 0 && dow !== 6) ouvreDays.push(String(d));
-            }
-            if (ouvreDays.length > 0) {
-              const hsPerDay = Math.round((monthlyHS / ouvreDays.length) * 100) / 100;
-              if (hsPerDay > 0) {
-                effectiveDays = {};
-                ouvreDays.forEach(d => { effectiveDays[d] = hsPerDay; });
-                totalHours = monthlyHS;
-              }
-            }
-          }
-        }
-
         r.months[mk] = {
           worked:  Math.round(totalHours * 100) / 100,
           daysOff: 0,
           paid:    monthData.paid || 0,
           carry:   monthData.carry || 0,
-          rawDays: days,           // ORIGINAL : pour contingent et calculs financiers (M1 prioritaire)
-          _syntheticDays: effectiveDays, // FIX : jours distribués UNIQUEMENT pour cumulWeeks bio
+          rawDays: days,
         };
         r.totalWorked += totalHours;
       }
@@ -836,13 +803,8 @@ class DTEEngine {
     if (m2 && m2.months && Object.keys(m2.months).length) {
       for (const [mk, monthData] of Object.entries(m2.months)) {
         if (!/^\d{4}-\d{2}$/.test(mk)) continue;
-        // FIX CONTINGENT : utiliser _syntheticDays (distribution bio) si rawDays vide
-        // rawDays = saisie réelle jour par jour → conservé intact pour contingent
-        // _syntheticDays = HS mensuelles distribuées sur jours ouvrés → bio uniquement
         const rawDays = monthData.rawDays || {};
-        const syntheticDays = monthData._syntheticDays || {};
-        const sourceDays = Object.keys(rawDays).length > 0 ? rawDays : syntheticDays;
-        for (const [day, hs] of Object.entries(sourceDays)) {
+        for (const [day, hs] of Object.entries(rawDays)) {
           const dateKey = mk + '-' + String(day).padStart(2, '0');
           if (!days[dateKey]) { // M1 prioritaire : ne pas écraser
             const h = parseHours(hs);
@@ -979,25 +941,13 @@ class DTEEngine {
     const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
-      // Des HS saisies cette semaine → heures réelles UNIQUEMENT (pas de blend N-1)
-      //
-      // FIX ARCHITECTURAL : le blend "sumExtra7 + prevWeekFull*(1-ratio)" était trop agressif.
-      // Ex: N-1=45h (10h extra) + mardi 4h saisis → weeklyH = 35+10 = 45h → score=2 (catastrophe)
-      // La mémoire biologique N-1 est capturée via cumulWeeks/cumulAmp/sonnentagMult/fatCumulative.
-      // On ne la double-compte PAS dans weeklyH.
-      // Sonnentag 2003 : le "carry-over" passe par le compteur de cumul, pas par le recalcul des h.
+      // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
       weeklyExtra = sumExtra7;
     } else if (todayDowA === 1 && prevWeekFull !== null) {
       // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
       // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
       // Mode hebdomadaire : une seule entrée Monday = la semaine entière → traité comme semaine complète
       weeklyExtra = prevWeekFull;
-    } else if (todayDowA === 1 && prevWeekFull === null && countWorkDays28 >= 5) {
-      // FIX LUNDI SANS N-1 : pas de données M1 semaine précédente (< 3 jours enregistrés)
-      // Avant : weeklyExtra28 * (1/5) = historique × 0.2 → ex. 8h/sem → 1.6h affiché → très sous-estimé
-      // Après : weeklyExtra28 complet → meilleure estimation de la semaine précédente
-      // Le scaling progressif est réservé au milieu de semaine (mar→ven), pas au lundi
-      weeklyExtra = weeklyExtra28;
     } else if (countWorkDays28 >= 5) {
       // FIX no-entry mid-week : estimation PROPORTIONNELLE au jour de semaine
       // Avant : weeklyExtra28 plein → score chute de 72→54 en milieu de semaine sans saisie
@@ -1176,10 +1126,7 @@ class DTEEngine {
     const todayMonday = weekMondayA; // FIX CCN : début de semaine CCN (pas forcément lundi civil)
     const baseJourCCN = _baseJourCCN; // réutilise le calcul déjà fait plus haut
 
-    // FIX : fenêtre 4 semaines (28j) — cohérent avec weeklyExtra rolling 28j
-    // 52 sem trop agressif : une semaine à 45h il y a 6 mois impactait encore les scores
-    // INRS : la charge physiologique pertinente = 4 semaines glissantes (mémoire biologique réelle)
-    for (let w = 3; w >= 0; w--) { // chronologique : w=3 (passé) → w=0 (maintenant)
+    for (let w = 51; w >= 0; w--) { // chronologique : w=51 (passé) → w=0 (maintenant)
       let weekH = 0, hasAnyDay = false, daysLogged = 0;
       // FIX VERSIONING : utiliser le nombre de jours ouvrés à cette semaine historique
       const _wDate = new Date(todayMonday); _wDate.setDate(todayMonday.getDate() - w * 7);
@@ -1242,7 +1189,7 @@ class DTEEngine {
     }
 
     // Passe 2 : réductions de récupération (même ordre chronologique)
-    for (let w = 3; w >= 0; w--) { // FIX : 4 semaines glissantes (cohérent passe 1)
+    for (let w = 51; w >= 0; w--) {
       let weekH = 0, hasAnyDay = false;
       // FIX VERSIONING : jours ouvrés à cette semaine historique
       const _wDate2 = new Date(todayMonday); _wDate2.setDate(todayMonday.getDate() - w * 7);
@@ -1492,30 +1439,20 @@ class DTEEngine {
     const overRatio = allDays.length ? overCount / allDays.length : 0;
 
     // Contingent légal — reset au 1er janvier (Art. L3121-30)
-    // FIX : utiliser l'année calendaire réelle (new Date()) et non raw.year
-    // raw.year peut valoir '2025' si l'utilisateur a navigué vers 2025 dans M2
-    // → toutes les HS 2026 seraient ignorées → contingent = 0 ou sous-estimé
-    const _currentYear = String(new Date().getFullYear());
+    // Calculé sur l'année courante UNIQUEMENT depuis le days fusionné M1+M2
+    // (m1.netOvertime n'était jamais assigné dans _m1() → NaN → remplacé ici)
+    const _currentYear = String(raw.year || new Date().getFullYear());
     let netOvertimeYear = m1.totalExtra || 0; // base M1 (déjà filtré par année dans _m1)
     // Ajouter les HS M2 de l'année courante non couvertes par M1
-    // FIX DÉCALAGE 4H : M2 affiche carry (HS reportées) dans son total mais M4 ne les comptait pas
-    // → décalage systématique de carry heures entre M2 et M4
     if (m2 && m2.months) {
       for (const [mk, monthData] of Object.entries(m2.months)) {
-        if (!mk.startsWith(_currentYear)) continue;
-        // Ajouter les HS saisies jour par jour non couvertes par M1
+        if (!mk.startsWith(_currentYear)) continue; // autre année → continuité bio seulement
         const rawDays = monthData.rawDays || {};
         for (const [day, hs] of Object.entries(rawDays)) {
           const dk = mk + '-' + String(day).padStart(2, '0');
-          if (!m1.days[dk]) {
+          if (!m1.days[dk]) { // M1 prioritaire : éviter double comptage
             netOvertimeYear += parseHours(hs);
           }
-        }
-        // FIX : ajouter le carry (HS reportées du mois précédent) si non couvert par rawDays
-        // carry = HS validées par M2 non encore incluses dans les rawDays de ce mois
-        const carryH = parseHours(monthData.carry || 0);
-        if (carryH > 0 && Object.keys(rawDays).length === 0) {
-          netOvertimeYear += carryH;
         }
       }
     }
@@ -1610,7 +1547,6 @@ class DTEEngine {
       // Valeurs brutes pour les calculs
       _avgExtra7:     avgExtra7,
       _currentWeekExtra: sumExtra7, // HS RÉELLES saisies cette semaine (pas projection historique)
-      _enteredWeeklyH: _ccnR.seuil + sumExtra7, // AFFICHAGE UNIQUEMENT : seuil + HS réelles saisies (sans blend N-1)
       _hasCurrentWeekData: hasAnyEntryThisWeek, // true si saisie réelle cette semaine
       _isProjection: !hasAnyEntryThisWeek && (count7 === 0), // avgExtra7 = projection 28j historique
       _avgH7:         avgH7,
@@ -1777,15 +1713,11 @@ class DTEEngine {
 
     // Sonnentag 2003 — dégradation du détachement psychologique
     // FIX BUG 4 : en vacances, sonnentagMult = 1.0 (pas d'amplification — détachement actif)
-    // FIX SIMPLIFICATION : utilisation de cumW au lieu de consecOT.
-    //   cumW (semaines de surcharge cumulées sur 28j) est plus fiable et déjà utilisé partout.
-    //   consecOT comptait les jours consécutifs avec HS et avait des bugs sur les blocs de repos.
-    //   Mapping équivalent : 5j ≈ 1 sem, 12j ≈ 2.4 sem, 20j ≈ 4 sem
     const sonnentagMult = isVacWeekNow ? 1.0
-                        : cumW >= 4.0 ? 1.15    // ≥4 sem surcharge : détachement sévèrement compromis
-                        : cumW >= 2.5 ? 1.10    // ≥2.5 sem surcharge : détachement partiellement compromis
-                        : cumW >= 1.0 ? 1.05    // ≥1 sem surcharge : premier signal Sonnentag
-                        : 1.0;                  // <1 sem : récupération weekend normale (baseline)
+                        : consecOT >= 20 ? 1.15   // >4 sem HS : détachement sévèrement compromis
+                        : consecOT >= 12 ? 1.10   // >2.4 sem HS : détachement partiellement compromis
+                        : consecOT >= 5  ? 1.05   // >1 sem HS : premier signal Sonnentag
+                        : 1.0;                    // <5j : récupération weekend normale (baseline)
 
     const _pf      = norm._posteFactors || { fatF:1, strF:1, cvF:1, cogF:1 };
     // FIX BUG 4 : en vacances, atténuer fatSurchar et fatBurnout (repos actif)
@@ -2009,26 +1941,17 @@ class DTEEngine {
     // de vacances de produire un effet visible sur recCeiling.
     // Avant : recCeiling max 85% après 8 sem cumul → perçu comme "plafond"
     // Après : recCeiling max 88% après 8 sem cumul, 91% après 12 sem
-    // ── INERTIE POST-REPOS v4 — inertia séparée fat/rec ──────────────────────
-    // FIX : recCeiling trop peu sensible à l'historique (cumW=2.9 → plafond 95%, presque aucun effet)
-    // Cause : inertia=cumW/8 trop douce → à 2.9 sem inertia=0.36 → rec reste à 93%
-    // Solution : inertia récup = cumW/4 (sature à P2 entry = 4 sem, pas 8 sem)
-    //   cumW=1  : rec≤98% (1 sem légère, presque pas d'impact)
-    //   cumW=2.9: rec≤89% (surcharge visible, recovery contrainte)
-    //   cumW=4  : rec≤82% (P2 établi, contrainte forte)
-    //   cumW=8  : rec≤68% (identique à avant — calibration P3 préservée)
-    // Référence : INRS phases RPS — P2 entry à 4 sem → récup structurellement limitée
-    if (cumW >= 1) {
-      const t = Math.min(1, (cumW - 1) / 7);
-      // Fatigue floor : inertia douce (cumW/8) — progression P1→P3
-      const fatInertia = Math.min(1, cumW / 8);
-      const fatMult    = 0.15 + t * 0.25;  // 0.15 à 1 sem → 0.40 à 8 sem
-      const fatFloor   = fatInertia * fatMult;
+    // ── INERTIE POST-REPOS v2 — mémoire biologique renforcée ─────────────────
+    // PATCH calibration : diviseur ÷8 (÷12 trop permissif → récup trop rapide)
+    // fatFloor ×0.40 : à 8 sem → plancher 40% (cible vacances : 40-45%)
+    // recCeiling ×0.32 : à 8 sem → plafond 68% (cible vacances : 60-70%)
+    // Note : recCeiling s'applique APRÈS vacationFloor → l'écrase si nécessaire.
+    // Combiné avec USURE (−12% à cumW=8) → récupération hors vacances ≈ 56% ✓
+    if (cumW >= 3) {
+      const inertia = Math.min(1, cumW / 8); // PATCH ÷8 : INRS P2/P3 réaliste
+      const fatFloor = inertia * 0.40; // PATCH ×0.40 : plancher dette (8 sem → 40%)
       if (fatFinal < fatFloor) fatFinal = fatFloor;
-      // Recovery ceiling : inertia plus agressive (cumW/4) — sature dès P2 entry
-      const recInertia = Math.min(1, cumW / 4);
-      const recMult    = 0.08 + t * 0.24;  // 0.08 à 1 sem → 0.32 à 8 sem
-      const recCeiling = 1.0 - recInertia * recMult;
+      const recCeiling = 1.0 - inertia * 0.32; // PATCH ×0.32 : plafond récup (8 sem → 68%)
       if (recFinal > recCeiling) recFinal = recCeiling;
     }
 
@@ -2036,14 +1959,12 @@ class DTEEngine {
     // Le cortisol basal reste chroniquement élevé après surcharge prolongée.
     // McEwen 1998 : allostatic load → seuil de stress physiologique durablement rehaussé.
     // Sluiter 2001 : "neuroendocrine recovery from sustained work demands = several weeks"
-    // → stress ne peut pas tomber à 0 dès la 1ère semaine de repos après P1/P2/P3.
-    // FIX EFFET FALAISE : progressif dès cumW >= 1 (vs >= 3 avant)
-    // Plancher : 0.08 à 1 sem → 0.28 à 8 sem (McEwen 1998 — allostatic load progressif)
-    if (cumW >= 1) {
+    // → stress ne peut pas tomber à 0 dès la 1ère semaine de repos après P2/P3.
+    // Plancher : 28% à 8 sem (cible post-surcharge : 25–40%).
+    // Même logique que fatFloor dans l'inertia block — appliquer même pendant vacances.
+    if (cumW >= 3) {
       const stressInertia = Math.min(1, cumW / 8);
-      const t2 = Math.min(1, (cumW - 1) / 7);
-      const stressMult  = 0.08 + t2 * 0.20; // 0.08 à 1 sem → 0.28 à 8 sem
-      const stressFloor = stressInertia * stressMult;
+      const stressFloor = stressInertia * 0.28; // 8 sem → 28%, 4 sem → 14%, 3 sem → 10%
       strFinal = Math.max(strFinal, stressFloor);
     }
 
@@ -2062,11 +1983,7 @@ class DTEEngine {
     // ── DÉGRADATION RÉCUPÉRATION — usure progressive INRS phases P2/P3 ───────────
     // En surcharge active : recovery structurellement plafonnée par la dette accumulée.
     // Seuil 3 sem : entrée P1→P2 (INRS). Seuil 6 sem : P2→P3 établi (dégradation amplifiée).
-    // ── DÉGRADATION RÉCUPÉRATION — usure progressive INRS phases P1→P3 ─────────────
-    // FIX : seuil abaissé à >= 1 (progressif) pour cohérence avec l'inertia block
-    // Avant : rien à cumW=2.9, saut à -2% à cumW=3.0 (effet falaise)
-    // Après : dégradation proportionnelle dès 1 sem (légère en P1, marquée en P2/P3)
-    if (cumW >= 1 && !isVacWeekNow) recFinal = Math.max(0, recFinal - Math.min(0.02, cumW * 0.007)); // ~0.7%/sem → 2% à 3 sem
+    if (cumW >= 3 && !isVacWeekNow) recFinal = Math.max(0, recFinal - 0.02); // −2% dès 3 sem
     if (cumW >= 6 && !isVacWeekNow) recFinal = Math.max(0, recFinal - 0.03); // −3% de plus ≥6 sem
 
     // ── PLAFOND LONG TERME — dette physiologique irréductible (OMS/INRS/McEwen) ──
