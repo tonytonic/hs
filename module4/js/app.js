@@ -714,20 +714,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
   setInterval(() => {
     try {
-      // Hash rapide des données M1 pour détecter un vrai changement
-      const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
-      const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
-      // FIX : surveiller TOUTES les années M2 (pas seulement yr actif)
-      const _m2keys = []; for(let _i=0;_i<localStorage.length;_i++){const _k=localStorage.key(_i);if(_k&&_k.startsWith('CA_HS_TRACKER_V1_DATA_'))_m2keys.push(localStorage.getItem(_k)||'');}
-      const m2raw = _m2keys.join('|');
-      const _today = new Date().toISOString().slice(0,10);
-      const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
-      // FIX : hash sur contenu réel (pas longueur) — ajouter/supprimer mêmes octets = même longueur
-      const _hs = (s) => { let h=0; for(let i=0;i<Math.min(s.length,4000);i++)h=(h*31+s.charCodeAt(i))>>>0; return h+'_'+s.length; };
-      const hash  = _hs(m1raw) + '|' + _hs(m2raw) + '|' + yr + '|' + _today + '|' + _ciDate;
-      if (hash === _syncHash) return; // rien changé → pas de re-analyse
-      _syncHash = hash;
-
+      // LIVE SYNC sans hash — analyse systématique toutes les 3s
+      // Fiabilité > performance : le coût CPU est négligeable pour un PWA
       const s = DTE.engine.analyze();
       DTE._state = s;
       const _risks  = DTE.risks.detect(s.scores, s.norm);
