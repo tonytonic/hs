@@ -705,44 +705,20 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
     _syncHash = ''; try { runAnalysis(); } catch(_) {}
   });
-  // Même onglet : patch setItem pour invalider le hash immédiatement
+  // Même onglet : patch setItem → runAnalysis() directement (plus de setInterval)
   (function(){ const _orig = localStorage.setItem.bind(localStorage);
     localStorage.setItem = function(k,v){ _orig(k,v);
-      if(_watchedPfx.some(p=>k.startsWith(p))) _syncHash='';
+      if(_watchedPfx.some(p=>k.startsWith(p))) {
+        // Délai 50ms pour laisser M2 finir son écriture avant l'analyse
+        clearTimeout(window._dteWriteTimer);
+        window._dteWriteTimer = setTimeout(() => { try { runAnalysis(); } catch(_) {} }, 50);
+      }
     };
   })();
 
-  setInterval(() => {
-    try {
-      // LIVE SYNC sans hash — analyse systématique toutes les 3s
-      // Fiabilité > performance : le coût CPU est négligeable pour un PWA
-      const s = DTE.engine.analyze();
-      DTE._state = s;
-      const _risks  = DTE.risks.detect(s.scores, s.norm);
-      const _advice = buildAdvice(s.scores, _risks, s.norm);
-      DTE.lastRisks  = _risks;
-      DTE.lastAdvice = _advice;
-
-      // Mettre à jour TOUT : dashboard + twin + footer
-      DTE.dashboard.render(s, _risks, _advice);
-      if (DTE.twin) DTE.twin.update(s.scores);
-
-      // Mettre à jour la vue active si prédictions/simulation
-      const activeView = document.querySelector('.view:not(.hidden)');
-      if (activeView) {
-        const vid = activeView.id;
-        if (vid === 'view-predictions') renderPredictions(s);
-        if (vid === 'view-whatif' && DTE.whatif) DTE.whatif.render();
-        if (vid === 'view-heatmap' && DTE.heatmap) DTE.heatmap.render(s);
-      }
-
-      // Mettre à jour le footer
-      const el = id => document.getElementById(id);
-      if(el('footer-year'))    el('footer-year').textContent    = 'ANNÉE ' + (s.raw && s.raw.year || '');
-      if(el('footer-time'))    el('footer-time').textContent    = 'ANALYSE : ' + new Date().toTimeString().slice(0,5);
-      if(el('footer-status'))  el('footer-status').textContent  = s.scores._hasData ? '■ SYNCHRONISÉ' : '○ EN ATTENTE';
-    } catch(_) {}
-  }, 3000);
+  // LIVE SYNC supprimé — remplacé par storage events (cross-tab + même onglet)
+  // Avant : setInterval 3s → DOM recréé toutes les 3s → preview/simulation/recommandations sautent
+  // Après : analyse uniquement à l'ouverture + quand M1/M2 change réellement
 
   // Exposer le forçage de sync (bouton visible)
   // Helper : retourner les jours de repos selon les checkboxes
