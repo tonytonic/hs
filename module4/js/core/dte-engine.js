@@ -1489,9 +1489,10 @@ class DTEEngine {
     const overRatio = allDays.length ? overCount / allDays.length : 0;
 
     // Contingent légal — reset au 1er janvier (Art. L3121-30)
-    // Calculé sur l'année courante UNIQUEMENT depuis le days fusionné M1+M2
-    // (m1.netOvertime n'était jamais assigné dans _m1() → NaN → remplacé ici)
-    const _currentYear = String(raw.year || new Date().getFullYear());
+    // FIX : utiliser l'année calendaire réelle (new Date()) et non raw.year
+    // raw.year peut valoir '2025' si l'utilisateur a navigué vers 2025 dans M2
+    // → toutes les HS 2026 seraient ignorées → contingent = 0 ou sous-estimé
+    const _currentYear = String(new Date().getFullYear());
     let netOvertimeYear = m1.totalExtra || 0; // base M1 (déjà filtré par année dans _m1)
     // Ajouter les HS M2 de l'année courante non couvertes par M1
     if (m2 && m2.months) {
