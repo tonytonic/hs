@@ -13,6 +13,10 @@ class WhatIfPanel {
   }
 
   render(){
+    // FIX CURSEURS : ne reconstruire le DOM qu'une seule fois
+    // Avant : render() appelé toutes les 3s par le LIVE SYNC → DOM recréé → sliders remis à 0
+    if (this._rendered) { this._simulate(); return; }
+    this._rendered = true;
     this._container.innerHTML = `
       <!-- COLONNE GAUCHE : contrôles -->
       <div style="display:flex;flex-direction:column;gap:5px;">
