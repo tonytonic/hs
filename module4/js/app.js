@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - dangers * 5 - alertes * 2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - dangers * 5 - alertes * 2))) };
       }
 
       DTE.notifs.checkAndNotify(state, risks);
@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const d2 = r2.filter(r => r.level === 'CRITIQUE').length;
         const al = r2.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - d2*5 - al*2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - d2*5 - al*2))) };
       }
       DTE.dashboard.render(s, r2, a2);
       if (DTE.twin) DTE.twin.update(s.scores);
@@ -697,47 +697,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── LIVE SYNC — re-analyse toutes les 3s
   let _syncHash = '';
-  setInterval(() => {
-    try {
-      // Hash rapide des données M1 pour détecter un vrai changement
-      const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
-      const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
-      const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '';
-      // Inclure la date du jour dans le hash → recalcul automatique chaque nouveau jour
-      // sans ça, consecRestDays/consecNonOTDays ne progressent pas sans nouvelle saisie
-      const _today = new Date().toISOString().slice(0,10);
-      const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
-      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr + '|' + _today + '|' + _ciDate;
-      if (hash === _syncHash) return; // rien changé → pas de re-analyse
-      _syncHash = hash;
 
-      const s = DTE.engine.analyze();
-      DTE._state = s;
-      const _risks  = DTE.risks.detect(s.scores, s.norm);
-      const _advice = buildAdvice(s.scores, _risks, s.norm);
-      DTE.lastRisks  = _risks;
-      DTE.lastAdvice = _advice;
-
-      // Mettre à jour TOUT : dashboard + twin + footer
-      DTE.dashboard.render(s, _risks, _advice);
-      if (DTE.twin) DTE.twin.update(s.scores);
-
-      // Mettre à jour la vue active si prédictions/simulation
-      const activeView = document.querySelector('.view:not(.hidden)');
-      if (activeView) {
-        const vid = activeView.id;
-        if (vid === 'view-predictions') renderPredictions(s);
-        if (vid === 'view-whatif' && DTE.whatif) DTE.whatif.render();
-        if (vid === 'view-heatmap' && DTE.heatmap) DTE.heatmap.render(s);
+  // FIX LECTURE PASSÉ — déclaré APRÈS _syncHash pour que les callbacks y aient accès
+  const _watchedPfx = ['DATA_REPORT_', 'CA_HS_TRACKER_V1_DATA_', 'DTE_CHECKIN_', 'DTE_VACANCES', 'DTE_REST_DAYS'];
+  // Cross-tab (M2 dans un autre onglet) : storage event natif
+  window.addEventListener('storage', (ev) => {
+    if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
+    _syncHash = ''; try { runAnalysis(); } catch(_) {}
+  });
+  // Même onglet : patch setItem → runAnalysis() directement (plus de setInterval)
+  (function(){ const _orig = localStorage.setItem.bind(localStorage);
+    localStorage.setItem = function(k,v){ _orig(k,v);
+      if(_watchedPfx.some(p=>k.startsWith(p))) {
+        // Délai 50ms pour laisser M2 finir son écriture avant l'analyse
+        clearTimeout(window._dteWriteTimer);
+        window._dteWriteTimer = setTimeout(() => { try { runAnalysis(); } catch(_) {} }, 50);
       }
+    };
+  })();
 
-      // Mettre à jour le footer
-      const el = id => document.getElementById(id);
-      if(el('footer-year'))    el('footer-year').textContent    = 'ANNÉE ' + (s.raw && s.raw.year || '');
-      if(el('footer-time'))    el('footer-time').textContent    = 'ANALYSE : ' + new Date().toTimeString().slice(0,5);
-      if(el('footer-status'))  el('footer-status').textContent  = s.scores._hasData ? '■ SYNCHRONISÉ' : '○ EN ATTENTE';
-    } catch(_) {}
-  }, 3000);
+  // LIVE SYNC supprimé — remplacé par storage events (cross-tab + même onglet)
+  // Avant : setInterval 3s → DOM recréé toutes les 3s → preview/simulation/recommandations sautent
+  // Après : analyse uniquement à l'ouverture + quand M1/M2 change réellement
 
   // Exposer le forçage de sync (bouton visible)
   // Helper : retourner les jours de repos selon les checkboxes
