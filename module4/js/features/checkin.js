@@ -344,7 +344,11 @@ class Checkin {
             this._saveN1Confirmed(q._prevMondayKey, extra, q._seuil);
           }
           // skip → continuer sans sauvegarder
+          // FIX : après rebuild, le tableau a perdu n1confirm (déjà confirmé),
+          // donc questions[0] = Q_STATUS. Si on ne remet pas _step à -1,
+          // le step++ suivant saute Q_STATUS et atterrit sur wellbeing[0].
           this._buildSequence();
+          this._step = -1; // sera incrémenté à 0 → Q_STATUS affiché correctement
         }
 
         setTimeout(() => {
