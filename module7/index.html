@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Nuit, Astreinte &amp; Primes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0a1228">
+<meta name="screen-orientation" content="portrait">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nuit & Primes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Outfit:wght@300;400;500;600;700;800&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{
+  --night:#0a1228; --night2:#0d1838; --ink:#070d1c;
+  --card:rgba(255,255,255,0.05); --card2:rgba(255,255,255,0.08); --line:rgba(255,255,255,0.10);
+  --moon:#ffd98a; --moon2:#f5b942; --star:#9ec5ff; --aurora:#7ee0c5; --lilac:#b8a4f0;
+  --txt:#f4f7ff; --mut:rgba(244,247,255,0.55); --mut2:rgba(244,247,255,0.38);
+  --good:#7ee0c5; --warn:#ffd98a; --soft:#ff9eb5;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--night);}
+body{
+  font-family:'Outfit',-apple-system,sans-serif;color:var(--txt);padding-bottom:60px;
+  background:
+    radial-gradient(1200px 500px at 80% -5%, rgba(126,224,197,0.10), transparent 60%),
+    radial-gradient(900px 500px at 0% 10%, rgba(184,164,240,0.12), transparent 55%),
+    linear-gradient(180deg, var(--night2) 0%, var(--night) 45%, var(--ink) 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+/* starfield */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 60% 15%, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1.5px 1.5px at 85% 40%, rgba(158,197,255,0.7), transparent),
+    radial-gradient(1px 1px at 35% 60%, rgba(255,255,255,0.5), transparent),
+    radial-gradient(1px 1px at 75% 70%, rgba(255,255,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 10% 80%, rgba(255,217,138,0.5), transparent),
+    radial-gradient(1px 1px at 50% 90%, rgba(255,255,255,0.5), transparent);
+  background-size:100% 100%;opacity:.6;animation:twinkle 6s ease-in-out infinite;
+}
+@keyframes twinkle{0%,100%{opacity:.4;}50%{opacity:.75;}}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--night);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:20px;} #lb .t{font-size:21px;font-weight:700;color:var(--moon);}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+/* header */
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:14px 16px 12px;padding-top:max(14px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(10,18,40,0.95), rgba(10,18,40,0.75) 80%, transparent);
+  backdrop-filter:blur(8px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;
+  padding:9px 13px;font-size:13px;font-weight:500;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Fraunces',serif;font-size:17px;font-weight:600;line-height:1;letter-spacing:.2px;}
+header .brand .su{font-size:10px;color:var(--mut);margin-top:3px;}
+header .hbtn{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:12px;
+  width:38px;height:38px;font-size:15px;cursor:pointer;flex-shrink:0;transition:.2s;}
+header .hbtn:active{transform:scale(0.92);}
+
+/* overlay */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(5,10,25,0.7);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:ovin .25s ease;}
+@keyframes ovin{from{opacity:0;}to{opacity:1;}}
+.box{background:linear-gradient(165deg,#16244a,#0e1834);border:1px solid var(--line);border-radius:26px;
+  max-width:430px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 24px 70px rgba(0,0,0,0.6);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);}
+@keyframes boxin{from{opacity:0;transform:translateY(20px) scale(.96);}to{opacity:1;transform:none;}}
+.box .hd{padding:22px 22px 16px;position:relative;}
+.box .hd .t{font-family:'Fraunces',serif;font-size:21px;font-weight:600;}
+.box .hd .s{font-size:12px;color:var(--mut);margin-top:3px;}
+.box .hd .x{position:absolute;top:18px;right:20px;background:var(--card2);border:none;border-radius:50%;
+  width:34px;height:34px;font-size:18px;color:var(--txt);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+
+.btn{display:block;width:100%;padding:15px;border:none;border-radius:15px;font-size:15px;font-weight:700;
+  cursor:pointer;text-align:center;font-family:'Outfit',sans-serif;transition:transform .15s, box-shadow .2s;}
+.btn:active{transform:scale(0.97);}
+.btn-moon{background:linear-gradient(135deg,var(--moon),var(--moon2));color:#3a2600;box-shadow:0 8px 24px rgba(245,185,66,0.3);}
+.btn-ghost{background:transparent;border:1.5px solid var(--moon);color:var(--moon);}
+.btn-soft{background:var(--card2);border:1px solid var(--line);color:var(--txt);}
+.btn-danger{background:rgba(255,158,181,0.12);border:1px solid rgba(255,158,181,0.4);color:var(--soft);}
+
+/* WIZARD */
+.wstep{display:none;text-align:center;} .wstep.show{display:block;animation:fade .3s;}
+@keyframes fade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.owl{width:120px;height:120px;object-fit:contain;display:inline-block;animation:float 3s ease-in-out infinite;filter:drop-shadow(0 10px 24px rgba(255,217,138,0.30));}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-8px) rotate(2deg);}}
+.wstep h2{font-family:'Fraunces',serif;font-size:23px;font-weight:600;margin:6px 0 10px;}
+.wstep p{font-size:13.5px;color:rgba(244,247,255,0.8);line-height:1.65;margin-bottom:8px;}
+.wstep .accent{color:var(--moon);font-weight:600;}
+.feat{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:13px;margin-bottom:9px;text-align:left;}
+.feat .ic{font-size:24px;flex-shrink:0;} .feat .tx{font-size:12.5px;line-height:1.5;color:rgba(244,247,255,0.82);}
+.feat .tx b{display:block;font-size:13.5px;margin-bottom:2px;color:var(--txt);font-weight:600;}
+.dots{display:flex;gap:7px;justify-content:center;margin:18px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.3s;}
+.dots .d.on{background:var(--moon);width:24px;border-radius:4px;}
+
+/* CCN chip */
+.ccn-chip{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:10px 13px;font-size:11.5px;color:var(--mut);margin:4px 0 14px;}
+.ccn-chip .ic{font-size:17px;} .ccn-chip b{color:var(--star);font-weight:600;}
+
+/* month bar */
+.monthbar{display:flex;align-items:center;justify-content:space-between;background:var(--card);
+  border:1px solid var(--line);border-radius:16px;padding:8px;margin-bottom:16px;}
+.monthbar button{background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:11px;
+  width:40px;height:40px;font-size:20px;cursor:pointer;transition:.15s;}
+.monthbar button:active{transform:scale(0.9);background:var(--moon);color:#000;}
+.monthbar .lbl{font-family:'Fraunces',serif;font-size:16px;font-weight:600;text-transform:capitalize;text-align:center;}
+.monthbar .lbl small{display:block;font-family:'Outfit';font-size:9px;color:var(--mut2);font-weight:400;text-transform:uppercase;letter-spacing:.1em;margin-top:2px;}
+
+/* HERO total */
+.hero{position:relative;border-radius:24px;padding:22px 20px;margin-bottom:18px;overflow:hidden;
+  background:linear-gradient(150deg, rgba(126,224,197,0.14), rgba(184,164,240,0.10) 60%, rgba(255,217,138,0.08));
+  border:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,0.3);}
+.hero::after{content:"🌙";position:absolute;right:-10px;top:-14px;font-size:90px;opacity:.10;transform:rotate(-12deg);}
+.hero .lbl{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.12em;}
+.hero .big{font-family:'Fraunces',serif;font-size:40px;font-weight:900;margin:6px 0 2px;letter-spacing:-1px;
+  background:linear-gradient(120deg,#fff,var(--moon));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+.hero .big small{font-family:'Outfit';font-size:13px;font-weight:500;color:var(--mut);-webkit-text-fill-color:var(--mut);}
+.hero .split{display:flex;gap:8px;margin-top:14px;}
+.hero .chip{flex:1;background:rgba(0,0,0,0.22);border:1px solid var(--line);border-radius:13px;padding:9px 6px;text-align:center;}
+.hero .chip .e{font-size:15px;} .hero .chip .v{font-size:13px;font-weight:700;color:var(--star);margin-top:2px;}
+.hero .chip .n{font-size:9px;color:var(--mut2);text-transform:uppercase;letter-spacing:.05em;}
+.pop{animation:pop .4s cubic-bezier(.2,.9,.3,1.4);}
+@keyframes pop{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
+
+/* tabs as pill segmented */
+.tabs{display:flex;gap:5px;margin-bottom:18px;background:var(--card);padding:5px;border-radius:16px;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 2px;border-radius:12px;
+  font-size:9px;font-weight:600;color:var(--mut);cursor:pointer;transition:.2s;text-transform:uppercase;letter-spacing:.04em;}
+.tab .te{font-size:18px;transition:.2s;}
+.tab.active{background:linear-gradient(135deg,var(--moon),var(--moon2));color:#3a2600;box-shadow:0 6px 18px rgba(245,185,66,0.25);}
+.tab.active .te{transform:scale(1.15);}
+.panel{display:none;} .panel.show{display:block;animation:fade .3s;}
+
+.sec-title{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:9px;}
+.sec-sub{font-size:11.5px;color:var(--mut);margin-bottom:14px;line-height:1.5;}
+
+.field{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:11px;transition:.2s;}
+.field:focus-within{border-color:rgba(255,217,138,0.4);background:var(--card2);}
+.field label{font-size:11.5px;color:var(--mut);display:block;margin-bottom:8px;font-weight:500;}
+.field .inline{display:flex;gap:9px;align-items:center;}
+.ip{background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:11px;padding:12px 13px;color:var(--txt);
+  font-size:16px;font-family:'Outfit';width:100%;font-weight:500;transition:.15s;}
+.ip:focus{outline:none;border-color:var(--moon);box-shadow:0 0 0 3px rgba(255,217,138,0.12);}
+select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffd98a' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:34px;}
+.unit{font-size:13px;color:var(--mut);white-space:nowrap;font-weight:500;}
+.hint{font-size:10.5px;color:var(--mut2);margin-top:7px;line-height:1.5;}
+
+.toggle{display:flex;gap:6px;margin-bottom:11px;background:rgba(0,0,0,0.2);padding:4px;border-radius:13px;}
+.toggle .t{flex:1;text-align:center;padding:11px 4px;border-radius:10px;font-size:11.5px;font-weight:600;color:var(--mut);cursor:pointer;transition:.2s;}
+.toggle .t.on{background:var(--card2);color:var(--moon);box-shadow:0 2px 10px rgba(0,0,0,0.2);}
+
+.check-row{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:12.5px;color:rgba(244,247,255,0.85);cursor:pointer;}
+.check-row .cb{width:24px;height:24px;border-radius:8px;border:2px solid var(--moon);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:#3a2600;transition:.2s;}
+.check-row.on .cb{background:var(--moon);transform:scale(1.05);}
+
+.res{background:linear-gradient(120deg,rgba(126,224,197,0.12),rgba(255,217,138,0.08));border:1px solid var(--line);
+  border-radius:16px;padding:15px 16px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;}
+.res .l{font-size:12.5px;color:rgba(244,247,255,0.75);} .res .v{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--moon);}
+.subres{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mut);padding:4px 6px;}
+.subres b{color:rgba(244,247,255,0.8);font-weight:600;}
+
+.legal{font-size:10px;color:var(--mut2);background:rgba(255,255,255,0.03);border-left:2px solid rgba(255,217,138,0.4);
+  border-radius:0 10px 10px 0;padding:10px 12px;margin-top:12px;line-height:1.55;}
+
+/* prime card */
+.prime{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:13px;margin-bottom:9px;cursor:pointer;transition:.2s;}
+.prime:active{transform:scale(0.98);}
+.prime.on{background:var(--card2);border-color:rgba(126,224,197,0.3);}
+.prime .chk{width:26px;height:26px;border-radius:9px;border:2px solid var(--aurora);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:#063;transition:.2s;}
+.prime.on .chk{background:var(--aurora);transform:scale(1.05);}
+.prime .nm{flex:1;font-size:13.5px;font-weight:600;} .prime .nm small{display:block;font-size:10.5px;color:var(--mut);font-weight:400;margin-top:1px;}
+.prime .amt{font-family:'Fraunces',serif;font-size:15px;font-weight:600;color:var(--aurora);text-align:right;}
+.prime.off{opacity:0.5;} .prime.off .amt{color:var(--mut2);font-family:'Outfit';font-size:13px;}
+.prime .del{background:none;border:none;color:var(--soft);font-size:16px;cursor:pointer;padding:0 2px;opacity:.7;}
+
+.addprime{text-align:center;margin-top:12px;}
+.addprime button{background:rgba(126,224,197,0.08);border:1.5px dashed var(--aurora);color:var(--aurora);
+  border-radius:14px;padding:13px;font-size:13px;font-weight:600;cursor:pointer;width:100%;transition:.2s;}
+.addprime button:active{transform:scale(0.97);background:rgba(126,224,197,0.16);}
+
+.foot{text-align:center;font-size:10px;color:var(--mut2);margin-top:22px;line-height:1.7;}
+.pe-row{margin-bottom:13px;} .pe-row label{font-size:11.5px;color:var(--mut);display:block;margin-bottom:6px;}
+.mchip{text-align:center;padding:9px 2px;border-radius:10px;font-size:11px;font-weight:600;background:rgba(0,0,0,0.2);
+  border:1px solid var(--line);color:var(--mut);cursor:pointer;transition:.15s;user-select:none;}
+.mchip.on{background:var(--moon);border-color:var(--moon);color:#3a2600;}
+.export-bar{margin-top:18px;display:flex;flex-direction:column;gap:9px;}
+.export-bar .twocol{display:flex;gap:9px;} .export-bar .twocol .btn{margin:0;}
+.history-empty{text-align:center;color:var(--mut);font-size:12.5px;padding:24px 12px;line-height:1.6;}
+.history-empty .e{font-size:38px;display:block;margin-bottom:10px;opacity:.6;}
+.hist-row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:13px 15px;margin-bottom:8px;font-size:13px;cursor:pointer;transition:.2s;}
+.hist-row:active{transform:scale(0.98);} .hist-row:hover{background:var(--card2);}
+.hist-row .hm{font-weight:600;text-transform:capitalize;} .hist-row .hv{font-family:'Fraunces',serif;color:var(--moon);font-weight:600;font-size:15px;}
+
+/* toast */
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);z-index:300;
+  background:linear-gradient(135deg,var(--moon),var(--moon2));color:#3a2600;font-weight:700;font-size:13px;
+  padding:12px 20px;border-radius:30px;box-shadow:0 10px 30px rgba(245,185,66,0.4);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* day list */
+.daylist{display:flex;flex-direction:column;gap:7px;}
+.dayrow{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);
+  border-radius:14px;padding:11px 13px;cursor:pointer;transition:.18s;}
+.dayrow:active{transform:scale(0.985);}
+.dayrow.has{background:var(--card2);border-color:rgba(126,224,197,0.28);}
+.dayrow.we{opacity:.92;}
+.dayrow .dnum{width:42px;flex-shrink:0;text-align:center;}
+.dayrow .dnum .dd{font-family:'Fraunces',serif;font-size:19px;font-weight:600;line-height:1;}
+.dayrow .dnum .dw{font-size:9px;color:var(--mut2);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.dayrow .dtags{flex:1;display:flex;flex-wrap:wrap;gap:4px;min-height:20px;align-items:center;}
+.dayrow .dtags .empty{font-size:11px;color:var(--mut2);}
+.dtag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;display:inline-flex;align-items:center;gap:3px;}
+.dtag.nuit{background:rgba(158,197,255,0.16);color:var(--star);}
+.dtag.astr{background:rgba(184,164,240,0.16);color:var(--lilac);}
+.dtag.prime{background:rgba(126,224,197,0.16);color:var(--aurora);}
+.dayrow .dval{font-family:'Fraunces',serif;font-size:14px;font-weight:600;color:var(--moon);flex-shrink:0;}
+.dayrow .dval.zero{font-family:'Outfit';font-size:12px;color:var(--mut2);font-weight:400;}
+.daysticky{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--night2),rgba(13,24,56,0.0));padding:2px 0 8px;}
+/* day editor popup sections */
+.deSection{border:1px solid var(--line);border-radius:16px;padding:13px;margin-bottom:11px;background:var(--card);}
+.deSection.on{border-color:rgba(126,224,197,0.3);background:var(--card2);}
+.deHead{display:flex;align-items:center;gap:10px;cursor:pointer;}
+.deHead .cb{width:24px;height:24px;border-radius:8px;border:2px solid var(--aurora);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:#063;transition:.2s;}
+.deSection.on .deHead .cb{background:var(--aurora);}
+.deHead .dt{flex:1;font-size:14px;font-weight:600;} .deHead .dt small{display:block;font-size:10.5px;color:var(--mut);font-weight:400;}
+.deBody{margin-top:12px;display:none;} .deSection.on .deBody{display:block;animation:fade .2s;}
+.deMini{font-size:11px;color:var(--mut);margin:2px 6px 6px;}
+.dprime{display:flex;align-items:center;gap:9px;padding:8px 4px;border-bottom:1px solid var(--line);}
+.dprime:last-child{border-bottom:none;}
+.dprime .pc{width:22px;height:22px;border-radius:7px;border:2px solid var(--aurora);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#063;}
+.dprime.on .pc{background:var(--aurora);}
+.dprime .pn{flex:1;font-size:12.5px;font-weight:500;} .dprime .pn small{display:block;font-size:10px;color:var(--mut);}
+.dprime .pq{width:64px;flex-shrink:0;}
+.dprime .pq input{width:100%;background:rgba(0,0,0,0.3);border:1px solid var(--line);border-radius:9px;padding:7px;color:var(--txt);font-size:14px;text-align:center;font-family:'Outfit';}
+.dayquick{display:flex;gap:7px;margin-bottom:12px;}
+.dayquick button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--mut);border-radius:11px;padding:9px 4px;font-size:11px;font-weight:600;cursor:pointer;}
+.dayquick button:active{background:var(--card2);}
+.copyprev{width:100%;background:rgba(158,197,255,0.1);border:1px dashed var(--star);color:var(--star);border-radius:12px;padding:11px;font-size:12px;font-weight:600;cursor:pointer;margin-bottom:12px;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--night);z-index:9999;"></div>
+
+<div id="lb"><div class="i">🌙</div><div class="t">Tourne ton téléphone</div><div style="color:var(--mut)">Cette appli s'utilise en portrait.</div></div>
+
+<header>
+  <a href="../menu.html" class="back">← Menu</a>
+  <div class="brand">
+    <div class="ti">Nuit, Astreinte &amp; Primes</div>
+    <div class="su">Ton suivi, jour après jour · v8.8</div>
+  </div>
+  <button class="hbtn" id="resetBtn" title="Réglages">⚙</button>
+  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd" style="text-align:center;padding-bottom:0;"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="owl" src="Mimizuku.png" alt="Mimizuku">
+      <h2>Hou hou ! Moi c'est Mimizuku</h2>
+      <p>Je veille sur tout ce qui <span class="accent">s'ajoute à ton salaire de base</span> quand la journée classique ne suffit pas à tout raconter.</p>
+      <p>Heures de nuit, astreintes, primes en tout genre… on va les suivre ensemble, tranquillement.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <img class="owl" src="Mimizuku.png" alt="Mimizuku">
+      <h2>On note jour par jour</h2>
+      <p>Tu n'as pas la même chose tous les jours ? C'est bien normal.</p>
+      <p>Ici, tu <span class="accent">touches un jour</span> dans la liste et tu déclares ce qui s'est passé : une nuit, une astreinte, une prime spéciale… ou rien du tout.</p>
+    </div>
+    <div class="wstep" data-step="2">
+      <img class="owl" src="Mimizuku.png" alt="Mimizuku">
+      <h2>Trois choses, pas plus</h2>
+      <div class="feat"><div class="ic">🌙</div><div class="tx"><b>La nuit</b>Tes heures nocturnes du jour, majorées ou en repos compensateur.</div></div>
+      <div class="feat"><div class="ic">📟</div><div class="tx"><b>L'astreinte</b>Le temps où tu restes joignable, et tes interventions réelles.</div></div>
+      <div class="feat"><div class="ic">🎁</div><div class="tx"><b>Les primes</b>Celles du jour (panier, dimanche…) et celles du mois (transport, 13e mois…).</div></div>
+    </div>
+    <div class="wstep" data-step="3">
+      <img class="owl" src="Mimizuku.png" alt="Mimizuku">
+      <h2>C'est toi qui mènes</h2>
+      <p>Les taux changent d'une convention à l'autre. Alors <span class="accent">tu saisis tes propres chiffres</span> — ceux de ton bulletin de paie.</p>
+      <p>Une fois ton taux horaire et tes montants réglés, je m'occupe des totaux.</p>
+    </div>
+    <div class="wstep" data-step="4">
+      <img class="owl" src="Mimizuku.png" alt="Mimizuku">
+      <h2>Un petit mot d'honnêteté</h2>
+      <p>Je <span class="accent">ne compte pas tes heures supplémentaires</span> — ça, c'est le travail du <b>module annuel</b> et du <b>module mensuel</b>.</p>
+      <p>Moi, je m'occupe de <span class="accent">ce qui vient en plus</span>.</p>
+      <div class="legal" style="margin-top:14px;">Mes estimations sont en brut, à titre indicatif. Seul ton bulletin de paie fait foi. Je ne suis ni avocat, ni comptable — juste une petite chouette attentionnée.</div>
+    </div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-moon" id="wNext">Continuer</button>
+    <button class="btn btn-soft" id="wSkip" style="margin-top:9px;">Passer l'intro</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">🦉 Mimizuku t'explique</div><div class="s">Comment on s'y prend</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">📅</div><div class="tx"><b>Choisir le mois</b>Les flèches en haut. Chaque mois est indépendant.</div></div>
+    <div class="feat"><div class="ic">👆</div><div class="tx"><b>Toucher un jour</b>Dans la liste, touche un jour pour déclarer nuit, astreinte ou prime. Tu peux recopier le jour précédent en un geste.</div></div>
+    <div class="feat"><div class="ic">⚙️</div><div class="tx"><b>Réglages du mois</b>Ton taux horaire de base, ta plage de nuit et tes taux par défaut — réglés une fois, repris partout.</div></div>
+    <div class="feat"><div class="ic">🎁</div><div class="tx"><b>Primes fixes</b>Transport, 13e mois, ancienneté… celles qui ne dépendent pas d'un jour précis.</div></div>
+    <div class="feat"><div class="ic">📊</div><div class="tx"><b>Historique</b>Tous tes mois, d'un coup d'œil.</div></div>
+    <div class="feat"><div class="ic">💾</div><div class="tx"><b>Sauvegarde</b>Tout reste sur ton téléphone. Exporte/restaure quand tu veux.</div></div>
+    <div class="legal">Rappel : suivi indicatif. Pour les heures sup, c'est le module annuel / mensuel.</div>
+    <button class="btn btn-moon" style="margin-top:14px;" data-close="help">Compris, merci Mimizuku</button>
+  </div></div>
+</div>
+
+<!-- RESET -->
+<div class="ov" id="resetOv">
+  <div class="box"><div class="hd"><div class="t">⚙ Réglages</div><div class="s">Que veux-tu faire ?</div>
+    <button class="x" data-close="resetOv">✕</button></div>
+  <div class="bd">
+    <button class="btn btn-soft" id="reReplay">📖 Revoir l'intro de Mimizuku</button>
+    <button class="btn btn-danger" id="reClearMonth" style="margin-top:9px;">🗑 Effacer le mois affiché</button>
+    <button class="btn btn-danger" id="reClearAll" style="margin-top:9px;">🧨 Tout recommencer (tous les mois)</button>
+    <button class="btn btn-moon" style="margin-top:14px;" data-close="resetOv">Annuler</button>
+  </div></div>
+</div>
+
+<!-- MONTH SETTINGS -->
+<div class="ov" id="setOv">
+  <div class="box"><div class="hd"><div class="t">⚙ Réglages du mois</div><div class="s">Réglés une fois, repris chaque jour</div>
+    <button class="x" data-close="setOv">✕</button></div>
+  <div class="bd">
+    <div class="field"><label>Ton taux horaire brut de base</label>
+      <div class="inline"><input class="ip" id="sBaseRate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div>
+      <div class="hint">Sert à estimer la majoration de nuit en euros.</div></div>
+    <div class="field"><label>Ta plage de nuit</label>
+      <div class="inline"><select class="ip" id="sNStart" style="text-align:center;"></select><span class="unit">→</span><select class="ip" id="sNEnd" style="text-align:center;"></select></div>
+      <div class="hint">Par défaut 21h–6h. Ta convention peut dire 22h–7h.</div></div>
+    <div class="field"><label>Taux de majoration de nuit par défaut</label>
+      <div class="inline"><input class="ip" id="sNRate" type="number" inputmode="decimal" value="0"><span class="unit">%</span></div>
+      <div class="hint">Repris pour chaque jour de nuit (modifiable jour par jour).</div></div>
+    <div class="field"><label>Indemnité d'astreinte par défaut</label>
+      <div class="inline"><input class="ip" id="sARate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div></div>
+    <div class="field"><label>Taux horaire d'intervention par défaut</label>
+      <div class="inline"><input class="ip" id="sAInterRate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div></div>
+    <button class="btn btn-moon" data-close="setOv" style="margin-top:4px;">Enregistrer</button>
+  </div></div>
+</div>
+
+<!-- DAY EDITOR -->
+<div class="ov" id="dayEdit">
+  <div class="box"><div class="hd"><div class="t" id="deTitle">Jour</div><div class="s" id="deSub">Que s'est-il passé ce jour-là ?</div>
+    <button class="x" data-close="dayEdit">✕</button></div>
+  <div class="bd">
+    <button class="copyprev" id="deCopyPrev">📋 Recopier le jour précédent</button>
+
+    <!-- NUIT -->
+    <div class="deSection" id="deNuit">
+      <div class="deHead" data-sec="deNuit"><div class="cb"></div><div class="dt">🌙 Heures de nuit<small id="deNuitSub">Tu as travaillé de nuit</small></div></div>
+      <div class="deBody">
+        <div class="field"><label>Heures de nuit ce jour</label>
+          <div class="inline"><input class="ip" id="deNHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+        <div class="toggle" id="deNMode">
+          <div class="t on" data-mode="majo">💶 Majorées</div>
+          <div class="t" data-mode="repos">😴 Repos compensateur</div></div>
+        <div class="field" id="deNMajoField"><label>Taux de majoration</label>
+          <div class="inline"><input class="ip" id="deNRate" type="number" inputmode="decimal" value="0"><span class="unit">%</span></div></div>
+        <div class="field" id="deNBaseField"><label>Ton taux horaire brut (pour l'estimation €)</label>
+          <div class="inline"><input class="ip" id="deNBase" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div>
+          <div class="hint">Saisi une fois, repris pour les jours suivants.</div></div>
+        <div class="field" id="deNReposField" style="display:none;"><label>Taux de repos compensateur</label>
+          <div class="inline"><input class="ip" id="deNReposRate" type="number" inputmode="decimal" value="0"><span class="unit">%</span></div>
+          <div class="hint">Affiché en temps, pas en euros.</div></div>
+      </div>
+    </div>
+
+    <!-- ASTREINTE -->
+    <div class="deSection" id="deAstr">
+      <div class="deHead" data-sec="deAstr"><div class="cb"></div><div class="dt">📟 Astreinte<small>Joignable, avec ou sans intervention</small></div></div>
+      <div class="deBody">
+        <div class="toggle" id="deAMode">
+          <div class="t on" data-mode="heure">À l'heure</div>
+          <div class="t" data-mode="forfait">Au forfait</div></div>
+        <div id="deAHeure">
+          <div class="field"><label>Temps d'astreinte (joignable)</label>
+            <div class="inline"><input class="ip" id="deAHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+          <div class="field"><label>Indemnité d'astreinte</label>
+            <div class="inline"><input class="ip" id="deARate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div></div>
+        </div>
+        <div id="deAForfait" style="display:none;">
+          <div class="field"><label>Montant du forfait ce jour</label>
+            <div class="inline"><input class="ip" id="deAForfaitAmt" type="number" inputmode="decimal" value="0"><span class="unit">€</span></div></div>
+        </div>
+        <div class="field"><label>Intervention réelle ce jour</label>
+          <div class="inline"><input class="ip" id="deAInter" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+        <div class="field"><label>Taux horaire d'intervention</label>
+          <div class="inline"><input class="ip" id="deAInterRate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div>
+          <div class="check-row" id="deAInterNight"><div class="cb"></div><div>Intervention de nuit (ajoute la majoration nuit)</div></div>
+          <div class="check-row" id="deAInterSun"><div class="cb"></div><div>Dimanche / jour férié</div></div></div>
+        <div class="field" id="deASunField" style="display:none;"><label>Majoration dimanche / férié</label>
+          <div class="inline"><input class="ip" id="deASunRate" type="number" inputmode="decimal" value="0"><span class="unit">%</span></div></div>
+      </div>
+    </div>
+
+    <!-- PRIMES JOUR -->
+    <div class="deSection" id="dePrimes">
+      <div class="deHead" data-sec="dePrimes"><div class="cb"></div><div class="dt">🎁 Primes du jour<small>Panier, dimanche, férié…</small></div></div>
+      <div class="deBody">
+        <div class="deMini">Coche et indique la quantité pour ce jour.</div>
+        <div id="dePrimeList"></div>
+        <div class="addprime" style="margin-top:8px;"><button id="deAddPrime">＋ Ajouter une prime jour</button></div>
+      </div>
+    </div>
+
+    <div class="res"><div class="l">Ce jour</div><div class="v" id="deDayTotal">+0 €</div></div>
+    <button class="btn btn-moon" id="deSave" style="margin-top:12px;">Enregistrer ce jour</button>
+    <button class="btn btn-danger" id="deClear" style="margin-top:8px;">Vider ce jour</button>
+  </div></div>
+</div>
+
+<!-- PRIME FIXE EDIT -->
+<div class="ov" id="primeEdit">
+  <div class="box"><div class="hd"><div class="t" id="peTitle">Nouvelle prime fixe</div><div class="s">D'après ton bulletin de paie</div>
+    <button class="x" data-close="primeEdit">✕</button></div>
+  <div class="bd">
+    <div class="pe-row"><label>Nom de la prime</label><input class="ip" id="peName" placeholder="Ex. Transport, 13e mois…"></div>
+    <div class="pe-row"><label>À quel rythme ?</label>
+      <select class="ip" id="peType">
+        <option value="mensuel">Chaque mois (€)</option>
+        <option value="trimestriel">Trimestrielle (€)</option>
+        <option value="semestriel">Semestrielle (€)</option>
+        <option value="annuel">Annuelle / 13e mois (€)</option>
+        <option value="pourcent">Juste une info en %</option>
+      </select></div>
+    <div class="pe-row"><label id="peAmtLabel">Montant</label>
+      <div class="inline"><input class="ip" id="peAmount" type="number" inputmode="decimal" placeholder="0"><span class="unit" id="peUnitLabel">€</span></div></div>
+    <div class="pe-row" id="pePeriodicRow" style="display:none;">
+      <label>Comment l'afficher dans le total ?</label>
+      <div class="toggle" id="pePeriodMode">
+        <div class="t on" data-pm="lisse">Lissé chaque mois</div>
+        <div class="t" data-pm="versement">Aux mois de versement</div>
+      </div>
+      <div class="hint" id="peVersementHint" style="display:none;">Coche le(s) mois où tu la reçois (<span id="peNeedN">2</span> attendus) — le montant sera réparti :</div>
+      <div id="peMonthsGrid" style="display:none;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px;"></div>
+      <div class="hint" id="peLisseHint">« Lissé » répartit sur l'année. « Aux mois de versement » colle à ton bulletin.</div>
+    </div>
+    <button class="btn btn-moon" id="peSave">Enregistrer</button>
+    <button class="btn btn-soft" style="margin-top:9px;" data-close="primeEdit">Annuler</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="ccn-chip" id="ccnChip" style="display:none;">
+    <span class="ic">⚖️</span><span>Ta convention : <b id="ccnName">—</b></span>
+  </div>
+
+  <div class="monthbar">
+    <button id="prevM">‹</button>
+    <div class="lbl" id="monthLbl">—<small>période</small></div>
+    <button id="nextM">›</button>
+  </div>
+
+  <div class="hero">
+    <div class="lbl">Ce qui s'ajoute · <span id="totMonth">ce mois</span></div>
+    <div class="big" id="totMain">+0 €<small> brut indicatif</small></div>
+    <div class="split">
+      <div class="chip"><div class="e">🌙</div><div class="v" id="totNuit">+0 €</div><div class="n">Nuit</div></div>
+      <div class="chip"><div class="e">📟</div><div class="v" id="totAstr">+0 €</div><div class="n">Astreinte</div></div>
+      <div class="chip"><div class="e">🎁</div><div class="v" id="totPrime">+0 €</div><div class="n">Primes</div></div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="jours"><span class="te">📅</span>Jours</div>
+    <div class="tab" data-tab="fixes"><span class="te">🎁</span>Primes fixes</div>
+    <div class="tab" data-tab="hist"><span class="te">📊</span>Historique</div>
+  </div>
+
+  <!-- JOURS -->
+  <div class="panel show" id="p-jours">
+    <div class="dayquick">
+      <button id="qReglages">⚙ Réglages du mois</button>
+    </div>
+    <div class="sec-sub" style="margin-bottom:10px;">Touche un jour pour déclarer une nuit, une astreinte ou une prime. Les jours déjà remplis sont surlignés.</div>
+    <div class="daylist" id="dayList"></div>
+  </div>
+
+  <!-- PRIMES FIXES -->
+  <div class="panel" id="p-fixes">
+    <div class="sec-title">🎁 Primes fixes du mois</div>
+    <div class="sec-sub">Celles qui ne dépendent pas d'un jour : transport, 13e mois, ancienneté…</div>
+    <div id="primeList"></div>
+    <div class="addprime"><button id="addPrimeBtn">＋ Ajouter une prime fixe</button></div>
+    <div class="subres" style="margin-top:10px;"><span>Primes fixes actives</span><b id="pCount">0</b></div>
+    <div class="res"><div class="l">Tes primes fixes ce mois</div><div class="v" id="pRes">+0 €</div></div>
+    <div class="legal">Montants que tu saisis. Certaines indemnités (transport, panier…) sont partiellement exonérées — l'estimation reste en brut.</div>
+  </div>
+
+  <!-- HIST -->
+  <div class="panel" id="p-hist">
+    <div class="sec-title">📊 Ton historique</div>
+    <div class="sec-sub">Tous les mois que tu as renseignés. Touche un mois pour l'ouvrir.</div>
+    <div id="histList"></div>
+  </div>
+
+  <div class="export-bar">
+    <button class="btn btn-ghost" id="exportPdfBtn">📄 Récapitulatif PDF du mois</button>
+    <div class="twocol">
+      <button class="btn btn-soft" id="exportJsonBtn">💾 Sauvegarder</button>
+      <button class="btn btn-soft" id="importJsonBtn">📥 Restaurer</button>
+    </div>
+    <input type="file" id="jsonInput" accept=".json,application/json" style="display:none;">
+  </div>
+
+  <div class="foot">
+    Estimations brutes, à titre informatif et de suivi.<br>
+    Seul ton bulletin de paie fait foi. Ni avis juridique, ni comptable.<br>
+    🦉 Tout reste sur ton appareil.
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>
+(function(){
+  "use strict";
+  var LS={ MONTHS:'M7_MONTHS', SET:'M7_SETTINGS', WELCOME:'M7_WELCOMED', CAT:'M7_PRIMES_CATALOG', DAYCAT:'M7_DAYPRIMES' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  function getRaw(k){ try{return localStorage.getItem(k);}catch(e){return null;} }
+  function eur(n){ n=Math.round((n||0)*100)/100; return (n>=0?'+':'')+n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+  function monthNum(key){ return parseInt(key.split('-')[1],10); }
+  function yearNum(key){ return parseInt(key.split('-')[0],10); }
+  function monthLabel(key){ var p=key.split('-'); var dt=new Date(+p[0],+p[1]-1,1); return dt.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); }
+  function daysInMonth(key){ return new Date(yearNum(key),monthNum(key),0).getDate(); }
+  var WD=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var PERIODIC={trimestriel:3,semestriel:6,annuel:12};
+  var MONTH_ABBR=['Jan','Fév','Mar','Avr','Mai','Juin','Juil','Aoû','Sep','Oct','Nov','Déc'];
+
+  /* fixed prime catalog (monthly/periodic), global */
+  var DEFAULT_FIXES=[
+    {id:'transport',name:'Indemnité transport',desc:'chaque mois',type:'mensuel',amount:0,on:false},
+    {id:'salissure',name:'Prime de salissure',desc:'chaque mois',type:'mensuel',amount:0,on:false},
+    {id:'habillage',name:'Contrepartie habillage',desc:'chaque mois',type:'mensuel',amount:0,on:false},
+    {id:'anciennete',name:'Prime d\u2019ancienneté',desc:'chaque mois',type:'mensuel',amount:0,on:false},
+    {id:'treize',name:'13e mois',desc:'une fois par an',type:'annuel',amount:0,pmode:'lisse',pmonths:[12],on:false}
+  ];
+  /* day-prime catalog (per-day primes), global definitions; quantities live in each day */
+  var DEFAULT_DAYPRIMES=[
+    {id:'panier',name:'Prime panier',desc:'par jour',amount:0},
+    {id:'dimanche',name:'Majoration dimanche',desc:'par dimanche',amount:0},
+    {id:'ferie',name:'Jour férié travaillé',desc:'par férié',amount:0},
+    {id:'equipe',name:'Prime d\u2019équipe / poste',desc:'par poste',amount:0},
+    {id:'repas',name:'Indemnité repas / déplacement',desc:'par jour',amount:0},
+    {id:'coupure',name:'Indemnité coupure / amplitude',desc:'par jour',amount:0}
+  ];
+
+  var settings=get(LS.SET,{baseRate:0,nStart:'21:00',nEnd:'06:00',nRate:0,aRate:0,aInterRate:0});
+  // ensure defaults
+  ['nStart','nEnd'].forEach(function(k,i){ if(!settings[k]) settings[k]=(i===0?'21:00':'06:00'); });
+  if(settings.nRate==null)settings.nRate=0; if(settings.aRate==null)settings.aRate=0; if(settings.aInterRate==null)settings.aInterRate=0; if(settings.baseRate==null)settings.baseRate=0;
+
+  var months=get(LS.MONTHS,{}); // months[key] = { days: { "1": {nuit,astr,primes:{id:qty}} , ... } }
+  var fixes=get(LS.CAT,null); if(!fixes) fixes=JSON.parse(JSON.stringify(DEFAULT_FIXES));
+  var dayPrimes=get(LS.DAYCAT,null); if(!dayPrimes) dayPrimes=JSON.parse(JSON.stringify(DEFAULT_DAYPRIMES));
+
+  var curKey=monthKey(new Date());
+  function curMonth(){ if(!months[curKey]) months[curKey]={days:{}}; if(!months[curKey].days) months[curKey].days={}; return months[curKey]; }
+  function saveAll(){ set(LS.MONTHS,months); set(LS.SET,settings); set(LS.CAT,fixes); set(LS.DAYCAT,dayPrimes); }
+
+  function toast(msg){ var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(function(){t.classList.remove('show');},1700); }
+  function popHero(){ var el=$('#totMain'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+
+  /* time dropdown options */
+  function timeOpts(){ var o=''; for(var hh=0;hh<24;hh++)for(var mm=0;mm<60;mm+=30){var t=String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');o+='<option value="'+t+'">'+t+'</option>';} return o; }
+
+  /* CCN banner */
+  (function(){ var nom=getRaw('CCN_NOM'),idcc=getRaw('CCN_IDCC');
+    function clean(s){ if(!s)return ''; s=String(s).trim(); if(s.charAt(0)==='"'){try{return JSON.parse(s);}catch(e){}} return s; }
+    nom=clean(nom);idcc=clean(idcc);
+    if(nom){ $('#ccnChip').style.display='flex'; $('#ccnName').textContent=nom+(idcc?(' · IDCC '+idcc):''); } })();
+
+  /* ===== DAY CALC ===== */
+  function dayNuit(day){ if(!day||!day.nuit)return 0; var d=day.nuit; if(d.mode==='repos')return 0; return (d.hours||0)*(settings.baseRate||0)*(d.rate||0)/100; }
+  function dayNuitRepos(day){ if(!day||!day.nuit||day.nuit.mode!=='repos')return 0; return (day.nuit.hours||0)*(day.nuit.reposRate||0)/100*60; }
+  function dayAstr(day){ if(!day||!day.astr)return 0; var a=day.astr;
+    var indem = a.mode==='forfait' ? (a.fAmt||0) : (a.hours||0)*(a.rate||0);
+    var interH=a.inter||0, interBase=interH*(a.interRate||0), extra=0;
+    if(a.night) extra+=interH*(settings.baseRate||0)*((day.nuit&&day.nuit.rate)||settings.nRate||0)/100;
+    if(a.sun) extra+=interBase*(a.sunRate||0)/100;
+    return indem+interBase+extra; }
+  function dayPrimesVal(day){ if(!day||!day.primes)return 0; var v=0; dayPrimes.forEach(function(p){ var q=day.primes[p.id]||0; v+=(p.amount||0)*q; }); return v; }
+  function dayTotal(day){ return dayNuit(day)+dayAstr(day)+dayPrimesVal(day); }
+  function dayHasContent(day){ if(!day)return false;
+    if(day.nuit&&(day.nuit.hours||0)>0)return true;
+    if(day.astr&&((day.astr.hours||0)>0||(day.astr.fAmt||0)>0||(day.astr.inter||0)>0))return true;
+    if(day.primes){ for(var k in day.primes){ if(day.primes[k]>0)return true; } }
+    return false; }
+
+  /* ===== FIXED PRIMES CALC ===== */
+  function fixeValueFor(p,key){ if(!p.on)return 0;
+    if(p.type==='mensuel')return p.amount||0;
+    if(p.type==='pourcent')return 0;
+    if(PERIODIC[p.type]){ var amt=p.amount||0;
+      if((p.pmode||'lisse')==='lisse')return amt/PERIODIC[p.type];
+      var pm=p.pmonths&&p.pmonths.length?p.pmonths:[12];
+      return pm.indexOf(monthNum(key))>=0 ? amt/pm.length : 0; }
+    return 0; }
+  function fixeValue(p){ return fixeValueFor(p,curKey); }
+
+  /* ===== MONTH AGG ===== */
+  function monthAgg(key){ var m=months[key]; var n=0,a=0,p=0,reposMin=0;
+    if(m&&m.days){ for(var dk in m.days){ var day=m.days[dk]; n+=dayNuit(day); a+=dayAstr(day); p+=dayPrimesVal(day); reposMin+=dayNuitRepos(day); } }
+    var pf=0; fixes.forEach(function(f){ if(f.on&&f.type!=='pourcent') pf+=fixeValueFor(f,key); });
+    return {nuit:n,astr:a,primesJour:p,primesFixe:pf,repos:reposMin,total:n+a+p+pf}; }
+  function monthTotal(key){ return monthAgg(key).total; }
+
+  function fmtRepos(min){ min=Math.round(min||0); if(min<=0)return ''; var h=Math.floor(min/60),m=min%60;
+    if(h&&m)return h+'h'+String(m).padStart(2,'0'); if(h)return h+'h'; return m+' min'; }
+  function recalc(){ var g=monthAgg(curKey);
+    var repTxt=fmtRepos(g.repos);
+    $('#totNuit').innerHTML=eur(g.nuit)+(repTxt?('<div style="font-size:10px;color:var(--aurora);font-weight:600;margin-top:1px;">😴 '+repTxt+'</div>'):'');
+    $('#totAstr').textContent=eur(g.astr); $('#totPrime').textContent=eur(g.primesJour+g.primesFixe);
+    $('#totMain').innerHTML=eur(g.total)+'<small> brut indicatif</small>'+(repTxt?('<div style="font-family:\'Outfit\';font-size:12px;font-weight:600;color:var(--aurora);-webkit-text-fill-color:var(--aurora);margin-top:2px;">+ '+repTxt+' de repos compensateur</div>'):''); popHero();
+    $('#pRes').textContent=eur(g.primesFixe); var cnt=0; fixes.forEach(function(f){if(f.on)cnt++;}); $('#pCount').textContent=cnt;
+  }
+
+  /* ===== WIZARD ===== */
+  var wizard=$('#wizard'),wStep=0,wMax=5;
+  function renderDots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function showStep(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});renderDots();
+    $('#wNext').textContent=(n===wMax-1)?'C\'est parti ✨':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  function openWizard(){wizard.classList.add('show');showStep(0);}
+  function closeWizard(){wizard.classList.remove('show');set(LS.WELCOME,1);}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)showStep(wStep+1);else closeWizard();});
+  $('#wSkip').addEventListener('click',closeWizard);
+
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $('#resetBtn').addEventListener('click',function(){$('#resetOv').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+  $('#reReplay').addEventListener('click',function(){$('#resetOv').classList.remove('show');openWizard();});
+  $('#reClearMonth').addEventListener('click',function(){ if(confirm('Effacer toutes les saisies du mois « '+monthLabel(curKey)+' » ?')){ delete months[curKey]; saveAll(); $('#resetOv').classList.remove('show'); renderDays(); recalc(); toast('Mois effacé'); }});
+  $('#reClearAll').addEventListener('click',function(){ if(confirm('Tout recommencer ? Tous les mois seront effacés.')){ months={}; fixes=JSON.parse(JSON.stringify(DEFAULT_FIXES)); dayPrimes=JSON.parse(JSON.stringify(DEFAULT_DAYPRIMES)); settings={baseRate:0,nStart:'21:00',nEnd:'06:00',nRate:0,aRate:0,aInterRate:0}; saveAll(); $('#resetOv').classList.remove('show'); renderDays(); renderFixes(); recalc(); toast('Tout est remis à zéro'); }});
+
+  /* ===== TABS ===== */
+  $all('.tab').forEach(function(t){t.addEventListener('click',function(){
+    $all('.tab').forEach(function(x){x.classList.remove('active');}); $all('.panel').forEach(function(x){x.classList.remove('show');});
+    t.classList.add('active'); $('#p-'+t.dataset.tab).classList.add('show');
+    if(t.dataset.tab==='hist') renderHistory(); if(t.dataset.tab==='jours') renderDays(); if(t.dataset.tab==='fixes') renderFixes();
+  });});
+
+  function shiftMonth(delta){ var p=curKey.split('-'); var d=new Date(+p[0],+p[1]-1+delta,1); curKey=monthKey(d); refreshMonthUI(); }
+  $('#prevM').addEventListener('click',function(){shiftMonth(-1);});
+  $('#nextM').addEventListener('click',function(){shiftMonth(1);});
+  function refreshMonthUI(){ $('#monthLbl').innerHTML=monthLabel(curKey)+'<small>période</small>'; $('#totMonth').textContent=monthLabel(curKey); renderDays(); renderFixes(); recalc(); }
+
+  /* ===== MONTH SETTINGS ===== */
+  $('#qReglages').addEventListener('click',function(){ openSettings(); });
+  function openSettings(){
+    $('#sBaseRate').value=settings.baseRate||0; $('#sNRate').value=settings.nRate||0;
+    $('#sARate').value=settings.aRate||0; $('#sAInterRate').value=settings.aInterRate||0;
+    $('#sNStart').value=settings.nStart||'21:00'; $('#sNEnd').value=settings.nEnd||'06:00';
+    $('#setOv').classList.add('show');
+  }
+  ['sBaseRate','sNRate','sARate','sAInterRate','sNStart','sNEnd'].forEach(function(id){
+    $('#'+id).addEventListener('input',function(){
+      settings.baseRate=parseFloat($('#sBaseRate').value)||0; settings.nRate=parseFloat($('#sNRate').value)||0;
+      settings.aRate=parseFloat($('#sARate').value)||0; settings.aInterRate=parseFloat($('#sAInterRate').value)||0;
+      settings.nStart=$('#sNStart').value; settings.nEnd=$('#sNEnd').value; saveAll(); recalc(); renderDays();
+    });
+  });
+
+  /* ===== DAY LIST ===== */
+  function renderDays(){
+    var c=$('#dayList'); if(!c)return; c.innerHTML=''; var m=curMonth(), n=daysInMonth(curKey), y=yearNum(curKey), mo=monthNum(curKey);
+    for(var d=1;d<=n;d++){(function(dnum){
+      var dt=new Date(y,mo-1,dnum), wd=dt.getDay(), day=m.days[dnum];
+      var row=document.createElement('div'); row.className='dayrow'+(dayHasContent(day)?' has':'')+((wd===0||wd===6)?' we':'');
+      var tags='';
+      if(day){ if(day.nuit&&(day.nuit.hours||0)>0)tags+='<span class="dtag nuit">🌙 '+(day.nuit.hours)+'h</span>';
+        if(day.astr&&((day.astr.hours||0)>0||(day.astr.fAmt||0)>0||(day.astr.inter||0)>0))tags+='<span class="dtag astr">📟</span>';
+        var pc=0; if(day.primes){for(var k in day.primes){if(day.primes[k]>0)pc++;}} if(pc)tags+='<span class="dtag prime">🎁 '+pc+'</span>'; }
+      if(!tags)tags='<span class="empty">—</span>';
+      var tot=dayTotal(day);
+      row.innerHTML='<div class="dnum"><div class="dd">'+dnum+'</div><div class="dw">'+WD[wd]+'</div></div>'+
+        '<div class="dtags">'+tags+'</div>'+
+        '<div class="dval'+(tot?'':' zero')+'">'+(tot?eur(tot):'')+'</div>';
+      row.addEventListener('click',function(){ openDay(dnum); });
+      c.appendChild(row);
+    })(d);}
+  }
+
+  /* ===== DAY EDITOR ===== */
+  var deDay=null, deNum=0;
+  function blankDay(){ return {nuit:{hours:0,mode:'majo',rate:settings.nRate||0,reposRate:settings.nReposRate||0},
+    astr:{mode:'heure',hours:0,rate:settings.aRate||0,fAmt:0,inter:0,interRate:settings.aInterRate||0,night:false,sun:false,sunRate:settings.aSunRate||0},
+    primes:{}, _nuitOn:false,_astrOn:false,_primesOn:false }; }
+  function openDay(dnum){
+    deNum=dnum; var m=curMonth();
+    var existing=m.days[dnum];
+    deDay = existing ? JSON.parse(JSON.stringify(existing)) : blankDay();
+    if(!deDay.nuit)deDay.nuit=blankDay().nuit; if(!deDay.astr)deDay.astr=blankDay().astr; if(!deDay.primes)deDay.primes={};
+    // section on-states based on content
+    deDay._nuitOn = (deDay.nuit.hours||0)>0 || existing&&existing._nuitOn;
+    deDay._astrOn = (deDay.astr.hours||0)>0||(deDay.astr.fAmt||0)>0||(deDay.astr.inter||0)>0 || existing&&existing._astrOn;
+    var pc=false; for(var k in deDay.primes){if(deDay.primes[k]>0)pc=true;} deDay._primesOn= pc || (existing&&existing._primesOn);
+    var dt=new Date(yearNum(curKey),monthNum(curKey)-1,dnum);
+    $('#deTitle').textContent=WD[dt.getDay()]+' '+dnum+' '+MONTH_ABBR[monthNum(curKey)-1];
+    $('#deCopyPrev').style.display = (dnum>1 && m.days[dnum-1]) ? 'block' : 'none';
+    // fill nuit
+    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0;
+    $('#deNBase').value=settings.baseRate||0;
+    setDeNMode(deDay.nuit.mode||'majo');
+    // fill astr
+    setDeAMode(deDay.astr.mode||'heure');
+    $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun);
+    $('#deASunField').style.display=deDay.astr.sun?'block':'none';
+    // sections
+    setSection('deNuit',deDay._nuitOn); setSection('deAstr',deDay._astrOn); setSection('dePrimes',deDay._primesOn);
+    renderDayPrimes();
+    updateDeTotal();
+    $('#dayEdit').classList.add('show');
+  }
+  function setSection(id,on){ var s=$('#'+id); s.classList.toggle('on',!!on); s.querySelector('.deHead .cb').textContent=on?'✓':''; }
+  $all('.deHead').forEach(function(h){ h.addEventListener('click',function(){
+    var id=h.dataset.sec; var s=$('#'+id); var on=!s.classList.contains('on'); setSection(id,on);
+    if(id==='deNuit')deDay._nuitOn=on; if(id==='deAstr')deDay._astrOn=on; if(id==='dePrimes')deDay._primesOn=on;
+  }); });
+  function setDeNMode(mode){ $all('#deNMode .t').forEach(function(b){b.classList.toggle('on',b.dataset.mode===mode);});
+    $('#deNMajoField').style.display=mode==='majo'?'block':'none'; $('#deNReposField').style.display=mode==='repos'?'block':'none'; deDay.nuit.mode=mode; }
+  $all('#deNMode .t').forEach(function(b){b.addEventListener('click',function(){setDeNMode(b.dataset.mode);updateDeTotal();});});
+  function setDeAMode(mode){ $all('#deAMode .t').forEach(function(b){b.classList.toggle('on',b.dataset.mode===mode);});
+    $('#deAHeure').style.display=mode==='heure'?'block':'none'; $('#deAForfait').style.display=mode==='forfait'?'block':'none'; deDay.astr.mode=mode; }
+  $all('#deAMode .t').forEach(function(b){b.addEventListener('click',function(){setDeAMode(b.dataset.mode);updateDeTotal();});});
+  function setDeCheck(sel,on){ $(sel).classList.toggle('on',!!on); $(sel+' .cb').textContent=on?'✓':''; }
+  $('#deAInterNight').addEventListener('click',function(){deDay.astr.night=!deDay.astr.night;setDeCheck('#deAInterNight',deDay.astr.night);updateDeTotal();});
+  $('#deAInterSun').addEventListener('click',function(){deDay.astr.sun=!deDay.astr.sun;setDeCheck('#deAInterSun',deDay.astr.sun);$('#deASunField').style.display=deDay.astr.sun?'block':'none';updateDeTotal();});
+
+  function readDeInputs(){
+    deDay.nuit.hours=parseFloat($('#deNHours').value)||0; deDay.nuit.rate=parseFloat($('#deNRate').value)||0; deDay.nuit.reposRate=parseFloat($('#deNReposRate').value)||0;
+    deDay.astr.hours=parseFloat($('#deAHours').value)||0; deDay.astr.rate=parseFloat($('#deARate').value)||0; deDay.astr.fAmt=parseFloat($('#deAForfaitAmt').value)||0;
+    deDay.astr.inter=parseFloat($('#deAInter').value)||0; deDay.astr.interRate=parseFloat($('#deAInterRate').value)||0; deDay.astr.sunRate=parseFloat($('#deASunRate').value)||0;
+    // Report auto : un taux saisi devient le defaut, repris pour les jours suivants (jusqu'a nouveau changement)
+    if(deDay.nuit.rate>0) settings.nRate=deDay.nuit.rate;
+    if(deDay.astr.rate>0) settings.aRate=deDay.astr.rate;
+    if(deDay.astr.interRate>0) settings.aInterRate=deDay.astr.interRate;
+    if(deDay.astr.sunRate>0) settings.aSunRate=deDay.astr.sunRate;
+    if(deDay.nuit.reposRate>0) settings.nReposRate=deDay.nuit.reposRate;
+    var b=parseFloat($('#deNBase').value); if(!isNaN(b)&&b>0) settings.baseRate=b;
+    set(LS.SET,settings);
+  }
+  ['deNHours','deNRate','deNBase','deNReposRate','deAHours','deARate','deAForfaitAmt','deAInter','deAInterRate','deASunRate'].forEach(function(id){
+    $('#'+id).addEventListener('input',function(){ readDeInputs(); updateDeTotal(); });
+  });
+  function updateDeTotal(){ readDeInputs();
+    var tmp=JSON.parse(JSON.stringify(deDay));
+    if(!deDay._nuitOn)tmp.nuit={hours:0,mode:'majo',rate:0,reposRate:0};
+    if(!deDay._astrOn)tmp.astr={mode:'heure',hours:0,rate:0,fAmt:0,inter:0,interRate:0,night:false,sun:false,sunRate:0};
+    if(!deDay._primesOn)tmp.primes={};
+    var t=dayNuit(tmp)+dayAstr(tmp)+dayPrimesVal(tmp);
+    var rep=dayNuitRepos(tmp);
+    $('#deDayTotal').innerHTML = eur(t) + (rep&&deDay._nuitOn?(' <small style="font-size:11px;color:var(--mut)">+ '+Math.round(rep)+' min repos</small>'):'');
+  }
+  function renderDayPrimes(){
+    var c=$('#dePrimeList'); c.innerHTML='';
+    dayPrimes.forEach(function(p){
+      var q=deDay.primes[p.id]||0, on=q>0;
+      var row=document.createElement('div'); row.className='dprime'+(on?' on':'');
+      var custom=DEFAULT_DAYPRIMES.findIndex(function(d){return d.id===p.id;})===-1;
+      row.innerHTML='<div class="pc">'+(on?'✓':'')+'</div><div class="pn">'+p.name+'<small>'+(p.amount?eur(p.amount).replace('+','')+' · '+p.desc:p.desc)+'</small></div>'+
+        '<div class="pq"><input type="number" inputmode="numeric" value="'+(q||'')+'" placeholder="0"></div>'+
+        (custom?'<button class="del" style="background:none;border:none;color:var(--soft);font-size:15px;cursor:pointer;">🗑</button>':'');
+      var inp=row.querySelector('input');
+      inp.addEventListener('input',function(){ deDay.primes[p.id]=parseFloat(inp.value)||0; row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
+      row.querySelector('.pc').addEventListener('click',function(){ if((deDay.primes[p.id]||0)>0){deDay.primes[p.id]=0;inp.value='';}else{ if(!p.amount){ editDayPrimeAmount(p); return;} deDay.primes[p.id]=1;inp.value=1;} row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
+      row.querySelector('.pn').addEventListener('click',function(){ editDayPrimeAmount(p); });
+      var del=row.querySelector('.del'); if(del)del.addEventListener('click',function(){ if(confirm('Supprimer « '+p.name+' » ?')){ var ix=dayPrimes.findIndex(function(x){return x.id===p.id;}); if(ix>=0)dayPrimes.splice(ix,1); saveAll(); renderDayPrimes(); } });
+      c.appendChild(row);
+    });
+  }
+  function editDayPrimeAmount(p){
+    var v=prompt('Montant de « '+p.name+' » (€ par unité) :', p.amount||'');
+    if(v===null)return; p.amount=parseFloat(v)||0; saveAll(); renderDayPrimes();
+  }
+  $('#deAddPrime').addEventListener('click',function(){
+    var name=prompt('Nom de la prime jour :'); if(!name)return;
+    var amt=prompt('Montant (€ par unité) :','0'); 
+    dayPrimes.push({id:'dp_'+Date.now(),name:name.trim(),desc:'personnalisée',amount:parseFloat(amt)||0});
+    saveAll(); renderDayPrimes();
+  });
+  $('#deCopyPrev').addEventListener('click',function(){
+    var prev=curMonth().days[deNum-1]; if(!prev){toast('Pas de jour précédent');return;}
+    deDay=JSON.parse(JSON.stringify(prev)); openDayFromObj(); toast('Jour précédent recopié 📋');
+  });
+  function openDayFromObj(){
+    if(!deDay.nuit)deDay.nuit=blankDay().nuit; if(!deDay.astr)deDay.astr=blankDay().astr; if(!deDay.primes)deDay.primes={};
+    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0; setDeNMode(deDay.nuit.mode||'majo');
+    $('#deNBase').value=settings.baseRate||0;
+    setDeAMode(deDay.astr.mode||'heure'); $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun); $('#deASunField').style.display=deDay.astr.sun?'block':'none';
+    deDay._nuitOn=(deDay.nuit.hours||0)>0; deDay._astrOn=(deDay.astr.hours||0)>0||(deDay.astr.fAmt||0)>0||(deDay.astr.inter||0)>0; var pc=false;for(var k in deDay.primes){if(deDay.primes[k]>0)pc=true;} deDay._primesOn=pc;
+    setSection('deNuit',deDay._nuitOn); setSection('deAstr',deDay._astrOn); setSection('dePrimes',deDay._primesOn);
+    renderDayPrimes(); updateDeTotal();
+  }
+  $('#deSave').addEventListener('click',function(){
+    readDeInputs(); var m=curMonth();
+    if(!deDay._nuitOn)deDay.nuit={hours:0,mode:'majo',rate:0,reposRate:0};
+    if(!deDay._astrOn)deDay.astr={mode:'heure',hours:0,rate:0,fAmt:0,inter:0,interRate:0,night:false,sun:false,sunRate:0};
+    if(!deDay._primesOn)deDay.primes={};
+    if(dayHasContent(deDay)||deDay._nuitOn||deDay._astrOn||deDay._primesOn){ m.days[deNum]=deDay; }
+    else { delete m.days[deNum]; }
+    saveAll(); $('#dayEdit').classList.remove('show'); renderDays(); recalc(); toast('Jour enregistré ✨');
+  });
+  $('#deClear').addEventListener('click',function(){ var m=curMonth(); delete m.days[deNum]; saveAll(); $('#dayEdit').classList.remove('show'); renderDays(); recalc(); toast('Jour vidé'); });
+
+  /* ===== FIXED PRIMES UI ===== */
+  function fixeDesc(p){ if(PERIODIC[p.type]){ var r={trimestriel:'trimestrielle',semestriel:'semestrielle',annuel:'annuelle'}[p.type]; var mo=(p.pmode||'lisse')==='lisse'?'lissée':'au versement'; return r+' · '+mo; } return p.desc||''; }
+  function fixeLabel(p){ if(p.type==='pourcent')return '+'+(p.amount||0)+' %'; if(!p.on)return '—';
+    if(PERIODIC[p.type]&&(p.pmode||'lisse')==='versement'){ var pm=p.pmonths&&p.pmonths.length?p.pmonths:[12]; return pm.indexOf(monthNum(curKey))>=0?eur(fixeValue(p)):'le mois venu'; }
+    var v=fixeValue(p); return v?eur(v):'—'; }
+  function renderFixes(){ var c=$('#primeList'); if(!c)return; c.innerHTML='';
+    fixes.forEach(function(p,idx){
+      var row=document.createElement('div'); row.className='prime'+(p.on?' on':' off');
+      var custom=DEFAULT_FIXES.findIndex(function(d){return d.id===p.id;})===-1;
+      row.innerHTML='<div class="chk">'+(p.on?'✓':'')+'</div><div class="nm">'+p.name+'<small>'+fixeDesc(p)+'</small></div><div class="amt">'+fixeLabel(p)+'</div>'+(custom?'<button class="del">🗑</button>':'');
+      row.querySelector('.chk').addEventListener('click',function(e){e.stopPropagation();p.on=!p.on;if(p.on&&!p.amount){openFixeEdit(idx);}else{saveAll();renderFixes();recalc();if(p.on)toast('Prime activée ✨');}});
+      row.querySelector('.nm').addEventListener('click',function(){openFixeEdit(idx);});
+      row.querySelector('.amt').addEventListener('click',function(){openFixeEdit(idx);});
+      var del=row.querySelector('.del'); if(del)del.addEventListener('click',function(e){e.stopPropagation();if(confirm('Supprimer « '+p.name+' » ?')){fixes.splice(idx,1);saveAll();renderFixes();recalc();}});
+      c.appendChild(row);
+    });
+  }
+  var feIdx=-1, feSelMonths=[];
+  function renderMonthChips(){ var g=$('#peMonthsGrid'); g.innerHTML=''; for(var i=1;i<=12;i++){(function(mn){
+    var chip=document.createElement('div'); chip.className='mchip'+(feSelMonths.indexOf(mn)>=0?' on':''); chip.textContent=MONTH_ABBR[mn-1];
+    chip.addEventListener('click',function(){ var ix=feSelMonths.indexOf(mn); if(ix>=0)feSelMonths.splice(ix,1);else feSelMonths.push(mn); renderMonthChips(); });
+    g.appendChild(chip); })(i);} }
+  function expectedMonths(t){ return t==='annuel'?1:(t==='semestriel'?2:(t==='trimestriel'?4:1)); }
+  function openFixeEdit(idx){ feIdx=idx;
+    var p=idx>=0?fixes[idx]:{name:'',amount:0,type:'mensuel',pmode:'lisse',pmonths:[12]};
+    $('#peTitle').textContent=idx>=0?'Modifier la prime':'Nouvelle prime fixe';
+    $('#peName').value=p.name||''; $('#peAmount').value=p.amount||''; $('#peType').value=p.type||'mensuel';
+    feSelMonths=(p.pmonths&&p.pmonths.length)?p.pmonths.slice():[12];
+    setPeriodMode(p.pmode||'lisse'); renderMonthChips(); syncPeType(); $('#primeEdit').classList.add('show');
+  }
+  function setPeriodMode(pm){ $all('#pePeriodMode .t').forEach(function(b){b.classList.toggle('on',b.dataset.pm===pm);});
+    var v=(pm==='versement'); $('#peVersementHint').style.display=v?'block':'none'; $('#peMonthsGrid').style.display=v?'grid':'none'; }
+  $all('#pePeriodMode .t').forEach(function(b){b.addEventListener('click',function(){setPeriodMode(b.dataset.pm);});});
+  function syncPeType(){ var t=$('#peType').value, periodic=!!PERIODIC[t];
+    $('#pePeriodicRow').style.display=periodic?'block':'none';
+    $('#peUnitLabel').textContent=(t==='pourcent')?'%':'€';
+    $('#peAmtLabel').textContent=(t==='pourcent')?'Taux (juste une info)':(periodic?'Montant total de la prime':'Montant');
+    if(periodic)$('#peNeedN').textContent=expectedMonths(t); }
+  $('#peType').addEventListener('change',syncPeType);
+  $('#peSave').addEventListener('click',function(){
+    var name=$('#peName').value.trim(); if(!name){alert('Donne un petit nom à ta prime 🙂');return;}
+    var type=$('#peType').value, pm=$('#pePeriodMode .t.on')?$('#pePeriodMode .t.on').dataset.pm:'lisse';
+    var amount=parseFloat($('#peAmount').value)||0;
+    if(PERIODIC[type]&&pm==='versement'){ if(feSelMonths.length===0){alert('Choisis au moins un mois.');return;}
+      var need=expectedMonths(type); if(feSelMonths.length!==need&&!confirm('Tu as choisi '+feSelMonths.length+' mois au lieu de '+need+'. Le montant sera réparti sur ces mois. Continuer ?'))return; }
+    var pmonths=feSelMonths.slice().sort(function(a,b){return a-b;});
+    if(feIdx>=0){var ex=fixes[feIdx];ex.name=name;ex.amount=amount;ex.type=type;ex.on=true;ex.pmode=pm;ex.pmonths=pmonths;if(!ex.desc)ex.desc='personnalisée';}
+    else{fixes.push({id:'fixe_'+Date.now(),name:name,desc:'personnalisée',type:type,amount:amount,on:true,pmode:pm,pmonths:pmonths});}
+    saveAll(); $('#primeEdit').classList.remove('show'); renderFixes(); recalc(); toast('Enregistré ✨');
+  });
+  $('#addPrimeBtn').addEventListener('click',function(){openFixeEdit(-1);});
+
+  /* ===== HISTORY ===== */
+  function renderHistory(){ var c=$('#histList'),keys=Object.keys(months).sort().reverse().filter(function(k){return monthTotal(k)>0;}); c.innerHTML='';
+    if(keys.length===0){c.innerHTML='<div class="history-empty"><span class="e">🌙</span>Rien à raconter pour l\'instant.<br>Renseigne un jour et ton mois apparaîtra ici.</div>';return;}
+    keys.forEach(function(k){ var row=document.createElement('div'); row.className='hist-row';
+      row.innerHTML='<span class="hm">'+monthLabel(k)+'</span><span class="hv">'+eur(monthTotal(k))+'</span>';
+      row.addEventListener('click',function(){ curKey=k; $all('.tab').forEach(function(x){x.classList.remove('active');});$all('.panel').forEach(function(x){x.classList.remove('show');});$('.tab[data-tab="jours"]').classList.add('active');$('#p-jours').classList.add('show'); refreshMonthUI(); window.scrollTo({top:0,behavior:'smooth'}); });
+      c.appendChild(row); });
+  }
+
+  /* ===== JSON ===== */
+  $('#exportJsonBtn').addEventListener('click',function(){ try{
+    var payload={app:'SimulHeures',module:'M7',version:4,date:new Date().toISOString(),settings:settings,fixes:fixes,dayPrimes:dayPrimes,months:months};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    var d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    a.href=url;a.download='nuit-primes-sauvegarde-'+stamp+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('Sauvegarde téléchargée 💾');
+  }catch(e){alert('Erreur export : '+e.message);} });
+  $('#importJsonBtn').addEventListener('click',function(){$('#jsonInput').click();});
+  $('#jsonInput').addEventListener('change',function(ev){ var f=ev.target.files&&ev.target.files[0];if(!f)return;var r=new FileReader();
+    r.onload=function(e){ try{ var d=JSON.parse(e.target.result);
+      if(d.module!=='M7'||!d.months){alert('Ce fichier n\'est pas une sauvegarde de cette appli.');ev.target.value='';return;}
+      if(!confirm('Restaurer cette sauvegarde ?\nDate : '+(d.date?new Date(d.date).toLocaleDateString('fr-FR'):'?')+'\nMois : '+Object.keys(d.months).length+'\n\nTes données actuelles seront remplacées.')){ev.target.value='';return;}
+      months=d.months||{}; settings=d.settings||settings; if(d.fixes)fixes=d.fixes; if(d.dayPrimes)dayPrimes=d.dayPrimes; saveAll(); curKey=monthKey(new Date()); refreshMonthUI(); toast('Restauré ✨');
+    }catch(err){alert('Impossible de lire le fichier : '+err.message);} ev.target.value=''; };
+    r.readAsText(f); });
+
+  /* ===== PDF ===== */
+  $('#exportPdfBtn').addEventListener('click',function(){ if(!window.jspdf){alert('Le PDF arrive… réessaie dans un instant.');return;}
+    try{ var jsPDF=window.jspdf.jsPDF,doc=new jsPDF({unit:'mm',format:'a4'}),y=18,g=monthAgg(curKey),m=curMonth();
+      doc.setFontSize(16);doc.setTextColor(20,30,60);doc.text('Nuit, Astreinte & Primes',14,y);y+=6;
+      doc.setFontSize(9);doc.setTextColor(120);doc.text('Recapitulatif indicatif — '+monthLabel(curKey),14,y);y+=10;
+      function line(l,v){doc.text(l,14,y);doc.text(v,196,y,{align:'right'});y+=7;}
+      doc.setFontSize(11);doc.setTextColor(30);doc.setFont(undefined,'bold');line('Heures de nuit',eur(g.nuit));doc.setFont(undefined,'normal');
+      if(g.repos){doc.setFontSize(9);doc.setTextColor(120);line('  + '+Math.round(g.repos)+' min de repos compensateur','');}
+      doc.setFontSize(11);doc.setTextColor(30);doc.setFont(undefined,'bold');line('Astreinte + interventions',eur(g.astr));
+      line('Primes du jour',eur(g.primesJour));line('Primes fixes',eur(g.primesFixe));doc.setFont(undefined,'normal');
+      // days detail
+      var dk=Object.keys(m.days||{}).map(Number).sort(function(a,b){return a-b;});
+      if(dk.length){ y+=2;doc.setFontSize(9);doc.setTextColor(120);doc.text('Detail par jour :',14,y);y+=6;
+        dk.forEach(function(dn){var t=dayTotal(m.days[dn]);if(t){line('  '+dn+' '+monthLabel(curKey).split(' ')[0],eur(t));}}); }
+      y+=2;doc.setDrawColor(200);doc.line(14,y,196,y);y+=8;
+      doc.setFontSize(13);doc.setTextColor(20,30,60);doc.setFont(undefined,'bold');line('TOTAL additionnel estime',eur(g.total));doc.setFont(undefined,'normal');
+      y+=6;doc.setFontSize(7.5);doc.setTextColor(140);
+      var disc='Document indicatif et personnel. Estimations en brut. Seul le bulletin de paie fait foi. Ne constitue pas un avis juridique ni comptable. Les heures supplementaires sont decomptees separement (module annuel / module mensuel).';
+      doc.text(doc.splitTextToSize(disc,182),14,y);
+      var dd=new Date(),stamp=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+      var uniq=String(dd.getHours()).padStart(2,'0')+String(dd.getMinutes()).padStart(2,'0')+String(dd.getSeconds()).padStart(2,'0');
+      var fname='nuit-primes-'+curKey+'-'+stamp+'-'+uniq+'.pdf';
+      // Telechargement via blob frais + object-URL (evite que Chrome Android reserve un ancien PDF)
+      try{
+        var blob=doc.output('blob');
+        var url=URL.createObjectURL(blob);
+        var a=document.createElement('a'); a.href=url; a.download=fname;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function(){ URL.revokeObjectURL(url); },2000);
+      }catch(e2){ doc.save(fname); }
+      toast('PDF généré 📄');
+    }catch(e){alert('Erreur PDF : '+e.message);} });
+
+  /* ===== INIT ===== */
+  $('#sNStart').innerHTML=timeOpts(); $('#sNEnd').innerHTML=timeOpts();
+  // toujours resynchroniser quand on revient sur la page (evite tout total fige)
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ try{ recalc(); renderDays(); }catch(e){} } });
+  window.addEventListener('pageshow',function(){ try{ recalc(); }catch(e){} });
+  refreshMonthUI();
+  if(!get(LS.WELCOME,0)){ openWizard(); }
+})();
+</script>
+</body>
+</html>
