@@ -1143,6 +1143,14 @@
   <div class="title" style="color:#a8d0ff;">📊 Lumina — Grilles CCN 2026</div>
 </div>
 
+<div class="btn" id="btn-module7" onclick="go('module7')" style="border:2px solid rgba(91,141,239,0.5);background:linear-gradient(160deg,#0c1a2e,#15294a);">
+  <img src="module7/mimizuku-menu.jpg" loading="eager" alt="Mimizuku — Nuit, Astreinte & Primes" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+  <div class="btn-no-img" style="background:linear-gradient(135deg,#0c1a2e,#15294a);min-height:100px;display:none">
+    <span style="font-size:2rem;">🌙</span>
+  </div>
+  <div class="title" style="color:#9ec3ff;">🌙 Nuit, Astreinte &amp; Primes</div>
+</div>
+
 <button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
 
 <button class="info-btn" onclick="openSharePopup()" style="margin-top:-8px;">📲 Partager l'application</button>
@@ -1444,17 +1452,18 @@ function copyLink(url, btnId) {
   });
 }
 function nativeShare() {
-  const url = 'https://simulateurheuressupfrance.pages.dev/menu';
-  const text = '📲 Installe l\'application SimulHeures pour suivre tes heures supplémentaires !';
+  const urlIOS = 'https://simulateurheuressupfrance.pages.dev/menu';
+  const urlAndroid = 'https://play.google.com/store/apps/details?id=com.tonytonic.heuressup';
+  const text = '📲 Installe l\'application SimulHeures pour suivre tes heures supplémentaires !\n\n📱 iPhone / iPad :\n' + urlIOS + '\n\n🤖 Android :\n' + urlAndroid;
   if (navigator.share) {
-    navigator.share({ title: 'SimulHeures — Heures Sup France', text: text, url: url })
+    navigator.share({ title: 'SimulHeures — Heures Sup France', text: text })
       .catch(function(){});
   } else {
-    // Fallback : copier le lien + message
-    navigator.clipboard.writeText(url).then(function(){
-      alert('📋 Lien copié !\n\n' + url);
+    // Fallback : copier les deux liens + message
+    navigator.clipboard.writeText(text).then(function(){
+      alert('📋 Liens copiés !\n\n' + text);
     }).catch(function(){
-      prompt('Copie ce lien pour le partager :', url);
+      prompt('Copie ce message pour le partager :', text);
     });
   }
 }
@@ -1519,7 +1528,7 @@ document.addEventListener('keydown', function(e){
 </div>
 
 <footer>
-  <div style="margin-bottom: 8px;">Développé par C. Anthony v10.0.0</div>
+  <div style="margin-bottom: 8px;">Développé par C. Anthony v7.2.0</div>
 
   <!-- Bouton contact -->
   <div style="text-align:center;margin:12px 0 8px;">
@@ -1749,6 +1758,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const contratType = _safeLS.get('menuContratType');
     const btn5 = document.getElementById('btn-module5');
     const btn6 = document.getElementById('btn-module6');
+    const btn7 = document.getElementById('btn-module7');
 
     // ── Helpers ──────────────────────────────────────────────────
     function removeBadge(btn) {
@@ -1764,7 +1774,13 @@ document.addEventListener('DOMContentLoaded', function(){
       btn.style.position = 'relative';
       btn.appendChild(badge);
     }
-    function firstBtn() { return document.querySelector('.btn:not(#btn-module5):not(#btn-module6)'); }
+    function firstBtn() { return document.querySelector('.btn:not(#btn-module5):not(#btn-module6):not(#btn-module7)'); }
+    // place Mimizuku (M7) right after a given button
+    function placeM7After(refBtn) {
+      if(!btn7 || !refBtn) return;
+      if(refBtn.nextSibling) refBtn.parentNode.insertBefore(btn7, refBtn.nextSibling);
+      else refBtn.parentNode.appendChild(btn7);
+    }
 
     if(contratType === 'partiel') {
       // ── M5 en premier + fond violet ───────────────────────────
@@ -1776,6 +1792,7 @@ document.addEventListener('DOMContentLoaded', function(){
         btn5.style.boxShadow = '0 4px 20px rgba(123,79,212,0.25)';
         addBadge(btn5, '#7B4FD4');
       }
+      placeM7After(btn5);
       // M6 : après M4
       if(btn6) {
         const btn4 = document.getElementById('btn-module4');
@@ -1802,6 +1819,7 @@ document.addEventListener('DOMContentLoaded', function(){
         if(titleEl) titleEl.style.color = '#C4A35A';
         addBadge(btn6, '#8B6914');
       }
+      placeM7After(btn6);
       // M5 : après M4
       if(btn5) {
         const btn4 = document.getElementById('btn-module4');
@@ -1834,6 +1852,12 @@ document.addEventListener('DOMContentLoaded', function(){
         btn6.style.boxShadow = '';
         const b6 = btn6.querySelector('.badge-mon-contrat'); if(b6) b6.remove();
       }
+      // Mimizuku en 3e position : juste apres module annuel (heures) + mensuel (paye)
+      (function(){
+        var payeBtn = document.querySelector('.btn[onclick*="paye"]');
+        if(payeBtn) placeM7After(payeBtn);
+        else placeM7After(btn6);
+      })();
       document.body.style.background = '#4FB3C2';
       document.querySelector('meta[name="theme-color"]')?.setAttribute('content','#4FB3C2');
     }
@@ -2303,7 +2327,7 @@ document.addEventListener('DOMContentLoaded', function(){
 <div id="annonce-overlay">
   <div id="annonce-card">
     <div class="annonce-badge">🎉 Nouveautés juin 2026</div>
-    <div class="annonce-titre">Deux nouveaux modules<br>sont disponibles !</div>
+    <div class="annonce-titre">De nouveaux modules<br>sont disponibles !</div>
     <div class="annonce-sous-titre">SimulHeures s'agrandit</div>
 
     <div class="annonce-modules">
@@ -2317,12 +2341,17 @@ document.addEventListener('DOMContentLoaded', function(){
         <div class="annonce-module-nom">Lumina</div>
         <div class="annonce-module-desc">428 grilles CCN 2026 — minima conventionnels</div>
       </div>
+      <div class="annonce-module">
+        <span class="annonce-module-ico">🌙</span>
+        <div class="annonce-module-nom">Mimizuku</div>
+        <div class="annonce-module-desc">Nuit, astreinte & primes — suivi jour par jour</div>
+      </div>
     </div>
 
     <div class="annonce-divider"></div>
 
     <div class="annonce-texte">
-      Retrouvez Zenji et Lumina dans le menu principal.<br>
+      Retrouvez Zenji, Lumina et Mimizuku dans le menu principal.<br>
       Données locales · Zéro collecte · Conformité Directive EU 2023/970.
     </div>
 
@@ -2332,8 +2361,9 @@ document.addEventListener('DOMContentLoaded', function(){
 </div>
 
 <script>
+var ANNONCE_KEY = 'annonce_zenji_lumina_mimizuku_v2';
 (function(){
-  var KEY = 'annonce_zenji_lumina_v1';
+  var KEY = ANNONCE_KEY;
   var EXPIRY_DAYS = 30;
 
   try {
@@ -2358,7 +2388,7 @@ function fermerAnnonce() {
   var overlay = document.getElementById('annonce-overlay');
   if (overlay) overlay.style.display = 'none';
   document.body.style.overflow = '';
-  try { localStorage.setItem('annonce_zenji_lumina_v1', Date.now().toString()); } catch(e) {}
+  try { localStorage.setItem(ANNONCE_KEY, Date.now().toString()); } catch(e) {}
 }
 
 // Fermer en cliquant sur l'overlay
