@@ -3,7 +3,7 @@
  * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.1.1";
+const CACHE_NAME = "heuressup-cache-v8.5.0"; // Cache First + skip cross-origin (fix CORS fonts)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -54,18 +54,42 @@ const FILES_TO_CACHE = [
   "./module5/js/features/pdf-report.js",
   "./module5/js/features/saisie.js",
   "./module5/js/features/wellbeing.js",
-  // Image Mizuki (préchargée pour M5)
+  // === Module 6 — Cadres (Zenji) ===
+  "./module6/index.html",
+  "./module6/css/main.css",
+  "./module6/images/Cadre.png",
+  "./module6/js/app.js",
+  "./module6/js/core/bio-engine.js",
+  "./module6/js/core/calc-engine.js",
+  "./module6/js/core/safe-boot.js",
+  "./module6/js/core/storage.js",
+  "./module6/js/data/ccn-adapter.js",
+  "./module6/js/data/glossaire-cadres.js",
+  "./module6/js/features/calendar.js",
+  "./module6/js/features/charts.js",
+  "./module6/js/features/coach.js",
+  "./module6/js/features/entretien-glossaire.js",
+  "./module6/js/features/import-export.js",
+  "./module6/js/features/nullite-checker.js",
+  "./module6/js/features/pdf-report.js",
+  "./module6/js/features/rupture-calculateur.js",
+  "./module6/js/features/simulateur-nullite.js",
+  "./module6/js/features/validite-heures-cd.js",
+  "./module6/js/features/zenji-popup.js",
+  "./module6/js/features/zenji.js",
+  "./module6/js/views/view-cadre-dirigeant.js",
+  "./module6/js/views/view-forfait-heures.js",
+  "./module6/js/views/view-forfait-jours.js",
+  "./module6/ccn/coefficients-grilles.js",
+  "./module6/ccn/conventions-cadres.js",
+  // Images
   "./images/Mizuki.PNG",
   "./images/renard-annuel.png.jpg", "./images/renard-mensuel.png.jpg",
   "./images/renard-central.png.jpg",
-
-  // Décors saisonniers Fox (dans images/)
   "./images/fox-bg.PNG",
   "./images/fox-bg-2.jpg",
   "./images/fox-bg-3.jpg",
   "./images/fox-bg-4.jpg",
-
-  // PNJ Fox (dans images/)
   "./images/foxplayer.PNG",
   "./images/foxplayer-2.PNG",
   "./images/foxplayer-3.PNG",
@@ -76,23 +100,21 @@ const FILES_TO_CACHE = [
   "./images/foxplayer-8.PNG",
   "./images/foxplayer-9.PNG",
   "./images/foxplayer-10.PNG",
-
-  // Images Fox (dans images/)
-  "./images/foxpredit.jpg"
+  "./images/foxpredit.jpg",
+  // === Lumina — Grilles Salariales CCN 2026 ===
+  "./GrillePaye/index.html",
+  "./GrillePaye/ccn-data.json"
 ];
 
 // ── INSTALL ───────────────────────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
-  
   event.waitUntil(
     caches.open(CACHE_NAME).then(async (cache) => {
-      
       let ok = 0, fail = 0;
       for (const url of FILES_TO_CACHE) {
         try {
           const res = await fetch(url);
           if (res.ok) {
-            // Lire le body complet avant de mettre en cache (fix Cloudflare content-length:0)
             const body = await res.arrayBuffer();
             const headers = new Headers();
             res.headers.forEach((val, key) => {
@@ -100,9 +122,8 @@ self.addEventListener("install", (event) => {
                 headers.append(key, val);
               }
             });
-            // Forcer Content-Length avec la vraie taille du body décompressé
             headers.set('content-length', body.byteLength.toString());
-            headers.delete('content-encoding'); // supprimer gzip/br — body déjà décompressé
+            headers.delete('content-encoding');
             headers.delete('transfer-encoding');
             const cleanRes = new Response(body, { status: res.status, statusText: res.statusText, headers });
             await cache.put(url, cleanRes);
@@ -115,9 +136,6 @@ self.addEventListener("install", (event) => {
           console.error("  ❌ [CACHE FAIL]", url, "— erreur:", err.message);
         }
       }
-      
-      
-      // Lister le contenu du cache après installation
       const keys = await cache.keys();
     })
   );
@@ -126,7 +144,6 @@ self.addEventListener("install", (event) => {
 
 // ── ACTIVATE ──────────────────────────────────────────────────────────────────
 self.addEventListener("activate", (event) => {
-  
   event.waitUntil(
     caches.keys().then(async (keys) => {
       for (const key of keys) {
@@ -139,24 +156,48 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-// ── FETCH ─────────────────────────────────────────────────────────────────────
+// ── FETCH — CACHE FIRST (stale-while-revalidate) ──────────────────────────────
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  const url = event.request.url;
-  const shortUrl = url.replace(self.location.origin, '');
+  // Ne PAS intercepter les requêtes cross-origin (Google Fonts, CDN…)
+  // Sinon la réécriture des headers casse le CORS (erreur if-modified-since).
+  const reqUrl = new URL(event.request.url);
+  if (reqUrl.origin !== self.location.origin) return;
 
   event.respondWith(
-    fetch(event.request)
-      .then(async (networkResponse) => {
-        const status = networkResponse.status;
-        if (status === 200) {
-          // Lire le body COMPLET avant de cloner — fix Cloudflare content-length:0
+    caches.match(event.request).then((cachedResponse) => {
+      // Cache disponible → retourner immédiatement + rafraîchir en arrière-plan
+      if (cachedResponse) {
+        fetch(event.request).then(async (networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const body = await networkResponse.arrayBuffer();
+            const headers = new Headers();
+            networkResponse.headers.forEach((val, key) => {
+              if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                headers.append(key, val);
+              }
+            });
+            headers.set('content-length', body.byteLength.toString());
+            headers.delete('content-encoding');
+            headers.delete('transfer-encoding');
+            const cleanResponse = new Response(body, {
+              status: networkResponse.status,
+              statusText: networkResponse.statusText,
+              headers
+            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+          }
+        }).catch(() => {});
+        return cachedResponse;
+      }
+
+      // Pas en cache → réseau
+      return fetch(event.request).then(async (networkResponse) => {
+        if (networkResponse && networkResponse.status === 200) {
           const body = await networkResponse.arrayBuffer();
-          // Reconstruire une réponse propre sans les headers qui bloquent le cache
           const headers = new Headers();
           networkResponse.headers.forEach((val, key) => {
-            // Exclure les headers qui empêchent la mise en cache
             if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
               headers.append(key, val);
             }
@@ -169,41 +210,23 @@ self.addEventListener("fetch", (event) => {
             statusText: networkResponse.statusText,
             headers
           });
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, cleanResponse);
-          });
-          // Retourner une nouvelle réponse avec le même body
-          return new Response(body, { status, statusText: networkResponse.statusText, headers: networkResponse.headers });
-        } else {
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+          return new Response(body, { status: networkResponse.status, statusText: networkResponse.statusText, headers: networkResponse.headers });
         }
         return networkResponse;
-      })
-      .catch((netErr) => {
-        
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          
-          console.error("❌ [FETCH CACHE MISS]", shortUrl, "— non trouvé dans le cache !");
-          
-          // Fallback HTML
-          const isNav = event.request.mode === "navigate" ||
-            event.request.headers.get("accept")?.includes("text/html");
-          
-          if (isNav) {
-            return caches.match(OFFLINE_URL).then(r => {
-              console.error("💥 [FETCH FALLBACK FAIL] menu.html absent du cache !");
-            });
-          }
-        });
-      })
+      }).catch(() => {
+        // Offline + pas en cache → fallback HTML
+        const isNav = event.request.mode === "navigate" ||
+          event.request.headers.get("accept")?.includes("text/html");
+        if (isNav) return caches.match(OFFLINE_URL);
+        return new Response('', { status: 503 });
+      });
+    })
   );
 });
 
 // ── SYNC ──────────────────────────────────────────────────────────────────────
-self.addEventListener("sync", (e) => {
-});
+self.addEventListener("sync", (e) => {});
 
 self.addEventListener("periodicsync", (e) => {
   if (e.tag === "update-cache") {
