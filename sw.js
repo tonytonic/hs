@@ -1,93 +1,91 @@
 /**
- * Service Worker : Simulateur Heures Sup & RPG Fox
- * Version : 6.0.0 (Le Parfait - Offline Solide + Periodic Sync)
+ * Service Worker — Simulateur Heures Sup & RPG Fox
+ * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.1.4";
+const CACHE_NAME = "heuressup-cache-v8.5.0"; // Cache First + skip cross-origin (fix CORS fonts)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
-  "./", 
-  "./index.html", 
-  "./menu.html", 
-  "./manifest.json",
-  "./icon-192.png", 
-  "./icon-512.png", 
-  "./apple-touch-icon.png",
-  "./heures/index.html", 
+  "./", "./index.html", "./menu.html", "./manifest.json",
+  "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
+  "./glossaire.js", "./ccn/conventions-collectives.js",
+  "./heures/index.html",
   "./paye/index.html",
-  "./module4/index.html",
-  "./module4/js/app.js",
-  "./module4/js/core/dte-engine.js",
-  "./module4/js/core/dte-simulator.js",
-  "./module4/js/core/dte-risks.js",
-  "./module4/js/core/dte-learning.js",
-  "./module4/js/features/ai-advisor.js",
-  "./module4/js/features/checkin.js",
-  "./module4/js/features/lifestyle.js",
-  "./module4/js/features/notifications.js",
-  "./module4/js/features/dte-glossary.js",
-  "./module4/js/features/dte-scenarios.js",
-  "./module4/js/ui/dashboard.js",
-  "./module4/js/ui/heatmap.js",
-  "./module4/js/ui/whatif-panel.js",
-  "./module4/js/ui/twin-body.js",
-  "./module4/js/ui/animus-boot.js",
-  "./module4/css/main.css",
-  "./module4/css/dashboard.css",
-  "./module4/css/components.css",
-  "./module4/css/charts.css",
-  "./module4/css/twin-body.css",
-  "./images/renard-annuel.png.jpg", 
-  "./images/renard-mensuel.png.jpg", 
-  "./images/renard-central.png.jpg",
-  "./fox/index.html", 
-  "./fox/css/style.css", 
-  "./fox/js/safety.js",
-  "./fox/js/storage.js", 
-  "./fox/js/config.js", 
-  "./fox/js/assets-config.js",
-  "./fox/js/modes.js", 
-  "./fox/js/xp-system.js", 
-  "./fox/js/leagues.js",
-  "./fox/js/badges.js", 
-  "./fox/js/milestones.js", 
-  "./fox/js/rpg-system.js",
-  "./fox/js/module3.js", 
-  "./fox/js/quests.js", 
-  "./fox/js/combat.js",
-  "./fox/js/skills.js", 
-  "./fox/js/inventory.js", 
-  "./fox/js/module-loader.js",
-  "./fox/js/scenarios-fox-data.js", 
-  "./fox/js/scenarios-fox.js",
-  "./fox/js/scenarios-ai.js", 
-  "./fox/js/legal-engine.js",
-  "./fox/js/data-bridge.js", 
-  "./fox/js/module-reader.js",
-  "./fox/js/snapshot-system.js", 
-  "./fox/js/export-rtf.js",
-  "./fox/js/ai-integration.js",
-  "./fox/js/main-rpg.js",
-
-  // Fox — fichiers manquants
-  "./fox/js/vue-pro.js",
-  "./fox/js/articles-loi.js",
-
-  // M4 — fichiers manquants
-  "./module4/js/features/schedule.js",
-  "./module4/js/features/vacances.js",
+  "./fox/index.html", "./fox/css/style.css",
+  "./fox/js/config.js", "./fox/js/assets-config.js", "./fox/js/safety.js",
+  "./fox/js/modes.js", "./fox/js/xp-system.js", "./fox/js/leagues.js",
+  "./fox/js/badges.js", "./fox/js/milestones.js", "./fox/js/rpg-system.js",
+  "./fox/js/quests.js", "./fox/js/combat.js", "./fox/js/skills.js",
+  "./fox/js/inventory.js", "./fox/js/module-loader.js",
+  "./fox/js/scenarios-fox-data.js", "./fox/js/scenarios-fox.js",
+  "./fox/js/scenarios-ai.js",
+  "./fox/js/legal-engine.js", "./fox/js/module-reader.js",
+  "./fox/js/module3.js", "./fox/js/data-bridge.js", "./fox/js/storage.js",
+  "./fox/js/snapshot-system.js", "./fox/js/export-rtf.js",
+  "./fox/js/ai-integration.js", "./fox/js/main-rpg.js",
+  "./fox/js/vue-pro.js", "./fox/js/articles-loi.js",
+  "./module4/index.html", "./module4/js/app.js",
+  "./module4/js/core/dte-engine.js", "./module4/js/core/dte-simulator.js",
+  "./module4/js/core/dte-risks.js", "./module4/js/core/dte-learning.js",
+  "./module4/js/features/ai-advisor.js", "./module4/js/features/checkin.js",
+  "./module4/js/features/lifestyle.js", "./module4/js/features/notifications.js",
+  "./module4/js/features/dte-glossary.js", "./module4/js/features/dte-scenarios.js",
+  "./module4/js/features/schedule.js", "./module4/js/features/vacances.js",
   "./module4/js/features/pdf-report.js",
-  "./module4/js/ui/radar-chart.js",
+  "./module4/js/ui/dashboard.js", "./module4/js/ui/heatmap.js",
+  "./module4/js/ui/whatif-panel.js", "./module4/js/ui/twin-body.js",
+  "./module4/js/ui/animus-boot.js", "./module4/js/ui/radar-chart.js",
   "./module4/js/ui/timeline-chart.js",
-
-  // CCN
-  "./ccn/conventions-collectives.js",
-
-  // Glossaire
-  "./glossaire.js",
-
-  // Images Fox décors & PNJ
+  "./module4/css/main.css", "./module4/css/dashboard.css",
+  "./module4/css/components.css", "./module4/css/charts.css",
+  "./module4/css/twin-body.css",
+  "./module4/assets/favicon.svg", "./module4/assets/icon-192.svg",
+  "./module4/assets/logo-dte.svg",
+  // === Module 5 — Temps partiel (Mizuki) ===
+  "./module5/index.html",
+  "./module5/css/main.css",
+  "./module5/assets/mizuki.svg",
+  "./module5/js/app.js",
+  "./module5/js/core/calc-engine.js",
+  "./module5/js/data/ccn-partiel.js",
+  "./module5/js/features/glossaire.js",
+  "./module5/js/features/mizuki.js",
+  "./module5/js/features/pdf-report.js",
+  "./module5/js/features/saisie.js",
+  "./module5/js/features/wellbeing.js",
+  // === Module 6 — Cadres (Zenji) ===
+  "./module6/index.html",
+  "./module6/css/main.css",
+  "./module6/images/Cadre.png",
+  "./module6/js/app.js",
+  "./module6/js/core/bio-engine.js",
+  "./module6/js/core/calc-engine.js",
+  "./module6/js/core/safe-boot.js",
+  "./module6/js/core/storage.js",
+  "./module6/js/data/ccn-adapter.js",
+  "./module6/js/data/glossaire-cadres.js",
+  "./module6/js/features/calendar.js",
+  "./module6/js/features/charts.js",
+  "./module6/js/features/coach.js",
+  "./module6/js/features/entretien-glossaire.js",
+  "./module6/js/features/import-export.js",
+  "./module6/js/features/nullite-checker.js",
+  "./module6/js/features/pdf-report.js",
+  "./module6/js/features/rupture-calculateur.js",
+  "./module6/js/features/simulateur-nullite.js",
+  "./module6/js/features/validite-heures-cd.js",
+  "./module6/js/features/zenji-popup.js",
+  "./module6/js/features/zenji.js",
+  "./module6/js/views/view-cadre-dirigeant.js",
+  "./module6/js/views/view-forfait-heures.js",
+  "./module6/js/views/view-forfait-jours.js",
+  "./module6/ccn/coefficients-grilles.js",
+  "./module6/ccn/conventions-cadres.js",
+  // Images
+  "./images/Mizuki.PNG",
+  "./images/renard-annuel.png.jpg", "./images/renard-mensuel.png.jpg",
+  "./images/renard-central.png.jpg",
   "./images/fox-bg.PNG",
   "./images/fox-bg-2.jpg",
   "./images/fox-bg-3.jpg",
@@ -102,126 +100,172 @@ const FILES_TO_CACHE = [
   "./images/foxplayer-8.PNG",
   "./images/foxplayer-9.PNG",
   "./images/foxplayer-10.PNG",
-  "./foxpredit.jpg",
+  "./images/foxpredit.jpg",
+  // === Lumina — Grilles Salariales CCN 2026 ===
+  "./GrillePaye/index.html",
+  "./GrillePaye/ccn-data.json"
 ];
 
-// --- INSTALLATION : Mise en cache fichier par fichier ---
+// ── INSTALL ───────────────────────────────────────────────────────────────────
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return Promise.all(
-        FILES_TO_CACHE.map((url) => {
-          return cache.add(url).catch((err) => {
-            console.warn("⚠️ Échec mise en cache (ignorable si en dev) :", url);
-          });
-        })
-      );
+    caches.open(CACHE_NAME).then(async (cache) => {
+      let ok = 0, fail = 0;
+      for (const url of FILES_TO_CACHE) {
+        try {
+          const res = await fetch(url);
+          if (res.ok) {
+            const body = await res.arrayBuffer();
+            const headers = new Headers();
+            res.headers.forEach((val, key) => {
+              if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                headers.append(key, val);
+              }
+            });
+            headers.set('content-length', body.byteLength.toString());
+            headers.delete('content-encoding');
+            headers.delete('transfer-encoding');
+            const cleanRes = new Response(body, { status: res.status, statusText: res.statusText, headers });
+            await cache.put(url, cleanRes);
+            ok++;
+          } else {
+            fail++;
+          }
+        } catch(err) {
+          fail++;
+          console.error("  ❌ [CACHE FAIL]", url, "— erreur:", err.message);
+        }
+      }
+      const keys = await cache.keys();
     })
   );
   self.skipWaiting();
 });
 
-// --- ACTIVATION : Nettoyage automatique des vieux caches ---
+// ── ACTIVATE ──────────────────────────────────────────────────────────────────
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      );
+    caches.keys().then(async (keys) => {
+      for (const key of keys) {
+        if (key !== CACHE_NAME) {
+          await caches.delete(key);
+        }
+      }
     })
   );
   self.clients.claim();
 });
 
-// --- FETCH : Stratégie Network First (Plus frais) avec Fallback Cache (Solidité) ---
+// ── FETCH — CACHE FIRST (stale-while-revalidate) ──────────────────────────────
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  // Ne PAS intercepter les requêtes cross-origin (Google Fonts, CDN…)
+  // Sinon la réécriture des headers casse le CORS (erreur if-modified-since).
+  const reqUrl = new URL(event.request.url);
+  if (reqUrl.origin !== self.location.origin) return;
+
   event.respondWith(
-    fetch(event.request)
-      .then((networkResponse) => {
-        // Si réseau OK, on met à jour le cache avec la nouvelle version
+    caches.match(event.request).then((cachedResponse) => {
+      // Cache disponible → retourner immédiatement + rafraîchir en arrière-plan
+      if (cachedResponse) {
+        fetch(event.request).then(async (networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const body = await networkResponse.arrayBuffer();
+            const headers = new Headers();
+            networkResponse.headers.forEach((val, key) => {
+              if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                headers.append(key, val);
+              }
+            });
+            headers.set('content-length', body.byteLength.toString());
+            headers.delete('content-encoding');
+            headers.delete('transfer-encoding');
+            const cleanResponse = new Response(body, {
+              status: networkResponse.status,
+              statusText: networkResponse.statusText,
+              headers
+            });
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+          }
+        }).catch(() => {});
+        return cachedResponse;
+      }
+
+      // Pas en cache → réseau
+      return fetch(event.request).then(async (networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
-          const cacheCopy = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cacheCopy));
+          const body = await networkResponse.arrayBuffer();
+          const headers = new Headers();
+          networkResponse.headers.forEach((val, key) => {
+            if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+              headers.append(key, val);
+            }
+          });
+          headers.set('content-length', body.byteLength.toString());
+          headers.delete('content-encoding');
+          headers.delete('transfer-encoding');
+          const cleanResponse = new Response(body, {
+            status: networkResponse.status,
+            statusText: networkResponse.statusText,
+            headers
+          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+          return new Response(body, { status: networkResponse.status, statusText: networkResponse.statusText, headers: networkResponse.headers });
         }
         return networkResponse;
-      })
-      .catch(() => {
-        // SI OFFLINE : On pioche dans le cache
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-          
-          // Secours ultime pour la navigation : renvoyer le menu
-          if (event.request.headers.get("accept") && event.request.headers.get("accept").includes("text/html")) {
-            return caches.match(OFFLINE_URL);
-          }
-        });
-      })
-  );
-});
-
-// --- SYNC : Pour les actions en attente ---
-self.addEventListener("sync", (event) => {
-  if (event.tag === "sync-punches") {
-    console.log("🔄 Synchronisation des pointages...");
-  }
-});
-
-// --- PERIODIC SYNC : La fameuse mise à jour auto ---
-self.addEventListener("periodicsync", (event) => {
-  if (event.tag === "update-cache") {
-    event.waitUntil(
-      caches.open(CACHE_NAME).then((cache) => {
-        return Promise.all(FILES_TO_CACHE.map(url => cache.add(url).catch(() => {})));
-      })
-    );
-  }
-});
-
-// --- NOTIFICATIONS PUSH ---
-self.addEventListener("push", (event) => {
-  const data = event.data ? event.data.json() : { title: "Heures Sup", body: "Nouvelle notification" };
-  event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: "./icon-192.png",
-      badge: "./icon-192.png"
+      }).catch(() => {
+        // Offline + pas en cache → fallback HTML
+        const isNav = event.request.mode === "navigate" ||
+          event.request.headers.get("accept")?.includes("text/html");
+        if (isNav) return caches.match(OFFLINE_URL);
+        return new Response('', { status: 503 });
+      });
     })
   );
 });
 
-// --- MESSAGES (GÉOLOCALISATION) ---
-self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "GEO_NOTIFY") {
-    const { action, distance } = event.data;
-    const isArrival = action === "in";
-    self.registration.showNotification(isArrival ? "📍 Arrivée" : "🏁 Départ", {
-      body: isArrival ? `Zone à ${Math.round(distance)}m` : `Sortie de zone`,
-      icon: "./icon-192.png",
-      tag: "geo-punch",
+// ── SYNC ──────────────────────────────────────────────────────────────────────
+self.addEventListener("sync", (e) => {});
+
+self.addEventListener("periodicsync", (e) => {
+  if (e.tag === "update-cache") {
+    e.waitUntil(
+      caches.open(CACHE_NAME).then((c) =>
+        Promise.all(FILES_TO_CACHE.map((u) => c.add(u).catch(() => {})))
+      )
+    );
+  }
+});
+
+self.addEventListener("push", (e) => {
+  const d = e.data?.json() ?? { title: "Heures Sup", body: "Notification" };
+  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "./icon-192.png" }));
+});
+
+self.addEventListener("message", (e) => {
+  if (e.data?.type === "GEO_NOTIFY") {
+    const { action, distance } = e.data;
+    self.registration.showNotification(action === "in" ? "📍 Arrivée" : "🏁 Départ", {
+      body: action === "in" ? `Zone à ${Math.round(distance)}m` : "Sortie de zone",
+      icon: "./icon-192.png", tag: "geo-punch",
       actions: [{ action: "punch", title: "Pointer" }, { action: "dismiss", title: "Fermer" }],
       data: { action }
     });
   }
 });
 
-// --- CLIC SUR NOTIFICATION ---
-self.addEventListener("notificationclick", (event) => {
-  event.notification.close();
-  if (event.action === "dismiss") return;
-
-  event.waitUntil(
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  if (e.action === "dismiss") return;
+  e.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
-      const action = event.notification.data?.action || "in";
-      // Si une fenêtre est déjà ouverte, on se focus dessus
+      const action = e.notification.data?.action || "in";
       for (const c of list) {
         if (c.url.includes("paye/index.html") && "focus" in c) {
-          c.postMessage({ type: "DO_PUNCH", action });
-          return c.focus();
+          c.postMessage({ type: "DO_PUNCH", action }); return c.focus();
         }
       }
-      // Sinon on ouvre une nouvelle fenêtre
       return clients.openWindow("./paye/index.html").then((w) => {
         if (w) setTimeout(() => w.postMessage({ type: "DO_PUNCH", action }), 1500);
       });
