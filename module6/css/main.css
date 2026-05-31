@@ -1,0 +1,1133 @@
+/* ═══════════════════════════════════════════════════════════════
+   M6 — CADRES · Palette Cabinet Exécutif
+   Cormorant Garamond (display) + Outfit (corps)
+   Ivoire · Charbon · Champagne
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
+
+:root {
+  --ivoire:       #F7F3ED;
+  --ivoire-2:     #EDE8E0;
+  --ivoire-3:     #E2DAD0;
+  --charbon:      #1A1714;
+  --charbon-2:    #2E2A26;
+  --charbon-3:    #4A4540;
+  --pierre:       #8A847C;
+  --pierre-2:     #BDB5A8;
+  --champagne:    #C4A35A;
+  --champagne-2:  #8B6914;
+  --champagne-3:  #F0E3C0;
+  --succes:       #2D6A4F;
+  --succes-bg:    #E8F5EF;
+  --alerte:       #9B2C2C;
+  --alerte-bg:    #FBEAEA;
+  --warning:      #7A5C00;
+  --warning-bg:   #FFF8E6;
+  --info-bg:      #EEF2FF;
+  --info:         #3730A3;
+
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Outfit', system-ui, sans-serif;
+
+  --radius-sm:  4px;
+  --radius:     8px;
+  --radius-lg:  14px;
+  --shadow-sm:  0 1px 3px rgba(26,23,20,0.08);
+  --shadow:     0 4px 16px rgba(26,23,20,0.10);
+  --shadow-lg:  0 8px 32px rgba(26,23,20,0.14);
+
+  --gold-line: 1px solid rgba(196,163,90,0.35);
+  --grey-line: 1px solid rgba(26,23,20,0.10);
+
+  /* ── Dark mode variables ─────────────────────────────────────── */
+  --dm-bg:         #121110;
+  --dm-surface:    #1E1C19;
+  --dm-surface-2:  #2A2724;
+  --dm-surface-3:  #363330;
+  --dm-text:       #F0ECE6;
+  --dm-text-2:     #C8C0B4;
+  --dm-border:     rgba(196,163,90,0.20);
+}
+
+/* ── M6 EST FORCÉ EN MODE CLAIR ──────────────────────────────────
+   Les règles dark-mode ont été DÉSACTIVÉES intentionnellement.
+   Même si l'utilisateur règle son téléphone en mode sombre système,
+   l'app M6 reste en clair pour garantir la lisibilité des contenus
+   juridiques (codes couleur warning/danger/ok, PDF d'exports, etc.).
+   Si vous souhaitez réactiver le dark mode, restaurez les règles
+   ci-dessous depuis git ou le zip d'origine. */
+html, body {
+  color-scheme: light !important;
+}
+/* Annule la classe dark-mode si elle est ajoutée par un autre script ou module */
+html.dark-mode {
+  --ivoire:    #FAF7F2;
+  --ivoire-2:  #F2EDE4;
+  --ivoire-3:  #E8E0D1;
+  --charbon:   #1A1714;
+  --charbon-2: #2C2823;
+  --charbon-3: #4A4540;
+  --pierre:    #8A847C;
+  --pierre-2:  #B5AFA6;
+  color-scheme: light !important;
+}
+html.dark-mode body,
+html.dark-mode .m6-header,
+html.dark-mode .m6-daily-msg,
+html.dark-mode .m6-bottom-nav,
+html.dark-mode .m6-overlay,
+html.dark-mode .m6-sheet,
+html.dark-mode input,
+html.dark-mode select,
+html.dark-mode textarea,
+html.dark-mode .m6-btn-ghost,
+html.dark-mode #zenji-sheet {
+  background: revert; color: revert; border-color: revert;
+}
+
+/* ── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-family: var(--font-body);
+  background: var(--ivoire);
+  color: var(--charbon);
+  min-height: 100dvh;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  /* Android: empêche le pull-to-refresh natif qui vide l'état de l'app */
+  overscroll-behavior-y: contain;
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
+/* Fix notch/status-bar : padding-top absorbe la safe-area,     */
+/* align-items:flex-end + padding-bottom centre le contenu      */
+/* dans les 48px visibles sous l'encoche.                       */
+.m6-header {
+  background: var(--charbon);
+  color: var(--ivoire);
+  padding: 0 12px 8px;
+  padding-top: max(8px, env(safe-area-inset-top, 8px));
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-height: calc(52px + env(safe-area-inset-top, 0px));
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: var(--gold-line);
+  box-sizing: border-box;
+}
+.m6-header-brand {
+  flex: 1;
+  min-width: 0; /* permet au texte de se réduire */
+  overflow: hidden;
+}
+.m6-header-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--ivoire);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m6-header-sub {
+  font-size: 0.62rem;
+  color: var(--champagne);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 400;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m6-header-btn {
+  background: rgba(196,163,90,0.15);
+  border: var(--gold-line);
+  color: var(--champagne);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.m6-header-btn:active { background: rgba(196,163,90,0.25); }
+
+/* ── Message journalier Zenji (bannière cliquable) ───────────── */
+.m6-daily-msg {
+  background: var(--charbon-2);
+  border-bottom: 1px solid rgba(196,163,90,0.2);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.m6-daily-msg:active { background: var(--charbon-3); }
+.m6-daily-msg-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(196,163,90,0.15);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.m6-daily-msg-text {
+  font-size: 0.72rem;
+  color: var(--pierre-2);
+  line-height: 1.3;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+.m6-daily-msg-cta {
+  font-size: 0.6rem;
+  color: var(--champagne);
+  flex-shrink: 0;
+}
+
+/* ── Wizard de bienvenue ──────────────────────────────────────── */
+.m6-wizard-step {
+  animation: m6FadeIn 0.3s ease-out;
+}
+.m6-wizard-progress {
+  display: flex; gap: 6px; justify-content: center; margin-bottom: 24px;
+}
+.m6-wizard-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(196,163,90,0.3);
+  transition: background 0.3s;
+}
+.m6-wizard-dot.active { background: var(--champagne); }
+
+/* ── Barre de progression forfait heures ─────────────────────── */
+.m6-progress-bar-wrap {
+  margin: 0 0 14px;
+  background: var(--ivoire-2);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  border: var(--grey-line);
+}
+.m6-progress-track {
+  height: 12px;
+  background: rgba(26,23,20,0.08);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 8px 0 4px;
+}
+.m6-progress-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+/* ── Toggle Matin / Après-midi ───────────────────────────────── */
+.m6-am-pm {
+  display: flex; gap: 8px; margin: 8px 0 0;
+}
+.m6-am-pm label {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 7px 10px;
+  border: 1px solid var(--ivoire-3); border-radius: var(--radius);
+  cursor: pointer; font-size: 0.78rem; color: var(--pierre);
+  transition: all 0.2s;
+}
+.m6-am-pm input[type=radio] { display: none; }
+.m6-am-pm input[type=radio]:checked + span {
+  color: var(--champagne-2); font-weight: 600;
+}
+.m6-am-pm label:has(input:checked) {
+  background: var(--champagne-3);
+  border-color: var(--champagne);
+  color: var(--champagne-2);
+}
+
+/* ── Tooltip bulle cliquable ─────────────────────────────────── */
+.m6-tooltip-wrap { position: relative; display: inline-block; }
+.m6-tooltip-bubble {
+  display: none;
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--charbon);
+  color: var(--ivoire);
+  font-size: 0.72rem;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  white-space: normal;
+  width: 220px;
+  z-index: 200;
+  line-height: 1.45;
+  box-shadow: var(--shadow);
+}
+.m6-tooltip-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%; left: 50%; transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--charbon);
+}
+.m6-tooltip-wrap.open .m6-tooltip-bubble { display: block; }
+
+/* ── Bottom Nav ─────────────────────────────────────────────── */
+.m6-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  background: var(--charbon);
+  border-top: var(--gold-line);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  z-index: 100;
+}
+/* Boutons de la 2ème ligne : prennent 4/n colonnes */
+.m6-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 2px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: var(--pierre);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  gap: 2px;
+  transition: color 0.2s;
+}
+.m6-nav-item.active { color: var(--champagne); }
+.m6-nav-item .nav-icon { font-size: 1.05rem; line-height: 1; }
+/* Séparateur entre les deux lignes */
+.m6-nav-row-sep {
+  grid-column: 1 / -1;
+  height: 1px;
+  background: rgba(196,163,90,0.15);
+  margin: 0;
+}
+
+/* ── Main scroll area ────────────────────────────────────────── */
+.m6-main {
+  /* Augmenté à 140px : la nav a maintenant 2 lignes (8 boutons) → ~120px de hauteur */
+  padding: 20px 16px calc(140px + env(safe-area-inset-bottom, 0));
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ── Section title ──────────────────────────────────────────── */
+.m6-section-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--charbon);
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+.m6-section-sub {
+  font-size: 0.78rem;
+  color: var(--pierre);
+  margin-bottom: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Cards ─────────────────────────────────────────────────── */
+.m6-card {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: var(--grey-line);
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.m6-card-header {
+  padding: 14px 16px 10px;
+  border-bottom: var(--grey-line);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.m6-card-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--champagne-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+.m6-card-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--pierre);
+  font-weight: 500;
+  line-height: 1.2;
+}
+.m6-card-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--charbon);
+  line-height: 1.2;
+}
+.m6-card-body { padding: 16px; }
+
+/* ── Metric large ────────────────────────────────────────────── */
+.m6-metric {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.m6-metric-val {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--charbon);
+  line-height: 1;
+}
+.m6-metric-unit {
+  font-size: 0.85rem;
+  color: var(--pierre);
+  font-weight: 400;
+}
+.m6-metric-label {
+  font-size: 0.75rem;
+  color: var(--pierre);
+  margin-bottom: 12px;
+}
+
+/* ── Progress bar champagne ─────────────────────────────────── */
+.m6-progress-wrap {
+  height: 6px;
+  background: var(--ivoire-2);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.m6-progress-bar {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--champagne-2), var(--champagne));
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+.m6-progress-bar.danger { background: linear-gradient(90deg, #9B2C2C, #E53E3E); }
+.m6-progress-bar.ok { background: linear-gradient(90deg, var(--succes), #48BB78); }
+
+/* ── Stats grid ──────────────────────────────────────────────── */
+.m6-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.m6-stat-box {
+  background: var(--ivoire);
+  border-radius: var(--radius);
+  padding: 12px;
+  border: var(--gold-line);
+}
+.m6-stat-val {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--charbon);
+  line-height: 1;
+}
+.m6-stat-label {
+  font-size: 0.68rem;
+  color: var(--pierre);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 3px;
+}
+
+/* ── Alertes ─────────────────────────────────────────────────── */
+.m6-alert {
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.m6-alert.danger { background: var(--alerte-bg); color: var(--alerte); border-left: 3px solid var(--alerte); }
+.m6-alert.warning { background: var(--warning-bg); color: var(--warning); border-left: 3px solid #D4A017; }
+.m6-alert.success { background: var(--succes-bg); color: var(--succes); border-left: 3px solid var(--succes); }
+.m6-alert.info { background: var(--info-bg); color: var(--info); border-left: 3px solid var(--info); }
+.m6-alert-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.m6-alert strong { font-weight: 600; }
+
+/* ── Boutons ─────────────────────────────────────────────────── */
+.m6-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 11px 20px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+}
+.m6-btn-primary {
+  background: var(--charbon);
+  color: var(--ivoire);
+  width: 100%;
+}
+.m6-btn-primary:active { background: var(--charbon-2); }
+.m6-btn-ghost {
+  background: transparent;
+  color: var(--charbon-3);
+  border: var(--grey-line);
+}
+.m6-btn-gold {
+  background: var(--champagne);
+  color: var(--charbon);
+  width: 100%;
+  font-weight: 600;
+}
+.m6-btn-gold:active { background: var(--champagne-2); color: #fff; }
+
+/* ── Separateur champagne ───────────────────────────────────── */
+.m6-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--champagne), transparent);
+  margin: 18px 0;
+  opacity: 0.5;
+}
+
+/* ── Ligne de donnée ────────────────────────────────────────── */
+.m6-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: var(--grey-line);
+  font-size: 0.83rem;
+}
+.m6-row:last-child { border-bottom: none; }
+.m6-row-label { color: var(--pierre); }
+.m6-row-val { font-weight: 500; color: var(--charbon); }
+.m6-row-val.gold { color: var(--champagne-2); }
+.m6-row-val.alert { color: var(--alerte); }
+.m6-row-val.ok { color: var(--succes); }
+
+/* ── Saisie / Modal ─────────────────────────────────────────── */
+.m6-overlay {
+  position: fixed; inset: 0;
+  background: rgba(26,23,20,0.6);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.m6-overlay.open { opacity: 1; pointer-events: all; }
+.m6-sheet {
+  background: #fff;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  border-radius: 20px 20px 0 0;
+  padding: 24px 20px;
+  padding-bottom: calc(24px + env(safe-area-inset-bottom, 0));
+  transform: translateY(40px);
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+}
+.m6-overlay.open .m6-sheet { transform: translateY(0); }
+.m6-sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  text-align: center;
+  color: var(--charbon);
+}
+
+/* ── Form fields ─────────────────────────────────────────────── */
+.m6-field { margin-bottom: 14px; }
+.m6-field label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--pierre);
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.m6-field input,
+.m6-field select {
+  width: 100%;
+  border: var(--grey-line);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--charbon);
+  background: var(--ivoire);
+  -webkit-appearance: none;
+}
+.m6-field input:focus,
+.m6-field select:focus {
+  outline: 2px solid var(--champagne);
+  border-color: var(--champagne);
+}
+
+/* ── Type jour pills ────────────────────────────────────────── */
+.m6-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.m6-type-pill {
+  border: 1px solid var(--ivoire-3);
+  border-radius: var(--radius);
+  padding: 10px 4px;
+  text-align: center;
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--charbon-3);
+  background: var(--ivoire);
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.m6-type-pill .pill-icon { font-size: 1.2rem; }
+.m6-type-pill.selected {
+  border-color: var(--champagne);
+  background: var(--champagne-3);
+  color: var(--charbon);
+}
+.m6-type-pill.selected-travail { border-color: var(--charbon); background: var(--charbon); color: var(--ivoire); }
+.m6-type-pill.selected-rtt { border-color: var(--champagne-2); background: var(--champagne-3); color: var(--champagne-2); }
+.m6-type-pill.selected-cp { border-color: var(--succes); background: var(--succes-bg); color: var(--succes); }
+.m6-type-pill.selected-ferie { border-color: var(--info); background: var(--info-bg); color: var(--info); }
+.m6-type-pill.selected-repos { border-color: var(--pierre); background: var(--ivoire-2); color: var(--pierre); }
+.m6-type-pill.selected-rachat { border-color: var(--alerte); background: var(--alerte-bg); color: var(--alerte); }
+
+/* ── Calendrier heatmap ─────────────────────────────────────── */
+.m6-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-top: 10px;
+}
+.m6-cal-head {
+  text-align: center;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--pierre);
+  padding: 3px 0;
+}
+.m6-cal-cell {
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background: var(--ivoire-2);
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  color: transparent;
+  transition: opacity 0.15s;
+}
+.m6-cal-cell:active { opacity: 0.7; }
+.m6-cal-cell.empty { background: transparent; pointer-events: none; }
+.m6-cal-cell.today { box-shadow: inset 0 0 0 2px var(--champagne); }
+.m6-cal-cell[data-type="travail"] { background: var(--charbon-2); }
+.m6-cal-cell[data-type="rtt"] { background: var(--champagne); }
+.m6-cal-cell[data-type="cp"] { background: var(--succes); }
+.m6-cal-cell[data-type="ferie"] { background: #3730A3; }
+.m6-cal-cell[data-type="repos"] { background: var(--pierre-2); }
+.m6-cal-cell[data-type="rachat"] { background: var(--alerte); }
+.m6-cal-cell[data-type="restant"] { background: var(--ivoire-3); }
+
+/* ── Legende ─────────────────────────────────────────────────── */
+.m6-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.m6-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  color: var(--pierre);
+}
+.m6-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Régime selector ─────────────────────────────────────────── */
+.m6-regime-screen {
+  min-height: 100dvh;
+  background: var(--charbon);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  padding-top: calc(32px + env(safe-area-inset-top, 0));
+}
+.m6-regime-logo {
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  font-weight: 600;
+  color: var(--ivoire);
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: 0.01em;
+}
+.m6-regime-subtitle {
+  font-size: 0.75rem;
+  color: var(--champagne);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 48px;
+}
+.m6-regime-card {
+  width: 100%;
+  max-width: 360px;
+  background: rgba(247,243,237,0.06);
+  border: var(--gold-line);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  transition: all 0.2s;
+}
+.m6-regime-card:active { background: rgba(196,163,90,0.15); }
+.m6-regime-card-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ivoire);
+  margin-bottom: 4px;
+}
+.m6-regime-card-sub {
+  font-size: 0.75rem;
+  color: var(--pierre);
+  line-height: 1.4;
+}
+.m6-regime-card-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--champagne);
+  border: var(--gold-line);
+  border-radius: 99px;
+  padding: 2px 8px;
+  margin-bottom: 8px;
+}
+
+/* ── Ornement de section ─────────────────────────────────────── */
+.m6-ornement {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  margin-top: 8px;
+}
+.m6-ornement-line { flex: 1; height: 1px; background: var(--champagne); opacity: 0.4; }
+.m6-ornement-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--charbon);
+  white-space: nowrap;
+}
+
+/* ── Toast ────────────────────────────────────────────────────── */
+.m6-toast {
+  position: fixed;
+  bottom: calc(76px + env(safe-area-inset-bottom, 0));
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--charbon);
+  color: var(--ivoire);
+  font-size: 0.82rem;
+  padding: 10px 20px;
+  border-radius: 99px;
+  z-index: 300;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.3s;
+  pointer-events: none;
+  border: var(--gold-line);
+}
+.m6-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── Badge ───────────────────────────────────────────────────── */
+.m6-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 99px;
+}
+.m6-badge-champagne { background: var(--champagne-3); color: var(--champagne-2); }
+.m6-badge-danger { background: var(--alerte-bg); color: var(--alerte); }
+.m6-badge-ok { background: var(--succes-bg); color: var(--succes); }
+.m6-badge-neutral { background: var(--ivoire-2); color: var(--pierre); }
+
+/* ── Animation fade-in ───────────────────────────────────────── */
+.m6-fade-in {
+  animation: m6FadeIn 0.3s ease-out;
+}
+@keyframes m6FadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tableau simulation ──────────────────────────────────────── */
+.m6-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.m6-table th {
+  text-align: left;
+  padding: 6px 8px;
+  color: var(--pierre);
+  font-weight: 500;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: var(--grey-line);
+}
+.m6-table td {
+  padding: 8px 8px;
+  border-bottom: var(--grey-line);
+  color: var(--charbon);
+}
+.m6-table td.gold { color: var(--champagne-2); font-weight: 500; }
+.m6-table tr:last-child td { border-bottom: none; }
+
+/* ── Choix de vue heures ─────────────────────────────────────── */
+.m6-tabs {
+  display: flex;
+  background: var(--ivoire-2);
+  border-radius: var(--radius);
+  padding: 3px;
+  margin-bottom: 16px;
+  gap: 2px;
+}
+.m6-tab {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: none;
+  background: none;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--pierre);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.m6-tab.active {
+  background: #fff;
+  color: var(--charbon);
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Input range ─────────────────────────────────────────────── */
+input[type=range] {
+  width: 100%;
+  accent-color: var(--champagne);
+}
+
+/* ── Config badge ───────────────────────────────────────────── */
+.m6-config-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--charbon);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  color: var(--ivoire);
+  font-size: 0.8rem;
+}
+.m6-config-summary strong { color: var(--champagne); font-family: var(--font-display); font-size: 1rem; }
+.m6-config-edit {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--pierre);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ═══════════════════════════════════════════════════════
+   UX ALLÉGÉE — Hiérarchie visuelle calmée + nav 4 onglets
+   ═══════════════════════════════════════════════════════ */
+
+/* Nav 4 colonnes simples, plus de séparateur double ligne */
+.m6-bottom-nav.m6-nav-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Bottom-sheet "Plus" */
+.m6-more-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ivoire);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -8px 32px rgba(0,0,0,0.18);
+  z-index: 110;
+  transform: translateY(100%);
+  transition: transform 0.22s ease;
+  padding: 8px 0 calc(20px + env(safe-area-inset-bottom,0));
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.m6-more-sheet.open { transform: translateY(0); }
+.m6-more-sheet-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--ivoire-3);
+  border-radius: 2px;
+  margin: 8px auto 12px;
+}
+.m6-more-sheet-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  color: var(--charbon);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--ivoire-2);
+}
+.m6-more-sheet-item:active { background: var(--ivoire-2); }
+.m6-more-sheet-item-icon { font-size: 1.3rem; width: 28px; text-align: center; }
+.m6-more-sheet-item-label { flex: 1; }
+.m6-more-sheet-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(26,23,20,0.4);
+  z-index: 105;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+.m6-more-sheet-backdrop.open { opacity: 1; pointer-events: all; }
+
+/* Disclosure progressive — cards collapsibles */
+.m6-collapsible {
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid var(--ivoire-3);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.m6-collapsible-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  user-select: none;
+}
+.m6-collapsible-header:active { background: var(--ivoire-2); }
+.m6-collapsible-icon {
+  font-size: 1.05rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.m6-collapsible-title {
+  flex: 1;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: var(--charbon);
+  line-height: 1.3;
+}
+.m6-collapsible-chevron {
+  font-size: 0.8rem;
+  color: var(--pierre);
+  transition: transform 0.2s;
+}
+.m6-collapsible[open] .m6-collapsible-chevron { transform: rotate(90deg); }
+.m6-collapsible-body {
+  padding: 0 14px 14px;
+  font-size: 0.82rem;
+  color: var(--charbon-3);
+  line-height: 1.5;
+}
+
+/* Hero KPI — chiffre dominant Bilan */
+.m6-hero-kpi {
+  background: #fff;
+  border: 1px solid var(--ivoire-3);
+  border-radius: 14px;
+  padding: 22px 18px 18px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+.m6-hero-kpi-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--pierre);
+  margin-bottom: 6px;
+}
+.m6-hero-kpi-value {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--charbon);
+}
+.m6-hero-kpi-unit {
+  font-size: 1rem;
+  color: var(--pierre);
+  margin-left: 6px;
+}
+.m6-hero-kpi-sub {
+  font-size: 0.78rem;
+  color: var(--pierre);
+  margin-top: 8px;
+}
+.m6-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.m6-kpi-mini {
+  background: #fff;
+  border: 1px solid var(--ivoire-3);
+  border-radius: 10px;
+  padding: 10px 8px;
+  text-align: center;
+}
+.m6-kpi-mini-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--charbon);
+}
+.m6-kpi-mini-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--pierre);
+  margin-top: 4px;
+}
+
+/* Alertes calmées — gris par défaut, accent seulement si critique */
+.m6-alert.info,
+.m6-alert.warning {
+  background: var(--ivoire-2);
+  border-left: 3px solid var(--pierre-2);
+  color: var(--charbon-3);
+}
+.m6-alert.info span:first-child,
+.m6-alert.warning span:first-child {
+  opacity: 0.7;
+}
+
+/* Ornements dorés moins voyants */
+.m6-ornement-line {
+  background: linear-gradient(90deg, transparent, var(--ivoire-3), transparent);
+}
+.m6-ornement-text {
+  color: var(--pierre);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   M6 FORCÉ EN PORTRAIT — verrouillage visuel orientation paysage
+   ═══════════════════════════════════════════════════════════════
+   Aucune API web ne peut techniquement empêcher la rotation côté
+   PWA mobile (l'OS décide). On affiche donc un overlay plein écran
+   qui masque tout le contenu et invite à tourner le téléphone.
+   Vérifie que body a min-width pour éviter les bugs de petits
+   écrans en portrait étroit. */
+@media screen and (orientation: landscape) and (max-height: 600px) {
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: #1A1714;
+    z-index: 99998;
+  }
+  body::after {
+    content: '📱 Tournez votre téléphone\A\A M6 Cadres est optimisé pour une utilisation en portrait. Veuillez remettre votre appareil en position verticale pour continuer.';
+    white-space: pre-wrap;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 32px;
+    color: #FAF7F2;
+    background: #1A1714;
+    font-family: Georgia, serif;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+  }
+  /* Masquer tout le reste */
+  #m6-global-header,
+  #m6-app-root,
+  .m6-overlay,
+  zenji-daily-bar,
+  #zenji-daily-bar {
+    display: none !important;
+  }
+}
