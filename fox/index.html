@@ -3592,6 +3592,79 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     }
   }
   else {
+    // ── Détection férié/jour normal travaillé via check-in M4 ──────────────
+    // Si check-in M4 dit "work" sur des jours sans HS (ex: férié travaillé),
+    // le total réel de la semaine > baseHebdo même si 0 HS dans M1/M2.
+    // On calcule : jours travaillés check-in × baseJour + HS connues
+    try {
+      const _ciHist = JSON.parse(localStorage.getItem('DTE_CHECKIN_HISTORY') || '[]');
+      const _nowCi  = new Date();
+      const _monCi  = new Date(_nowCi);
+      _monCi.setDate(_nowCi.getDate() - ((_nowCi.getDay() + 6) % 7));
+      _monCi.setHours(0,0,0,0);
+      const _sunCi  = new Date(_monCi); _sunCi.setDate(_monCi.getDate() + 6);
+      const _fmtCi  = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      const _monStr = _fmtCi(_monCi);
+      const _sunStr = _fmtCi(_sunCi);
+      // Jours "work" cette semaine selon check-in
+      const _workedDays = _ciHist.filter(e => e.dayStatus === 'work' && e.date >= _monStr && e.date <= _sunStr);
+      if (_workedDays.length > 0) {
+        // HS réelles cette semaine — recalcul direct depuis M1+M2
+        let _wkOT = 0;
+        try {
+          const _yr2 = _monStr.slice(0,4);
+          const _rawM1ci = JSON.parse(localStorage.getItem('DATA_REPORT_' + _yr2) || '{}');
+          const _rawM2ci = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr2) || '{}');
+          for (let _dd = 0; _dd < 7; _dd++) {
+            const _dt = new Date(_monCi); _dt.setDate(_monCi.getDate() + _dd);
+            const _dk = _fmtCi(_dt);
+            const _v1 = _rawM1ci[_dk];
+            if (_v1 && (_v1.extra||0) > 0) { _wkOT += Math.max(0, Number(_v1.extra||0) - Number(_v1.recup||0) - Number(_v1.absent||0)); continue; }
+            const _mk = _dk.slice(0,7);
+            const _mv = _rawM2ci[_mk];
+            if (_mv && _mv.days) { const _h = parseFloat(_mv.days[String(parseInt(_dk.slice(8)))]||0); if (_h > 0) _wkOT += _h; }
+          }
+        } catch(_e2) {}
+        // Jours check-in "work" sans aucune saisie M1/M2 = jours normaux non comptés (ex: férié travaillé)
+        const _workedWithoutHS = _workedDays.filter(e => {
+          try {
+            const _yr3 = e.date.slice(0,4);
+            const _v = (JSON.parse(localStorage.getItem('DATA_REPORT_'+_yr3)||'{}')||{})[e.date];
+            if (_v && (_v.extra||0) > 0) return false;
+            const _mk2 = e.date.slice(0,7);
+            const _mv2 = ((JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_'+_yr3)||'{}')||{})[_mk2]);
+            if (_mv2 && _mv2.days && parseFloat(_mv2.days[String(parseInt(e.date.slice(8)))]||0) > 0) return false;
+          } catch(_) {}
+          return true;
+        });
+        // Lundi férié travaillé = jour normalement repos → +7h vs semaine sans ce jour
+        // Total réel = base(35h) + HS saisies(M1/M2) + jours extra sans saisie × baseJour
+        // Ex: base35 + 4hSup + 1jourFérié×7h = 46h ? NON
+        // Le lundi férié est déjà UN JOUR OUVRÉ compté dans les 5j de base
+        // Donc si tu travailles ce lundi normalement : pas de HS mais la semaine est bien 5j×7h+4hSup=39h
+        // _extraDaysH ne s'additionne PAS à baseHebdo — il REMPLACE un jour "non travaillé présumé"
+        // La semaine de base (35h) présuppose que le férié = repos → tu aurais eu 4j×7h=28h
+        // Avec le lundi travaillé : 5j×7h+4hSup = 39h
+        // Donc : _totalSemaine = baseHebdo + _wkOT (le lundi est déjà dans les 5j de base)
+        const _totalSemaine = s.baseHebdo + _wkOT;
+        if (_workedWithoutHS.length > 0) {
+          const _ot = Math.round(_wkOT * 10) / 10;
+          const _totalFmt = _fmtH(_totalSemaine);
+          const _otFmt    = _ot > 0 ? _fmtH(_ot) : '0h';
+          msg = {
+            titre: `Semaine à ${_totalFmt} — dont 1 jour férié travaillé`,
+            message: `Tu as travaillé le lundi férié (journée normale, sans HS déclarée) + ${_otFmt} sup en milieu de semaine. Total estimé : ${_totalFmt} (base ${_fmtH(s.baseHebdo)} + ${_otFmt} sup). Le jour férié travaillé ouvre droit à majoration ou repos compensateur.`,
+            actions: [
+              `${_ot > 0 ? _otFmt + ' d\'heures supplémentaires à déclarer' : 'Aucune HS mais journée supplémentaire travaillée'}`,
+              'Vérifier la majoration jour férié sur ta fiche de paie',
+              'Art. L3133-1 : travail un jour férié = majoration ou repos compensateur'
+            ]
+          };
+        }
+      }
+    } catch(_cie) {}
+    // ── Fin détection check-in ──────────────────────────────────────────────
+
     const msgs = [
       { titre: 'Situation normale',
         message: 'Pas d\'heures supplémentaires détectées. Ta semaine est conforme à la durée légale de 35h. Bien joué !',
@@ -3624,7 +3697,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Semaine enregistrée sans dépassement. Ton historique FOX reste précis et complet. Continue !',
         actions: ['Données à jour ✓', 'Bilan mensuel en fin de mois', 'Prochain suivi la semaine prochaine'] },
     ];
-    msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
+    if (!msg.titre) msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
   }
   
   // ══════════════════════════════════════════════════════════════
@@ -4284,7 +4357,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
         _globalHash = ((_globalHash << 5) - _globalHash + _s.charCodeAt(_i)) | 0;
       }
     } catch(e) {}
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_r4';
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_r5';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
