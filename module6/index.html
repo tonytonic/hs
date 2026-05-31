@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>M6 Cadres — Forfait Jours & Heures</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- M6 FORCÉ EN MODE CLAIR — pas de prise en compte des préférences système sombres -->
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#1A1714">
+  <!-- M6 FORCÉ EN ORIENTATION PORTRAIT — voir CSS @media orientation: landscape -->
+  <meta name="screen-orientation" content="portrait">
+  <meta name="x5-orientation" content="portrait">
+  <link rel="manifest" href="../manifest.json">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="M6 Cadres">
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- BLINDAGE PROD : doit être chargé EN PREMIER (patch localStorage, error boundary, version) -->
+  <script src="js/core/safe-boot.js"></script>
+  <script src="../ccn/conventions-collectives.js"></script>
+  <!-- CCN Cadres : données spécifiques forfait jours + cadres dirigeants (propre à M6) -->
+  <!-- Le fichier ci-dessus (conventions-collectives.js) est partagé modules 1-5 et ne doit pas être modifié -->
+  <script src="ccn/conventions-cadres.js"></script>
+  <script src="ccn/coefficients-grilles.js"></script>
+  <link rel="stylesheet" href="css/main.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+</head>
+<body>
+
+<!-- ── HEADER UNIQUE & AUTORITAIRE ───────────────────────────── -->
+<!-- Toutes les vues mettent à jour ce header via M6_Header.set()  -->
+<header class="m6-header" id="m6-global-header">
+  <a href="../menu.html" id="m6-menu-btn" class="m6-header-btn" title="Retour au menu"
+     style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:var(--ivoire);flex-shrink:0">
+    ← Menu
+  </a>
+  <div class="m6-header-brand" style="text-align:center">
+    <div class="m6-header-title" id="m6-header-title">M6 — Cadres</div>
+    <div class="m6-header-sub" id="m6-header-sub">Forfait Jours · Forfait Heures</div>
+  </div>
+  <div style="display:flex;gap:6px;flex-shrink:0">
+    <button id="m6-help-btn" class="m6-header-btn" title="Aide &amp; tutoriel" style="font-size:1rem;padding:5px 10px;font-family:Georgia,serif;font-weight:700" aria-label="Aide">?</button>
+    <button id="m6-reset-btn" class="m6-header-btn" style="display:none" title="Reconfigurer / Relancer le wizard">
+      ⚙
+    </button>
+    <button id="m6-regime-switch" class="m6-header-btn" style="display:none" title="Changer de régime">
+      ⇄
+    </button>
+  </div>
+</header>
+
+<!-- ── APP ROOT ──────────────────────────────────────────────── -->
+<div id="m6-app-root"></div>
+
+<!-- ── SCRIPTS ───────────────────────────────────────────────── -->
+<script src="js/core/calc-engine.js"></script>
+<script src="js/core/bio-engine.js"></script>
+<script src="js/core/storage.js"></script>
+<script src="js/data/ccn-adapter.js"></script>
+<script src="js/data/glossaire-cadres.js"></script>
+<script src="js/features/zenji.js"></script>
+<script src="js/features/zenji-popup.js"></script>
+<script src="js/features/charts.js"></script>
+<script src="js/features/simulateur-nullite.js"></script>
+<script src="js/features/calendar.js"></script>
+<script src="js/features/import-export.js"></script>
+<script src="js/features/pdf-report.js"></script>
+<script src="js/features/entretien-glossaire.js"></script>
+<script src="js/features/rupture-calculateur.js"></script>
+<script src="js/features/nullite-checker.js"></script>
+<script src="js/features/validite-heures-cd.js"></script>
+<script src="js/features/coach.js"></script>
+<script src="js/views/view-forfait-jours.js"></script>
+<script src="js/views/view-forfait-heures.js"></script>
+<script src="js/views/view-cadre-dirigeant.js"></script>
+<script src="js/app.js"></script>
+<script>
+// Enregistrement Service Worker PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('[M6] SW enregistre:', reg.scope))
+      .catch(err => console.warn('[M6] SW echec:', err));
+  });
+}
+// Rappel vendredi via Notifications (si permission accordée)
+(function scheduleVendrediReminder() {
+  const d = new Date();
+  if (d.getDay() !== 5) return; // vendredi seulement
+  const lastReminder = localStorage.getItem('M6_VENDREDI_REMINDER');
+  const today = d.toISOString().slice(0,10);
+  if (lastReminder === today) return;
+  if (Notification.permission === 'granted') {
+    new Notification('Zenji — Rappel vendredi', {
+      body: 'Pensez a valider votre semaine et a mettre a jour votre forfait. Bonne fin de semaine !',
+      icon: 'images/Cadre.png',
+    });
+    localStorage.setItem('M6_VENDREDI_REMINDER', today);
+  }
+})();
+</script>
+
+</body>
+</html>
