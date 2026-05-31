@@ -3,7 +3,7 @@
  * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.5.0"; // Cache First + skip cross-origin (fix CORS fonts)
+const CACHE_NAME = "heuressup-cache-v10.0.0"; // Cache First + skip cross-origin (fix CORS fonts)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
