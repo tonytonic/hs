@@ -175,7 +175,13 @@ class Dashboard {
       desc: 'Niveau de tension nerveuse et de cortisol estimé. Thompson 2022 : le cortisol monte +14% dès la 1ère nuit courte.',
       source: 'Thompson 2022 (Frontiers) · ANACT/INRS · ANI 2008',
       facteurs_heures: [
-        { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: v => v.toFixed(0)+'h/sem (optimal : 35h)' },
+        { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: (v, n) => {
+            const src = n('_weeklyHSource');
+            const badge = src === 'live' ? ' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>'
+                        : src === 'avg'  ? ' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
+                        :                  ' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            return v.toFixed(0)+'h/sem (optimal : 35h)'+badge;
+          } },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
         { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => {
             const vR = Math.round(v * 10) / 10;
@@ -203,12 +209,18 @@ class Dashboard {
       desc: 'Votre efficacité estimée. Pencavel/Stanford 2014 : chute après 50h/sem, falaise à 55h.',
       source: 'Pencavel 2014 (Stanford) · OEM 2025 (Jang) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: v => {
+        { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: (v, n) => {
             const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
             if (isRest) return '0h travaillées — potentiel de récupération actif';
-            return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%');
+            const src = n('_weeklyHSource');
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%')+badge;
         }},
-        { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)' },
+        { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: (v, n) => {
+            const src = n('_weeklyHSource');
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            return (v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)')+badge;
+          } },
       ],
       facteurs_vie: [
         { label:'Énergie (check-in)',    key:'ci_energy', fmt: v => v!==undefined ? ['Épuisé','Fatigué','Neutre','Énergique','Excellent'][v]||'—' : 'Non renseigné' },
@@ -260,7 +272,11 @@ class Dashboard {
       desc: 'Modifications structurelles cérébrales détectées par IRM à ≥52h/sem (Jang/Yonsei 2025). 17 régions affectées.',
       source: 'OEM 2025 — Jang W. et al., Yonsei University',
       facteurs_heures: [
-        { label:'Seuil ≥52h/sem', key:'_recentWeeklyH', fmt: v => v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)' },
+        { label:'Seuil ≥52h/sem', key:'_recentWeeklyH', fmt: (v, n) => {
+            const src = n('_weeklyHSource');
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            return (v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)')+badge;
+          } },
         { label:'Durée exposition', key:'_cumulWeeks', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             return vR > 0 ? vR+' sem. → risque ×'+Math.round(Math.min(2.0,(1+vR*0.05))*100)/100 : 'Sous le seuil';
