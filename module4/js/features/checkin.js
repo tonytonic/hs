@@ -66,6 +66,34 @@ class Checkin {
     if(this._close) this._close.addEventListener('click', () => this.close());
     if(this._modal) this._modal.querySelector('.modal-overlay')?.addEventListener('click', () => this.close());
     this._scheduleMidnightReset();
+    this._purgeCorruptedN1Entries();
+  }
+
+  // Purge les entrées DATA_REPORT_ créées par bug (anciennes versions de _saveN1Confirmed
+  // qui écrivaient extra:N sur le lundi de la semaine précédente → case rouge heatmap).
+  // Une entrée est corrompue si elle a _n1confirmed:true dans DATA_REPORT_.
+  // Les données M2 réelles n'ont jamais ce flag (elles viennent de CA_HS_TRACKER).
+  _purgeCorruptedN1Entries(){
+    try {
+      const currentYear = new Date().getFullYear();
+      for(const yr of [currentYear, currentYear - 1]) {
+        const raw = localStorage.getItem('DATA_REPORT_'+yr);
+        if(!raw || raw === '{}') continue;
+        const d = JSON.parse(raw);
+        const days = d.days || d.jours || {};
+        let changed = false;
+        for(const [k, v] of Object.entries(days)) {
+          if(v && v._n1confirmed === true) {
+            delete days[k];
+            changed = true;
+          }
+        }
+        if(changed) {
+          d.days = days;
+          localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+        }
+      }
+    } catch(_) {}
   }
 
   _scheduleMidnightReset(){
@@ -440,22 +468,27 @@ class Checkin {
   }
 
   _saveN1Confirmed(mondayKey, extraH, seuil){
-    // Stocker le total hebdo confirmé par l'utilisateur dans une clé dédiée.
-    // Indépendant de M1/M2 — fonctionne que l'utilisateur utilise M1 ou M2.
-    // Le moteur DTE lit DTE_N1_WEEK_{mondayKey} et le préfère à la somme brute M1/M2.
+    // Stocker le total hebdo confirmé dans une clé dédiée UNIQUEMENT.
+    // On n'écrit PAS dans DATA_REPORT_ : la heatmap lit DATA_REPORT_ par jour,
+    // et y écrire extra:4 sur le lundi ferait apparaître 4h HS ce jour-là (case rouge).
+    // DTE_N1_WEEK_{mondayKey} est lu par le moteur DTE pour remplacer la somme brute M2.
     try {
       _safeLS.set('DTE_N1_WEEK_' + mondayKey, String(extraH));
     } catch(_) {}
-    // Aussi écrire dans DATA_REPORT pour compatibilité M1
+    // PURGE : supprimer toute entrée corrompue dans DATA_REPORT_ sur ce lundi
+    // (bug versions précédentes qui écrivaient extra:N sur le lundi → case rouge heatmap)
     try {
       const yr = parseInt(mondayKey.slice(0,4));
       const raw = localStorage.getItem('DATA_REPORT_'+yr);
-      const d = raw && raw !== '{}' ? JSON.parse(raw) : {};
-      const days = d.days || d.jours || {};
-      const existing = days[mondayKey] || {};
-      days[mondayKey] = { ...existing, extra: extraH, recup: existing.recup || 0, absent: existing.absent || 0, _n1confirmed: true };
-      d.days = days;
-      localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+      if(raw && raw !== '{}') {
+        const d = JSON.parse(raw);
+        const days = d.days || d.jours || {};
+        if(days[mondayKey] && days[mondayKey]._n1confirmed === true) {
+          delete days[mondayKey];
+          d.days = days;
+          localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+        }
+      }
     } catch(_) {}
   }
 
