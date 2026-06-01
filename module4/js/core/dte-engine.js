@@ -926,30 +926,17 @@ class DTEEngine {
     //   Avant : countWorkDays28 >= 5 → 28j écrasait la semaine courante →
     //   progression lun→ven invisible (weeklyExtra constant = moyenne historique).
     let weeklyExtra;
-    // Calculer la semaine précédente complète — prioritaire le lundi matin
-    let prevExtra = 0, prevCount = 0;
-    for (let dd = 0; dd < workDaysPerWeek; dd++) {
-      const dt = new Date(weekMondayA); dt.setDate(weekMondayA.getDate() - 7 + dd);
-      const k = localDK(dt);
-      const e = days[k];
-      if (e && !e.absent) { prevExtra += e.extra || 0; prevCount++; }
-    }
-    // FIX MODE HEBDOMADAIRE : M1 en mode "total semaine" stocke UNE seule entrée
-    // sous la date du lundi de la semaine. prevCount = 1 → la condition >=3 échouait
-    // → prevWeekFull = null → fallback lundi ignoré → rolling 28j × dayRatio = valeur amortie
-    // Détection : si 1 seule entrée ET elle est sur le lundi de la semaine précédente
-    const prevMondayKey = localDK(new Date(weekMondayA.getTime() - 7*86400000));
-    const isWeeklyMode  = prevCount === 1 && !!days[prevMondayKey] && !days[prevMondayKey]?.absent;
-    const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
-
     if (count7 >= 1 || sumExtra7 > 0) {
       // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
       weeklyExtra = sumExtra7;
-    } else if (todayDowA === 1 && prevWeekFull !== null) {
-      // Lundi matin sans saisie → semaine précédente complète (mémoire biologique)
-      // Sonnentag 2003 : l'effet d'une semaine chargée persiste le lundi suivant
-      // Mode hebdomadaire : une seule entrée Monday = la semaine entière → traité comme semaine complète
-      weeklyExtra = prevWeekFull;
+    } else if (todayDowA === 1 && countWorkDays28 >= 5) {
+      // Lundi matin sans saisie → moyenne rolling 28j (Sonnentag 2003 : persistance biologique)
+      // Remplace l'ancienne logique semaine N-1 brute qui causait des artefacts avec M2
+      // (somme jour par jour → valeur gonflée). weeklyExtra28 est lissé et source-agnostique.
+      weeklyExtra = weeklyExtra28;
+    } else if (todayDowA === 1) {
+      // Lundi matin, pas assez d'historique → seuil CCN (0 HS)
+      weeklyExtra = 0;
     } else if (countWorkDays28 >= 5) {
       // FIX no-entry mid-week : estimation PROPORTIONNELLE au jour de semaine
       // Avant : weeklyExtra28 plein → score chute de 72→54 en milieu de semaine sans saisie
@@ -960,7 +947,7 @@ class DTEEngine {
       weeklyExtra = weeklyExtra28 * _dayRatio;
     } else {
       // Fallback démarrage
-      weeklyExtra = prevWeekFull !== null ? prevWeekFull * Math.min(1, todayDowA / Math.max(1, workDaysPerWeek)) : 0;
+      weeklyExtra = 0;
     }
     // FIX BUG 2 : avgExtra7 normalisé sur workDaysPerWeek STANDARD (5j)
     // Avant : avgExtra7 = weeklyExtra / workDaysPerWeek → avec 3j ouvrés configurés,
@@ -1559,6 +1546,7 @@ class DTEEngine {
       _avgH7:         avgH7,
       _weeklyH7:      weeklyH7Effective,
       _recentWeeklyH: recentWeeklyH,
+      _weeklyHSource: hasAnyEntryThisWeek ? 'live' : (countWorkDays28 >= 5 ? 'avg' : 'seuil'),
       _isVacationWeek: isCurrentWeekVacation,
       _consec:        consec,
       _consecOT:      consecOT,
