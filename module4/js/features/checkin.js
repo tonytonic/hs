@@ -440,22 +440,19 @@ class Checkin {
   }
 
   _saveN1Confirmed(mondayKey, extraH, seuil){
-    // Stocker le total hebdo confirmé par l'utilisateur dans une clé dédiée.
-    // Indépendant de M1/M2 — fonctionne que l'utilisateur utilise M1 ou M2.
-    // Le moteur DTE lit DTE_N1_WEEK_{mondayKey} et le préfère à la somme brute M1/M2.
-    try {
-      _safeLS.set('DTE_N1_WEEK_' + mondayKey, String(extraH));
-    } catch(_) {}
-    // Aussi écrire dans DATA_REPORT pour compatibilité M1
+    // Écrire la semaine confirmée dans DATA_REPORT si elle n'y est pas déjà
+    // ou si on veut consolider une saisie hebdomadaire
     try {
       const yr = parseInt(mondayKey.slice(0,4));
       const raw = localStorage.getItem('DATA_REPORT_'+yr);
       const d = raw && raw !== '{}' ? JSON.parse(raw) : {};
       const days = d.days || d.jours || {};
-      const existing = days[mondayKey] || {};
-      days[mondayKey] = { ...existing, extra: extraH, recup: existing.recup || 0, absent: existing.absent || 0, _n1confirmed: true };
-      d.days = days;
-      localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+      // Écrire uniquement si l'entrée n'existe pas déjà (ne pas écraser une saisie manuelle)
+      if(!days[mondayKey]) {
+        days[mondayKey] = { extra: extraH, recup: 0, absent: 0 };
+        d.days = days;
+        localStorage.setItem('DATA_REPORT_'+yr, JSON.stringify(d));
+      }
     } catch(_) {}
   }
 
