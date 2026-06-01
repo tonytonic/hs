@@ -272,9 +272,8 @@ function musculoRisk(weeklyH, cumulMonths, consec) {
  *   - À 10 sem : saturation HPA → factor 2.50 (cortisol fixe même WE)
  *   - Pente : (2.50-1) / 10 = 0.15/semaine → min(2.5, 1 + cumW×0.15)
  */
-function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays, consecNonOTDays, hOptimal) {
-  const _hOptimal = hOptimal || D.H_OPTIMAL;
-  const loadF    = Math.max(0, (weeklyH - _hOptimal) / (D.H_CV - _hOptimal));
+function cortisolModel(weeklyH, variabSigma, cumulWeeks, consecRestDays, consecNonOTDays) {
+  const loadF    = Math.max(0, (weeklyH - D.H_OPTIMAL) / (D.H_CV - D.H_OPTIMAL));
   // FIX SIGMA BUG : variabF réduit pour éviter explosion stress à mi-semaine
   // Avant : sigma/8 × 0.45 → sigma=7.8h → variabF=0.97 → stress=80 (irréaliste pour 42h/sem)
   // Après : sigma/12 × 0.25 → sigma=7.8h → variabF=0.65 → contribution 0.16 max
@@ -941,21 +940,7 @@ class DTEEngine {
     // Détection : si 1 seule entrée ET elle est sur le lundi de la semaine précédente
     const prevMondayKey = localDK(new Date(weekMondayA.getTime() - 7*86400000));
     const isWeeklyMode  = prevCount === 1 && !!days[prevMondayKey] && !days[prevMondayKey]?.absent;
-    // FIX CHECK-IN N1 : lire le total hebdo confirmé par l'utilisateur (stocké par checkin.js).
-    // Fonctionne pour M1 ET M2 (M2 ne passe pas par DATA_REPORT, donc on utilise une clé dédiée).
-    // DTE_N1_WEEK_{mondayKey} = extra heures confirmées par l'utilisateur au check-in du lundi.
-    // Ce total prime sur la somme brute M1/M2 jour par jour.
-    const _n1WeekRaw = (typeof localStorage !== 'undefined')
-      ? localStorage.getItem('DTE_N1_WEEK_' + prevMondayKey)
-      : null;
-    const _n1ConfirmedExtra = (_n1WeekRaw !== null && _n1WeekRaw !== '')
-      ? parseFloat(_n1WeekRaw)
-      : (days[prevMondayKey]?._n1confirmed === true ? (days[prevMondayKey].extra || 0) : null);
-    const prevWeekFull = isWeeklyMode
-      ? prevExtra
-      : (_n1ConfirmedExtra !== null && !isNaN(_n1ConfirmedExtra))
-        ? _n1ConfirmedExtra
-        : (prevCount >= 3 ? prevExtra : null);
+    const prevWeekFull  = isWeeklyMode ? prevExtra : (prevCount >= 3 ? prevExtra : null);
 
     if (count7 >= 1 || sumExtra7 > 0) {
       // Des HS saisies cette semaine → utiliser les HS réelles (progression jour par jour)
@@ -1747,7 +1732,7 @@ class DTEEngine {
     // FIX BUG 8 : le stress amplifie la fatigue (INRS + OMS + Sonnentag)
     // Référence architecture : facteur_stress = 1 + stress * 0.5
     // On utilise cortisolModel (indépendant de fatigue, pas de dépendance circulaire)
-    const prelimStress = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest, consecNonOT, _ccnR.seuil);
+    const prelimStress = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest, consecNonOT);
     const stressFatigueMult = 1 + prelimStress * 0.15; // INRS: stress amplifie fatigue (modéré — 0.15 évite surréaction)
     const fat_raw = (fatHS + fatSommeil + (fatSurchar * vacFatReduction) + (fatBurnout * vacFatReduction) + (fatHS > 0 ? 0 : fatCumulative)) * cumulAmp * sonnentagMult * stressFatigueMult * _pf.fatF;
     const fatigue = Math.max(0, Math.min(1, fat_raw));
@@ -1758,7 +1743,7 @@ class DTEEngine {
     //   Nuit partielle : ×1.20 (mélatonine partiellement supprimée, INRS)
     //   Décalé tard    : ×1.10 (dette sommeil mécanique, ANACT)
     const nightFactor = norm._nightFactor || 1.0;
-    const cortisolS   = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest, consecNonOT, _ccnR.seuil);
+    const cortisolS   = cortisolModel(weeklyH, norm._sigma || 0, cumW, consecRest, consecNonOT);
 
     // stressExt : composante chronique (fatigue × variabilité) — décroit avec TOUTE absence de HS
     // Meijman & Mulder 1998 : récupération commence dès que charge ≤ baseline, WE ou pas.
