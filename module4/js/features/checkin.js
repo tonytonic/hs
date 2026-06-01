@@ -138,11 +138,10 @@ class Checkin {
   _buildSequence(){
     const s = this._answers.dayStatus;
     // Injecter la question de confirmation N-1 si lundi matin et pas encore confirmé
-    const mondayQ = this._mondayN1Question();
-    const mondayArr = mondayQ ? [mondayQ] : [];
-    if(!s) this._questions = [...mondayArr, Q_STATUS, ...QUESTIONS_WELLBEING];
-    else if(s === 'work') this._questions = [...mondayArr, Q_STATUS, Q_SLOT, ...QUESTIONS_WELLBEING];
-    else this._questions = [...mondayArr, Q_STATUS, ...QUESTIONS_WELLBEING];
+    // Question N-1 supprimée : le lundi utilise désormais la moyenne rolling 28j (weeklyExtra28).
+    if(!s) this._questions = [Q_STATUS, ...QUESTIONS_WELLBEING];
+    else if(s === 'work') this._questions = [Q_STATUS, Q_SLOT, ...QUESTIONS_WELLBEING];
+    else this._questions = [Q_STATUS, ...QUESTIONS_WELLBEING];
   }
 
   _mondayN1Question(){
