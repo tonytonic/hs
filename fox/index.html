@@ -3626,7 +3626,19 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
           }
         } catch(_e2) {}
         // Jours check-in "work" sans aucune saisie M1/M2 = jours normaux non comptés (ex: férié travaillé)
+        // FIX : on ne retient QUE les jours réellement fériés (DTE_FERIES_ ou SPECIAL_DAYS_)
+        // Sinon tout lundi check-in 'work' sans HS déclenche le message la semaine suivante.
+        const _feriesSet = {};
+        try {
+          const _yr0 = _monStr.slice(0,4);
+          const _sd0 = JSON.parse(localStorage.getItem('SPECIAL_DAYS_'+_yr0)||'{}');
+          Object.entries(_sd0).forEach(([d,t]) => { if(t==='ferie') _feriesSet[d]=true; });
+          const _fd0 = JSON.parse(localStorage.getItem('DTE_FERIES_'+_yr0)||'{}');
+          Object.keys(_fd0).forEach(d => { _feriesSet[d]=true; });
+        } catch(_) {}
         const _workedWithoutHS = _workedDays.filter(e => {
+          // FIX : exclure les jours qui ne sont pas fériés
+          if (!_feriesSet[e.date]) return false;
           try {
             const _yr3 = e.date.slice(0,4);
             const _v = (JSON.parse(localStorage.getItem('DATA_REPORT_'+_yr3)||'{}')||{})[e.date];
