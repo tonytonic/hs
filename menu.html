@@ -472,7 +472,112 @@
         ⚠️ Calculs indicatifs — seul le bulletin de paie fait foi.
       </p>
     </div>
+
     <div class="wiz-step" id="wStep1">
+
+      <!-- En-tête ludique -->
+      <div style="text-align:center;margin-bottom:16px;">
+        <div style="font-size:36px;margin-bottom:6px;">🦊⚖️</div>
+        <h2 style="font-size:17px;font-weight:700;color:#1a1a2e;margin-bottom:4px;">
+          Avant de plonger dans le terrier…
+        </h2>
+        <p style="font-size:11.5px;color:#666;line-height:1.5;">
+          La Famille Renard tient à être transparente.<br>
+          <strong style="color:#1a1a2e;">Faites défiler</strong> pour lire, puis confirmez.
+        </p>
+      </div>
+
+      <!-- Zone scrollable — cartes dans le style du wizard -->
+      <div id="betonScroll" onscroll="checkBetonScroll()"
+        style="height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+               padding:2px 2px 12px;margin-bottom:14px;-webkit-overflow-scrolling:touch;">
+
+        <!-- Carte 1 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(79,179,194,0.35);
+          background:rgba(79,179,194,0.06);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">🎓</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#1a6b7a;">Outil pédagogique privé</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">SimulHeures est un simulateur éducatif créé par un particulier. Il n'est affilié à aucune entité gouvernementale ou officielle.</div>
+          </div>
+        </div>
+
+        <!-- Carte 2 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(240,192,64,0.4);
+          background:rgba(240,192,64,0.06);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">📊</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#8a6010;">Résultats estimatifs</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">Les calculs sont indicatifs. Ils ne couvrent pas toutes les conventions collectives ni toutes les situations personnelles. Seul votre bulletin officiel fait foi.</div>
+          </div>
+        </div>
+
+        <!-- Carte 3 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(200,74,58,0.3);
+          background:rgba(200,74,58,0.05);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">⚖️</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#a03020;">Aucune valeur légale</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">Les résultats ne constituent ni un avis juridique, ni fiscal, ni médical. Ils ne peuvent pas servir de preuve ou de fondement dans un litige.</div>
+          </div>
+        </div>
+
+        <!-- Carte 4 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(123,79,212,0.3);
+          background:rgba(123,79,212,0.05);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">🔄</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#5a30a0;">Le droit évolue vite</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">Malgré notre vigilance, certaines informations peuvent ne pas refléter les toutes dernières évolutions. En cas de doute, consultez un professionnel.</div>
+          </div>
+        </div>
+
+        <!-- Carte 5 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(26,107,58,0.3);
+          background:rgba(26,107,58,0.05);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">🔒</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#1a6b3a;">Vos données restent chez vous</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">Aucune donnée n'est collectée ni transmise. Tout reste sur votre appareil. Vous en êtes l'unique propriétaire.</div>
+          </div>
+        </div>
+
+        <!-- Indicateur fin de scroll -->
+        <div style="text-align:center;padding:8px 0 4px;flex-shrink:0;">
+          <span style="font-size:11px;color:#4FB3C2;font-weight:700;">✓ Vous êtes arrivé au bout — cochez ci-dessous</span>
+        </div>
+      </div>
+
+      <!-- Checkbox — dans le style des cartes du wizard -->
+      <label id="betonCheckLabel"
+        onclick=""
+        style="display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+               padding:13px 14px;border-radius:12px;margin-bottom:14px;
+               border:2px solid rgba(79,179,194,0.3);background:rgba(79,179,194,0.06);
+               opacity:0.4;pointer-events:none;transition:opacity .3s,border-color .3s,background .3s;">
+        <input type="checkbox" id="betonCheck" onchange="checkBetonReady()"
+          style="width:22px;height:22px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#4FB3C2;">
+        <span style="font-size:12.5px;color:#1a1a2e;line-height:1.55;font-weight:600;">
+          J'ai lu et compris — j'utilise cet outil en tant que simulateur indicatif, sans valeur légale.
+        </span>
+      </label>
+
+      <!-- Bouton — dans le style du wizard (teal quand débloqué) -->
+      <button id="betonBtn" disabled onclick="acceptBeton()"
+        style="width:100%;padding:15px 14px;font-size:13px;font-weight:700;border-radius:12px;
+               border:2px solid rgba(79,179,194,0.3);cursor:not-allowed;letter-spacing:0.2px;
+               background:rgba(79,179,194,0.08);color:#aaa;transition:.3s;
+               display:flex;align-items:center;justify-content:center;gap:8px;">
+        <span id="betonBtnIcon">↓</span>
+        <span id="betonBtnText">Faites défiler pour continuer</span>
+      </button>
+
+      <p style="text-align:center;font-size:10px;color:#bbb;margin-top:8px;line-height:1.5;">
+        🔒 Consentement enregistré localement sur votre appareil
+      </p>
+    </div>
+
+    <div class="wiz-step" id="wStep2">
       <h2>👋 Bienvenue !</h2>
       <p style="text-align:center;color:#555;font-size:13px;margin:8px 0">
         Outil personnel de suivi des heures supplémentaires.<br>
@@ -483,9 +588,9 @@
         ⚠️ Calculs <strong>indicatifs</strong> — seul le bulletin de paie fait foi.<br>
         Pensez à exporter régulièrement vos données.
       </p>
-      <button class="wiz-btn primary" onclick="goStep(2)" style="margin-top:10px">Commencer →</button>
+      <button class="wiz-btn primary" onclick="goStep(3)" style="margin-top:10px">Commencer →</button>
     </div>
-    <div class="wiz-step" id="wStep2">
+    <div class="wiz-step" id="wStep3">
       <h2>⚙️ Ton contrat de travail</h2>
       <div style="margin-bottom:16px;">
         <p style="font-size:12px;color:#666;margin-bottom:10px;">
@@ -517,9 +622,9 @@
           </button>
         </div>
       </div>
-      <button class="wiz-btn primary" onclick="goStep(3)" style="margin-top:16px">Continuer →</button>
+      <button class="wiz-btn primary" onclick="goStep(4)" style="margin-top:16px">Continuer →</button>
     </div>
-    <div class="wiz-step" id="wStep3">
+    <div class="wiz-step" id="wStep4">
       <h2>🎁 Deux modules bonus</h2>
       <p style="text-align:center;font-size:12px;color:#666;margin-bottom:16px;">En plus du suivi des heures, tu as accès à deux expériences uniques :</p>
       <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
@@ -536,9 +641,9 @@
           </div>
         </div>
       </div>
-      <button class="wiz-btn primary" onclick="goStep(4)">C'est parti ! →</button>
+      <button class="wiz-btn primary" onclick="goStep(5)">C'est parti ! →</button>
     </div>
-    <div class="wiz-step" id="wStep4">
+    <div class="wiz-step" id="wStep5">
       <h2>🎯 Votre situation</h2>
       <p style="text-align:center;color:#555;font-size:13px;margin-bottom:4px">
         Comment sont payées vos heures supplémentaires ?
@@ -567,10 +672,10 @@
         ✅ Adapté si vous êtes <strong>salarié payé chaque fin de mois</strong>.</p>
         <button class="wiz-btn go-mensuel" onclick="goApp('paye')">Ouvrir le simulateur mensuel →</button>
       </div>
-      <button class="wiz-btn secondary" onclick="goStep(5)" style="margin-top:16px">Je veux voir les deux outils →</button>
+      <button class="wiz-btn secondary" onclick="goStep(6)" style="margin-top:16px">Je veux voir les deux outils →</button>
       <p class="legal-note">Vous pourrez changer d'outil à tout moment depuis ce menu.</p>
     </div>
-    <div class="wiz-step" id="wStep5">
+    <div class="wiz-step" id="wStep6">
       <h2>✅ Tout est prêt</h2>
       <p style="text-align:center;font-size:13px;color:#555">Les deux simulateurs sont accessibles depuis le menu principal.</p>
       <div style="background:#f0fbfc;border-radius:12px;padding:14px;margin-top:10px;font-size:13px">
@@ -1095,7 +1200,19 @@
   <button onclick="dismissIOSBanner()">J'ai compris ✓</button>
 </div>
 
-<button class="info-btn" onclick="reopenWizard()" style="background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
+<div style="display:flex;gap:8px;">
+  <button class="info-btn" onclick="reopenWizard()" style="flex:2;background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
+  <button disabled title="Le Terrier — nouvelle section bientôt disponible !"
+    style="flex:1;cursor:not-allowed;border-radius:10px;padding:10px 8px;
+           font-family:inherit;font-weight:700;font-size:11.5px;
+           background:linear-gradient(135deg,#2a1e08,#3a2a10);
+           border:2px solid #c8a030;
+           color:#f0c040;
+           box-shadow:0 2px 10px rgba(0,0,0,0.4);">
+    🦊 Le Terrier<br>
+    <span style="font-size:9px;letter-spacing:0.5px;font-weight:700;opacity:0.8;">✨ Bientôt disponible</span>
+  </button>
+</div>
 
 <div id="ccn-badge" onclick="openCCNModal()" title="Changer de convention collective">
   <span>⚖️</span>
@@ -1151,11 +1268,118 @@
   <div class="title" style="color:#9ec3ff;">🌙 Nuit, Astreinte &amp; Primes</div>
 </div>
 
+<!-- ═══ TERRIER : VERSION ACTIVE ═══ -->
+<div id="btn-terrier-actif"
+  style="cursor:pointer;border-radius:16px;overflow:hidden;border:2px solid rgba(200,160,75,0.55);
+    background:linear-gradient(160deg,#1e1408,#2a1e0e);
+    box-shadow:0 8px 24px rgba(200,160,75,0.2),0 2px 0 rgba(200,160,75,0.3);
+    position:relative;margin-bottom:6px;display:none;">
+  <img src="trousse-menu.jpg" alt="Le Terrier de la Famille Renard"
+    style="width:100%;height:140px;object-fit:cover;object-position:center 20%;display:block;"
+    onerror="this.style.display='none'">
+  <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:24px;">🦊</span>
+    <div style="flex:1;">
+      <div style="font-family:Georgia,serif;font-weight:700;font-size:15px;color:#f0c040;font-style:italic;">Le Terrier de la Famille Renard</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px;">21 outils — Tous vos droits au clair</div>
+    </div>
+    <span style="font-size:18px;color:rgba(240,192,64,0.7);">→</span>
+  </div>
+</div>
+
+<!-- ═══ TERRIER : VERSION BIENTÔT DISPONIBLE ═══ -->
+<div id="btn-terrier-wip"
+  style="cursor:default;border-radius:16px;overflow:hidden;
+    border:2px solid rgba(200,160,75,0.45);
+    background:linear-gradient(160deg,#1e1408,#2a1e0e);
+    box-shadow:0 6px 20px rgba(0,0,0,0.35);
+    position:relative;margin-bottom:6px;display:none;">
+  <!-- Image avec léger assombrissement — pas grisée -->
+  <img src="trousse-menu.jpg" alt="Le Terrier de la Famille Renard"
+    style="width:100%;height:140px;object-fit:cover;object-position:center 20%;display:block;filter:brightness(0.75) saturate(0.85);"
+    onerror="this.style.display='none'">
+  <!-- Badge discret "Prochainement" en haut à droite -->
+  <div style="position:absolute;top:10px;right:10px;">
+    <span style="background:rgba(30,20,8,0.85);backdrop-filter:blur(4px);
+      border:1px solid rgba(200,160,75,0.6);border-radius:20px;
+      color:#f0c040;font-weight:700;font-size:10px;letter-spacing:0.5px;
+      padding:4px 10px;display:inline-block;">
+      ✨ Prochainement
+    </span>
+  </div>
+  <!-- Corps de la carte -->
+  <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;">
+    <span style="font-size:24px;">🦊</span>
+    <div style="flex:1;">
+      <div style="font-family:Georgia,serif;font-weight:700;font-size:15px;color:#f0c040;font-style:italic;">Le Terrier de la Famille Renard</div>
+      <div style="font-size:11px;color:rgba(240,192,64,0.65);margin-top:3px;">
+        21 outils en cours de préparation — disponible très bientôt
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Afficher la bonne version du bouton Terrier ──
+(function(){
+  // Changer 'actif' en 'wip' pour mettre en travaux
+  var mode = 'wip'; // 'actif' ou 'wip'
+  var a=document.getElementById('btn-terrier-actif');
+  var w=document.getElementById('btn-terrier-wip');
+  if(a) a.style.display=(mode==='actif'?'block':'none');
+  if(w) w.style.display=(mode==='wip'?'block':'none');
+})();
+</script>
+
+<div id="pinnedTools"></div>
+
 <button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
 
 <button class="info-btn" onclick="openSharePopup()" style="margin-top:-8px;">📲 Partager l'application</button>
 
+<button class="info-btn" onclick="openSocialPopup()" style="margin-top:-8px;background:linear-gradient(135deg,#e87820,#c85010);border:none;color:#fff;">🎬 Nos réseaux &amp; tutos vidéo</button>
+
 <button class="info-btn" onclick="openBackupPopup()" style="margin-top:-8px;">💾 Sauvegarde générale</button>
+
+<!-- ══ DROIT À L'ERREUR — BAS DE PAGE ════════════════════════ -->
+<div style="margin:24px 14px 0;background:#12192a;border-radius:16px;overflow:hidden;
+  box-shadow:0 4px 20px rgba(0,0,0,0.4);">
+
+  <!-- En-tête doré -->
+  <div style="background:linear-gradient(135deg,#c8a030,#8a6018);padding:13px 16px;
+    display:flex;align-items:center;gap:10px;">
+    <span style="font-size:20px;">⚖️</span>
+    <div>
+      <div style="font-weight:700;font-size:13px;color:#fff;">Droit à l'erreur &amp; évolutivité du droit</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.75);margin-top:1px;">Information importante avant d'utiliser cet outil</div>
+    </div>
+  </div>
+
+  <!-- Corps -->
+  <div style="padding:14px 16px;font-size:12px;color:#c8d4e8;line-height:1.7;">
+    Le droit du travail évolue rapidement — lois, décrets, jurisprudence, barèmes. Malgré notre vigilance, certaines informations peuvent ne pas refléter les toutes dernières évolutions à l'instant où vous lisez ces lignes. Nous faisons au mieux et mettons à jour régulièrement, mais <strong style="color:#e8d090;">nous ne pouvons pas garantir une exactitude absolue en temps réel.</strong>
+  </div>
+
+  <!-- Ligne séparatrice -->
+  <div style="height:1px;background:rgba(255,255,255,0.08);margin:0 16px;"></div>
+
+  <!-- En cas de doute -->
+  <div style="padding:12px 16px;display:flex;gap:10px;align-items:flex-start;">
+    <span style="font-size:18px;flex-shrink:0;">💡</span>
+    <div style="font-size:12px;color:#c8d4e8;line-height:1.6;">
+      <strong style="color:#fff;">En cas de doute :</strong> consultez un professionnel — avocat, juriste, représentant du personnel, syndicat ou service RH.<br>
+      <span style="color:rgba(200,212,232,0.7);">Tous les outils sont indicatifs et pédagogiques — aucune valeur légale ou contractuelle.</span>
+    </div>
+  </div>
+
+  <!-- Footer du bloc -->
+  <div style="background:rgba(0,0,0,0.3);padding:10px 16px;text-align:center;
+    font-size:10px;color:rgba(200,212,232,0.5);letter-spacing:0.4px;line-height:1.6;">
+    SimulHeures · Outil pédagogique privé · Ni avis juridique ni avis fiscal<br>
+    Données 100 % locales · Aucune collecte · Votre appareil, vos données
+  </div>
+</div>
+
 
 <!-- ══ POPUP SAUVEGARDE / EXPORT-IMPORT ════════════════════════ -->
 <div id="backup-popup-overlay" style="
@@ -1527,36 +1751,103 @@ document.addEventListener('keydown', function(e){
   <button onclick="window.openPrivacyPopup()" style="background:none;border:none;color:rgba(255,255,255,0.8);cursor:pointer;font-size:11px;padding:0;margin:0;text-decoration:underline;">🔒 Confidentialité</button>
 </div>
 
-<footer>
-  <div style="margin-bottom: 8px;">Développé par C. Anthony v7.2.0</div>
+<footer style="background:transparent;padding:0;margin:0;">
 
-  <!-- Bouton contact -->
-  <div style="text-align:center;margin:12px 0 8px;">
-    <button onclick="openContactPopup()" style="
-      background:linear-gradient(135deg,#4FB3C2,#2196a6);
-      color:#fff;border:none;border-radius:8px;
-      padding:10px 22px;font-size:14px;font-weight:600;
-      cursor:pointer;box-shadow:0 2px 8px rgba(33,150,166,0.25);
-      display:inline-flex;align-items:center;gap:8px;">
-      ✉️ Nous contacter
-    </button>
-  </div>
+  <!-- Carte principale footer -->
+  <div style="margin:16px 14px 0;background:#0e1520;border-radius:16px;overflow:hidden;
+    box-shadow:0 4px 24px rgba(0,0,0,0.5);">
 
-  <div style="font-size:10px;color:rgba(0,0,0,0.55);line-height:1.5;max-width:560px;margin:0 auto;padding:12px 16px;border-top:1px solid rgba(0,0,0,0.08);">
-    <strong style="color:#c0392b;">⚠️ Application indépendante :</strong> <strong>Simulateur Heures Sup France n'est PAS affilié</strong> au gouvernement français, au Ministère du Travail, à l'URSSAF, à Légifrance, ni à aucune autre entité publique. C'est un outil privé indépendant développé par un particulier.
-    <br><br>
-    <strong>⚖️ Avertissement légal :</strong> Cette application est un <strong>outil informatif et pédagogique</strong>. Les informations, calculs, articles juridiques, simulations de paie et indicateurs de bien-être qu'elle propose ne constituent <strong>ni un conseil juridique, ni un avis médical, ni un bulletin de paie officiel</strong>. En cas de doute ou de litige, consultez un professionnel qualifié (avocat, expert-comptable, médecin du travail, syndicat). L'utilisateur reste seul responsable de l'usage qu'il fait des informations fournies. Le développeur décline toute responsabilité concernant les décisions prises sur la base des données affichées par l'application.
-    <br><br>
-    <strong>📚 Sources officielles utilisées (consultables directement) :</strong>
-    <br>• Code du travail : <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener" style="color:#2196a6;">legifrance.gouv.fr</a>
-    <br>• Code du travail numérique : <a href="https://code.travail.gouv.fr" target="_blank" rel="noopener" style="color:#2196a6;">code.travail.gouv.fr</a>
-    <br>• Service public : <a href="https://www.service-public.fr" target="_blank" rel="noopener" style="color:#2196a6;">service-public.fr</a>
-    <br>• Conventions collectives (IDCC) : <a href="https://www.legifrance.gouv.fr/liste/idcc" target="_blank" rel="noopener" style="color:#2196a6;">legifrance.gouv.fr/liste/idcc</a>
-    <br>• Jours fériés : <a href="https://calendrier.api.gouv.fr" target="_blank" rel="noopener" style="color:#2196a6;">calendrier.api.gouv.fr</a> (API publique)
-    <br>• Études santé : OMS/OIT 2021, INRS, ANACT, Lancet
-    <br><br>
-    Conventions collectives indicatives — vérifiez toujours avec votre CCN officielle.
+    <!-- Auteur + contact -->
+    <div style="padding:18px 16px 14px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <div style="font-size:11px;color:rgba(200,212,232,0.5);letter-spacing:0.5px;margin-bottom:10px;">
+        Développé par C. Anthony · v7.2.0
+      </div>
+      <button onclick="openContactPopup()" style="
+        background:linear-gradient(135deg,#4FB3C2,#2196a6);
+        color:#fff;border:none;border-radius:10px;
+        padding:11px 24px;font-size:13px;font-weight:700;
+        cursor:pointer;box-shadow:0 3px 12px rgba(33,150,166,0.4);
+        display:inline-flex;align-items:center;gap:8px;letter-spacing:0.2px;">
+        ✉️ Nous contacter
+      </button>
+    </div>
+
+    <!-- Application indépendante -->
+    <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+      display:flex;gap:10px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px;">⚠️</span>
+      <div style="font-size:11.5px;color:#c8d4e8;line-height:1.6;">
+        <strong style="color:#f0a0a0;">Application indépendante</strong><br>
+        Simulateur Heures Sup France <strong style="color:#fff;">n'est PAS affilié</strong> au gouvernement français, au Ministère du Travail, à l'URSSAF, à Légifrance, ni à aucune autre entité publique. C'est un outil privé développé par un particulier.
+      </div>
+    </div>
+
+    <!-- Avertissement légal -->
+    <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);
+      display:flex;gap:10px;align-items:flex-start;">
+      <span style="font-size:18px;flex-shrink:0;margin-top:1px;">⚖️</span>
+      <div style="font-size:11.5px;color:#c8d4e8;line-height:1.6;">
+        <strong style="color:#fff;">Avertissement légal</strong><br>
+        Cette application est un <strong style="color:#e8d090;">outil informatif et pédagogique</strong>. Les informations, calculs et simulations ne constituent <strong style="color:#e8d090;">ni un conseil juridique, ni un avis médical, ni un bulletin de paie officiel</strong>. L'utilisateur reste seul responsable des décisions prises. En cas de doute, consultez un professionnel qualifié.
+      </div>
+    </div>
+
+    <!-- Sources officielles -->
+    <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.07);">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;">
+        <span style="font-size:18px;flex-shrink:0;">📚</span>
+        <strong style="font-size:12px;color:#fff;">Sources officielles</strong>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;padding-left:28px;">
+        <a href="https://www.legifrance.gouv.fr" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span style="font-size:14px;">📋</span>
+          <span style="font-size:12px;color:#7ab8d4;">legifrance.gouv.fr</span>
+          <span style="font-size:10px;color:rgba(200,212,232,0.45);margin-left:2px;">Code du travail</span>
+        </a>
+        <a href="https://code.travail.gouv.fr" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span style="font-size:14px;">💻</span>
+          <span style="font-size:12px;color:#7ab8d4;">code.travail.gouv.fr</span>
+          <span style="font-size:10px;color:rgba(200,212,232,0.45);margin-left:2px;">CT numérique</span>
+        </a>
+        <a href="https://www.service-public.fr" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span style="font-size:14px;">🏛️</span>
+          <span style="font-size:12px;color:#7ab8d4;">service-public.fr</span>
+          <span style="font-size:10px;color:rgba(200,212,232,0.45);margin-left:2px;">Service public</span>
+        </a>
+        <a href="https://www.legifrance.gouv.fr/liste/idcc" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span style="font-size:14px;">📂</span>
+          <span style="font-size:12px;color:#7ab8d4;">legifrance.gouv.fr/idcc</span>
+          <span style="font-size:10px;color:rgba(200,212,232,0.45);margin-left:2px;">CCN (IDCC)</span>
+        </a>
+        <a href="https://calendrier.api.gouv.fr" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+          <span style="font-size:14px;">📅</span>
+          <span style="font-size:12px;color:#7ab8d4;">calendrier.api.gouv.fr</span>
+          <span style="font-size:10px;color:rgba(200,212,232,0.45);margin-left:2px;">Jours fériés (API)</span>
+        </a>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:14px;">🔬</span>
+          <span style="font-size:11px;color:rgba(200,212,232,0.6);">OMS/OIT 2021, INRS, ANACT, Lancet</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Note CCN + bas de footer -->
+    <div style="padding:12px 16px;background:rgba(0,0,0,0.25);text-align:center;">
+      <div style="font-size:10.5px;color:rgba(200,212,232,0.5);line-height:1.6;">
+        Conventions collectives indicatives — vérifiez toujours avec votre CCN officielle.<br>
+        <span style="color:rgba(200,212,232,0.3);font-size:9.5px;letter-spacing:0.3px;">
+          Données 100 % locales · Aucune collecte · Votre appareil, vos données
+        </span>
+      </div>
+    </div>
+
   </div>
+  <div style="height:32px;"></div>
 </footer>
 
 <!-- POPUP CONTACT -->
@@ -1914,15 +2205,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
   function wizChoixContrat(type) {
     if(type === 'partiel') {
-      // Mémoriser le choix + marquer le wizard comme vu
       try { localStorage.setItem('menuContratType','partiel'); } catch(e){}
-      // Fermer le wizard et aller directement sur Mizuki
+      if(!hasConsent()) { goStep(1); return; }
       closeWizard();
       go('module5');
     } else {
-      // Temps plein : continuer le wizard normal
-      try { localStorage.setItem('menuContratType','plein'); } catch(e){}
-      goStep(1);
+      try { localStorage.setItem('menuContratType', type||'plein'); } catch(e){}
+      if(!hasConsent()) { goStep(1); return; }
+      goStep(2);
     }
   }
 
@@ -1953,29 +2243,36 @@ document.addEventListener('DOMContentLoaded', function(){
   function goApp(app) { closeWizard(); go(app); }
 
   function wizChoixContrat(type) {
+    // Mémoriser le choix
+    try { _safeLS.set('menuContratType', type||'plein'); } catch(e){}
+    try { localStorage.setItem('menuContratType', type||'plein'); } catch(e){}
+    // Béton armé : forcer le step 1 si consentement pas encore donné
+    if(!hasConsent()) {
+      // Stocker le type pour y revenir après le consentement
+      try { localStorage.setItem('_pendingType', type); } catch(e){}
+      goStep(1);
+      return;
+    }
+    // Consentement déjà donné — continuer normalement
     if(type === 'partiel') {
-      _safeLS.set('menuContratType', 'partiel');
-      _safeLS.set('menuWizardDone', '1');
-      // Transition fond violet avant de partir
+      try { _safeLS.set('menuWizardDone', '1'); } catch(e){}
       document.body.style.transition = 'background 0.4s ease';
       document.body.style.background = 'linear-gradient(160deg,#1A0A3E 0%,#2D1467 50%,#3B1F8C 100%)';
-      document.getElementById('welcomeWizard').style.display = 'none';
-      unlockScroll();
-      setTimeout(() => go('module5'), 400);
+      var ww = document.getElementById('welcomeWizard');
+      if(ww) ww.style.display = 'none';
+      try { unlockScroll(); } catch(e){}
+      setTimeout(function(){ go('module5'); }, 400);
     } else if(type === 'cadre') {
-      _safeLS.set('menuContratType', 'cadre');
-      _safeLS.set('menuWizardDone', '1');
-      // Transition fond charbon/champagne avant de partir
+      try { _safeLS.set('menuWizardDone', '1'); } catch(e){}
       document.body.style.transition = 'background 0.4s ease';
       document.body.style.background = 'linear-gradient(160deg,#1A1714 0%,#2E2A26 60%,#1A1714 100%)';
-      document.getElementById('welcomeWizard').style.display = 'none';
-      unlockScroll();
-      setTimeout(() => go('module6'), 400);
+      var ww = document.getElementById('welcomeWizard');
+      if(ww) ww.style.display = 'none';
+      try { unlockScroll(); } catch(e){}
+      setTimeout(function(){ go('module6'); }, 400);
     } else {
-      // Temps plein → wizard normal + fond teal
-      _safeLS.set('menuContratType', 'plein');
       document.body.style.background = '#4FB3C2';
-      goStep(1);
+      goStep(2);
     }
   }
 
@@ -2065,6 +2362,143 @@ document.addEventListener('DOMContentLoaded', function(){
     _safeLS.set("lastApp", app);
     window.location.href = app + "/index.html";
   }
+
+  // ── Trousse à outils : afficher les outils épinglés dans le menu principal ──
+  (function renderPinnedTools(){
+    var TOOLS = {
+      module8: {
+        title:'🧳 Carnet de frais pro', img:'module8/fraispro-menu.jpg', emoji:'🧳',
+        fbg:'linear-gradient(135deg,#c8a878,#a8895f)', tcolor:'#5a4631',
+        border:'2px solid rgba(168,137,95,0.7)', bg:'linear-gradient(160deg,#e8dcc4,#d2c3a2)'
+      },
+      'module-temps': {
+        title:'⚙️ Temps &amp; Repos', img:'module-temps/temps-menu.jpg', emoji:'⚙️',
+        fbg:'linear-gradient(135deg,#3a2c1d,#241a12)', tcolor:'#e8cf6b',
+        border:'2px solid rgba(201,162,39,0.6)', bg:'linear-gradient(160deg,#3a2c1d,#241a12)'
+      },
+      'module-conges': {
+        title:'🏝️ Mes Congés payés', img:'module-conges/conges-menu.jpg', emoji:'🏝️',
+        fbg:'linear-gradient(135deg,#ff9a6c,#f857a6)', tcolor:'#fff',
+        border:'2px solid rgba(248,87,166,0.5)', bg:'linear-gradient(160deg,#ff9a6c,#f857a6)'
+      },
+      'module-fincontrat': {
+        title:'🌄 Fin de contrat', img:'module-fincontrat/fincontrat-menu.jpg', emoji:'🌄',
+        fbg:'linear-gradient(135deg,#f7b58a,#7d6a9c)', tcolor:'#fff',
+        border:'2px solid rgba(201,107,142,0.5)', bg:'linear-gradient(160deg,#f7b58a,#c96b8e)'
+      },
+      'module-chomage': {
+        title:'🪂 Droits chômage (ARE)', img:'module-chomage/chomage-menu.jpg', emoji:'🪂',
+        fbg:'linear-gradient(135deg,#7fc4ec,#3b6fb5)', tcolor:'#fff',
+        border:'2px solid rgba(59,111,181,0.5)', bg:'linear-gradient(160deg,#7fc4ec,#3b6fb5)'
+      },
+      'module-famille': {
+        title:'🪺 Congés familiaux', img:'module-famille/famille-menu.jpg', emoji:'🪺',
+        fbg:'linear-gradient(135deg,#fbeeda,#e8956b)', tcolor:'#fff',
+        border:'2px solid rgba(232,149,107,0.5)', bg:'linear-gradient(160deg,#f4c9c0,#e8956b)'
+      },
+      'module-arret': {
+        title:'🩺 Arrêt maladie & IJSS', img:'module-arret/arret-menu.jpg', emoji:'🩺',
+        fbg:'linear-gradient(135deg,#c8dff0,#2d5f8a)', tcolor:'#fff',
+        border:'2px solid rgba(74,127,168,0.6)', bg:'linear-gradient(160deg,#d8ecf8,#4a7fa8)'
+      },
+      'module-tr': {
+        title:'🍽️ Titres-restaurant', img:'module-tr/tr-menu.jpg', emoji:'🍽️',
+        fbg:'linear-gradient(135deg,#5c0e0e,#2a2d35)', tcolor:'#f8f4ed',
+        border:'2px solid rgba(139,26,26,0.6)', bg:'linear-gradient(160deg,#8b1a1a,#2a2d35)'
+      },
+      'module-feries': {
+        title:'🎆 Jours feries 2026', img:'module-feries/feries-menu.jpg', emoji:'🎆',
+        fbg:'linear-gradient(135deg,#1a2a7a,#2b4bba)', tcolor:'#fff',
+        border:'2px solid rgba(43,75,186,0.6)', bg:'linear-gradient(160deg,#0d1440,#2b4bba)'
+      },
+      'module-saisie': {
+        title:'🔒 Saisie sur salaire', img:'module-saisie/saisie-menu.jpg', emoji:'🔒',
+        fbg:'linear-gradient(135deg,#2a3540,#141e26)', tcolor:'#c8d4dc',
+        border:'2px solid rgba(200,168,75,0.4)', bg:'linear-gradient(160deg,#3a4550,#1e2830)'
+      },
+      'module-anciennete': {
+        title:'🌳 Ancienneté & jalons', img:'module-anciennete/anciennete-menu.jpg', emoji:'🌳',
+        fbg:'linear-gradient(135deg,#2d5a2d,#3a2a1a)', tcolor:'#f8f4ec',
+        border:'2px solid rgba(74,154,74,0.5)', bg:'linear-gradient(160deg,#3a7a3a,#5a3e28)'
+      },
+      'module-journal': {
+        title:'📓 Journal d\'incidents', img:'module-journal/journal-menu.jpg', emoji:'📓',
+        fbg:'linear-gradient(135deg,#4a3020,#2c1e10)', tcolor:'#f5f0e8',
+        border:'2px solid rgba(74,48,32,0.6)', bg:'linear-gradient(160deg,#6a4a32,#2c1e10)'
+      },
+      'module-c2p': {
+        title:'🦺 C2P Pénibilité', img:'module-c2p/c2p-menu.jpg', emoji:'🦺',
+        fbg:'linear-gradient(135deg,#b85a10,#1a1e26)', tcolor:'#fff',
+        border:'2px solid rgba(232,120,32,0.5)', bg:'linear-gradient(160deg,#e87820,#252c38)'
+      },
+      'module-lexique': {
+        title:'📚 Lexique bulletin de paie', img:'module-lexique/lexique-menu.jpg', emoji:'📚',
+        fbg:'linear-gradient(135deg,#7a5530,#2a1e0e)', tcolor:'#faf6ee',
+        border:'2px solid rgba(160,120,72,0.5)', bg:'linear-gradient(160deg,#a07848,#5a3e1e)'
+      },
+      'module-fincontrat2': {
+        title:'📋 Solde de tout compte', img:'module-fincontrat2/stc-menu.jpg', emoji:'📋',
+        fbg:'linear-gradient(135deg,#1a6b3a,#0e4020)', tcolor:'#fff',
+        border:'2px solid rgba(26,107,58,0.5)', bg:'linear-gradient(160deg,#2a9b55,#1a6b3a)'
+      },
+      'module-contrats': {
+        title:'📊 CDI · CDD · Intérim', img:'module-contrats/contrats-menu.jpg', emoji:'📊',
+        fbg:'linear-gradient(135deg,#1a3a6a,#0e1a2e)', tcolor:'#fff',
+        border:'2px solid rgba(26,58,106,0.5)', bg:'linear-gradient(160deg,#2a5a9a,#1a3a6a)'
+      },
+      'module-archives': {
+        title:'📁 Conservation documents RH', img:'module-archives/archives-menu.jpg', emoji:'📁',
+        fbg:'linear-gradient(135deg,#6b4a1e,#4a2e0e)', tcolor:'#fdf8f0',
+        border:'2px solid rgba(107,74,30,0.5)', bg:'linear-gradient(160deg,#8b6a3e,#6b4a1e)'
+      },
+      'module-convertisseur': {
+        title:'🧮 Convertisseur de paie', img:'module-convertisseur/cvr-menu.jpg', emoji:'🧮',
+        fbg:'linear-gradient(135deg,#1e4a7a,#0a1628)', tcolor:'#fff',
+        border:'2px solid rgba(30,74,122,0.5)', bg:'linear-gradient(160deg,#2e6aaa,#1e4a7a)'
+      },
+      'module-essai': {
+        title:'⏳ Période d\'essai', img:'module-essai/essai-menu.jpg', emoji:'⏳',
+        fbg:'linear-gradient(135deg,#4a3080,#1a1228)', tcolor:'#fff',
+        border:'2px solid rgba(74,48,128,0.5)', bg:'linear-gradient(160deg,#6a50a0,#4a3080)'
+      },
+      'module-mutuelle': {
+        title:'🛡️ Mutuelle obligatoire', img:'module-mutuelle/mutuelle-menu.jpg', emoji:'🛡️',
+        fbg:'linear-gradient(135deg,#0d6e5a,#071e18)', tcolor:'#fff',
+        border:'2px solid rgba(13,110,90,0.5)', bg:'linear-gradient(160deg,#1a9e82,#0d6e5a)'
+      },
+      'module-transport': {
+        title:'🚌 Transport & Mobilité', img:'module-transport/transport-menu.jpg', emoji:'🚌',
+        fbg:'linear-gradient(135deg,#1a4a8a,#0a1428)', tcolor:'#fff',
+        border:'2px solid rgba(26,74,138,0.5)', bg:'linear-gradient(160deg,#2a6acc,#1a4a8a)'
+      },
+      'module-cse': {
+        title:'🏛️ CSE & Représentation', img:'module-cse/cse-menu.jpg', emoji:'🏛️',
+        fbg:'linear-gradient(135deg,#3a1a6a,#130a22)', tcolor:'#fff',
+        border:'2px solid rgba(58,26,106,0.5)', bg:'linear-gradient(160deg,#5a3a9a,#3a1a6a)'
+      }
+    };
+    function getPinned(){ try{ return JSON.parse(localStorage.getItem('pinnedTools')||'[]'); }catch(e){ return []; } }
+    function setPinned(a){ try{ localStorage.setItem('pinnedTools', JSON.stringify(a)); }catch(e){} }
+    var host = document.getElementById('pinnedTools');
+    if(!host) return;
+    var pinned = getPinned();
+    host.innerHTML='';
+    pinned.forEach(function(id){
+      var t=TOOLS[id]; if(!t) return;
+      var card=document.createElement('div'); card.className='btn'; card.id='btn-'+id;
+      card.setAttribute('style','border:'+t.border+';background:'+t.bg+';position:relative;');
+      card.innerHTML =
+        '<img src="'+t.img+'" loading="eager" alt="'+t.title+'" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'+
+        '<div class="btn-no-img" style="background:'+t.fbg+';min-height:100px;display:none"><span style="font-size:2rem;">'+t.emoji+'</span></div>'+
+        '<button class="unpin-btn" title="Retirer du menu (remettre dans la trousse)" style="position:absolute;top:10px;right:10px;width:38px;height:38px;border-radius:50%;background:#ffd166;border:none;color:#7a5a00;font-size:18px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;">★</button>'+
+        '<div class="title" style="color:'+t.tcolor+';">'+t.title+'</div>';
+      card.addEventListener('click', function(ev){ if(ev.target.closest('.unpin-btn')) return; go(id); });
+      card.querySelector('.unpin-btn').addEventListener('click', function(ev){ ev.stopPropagation();
+        var p=getPinned(); var i=p.indexOf(id); if(i>-1){ p.splice(i,1); setPinned(p); card.remove(); }
+      });
+      host.appendChild(card);
+    });
+  })();
 
   // Surbrillance du dernier module utilisé
   (function highlightLastApp() {
@@ -2397,5 +2831,148 @@ document.getElementById('annonce-overlay').addEventListener('click', function(e)
 });
 </script>
 
+
+<!-- ══ POPUP RÉSEAUX SOCIAUX ════════════════════════════════════ -->
+<div id="social-popup-overlay" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;"
+  onclick="closeSocialPopup()">
+  <div onclick="event.stopPropagation()" style="
+    background:linear-gradient(165deg,#1a1208,#2a1e0e);
+    border:2px solid rgba(232,120,32,0.5);
+    border-top:4px solid #e87820;
+    border-radius:20px;width:100%;max-width:420px;
+    padding:24px 22px 28px;
+    box-shadow:0 24px 60px rgba(0,0,0,0.7);">
+    <div style="text-align:center;margin-bottom:18px;">
+      <div style="font-size:36px;margin-bottom:6px;">🦊</div>
+      <div style="font-family:Georgia,serif;font-size:20px;font-weight:700;color:#f0c040;font-style:italic;">Le Terrier de la Famille Renard</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:4px;">Retrouve-nous sur nos reseaux</div>
+    </div>
+    <a href="https://youtube.com/@heuressupplementairesfrance?si=vbzZuUu0Dodr4thB"
+       target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:14px;background:rgba(255,0,0,0.15);border:1.5px solid rgba(255,60,60,0.4);border-radius:14px;padding:14px 16px;margin-bottom:10px;text-decoration:none;">
+      <span style="font-size:30px;flex-shrink:0;">&#9654;&#65039;</span>
+      <div>
+        <div style="font-weight:700;font-size:14px;color:#fff;">YouTube</div>
+        <div style="font-size:11.5px;color:rgba(255,255,255,0.7);margin-top:2px;">Tutoriels video de tous les modules — @heuressupplementairesfrance</div>
+      </div>
+      <span style="margin-left:auto;font-size:12px;background:#ff3c3c;color:#fff;border-radius:6px;padding:4px 8px;font-weight:700;flex-shrink:0;">TUTOS</span>
+    </a>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;">
+      <a href="https://www.facebook.com/share/18ZNV61uY6/?mibextid=wwXIfr"
+         target="_blank" rel="noopener"
+         style="display:flex;align-items:center;gap:10px;background:rgba(24,119,242,0.15);border:1.5px solid rgba(24,119,242,0.4);border-radius:12px;padding:12px 13px;text-decoration:none;">
+        <span style="font-size:22px;">&#128216;</span>
+        <div><div style="font-weight:700;font-size:13px;color:#fff;">Facebook</div></div>
+      </a>
+      <a href="https://www.instagram.com/simulateurheuressup"
+         target="_blank" rel="noopener"
+         style="display:flex;align-items:center;gap:10px;background:rgba(225,48,108,0.15);border:1.5px solid rgba(225,48,108,0.4);border-radius:12px;padding:12px 13px;text-decoration:none;">
+        <span style="font-size:22px;">&#128248;</span>
+        <div><div style="font-weight:700;font-size:13px;color:#fff;">Instagram</div></div>
+      </a>
+      <a href="https://www.threads.com/@simulateurheuressup"
+         target="_blank" rel="noopener"
+         style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:12px 13px;text-decoration:none;">
+        <span style="font-size:22px;">&#129525;</span>
+        <div><div style="font-weight:700;font-size:13px;color:#fff;">Threads</div></div>
+      </a>
+      <a href="https://www.tiktok.com/@appli.heures.sup"
+         target="_blank" rel="noopener"
+         style="display:flex;align-items:center;gap:10px;background:rgba(105,201,208,0.12);border:1.5px solid rgba(105,201,208,0.35);border-radius:12px;padding:12px 13px;text-decoration:none;">
+        <span style="font-size:22px;">&#127925;</span>
+        <div><div style="font-weight:700;font-size:13px;color:#fff;">TikTok</div></div>
+      </a>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;line-height:1.5;margin-bottom:16px;">
+      Les tutos video expliquent chaque module etape par etape.<br>Rejoins la communaute pour suivre les nouveautes 🦊
+    </div>
+    <button onclick="closeSocialPopup()" style="
+      display:block;width:100%;background:#e87820;border:none;border-radius:12px;
+      padding:13px;color:#fff;font-weight:700;font-size:14px;cursor:pointer;">
+      Fermer
+    </button>
+  </div>
+</div>
+<script>
+function openSocialPopup(){document.getElementById('social-popup-overlay').style.display='flex';}
+function closeSocialPopup(){document.getElementById('social-popup-overlay').style.display='none';}
+
+// ── BÉTON ARMÉ — Consentement utilisateur ──
+function checkBetonScroll(){
+  var el=document.getElementById('betonScroll');
+  if(!el) return;
+  var atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 10;
+  var lbl=document.getElementById('betonCheckLabel')||document.getElementById('betonLabel');
+  if(atBottom && lbl){
+    lbl.style.opacity='1';
+    lbl.style.pointerEvents='auto';
+  }
+  checkBetonReady();
+}
+function checkBetonReady(){
+  var el=document.getElementById('betonScroll');
+  var cb=document.getElementById('betonCheck');
+  var btn=document.getElementById('betonBtn');
+  var lbl=document.getElementById('betonCheckLabel');
+  if(!el||!cb||!btn) return;
+  var atBottom=el.scrollTop+el.clientHeight>=el.scrollHeight-10;
+  var ready=atBottom&&cb.checked;
+  // Débloquer la checkbox quand on a scrollé au bas
+  if(lbl){
+    lbl.style.opacity=atBottom?'1':'0.4';
+    lbl.style.pointerEvents=atBottom?'auto':'none';
+    if(atBottom){ lbl.style.borderColor='rgba(79,179,194,0.6)'; lbl.style.background='rgba(79,179,194,0.1)'; }
+  }
+  // Bouton
+  btn.disabled=!ready;
+  btn.style.cursor=ready?'pointer':'not-allowed';
+  btn.style.background=ready?'linear-gradient(135deg,#4FB3C2,#2196a6)':'rgba(79,179,194,0.08)';
+  btn.style.color=ready?'#fff':'#aaa';
+  btn.style.border=ready?'2px solid transparent':'2px solid rgba(79,179,194,0.3)';
+  btn.style.boxShadow=ready?'0 3px 12px rgba(33,150,166,0.35)':'none';
+  var ico=document.getElementById('betonBtnIcon');
+  var txt=document.getElementById('betonBtnText');
+  if(ico) ico.textContent=ready?'✅':'↓';
+  if(txt) txt.textContent=ready?'C\'est parti — entrer dans le terrier 🦊':'Faites défiler pour continuer';
+}
+function acceptBeton(){
+  var ts=new Date().toISOString();
+  try{
+    localStorage.setItem('SH_CONSENT','1');
+    localStorage.setItem('SH_CONSENT_TS',ts);
+    localStorage.setItem('SH_CONSENT_V','1.0');
+  }catch(e){}
+  // Reprendre le choix contrat en attente
+  var pending='';
+  try{ pending=localStorage.getItem('_pendingType')||''; }catch(e){}
+  try{ localStorage.removeItem('_pendingType'); }catch(e){}
+  if(pending==='partiel'){
+    document.body.style.background='linear-gradient(160deg,#1A0A3E 0%,#2D1467 50%,#3B1F8C 100%)';
+    var ww=document.getElementById('welcomeWizard');
+    if(ww) ww.style.display='none';
+    try{unlockScroll();}catch(e){}
+    setTimeout(function(){go('module5');},400);
+  } else if(pending==='cadre'){
+    document.body.style.background='linear-gradient(160deg,#1A1714 0%,#2E2A26 60%,#1A1714 100%)';
+    var ww=document.getElementById('welcomeWizard');
+    if(ww) ww.style.display='none';
+    try{unlockScroll();}catch(e){}
+    setTimeout(function(){go('module6');},400);
+  } else {
+    document.body.style.background='#4FB3C2';
+    goStep(2);
+  }
+}
+function hasConsent(){
+  try{
+    return localStorage.getItem('SH_CONSENT')==='1'
+        && localStorage.getItem('SH_CONSENT_V')==='1.0';
+  }catch(e){return false;}
+}
+
+</script>
 </body>
 </html>
