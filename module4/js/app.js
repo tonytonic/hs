@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function runAnalysis() {
     try {
       const state  = DTE.engine.analyze();
-      DTE.learning.autoAdapt();
+      // autoAdapt() supprimé : M3 ne doit pas écrire dans M4 (lecture seule)
       const risks  = DTE.risks.detect(state.scores, state.norm);
       let advice = [];
       try { advice = buildAdvice(state.scores, risks, state.norm); } catch(e) { console.warn('[DTE] buildAdvice error:', e); }
