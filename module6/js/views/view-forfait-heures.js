@@ -189,7 +189,7 @@ const VFH = {
     <div style="display:flex;gap:8px">
       <button class="m6-btn m6-btn-ghost" id="fh-newyr" style="flex:1;font-size:0.78rem">📅 Nouvel exercice</button>
       <button class="m6-btn m6-btn-ghost" id="fh-edit-contract" style="flex:1;font-size:0.78rem">⚙️ Contrat</button>
-    </div>`;
+    </div><div class="m6-alert info" style="margin-top:16px;font-size:0.72rem"><span>&#9878;&#65039;</span><div><strong>Information juridique.</strong> Outil indicatif et pedagogique &mdash; ni avis juridique ni valeur legale. Le forfait heures (hebdomadaire ou mensuel) doit etre prevu par une convention individuelle ecrite et respecter les durees maximales de travail et les repos obligatoires. Au-dela du forfait, les heures supplementaires restent dues. En cas de doute, rapproche-toi des representants du personnel, de l inspection du travail ou d un conseil juridique. Sources : Art. L3121-56 et s. du Code du travail &middot; Legifrance.</div></div>`;
   },
 
   _bindBilan(analysis) {
