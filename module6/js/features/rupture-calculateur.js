@@ -89,8 +89,8 @@ const M6_RuptureCalculateur = {
 
     // ── Régime fiscal et social ────────────────────────────────
     // Exonération IR : min(2 × rém annuelle brute, 50% indemnité)
-    // Plafond SS 2026 : 3 925 €/mois, plafond annuel 47 100 €
-    const plafondSSAnnuel = 47100;
+    // Plafond SS 2026 : 4 005 €/mois, plafond annuel 48 060 €
+    const plafondSSAnnuel = 48060;
     const exoIRPlafond = Math.min(2 * salRef * 12, indemApplicable * 0.5, plafondSSAnnuel * 2);
     const partImposable = Math.max(0, indemApplicable - exoIRPlafond);
 
@@ -236,7 +236,7 @@ const M6_RuptureCalculateur = {
 
           <div style="font-size:0.68rem;color:var(--pierre);margin-top:10px;line-height:1.5">
             * Estimation basée sur la formule légale (R1234-2). Votre CCN et situation réelle peuvent modifier ces montants.
-            Plafond SS 2026 utilisé : 47 100 €/an. Consultez un professionnel avant signature.
+            Plafond SS 2026 utilisé : 48 060 €/an. Consultez un professionnel avant signature.
           </div>
         </div>
       </div>`;
