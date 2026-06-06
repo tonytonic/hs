@@ -183,9 +183,9 @@ class Dashboard {
             return v.toFixed(0)+'h/sem (optimal : 35h)'+badge;
           } },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
-        { label:'Durée d\'exposition',     key:'_cumulWeeks',   fmt: v => {
+        { label:'Durée exposition (12 sem.)', key:'_cumulWeeksLong',   fmt: v => {
             const vR = Math.round(v * 10) / 10;
-            if (vR <= 0) return 'Première semaine — pas d\'historique';
+            if (vR <= 0) return 'Sous le seuil (12 sem.)';
             if (vR < 1) return 'Effet partiel d\'1 semaine légère';
             if (vR < 4) return vR.toFixed(1)+' sem. — vigilance';
             if (vR < 8) return vR.toFixed(1)+' sem. — fatigue chronique';
@@ -277,7 +277,7 @@ class Dashboard {
             const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
             return (v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)')+badge;
           } },
-        { label:'Durée exposition', key:'_cumulWeeks', fmt: v => {
+        { label:'Durée exposition (12 sem.)', key:'_cumulWeeksLong', fmt: v => {
             const vR = Math.round(v * 10) / 10;
             return vR > 0 ? vR+' sem. → risque ×'+Math.round(Math.min(2.0,(1+vR*0.05))*100)/100 : 'Sous le seuil';
         }},
@@ -392,6 +392,7 @@ class Dashboard {
       const normVal = (k) => {
         if(k.startsWith('ci_')) return ci[k.replace('ci_','')];
         if(k==='_cumulMonths') return norm ? (norm._cumulWeeks||0)/4.33 : 0;
+        if(k==='_cumulMonthsLong') return norm ? (norm._cumulWeeksLong||0)/4.33 : 0;
         if(k==='_consecOT')   return norm ? (norm._consecOT || 0) : 0;
         return norm ? norm[k] : 0;
       };
