@@ -35,14 +35,14 @@ const GLOSSAIRE = [
     terme: 'Majoration +10%',
     art: 'Art. L3123-29',
     def: "Les premières heures complémentaires (dans la limite du 1/10e de ton contrat) sont payées avec 10% de plus que ton taux horaire normal. C'est le minimum légal supplétif — ta CCN peut prévoir un taux plus élevé.",
-    exemple: "Taux horaire 11,88€ × 1,10 = 13,07€/h pour les premières heures complémentaires.",
+    exemple: "Taux horaire 12,31€ × 1,10 = 13,54€/h pour les premières heures complémentaires.",
     tags: ['majoration','10%','rémunération']
   },
   {
     terme: 'Majoration +25%',
     art: 'Art. L3123-29',
     def: "Au-delà du 1/10e de ton contrat et jusqu'au plafond autorisé, chaque heure complémentaire est payée avec 25% de plus. C'est le taux légal minimum — vérifie si ta CCN prévoit mieux.",
-    exemple: "Contrat 25h, taux 11,88€ → 2,5 premières HC à 13,07€, puis les suivantes à 14,85€.",
+    exemple: "Contrat 25h, taux 12,31€ → 2,5 premières HC à 13,54€, puis les suivantes à 14,85€.",
     tags: ['majoration','25%','rémunération']
   },
   {
