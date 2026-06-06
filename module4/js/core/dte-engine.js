@@ -845,9 +845,12 @@ class DTEEngine {
     for (let i = 0; i < 28; i++) {
       const d = new Date(today); d.setDate(today.getDate() - i);
       const dow = d.getDay();
-      if (_isRestDowAt(dow, d)) continue; // FIX VERSIONING : config active à cette date historique
       const k = localDK(d);
       const e = days[k];
+      // FIX REPOS AVEC HS : si un jour de repos (sam/dim) a des heures réelles saisies,
+      // il compte dans la charge biologique (travail exceptionnel déclaré dans M2/M1)
+      const isRestDay28 = _isRestDowAt(dow, d);
+      if (isRestDay28 && !(e && e.extra > 0)) continue; // FIX VERSIONING : config active à cette date historique
       if (e && e.absent > 0) continue;
       if (e && (e.recup >= 7)) continue;
       // FIX FÉRIÉ + M2 : si des heures sont saisies sur un jour férié → jour travaillé
@@ -873,11 +876,18 @@ class DTEEngine {
     // Avant : !e → count7++ (jour vide compté comme jour travaillé → faux pour les vacances)
     let sumExtra7 = 0, count7 = 0;
     let hasAnyEntryThisWeek = false; // au moins 1 entrée M1/M2 cette semaine
-    for (let dd = 0; dd < todayDowA && dd < workDaysPerWeek; dd++) {
+    // FIX REPOS AVEC HS : on scanne 7 jours (pas workDaysPerWeek) pour inclure
+    // les HS saisies un samedi/dimanche (travail exceptionnel déclaré dans M2/M1)
+    // Le filtre rest-day s'applique DANS la boucle, pas sur le compteur de jours
+    const todayDow7Real = Math.floor((today.getTime() - weekMondayA.getTime()) / 86400000) + 1;
+    for (let dd = 0; dd < Math.min(7, todayDow7Real); dd++) {
       const d = new Date(weekMondayA); d.setDate(weekMondayA.getDate() + dd);
       if (d > today) break;
       const k = localDK(d);
       const e = days[k];
+      // FIX REPOS AVEC HS : skip les jours de repos SAUF si HS réelles saisies
+      const _dow7 = d.getDay();
+      if (_isRestDowAt(_dow7, d) && !(e && e.extra > 0)) continue;
       // FIX : M2/M1 heures réelles priment TOUJOURS sur vacation déclarée dans M4.
       // Si M2 dit que tu as travaillé (extra > 0), ces heures sont réelles —
       // la déclaration vacances dans M4 ne doit pas les effacer.
@@ -1096,157 +1106,162 @@ class DTEEngine {
 
     // ── CUMUL SEMAINES DE SURCHARGE — 2 passes pour éviter le bug d'ordre ────
     //
-    // BUG CORRIGÉ : l'ancienne boucle unique allait de w=0 (aujourd'hui) → w=51 (il y a 1 an).
-    // Les réductions (vacances, sem normales) s'appliquaient sur cumulWeeks=0 AVANT
-    // d'avoir accumulé les semaines de surcharge passées → résultat faussé.
+    // REFONTE : cumulWeeks GLISSANT 28J (4 semaines)
     //
-    // NOUVELLE APPROCHE : 2 passes chronologiques séparées.
-    // Passe 1 (chronologique, du passé vers aujourd'hui) : accumuler les semaines de surcharge.
-    // Passe 2 (même ordre) : soustraire les semaines de récupération.
-    // Séparation garantit que les +1 sont TOUJOURS calculés avant les −0.10/−0.25.
+    // Ancienne logique (52 semaines) : Jan–Mars 45h/sem → cumul 9.7 sem.
+    // Après 11 semaines normales : encore 8.0 → score dans le rouge tout l'été.
+    // INCOHÉRENT avec le ressenti biologique réel.
     //
-    // BUG FLOAT CORRIGÉ : 10 − 0.10 × 40 = 6.0000000000000014 en JS (IEEE 754)
-    // Fix : arrondi à 9 décimales après chaque opération (préserve la précision utile).
+    // Nouvelle logique (4 semaines glissantes) :
+    //   - Seules les 4 DERNIÈRES semaines comptent pour la fatigue courante
+    //   - Cap naturel à 4.0 (le max possible en 28j)
+    //   - Si les 4 dernières semaines sont ≤ 35h : cumulWeeks = 0 → score en forme
+    //   - Aligné avec : Code du travail (12 sem glissantes), recherche INRS (court-terme),
+    //     Sonnentag 2003 (récupération observable sur 2–4 sem), Meijman & Mulder 1998
+    //   - M3 (FOX/RPG) continue de lire _cumulWeeks normalement
+    //
+    // RÈGLE FÉRIÉS : un jour férié dans DTE_VACANCES n'est PAS une semaine de vacances.
+    // isVacWeek = true SEULEMENT si au moins 1 vrai jour de congé ouvré (non-férié, non-WE).
+    //
 
     const _ccnSeuilW = _dteGetCCNRules().seuil;
 
-    // Passe 1 : accumulation des semaines de surcharge (plus ancienne → plus récente)
     let cumulWeeks = 0;
-    const todayMonday = weekMondayA; // FIX CCN : début de semaine CCN (pas forcément lundi civil)
-    const baseJourCCN = _baseJourCCN; // réutilise le calcul déjà fait plus haut
+    const todayMonday = weekMondayA;
+    const baseJourCCN = _baseJourCCN;
 
-    for (let w = 51; w >= 0; w--) { // chronologique : w=51 (passé) → w=0 (maintenant)
-      let weekH = 0, hasAnyDay = false, daysLogged = 0;
-      // FIX VERSIONING : utiliser le nombre de jours ouvrés à cette semaine historique
-      const _wDate = new Date(todayMonday); _wDate.setDate(todayMonday.getDate() - w * 7);
-      const _wDaysCount = _workDaysAt(_wDate);
-      for (let dd = 0; dd < _wDaysCount; dd++) { // FIX CCN : workDays historiques
-        const dt = new Date(todayMonday);
-        dt.setDate(todayMonday.getDate() - w * 7 + dd);
-        if (dt > today) continue;
-        const k = localDK(dt);
-        const e = days[k];
-        if (e && e.absent) continue;
-        if (e && (e.recup >= 7)) continue;
-        // FIX FÉRIÉ + M2 : heures saisies sur férié → jour travaillé (M2 prioritaire)
-        const isFerieDay2 = specialDays[k] === 'ferie';
-        if (isFerieDay2 && !(e && e.extra > 0)) continue; // férié sans heures → exclu
-        const isVacDay = !!vacances[k];
-        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0));
-        if (e) hasAnyDay = true;
-        if (e && e.extra > 0 && !isVacDay) daysLogged++;
-      }
-      // FIX EXTRAPOLATION : semaine courante → weekH réel (HS faites + base jours restants)
-      // Cohérent avec weeklyExtra conservative → weekH = seuil + HS réelles
-      if (w === 0 && count7 >= 1 && count7 < workDaysPerWeek) {
-        weekH = _ccnSeuilW + weeklyExtraEffective; // weeklyExtraEffective = sumExtra7 (HS réelles)
-      }
-      // FIX PROPORTIONNEL v2 (Meijman & Mulder 1998 / INRS) :
-      // isM1RestWeekP1 : majorité des jours absents pour M1 (1 seul absent ≠ semaine repos)
-      // MAIS vacances[] garde .some() — 1 jour vacances déclaré = semaine hors calcul
-      // Contribution proportionnelle : HS réelles = weekH - seuil CCN (pas daysLogged×base)
-      // Normalisé sur seuil×0.20 (7h pour 35h contrat) → cap à 1.0
-      const isM1RestWeekP1 = (() => {
-        let restDays = 0;
-        for (let dd2 = 0; dd2 < workDaysPerWeek; dd2++) {
-          const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd2);
-          const ek = localDK(dt2); const ev = days[ek];
-          if (ev && ((ev.absent >= 7) || (ev.recup >= 7))) restDays++;
-        }
-        return restDays >= Math.ceil(workDaysPerWeek / 2); // majorité = repos réel
-      })();
-      const isVacWeekP1 = isM1RestWeekP1 || Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
-        const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
-        return vacances[localDK(dt2)];
-      });
-      if (hasAnyDay && !isVacWeekP1 && weekH > _ccnSeuilW) {
-        // Contribution proportionnelle : HS réelles vs seuil CCN
-        // FIX v2 : weekH - _ccnSeuilW (pas daysLogged×base qui gonflait hsReelles)
-        // Exemples (seuil 35h) : +6h HS → 0.86 | +2h HS → 0.29 | +10h HS → 1.0 (cap)
-        const hsReelles = weekH - _ccnSeuilW;
-        // SEUIL MINIMUM : < 5h extra/sem = semaine légèrement chargée, pas de surcharge cumulative
-        // INRS (guide RPS) : fatigue chronique à partir de ~40h/sem sur base 35h = 5h extra
-        // J.Occup.Health 2021 : effets dose-temps significatifs à partir de >43h/sem
-        // < 5h : pas de contribution | 5h-7h : contribution linéaire | >7h : contribution pleine
-        if (hsReelles < 5) {
-          // Semaine légère (<5h extra = <40h) : pas de contribution, réduction partielle
-          if (cumulWeeks > 0) cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.06) * 1e9) / 1e9;
-        } else {
-          const contribution = Math.min(1, hsReelles / (_ccnSeuilW * 0.20));
-          cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
-        }
-      }
-    }
-
-    // Passe 2 : réductions de récupération (même ordre chronologique)
-    for (let w = 51; w >= 0; w--) {
+    // ── 4 semaines glissantes (w=3=plus ancienne → w=0=semaine courante) ──────
+    for (let w = 3; w >= 0; w--) {
       let weekH = 0, hasAnyDay = false;
-      // FIX VERSIONING : jours ouvrés à cette semaine historique
-      const _wDate2 = new Date(todayMonday); _wDate2.setDate(todayMonday.getDate() - w * 7);
-      const _wDaysCount2 = _workDaysAt(_wDate2);
-      for (let dd = 0; dd < _wDaysCount2; dd++) { // FIX CCN
+      let isVacWeekCur = false;
+
+      for (let dd = 0; dd < workDaysPerWeek; dd++) {
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
+
         const k = localDK(dt);
         const e = days[k];
-        if (e && e.absent) continue;
-        if (e && (e.recup >= 7)) continue;
-        // FIX FÉRIÉ + M2 passe 2 : heures saisies → jour travaillé
-        const isFerieDay3 = specialDays[k] === 'ferie';
-        if (isFerieDay3 && !(e && e.extra > 0)) continue;
-        const isVacDay = !!vacances[k];
-        weekH += baseJourCCN + (isVacDay ? 0 : (e ? (e.extra || 0) : 0));
-        hasAnyDay = true; // Passe 2 : semaines vides = repos → décroissance cumulWeeks
-      }
-      // FIX : isM1RestWeekP2 requiert majorité des jours absents (même logique que Passe 1)
-      // 1 jour absent seul (ex: lundi férié marqué absent) ne = pas semaine de vacances
-      const isM1RestWeekP2 = (() => {
-        let restDays = 0;
-        for (let dd2 = 0; dd2 < workDaysPerWeek; dd2++) {
-          const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd2);
-          const ek = localDK(dt2); const ev = days[ek];
-          if (ev && ((ev.absent >= 7) || (ev.recup >= 7))) restDays++;
+        const isFerieDay = specialDays[k] === 'ferie';
+        const isVacDay   = !!vacances[k];
+
+        // RÈGLE FÉRIÉS : férié seul dans DTE_VACANCES → NE déclenche PAS isVacWeek
+        // Un vrai congé = vacances ET pas un jour férié
+        const isRealVacDay = isVacDay && !isFerieDay;
+
+        if (isRealVacDay) {
+          // Vrai jour de congé → jour travaillable mais 0 HS
+          weekH += baseJourCCN;
+          isVacWeekCur = true;
+          hasAnyDay = true;
+          continue;
         }
-        return restDays >= Math.ceil(workDaysPerWeek / 2);
-      })();
-      const isVacWeekP2 = isM1RestWeekP2 || Array.from({length: workDaysPerWeek}, (_,dd) => dd).some(dd => {
-        const dt2 = new Date(todayMonday); dt2.setDate(todayMonday.getDate() - w*7 + dd);
-        return vacances[localDK(dt2)];
-      });
+
+        // MÉTHODE ORIGINE : un férié non travaillé = repos = 7h CCN, pas de HS
+        // La semaine garde sa base complète (5j × 7h = 35h)
+        // Si l'utilisateur a travaillé le férié → check-in ignoré → extra = 0 ou présent
+        if (e && e.absent > 0) continue;
+        if (e && e.recup >= baseJourCCN) continue;
+
+        const hs = (e && !isVacDay && !isFerieDay) ? (e.extra || 0)
+                 : (e && isFerieDay) ? (e.extra || 0)  // travaillé sur férié → HS comptées
+                 : 0;
+        weekH += baseJourCCN + hs;
+        hasAnyDay = true;
+      }
+
       if (!hasAnyDay) continue;
-      if (isVacWeekP2 && cumulWeeks > 0) {
-        // Vacances déclarées M4 — PATCH calibration anti-reset (de Bloom 2010 + INRS)
-        // Avant : -0.75/sem (trop fort → quasi reset après 1-2 sem, irréaliste)
-        // Après : -0.45/sem → récupération forte mais PARTIELLE, dette résiduelle conservée
-        // 1 sem OFF = -0.45 | 2 sem = -0.90 | 3 sem = -1.35 (mémoire physiologique réaliste)
-        cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.45) * 1e9) / 1e9;
-      } else if (!isVacWeekP2 && weekH <= _ccnSeuilW && cumulWeeks > 0) {
-        // Semaine normale (0 HS) — PATCH : -0.12/sem (vs -0.10) — différenciation vacances/repos claire
-        // Meijman & Mulder 1998 : récupération partielle active dès retour à charge normale
-        cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.12) * 1e9) / 1e9;
-      } else if (!isVacWeekP2 && weekH > _ccnSeuilW && (weekH - _ccnSeuilW) < 5 && cumulWeeks > 0) {
-        // Semaine légère (<5h extra = <40h) : légère réduction (entre semaine normale et surcharge)
-        cumulWeeks = Math.round(Math.max(0, cumulWeeks - 0.06) * 1e9) / 1e9;
+
+      // Surcharge = weekH dépasse le SEUIL CCN ABSOLU (35h par défaut)
+      // Un férié retire un jour → weekH peut être < 35h même avec HS → pas de surcharge
+      const hsAuDessus35 = Math.max(0, weekH - _ccnSeuilW);
+
+      if (isVacWeekCur) {
+        // Semaine de vrais congés → pas d'accumulation (repos actif)
+        // Pas de réduction non plus (déjà à 0 en base glissante)
+      } else if (hsAuDessus35 >= 5) {
+        // Vraie surcharge ≥ 5h au-dessus de 35h → accumulation
+        const contribution = Math.min(1.0, hsAuDessus35 / (_ccnSeuilW * 0.20));
+        cumulWeeks = Math.round((cumulWeeks + contribution) * 1e9) / 1e9;
       }
+      // Semaines ≤ 35h (normales, légères, avec fériés) → contribution = 0
+      // En fenêtre glissante : elles "tombent" automatiquement quand elles sortent des 4 sem
     }
 
-    // Fallback robuste : si cumulWeeks = 0 mais qu'il existe des logs,
-    // estimer la durée d'exposition via la plage de dates réelle du log.
-    // Corrige le cas où des semaines partielles tombent toutes sous H_OPTIMAL.
-    if (cumulWeeks === 0 && Object.keys(days).length > 0) {
-      const allDateKeys = Object.keys(days).filter(k => days[k] && days[k].extra > 0).sort();
-      if (allDateKeys.length >= 5) { // au moins 1 semaine de données
-        const firstDate = new Date(allDateKeys[0] + 'T12:00:00');
-        const diffDays  = Math.ceil((today - firstDate) / 864e5);
-        cumulWeeks = Math.max(1, Math.round(diffDays / 7));
-      }
+    // Arrondi final
+    let cumulWeeksR = Math.round(cumulWeeks * 10) / 10;
+    let cumulMonths = Math.round((cumulWeeksR / 4.33) * 10) / 10;
+
+    // Compteur de jours de vacances récents (28j) — pour boosts post-vac (Sonnentag 2003)
+    let recentVacDays28 = 0;
+    for (let i = 0; i < 28; i++) {
+      const d = new Date(today); d.setDate(today.getDate() - i);
+      const k = localDK(d);
+      const e = days[k];
+      const isFerieDay = specialDays[k] === 'ferie';
+      const isRealVac = vacances[k] && !isFerieDay;
+      if (isRealVac || (e && ((e.absent >= 7) || (e.recup >= 7)))) recentVacDays28++;
     }
 
-    // Arrondi final pour éviter 6.0000000000000014 dans l'affichage
-    // PATCH : let (vs const) — cumulWeeksR sera réajusté après calcul recentVacDays28
-    let cumulWeeksR  = Math.round(cumulWeeks * 10) / 10;  // 1 décimale
-    let cumulMonths  = Math.round((cumulWeeksR / 4.33) * 10) / 10; // même précision
+    // Post-vacances bonus (Sonnentag 2003 + de Bloom 2010) — conservé
+    // 5+ vrais jours de congé dans les 28j → note: en fenêtre glissante le cumul
+    // est déjà naturellement bas, mais on garde le signal pour le dashboard
+    if (recentVacDays28 >= 5) {
+      cumulWeeks  = Math.max(0, cumulWeeks - 0.10);
+      cumulWeeksR = Math.round(cumulWeeks * 10) / 10;
+      cumulMonths = Math.round((cumulWeeksR / 4.33) * 10) / 10;
+    }
+
+    // ── cumulWeeksLong : fenêtre 12 semaines glissantes ───────────────────────
+    //
+    // Utilisé UNIQUEMENT pour cvRisk (Kivimäki 2015) et cogRisk (Jang/OEM 2025).
+    // Ces risques sont STRUCTURELS (long terme) : une exposition de 3 mois à 55h/sem
+    // ne s'efface pas en 4 semaines normales (contrairement à la fatigue courante).
+    //
+    // Règle identique au 28j mais sur 12 semaines (référentiel légal Art. L3121-22).
+    // Fériés = 7h CCN (méthode origine). Pas de séparation isVacWeek/isRestWeek :
+    // seule l'accumulation compte (pas de réduction — le risque structurel ne décroît
+    // pas à -0.12/sem, il requiert des mois de retour à la normale).
+    //
+    let cumulWeeksLong = 0;
+    for (let w = 11; w >= 0; w--) {
+      let weekHLong = 0, hasAnyLong = false;
+
+      for (let dd = 0; dd < workDaysPerWeek; dd++) {
+        const dt = new Date(todayMonday);
+        dt.setDate(todayMonday.getDate() - w * 7 + dd);
+        if (dt > today) continue;
+
+        const k = localDK(dt);
+        const e = days[k];
+        const isFerie = specialDays[k] === 'ferie';
+        const isVacReal = !!vacances[k] && !isFerie; // vrai congé seulement
+
+        if (isVacReal) {
+          weekHLong += baseJourCCN; // congé = base 7h, 0 HS
+          hasAnyLong = true;
+          continue;
+        }
+        if (e && e.absent > 0) continue;
+        if (e && e.recup >= baseJourCCN) continue;
+
+        const hs = e ? (e.extra || 0) : 0;
+        weekHLong += baseJourCCN + hs; // férié = 7h base + HS si travaillé
+        hasAnyLong = true;
+      }
+
+      if (!hasAnyLong) continue;
+
+      const hs35Long = Math.max(0, weekHLong - _ccnSeuilW);
+      if (hs35Long >= 5) {
+        const contrib = Math.min(1.0, hs35Long / (_ccnSeuilW * 0.20));
+        cumulWeeksLong = Math.round((cumulWeeksLong + contrib) * 1e9) / 1e9;
+      }
+      // Pas de réduction (-0.12) : le risque structurel est cumulatif sur la fenêtre
+    }
+
+    const cumulWeeksLongR = Math.round(cumulWeeksLong * 10) / 10;
+    const cumulMonthsLong = Math.round((cumulWeeksLongR / 4.33) * 10) / 10;
 
     // ── COMPTEURS DE RÉCUPÉRATION — deux niveaux distincts ───────────────────
     //
@@ -1316,29 +1331,6 @@ class DTEEngine {
       consecNonOTDays++;
     }
 
-    // [C] recentVacDays28 : total de jours de VACANCES dans les 28 derniers jours
-    // PAS consécutif — capte l'effet d'une semaine OFF même si l'utilisateur a retravaillé après.
-    // Sonnentag 2003 : les effets du repos persistent ~2-4 semaines après la reprise.
-    // Bug corrigé : consecRestDays=0 dès le 1er jour travaillé → vacances passées invisibles.
-    let recentVacDays28 = 0;
-    for (let i = 0; i < 28; i++) {
-      const d = new Date(today); d.setDate(today.getDate() - i);
-      const k = localDK(d);
-      const e = days[k];
-      // M1→M4 : absent ≥ 7h ou recup ≥ 7h = jour de repos → compte dans le buffer vacances récentes
-      if (vacances[k] || (e && ((e.absent >= 7) || (e.recup >= 7)))) recentVacDays28++;
-    }
-
-    // ── MÉMOIRE BIOLOGIQUE POST-VACANCES (Sonnentag 2003 + de Bloom 2010) ───
-    // Sonnentag 2003 : les effets du repos persistent 2-4 semaines après la reprise.
-    // de Bloom 2010 : "vacation effects are short-lived but remain measurable" (2 semaines).
-    // 5+ jours de vacances dans les 28j → réduction supplémentaire du cumul (-0.20)
-    // → différencie clairement "a travaillé 28j sans pause" vs "a eu une semaine OFF récente"
-    if (recentVacDays28 >= 5) {
-      cumulWeeks  = Math.max(0, cumulWeeks - 0.20);
-      cumulWeeksR = Math.round(cumulWeeks * 10) / 10;
-      cumulMonths = Math.round((cumulWeeksR / 4.33) * 10) / 10;
-    }
 
     // Variabilité horaire (ANACT) — fenêtre VARIAB_WINDOW semaines COMPLÈTES passées
     // FIX BUG 7 : ANACT recommande d'exclure congés, absences longues, arrêts
@@ -1550,7 +1542,9 @@ class DTEEngine {
       _isVacationWeek: isCurrentWeekVacation,
       _consec:        consec,
       _consecOT:      consecOT,
-      _cumulWeeks:    cumulWeeksR,
+      _cumulWeeks:    cumulWeeksR,      // 28j — fatigue/stress/score
+      _cumulWeeksLong: cumulWeeksLongR,  // 12sem — cvRisk/cogRisk
+      _cumulMonthsLong: cumulMonthsLong,
       _cumulMonths:   cumulMonths,
       _consecRestDays: consecRestDays,
       _consecNonOTDays: consecNonOTDays,
@@ -1615,8 +1609,10 @@ class DTEEngine {
         }
       }
     } catch(_) {}
-    const cumW    = norm._cumulWeeks    || 0;
-    const cumM    = norm._cumulMonths   || 0;
+    const cumW     = norm._cumulWeeks     || 0; // 28j → fatigue/stress/score
+    const cumM     = norm._cumulMonths    || 0; // dérivé 28j (conservé pour compat)
+    const cumWLong = norm._cumulWeeksLong || 0; // 12sem → cvRisk/cogRisk (Kivimäki/Jang)
+    const cumMLong = norm._cumulMonthsLong|| 0; // dérivé 12sem
     // Deux compteurs de récupération — voir _normalize() pour la justification scientifique
     const consecRest    = norm._consecRestDays   || 0; // repos COMPLET (Sonnentag 2003 / HPA)
     const consecNonOT   = norm._consecNonOTDays  || 0; // sans HS (Meijman & Mulder 1998)
@@ -1640,7 +1636,7 @@ class DTEEngine {
         diabetesRisk:0, musculoRisk:0,
         _f:0, _s:0, _p:0, _r:0,
         _hasData:false, _hasM1:false, _hasM2:false,
-        _weeklyH:weeklyH, _cumulWeeks:cumW,
+        _weeklyH:weeklyH, _cumulWeeks:cumW, _cumulWeeksLong:cumWLong,
       };
     }
 
@@ -1759,7 +1755,8 @@ class DTEEngine {
     // On retourne la capacité de base (Pencavel à 35h) sans dégradation cumulative.
     const perfPencavel = pencavelPerf(weeklyH);
     // Dégradation cognitive OEM 2025 (>52h)
-    const cogDeg       = cogRisk(weeklyH, cumW);
+    // cogDeg pour perf → risque long terme (Jang/OEM 2025)
+    const cogDeg       = cogRisk(weeklyH, cumWLong);
     const perfMotiv    = norm.motiv * 0.12;
     const perfFat      = fatigue * 0.50; // FIX 0.65→0.50 : Pencavel 2014 — lien fatigue→perf moins punitif
     const perfStr      = stress  * 0.10;
@@ -1866,11 +1863,14 @@ class DTEEngine {
       ? Math.max(0.88, Math.exp(-Math.log(2) * _consecForRiskDecay / 120))
       : 1.0;
 
-    const cvR_base  = Math.min(0.65, cvRisk(weeklyH, cumM) * nightFactor * _pf.cvF);
+    // cvRisk : Kivimäki 2015 (Lancet) — risque structurel long terme → 12 semaines
+    const cvR_base  = Math.min(0.65, cvRisk(weeklyH, cumMLong) * nightFactor * _pf.cvF);
     const cvR       = cvR_base * cvRiskRestDecay; // FIX: decay toujours appliqué (pas seulement vacances)
-    const cogR_base = Math.min(0.5, cogRisk(weeklyH, cumW) * _pf.cogF);
+    // cogRisk : Jang/OEM 2025 (Yonsei) — modifications cérébrales long terme → 12 semaines
+    const cogR_base = Math.min(0.5, cogRisk(weeklyH, cumWLong) * _pf.cogF);
     const cogR      = cogR_base * cogRiskRestDecay; // FIX: idem
-    const diabR     = metabolicRisk(weeklyH, cumM); // Lancet 2021 HR=1.18
+    // metabolicRisk : Lancet 2021 — risque structurel long terme → 12 semaines
+    const diabR     = metabolicRisk(weeklyH, cumMLong); // Lancet 2021 HR=1.18
     const muscR     = musculoRisk(weeklyH, cumM, norm._consec || 0); // Lancet 2021 HR=1.15
 
     // Appliquer lifestyle (multiplicateur sur fatigue) + check-in (additif modéré)
@@ -2084,25 +2084,17 @@ class DTEEngine {
 
   /* ── Adaptatif ──────────────────────────────────────────────── */
   _loadCoefs() {
-    const def = { fh: 1, fc: 1 };
-    try { const r = localStorage.getItem('DTE_COEFS'); if (r) return Object.assign(def, JSON.parse(r)); } catch(_) {}
-    return def;
+    // COEFS FIXES : fh=1, fc=1 — M3 (RPG) ne modifie plus M4.
+    // L'ancien autoAdapt() comparait burnout M3 à fatigue M4 et montait fh jusqu'à 2.0,
+    // faussant tous les calculs biologiques. Supprimé définitivement.
+    // Nettoyage de l'éventuel DTE_COEFS corrompu en localStorage :
+    try { localStorage.removeItem('DTE_COEFS'); } catch(_) {}
+    return { fh: 1, fc: 1 };
   }
-  saveCoefs() { try { localStorage.setItem('DTE_COEFS', JSON.stringify(this._coefs)); } catch(_) {} }
-  adapt(real, predicted, key) {
-    const err = real - predicted;
-    this._coefs[key] = Math.max(0.5, Math.min(2, this._coefs[key] - D.LR * err));
-    this.saveCoefs();
-  }
-  resetCoefs() { this._coefs = { fh: 1, fc: 1 }; this.saveCoefs(); }
-  autoAdapt() {
-    const state = this._cache;
-    if (!state || !state.raw.rpg.burnout) return;
-    const real = state.raw.rpg.burnout / 100;
-    const pred = state.scores._f || 0;
-    this.adapt(real, pred, 'fh');
-    this.adapt(real, pred, 'fc');
-  }
+  saveCoefs() { /* no-op : coefs fixes, pas d'écriture */ }
+  adapt(real, predicted, key) { /* no-op : M3 lecture seule sur M4 */ }
+  resetCoefs() { this._coefs = { fh: 1, fc: 1 }; }
+  autoAdapt() { /* no-op : M3 lecture seule sur M4 */ }
 
   /* Expose les fonctions scientifiques */
 
