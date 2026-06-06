@@ -31,26 +31,14 @@ class DTELearning {
   }
 
   /** Adapte les coefs depuis un rapport réel */
-  adaptFromCheckin(checkinData, predictedScores){
-    if(!checkinData||!predictedScores) return;
-    if(checkinData.energy!==undefined){
-      const realPerf=checkinData.energy/4;
-      const predPerf=predictedScores.performance/100;
-      this._engine.adapt(realPerf,predPerf,'fh');
-    }
-    if(checkinData.stress!==undefined){
-      const realStress=checkinData.stress/4;
-      const predStress=predictedScores.stress/100;
-      this._engine.adapt(realStress,predStress,'fc');
-    }
-  }
+  // DÉSACTIVÉ : M3 (RPG/burnout) ne doit pas écrire dans les paramètres M4.
+  // M3 est en lecture seule sur M4. Les coefs fh/fc sont figés à {fh:1, fc:1}.
+  adaptFromCheckin(checkinData, predictedScores){ /* no-op */ }
 
   /** Auto-adapt depuis score burnout RPG */
-  autoAdapt(){
-    const st=this._engine.getState();
-    if(!st) return;
-    this._engine.autoAdapt(st.raw.rpg.burnout, st.scores._f);
-  }
+  // DÉSACTIVÉ : même raison. autoAdapt() appelait engine.adapt() qui modifiait
+  // DTE_COEFS dans localStorage, faussant la fatigue sur plusieurs semaines.
+  autoAdapt(){ /* no-op */ }
 
   /** Score de précision du modèle (0-100) */
   accuracyScore(){
