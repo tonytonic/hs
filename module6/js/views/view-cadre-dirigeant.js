@@ -342,7 +342,7 @@ const VCD = {
     <div style="display:flex;gap:8px">
       <button class="m6-btn m6-btn-ghost" id="cd-newyr" style="flex:1;font-size:0.78rem">📅 Nouvel exercice</button>
       <button class="m6-btn m6-btn-ghost" id="cd-reset" style="flex:1;font-size:0.78rem">⚙️ Reconfigurer</button>
-    </div>`;
+    </div><div class="m6-alert info" style="margin-top:16px;font-size:0.72rem"><span>&#9878;&#65039;</span><div><strong>Information juridique.</strong> Outil indicatif et pedagogique &mdash; ni avis juridique ni valeur legale. Le statut de cadre dirigeant est strictement encadre : il suppose de larges responsabilites, une grande autonomie de decision et l une des remunerations les plus elevees de l entreprise (Art. L3111-2). Une qualification abusive peut etre requalifiee par les tribunaux, ouvrant droit au paiement des heures supplementaires. En cas de doute, rapproche-toi des representants du personnel, de l inspection du travail ou d un conseil juridique. Sources : Art. L3111-2 du Code du travail &middot; Legifrance.</div></div>`;
   },
 
   _bindBilan() {

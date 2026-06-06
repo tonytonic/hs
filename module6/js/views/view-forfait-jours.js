@@ -330,7 +330,9 @@ const VFJ = {
       <button class="m6-btn m6-btn-ghost" id="pdf-a" style="flex:1;min-width:110px;font-size:0.78rem">📋 PDF Annuel</button>
       
     </div>
-    <div style="font-size:0.7rem;color:var(--pierre);text-align:center;margin-top:6px">→ Onglet <strong>Exports</strong> pour PDF mensuel, période libre, validations et JSON</div>`;
+    <div style="font-size:0.7rem;color:var(--pierre);text-align:center;margin-top:6px">→ Onglet <strong>Exports</strong> pour PDF mensuel, période libre, validations et JSON</div>
+
+    <div class="m6-alert info" style="margin-top:16px;font-size:0.72rem"><span>⚖️</span><div><strong>Information juridique.</strong> Cet outil est indicatif et pédagogique — il ne constitue ni un avis juridique ni une valeur légale. La validité d'une convention de forfait jours dépend d'un accord collectif conforme et du respect par l'employeur de son obligation de suivi de la charge de travail (Cass. soc., jurisprudence constante). En cas de doute sur la validité de ton forfait, rapproche-toi des représentants du personnel, de l'inspection du travail ou d'un conseil juridique. Sources : Art. L3121-58 et s. du Code du travail · Légifrance.</div></div>`;
   },
 
   _bindBilan(analysis, bio) {
