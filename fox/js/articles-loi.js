@@ -815,7 +815,7 @@ const ARTICLES_LOI = [
   {
     art: "Art. L3211-1", titre: "Salaire minimum interprofessionnel de croissance — SMIC",
     def: "Tout salarié perçoit une rémunération au moins égale au salaire minimum interprofessionnel de croissance (SMIC). Aucune dérogation n'est possible. Le SMIC est revalorisé au moins une fois par an.",
-    ex: "En 2024, le SMIC horaire brut est de 11,65 euros. Aucun salarié ne peut légalement percevoir moins, même à temps partiel. La convention collective peut prévoir plus.",
+    ex: "En 2026, le SMIC horaire brut est de 12,31 euros. Aucun salarié ne peut légalement percevoir moins, même à temps partiel. La convention collective peut prévoir plus.",
     mots: ["SMIC", "salaire minimum", "rémunération", "revalorisation", "plancher"]
   },
   {
