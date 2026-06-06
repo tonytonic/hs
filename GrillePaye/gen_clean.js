@@ -18,7 +18,7 @@ const js = `
 const CCN_ALL=${JSON.stringify(CCN_ALL)};
 const _B64="${GR_B64}";
 const GR_REMOTE=(function(){try{return JSON.parse(atob(_B64));}catch(e){return{};}})();
-const SMIC_DEF=1823.03,SDATE_DEF="01/01/2026",SSRC_DEF="D\u00e9cret n\u00b02025-1228";
+const SMIC_DEF=1867.02,SDATE_DEF="01/06/2026",SSRC_DEF="Arr\u00eat\u00e9 du 16/05/2026 (JO) \u2014 revalorisation +2,41% (inflation)";
 const HS_DEF={
   DC:{n:"Droit commun",s:35,t1:25,p1:8,ti:null,pi:null,t2:50,cg:220,mh:48},
   BOULAN329:{n:"Boulangerie",s:35,t1:25,p1:8,ti:null,pi:null,t2:50,cg:329,mh:48},
