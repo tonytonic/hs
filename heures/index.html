@@ -11,95 +11,239 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 .popup-content input[type=number]{box-sizing:border-box;width:100%;}
-.saisie-toggle{display:flex;gap:0;margin-bottom:12px;border-radius:8px;overflow:hidden;border:1px solid #ddd}
-.saisie-toggle button{flex:1;padding:8px 6px;border:none;background:#f5f5f5;color:#666;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s,color .2s}
+.saisie-toggle{display:flex;gap:0;margin-bottom:12px;border-radius:14px;overflow:hidden;border:1px solid #ddd}
+.saisie-toggle button{flex:1;padding:9px 6px;border:none;background:#f5f5f5;color:#666;font-size:13px;font-weight:500;cursor:pointer;transition:background .2s,color .2s;border-radius:0}
 .saisie-toggle button.active{background:#4FB3C2;color:#fff}
-.saisie-worked{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:8px;padding:10px;margin-bottom:8px}
+.saisie-worked{background:#e8f5e9;border:1px solid #a5d6a7;border-radius:14px;padding:10px;margin-bottom:8px}
 .saisie-worked label{font-size:13px;font-weight:600;color:#2e7d32;display:block;margin-bottom:4px}
 .saisie-worked .calc-result{font-size:12px;color:#555;margin-top:6px;min-height:18px}
-.kitsune-btn{flex:1;padding:8px 16px;border-radius:20px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 2px 8px rgba(79,179,194,.35);transition:transform .15s,box-shadow .15s}
+
+/* NAV BUTTONS */
+.top-nav-bar{display:flex;gap:8px;margin-top:8px;margin-bottom:14px;max-width:900px;margin-left:auto;margin-right:auto}
+.menu-btn{flex:0 0 auto;padding:12px 20px;border-radius:99px;border:1.5px solid #dde3ec;background:#fff;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.08);transition:background .15s;white-space:nowrap;width:auto;margin:0;line-height:1.2}
+.menu-btn:active{background:#f0f4f8}
+.kitsune-btn{flex:1;padding:12px 16px;border-radius:99px;border:none;background:linear-gradient(135deg,#3db8c8,#1a9aad);color:#fff;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(33,150,166,.4);transition:transform .15s,box-shadow .15s;white-space:nowrap;line-height:1.2}
 .kitsune-btn:hover{transform:scale(1.02);box-shadow:0 4px 16px rgba(79,179,194,.55)}
 .kitsune-btn:active{transform:scale(.97)}
-.top-nav-bar{display:flex;gap:8px;margin-top:8px;margin-bottom:20px}
-.top-nav-bar .menu-btn{flex:1;margin:0}
-.menu-btn{margin-top:8px;margin-bottom:20px;padding:8px 16px;border-radius:20px;border:none;background:rgba(255,255,255,.85);font-size:14px;font-weight:500;cursor:pointer}
+
+/* SELECTS MOIS/ANNEE */
 .month-nav{display:flex;gap:10px;margin-bottom:10px;width:100%}
-.month-nav select{flex:1;min-height:40px;display:block;width:100%;box-sizing:border-box;background-color:#fff;-webkit-appearance:menulist;border:1px solid #ccc;border-radius:4px}
-.calc-details summary{cursor:pointer;font-weight:bold;background:#e3f2fd;padding:8px;border-radius:6px;margin-bottom:8px}
-.calc-details[open] summary{background:#bbdefb}
-body{font-family:Arial,sans-serif;background:#f2f2f2;padding:15px}
-h1,h2{text-align:center}
-.config,.totaux{background:#fff;padding:15px;border-radius:8px;max-width:900px;margin:15px auto}
-.calendar-wrapper{max-width:900px;margin:20px auto}
+.month-nav select{flex:1;min-height:42px;display:block;width:100%;box-sizing:border-box;background-color:#fff;-webkit-appearance:menulist;border:1.5px solid #dde3ec;border-radius:14px;padding:0 8px}
+
+/* DETAILS CALCUL */
+.calc-details summary{cursor:pointer;font-weight:600;background:#e8f7f9;color:#2196a6;padding:10px 14px;border-radius:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px;list-style:none}
+.calc-details summary::-webkit-details-marker{display:none}
+.calc-details[open] summary{background:#d0eef3;border-radius:14px 14px 6px 6px}
+
+/* BODY & FOND */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#e8edf4;padding:10px 10px 40px}
+h1{text-align:center;font-size:20px;font-weight:800;color:#1a2a3a;margin:8px 0 4px}
+h2{text-align:center}
+
+/* CARTES BLANCHES */
+.card-block{background:#fff;border-radius:18px;padding:16px;max-width:900px;margin:8px auto;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.config,.totaux{background:#fff;padding:16px;border-radius:18px;max-width:900px;margin:8px auto;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+
+/* CALENDRIER */
+.calendar-wrapper{max-width:900px;margin:8px auto;background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
 .weekdays,.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.weekday{text-align:center;font-weight:bold;background:#ddd;padding:8px 0;border-radius:6px}
-.day{background:#fff;padding:6px;border-radius:6px;cursor:pointer;text-align:center;height:80px;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.weekday{text-align:center;font-weight:700;background:#eef2f7;color:#555;padding:8px 0;border-radius:10px;font-size:13px}
+.day{background:#f7f9fc;padding:6px;border-radius:12px;cursor:pointer;text-align:center;height:80px;box-sizing:border-box;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;border:1.5px solid transparent;transition:border-color .15s,background .15s}
 .day small{font-size:11px;line-height:1.1;white-space:nowrap}
-.day.in-period{border:2px solid #2196a6;background:#e0f4f7}
+.day.in-period{border:2px solid #4FB3C2;background:#e6f6f8}
+.day.today{outline:3px solid #2196a6;box-shadow:0 0 6px rgba(33,150,166,.4)}
+
 button,input,textarea{width:100%;padding:8px;margin:5px 0}
+
+/* POPUPS */
 .popup{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:1000;pointer-events:auto;will-change:transform;transform:translateZ(0);backface-visibility:hidden}
-.popup-content{background:#fff;width:100%;max-width:500px;max-height:70svh;overflow-y:auto;border-radius:16px 16px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.breakdown{background:#f9f9f9;padding:10px;border-radius:6px;margin-top:10px;font-size:14px}
-.day.today{outline:3px solid #2196a6;box-shadow:0 0 6px rgba(33,150,166,.6)}
-.sheet-handle{width:40px;height:4px;background:#ccc;border-radius:2px;margin:6px auto 10px}
+.popup-content{background:#fff;width:100%;max-width:500px;max-height:70svh;overflow-y:auto;border-radius:20px 20px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.breakdown{background:#f4f8fb;padding:10px;border-radius:14px;margin-top:10px;font-size:14px}
+.sheet-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:6px auto 10px}
 .block{border:none;margin-bottom:16px}
 .block.plus legend{color:#1976d2}
 .block.minus legend{color:#ef6c00}
 .block.absence legend{color:#c62828}
 .popup-actions{position:sticky;bottom:env(safe-area-inset-bottom);background:#fff;padding-top:10px}
-#openSettingsBtn{display:block;width:calc(100% - 30px);max-width:900px;margin:0 auto 20px;padding:13px 20px;background:linear-gradient(135deg,#37474f,#546e7a);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px rgba(55,71,79,.3);transition:transform .15s,box-shadow .15s;text-align:left}
-#openSettingsBtn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(55,71,79,.45)}
+
+/* Boutons dans popup saisie heures */
+.block button{border-radius:12px;margin:3px 0}
+.popup-actions button{border-radius:14px}
+
+/* BOUTON CONFIG PRINCIPAL */
+#openSettingsBtn{display:block;width:calc(100% - 20px);max-width:900px;margin:0 auto 8px;padding:14px 20px;background:linear-gradient(135deg,#37474f,#546e7a);color:#fff;border:none;border-radius:18px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 2px 10px rgba(55,71,79,.25);transition:transform .15s,box-shadow .15s;text-align:left}
+#openSettingsBtn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(55,71,79,.35)}
 #openSettingsBtn:active{transform:scale(.98)}
-#settingsModal .popup-content{max-width:600px;max-height:70svh;overflow-y:auto;border-radius:16px 16px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+#settingsModal .popup-content{max-width:600px;max-height:75svh;overflow-y:auto;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+
+/* SETTINGS */
 .settings-group{margin-bottom:18px}
 .settings-group-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#888;margin-bottom:8px;display:block}
 .settings-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-.settings-row button,.settings-row input,.settings-row select{flex:1;min-width:120px;margin:0}
+.settings-row button,.settings-row input,.settings-row select{flex:1;min-width:120px;margin:0;border-radius:14px}
+.settings-row button{padding:10px 8px}
 .settings-divider{border:none;border-top:1px solid #eee;margin:16px 0}
-.settings-danger-btn{background:#ffcdd2;color:#b71c1c;font-weight:bold;border:1px solid #ef9a9a;border-radius:8px;padding:8px;cursor:pointer;width:100%}
+.settings-danger-btn{background:#ffcdd2;color:#b71c1c;font-weight:bold;border:1px solid #ef9a9a;border-radius:14px;padding:10px;cursor:pointer;width:100%}
 .settings-modal-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .settings-modal-title h3{margin:0}
 .settings-close-x{background:none;border:none;font-size:22px;cursor:pointer;color:#888;padding:0 4px;line-height:1;width:auto}
-#wizardModal .popup-content{max-width:540px;max-height:70svh;overflow-y:auto;border-radius:16px 16px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
-.wiz-progress{background:#e0e0e0;border-radius:4px;height:6px;margin-bottom:6px;overflow:hidden}
-.wiz-progress-bar{height:100%;background:linear-gradient(90deg,#4FB3C2,#2196a6);border-radius:4px;transition:width .4s ease}
+
+/* Settings inputs & boutons arrondis */
+#settingsModal input[type=date],
+#settingsModal input[type=number],
+#settingsModal input[type=text],
+#settingsModal select{border-radius:14px !important;border:1.5px solid #dde3ec !important;padding:12px 14px !important;background:#f8f9fa;width:100%;box-sizing:border-box;margin:4px 0}
+#settingsModal button:not(.settings-close-x):not(.settings-danger-btn):not(.kitsune-btn){border-radius:14px !important}
+#settingsModal .popup-actions button{border-radius:14px !important;padding:13px !important}
+#settingsModal #btnImportFeries{border-radius:14px !important}
+
+/* Jours fériés toggle row */
+#settingsModal .ferie-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f8f9fa;border-radius:14px;border:1px solid #e8edf4;margin-bottom:8px}
+
+/* details summary flèche */
+#settingsSaveGroup summary::-webkit-details-marker{display:none}
+#settingsSaveGroup[open] summary span:last-child{transform:rotate(90deg);display:inline-block}
+
+/* SETTINGS SECTIONS VISUELLES */
+.sett-section{background:#f4f8fb;border-radius:16px;padding:14px 14px 10px;margin-bottom:10px}
+.sett-danger-section{background:#fff5f5}
+.sett-section-header{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.9px;color:#2196a6;margin-bottom:10px;display:block}
+.sett-danger-section .sett-section-header{color:#c62828}
+.sett-field{margin-bottom:8px}
+.sett-label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:4px}
+.sett-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;border-radius:12px;border:1px solid #e8edf4;margin-bottom:8px;gap:8px}
+.sett-check-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#fff;border-radius:12px;border:1px solid #e8edf4;cursor:pointer;margin-top:4px}
+.sett-details summary{list-style:none}
+.sett-details-summary{display:flex;align-items:center;justify-content:space-between;cursor:pointer;margin-bottom:0 !important}
+.sett-arrow{font-size:16px;opacity:.5;transition:transform .2s}
+.sett-details[open] .sett-arrow{transform:rotate(90deg)}
+
+/* WIZARD */
+#wizardModal .popup-content{max-width:540px;max-height:75svh;overflow-y:auto;border-radius:20px 20px 0 0;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+.wiz-progress{background:#e8edf4;border-radius:99px;height:8px;margin-bottom:6px;overflow:hidden}
+.wiz-progress-bar{height:100%;background:linear-gradient(90deg,#4FB3C2,#2196a6);border-radius:99px;transition:width .4s ease}
 .wiz-step-label{font-size:11px;color:#aaa;margin-bottom:20px;display:block}
 .wiz-step{display:none}
 .wiz-step.wiz-active{display:block}
-.wiz-question{font-size:18px;font-weight:700;color:#2c3e50;margin-bottom:18px;line-height:1.4}
+.wiz-question{font-size:18px;font-weight:700;color:#1a2a3a;margin-bottom:18px;line-height:1.4}
 .wiz-hint{font-size:13px;color:#888;margin-top:-10px;margin-bottom:14px}
 .wiz-choice-row{display:flex;gap:10px;margin-bottom:16px}
-.wiz-choice-btn{flex:1;padding:14px 10px;border-radius:12px;border:2px solid #e0e0e0;background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
-.wiz-choice-btn:hover,.wiz-choice-btn.wiz-selected{border-color:#4FB3C2;background:#e0f4f7;color:#2196a6}
+.wiz-choice-btn{flex:1;padding:14px 10px;border-radius:16px;border:2px solid #e0e0e0;background:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
+.wiz-choice-btn:hover,.wiz-choice-btn.wiz-selected{border-color:#4FB3C2;background:#e6f6f8;color:#2196a6}
 .wiz-nav{display:flex;gap:10px;margin-top:20px;background:#fff;padding-top:10px;padding-bottom:4px}
+.wiz-nav button:not(.kitsune-btn){border-radius:14px}
 .wiz-closures-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
 .wiz-closures-grid label{font-size:12px;color:#666;margin-bottom:2px;display:block}
-.wiz-closures-grid input{margin:0;font-size:13px;padding:6px}
-.wiz-check-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:#f9f9f9;border:1px solid #eee;margin-bottom:10px;cursor:pointer}
+.wiz-closures-grid input{margin:0;font-size:13px;padding:8px;border-radius:12px;border:1.5px solid #dde3ec;box-sizing:border-box}
+.wiz-check-row{display:flex;align-items:center;gap:10px;padding:12px;border-radius:14px;background:#f4f8fb;border:1px solid #e8edf4;margin-bottom:10px;cursor:pointer}
 .wiz-check-row input[type=checkbox]{width:18px;height:18px;margin:0;flex-shrink:0;cursor:pointer}
 .wiz-step input[type="date"],.wiz-step input[type="number"],.wiz-step input[type="text"]{
   width:100%;box-sizing:border-box;padding:16px;font-size:17px;
-  border:2px solid #e0e0e0;border-radius:12px;background:#fff;color:#222;
+  border:2px solid #e0e0e0;border-radius:14px;background:#fff;color:#222;
   -webkit-appearance:none;appearance:none;margin-bottom:4px;display:block;
   min-height:56px;line-height:1.4;
 }
-/* Fix champ date iOS — affichage pleine largeur */
-.wiz-step input[type="date"]::-webkit-date-and-time-value {
-  text-align:left;
-  min-height:24px;
-}
-.wiz-step input[type="date"]:focus,.wiz-step input[type="number"]:focus{
-  border-color:#4FB3C2;outline:none;
-}
+.wiz-step input[type="date"]::-webkit-date-and-time-value{text-align:left;min-height:24px;}
+.wiz-step input[type="date"]:focus,.wiz-step input[type="number"]:focus{border-color:#4FB3C2;outline:none;}
 .wiz-check-row span{font-size:14px;font-weight:500}
-.wiz-summary{background:#f1f8e9;border:1px solid #aed581;border-radius:10px;padding:14px;font-size:13px;line-height:1.8;margin-bottom:16px}
+.wiz-summary{background:#f0f9f0;border:1px solid #aed581;border-radius:14px;padding:14px;font-size:13px;line-height:1.8;margin-bottom:16px}
 .wiz-summary b{color:#33691e}
-/* === MODALE PDF UNIFIÉE === */
-.pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid #ddd}
+/* Lien "passer config" dans wizard */
+.wiz-skip-link{display:block;text-align:center;font-size:13px;color:#aaa;margin-top:8px;cursor:pointer;text-decoration:underline;background:none;border:none;width:100%;padding:4px}
+.wiz-skip-link:hover{color:#2196a6}
+
+/* PDF TABS */
+.pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:14px;overflow:hidden;border:1px solid #ddd}
 .pdf-tab{flex:1;padding:9px 4px;font-size:13px;font-weight:600;border:none;background:#f5f5f5;color:#888;cursor:pointer;margin:0;border-radius:0;transition:background .15s,color .15s}
 .pdf-tab.active{background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff}
-.pdf-tab:first-child{border-radius:9px 0 0 9px}
-.pdf-tab:last-child{border-radius:0 9px 9px 0}
+.pdf-tab:first-child{border-radius:13px 0 0 13px}
+.pdf-tab:last-child{border-radius:0 13px 13px 0}
+.pdf-panel{display:none;margin-top:14px}
+.pdf-panel.active{display:block}
+.pdf-opt-row{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px}
+.pdf-opt-row input[type=checkbox]{width:auto;margin:0}
+.pdf-info-block{background:#e0f4f7;border:1px solid #90caf9;border-radius:10px;padding:10px;font-size:13px;color:#1565c0;margin-bottom:10px}
+
+/* TOAST */
+#toastContainer{position:fixed;bottom:calc(env(safe-area-inset-bottom)+70px);left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;width:90%;max-width:400px}
+.toast{background:#1c2a1c;color:#e6e6e6;padding:10px 18px;border-radius:24px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;transform:translateY(16px);transition:opacity .25s,transform .25s;pointer-events:none;text-align:center;border-left:3px solid #21959a}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.success{border-color:#2ecc71}
+.toast.error{border-color:#c0392b}
+.toast.warn{border-color:#f39c12}
+.toast.info{border-color:#21959a}
+
+/* CONFIRM MODAL */
+#confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:999999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#confirmModal.open{opacity:1;pointer-events:auto}
+#confirmModal .cm-box{background:#1c1f26;border-radius:18px;padding:24px 20px;width:88%;max-width:360px;text-align:center}
+#confirmModal .cm-msg{font-size:15px;margin-bottom:20px;line-height:1.5;color:#e6e6e6}
+#confirmModal .cm-btns{display:flex;gap:10px}
+#confirmModal .cm-btns button{flex:1;margin:0;padding:11px;border-radius:14px}
+
+/* BARRE CONTINGENT */
+.contingent-wrap{background:#fff;border-radius:18px;padding:14px 16px;margin:0;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.contingent-label{font-size:13px;color:#555;display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:500}
+.contingent-label .cont-value{font-size:17px;font-weight:800;color:#1a2a3a}
+.contingent-track{background:#e4e9f0;border-radius:99px;height:11px;overflow:hidden;cursor:pointer}
+.contingent-fill{height:100%;border-radius:99px;transition:width .4s ease,background .4s}
+.rco-wrap{background:rgba(231,76,60,.07);border:1px solid rgba(231,76,60,.25);border-radius:16px;padding:10px 14px;margin:8px 0;display:none}
+.rco-wrap.visible{display:block}
+.rco-label{font-size:12px;color:#e74c3c;display:flex;justify-content:space-between;align-items:center}
+.rco-detail{font-size:11px;color:#999;margin-top:4px}
+.tip-btn{background:none;border:none;cursor:pointer;font-size:14px;padding:0 4px;vertical-align:middle;opacity:.7;transition:opacity .2s}
+.tip-btn:hover{opacity:1}
+.tip-pill-btn{background:#e8f6f8;border:none;color:#2196a6;font-size:12px;font-weight:600;padding:6px 12px;border-radius:99px;cursor:pointer;width:auto;margin:0;transition:background .15s}
+.tip-pill-btn:hover{background:#d0eef3}
+
+/* CARTES SOLDES */
+.soldes-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 10px}
+.solde-card{background:#fff;border-radius:16px;padding:14px 10px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.solde-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:#aaa;margin-bottom:6px}
+.solde-card-value{font-size:24px;font-weight:800;color:#4FB3C2}
+.solde-card.recup .solde-card-value{color:#e67e22}
+.solde-card-net{background:#fff;border-radius:16px;padding:16px 12px;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07);margin:0 0 4px}
+.solde-card-net .solde-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.9px;color:#aaa;margin-bottom:6px}
+.solde-card-net .solde-card-value{font-size:34px;font-weight:800;color:#4FB3C2}
+
+/* TIP OVERLAY */
+.tip-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99990;display:none;align-items:flex-end;justify-content:center;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+.tip-overlay.visible{display:flex}
+.tip-panel{background:#1c1f26;width:100%;max-width:500px;max-height:60svh;border-radius:20px 20px 0 0;padding:20px 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom));overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;animation:tipSlide .25s ease-out}
+@keyframes tipSlide{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.tip-panel h3{margin:0 0 8px;font-size:15px;color:#fff}
+.tip-panel p{margin:0 0 10px;font-size:13px;color:#bcc0c8;line-height:1.5}
+.tip-panel .tip-ref{font-size:11px;color:#6b7280;margin-top:6px;border-top:1px solid #2a2f3a;padding-top:8px}
+.tip-close{position:absolute;top:12px;right:14px;background:none;border:none;color:#9aa0a6;font-size:20px;cursor:pointer;padding:4px 8px}
+
+/* BOUTONS ACTIONS (sauvegarde / import / pdf / prédiction) */
+.action-bar{background:#fff;border-radius:18px;padding:14px 16px;max-width:900px;margin:8px auto;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.action-bar-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:#aaa;margin-bottom:10px}
+.action-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.action-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:12px 6px;border-radius:14px;border:none;cursor:pointer;font-size:11px;font-weight:600;transition:transform .15s,box-shadow .15s;min-height:64px;width:100%;margin:0}
+.action-btn:active{transform:scale(.95)}
+.action-btn-save{background:#e6f6f8;color:#2196a6;border:1.5px solid #b0dde5}
+.action-btn-import{background:#fff3e0;color:#e67e22;border:1.5px solid #f5cfa0}
+.action-btn-pdf{background:linear-gradient(135deg,#2a5298,#1a237e);color:#fff;border:none;box-shadow:0 2px 8px rgba(26,35,126,.25)}
+.action-btn-predict{background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;border:none;box-shadow:0 2px 8px rgba(33,150,166,.25)}
+.action-btn span:first-child{font-size:22px;line-height:1}
+.action-badges{font-size:12px;color:#2196a6;line-height:1.6}
+
+/* BANNIÈRE PÉRIODE */
+.period-banner{max-width:900px;margin:8px auto;background:#e8f6f8;border:1px solid #b0dde5;padding:10px 14px;border-radius:14px;font-size:14px;font-weight:600;color:#1a5276;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:space-between}
+.period-banner:hover{background:#d0eef3}
+.period-banner .pb-arrow{font-size:18px;opacity:.5}
+
+/* ── COMPATIBILITY FIXES ─────────────────────────────────── */
+* { -webkit-tap-highlight-color: transparent; }
+button, [onclick] { -webkit-user-select: none; user-select: none; }
+/* iOS fix : touch-action:manipulation élimine le délai 300ms et le double-tap zoom */
+button { touch-action: manipulation; }
+.menu-btn, .kitsune-btn, .tip-pill-btn, .wiz-choice-btn, .action-btn { touch-action: manipulation; }
+body { overscroll-behavior-y: none; touch-action: pan-y; }
+.popup, .modal, [class*="overlay"] { overscroll-behavior: contain; }
+input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; }
+input, select, textarea { font-size: 16px !important; }
 .pdf-panel{display:none;margin-top:14px}
 .pdf-panel.active{display:block}
 .pdf-opt-row{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;margin-bottom:6px}
@@ -212,7 +356,7 @@ document.addEventListener("DOMContentLoaded", function(){
   <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
 </div>
 <div class="top-nav-bar">
-  <button class="menu-btn" onclick="goMenu()">&#8592; Retour au menu</button>
+  <button class="menu-btn" onclick="goMenu()" ontouchend="goMenu();event.preventDefault()">&#8592; Retour au menu</button>
   <button class="kitsune-btn" onclick="window.location.href='../fox/index.html'" title="Mon compagnon d'analyse — suit tes heures et te récompense">&#x1F98A; Mon compagnon</button>
 </div>
 
@@ -244,85 +388,130 @@ document.addEventListener("DOMContentLoaded", function(){
     <button onclick="closeNotice()">Fermer</button>
   </div>
 </div>
-<h1>Compteur Heures Sup</h1>
-<p style="text-align:center"></p>
-<p style="text-align:center">Exercice&nbsp;: <b id="activeYearLabel"></b> <button onclick="switchYear()">&#128193; Changer</button></p>
+<div class="card-block" style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;margin-top:8px">
+  <h1 style="margin:0;font-size:20px;font-weight:800">Compteur annuel</h1>
+  <button onclick="switchYear()" style="width:auto;padding:6px 14px;border-radius:99px;border:1.5px solid #b0dde5;background:#e8f6f8;color:#2196a6;font-weight:700;font-size:13px;cursor:pointer;margin:0"><b id="activeYearLabel"></b> ⇄</button>
+</div>
+
+<div id="contingentBar" style="max-width:900px;margin:8px auto">
+  <div class="contingent-wrap">
+    <div class="contingent-label">
+      <span>Contingent annuel</span>
+      <span class="cont-value" id="contingentText">0h / …h</span>
+    </div>
+    <div class="contingent-track" onclick="openSettingsModal()" title="Appuyer pour ouvrir la configuration">
+      <div class="contingent-fill" id="contingentFill" style="width:0%;background:#4FB3C2"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <button class="tip-pill-btn" onclick="showTip('contingent')">ℹ️ Contingent</button>
+      <button class="tip-pill-btn" onclick="showTip('rco')">ℹ️ Repos compensateur</button>
+    </div>
+  </div>
+  <div class="rco-wrap" id="rcoWrap">
+    <div class="rco-label">
+      <span>🛌 RCO <button class="tip-btn" onclick="showTip('rco')">ℹ️</button></span>
+      <span id="rcoText">0h</span>
+    </div>
+    <div class="rco-detail" id="rcoDetail"></div>
+  </div>
+</div>
+
 <button id="openSettingsBtn" onclick="openSettingsModal()">&#9881;&#65039; Configuration &amp; R&eacute;glages <span style="float:right;opacity:.6;font-weight:400;font-size:13px">Appuyer pour ouvrir &rsaquo;</span></button>
 <div class="popup" id="settingsModal">
   <div class="popup-content">
-    <div class="settings-modal-title"><h3>&#9881;&#65039; Configuration</h3><button class="settings-close-x" onclick="closeSettingsModal()">&#10005;</button></div>
-    <div class="settings-group">
-      <span class="settings-group-label">&#128197; Exercice &amp; Calendrier</span>
-      <label style="font-size:13px;margin-bottom:4px;display:block;">Date de d&eacute;but d&apos;exercice</label>
-      <input type="date" id="exerciseStartInput">
-      <label style="font-size:13px;margin-top:8px;margin-bottom:4px;display:block;">Date de cl&ocirc;ture annuelle</label>
-      <input type="date" id="annualDateInput">
+
+    <!-- EN-TÊTE -->
+    <div class="settings-modal-title">
+      <h3 style="font-size:17px;font-weight:800">&#9881;&#65039; Configuration</h3>
+      <button class="settings-close-x" onclick="closeSettingsModal()">&#10005;</button>
     </div>
-    <input type="number" step="0.5" id="baseHebdoInput" style="display:none;">
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label">&#128198; Cl&ocirc;tures comptables</span>
-      <div class="settings-row">
+
+    <!-- SECTION 1 : EXERCICE -->
+    <div class="sett-section">
+      <div class="sett-section-header">&#128197; Exercice &amp; Calendrier</div>
+      <div class="sett-field">
+        <label class="sett-label">Date de d&eacute;but d&apos;exercice</label>
+        <input type="date" id="exerciseStartInput">
+      </div>
+      <div class="sett-field">
+        <label class="sett-label">Date de cl&ocirc;ture annuelle</label>
+        <input type="date" id="annualDateInput">
+      </div>
+      <div class="sett-field">
+        <label class="sett-label">&#128176; Taux horaire (&euro;)</label>
+        <input type="number" step="any" min="0" id="hourlyRateConfigInput" placeholder="ex: 12.50" oninput="updateHourlyRate(this.value)">
+      </div>
+      <input type="number" step="0.5" id="baseHebdoInput" style="display:none;">
+    </div>
+
+    <!-- SECTION 2 : CLÔTURES -->
+    <div class="sett-section">
+      <div class="sett-section-header">&#128198; Cl&ocirc;tures comptables</div>
+      <div class="settings-row" style="margin-bottom:8px">
         <button onclick="openClosures()">&#128197; G&eacute;rer les cl&ocirc;tures</button>
         <select id="periodSelect" style="min-width:0"></select>
       </div>
-      <p id="periodInfo" style="font-size:13px;color:#555;margin:6px 0 0;"></p>
+      <p id="periodInfo" style="font-size:13px;color:#666;margin:0;line-height:1.5;background:#f4f8fb;border-radius:10px;padding:8px 12px;"></p>
       <div id="rateContainer"></div>
     </div>
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label">🎌 Jours fériés</span>
 
-      <!-- Toggle import API -->
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#f8f9fa;border-radius:10px;border:1px solid #e0e0e0;margin-bottom:8px;">
+    <!-- SECTION 3 : JOURS FÉRIÉS -->
+    <div class="sett-section">
+      <div class="sett-section-header">&#127884; Jours f&eacute;ri&eacute;s</div>
+      <div class="sett-toggle-row">
         <div>
-          <div style="font-size:14px;font-weight:600;color:#2c3e50;">🇫🇷 Import jours fériés (source publique)</div>
-          <div style="font-size:11px;color:#888;margin-top:2px;">Importer automatiquement les jours fériés officiels</div>
+          <div style="font-size:14px;font-weight:600;color:#1a2a3a;">&#x1F1EB;&#x1F1F7; Import automatique (source publique)</div>
+          <div style="font-size:11px;color:#888;margin-top:2px;">calendrier.api.gouv.fr</div>
         </div>
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin:0;flex-shrink:0">
           <input type="checkbox" id="autoImportFeriesToggle" style="width:18px;height:18px;accent-color:#4FB3C2;margin:0;">
-          <span id="autoImportFeriesLabel" style="font-size:12px;font-weight:600;color:#888;">OFF</span>
+          <span id="autoImportFeriesLabel" style="font-size:12px;font-weight:700;color:#888;min-width:24px">OFF</span>
         </label>
       </div>
-
-      <!-- Bouton import manuel (toujours disponible) -->
-      <button onclick="importFeries()" id="btnImportFeries" style="width:100%;margin-bottom:8px;">
-        🇫🇷 Importer maintenant les jours fériés
+      <button onclick="importFeries()" id="btnImportFeries" style="margin-bottom:4px;">
+        &#x1F1EB;&#x1F1F7; Importer maintenant les jours f&eacute;ri&eacute;s
       </button>
-
-      <!-- Toggle mode auto-férié -->
-      <label style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:14px;cursor:pointer;">
-        <input type="checkbox" id="autoFerieToggle" style="width:auto;margin:0;">
-        Mode férié automatique (−7h en semaine)
+      <label class="sett-check-row">
+        <input type="checkbox" id="autoFerieToggle" style="width:18px;height:18px;flex-shrink:0;margin:0;accent-color:#4FB3C2;">
+        <span style="font-size:14px;">Mode f&eacute;ri&eacute; automatique (−7h en semaine)</span>
       </label>
     </div>
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label">&#x1F4BE; Import / Export</span>
-      <div class="settings-row">
+
+    <!-- SECTION 4 : SAUVEGARDE (dépliable) -->
+    <details class="sett-section sett-details" id="settingsSaveGroup">
+      <summary class="sett-section-header sett-details-summary">
+        <span>&#x1F4BE; Sauvegarde &amp; Export</span>
+        <span class="sett-arrow">›</span>
+      </summary>
+      <div class="settings-row" style="margin-top:10px">
+        <button onclick="exportJSON()">&#x1F4BE; Sauvegarder (.json)</button>
         <button onclick="importJSON()">&#x2B06;&#65039; Importer (.json)</button>
-        <button onclick="exportJSON()">&#x1F4BE; Sauvegarder</button>
       </div>
-      <!-- ★ BOUTON PDF UNIFIÉ ★ -->
-      <button onclick="openPdfModal()" style="margin-top:8px;background:linear-gradient(135deg,#2a5298,#1a237e);color:#fff;font-weight:bold;border-radius:8px;">&#x1F4C4; Exporter en PDF &rsaquo;</button>
+      <button onclick="openPdfModal()" style="margin-top:6px;background:linear-gradient(135deg,#2a5298,#1a237e);color:#fff;font-weight:bold;border-radius:14px;">&#x1F4C4; Exporter en PDF &rsaquo;</button>
+    </details>
+
+    <!-- SECTION 5 : SÉCURITÉ -->
+    <div class="sett-section">
+      <div class="sett-section-header">&#x1F512; S&eacute;curit&eacute;</div>
+      <button onclick="toggleConfigLock()">&#x1F512;&thinsp;/&thinsp;&#x1F513; Verrouiller la configuration</button>
+      <p id="configLockInfo" style="font-size:12px;color:#888;margin:6px 0 0;padding:0 4px;"></p>
     </div>
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label">&#x1F512; S&eacute;curit&eacute;</span>
-      <button onclick="toggleConfigLock()">&#x1F512; / &#x1F513; Verrouiller la configuration</button>
-      <p id="configLockInfo" style="font-size:13px;color:#555;margin:6px 0 0;"></p>
-    </div>
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label">&#x1F9D9; Assistant de configuration</span>
+
+    <!-- SECTION 6 : ASSISTANT -->
+    <div class="sett-section">
+      <div class="sett-section-header">&#x1F9D9; Assistant de configuration</div>
       <button class="kitsune-btn" style="width:100%;" onclick="restartWizard()">&#x1F9D9; Relancer l&apos;assistant de d&eacute;marrage</button>
     </div>
-    <hr class="settings-divider">
-    <div class="settings-group">
-      <span class="settings-group-label" style="color:#c62828;">&#9888;&#65039; Zone de danger</span>
+
+    <!-- SECTION 7 : ZONE DE DANGER -->
+    <div class="sett-section sett-danger-section">
+      <div class="sett-section-header" style="color:#c62828;">&#9888;&#65039; Zone de danger</div>
       <button class="settings-danger-btn" onclick="event.stopPropagation();try{resetCurrentExercise();}catch(e){console.error(e);}">&#x267B;&#65039; R&eacute;initialiser l&apos;exercice en cours</button>
     </div>
-    <div class="popup-actions"><button onclick="closeSettingsModal()">Fermer</button></div>
+
+    <div class="popup-actions">
+      <button onclick="closeSettingsModal()">Fermer</button>
+    </div>
   </div>
 </div>
 
@@ -330,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function(){
      MODALE PDF UNIFIÉE
 ===================================================== -->
 <div class="popup" id="pdfModal">
-  <div class="popup-content" style="max-width:540px;">
+  <div class="popup-content" style="max-width:560px;max-height:85svh;">
     <div class="sheet-handle"></div>
     <h3 style="margin:0 0 12px">&#x1F4C4; Exporter en PDF</h3>
     <div class="pdf-tabs">
@@ -342,65 +531,49 @@ document.addEventListener("DOMContentLoaded", function(){
     <!-- PANEL PÉRIODE -->
     <div class="pdf-panel active" id="ppanel-periode">
       <label style="font-size:12px;color:#777;display:block;margin-top:10px;margin-bottom:4px">P&eacute;riode &agrave; exporter</label>
-      <select id="pdfPeriodSelect" style="width:100%;padding:8px;border-radius:6px;border:1px solid #ccc;font-size:13px;margin-bottom:6px;"></select>
-      <div class="pdf-info-block" id="pdfPeriodeInfo">&#x1F4CC; S&eacute;lectionne une p&eacute;riode ci-dessus.</div>
+      <select id="pdfPeriodSelect" style="width:100%;padding:10px;border-radius:14px;border:1.5px solid #dde3ec;font-size:13px;margin-bottom:6px;"></select>
+      <div class="pdf-info-block" id="pdfPeriodeInfo" style="border-radius:12px;">&#x1F4CC; S&eacute;lectionne une p&eacute;riode ci-dessus.</div>
       <p style="font-size:13px;color:#555;margin:6px 0 10px">Relev&eacute; complet semaine par semaine avec d&eacute;tail 25%/50%, absences, r&eacute;cup&eacute;rations, report et solde net.</p>
-      <div style="background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:10px">
+      <div style="background:#f4f8fb;border-radius:14px;padding:12px;margin-bottom:10px">
         <label style="font-size:12px;color:#777;display:block;margin-bottom:6px">Options</label>
         <label class="pdf-opt-row"><input type="checkbox" id="pOptJoursFeries" checked> Inclure le d&eacute;tail des jours f&eacute;ri&eacute;s</label>
         <label class="pdf-opt-row"><input type="checkbox" id="pOptSignature" checked> Bloc signature &amp; validation</label>
       </div>
-      <button onclick="exportPeriodPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:8px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF de p&eacute;riode</button>
+      <button onclick="exportPeriodPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:14px;padding:12px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF de p&eacute;riode</button>
     </div>
 
     <!-- PANEL MENSUEL -->
     <div class="pdf-panel" id="ppanel-mensuel">
       <p style="font-size:13px;color:#555;margin:10px 0 10px">R&eacute;capitulatif semaine par semaine pour le <b>mois calendaire affich&eacute;</b> (<span id="pdfMoisLabel"></span>).</p>
-      <div style="background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:10px">
+      <div style="background:#f4f8fb;border-radius:14px;padding:12px;margin-bottom:10px">
         <label style="font-size:12px;color:#777;display:block;margin-bottom:6px">Options</label>
         <label class="pdf-opt-row"><input type="checkbox" id="mOptAbsences" checked> Inclure d&eacute;tail absences</label>
         <label class="pdf-opt-row"><input type="checkbox" id="mOptRecup" checked> Inclure r&eacute;cup&eacute;rations</label>
         <label class="pdf-opt-row"><input type="checkbox" id="mOptSignature" checked> Bloc signature &amp; validation</label>
       </div>
-      <button onclick="exportMonthlyFullPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:8px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF mensuel</button>
+      <button onclick="exportMonthlyFullPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:14px;padding:12px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF mensuel</button>
     </div>
 
     <!-- PANEL ANNUEL -->
     <div class="pdf-panel" id="ppanel-annuel">
       <p style="font-size:13px;color:#555;margin:10px 0 10px">Bilan complet de l&apos;exercice <b id="pdfExerciceLabel"></b> : tableau de toutes les p&eacute;riodes avec soldes, 25%/50%, r&eacute;cup&eacute;rations et report.</p>
-      <div style="background:#f5f5f5;border-radius:8px;padding:10px;margin-bottom:10px">
+      <div style="background:#f4f8fb;border-radius:14px;padding:12px;margin-bottom:10px">
         <label style="font-size:12px;color:#777;display:block;margin-bottom:6px">Options</label>
         <label class="pdf-opt-row"><input type="checkbox" id="aOptDetail" checked> D&eacute;tail hebdomadaire par p&eacute;riode</label>
         <label class="pdf-opt-row"><input type="checkbox" id="aOptSignature" checked> Bloc signature &amp; validation</label>
       </div>
-      <button onclick="exportAnnualPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:8px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF annuel</button>
+      <button onclick="exportAnnualPDF()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:bold;border-radius:14px;padding:12px;margin-top:4px;">&#x1F4E5; G&eacute;n&eacute;rer le PDF annuel</button>
     </div>
 
     <div class="popup-actions">
-      <button onclick="closePdfModal()" style="background:#f5f5f5;color:#333;">Fermer</button>
+      <button onclick="closePdfModal()" style="background:#f0f4f8;color:#555;border-radius:14px;">Fermer</button>
     </div>
   </div>
 </div>
 
-<div id="contingentBar" style="max-width:900px;margin:8px auto;padding:0 12px">
-  <div class="contingent-wrap">
-    <div class="contingent-label">
-      <span>📊 Contingent annuel <button class="tip-btn" onclick="showTip('contingent')">ℹ️</button></span>
-      <span id="contingentText">0h / …h</span>
-    </div>
-    <div class="contingent-track">
-      <div class="contingent-fill" id="contingentFill" style="width:0%;background:#2ecc71"></div>
-    </div>
-  </div>
-  <div class="rco-wrap" id="rcoWrap">
-    <div class="rco-label">
-      <span>🛌 Repos Compensateur Obligatoire (RCO) <button class="tip-btn" onclick="showTip('rco')">ℹ️</button></span>
-      <span id="rcoText">0h</span>
-    </div>
-    <div class="rco-detail" id="rcoDetail"></div>
-  </div>
+<div id="activePeriodBanner" style="max-width:900px;margin:8px auto;display:none">
+  <select id="periodSelectCalendar" style="width:100%;padding:10px 14px;border-radius:14px;border:1.5px solid #b0dde5;background:#e8f6f8;color:#1a5276;font-size:14px;font-weight:600;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2220%22 height=%2220%22 viewBox=%220 0 20 20%22><path fill=%22%232196a6%22 d=%22M5 8l5 5 5-5z%22/></svg>');background-repeat:no-repeat;background-position:right 12px center;padding-right:36px"></select>
 </div>
-<div id="activePeriodBanner" style="max-width:900px;margin:10px auto;background:#e3f2fd;border:1px solid #90caf9;padding:8px 12px;border-radius:8px;font-size:14px;font-weight:bold;"></div>
 <div class="calendar-wrapper main-zone">
   <div class="month-nav">
     <select id="monthSelect"></select>
@@ -412,23 +585,47 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
   <div class="calendar" id="calendar"></div>
 </div>
-<div style="max-width:900px;margin:15px auto;display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;">
-  <div style="display:flex;gap:10px;flex-wrap:wrap;">
-    <button onclick="exportJSON()" style="background:#e0f4f7;border:1px solid #2196a6;font-weight:bold;">&#x1F4BE; Sauvegarde dans un fichier</button>
-  </div>
-  <div id="saveBadges" style="font-size:13px;color:#2196a6;margin-top:6px;width:100%;">
-    <span id="autoSaveBadge">&#x1F7E2; Dans l&apos;application&nbsp;: &mdash;</span><br>
-    <span id="fileSaveBadge">&#x1F4BE; Sauvegarde fichier&nbsp;: &mdash;</span>
-  </div>
-  <button onclick="window.location.href='../module4/index.html'" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;border:none;border-radius:20px;padding:8px 22px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;">📊 Prédiction</button>
-  <span style="font-size:13px;color:#2196a6;align-self:center;">Sauvegarde automatique dans l&apos;application &middot; Sauvegarde fichier recommand&eacute;e</span>
-</div>
 <div class="totaux main-zone" id="totaux"></div>
+<div class="action-bar">
+  <div class="action-btns">
+    <button class="action-btn action-btn-save" onclick="exportJSON()">
+      <span>💾</span><span>Sauvegarder</span>
+    </button>
+    <button class="action-btn action-btn-import" onclick="importJSON()">
+      <span>⬆️</span><span>Importer</span>
+    </button>
+    <button class="action-btn action-btn-pdf" onclick="openPdfModal()">
+      <span>📄</span><span>Export PDF</span>
+    </button>
+  </div>
+  <div id="saveBadges" class="action-badges">
+    <span id="autoSaveBadge">🟢 Application : —</span><br>
+    <span id="fileSaveBadge">💾 Fichier : —</span>
+  </div>
+  <button onclick="window.location.href='../module4/index.html'" style="width:100%;margin:10px 0 0;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;border:none;border-radius:14px;padding:12px;font-size:14px;font-weight:700;cursor:pointer;">📊 Prédiction →</button>
+</div>
+
+<div style="text-align:center;font-size:12px;color:#888;margin:20px auto;max-width:900px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap;align-items:center;">
+  <a href="#" onclick="event.preventDefault();openLegalPopup();" style="color:#888;text-decoration:none;">&#x2139;&#65039; Informations légales &amp; calcul</a>
+  <a href="#" onclick="event.preventDefault();openNotice();" style="color:#888;text-decoration:none;">&#x1F4D8; Notice utilisateur</a>
+  <button type="button" onclick="protectedCrash()" style="background:none;border:none;padding:0;color:#bbb;font-size:11px;cursor:pointer;width:auto;margin:0;">&copy; C.Anthony</button>
+</div>
+
+<p style="max-width:900px;margin:12px auto 30px;font-size:12px;color:#aaa;text-align:center;padding:0 10px;">
+  &#9888;&#65039; <b>Sauvegarde des donn&eacute;es</b> — Les donn&eacute;es saisies sont enregistr&eacute;es <b>localement sur cet appareil</b>. Il est fortement recommand&eacute; d&apos;effectuer des exports r&eacute;guliers (mensuels ou apr&egrave;s chaque cl&ocirc;ture).
+</p>
+
+<div style="max-width:900px;margin:0 auto 40px;background:#f4f8fb;border-radius:16px;padding:16px 18px;font-size:11px;color:#888;line-height:1.6;border:1px solid #e4e9f0;">
+  <b style="display:block;font-size:12px;color:#555;margin-bottom:6px;">&#x26A0;&#xFE0F; Avertissement — &Agrave; titre indicatif uniquement</b>
+  Les r&eacute;sultats affich&eacute;s par cette application sont fournis <b>exclusivement &agrave; titre indicatif</b>. Ils ne constituent en aucun cas un document officiel, un avis juridique, ni un bulletin de paie ou document comptable opposable.<br><br>
+  Les calculs reposent sur les donn&eacute;es saisies par l&apos;utilisateur et sur les r&egrave;gles g&eacute;n&eacute;rales du Code du travail. Ils peuvent ne pas refl&eacute;ter la r&eacute;alit&eacute; contractuelle ou conventionnelle applicable &agrave; votre situation (accord d&apos;entreprise, CCN sp&eacute;cifique, pratiques internes, &eacute;volutions l&eacute;gislatives post&eacute;rieures).<br><br>
+  <b>Seuls les documents &eacute;tablis par l&apos;employeur et le droit applicable font foi.</b> En cas de doute, consultez votre employeur, votre service RH, ou un professionnel comp&eacute;tent (juriste, expert-comptable, inspecteur du travail).
+</div>
 <div class="popup" id="popup">
-  <div class="popup-content">
+  <div class="popup-content" style="max-height:85svh;">
     <div class="sheet-handle"></div>
     <h3 id="popupDate"></h3>
-    <div id="popup-ferie-info" style="display:none;background:#e3f2fd;border:1px solid #1976d2;border-radius:8px;padding:10px;font-size:13px;color:#1565c0;margin-bottom:10px;line-height:1.5;"></div>
+    <div id="popup-ferie-info" style="display:none;background:#e3f2fd;border:1px solid #1976d2;border-radius:12px;padding:10px;font-size:13px;color:#1565c0;margin-bottom:10px;line-height:1.5;"></div>
 
     <!-- MODE TOGGLE -->
     <div class="saisie-toggle">
@@ -440,39 +637,45 @@ document.addEventListener("DOMContentLoaded", function(){
     <div id="saisieWorked" style="display:none">
       <div class="saisie-worked">
         <label>&#x1F551; Total heures travaill&eacute;es ce jour</label>
-        <input id="workedHours" type="number" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcFromWorked()" style="font-size:16px;">
+        <input id="workedHours" type="number" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcFromWorked()" style="font-size:16px;border-radius:14px;">
         <div class="calc-result" id="workedResult"></div>
       </div>
     </div>
 
-    <!-- MODE HS DIRECTES (existant) -->
+    <!-- MODE HS DIRECTES -->
     <div id="saisieHS">
-      <fieldset class="block plus">
-        <legend>&#10133; Heures suppl&eacute;mentaires</legend>
-        <button onclick="addExtra(0.25)">+15 min</button>
-        <button onclick="addExtra(0.5)">+30 min</button>
-        <button onclick="addExtra(1)">+1 h</button>
-        <button onclick="addExtra(2)">+2 h</button>
-        <input id="manualExtra" type="number" step="0.25">
+      <fieldset class="block plus" style="border:none;padding:0">
+        <legend style="font-weight:700;color:#1976d2;margin-bottom:6px">&#10133; Heures suppl&eacute;mentaires</legend>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
+          <button onclick="addExtra(0.25)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+15 min</button>
+          <button onclick="addExtra(0.5)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+30 min</button>
+          <button onclick="addExtra(1)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+1 h</button>
+          <button onclick="addExtra(2)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+2 h</button>
+        </div>
+        <input id="manualExtra" type="number" step="0.25" style="border-radius:12px;">
       </fieldset>
     </div>
 
-    <fieldset class="block minus">
-      <legend>&#10134; R&eacute;cup&eacute;ration</legend>
-      <button onclick="addRecup(0.25)">-15 min</button>
-      <button onclick="addRecup(0.5)">-30 min</button>
-      <button onclick="addRecup(1)">-1 h</button>
-      <input id="manualRecup" type="number" step="0.25">
+    <fieldset class="block minus" style="border:none;padding:0;margin-top:8px">
+      <legend style="font-weight:700;color:#ef6c00;margin-bottom:6px">&#10134; R&eacute;cup&eacute;ration</legend>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
+        <button onclick="addRecup(0.25)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-15 min</button>
+        <button onclick="addRecup(0.5)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-30 min</button>
+        <button onclick="addRecup(1)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-1 h</button>
+      </div>
+      <input id="manualRecup" type="number" step="0.25" style="border-radius:12px;">
     </fieldset>
-    <fieldset class="block absence">
-      <legend>&#10060; Absence</legend>
-      <label><input type="checkbox" id="isAbsent"> Heures d&apos;absence</label>
-      <input id="absentHours" type="number" step="0.25">
+
+    <fieldset class="block absence" style="border:none;padding:0;margin-top:8px">
+      <legend style="font-weight:700;color:#c62828;margin-bottom:6px">&#10060; Absence</legend>
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:4px"><input type="checkbox" id="isAbsent" style="width:18px;height:18px;margin:0"> Heures d&apos;absence</label>
+      <input id="absentHours" type="number" step="0.25" style="border-radius:12px;">
     </fieldset>
+
     <div class="popup-actions">
-      <button onclick="saveManual()">Valider</button>
-      <button onclick="resetDay()" style="background:#c62828;color:#fff">&#x1F5D1;&#65039; Supprimer les heures du jour</button>
-      <button onclick="closePopup()">Annuler</button>
+      <button onclick="saveManual()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-weight:700;border-radius:14px;">Valider</button>
+      <button onclick="resetDay()" style="background:#ffebee;color:#c62828;border:1.5px solid #ef9a9a;border-radius:14px;font-weight:600;">&#x1F5D1;&#65039; Supprimer les heures du jour</button>
+      <button onclick="closePopup()" style="background:#f0f4f8;color:#555;border-radius:14px;">Annuler</button>
     </div>
   </div>
 </div>
@@ -553,7 +756,7 @@ window.addEventListener("unhandledrejection",e=>{
   if(msg.includes("fetch")||msg.includes("Permission denied"))return;
   enterRecoveryMode("promise",e.reason);
 });
-function goMenu(){localStorage.removeItem("lastApp");window.location.href="../menu.html";}
+function goMenu(){try{unlockBodyScroll();}catch(_){}localStorage.removeItem("lastApp");window.location.href="../menu.html";}
 function autoSwitchPeriodAtMidnight(){const now=new Date();const next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,0,0);if(midnightTimer)clearTimeout(midnightTimer);midnightTimer=setTimeout(()=>{if(typeof buildPeriods==="function")buildPeriods();if(typeof update==="function")update();showToast();autoSwitchPeriodAtMidnight();},next-now);}
 let currentSuffix=localStorage.getItem("ACTIVE_YEAR_SUFFIX")||new Date().getFullYear();
 document.getElementById("activeYearLabel").textContent=currentSuffix;
@@ -802,7 +1005,7 @@ function buildPeriods(){
 }
 
 function toggleConfigLock(){const key="CONFIG_LOCK_"+currentSuffix;localStorage.setItem(key,!(localStorage.getItem(key)==="true"));applyConfigLock();}
-function applyConfigLock(){const locked=localStorage.getItem("CONFIG_LOCK_"+currentSuffix)==="true";document.querySelectorAll("#exerciseStartInput,#baseHebdoInput,#annualDateInput").forEach(el=>el.disabled=locked);const info=document.getElementById("configLockInfo");if(info)info.textContent=locked?"🔒 Configuration verrouillée":"🔓 Configuration modifiable";}
+function applyConfigLock(){const locked=localStorage.getItem("CONFIG_LOCK_"+currentSuffix)==="true";document.querySelectorAll("#exerciseStartInput,#baseHebdoInput,#annualDateInput,#hourlyRateConfigInput").forEach(el=>{if(el)el.disabled=locked;});const info=document.getElementById("configLockInfo");if(info)info.textContent=locked?"🔒 Configuration verrouillée":"🔓 Configuration modifiable";}
 
 function getCurrentPeriod(){
   const base=getBaseStartDate();if(!base)return null;
@@ -943,7 +1146,7 @@ function calculate(){
   const brut=brut1+brutInter+brut2+reportPrev,net=brut-totalRecup;
   reports[period.index]=net;localStorage.setItem(STORAGE.reports,JSON.stringify(reports));
   const interLine=rules.taux_inter?`<br>${rules.taux_inter}% : ${fmtH(hInter)} × ${coefInter.toFixed(2)} = ${fmtH(brutInter)}`:'';
-  totaux.innerHTML=`<details class="calc-details"><summary>📊 Détails des calculs</summary><div class="breakdown">${details.join("<br>")}<hr>${rules.taux1}% : ${fmtH(h1)} × ${coef1.toFixed(2)} = ${fmtH(brut1)}${interLine}<br>${rules.taux2}% : ${fmtH(h2)} × ${coef2.toFixed(2)} = ${fmtH(brut2)}<br>Report précédent : ${fmtH(reportPrev)}</div></details><hr><b>Solde brut :</b> ${fmtH(brut)}<br>Récup : ${fmtH(totalRecup)}<br><b>Solde net :</b> ${fmtH(net)}`;
+  totaux.innerHTML=`<details class="calc-details"><summary>📊 Détails des calculs</summary><div class="breakdown">${details.join("<br>")}<hr>${rules.taux1}% : ${fmtH(h1)} × ${coef1.toFixed(2)} = ${fmtH(brut1)}${interLine}<br>${rules.taux2}% : ${fmtH(h2)} × ${coef2.toFixed(2)} = ${fmtH(brut2)}<br>Report précédent : ${fmtH(reportPrev)}</div></details><div class="soldes-grid"><div class="solde-card"><div class="solde-card-label">Solde brut</div><div class="solde-card-value">${fmtH(brut)}</div></div><div class="solde-card recup"><div class="solde-card-label">Récupération</div><div class="solde-card-value">${fmtH(totalRecup)}</div></div></div><div class="solde-card-net"><div class="solde-card-label">Solde net</div><div class="solde-card-value">${fmtH(net)}</div></div>`;
   const rateContainer=document.getElementById("rateContainer");rateContainer.innerHTML="";
   if(shouldShowAnnualClosure()){if(!document.getElementById("hourlyRateInput")){rateContainer.innerHTML=`<div style="background:#e0f4f7;padding:10px;border-radius:6px;border:1px solid #4FB3C2;margin-top:10px;box-sizing:border-box;width:100%;"><label style="display:block;font-weight:bold;margin-bottom:4px;">Taux horaire (€)</label><input type="number" id="hourlyRateInput" step="any" value="${annualRate}" style="width:100%;box-sizing:border-box;margin:0;"></div>`;const _hri=document.getElementById("hourlyRateInput");_hri.oninput=()=>{const v=Number(_hri.value);if(!isNaN(v)&&v>0){annualRate=v;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);}};_hri.onchange=()=>{calculate();};}else if(document.activeElement.id!=="hourlyRateInput"){document.getElementById("hourlyRateInput").value=annualRate;}totaux.innerHTML+=`<hr><div style="background:#e0f4f7;padding:15px;border:2px solid #2196a6;border-radius:8px;"><h3 style="margin:0;color:#2196a6;">🎯 Clôture Annuelle</h3><b>Paiement (${annualRate}€/h) :</b> ${(net*annualRate).toFixed(2)} €</div>`;}
 }
@@ -1194,7 +1397,7 @@ function update(){
     };
   }
   const banner=document.getElementById("activePeriodBanner"),period=getCurrentPeriod();
-  if(banner){if(period&&exerciseStart){const s=period.start.toLocaleDateString(),e=period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString();banner.innerHTML=`📘 Période ${period.index+1} : ${s} \u2192 ${e}`;}else banner.innerHTML="";}
+  if(banner){if(period&&exerciseStart){banner.style.display="block";const psc=document.getElementById("periodSelectCalendar");if(psc&&periodSelect){psc.innerHTML=periodSelect.innerHTML;psc.value=periodSelect.value;psc.onchange=()=>{periodSelect.value=psc.value;currentPeriodIndex=+psc.value;update();showToast();};}}else{banner.style.display="none";}}
 }
 monthSelect.onchange=()=>{viewMonth=+monthSelect.value;if(typeof update==="function")update();};
 yearSelect.onchange=()=>{viewYear=+yearSelect.value;if(typeof update==="function")update();};
@@ -1865,16 +2068,6 @@ function protectFunctions(){
     <button onclick="closeClosures()">Fermer</button>
   </div>
 </div>
-<div style="text-align:center;font-size:12px;color:#666;margin-top:30px;">
-  <a href="#" onclick="event.preventDefault();openLegalPopup();">&#x2139;&#65039; Informations légales &amp; calcul</a>
-  <a href="#" onclick="event.preventDefault();openNotice();">&#x1F4D8; Notice utilisateur</a>
-  <button type="button" onclick="protectedCrash()" style="margin-left:10px;background:none;border:none;padding:0;color:#777;font-size:12px;cursor:pointer;user-select:none;">&copy; C.Anthony</button>
-</div>
-<p style="max-width:900px;margin:20px auto;font-size:12px;color:#777;text-align:center;">
-  &#9888;&#65039; <b>Sauvegarde des données</b><br><br>
-  Les données saisies dans cette application sont enregistrées <b>localement sur cet appareil</b>.<br><br>
-  <b>Il est fortement recommandé d'effectuer des exports réguliers</b> (mensuels ou après chaque clôture).
-</p>
 <div class="popup" id="popupLegal">
   <div class="popup-content" style="max-width:700px;max-height:80vh;overflow:auto;">
     <h3>ℹ️ Informations légales &amp; règles de calcul</h3>
@@ -1921,6 +2114,7 @@ function protectFunctions(){
       <p class="wiz-hint">C'est le <b>premier jour de ta période de paie annuelle</b> — la date à partir de laquelle tes heures supplémentaires sont comptées pour cette année. Demande à ton employeur ou consulte ton contrat si tu n'es pas sûr.</p>
       <input type="date" id="wizStartDate">
       <div class="wiz-nav"><button class="kitsune-btn" onclick="wizGoTo(2)">Suivant →</button></div>
+      <button class="wiz-skip-link" onclick="document.getElementById('wizardModal').style.display='none';unlockBodyScroll();">Passer la configuration →</button>
     </div>
     <div class="wiz-step" id="wizStep2">
       <div class="wiz-question">📆 Est-ce que tu connais déjà toutes les dates de l'année ?</div>
@@ -1982,7 +2176,8 @@ function protectFunctions(){
   </div>
 </div>
 <script>
-function openSettingsModal(){document.getElementById("exerciseStartInput").value=exerciseStart||"";document.getElementById("annualDateInput").value=annualDate||"";document.getElementById("baseHebdoInput").value=BASE_HEBDO;const aft=document.getElementById("autoFerieToggle");if(aft)aft.checked=AUTO_FERIE;document.getElementById("settingsModal").style.display="flex";lockBodyScroll();}
+function openSettingsModal(){document.getElementById("exerciseStartInput").value=exerciseStart||"";document.getElementById("annualDateInput").value=annualDate||"";document.getElementById("baseHebdoInput").value=BASE_HEBDO;const hri=document.getElementById("hourlyRateConfigInput");if(hri)hri.value=annualRate;const aft=document.getElementById("autoFerieToggle");if(aft)aft.checked=AUTO_FERIE;document.getElementById("settingsModal").style.display="flex";lockBodyScroll();}
+function updateHourlyRate(v){const n=Number(v);if(!isNaN(n)&&n>0){annualRate=n;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);const hri2=document.getElementById("hourlyRateInput");if(hri2&&document.activeElement.id!=="hourlyRateInput")hri2.value=annualRate;if(typeof update==="function")update();}}
 function closeSettingsModal(){document.getElementById("settingsModal").style.display="none";unlockBodyScroll();if(typeof update==="function")update();}
 document.getElementById("settingsModal").addEventListener("click",function(e){if(e.target===this)closeSettingsModal();});
 // Wizard obligatoire — pas de fermeture par click extérieur
@@ -2139,6 +2334,27 @@ function closeTip(){
   document.getElementById('tipOverlay').classList.remove('visible');
   document.body.style.overflow='';
 }
+</script>
+
+<!-- Stub glossaire — actif si glossaire.js absent, écrasé s'il est présent -->
+<script>
+(function(){
+  var stored = localStorage.getItem('APP_MODE') || localStorage.getItem('GLOSSAIRE_MODE') || 'debutant';
+  function applyMode(mode){
+    localStorage.setItem('APP_MODE', mode);
+    localStorage.setItem('GLOSSAIRE_MODE', mode);
+    localStorage.setItem('GLOS_MODE', mode);
+    var bi1=document.getElementById('btnModeDebutant'), bi2=document.getElementById('btnModeExpert');
+    if(bi1){bi1.style.background=mode==='debutant'?'#4FB3C2':'#fff';bi1.style.color=mode==='debutant'?'#fff':'#555';bi1.style.borderColor=mode==='debutant'?'#2196a6':'#dde3ec';}
+    if(bi2){bi2.style.background=mode==='expert'?'#4FB3C2':'#fff';bi2.style.color=mode==='expert'?'#fff':'#555';bi2.style.borderColor=mode==='expert'?'#2196a6':'#dde3ec';}
+    if(mode==='expert'){document.documentElement.classList.add('mode-expert');document.body&&document.body.classList.add('mode-expert');}
+    else{document.documentElement.classList.remove('mode-expert');document.body&&document.body.classList.remove('mode-expert');}
+  }
+  window.setGlosMode = function(mode){ applyMode(mode); };
+  window.openGlossaire = function(){ openNotice(); };
+  window.toggleGlossaire = window.openGlossaire;
+  document.addEventListener('DOMContentLoaded', function(){ applyMode(stored); });
+})();
 </script>
 
 <!-- Glossaire mode débutant/expert -->
