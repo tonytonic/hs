@@ -1501,6 +1501,9 @@ class DTEEngine {
     } catch(_) { return null; }})();
     const _hasWorkThisWeek = count7 > 0 || (_todayCheckin && _todayCheckin.dayStatus === 'work');
     const isCurrentWeekVacation = !_hasWorkThisWeek && (isVacFromDTE || noWorkThisWeek || belowBaseThisWeek);
+    // FIX récupération 99 samedi : distinguer vraie vacance (DTE_VACANCES) vs semaine sans saisie
+    // vacationFloor ne doit s'appliquer qu'aux vraies vacances déclarées, pas aux samedis normaux
+    const isRealVacationWeek = !_hasWorkThisWeek && isVacFromDTE;
 
     // avgH7 déjà déclaré plus haut — fatHS forcé à 0 en vacances dans _scores()
 
@@ -1540,6 +1543,7 @@ class DTEEngine {
       _recentWeeklyH: recentWeeklyH,
       _weeklyHSource: hasAnyEntryThisWeek ? 'live' : (countWorkDays28 >= 5 ? 'avg' : 'seuil'),
       _isVacationWeek: isCurrentWeekVacation,
+      _isRealVacation:  isRealVacationWeek, // true seulement si DTE_VACANCES déclaré
       _consec:        consec,
       _consecOT:      consecOT,
       _cumulWeeks:    cumulWeeksR,      // 28j — fatigue/stress/score
@@ -1772,7 +1776,7 @@ class DTEEngine {
     // Pendant les vacances avec bon sommeil → recharge accélérée (×2 vs weekend normal).
     // Base de récupération : D.RECOVERY_WE = 0.045/jour
     const recNightPenalty = norm._isNight ? 0.15 : norm._isNightPartial ? 0.08 : 0;
-    const isVacWeekScore = norm._isVacationWeek || false;
+    const isVacWeekScore = norm._isRealVacation || false; // FIX: seulement vraies vacances DTE_VACANCES
 
     // Sonnentag 2003 (J.Applied Psychology) : le détachement psychologique nécessite
     // une vraie coupure du travail — le bonus Sonnentag n'est actif qu'en repos COMPLET.
