@@ -7,37 +7,33 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
-<meta name="theme-color" content="#0f1115">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#4FB3C2">
+<meta name="color-scheme" content="dark light">
 <meta charset="UTF-8">
 <title>Simulateur d'heures mensualisé</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 *,*::before,*::after{box-sizing:border-box}
-.kitsune-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border-radius:99px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:700;cursor:pointer;width:auto;margin:0;box-shadow:0 3px 12px rgba(79,179,194,0.45);transition:transform .15s,box-shadow .15s;line-height:1}
+.kitsune-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 18px;border-radius:24px;border:none;background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff;font-size:14px;font-weight:600;cursor:pointer;width:auto;margin:0;box-shadow:0 2px 8px rgba(79,179,194,0.35);transition:transform .15s,box-shadow .15s;line-height:1}
 .kitsune-btn:hover{transform:scale(1.02);box-shadow:0 4px 16px rgba(79,179,194,0.55)}
 .kitsune-btn:active{transform:scale(0.97)}
-.menu-btn{padding:11px 20px;border-radius:99px;border:1.5px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.08);color:#e6e6e6;font-size:14px;font-weight:500;cursor:pointer;width:auto;margin:0;line-height:1;transition:background .15s}
-.menu-btn:active{background:rgba(255,255,255,0.16)}
+.menu-btn{padding:9px 16px;border-radius:20px;border:none;background:rgba(255,255,255,0.12);color:#e6e6e6;font-size:14px;font-weight:500;cursor:pointer;width:auto;margin:0;line-height:1}
 .topbar{position:sticky;top:0;z-index:2000;background:var(--bg);padding:calc(env(safe-area-inset-top) + 8px) 12px 8px;display:flex;gap:8px;align-items:center;justify-content:flex-start;flex-wrap:nowrap;border-bottom:1px solid #1c1f26;min-height:54px}
 
-:root{--bg:#0f1115;--card:#1c1f26;--card2:#22262f;--text:#e6e6e6;--muted:#9aa0a6;--accent:#4FB3C2;--accent2:#2196a6;--danger:#c0392b;--success:#2ecc71}
+:root{--bg:#0f1115;--card:#1c1f26;--text:#e6e6e6;--muted:#9aa0a6;--accent:#4FB3C2;--accent2:#2196a6;--danger:#c0392b;--success:#2ecc71}
 #versionBadge{position:fixed;bottom:calc(env(safe-area-inset-bottom) + 14px);right:calc(env(safe-area-inset-right) + 14px);font-size:11px;opacity:.55;color:#9aa0a6;z-index:99999;user-select:none;pointer-events:none}
-html{background:var(--bg);color-scheme:dark;min-height:100%}body{margin:0;min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;overflow-x:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+html{background:var(--bg)}body{margin:0;min-height: 100vh; min-height: 100dvh; height: 100dvh;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,Arial,sans-serif;overflow-x:hidden;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 @media (min-width: 900px) { .container, .main { max-width: 900px; margin: 0 auto; } }
-.main{padding:12px;padding-top:70px;overflow-x:hidden;background:var(--bg);min-height:100vh}
+.main{padding:12px;padding-top:70px;overflow-x:hidden}
 h1,h2,h3{text-align:center}
-button{width:100%;padding:11px;border-radius:16px;border:none;background:var(--accent);color:white;font-size:15px;margin-top:6px;font-weight:600;transition:opacity .15s,transform .1s}
-button:active{transform:scale(.97);opacity:.85}
-button.secondary{background:#2a2f3a;color:var(--text)}
+button{width:100%;padding:10px;border-radius:8px;border:none;background:var(--accent);color:white;font-size:15px;margin-top:6px}
+button.secondary{background:#2a2f3a}
 button.danger{background:var(--danger)}
-input,select{width:100%;max-width:100%;padding:10px 12px;margin-top:6px;background:#262a33;color:var(--text);border:1px solid #333;border-radius:14px;display:block}
-input[type="date"],input[type="month"]{overflow:hidden;min-width:0;-webkit-appearance:none;appearance:none;max-width:100%;width:100%}
-.card{background:var(--card);padding:16px;border-radius:18px;margin-top:12px;overflow:hidden}
-.card-inner{background:var(--card2);border-radius:14px;padding:14px;margin-top:10px}
+input,select{width:100%;max-width:100%;padding:8px;margin-top:6px;background:#262a33;color:var(--text);border:1px solid #333;border-radius:6px;display:block}input[type="date"],input[type="month"]{overflow:hidden;min-width:0;-webkit-appearance:none;appearance:none;max-width:100%;width:100%}
+.card{background:var(--card);padding:15px;border-radius:12px;margin-top:15px;overflow:hidden}
 .calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;width:100%;box-sizing:border-box}
 .weekday{text-align:center;font-weight:bold;font-size:12px}
-.day{background:#262a33;border-radius:10px;padding:4px 2px;text-align:center;cursor:pointer;min-height:60px;overflow:hidden;word-break:break-word;min-width:0;transition:border .2s ease,opacity .2s ease,transform .1s ease}
+.day{background:#262a33;border-radius:8px;padding:4px 2px;text-align:center;cursor:pointer;min-height:60px;overflow:hidden;word-break:break-word;min-width:0;transition:border .2s ease,opacity .2s ease,transform .1s ease}
 .day.today{border:2px solid #4FB3C2 !important;opacity:1 !important;background:#0d2630;box-shadow:0 0 0 2px rgba(79,179,194,0.4);transform:scale(1.03);z-index:2}
 .day.locked{opacity:.4;cursor:not-allowed}
 .day.after-closing{border:1px dashed #4FB3C2;opacity:0.75}
@@ -48,54 +44,32 @@ input[type="date"],input[type="month"]{overflow:hidden;min-width:0;-webkit-appea
 .closure-row input{margin-top:0;font-size:13px}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:4000;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .2s ease,transform .2s ease}
 .modal.open{opacity:1;pointer-events:auto;transform:translateY(0)}
-.modal-content{background:var(--card);padding:20px;border-radius:20px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto}
-.wiz-progress-bar{background:#333;border-radius:99px;height:6px;margin-bottom:16px;overflow:hidden}
-.wiz-progress-fill{height:100%;background:linear-gradient(90deg,#4FB3C2,#2196a6);transition:width .3s ease;border-radius:99px}
+.modal-content{background:var(--card);padding:20px;border-radius:16px;width:90%;max-width:480px;max-height:85vh;overflow-y:auto}
+.wiz-progress-bar{background:#333;border-radius:4px;height:5px;margin-bottom:16px;overflow:hidden}
+.wiz-progress-fill{height:100%;background:linear-gradient(90deg,#4FB3C2,#2196a6);transition:width .3s ease}
 .wiz-step{display:none}
 .wiz-step.active{display:block}
 .wiz-nav{display:flex;gap:10px;margin-top:20px}
-.wiz-nav button{flex:1;margin-top:0;border-radius:14px}
-.wiz-skip-link{display:block;text-align:center;font-size:13px;color:var(--muted);margin-top:10px;cursor:pointer;background:none;border:none;width:100%;padding:4px;text-decoration:underline;transition:color .15s}
-.wiz-skip-link:hover{color:var(--accent)}
+.wiz-nav button{flex:1;margin-top:0}
 .wiz-choice{display:flex;gap:10px;margin-top:8px}
-.wiz-choice button{flex:1;margin-top:0;font-size:13px;padding:12px 8px;border-radius:14px}
+.wiz-choice button{flex:1;margin-top:0;font-size:13px;padding:10px 8px}
 .blur{filter:blur(8px)}
-.badge{display:inline-block;padding:4px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.badge{display:inline-block;padding:4px 8px;border-radius:12px;font-size:12px}
 .badge.ok{background:#1a3a4a;color:#4FB3C2}
 .badge.file{background:#283593}
 input[type="month"]{text-align:center;padding-right:0;appearance:none;-webkit-appearance:none}
 input[type="number" inputmode="decimal"]{text-align:center;appearance:none;-webkit-appearance:none;-moz-appearance:textfield;padding-left:0;padding-right:0}
-/* STAT GRID */
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
-.stat-box{background:var(--card2);border-radius:14px;padding:12px 8px;text-align:center}
-.stat-box .val{font-size:22px;font-weight:800;color:var(--accent);line-height:1.1}
-.stat-box .lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-top:4px}
-/* RESTANT DU */
-.restedu-card{background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.35);border-radius:16px;padding:14px;margin-top:10px}
-.restedu-card .rd-title{font-size:11px;font-weight:700;color:#e74c3c;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
-.restedu-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px}
-.restedu-row:last-child{border-bottom:none}
-.restedu-total{font-size:16px;font-weight:800;color:#e74c3c;margin-top:8px}
-.restedu-ok{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.3);border-radius:14px;padding:12px;margin-top:10px;font-size:13px;color:#2ecc71;text-align:center}
-/* WIZ TOGGLE */
-.wiz-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#262a33;border-radius:14px;margin-bottom:8px;gap:8px}
-.wiz-toggle-row .wt-left{flex:1}
-.wiz-toggle-row .wt-label{font-size:14px;font-weight:600}
-.wiz-toggle-row .wt-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.wiz-toggle{width:42px;height:24px;background:#333;border-radius:99px;cursor:pointer;flex-shrink:0;position:relative;transition:background .2s;border:none;padding:0;margin:0;display:inline-block}
-.wiz-toggle::after{content:"";position:absolute;left:3px;top:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:left .2s}
-.wiz-toggle.on{background:var(--accent)}
-.wiz-toggle.on::after{left:21px}
-/* PDF TABS */
-.pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:14px;overflow:hidden;border:1px solid #333}
+
+/* === MODALE PDF UNIFIÉE === */
+.pdf-tabs{display:flex;gap:0;margin-top:4px;border-radius:10px;overflow:hidden;border:1px solid #333}
 .pdf-tab{flex:1;padding:9px 4px;font-size:13px;font-weight:600;border:none;background:#262a33;color:var(--muted);cursor:pointer;margin:0;border-radius:0;transition:background .15s,color .15s}
 .pdf-tab.active{background:linear-gradient(135deg,#4FB3C2,#2196a6);color:#fff}
-.pdf-tab:first-child{border-radius:13px 0 0 13px}
-.pdf-tab:last-child{border-radius:0 13px 13px 0}
+.pdf-tab:first-child{border-radius:9px 0 0 9px}
+.pdf-tab:last-child{border-radius:0 9px 9px 0}
 .pdf-panel{display:none;margin-top:14px}
 .pdf-panel.active{display:block}
 .period-shortcuts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.period-shortcuts button{flex:1;min-width:calc(50% - 3px);font-size:12px;padding:8px 6px;margin-top:0;background:#262a33;border:1px solid #333;border-radius:12px;color:var(--text);cursor:pointer}
+.period-shortcuts button{flex:1;min-width:calc(50% - 3px);font-size:12px;padding:8px 6px;margin-top:0;background:#262a33;border:1px solid #333;border-radius:8px;color:var(--text);cursor:pointer}
 .period-shortcuts button:hover{background:#2e3442;border-color:#4FB3C2}
 .period-range-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .period-range-row .period-field{display:flex;flex-direction:column;gap:4px}
@@ -295,7 +269,6 @@ document.addEventListener("DOMContentLoaded", function(){
       <li>La zone € est protégée par un code</li>
     </ol>
     <div class="wiz-nav"><button onclick="wizNext()">Suivant &#x2192;</button></div>
-    <button class="wiz-skip-link" onclick="closeWizard()">Passer la configuration &#x2192;</button>
   </div>
 
   <div class="wiz-step" id="wizStep2">
@@ -341,31 +314,13 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
 
   <div class="wiz-step" id="wizStep4_code">
-    <h2 style="margin-top:0">&#x1F510; Protection de la zone €</h2>
-    <p style="font-size:14px;color:var(--muted)">La zone € affiche les montants estimés de tes heures sup. Tu peux la protéger et la flouter selon tes préférences.</p>
-
-    <div class="wiz-toggle-row">
-      <div class="wt-left">
-        <div class="wt-label">🔐 Activer un code d'accès</div>
-        <div class="wt-sub">Protège la zone € par un code PIN</div>
-      </div>
-      <button class="wiz-toggle" id="togUseCode" onclick="wizToggle('useCode')" aria-pressed="true"></button>
+    <h2 style="margin-top:0">&#x1F510; Code de sécurité</h2>
+    <p style="font-size:14px;color:var(--muted)">La zone € affiche le montant de tes heures sup en argent. Elle est protégée par un code pour éviter que quelqu'un voie tes données salariales. Le code par défaut est <b>1234</b> — change-le pour sécuriser tes données.</p>
+    <div style="background:#262a33;border-radius:10px;padding:14px;margin-top:10px">
+      <label style="font-size:13px;color:var(--muted)">Nouveau code (laisser vide = garder 1234)</label>
+      <input type="password" id="wizNewCode" placeholder="Minimum 4 caractères">
+      <input type="password" id="wizConfirmCode" placeholder="Confirmer le code" style="margin-top:8px">
     </div>
-
-    <div id="wizCodeFields" style="background:#262a33;border-radius:14px;padding:14px;margin-bottom:8px">
-      <label style="font-size:13px;color:var(--muted)">Nouveau code (vide = garder 1234)</label>
-      <input type="password" id="wizNewCode" placeholder="Minimum 4 caractères" style="border-radius:12px">
-      <input type="password" id="wizConfirmCode" placeholder="Confirmer le code" style="margin-top:8px;border-radius:12px">
-    </div>
-
-    <div class="wiz-toggle-row">
-      <div class="wt-left">
-        <div class="wt-label">🫥 Flouter les montants par défaut</div>
-        <div class="wt-sub">Les € sont masqués jusqu'au déverrouillage</div>
-      </div>
-      <button class="wiz-toggle on" id="togUseBlur" onclick="wizToggle('useBlur')" aria-pressed="true"></button>
-    </div>
-
     <div class="wiz-nav">
       <button class="secondary" onclick="wizPrev()">&#x2190; Retour</button>
       <button onclick="wizFinish()" style="background:linear-gradient(135deg,#4FB3C2,#2196a6)">&#x2705; Terminer &amp; Lancer</button>
@@ -527,97 +482,54 @@ document.addEventListener("DOMContentLoaded", function(){
   </p>
 
   <div class="card">
-    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Mois suivi</label>
+    <label>Mois suivi</label>
     <input type="month" id="monthPicker">
-    <label style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-top:12px;display:block">Jour de clôture mensuelle</label>
+    <label>Jour de clôture mensuelle</label>
     <input type="date" id="closingDate">
-    <button onclick="openClosuresModal()" style="margin-top:10px;background:#2a2f3a;font-size:13px;border-radius:14px;">&#x1F4C5; Configurer les clôtures des 12 mois</button>
+    <button onclick="openClosuresModal()" style="margin-top:10px;background:#2a2f3a;font-size:13px;">&#x1F4C5; Configurer les clôtures des 12 mois</button>
   </div>
 
   <div class="calendar card" id="calendar"></div>
 
   <div class="card">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px">Récapitulatif</div>
-
-    <!-- STAT GRID — rendue dynamiquement par recalc() selon les paliers CCN -->
-    <div id="statGridContainer" class="stat-grid"></div>
-
-    <!-- DETAIL PALIERS (caché dans stat-grid, gardé pour JS) -->
-    <div style="display:none" id="hoursBreakdown">
+    <h3>Récapitulatif</h3>
+    <p>Report précédent : <b id="prevCarry">0.00</b></p>
+    <p>Total période : <b id="totalMonth">0.00</b></p>
+    <div id="hoursBreakdown">
       <p>Heures à 25 % : <b id="hours25">0.00</b></p>
       <p>Heures à 50 % : <b id="hours50">0.00</b></p>
     </div>
     <p style="font-size:12px;color:#aaa;margin-top:8px" id="calcInfoText"></p>
-
-    <!-- INFOS COMPLÉMENTAIRES -->
-    <div class="card-inner" style="margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-size:13px;color:var(--muted)">Report précédent</span>
-        <b id="prevCarry" style="font-size:14px">0.00</b>
-      </div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="font-size:13px;color:var(--muted)">Total période</span>
-        <b id="totalMonth" style="font-size:14px">0.00</b>
-      </div>
-      <!-- Inputs heures payées par taux — générés dynamiquement -->
-      <div id="paidInputsContainer" style="border-top:1px solid rgba(255,255,255,.07);padding-top:10px"></div>
-      <!-- Champ caché — valeur totale pour recalcCascade (backward compat) -->
-      <input type="hidden" id="paidHours" value="0">
-    </div>
-
-    <!-- RESTANT DÛ HEURES (sans €, toujours visible) -->
-    <div id="restantDuContainer"></div>
-
-    <!-- RELIQUAT -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:rgba(79,179,194,.1);border-radius:12px;border:1px solid rgba(79,179,194,.25)">
-      <span style="font-size:13px;font-weight:600">Reliquat reporté</span>
-      <b id="carryOver" style="font-size:16px;color:var(--accent)">0.00</b>
-    </div>
+    <p>Heures payées : <input type="number" inputmode="decimal" id="paidHours" step="0.25"></p>
+    <p>Reliquat reporté : <b id="carryOver">0.00</b></p>
   </div>
 
   <div class="card">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">&#x1F4B0; Valeur €</div>
-      <span id="euroLockBadge" style="font-size:11px;background:#2a2f3a;border-radius:99px;padding:3px 10px;color:var(--muted)">🔒 Verrouillé</span>
-    </div>
-    <div id="euroBox">
-      <div class="card-inner">
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px">Taux horaire (€)</label>
-        <input type="number" inputmode="decimal" id="rate" style="border-radius:12px">
-        <label id="coef25Label" style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:10px">Coef 25 %</label>
-        <input type="number" inputmode="decimal" id="coef25" style="border-radius:12px">
-        <div id="coefInterContainer" style="display:none;">
-          <label id="coefInterLabel" style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:10px">Coef 10 %</label>
-          <input type="number" inputmode="decimal" id="coefInter" style="border-radius:12px">
-        </div>
-        <label id="coef50Label" style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:10px">Coef 50 %</label>
-        <input type="number" inputmode="decimal" id="coef50" style="border-radius:12px">
-        <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:4px;margin-top:10px">Coef brut → net</label>
-        <input type="number" inputmode="decimal" id="coefNet" style="border-radius:12px">
+    <h3>&#x1F4B0; Valeur €</h3>
+    <div id="euroBox" class="blur">
+      <label>Taux horaire (€)</label><input type="number" inputmode="decimal" id="rate">
+      <label id="coef25Label">Coef 25 %</label><input type="number" inputmode="decimal" id="coef25">
+      <div id="coefInterContainer" style="display:none;">
+        <label id="coefInterLabel">Coef 10 %</label><input type="number" inputmode="decimal" id="coefInter">
       </div>
-      <div style="background:linear-gradient(135deg,#1a4a5a,#0d2630);border:1px solid rgba(79,179,194,.3);border-radius:14px;padding:16px;margin-top:10px;text-align:center">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:rgba(79,179,194,.8);margin-bottom:6px">Estimation nette</div>
-        <div style="font-size:32px;font-weight:900;color:#fff"><b id="euroResult">0.00 €</b></div>
-        <div id="euroDetail" style="font-size:12px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.6"></div>
-      </div>
-      <!-- RESTANT DÛ AVEC € (dans la zone protégée) -->
-      <div id="restantDuEuro" style="margin-top:10px"></div>
-      <p style="font-size:11px;color:#9aa0a6;margin-top:10px;line-height:1.4;text-align:center">
-        &#x26A0;&#xFE0F; Indicatif uniquement. <b>Seul le bulletin de paie fait foi.</b>
+      <label id="coef50Label">Coef 50 %</label><input type="number" inputmode="decimal" id="coef50">
+      <label>Coef brut &#x2192; net</label><input type="number" inputmode="decimal" id="coefNet">
+      <p><b id="euroResult">0.00 €</b></p>
+      <p id="euroDetail" style="font-size:12px;color:#aaa;margin-top:8px"></p>
+      <p style="font-size:12px;color:#9aa0a6;margin-top:10px;line-height:1.4">
+        &#x26A0;&#xFE0F; Taux et coefficients fournis à titre <b>strictement indicatif</b>. <b>Seul le bulletin de paie fait foi.</b>
       </p>
     </div>
-    <div id="euroUnlockBox" style="margin-top:8px">
-      <input type="password" id="unlockCode" placeholder="Code (1234)" style="border-radius:14px">
-      <button onclick="unlockEuro()" style="border-radius:14px;margin-top:8px">Déverrouiller</button>
-    </div>
+    <input type="password" id="unlockCode" placeholder="Code (1234)">
+    <button onclick="unlockEuro()">Déverrouiller</button>
   </div>
 
-  <button class="secondary" onclick="toggleChangeCode()" style="border-radius:14px">&#x1F501; Changer le code</button>
+  <button class="secondary" onclick="toggleChangeCode()">&#x1F501; Changer le code</button>
   <div id="changeCodeBox" style="display:none;margin-top:10px">
-    <input type="password" id="oldCode" placeholder="Ancien code" style="border-radius:14px">
-    <input type="password" id="newCode" placeholder="Nouveau code (4 chiffres min)" style="border-radius:14px">
-    <input type="password" id="confirmCode" placeholder="Confirmer le code" style="border-radius:14px">
-    <button class="danger" onclick="changeCode()" style="border-radius:14px">Valider le nouveau code</button>
+    <input type="password" id="oldCode" placeholder="Ancien code">
+    <input type="password" id="newCode" placeholder="Nouveau code (4 chiffres min)">
+    <input type="password" id="confirmCode" placeholder="Confirmer le code">
+    <button class="danger" onclick="changeCode()">Valider le nouveau code</button>
   </div>
 
   <div class="card">
@@ -808,18 +720,6 @@ function wizSelectClosure(mode){
   document.getElementById("wizClosureManual").style.background=mode==="manual"?"#2196a6":"#2a2f3a";
 }
 
-/* Wizard toggles code/blur */
-const _wizToggles = { useCode: true, useBlur: true };
-function wizToggle(key){
-  _wizToggles[key] = !_wizToggles[key];
-  const btn = document.getElementById(key==='useCode'?'togUseCode':'togUseBlur');
-  if(btn){ btn.classList.toggle('on', _wizToggles[key]); btn.setAttribute('aria-pressed', _wizToggles[key]); }
-  if(key==='useCode'){
-    const fields = document.getElementById('wizCodeFields');
-    if(fields) fields.style.display = _wizToggles[key] ? 'block' : 'none';
-  }
-}
-
 function wizBuildManualGrid(){
   const grid=document.getElementById("wizClosuresGrid");
   if(grid.children.length>0) return;
@@ -857,10 +757,7 @@ async function wizFinish(){
     saveYearData(year,ALL_DATA[year]);
   }
   localStorage.setItem("ONBOARDING_DONE","1");localStorage.setItem("CA_HS_TRACKER_V1_ONBOARDING","1");
-  // Sauvegarder préférences code/blur
-  localStorage.setItem(kUseCode(), _wizToggles.useCode ? "1" : "0");
-  localStorage.setItem(kUseBlur(), _wizToggles.useBlur ? "1" : "0");
-  closeWizard();loadMonth();initEuroBox();
+  closeWizard();loadMonth();
 }
 
 /* INIT */
@@ -875,7 +772,6 @@ window.addEventListener("load",()=>{
   if(!localStorage.getItem("CA_HS_TRACKER_V1_ONBOARDING")){openWizard();return}
   if(typeof syncCCNSettings==="function")syncCCNSettings();
   loadMonth();
-  initEuroBox();
 });
 
 function acceptLegal(){localStorage.setItem("LEGAL_OK","1");document.getElementById("legalModal").classList.remove("open");if(!localStorage.getItem("CA_HS_TRACKER_V1_ONBOARDING"))openWizard();else loadMonth()}
@@ -1090,32 +986,8 @@ function recalc(){
     }
   }
   
-  document.getElementById("totalMonth").textContent=fmtH(ph);
-  document.getElementById("prevCarry").textContent=fmtH(getPreviousCarry(currentKey));
-  document.getElementById("carryOver").textContent=fmtH((DATA[currentKey].carry||0));
-
-  // Stat-grid dynamique (s'adapte au nombre de paliers CCN)
-  const sgc = document.getElementById("statGridContainer");
-  if(sgc){
-    const paliers = [
-      { val: fmtH(ph),     lbl: 'Total<br>période', color: 'var(--accent)' },
-      { val: fmtH(t25),    lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
-      ...(rules.taux_inter !== null ? [{ val: fmtH(tInter), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
-      { val: fmtH(t50),    lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
-    ];
-    sgc.style.gridTemplateColumns = 'repeat('+paliers.length+',1fr)';
-    sgc.innerHTML = paliers.map(p =>
-      '<div class="stat-box"><div class="val" style="color:'+p.color+'">'+p.val+'</div><div class="lbl">'+p.lbl+'</div></div>'
-    ).join('');
-  }
-
-  // Inputs heures payées par taux (dynamiques selon CCN)
-  renderPaidInputs(rules);
-
-  // Restant dû
-  updateRestantDu();
-
-  if(unlocked)calcEuro();
+  document.getElementById("totalMonth").textContent=fmtH(ph);document.getElementById("prevCarry").textContent=fmtH(getPreviousCarry(currentKey));document.getElementById("carryOver").textContent=fmtH((DATA[currentKey].carry||0));
+  // Mise à jour du texte d'information sur les taux
   const infoEl = document.getElementById("calcInfoText");
   if (infoEl) {
     if (rules.taux_inter !== null) {
@@ -1127,197 +999,6 @@ function recalc(){
   if(unlocked)calcEuro();
   updateContingent();
 }
-/* ─────────────────────────────────────────────────────────────────────
-   renderPaidInputs : génère les inputs "heures payées" par palier CCN.
-   Appelé depuis recalc() quand les règles CCN sont connues.
-   Stocke paid1/paidInter/paid2 dans DATA[currentKey].
-   Met à jour paid (total) pour compatibilité recalcCascade.
-───────────────────────────────────────────────────────────────────── */
-function renderPaidInputs(rules){
-  const container = document.getElementById("paidInputsContainer");
-  if(!container) return;
-  const m = DATA[currentKey] || {};
-
-  const paliers = [
-    { id:'paidH1',  key:'paid1',     taux:rules.taux1,      color:'#f39c12', label:'À '+rules.taux1+'%' },
-    ...(rules.taux_inter ? [{ id:'paidHI', key:'paidInter', taux:rules.taux_inter, color:'#e67e22', label:'À '+rules.taux_inter+'%' }] : []),
-    { id:'paidH2',  key:'paid2',     taux:rules.taux2,      color:'#e74c3c', label:'À '+rules.taux2+'%' },
-  ];
-
-  // Reconstruire seulement si la structure a changé (nombre de paliers)
-  const existingCount = container.querySelectorAll('input[type="number"]').length;
-  if(existingCount !== paliers.length){
-    container.innerHTML = paliers.map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <label style="font-size:13px;font-weight:600;color:${p.color};margin:0">${p.label} payées</label>
-        <input type="number" inputmode="decimal" id="${p.id}" step="0.25" value="0"
-          style="width:90px;text-align:right;margin:0;padding:6px 10px;border-radius:10px;
-                 font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
-      </div>`).join('');
-
-    // Bind des événements
-    paliers.forEach(p => {
-      const inp = document.getElementById(p.id);
-      if(!inp) return;
-      inp.oninput = () => {
-        if(!DATA||!DATA[currentKey]) return;
-        DATA[currentKey][p.key] = parseFloat(inp.value)||0;
-        // Recalculer le total paid (backward compat recalcCascade)
-        DATA[currentKey].paid = paliers.reduce((s,t)=>s+(Number(DATA[currentKey][t.key])||0), 0);
-        // Sync champ caché
-        const h = document.getElementById('paidHours');
-        if(h) h.value = DATA[currentKey].paid;
-        save(); recalc();
-      };
-    });
-  }
-
-  // Remplir les valeurs depuis DATA (migration : si paid1 absent, répartir paid sur taux1)
-  paliers.forEach(p => {
-    const inp = document.getElementById(p.id);
-    if(!inp) return;
-    if(m[p.key] !== undefined){
-      inp.value = m[p.key];
-    } else {
-      // Données legacy : paid non ventilé → on l'affecte à taux1 par défaut
-      inp.value = p.id==='paidH1' ? (m.paid||0) : 0;
-    }
-  });
-
-  // Sync champ caché
-  const hid = document.getElementById('paidHours');
-  if(hid) hid.value = m.paid||0;
-}
-
-/* ─────────────────────────────────────────────────────────────────────
-   computeCarryBreakdown : ventilation des heures impayées par taux
-   sur TOUT l'historique jusqu'à upToKey.
-   - Mois avec paid1/paid2 : soustraction directe par taux (précis)
-   - Mois legacy (paid seulement) : FIFO sur l'accumulé
-   Ne touche à aucune donnée — lecture seule.
-───────────────────────────────────────────────────────────────────── */
-function computeCarryBreakdown(upToKey){
-  const rules = getCCNRules();
-  const yd = ALL_DATA[currentYear] || {};
-  const allKeys = Object.keys(yd)
-    .filter(k => /^\d{4}-\d{2}$/.test(k) && k <= upToKey)
-    .sort();
-
-  let acc1=0, accI=0, acc2=0; // heures accumulées non-payées par taux
-
-  allKeys.forEach(mk => {
-    const {start,end} = getPeriodBounds(mk);
-    const days = buildDayList(start, end);
-    const {h25, hInter, h50} = calcWeeks(days);
-    const m = yd[mk] || {};
-
-    acc1 += (h25||0);
-    accI += (hInter||0);
-    acc2 += (h50||0);
-
-    if(m.paid1 !== undefined || m.paid2 !== undefined){
-      // Données per-taux disponibles : soustraction directe
-      acc1 = Math.max(0, acc1 - (Number(m.paid1)||0));
-      accI = Math.max(0, accI - (Number(m.paidInter)||0));
-      acc2 = Math.max(0, acc2 - (Number(m.paid2)||0));
-    } else if(m.paid){
-      // Legacy FIFO : payer taux1 d'abord, puis inter, puis taux2
-      let rem = Number(m.paid)||0;
-      const p1 = Math.min(acc1, rem); acc1 -= p1; rem -= p1;
-      const pI = Math.min(accI, rem); accI -= pI; rem -= pI;
-      const p2 = Math.min(acc2, rem); acc2 -= p2;
-    }
-  });
-
-  return {
-    unpaid1:     Math.max(0, acc1),
-    unpaidInter: Math.max(0, accI),
-    unpaid2:     Math.max(0, acc2),
-    totalCarry:  Math.max(0, acc1 + accI + acc2),
-    rules
-  };
-}
-
-/* ─────────────────────────────────────────────────────────────────────
-   updateRestantDu : appelle computeCarryBreakdown, puis :
-   - rend les heures par taux (sans €) dans #restantDuContainer
-   - rend la carte complète avec € dans #restantDuEuro (zone protégée)
-───────────────────────────────────────────────────────────────────── */
-function updateRestantDu(){
-  const bd = computeCarryBreakdown(currentKey);
-  const { unpaid1, unpaidInter, unpaid2, totalCarry, rules } = bd;
-  const container = document.getElementById("restantDuContainer");
-  const euroDiv   = document.getElementById("restantDuEuro");
-
-  /* ── HEURES SEULES (toujours visible, sans €) ── */
-  if(container){
-    if(totalCarry <= 0){
-      container.innerHTML = '<div class="restedu-ok">\u2705 Toutes les heures sont pay\u00e9es</div>';
-    } else {
-      const COLORS = ["#f39c12","#e67e22","#e74c3c"];
-      const paliers = [
-        { h: unpaid1,     taux: rules.taux1,                  color: COLORS[0] },
-        { h: unpaidInter, taux: rules.taux_inter,              color: COLORS[1], hide: !rules.taux_inter },
-        { h: unpaid2,     taux: rules.taux2,                   color: COLORS[2] },
-      ];
-      let rows = "";
-      paliers.forEach(p => {
-        if(p.hide || p.h <= 0) return;
-        rows += `<div class="restedu-row">
-          <span style="color:${p.color}">\u00c0 ${p.taux}%</span>
-          <span style="font-weight:700">${fmtH(p.h)}</span>
-        </div>`;
-      });
-      container.innerHTML = `<div class="restedu-card">
-        <div class="rd-title">\u26a0\ufe0f Restant d\u00fb : ${fmtH(totalCarry)}</div>
-        ${rows}
-        <div style="font-size:10px;color:var(--muted);margin-top:6px">D\u00e9tail par taux — montants dans la zone €</div>
-      </div>`;
-    }
-  }
-
-  /* ── CARTE EURO COMPLÈTE (dans zone protégée) ── */
-  if(euroDiv){
-    if(totalCarry <= 0){
-      euroDiv.innerHTML = '<div class="restedu-ok">\u2705 Toutes les heures sont pay\u00e9es</div>';
-      return;
-    }
-    const rate = Number(document.getElementById("rate")?.value)||0;
-    const c1   = Number(document.getElementById("coef25")?.value)||(1+rules.taux1/100);
-    const cI   = Number(document.getElementById("coefInter")?.value)||(1+(rules.taux_inter||10)/100);
-    const c2   = Number(document.getElementById("coef50")?.value)||(1+rules.taux2/100);
-    const cn   = Number(document.getElementById("coefNet")?.value)||1;
-    const hasRate = rate > 0;
-    const COLORS = ["#f39c12","#e67e22","#e74c3c"];
-    const paliers = [
-      { h: unpaid1,     taux: rules.taux1,       coef: c1,  color: COLORS[0] },
-      { h: unpaidInter, taux: rules.taux_inter,  coef: cI,  color: COLORS[1], hide: !rules.taux_inter },
-      { h: unpaid2,     taux: rules.taux2,       coef: c2,  color: COLORS[2] },
-    ];
-    let rows = "", totalEuro = 0;
-    paliers.forEach(p => {
-      if(p.hide || p.h <= 0) return;
-      const eur = p.h * p.coef * rate * cn;
-      totalEuro += eur;
-      const estStr = hasRate ? ` \u2192 ~${eur.toFixed(2)}\u00a0\u20ac` : "";
-      rows += `<div class="restedu-row">
-        <span style="color:${p.color}">\u00c0 ${p.taux}% (\u00d7${p.coef.toFixed(2)})</span>
-        <span style="font-weight:700">${fmtH(p.h)}${estStr}</span>
-      </div>`;
-    });
-    const totalStr = hasRate
-      ? `<div class="restedu-total">${fmtH(totalCarry)} non pay\u00e9es</div>
-         <div style="font-size:13px;font-weight:700;color:#e74c3c;margin-top:4px">Estimation nette : ~${totalEuro.toFixed(2)}\u00a0\u20ac</div>`
-      : `<div class="restedu-total">${fmtH(totalCarry)} non pay\u00e9es</div>`;
-    euroDiv.innerHTML = `<div class="restedu-card">
-      <div class="rd-title">\u26a0\ufe0f Restant d\u00fb ce cycle</div>
-      ${rows}
-      ${totalStr}
-      <div style="font-size:10px;color:var(--muted);margin-top:8px">Calcul indicatif (FIFO) — ventilation sur tout l\'historique.</div>
-    </div>`;
-  }
-}
-
 function calcEuro(){
   if(!unlocked)return;
   const rate=Number(document.getElementById("rate").value)||0;
@@ -1345,8 +1026,6 @@ function calcEuro(){
   }else{
     document.getElementById("euroDetail").innerHTML=`${fmtH(h25)} × ${c25.toFixed(2)} = ${fmtH(w25)}<br>${fmtH(h50)} × ${c50.toFixed(2)} = ${fmtH(w50)}<br><b>Total pondéré : ${fmtH(wt)}</b>`;
   }
-  // Rafraîchir le restant dû avec les nouveaux coefs/taux
-  updateRestantDu();
 }
 function recalcCascade(){
   // Opérer uniquement sur l'exercice actif pour éviter contamination entre années
@@ -1375,46 +1054,9 @@ function recalcCascade(){
 }
 
 /* SÉCURITÉ */
-const kUseCode = () => `${STORAGE_PREFIX}_USE_CODE`;
-const kUseBlur = () => `${STORAGE_PREFIX}_USE_BLUR`;
-function isCodeEnabled(){ return localStorage.getItem(kUseCode()) !== "0"; }
-function isBlurEnabled(){ return localStorage.getItem(kUseBlur()) !== "0"; }
-
 async function sha256(str){const buf=new TextEncoder().encode(str);const hash=await crypto.subtle.digest("SHA-256",buf);return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("")}
 async function getSecureCode(){let h=localStorage.getItem(kCode());if(!h){h=await sha256("1234");localStorage.setItem(kCode(),h)}return h}
-
-function initEuroBox(){
-  const euroBox = document.getElementById("euroBox");
-  const unlockBox = document.getElementById("euroUnlockBox");
-  const badge = document.getElementById("euroLockBadge");
-  if(!euroBox) return;
-  if(!isCodeEnabled()){
-    // Pas de code → accès direct
-    unlocked = true;
-    if(euroBox) euroBox.classList.remove("blur");
-    if(unlockBox) unlockBox.style.display = "none";
-    if(badge) badge.innerHTML = "🔓 Accès libre";
-  } else {
-    unlocked = false;
-    if(isBlurEnabled()) euroBox.classList.add("blur"); else euroBox.classList.remove("blur");
-    if(unlockBox) unlockBox.style.display = "block";
-    if(badge) badge.innerHTML = "🔒 Verrouillé";
-  }
-}
-
-async function unlockEuro(){
-  if(!isCodeEnabled()){ unlocked=true; document.getElementById("euroBox").classList.remove("blur"); resetEuroTimer(); recalc(); return; }
-  const inp=document.getElementById("unlockCode").value,ih=await sha256(inp);
-  if(ih===await getSecureCode()){
-    unlocked=true;
-    document.getElementById("euroBox").classList.remove("blur");
-    document.getElementById("unlockCode").value="";
-    document.getElementById("euroLockBadge").innerHTML="🔓 Déverrouillé";
-    if(document.getElementById("euroUnlockBox")) document.getElementById("euroUnlockBox").style.display="none";
-    resetEuroTimer();recalc();
-    if(inp==="1234")toast("⚠️ Pense à changer le code","warn");
-  } else toast("❌ Code incorrect","error");
-}
+async function unlockEuro(){const inp=document.getElementById("unlockCode").value,ih=await sha256(inp);if(ih===await getSecureCode()){unlocked=true;document.getElementById("euroBox").classList.remove("blur");document.getElementById("unlockCode").value="";resetEuroTimer();recalc();if(inp==="1234")toast("⚠️ Pense à changer le code","warn")}else toast("❌ Code incorrect","error")}
 function toggleChangeCode(){if(!unlocked){toast("🔒 Déverrouille d'abord la zone €","warn");return}const box=document.getElementById("changeCodeBox");box.style.display=box.style.display==="none"?"block":"none"}
 async function changeCode(){const o=document.getElementById("oldCode").value,n=document.getElementById("newCode").value,c=document.getElementById("confirmCode").value;if(!o||!n||!c){toast("⚠️ Remplis tous les champs","warn");return}if(n.length<4){toast("⚠️ Code trop court","warn");return}if(n!==c){toast("❌ Codes différents","error");return}if(await sha256(o)!==await getSecureCode()){toast("❌ Code incorrect","error");return}localStorage.setItem(kCode(),await sha256(n));document.getElementById("changeCodeBox").style.display="none";["oldCode","newCode","confirmCode"].forEach(id=>document.getElementById(id).value="");toast("✅ Code mis à jour","success")}
 
