@@ -210,11 +210,16 @@ class Dashboard {
       source: 'Pencavel 2014 (Stanford) · OEM 2025 (Jang) · Nature 2025 (Fan)',
       facteurs_heures: [
         { label:'Heures hebdo (courbe Pencavel)', key:'_recentWeeklyH', fmt: (v, n) => {
-            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
-            if (isRest) return '0h travaillées — potentiel de récupération actif';
             const src = n('_weeklyHSource');
+            const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
+            // FIX : ne jamais afficher "0h" si on a des données réelles cette semaine (src=live/avg)
+            // "0h travaillées" était affiché samedi quand le moteur basculait en mode repos
+            // alors que lun-ven avaient des HS saisies dans M2
+            if (isRest && src !== 'live' && src !== 'avg') return '0h travaillées — potentiel de récupération actif';
             const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
-            return v.toFixed(0)+'h/sem — perf. Pencavel '+(v<=35?'100%':v<=40?'~99%':v<=48?'~82%':v<=50?'~80%':v<=55?'~60%':'~52%')+badge;
+            // Afficher la base CCN (35h) si semaine repos sans données
+            const h = (isRest && v < 10) ? 35 : v;
+            return h.toFixed(0)+'h/sem — perf. Pencavel '+(h<=35?'100%':h<=40?'~99%':h<=48?'~82%':h<=50?'~80%':h<=55?'~60%':'~52%')+badge;
         }},
         { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: (v, n) => {
             const src = n('_weeklyHSource');
