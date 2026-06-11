@@ -3771,6 +3771,32 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         message: 'Semaine enregistrée sans dépassement. Ton historique FOX reste précis et complet. Continue !',
         actions: ['Données à jour ✓', 'Bilan mensuel en fin de mois', 'Prochain suivi la semaine prochaine'] },
     ];
+    // ── GUARD milieu de semaine : HS déjà posées → PAS de message "35h nickel" ──
+    // Bug : tant que les jours restants ne sont pas saisis, _weekBase_cw est tronquée
+    // (jeudi = 4j×7h = 28h) donc currentWeekTotal ≤ 35 → on retombait à tort sur le
+    // pool positif. Règle : si ≥1 jour avec extra cette semaine ET qu'on n'est pas en
+    // week-end (semaine civile non bouclée), on affiche un bilan "en cours", pas "35h ok".
+    if (!msg.titre) {
+      const _cwHS_g  = (s.weekly && s.weekly.currentWeekHS)  || 0;
+      const _cwDay_g = (s.weekly && s.weekly.currentWeekDays) || 0;
+      const _dowNow_g = (new Date().getDay() + 6) % 7; // 0=lun … 5=sam, 6=dim
+      const _semBouclee_g = _dowNow_g >= 5; // sam/dim : la PRIORITÉ -1 gère déjà le total réel
+      if (_cwHS_g > 0 && _cwDay_g > 0 && !_semBouclee_g) {
+        const _nm_g  = localStorage.getItem('FOX_USER_NAME') || '';
+        const _prn_g = _nm_g ? _nm_g + ', ' : '';
+        const _jr_g  = ['lundi','mardi','mercredi','jeudi','vendredi'][_dowNow_g] || 'cette semaine';
+        const _hsf_g = _fmtH(_cwHS_g);
+        msg = {
+          titre: `Semaine en cours — ${_hsf_g} sup déjà posées`,
+          message: `${_prn_g}on est ${_jr_g}, la semaine n'est pas terminée. Tu as déjà ${_hsf_g} d'heures sup sur ${_cwDay_g} jour${_cwDay_g > 1 ? 's' : ''}. Le total réel et les majorations ne seront connus qu'une fois les jours restants saisis — donc pas de bilan « 35h » tant que la semaine n'est pas bouclée.`,
+          actions: [
+            `${_hsf_g} sup déjà enregistrées cette semaine`,
+            'Reviens en fin de semaine pour le total réel et les majorations',
+            'Continue à saisir tes heures chaque jour'
+          ]
+        };
+      }
+    }
     if (!msg.titre) msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
   }
   
