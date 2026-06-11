@@ -1625,12 +1625,13 @@ body { padding-top: env(safe-area-inset-top) !important; }
 <!-- Switcher de rôle (affiché dans le header après choix) -->
 <div class="role-switcher" id="role-switcher" style="display:none"></div>
     <div id="disc-modal" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(5,11,26,.88);backdrop-filter:blur(16px);align-items:center;justify-content:center;padding:16px">
-  <div style="background:linear-gradient(135deg,#0f1f3d,#1a3a6e);border:1px solid rgba(168,208,255,.2);border-radius:18px;max-width:480px;width:100%;padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.7)">
+  <div style="background:linear-gradient(135deg,#0f1f3d,#1a3a6e);border:1px solid rgba(168,208,255,.2);border-radius:18px;max-width:480px;width:100%;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:24px;box-shadow:0 24px 64px rgba(0,0,0,.7)">
     <div style="font-size:1.1rem;font-weight:700;color:var(--shine);margin-bottom:16px;letter-spacing:-.01em">🔐 Lumina — Informations importantes</div>
     <div style="font-size:.82rem;color:var(--pi);line-height:1.65;margin-bottom:14px">
       <div style="display:flex;gap:10px;margin-bottom:10px"><span>🔒</span><div><strong style="color:var(--shine)">Zéro collecte</strong><br>Toutes les données restent <strong>exclusivement dans votre navigateur</strong>. Rien n'est transmis.</div></div>
       <div style="display:flex;gap:10px;margin-bottom:10px"><span>📅</span><div><strong style="color:var(--shine)">Directive EU 2023/970</strong><br>Transposition obligatoire avant le 7 juin 2026. Lumina intègre ces obligations.</div></div>
       <div style="display:flex;gap:10px;margin-bottom:10px"><span>⚖️</span><div><strong style="color:var(--shine)">Périmètre légal</strong><br>Outil d'aide à la décision — il constate, il ne décide pas.</div></div>
+      <div style="display:flex;gap:10px;margin-bottom:10px;background:rgba(245,166,35,.10);border:1px solid var(--orb);border-radius:10px;padding:10px"><span>📌</span><div><strong style="color:var(--shine)">Montants à titre indicatif</strong><br>Les minima et écarts affichés sont des <strong>repères</strong>, pas une analyse juridique de votre situation. Avant toute démarche (réclamation, courrier, saisine), <strong>vérifiez vous-même</strong> la donnée sur l'avenant officiel de votre convention (Légifrance / BOCC) et, en cas de doute, rapprochez-vous d'un représentant du personnel, d'un syndicat, de l'inspection du travail ou d'un conseil juridique. Lumina ne se substitue pas à ces interlocuteurs.</div></div>
       <div style="color:var(--sa);font-size:.75rem;border-top:1px solid rgba(74,127,200,.2);padding-top:10px;margin-top:10px">
         <strong>Sources :</strong> Légifrance, BOCC, avenants de branche. Données arrêtées au <strong>juin 2026</strong>.<br>
         <strong>Mise à jour :</strong> via fichier <code style="font-size:.72rem">ccn-data.json</code> hébergé par l'administrateur.
@@ -1693,7 +1694,7 @@ body { padding-top: env(safe-area-inset-top) !important; }
     <span><span class="sdot sn">🔵 Nationale</span> agri. dép. → grille 9811</span>
     <span><span class="sdot se">🟠 Estimée</span> % SMIC à compléter</span>
     <span><span class="sdot sc">✏️ Perso</span> saisie via Admin</span>
-    <span style="font-size:.63rem;color:var(--sa);font-family:var(--fm)">· <strong>c.NNN</strong> = coefficient hiérarchique · <span class="pct-t">%SMIC</span> = recalcul auto</span>
+    <span style="font-size:.63rem;color:var(--sa);font-family:var(--fm)">· <strong>c.NNN</strong> = coefficient hiérarchique · <span class="pct-t">%SMIC</span> = recalcul auto · <strong>Montants à titre indicatif — à vérifier sur l'avenant officiel</strong></span>
   </div>
   <div class="sw"><span class="si">🔍</span>
     <input type="text" class="sinp" id="g-search" placeholder="Rechercher parmi 428 CCN (nom, IDCC, secteur)…" autocomplete="off">
@@ -2360,7 +2361,7 @@ function showGD(idx){
     <div class="hsc"><div class="hsv">${hs.cg}h</div><div class="hsl">Contingent/an</div></div>
     <div class="hsc"><div class="hsv">${hs.mh}h</div><div class="hsl">Max hebdo</div></div>
   </div></div>`;
-  h+=`<div class="disc-modal">Source : ${gd.s} · SMIC ${fmt(SMIC)} (${SDATE}) · Vérifier sur Légifrance avant application.</div>`;
+  h+=`<div class="disc-modal">Source : ${gd.s} · SMIC ${fmt(SMIC)} (${SDATE}) · Montants à titre indicatif · Vérifier sur Légifrance avant application.</div>`;
   document.getElementById("g-detail-card").innerHTML=h;
 }
 document.getElementById("g-back")?.addEventListener("click",()=>{
@@ -2526,9 +2527,9 @@ document.getElementById("c-calc")?.addEventListener("click",()=>{
   document.getElementById("c-result-card").innerHTML=`
     <div class="ct">📊 Résultat</div>
     <div class="al ${isOk?"ao":"ae"}" style="margin-bottom:12px"><span class="aico">${isOk?"✅":"🚨"}</span>
-      <div><div class="at">${isOk?"Conforme à la grille":"SOUS le minimum conventionnel !"}</div>
+      <div><div class="at">${isOk?"Aligné sur la grille affichée":"Écart constaté avec le minimum affiché"}</div>
       ${isOk?fmt(sal)+" : +"+fmt(diff)+" au-dessus de "+nL+" ("+fmt(mB)+")"
-              :"<strong>"+fmt(Math.abs(diff))+"</strong> en-dessous. Régularisation obligatoire."}</div></div>
+              :"<strong>"+fmt(Math.abs(diff))+"</strong> en-dessous du minimum indicatif. À vérifier avant toute démarche."}</div></div>
     <div style="margin-bottom:14px">
       <div style="display:flex;justify-content:space-between;font-size:.71rem;margin-bottom:3px"><span><strong>${fmt(sal)}</strong></span><span style="font-weight:700;font-family:var(--fm);color:${isOk?"var(--ve)":"var(--ro)"};">${pct(dp)}</span></div>
       <div class="gtr"><div class="gfi" style="width:${Math.min(sal/mx*100,100).toFixed(1)}%;background:${isOk?"var(--ve)":"var(--ro)"}"></div>
@@ -2540,8 +2541,8 @@ document.getElementById("c-calc")?.addEventListener("click",()=>{
       <div class="sb" style="flex:1;min-width:0;padding:8px 4px;overflow:hidden"><div class="sv2" style="font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${fmt(mB)}</div><div class="sl2" style="font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Min. CCN</div></div>
       <div class="sb" style="flex:1;min-width:0;padding:8px 4px;overflow:hidden"><div class="sv2" style="font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:${isOk?"var(--ve)":"var(--ro)"}">${fmt(sal)}</div><div class="sl2" style="font-size:.58rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Salaire saisi</div></div>
     </div>
-    ${!isOk?'<div class="al ae"><span class="aico">⚖️</span><div><div class="at">Risque juridique — Art. L2254-1</div>Rappel estimé : <strong>'+fmt(Math.abs(diff))+"/mois</strong>.</div></div>":""}
-    <div class="disc-modal">Source : ${compCCN.gd.s} · SMIC ${fmt(SMIC)}</div>`;
+    ${!isOk?'<div class="al ae"><span class="aico">⚖️</span><div><div class="at">Écart estimé — à vérifier (réf. Art. L2254-1)</div>Rappel potentiel estimé : <strong>'+fmt(Math.abs(diff))+"/mois</strong>. Montant indicatif, à confirmer sur l'avenant officiel.</div></div>":""}
+    <div class="disc-modal">Source : ${compCCN.gd.s} · SMIC ${fmt(SMIC)} · Montants à titre indicatif · Vérifiez sur Légifrance avant toute démarche</div>`;
   document.getElementById("c-result").scrollIntoView({behavior:"smooth",block:"nearest"});
 });
 
@@ -3585,7 +3586,7 @@ function renderConfAnalyse(){
   const banner5 = `<div style="border-radius:var(--r16);padding:12px 15px;margin-bottom:13px;border:2px solid ${ecart5>0?"var(--orb)":sous_total>0?"rgba(217,79,79,.4)":"rgba(61,158,106,.3)"};background:${ecart5>0?"var(--orl)":sous_total>0?"var(--rob)":"var(--veb)"};display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center">
     <div>
       <div style="font-size:1.5rem;font-weight:700;font-family:var(--fm);color:${sous_total>0?"var(--ro)":"var(--ve)"}">${sous_total}</div>
-      <div style="font-size:.63rem;color:var(--pi);font-weight:600">Sous min. légal/CCN<br><span style="font-size:.58rem;color:var(--sa)">Régularisation obligatoire</span></div>
+      <div style="font-size:.63rem;color:var(--pi);font-weight:600">Sous min. légal/CCN<br><span style="font-size:.58rem;color:var(--sa)">Régularisation à prévoir (à vérifier)</span></div>
     </div>
     <div>
       <div style="font-size:1.5rem;font-weight:700;font-family:var(--fm);color:${ecart5>0?"var(--oa)":"var(--ve)"}">${ecart5}</div>
@@ -4454,7 +4455,7 @@ body.tuto-open { overflow: hidden; }
           <li>🟠 <strong>Estimée</strong> — montant calculé sur base SMIC en attente d'avenant</li>
         </ul>
         Trouvez votre niveau dans la liste et comparez avec votre salaire brut.
-        <div class="tuto-tip">💡 Si votre salaire est inférieur au minimum de votre niveau, l'employeur est en infraction (Art. L2254-1).</div>
+        <div class="tuto-tip">💡 Comparez votre salaire avec le minimum affiché. Si vous constatez un écart, <strong>vérifiez vous-même l'avenant officiel de votre CCN</strong> (Légifrance / BOCC) avant toute décision : les montants affichés sont donnés <strong>à titre indicatif</strong>. (Cadre légal : Art. L2254-1.)</div>
       </div>
     </div>
 
@@ -4468,11 +4469,12 @@ body.tuto-open { overflow: hidden; }
         Onglet <strong>Mon salaire</strong> → sélectionnez votre CCN, votre niveau et entrez votre salaire brut mensuel.<br><br>
         Lumina calcule :
         <ul>
-          <li><strong>Écart €</strong> — différence entre votre salaire et le minimum</li>
-          <li><strong>Risque juridique</strong> — rappel de salaire estimé (Art. L2254-1)</li>
-          <li><strong>Statut</strong> — conforme ✅ ou sous le minimum 🚨</li>
+          <li><strong>Écart €</strong> — différence indicative entre votre salaire et le minimum affiché</li>
+          <li><strong>Repère juridique</strong> — rappel de salaire <em>potentiel</em>, à vérifier (réf. Art. L2254-1)</li>
+          <li><strong>Statut</strong> — aligné ✅ ou écart constaté ⚠️ (repère indicatif)</li>
         </ul>
         <div class="tuto-tip">💡 Le SMIC est mis à jour automatiquement. Si votre minimum CCN est inférieur au SMIC, c'est le SMIC qui s'applique.</div>
+        <div class="tuto-tip">⚠️ Ces résultats sont des <strong>repères à titre indicatif</strong>. En cas d'écart, vérifiez la donnée vous-même (avenant officiel de votre CCN) avant d'engager toute démarche.</div>
       </div>
     </div>
 
