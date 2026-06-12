@@ -1044,6 +1044,7 @@ function closeTutorial(){document.getElementById("tutorialModal").classList.remo
 function getPreviousCarry(mk){const am=[];const yd=ALL_DATA[currentYear]||{};Object.keys(yd).forEach(k=>{if(/^\d{4}-\d{2}$/.test(k))am.push({key:k,month:yd[k]})});am.sort((a,b)=>a.key.localeCompare(b.key));let pc=0;for(const item of am){if(item.key===mk)break;if(item.month.carry!=null)pc=item.month.carry}return pc}
 function recalc(){
   checkActivatePerTaux();
+  recalcCascade(); // Recalculer la chaîne carry + breakdown figé par taux
   updateFuturePaymentsAlert(); // Avertir si des paiements futurs existent sur cette période
   const{start,end}=getPeriodBounds(currentKey);const weeks={};
   const rules=getCCNRules();
@@ -1347,46 +1348,21 @@ function computePrevBreakdown(){
    - Mois legacy (paid seulement) : FIFO sur l'accumulé
    Ne touche à aucune donnée — lecture seule. */
 function computeCarryBreakdown(upToKey){
+  // Lit le snapshot figé calculé par recalcCascade (m.dueBreakdown).
+  // Plus de recalcul FIFO global qui mélangeait les mois.
   const rules = getCCNRules();
   const yd = ALL_DATA[currentYear] || {};
-  const allKeys = Object.keys(yd)
-    .filter(k => /^\d{4}-\d{2}$/.test(k) && k <= upToKey)
-    .sort();
-
-  let acc1=0, accI=0, acc2=0;
-  let hasPerRateData = false; // true si au moins 1 mois a des données per-taux
-
-  allKeys.forEach(mk => {
-    const {start,end} = getPeriodBounds(mk);
-    const days = buildDayList(start, end);
-    const {h25, hInter, h50} = calcWeeks(days);
-    const m = yd[mk] || {};
-
-    acc1 += (h25||0);
-    accI += (hInter||0);
-    acc2 += (h50||0);
-
-    if(m.paid1 !== undefined || m.paid2 !== undefined){
-      hasPerRateData = true;
-      acc1 = Math.max(0, acc1 - (Number(m.paid1)||0));
-      accI = Math.max(0, accI - (Number(m.paidInter)||0));
-      acc2 = Math.max(0, acc2 - (Number(m.paid2)||0));
-    } else if(m.paid){
-      // Legacy FIFO — résultat estimé, non fiable pour la ventilation par taux
-      let rem = Number(m.paid)||0;
-      const p1 = Math.min(acc1, rem); acc1 -= p1; rem -= p1;
-      const pI = Math.min(accI, rem); accI -= pI; rem -= pI;
-      const p2 = Math.min(acc2, rem); acc2 -= p2;
-    }
-  });
-
-  const totalCarry = Math.max(0, acc1 + accI + acc2);
+  const m = yd[upToKey] || {};
+  const bd = m.dueBreakdown || { due1: m.carry||0, dueInter: 0, due2: 0 };
+  const unpaid1 = Math.max(0, bd.due1||0);
+  const unpaidInter = Math.max(0, bd.dueInter||0);
+  const unpaid2 = Math.max(0, bd.due2||0);
   return {
-    unpaid1:     Math.max(0, acc1),
-    unpaidInter: Math.max(0, accI),
-    unpaid2:     Math.max(0, acc2),
-    totalCarry,
-    reliable:    hasPerRateData,
+    unpaid1,
+    unpaidInter,
+    unpaid2,
+    totalCarry: unpaid1 + unpaidInter + unpaid2,
+    reliable: true,
     rules
   };
 }
@@ -1524,7 +1500,10 @@ function recalcCascade(){
   const am=[];
   Object.entries(yd).forEach(([k,m])=>{if(/^\d{4}-\d{2}$/.test(k))am.push({key:k,month:m})});
   am.sort((a,b)=>a.key.localeCompare(b.key));
+  const rules=getCCNRules();
   let rc=0;
+  // Snapshot figé du restant dû par taux, propagé de mois en mois
+  let due1=0, dueInter=0, due2=0;
   am.forEach(({key})=>{
     const{start,end}=getPeriodBounds(key);
     let ph=0;
@@ -1538,9 +1517,45 @@ function recalcCascade(){
     });
     const m=yd[key];
     if(!m)return;
+
+    // ── Carry total (inchangé) ──
     rc+=ph-(Number(m.paid)||0);
     if(rc<0)rc=0;
     m.carry=rc;
+
+    // ── Breakdown par taux figé ──
+    // 1. Heures de CE mois ventilées par taux (calcul hebdo sur la période)
+    const {h25, hInter, h50} = calcWeeks(buildDayList(start, end));
+    // 2. On AJOUTE au snapshot reporté du mois précédent
+    due1     += h25;
+    dueInter += (hInter||0);
+    due2     += h50;
+    // 3. On SOUSTRAIT les paiements per-taux de CE mois (sur leur propre taux)
+    //    Si pas de données per-taux, on utilise paid total en FIFO LOCAL (25→inter→50)
+    if(m.paid1!==undefined || m.paid2!==undefined){
+      due1     = Math.max(0, due1     - (Number(m.paid1)||0));
+      dueInter = Math.max(0, dueInter - (Number(m.paidInter)||0));
+      due2     = Math.max(0, due2     - (Number(m.paid2)||0));
+    } else if(m.paid){
+      let rem=Number(m.paid)||0;
+      const p1=Math.min(due1,rem); due1-=p1; rem-=p1;
+      const pI=Math.min(dueInter,rem); dueInter-=pI; rem-=pI;
+      const p2=Math.min(due2,rem); due2-=p2;
+    }
+    // 4. Réconciliation : le total du breakdown doit correspondre au carry réel.
+    //    En cas d'écart (changement CCN, incohérence), on resynchronise sur le carry.
+    const bdTotal = due1 + dueInter + due2;
+    if(Math.abs(bdTotal - rc) > 0.01){
+      // Resynchroniser proportionnellement, ou tout mettre au taux1 si bdTotal=0
+      if(bdTotal > 0){
+        const ratio = rc / bdTotal;
+        due1 *= ratio; dueInter *= ratio; due2 *= ratio;
+      } else {
+        due1 = rc; dueInter = 0; due2 = 0;
+      }
+    }
+    // 5. Figer le snapshot dans le mois
+    m.dueBreakdown = { due1, dueInter, due2 };
   });
 }
 
@@ -1657,7 +1672,7 @@ function clearPerRatePaidData(){
   Object.values(ALL_DATA).forEach(yd=>{
     Object.values(yd||{}).forEach(m=>{
       if(m && typeof m === 'object'){
-        delete m.paid1; delete m.paid2; delete m.paidInter;
+        delete m.paid1; delete m.paid2; delete m.paidInter; delete m.dueBreakdown;
       }
     });
   });
