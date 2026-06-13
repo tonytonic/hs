@@ -274,6 +274,14 @@ document.addEventListener("DOMContentLoaded", function(){
   <p style="font-size:12px;color:#aaa;margin-top:10px">&#x26A0;&#xFE0F; La réinitialisation complète supprime les données locales.</p>
 </div></div>
 
+<!-- MODAL : reliquat post mise à zéro, choix du taux -->
+<div class="modal" id="reliquatModal"><div class="modal-content" style="max-width:440px">
+  <h2 style="color:#e74c3c">&#x26A0;&#xFE0F; Heures ajoutées dans le passé</h2>
+  <p style="font-size:14px;line-height:1.5" id="reliquatModalText">Une période déjà soldée a de nouveau un solde à régler.</p>
+  <p style="font-size:13px;color:var(--muted);margin:10px 0 6px" id="reliquatModalQuestion">À quel taux reporter ces heures ?</p>
+  <div id="reliquatModalBtns" style="display:flex;flex-direction:column;gap:8px"></div>
+</div></div>
+
 <div class="modal" id="legalModal"><div class="modal-content">
   <h2>&#x26A0;&#xFE0F; Avertissement important</h2>
   <p style="font-size:14px">Cet outil est un <b>simulateur personnel</b>.<br><br>Les calculs sont indicatifs et peuvent différer de votre bulletin de paie réel.<br><br><b>Seuls les documents de l'employeur font foi.</b></p>
@@ -537,13 +545,19 @@ document.addEventListener("DOMContentLoaded", function(){
   <div class="calendar card" id="calendar"></div>
 
   <div class="card">
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:12px">Récapitulatif</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)">Récapitulatif</div>
+      <button type="button" id="periodLockBtn" onclick="togglePeriodLock()" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer">🔓 Verrouiller</button>
+    </div>
 
     <!-- STAT GRID — rendue dynamiquement par recalc() selon les paliers CCN -->
     <div id="statGridContainer" class="stat-grid"></div>
 
     <!-- AVERTISSEMENT : paiements enregistrés dans les périodes futures -->
     <div id="futurePaymentsAlert" style="display:none;margin-top:10px;background:rgba(243,156,18,.1);border:1px solid rgba(243,156,18,.4);border-radius:14px;padding:12px 14px"></div>
+
+    <!-- ALERTE : reliquat réapparu après la mise à zéro (migration) -->
+    <div id="postMigrationAlert" style="display:none;margin-top:10px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.4);border-radius:14px;padding:14px"></div>
 
     <!-- DETAIL PALIERS (caché dans stat-grid, gardé pour JS) -->
     <div style="display:none" id="hoursBreakdown">
@@ -891,6 +905,19 @@ async function wizFinish(){
 ;(function preloadAllYears(){const idx=JSON.parse(localStorage.getItem(kIndex())||"[]");if(!idx.includes(currentYear))idx.push(currentYear);idx.forEach(y=>{try{ALL_DATA[y]=loadYearData(y)}catch(e){ALL_DATA[y]={}}}); })();
 ;(function migrate(){const s=localStorage.getItem("CA_DATA_VERSION");if(s===DATA_VERSION)return;Object.entries(ALL_DATA).forEach(([y,yd])=>{Object.values(yd).forEach(m=>{if(typeof m.closing!=="number")m.closing=null;if(typeof m.locked!=="boolean")m.locked=false});saveYearData(y,yd)});localStorage.setItem("CA_DATA_VERSION",DATA_VERSION)})();
 
+/* Migration de l'ancien système (perTauxModeOn booléen) vers migrationKey (période).
+   On ne peut pas calculer les carry ici (recalcCascade pas encore exécuté), donc on
+   pose un flag _needMigrationResolve ; checkActivatePerTaux le résoudra avec les
+   carry à jour au premier recalc. */
+;(function migratePerTaux(){
+  try{
+    if(SETTINGS.migrationKey) return;
+    if(!SETTINGS.perTauxModeOn) return;
+    SETTINGS._needMigrationResolve = true;       // à résoudre après le 1er recalcCascade
+    localStorage.setItem(kSettings(), JSON.stringify(SETTINGS));
+  }catch(_){}
+})();
+
 window.addEventListener("load",()=>{
   const v=document.getElementById("versionBadge");if(v)v.textContent="v"+APP_VERSION;
   if(RECOVERY_ACTIVE){openRecovery();return}
@@ -970,6 +997,32 @@ function getPeriodBounds(monthKey){
   let closing=cm.closing;if(typeof closing!=="number"||new Date(y,m-1,closing).getDay()!==getClosingDow())closing=getLastClosingDay(y,m-1);
   return{start,end:new Date(y,m-1,closing)};
 }
+
+/* Détermine la clé de période (YYYY-MM) à laquelle appartient une date donnée.
+   Une période "YYYY-MM" couvre de (clôture mois précédent +1) à (clôture mois M).
+   Un jour de fin de mois peut donc appartenir à la période du mois SUIVANT. */
+function getPeriodKeyForDate(date){
+  const y=date.getFullYear(), m=date.getMonth()+1;
+  const thisKey=y+"-"+String(m).padStart(2,"0");
+  const {start,end}=getPeriodBounds(thisKey);
+  if(date>=start && date<=end) return thisKey;
+  // Si après la clôture de ce mois → appartient à la période du mois suivant
+  if(date>end){
+    const nd=new Date(y,m,1); // mois suivant
+    return nd.getFullYear()+"-"+String(nd.getMonth()+1).padStart(2,"0");
+  }
+  // Si avant le début → période du mois précédent (rare, sécurité)
+  const pd=new Date(y,m-2,1);
+  return pd.getFullYear()+"-"+String(pd.getMonth()+1).padStart(2,"0");
+}
+
+/* Vrai si la période à laquelle appartient cette date est verrouillée. */
+function isDateLocked(date){
+  const pk=getPeriodKeyForDate(date);
+  const yd=ALL_DATA[getYearFromMonth(pk)]||{};
+  return !!(yd[pk] && yd[pk].locked);
+}
+
 function goMenu(){localStorage.removeItem("lastApp");window.location.href="../menu.html"}
 function loadMonth(){updateYearLabel();
   currentKey=monthPicker.value;const year=getYearFromMonth(currentKey);registerYear(year);
@@ -993,12 +1046,13 @@ function renderCalendar(){
   for(let d=1;d<=dim;d++){
     const div=document.createElement("div");div.className="day";
     const date=new Date(y,m-1,d);
+    const dayLocked = isDateLocked(date); // verrou basé sur la PÉRIODE du jour
     if(date>end)div.classList.add("after-closing");
-    if(isLocked)div.classList.add("locked");
+    if(dayLocked)div.classList.add("locked");
     if(isCurMonth&&d===today.getDate()){div.classList.add("today");div.id="todayCell"}
     const val=DATA[currentKey].days[d];
     div.innerHTML=`<b style="font-size:13px">${d}</b><br><span style="color:#fff;font-weight:600;font-size:11px;display:block;line-height:1.2">${val?fmtH(val):""}</span>`;
-    div.onclick=()=>{if(isLocked){toast("🔒 Mois verrouillé","warn");return}openHours(d)};
+    div.onclick=()=>{if(dayLocked){toast("🔒 Période verrouillée","warn");return}openHours(d)};
     cal.appendChild(div);
   }
 }
@@ -1006,9 +1060,9 @@ function renderCalendar(){
 /* POPUP HEURES */
 function openHours(d){currentDay=d;const c=document.getElementById("hoursChoices");c.innerHTML="";[0.25,0.5,0.75,1,1.25,1.5,2].forEach(v=>{const b=document.createElement("button");b.textContent="+"+fmtH(v);b.onclick=()=>applyHours(v);c.appendChild(b)});setM2SaisieMode(_m2SaisieMode);document.getElementById("hoursModal").classList.add("open");lockBodyScroll()}
 function closeHours(){document.getElementById("hoursModal").classList.remove("open");unlockBodyScroll()}
-function applyHours(h){if(h<=0)return;DATA[currentKey].days[currentDay]=(DATA[currentKey].days[currentDay]||0)+h;save();renderCalendar();recalc();const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)}
+function applyHours(h){if(h<=0)return;const[_y,_m]=currentKey.split("-").map(Number);if(isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}DATA[currentKey].days[currentDay]=(DATA[currentKey].days[currentDay]||0)+h;save();renderCalendar();recalc();maybeShowReliquatPopup();const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)}
 function confirmManual(){const inp=document.getElementById("manualHours"),h=parseFloat(inp.value);if(isNaN(h)||h<=0){toast("⛔ Valeur invalide","error");return}applyHours(h);inp.value=""}
-function deleteDayHours(){if(DATA[currentKey].locked){toast("🔒 Mois verrouillé","warn");return}if(!currentDay||!DATA[currentKey].days[currentDay]){toast("ℹ️ Aucune heure à supprimer","info");return}confirmModal(`Supprimer les heures du ${currentDay} ?`,()=>{delete DATA[currentKey].days[currentDay];currentDay=null;save();renderCalendar();recalc();closeHours();},"Supprimer",true);return;currentDay=null;save();renderCalendar();recalc();closeHours()}
+function deleteDayHours(){const[_y,_m]=currentKey.split("-").map(Number);if(currentDay&&isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}if(!currentDay||!DATA[currentKey].days[currentDay]){toast("ℹ️ Aucune heure à supprimer","info");return}confirmModal(`Supprimer les heures du ${currentDay} ?`,()=>{delete DATA[currentKey].days[currentDay];currentDay=null;save();renderCalendar();recalc();maybeShowReliquatPopup();closeHours();},"Supprimer",true);return;currentDay=null;save();renderCalendar();recalc();closeHours()}
 /* ── MODE SAISIE M2 : HS directes / Heures travaillées ── */
 let _m2SaisieMode=localStorage.getItem('M2_SAISIE_MODE')||'hs';
 function setM2SaisieMode(mode){
@@ -1043,9 +1097,12 @@ function closeTutorial(){document.getElementById("tutorialModal").classList.remo
 /* CALCUL */
 function getPreviousCarry(mk){const am=[];const yd=ALL_DATA[currentYear]||{};Object.keys(yd).forEach(k=>{if(/^\d{4}-\d{2}$/.test(k))am.push({key:k,month:yd[k]})});am.sort((a,b)=>a.key.localeCompare(b.key));let pc=0;for(const item of am){if(item.key===mk)break;if(item.month.carry!=null)pc=item.month.carry}return pc}
 function recalc(){
-  checkActivatePerTaux();
-  recalcCascade(); // Recalculer la chaîne carry + breakdown figé par taux
+  recalcCascade(); // 1. Recalculer la chaîne carry + breakdown figé par taux EN PREMIER
+  checkActivatePerTaux(); // 2. Détecter la migration avec des carry à jour
   updateFuturePaymentsAlert(); // Avertir si des paiements futurs existent sur cette période
+  // NOTE : le pop-up de reliquat (updatePostMigrationAlert) n'est PLUS appelé ici.
+  // Il ne doit s'ouvrir QUE sur une action de saisie/suppression d'heures, jamais
+  // à la navigation entre périodes. Voir maybeShowReliquatPopup().
   const{start,end}=getPeriodBounds(currentKey);const weeks={};
   const rules=getCCNRules();
   Object.entries(DATA).forEach(([mk,month])=>{Object.entries(month.days||{}).forEach(([d,h])=>{const date=new Date(mk.split("-")[0],mk.split("-")[1]-1,d);if(date<start||date>end)return;const wk=getWeekKeyM2(date);weeks[wk]=(weeks[wk]||0)+h})});
@@ -1122,17 +1179,23 @@ function recalc(){
   const prevCarryVal = getPreviousCarry(currentKey);
   const prevCarryEl = document.getElementById("prevCarry");
   if(prevCarryEl){
-    if(prevCarryVal <= 0 || isLegacyMode()){
+    if(prevCarryVal <= 0){
       prevCarryEl.innerHTML = fmtH(prevCarryVal);
     } else {
       const prevBd = computePrevBreakdown();
       let html = fmtH(prevCarryVal);
-      if(prevBd && prevBd.totalCarry > 0 && prevBd.reliable){
+      // Afficher la répartition par taux du report en attente (même en mode legacy
+      // si le mois précédent a un breakdown figé cohérent)
+      if(prevBd && prevBd.totalCarry > 0){
         const parts = [];
         if(prevBd.unpaid1 > 0) parts.push(`<span style="color:#f39c12">${fmtH(prevBd.unpaid1)} \u00e0 ${rules.taux1}%</span>`);
         if(prevBd.unpaidInter > 0 && rules.taux_inter) parts.push(`<span style="color:#e67e22">${fmtH(prevBd.unpaidInter)} \u00e0 ${rules.taux_inter}%</span>`);
         if(prevBd.unpaid2 > 0) parts.push(`<span style="color:#e74c3c">${fmtH(prevBd.unpaid2)} \u00e0 ${rules.taux2}%</span>`);
-        if(parts.length >= 1) html += `<br><span style="font-size:11px;font-weight:400;opacity:.8">${parts.join(' + ')}</span>`;
+        // N'afficher que si la répartition est cohérente avec le total (évite affichage trompeur)
+        const sumParts = (prevBd.unpaid1||0)+(prevBd.unpaidInter||0)+(prevBd.unpaid2||0);
+        if(parts.length >= 1 && Math.abs(sumParts - prevCarryVal) <= 0.01){
+          html += `<br><span style="font-size:11px;font-weight:400;opacity:.8">${parts.join(' + ')}</span>`;
+        }
       }
       prevCarryEl.innerHTML = html;
     }
@@ -1141,13 +1204,19 @@ function recalc(){
   document.getElementById("carryOver").textContent=fmtH((DATA[currentKey].carry||0));
 
   // Stat-grid dynamique (s'adapte au nombre de paliers CCN)
+  // Affiche la ventilation RÉELLE du restant dû (dueBreakdown), cohérente avec
+  // le report et les choix de taux de l'utilisateur — pas la théorie par paliers.
   const sgc = document.getElementById("statGridContainer");
   if(sgc){
+    const bdReal = (DATA[currentKey] && DATA[currentKey].dueBreakdown) || null;
+    const g25 = bdReal ? (Number(bdReal.due1)||0) : t25;
+    const gInter = bdReal ? (Number(bdReal.dueInter)||0) : tInter;
+    const g50 = bdReal ? (Number(bdReal.due2)||0) : t50;
     const paliers = [
       { val: fmtH(ph),     lbl: 'Total<br>période', color: 'var(--accent)' },
-      { val: fmtH(t25),    lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
-      ...(rules.taux_inter !== null ? [{ val: fmtH(tInter), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
-      { val: fmtH(t50),    lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
+      { val: fmtH(g25),    lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
+      ...(rules.taux_inter !== null ? [{ val: fmtH(gInter), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
+      { val: fmtH(g50),    lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
     ];
     sgc.style.gridTemplateColumns = 'repeat('+paliers.length+',1fr)';
     sgc.innerHTML = paliers.map(p =>
@@ -1157,6 +1226,7 @@ function recalc(){
 
   // Inputs heures payées par taux (dynamiques selon CCN)
   renderPaidInputs(rules);
+  updatePeriodLockUI(); // Refléter l'état du verrou de période
 
   // Restant dû
   updateRestantDu();
@@ -1180,22 +1250,271 @@ function recalc(){
    Met à jour paid (total) pour compatibilité recalcCascade.
 ───────────────────────────────────────────────────────────────────── */
 function isLegacyMode(){
-  /* Mode legacy = l'utilisateur n'a pas encore atteint un reliquat zéro
-     depuis l'introduction du suivi per-taux.
-     Le flag perTauxModeOn est activé dès que le carry précédent est 0
-     et reste actif pour toujours (migration irréversible). */
-  if(SETTINGS.perTauxModeOn) return false;
-  return getPreviousCarry(currentKey) > 0;
+  /* Mode legacy = AVANT la migration (le solde n'a jamais atteint zéro).
+     En legacy : total simple, pas de taux, pas de FIFO.
+     La migration s'enregistre sur la période où le solde atteint zéro (migrationKey).
+     Toute période <= migrationKey reste en mode simple ; les périodes > migrationKey sont per-taux. */
+  if(!SETTINGS.migrationKey) return true;          // pas encore migré → tout est legacy
+  return currentKey <= SETTINGS.migrationKey;       // période pré/migration → legacy simple
 }
 
 function checkActivatePerTaux(){
-  /* Appelé depuis recalc(). Active le mode per-taux définitivement
-     dès que le carry précédent est 0 (carry nul = point de départ propre). */
-  if(SETTINGS.perTauxModeOn) return;
-  if(getPreviousCarry(currentKey) <= 0){
-    SETTINGS.perTauxModeOn = true;
-    // Sauvegarde directe sans déclencher de recalc (évite boucle infinie)
+  /* Enregistre la période de migration = la PREMIÈRE période dont le carry atteint 0.
+     Gère aussi la résolution de l'ancien format (_needMigrationResolve) : dans ce cas
+     on prend la DERNIÈRE période soldée (carry 0), ou la 1ère période si aucune. */
+  if(SETTINGS.migrationKey && !SETTINGS._needMigrationResolve) return;
+  const yd = ALL_DATA[currentYear] || {};
+  const keys = Object.keys(yd).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort();
+
+  if(SETTINGS._needMigrationResolve){
+    // Ancien utilisateur : trouver la dernière période soldée comme point de migration
+    let chosen = null, firstKey = null;
+    // Parcourir TOUTES les années pour être complet
+    Object.keys(ALL_DATA).sort().forEach(y=>{
+      const yyd = ALL_DATA[y] || {};
+      Object.keys(yyd).filter(k=>/^\d{4}-\d{2}$/.test(k)).sort().forEach(k=>{
+        if(!firstKey) firstKey = k;
+        const c = yyd[k].carry;
+        if(c != null && c <= 0) chosen = k;
+      });
+    });
+    SETTINGS.migrationKey = chosen || firstKey;
+    delete SETTINGS._needMigrationResolve;
+    delete SETTINGS.perTauxModeOn;
     try{ localStorage.setItem(kSettings(), JSON.stringify(SETTINGS)); }catch(_){}
+    return;
+  }
+
+  // Cas normal : 1ère période dont le carry atteint 0
+  for(const k of keys){
+    const c = yd[k].carry;
+    if(c != null && c <= 0){
+      SETTINGS.migrationKey = k;
+      try{ localStorage.setItem(kSettings(), JSON.stringify(SETTINGS)); }catch(_){}
+      break;
+    }
+  }
+}
+
+/* Détecte si le mois de migration a un carry redevenu positif
+   (= heures ajoutées rétroactivement après la mise à zéro).
+   Le flag reliquatHandledFor mémorise la valeur de carry déjà traitée :
+   si le carry change encore, l'alerte réapparaît. */
+/* Détecte un reliquat à router par taux.
+   Deux situations couvertes :
+   1. La période de migration (mise à zéro initiale) est repassée positive.
+   2. Une période quelconque a un carry positif suite à un ajout rétroactif
+      et l'utilisateur n'a pas encore choisi comment le ventiler.
+   On regarde EN PRIORITÉ la période actuellement affichée (celle qu'on modifie),
+   puis à défaut la période de migration. Retourne {key, carry} ou null. */
+function reliquatSumAlloc(m){
+  const a = m && m.reliquatAlloc;
+  if(!a) return 0;
+  return (Number(a.t1)||0) + (Number(a.ti)||0) + (Number(a.t2)||0);
+}
+
+/* Borne l'allocation manuelle à un maximum d'heures (heures propres non payées).
+   Si l'utilisateur supprime des heures, l'allocation est réduite/effacée en
+   conséquence — ainsi re-saisir des heures redéclenche bien le pop-up. */
+function clampReliquatAlloc(m, maxHours){
+  if(!m || !m.reliquatAlloc) return;
+  let a1=Number(m.reliquatAlloc.t1)||0, ai=Number(m.reliquatAlloc.ti)||0, a2=Number(m.reliquatAlloc.t2)||0;
+  const sumA = a1+ai+a2;
+  if(sumA <= maxHours + 0.01) return;          // rien à borner
+  if(maxHours <= 0.01){ delete m.reliquatAlloc; return; }
+  let excess = sumA - maxHours;
+  const c2=Math.min(a2,excess); a2-=c2; excess-=c2; // retirer des hauts taux d'abord
+  const cI=Math.min(ai,excess); ai-=cI; excess-=cI;
+  const c1=Math.min(a1,excess); a1-=c1;
+  m.reliquatAlloc = {t1:a1, ti:ai, t2:a2};
+}
+
+/* Total des heures PROPRES d'une période (dans ses bornes de période). */
+function periodOwnHours(key){
+  const {start,end} = getPeriodBounds(key);
+  let own = 0;
+  Object.entries(ALL_DATA).forEach(([,yyd])=>{
+    Object.entries(yyd||{}).forEach(([mk,mo])=>{
+      Object.entries(mo.days||{}).forEach(([d,h])=>{
+        const[y,mo2]=mk.split("-").map(Number);
+        const date=new Date(y,mo2-1,d);
+        if(date>=start&&date<=end) own += (Number(h)||0);
+      });
+    });
+  });
+  return own;
+}
+
+/* Vrai s'il existe une période POSTÉRIEURE avec de l'activité (heures ou paiement).
+   Sert à savoir si currentKey est une période "passée" éditée rétroactivement. */
+function hasLaterActivity(key){
+  const yd = ALL_DATA[currentYear] || {};
+  return Object.keys(yd).some(k=>{
+    if(!/^\d{4}-\d{2}$/.test(k) || k <= key) return false;
+    const m = yd[k];
+    const hasHours = m.days && Object.values(m.days).some(h=>(Number(h)||0)>0);
+    return hasHours || (Number(m.paid)||0)>0;
+  });
+}
+
+/* Détecte un reliquat à router = heures PROPRES non payées et non encore routées
+   de la période actuellement éditée. Le pop-up cible TOUJOURS la période éditée
+   (le choix de l'utilisateur prime), MAIS uniquement si c'est une période RÉELLEMENT
+   PASSÉE — c'est-à-dire suivie d'une période plus récente ayant de l'activité.
+   La période courante en cours (la plus récente) ne déclenche jamais le pop-up :
+   on y travaille normalement, la ventilation suit les paliers. */
+function checkPostMigrationReliquat(){
+  if(!SETTINGS.migrationKey) return null;
+  const yd = ALL_DATA[currentYear] || {};
+  const cur = yd[currentKey];
+  if(!cur) return null;
+  // Période passée = il existe une période POSTÉRIEURE avec activité.
+  if(!hasLaterActivity(currentKey)) return null;
+  const ownH = periodOwnHours(currentKey);
+  const ownPaid = Number(cur.paid)||0;
+  const ownUnpaid = ownH - ownPaid;        // heures propres non payées (le reliquat)
+  clampReliquatAlloc(cur, ownUnpaid);       // borner l'alloc aux heures réellement présentes
+  const delta = ownUnpaid - reliquatSumAlloc(cur); // non encore routées
+  if(delta > 0.01){
+    return { key: currentKey, carry: ownUnpaid, delta };
+  }
+  return null;
+}
+
+/* Affiche le POP-UP modal de reliquat avec choix du taux.
+   Le modal s'ouvre dès qu'un reliquat non traité est détecté, peu importe
+   la période affichée. Mémorise la période concernée dans _reliquatKey. */
+let _reliquatKey = null;
+let _reliquatShownDelta = null;
+/* À appeler UNIQUEMENT après une saisie ou suppression d'heures (jamais à la
+   navigation). Ouvre le pop-up de choix du taux si une période passée a un
+   reliquat non routé. */
+function maybeShowReliquatPopup(){
+  updatePostMigrationAlert();
+}
+
+function updatePostMigrationAlert(){
+  // Masquer l'ancien bandeau inline s'il existe (compat)
+  const old = document.getElementById("postMigrationAlert");
+  if(old) old.style.display = "none";
+
+  const modal = document.getElementById("reliquatModal");
+  if(!modal) return;
+  const reliquat = checkPostMigrationReliquat();
+
+  if(!reliquat){
+    _reliquatKey = null;
+    _reliquatShownDelta = null;
+    modal.classList.remove("open");
+    return;
+  }
+  // Rafraîchir si la période OU le delta change (nouvelles heures ajoutées entre-temps)
+  if(modal.classList.contains("open") && _reliquatKey === reliquat.key && _reliquatShownDelta === reliquat.delta) return;
+
+  _reliquatKey = reliquat.key;
+  _reliquatShownDelta = reliquat.delta;
+  const rules = getCCNRules();
+  const d = reliquat.delta; // les NOUVELLES heures à traiter (pas tout le carry)
+
+  const txt = document.getElementById("reliquatModalText");
+  const q = document.getElementById("reliquatModalQuestion");
+  const btns = document.getElementById("reliquatModalBtns");
+  if(txt) txt.innerHTML = `Vous venez d'ajouter <b style="color:#e74c3c">${fmtH(d)}</b> dans la période <b>${reliquat.key}</b> (déjà soldée). Comment traiter ces nouvelles heures ?`;
+  if(q) q.textContent = `À quel taux reporter ces ${fmtH(d)} ?`;
+  if(btns){
+    let html = `<button type="button" onclick="handleReliquatTaux('taux1')" style="padding:12px;border-radius:12px;background:rgba(243,156,18,.2);border:1px solid #f39c12;color:#f39c12;font-weight:700;font-size:14px;cursor:pointer">Reporter à ${rules.taux1}%</button>`;
+    if(rules.taux_inter){
+      html += `<button type="button" onclick="handleReliquatTaux('taux_inter')" style="padding:12px;border-radius:12px;background:rgba(230,126,34,.2);border:1px solid #e67e22;color:#e67e22;font-weight:700;font-size:14px;cursor:pointer">Reporter à ${rules.taux_inter}%</button>`;
+    }
+    html += `<button type="button" onclick="handleReliquatTaux('taux2')" style="padding:12px;border-radius:12px;background:rgba(231,76,60,.2);border:1px solid #e74c3c;color:#e74c3c;font-weight:700;font-size:14px;cursor:pointer">Reporter à ${rules.taux2}%</button>`;
+    html += `<button type="button" onclick="handleReliquatSolder()" style="padding:12px;border-radius:12px;background:rgba(46,204,113,.2);border:1px solid #2ecc71;color:#2ecc71;font-weight:700;font-size:14px;cursor:pointer;margin-top:4px">✅ Ces ${fmtH(d)} ont été payées</button>`;
+    btns.innerHTML = html;
+  }
+  modal.classList.add("open");
+}
+
+/* L'utilisateur choisit à quel taux reporter le reliquat. Cible la période _reliquatKey. */
+function handleReliquatTaux(which){
+  const key = _reliquatKey || SETTINGS.migrationKey;
+  if(!key) return;
+  recalcCascade(); // carry à jour
+  const yd = ALL_DATA[currentYear] || {};
+  const m = yd[key];
+  if(!m) return;
+  // delta = heures propres non payées et non encore routées
+  const ownUnpaid = periodOwnHours(key) - (Number(m.paid)||0);
+  clampReliquatAlloc(m, ownUnpaid);
+  const delta = ownUnpaid - reliquatSumAlloc(m);
+  if(delta <= 0.01) return;
+  // Ajouter le delta à l'allocation CUMULATIVE du taux choisi (sans toucher au reste)
+  if(!m.reliquatAlloc) m.reliquatAlloc = {t1:0, ti:0, t2:0};
+  const slot = which==='taux2' ? 't2' : which==='taux_inter' ? 'ti' : 't1';
+  m.reliquatAlloc[slot] = (Number(m.reliquatAlloc[slot])||0) + delta;
+  const modal = document.getElementById("reliquatModal");
+  if(modal) modal.classList.remove("open");
+  _reliquatKey = null; _reliquatShownDelta = null;
+  save(); recalc();
+  toast(`${fmtH(delta)} reportées à ${rules2pct(which)}`, "success");
+}
+function rules2pct(which){const r=getCCNRules();return which==='taux2'?r.taux2+'%':which==='taux_inter'?(r.taux_inter||0)+'%':r.taux1+'%'}
+
+/* L'utilisateur confirme avoir payé UNIQUEMENT les nouvelles heures (le delta).
+   Les heures déjà reportées à un taux lors d'ajouts précédents restent intactes. */
+function handleReliquatSolder(){
+  const key = _reliquatKey || SETTINGS.migrationKey;
+  if(!key) return;
+  recalcCascade(); // carry à jour
+  const yd = ALL_DATA[currentYear] || {};
+  const m = yd[key];
+  if(!m) return;
+  // delta = heures propres non payées et non encore routées
+  const ownUnpaid = periodOwnHours(key) - (Number(m.paid)||0);
+  clampReliquatAlloc(m, ownUnpaid);
+  const delta = ownUnpaid - reliquatSumAlloc(m);
+  if(delta <= 0.01) return;
+  m.paid = (Number(m.paid)||0) + delta;
+  const modal = document.getElementById("reliquatModal");
+  if(modal) modal.classList.remove("open");
+  _reliquatKey = null; _reliquatShownDelta = null;
+  save(); recalc();
+  toast(`✅ ${fmtH(delta)} marquées payées`, "success");
+}
+
+function togglePeriodLock(){
+  if(!DATA||!DATA[currentKey]) return;
+  const willLock = !DATA[currentKey].locked;
+  if(willLock){
+    DATA[currentKey].locked = true;
+    save(); 
+    updatePeriodLockUI();
+    renderCalendar();
+    renderPaidInputs(getCCNRules());
+    toast("🔒 Période verrouillée", "success");
+  } else {
+    // Déverrouillage : confirmation légère pour éviter déverrouillage accidentel
+    DATA[currentKey].locked = false;
+    save();
+    updatePeriodLockUI();
+    renderCalendar();
+    renderPaidInputs(getCCNRules());
+    toast("🔓 Période déverrouillée", "info");
+  }
+}
+
+function updatePeriodLockUI(){
+  const btn = document.getElementById("periodLockBtn");
+  if(!btn || !DATA || !DATA[currentKey]) return;
+  const locked = DATA[currentKey].locked;
+  if(locked){
+    btn.innerHTML = "🔒 Verrouillé";
+    btn.style.background = "rgba(243,156,18,.15)";
+    btn.style.borderColor = "rgba(243,156,18,.4)";
+    btn.style.color = "#f39c12";
+  } else {
+    btn.innerHTML = "🔓 Verrouiller";
+    btn.style.background = "rgba(255,255,255,.06)";
+    btn.style.borderColor = "rgba(255,255,255,.12)";
+    btn.style.color = "var(--muted)";
   }
 }
 
@@ -1204,8 +1523,38 @@ function renderPaidInputs(rules){
   if(!container) return;
   const m = DATA[currentKey] || {};
 
+  // Réinitialiser le flag d'UI si on a changé de mois (évite contamination entre mois)
+  if(container.dataset.forKey !== currentKey){
+    container.dataset.forKey = currentKey;
+    container.dataset.legacyDetail = "0";
+    container.innerHTML = ''; // forcer reconstruction propre
+  }
+
+  // ── PÉRIODE VERROUILLÉE : affichage en lecture seule, pas de saisie ──
+  if(m.locked){
+    const r = rules;
+    const rows = [];
+    if(m.paid1 !== undefined || m.paid2 !== undefined || m.paidInter !== undefined){
+      if((Number(m.paid1)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#f39c12">À ${r.taux1}% payées</span><b>${fmtH(Number(m.paid1)||0)}</b></div>`);
+      if((Number(m.paidInter)||0) > 0 && r.taux_inter) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#e67e22">À ${r.taux_inter}% payées</span><b>${fmtH(Number(m.paidInter)||0)}</b></div>`);
+      if((Number(m.paid2)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#e74c3c">À ${r.taux2}% payées</span><b>${fmtH(Number(m.paid2)||0)}</b></div>`);
+    }
+    if(rows.length === 0 && (Number(m.paid)||0) > 0){
+      rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:var(--muted)">Heures payées</span><b>${fmtH(Number(m.paid)||0)}</b></div>`);
+    }
+    container.dataset.forKey = currentKey; // garder synchro
+    container.innerHTML = `
+      <div style="opacity:.7;pointer-events:none">${rows.join('') || '<div style="font-size:13px;color:var(--muted)">Aucun paiement enregistré</div>'}</div>
+      <div style="font-size:10px;color:#f39c12;margin-top:8px">🔒 Période verrouillée — déverrouillez en haut pour modifier.</div>`;
+    const hid = document.getElementById('paidHours');
+    if(hid) hid.value = m.paid||0;
+    return;
+  }
+
   if(isLegacyMode()){
-    /* ── MODE LEGACY : input total unique ── */
+    /* ── MODE LEGACY (avant migration) : TOTAL SIMPLE uniquement ──
+       Pas de distinction de taux, pas de FIFO. On fait des heures,
+       on paie un total, le reste va en carry. Jusqu'à la mise à zéro. */
     if(!container.querySelector('#paidHTot')){
       container.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -1214,20 +1563,16 @@ function renderPaidInputs(rules){
             style="width:90px;text-align:right;margin:0;padding:6px 10px;border-radius:10px;
                    font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
         </div>
-        <div style="font-size:10px;color:var(--muted);line-height:1.4">
-          Suivi per-taux disponible apr\u00e8s solde du reliquat pr\u00e9c\u00e9dent
+        <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-top:4px">
+          Suivi d\u00e9taill\u00e9 par taux d\u00e8s que le solde atteint z\u00e9ro
         </div>`;
       const inp = document.getElementById('paidHTot');
       if(inp) inp.oninput = () => {
         if(!DATA||!DATA[currentKey]) return;
         const v = parseFloat(inp.value)||0;
         DATA[currentKey].paid = v;
-        // Effacer données per-taux en mode legacy
-        delete DATA[currentKey].paid1;
-        delete DATA[currentKey].paid2;
-        delete DATA[currentKey].paidInter;
-        const h = document.getElementById('paidHours');
-        if(h) h.value = v;
+        delete DATA[currentKey].paid1; delete DATA[currentKey].paid2; delete DATA[currentKey].paidInter;
+        const h = document.getElementById('paidHours'); if(h) h.value = v;
         save(); recalc();
       };
     }
@@ -1238,52 +1583,101 @@ function renderPaidInputs(rules){
     return;
   }
 
-  /* ── MODE PER-TAUX : reliquat précédent = 0, base propre ── */
+  /* ── MODE PER-TAUX (ou legacy détaillé) : saisie séparée par taux ── */
   const paliers = [
     { id:'paidH1',  key:'paid1',     taux:rules.taux1,      color:'#f39c12', label:'\u00c0 '+rules.taux1+'%' },
     ...(rules.taux_inter ? [{ id:'paidHI', key:'paidInter', taux:rules.taux_inter, color:'#e67e22', label:'\u00c0 '+rules.taux_inter+'%' }] : []),
     { id:'paidH2',  key:'paid2',     taux:rules.taux2,      color:'#e74c3c', label:'\u00c0 '+rules.taux2+'%' },
   ];
 
+  const legacyDetail = isLegacyMode();
   const existingCount = container.querySelectorAll('input[type="number"]').length;
-  if(existingCount !== paliers.length || container.querySelector('#paidHTot')){
-    container.innerHTML = paliers.map(p => `
+  const needRebuild = existingCount !== paliers.length || container.querySelector('#paidHTot') ||
+                      (legacyDetail && !container.querySelector('#backToTotalBtn')) ||
+                      (!legacyDetail && container.querySelector('#backToTotalBtn'));
+  if(needRebuild){
+    let html = paliers.map(p => `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <label style="font-size:13px;font-weight:600;color:${p.color};margin:0">${p.label} pay\u00e9es</label>
         <input type="number" inputmode="decimal" id="${p.id}" step="0.25" value="0"
           style="width:90px;text-align:right;margin:0;padding:6px 10px;border-radius:10px;
                  font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
       </div>`).join('');
+    // En mode legacy détaillé, proposer un retour au total simple
+    if(legacyDetail){
+      html += `<button type="button" id="backToTotalBtn" style="background:none;border:none;color:var(--muted);font-size:12px;padding:4px 0;cursor:pointer;text-decoration:underline">\u2190 Revenir au total simple</button>`;
+    }
+    container.innerHTML = html;
 
     paliers.forEach(p => {
       const inp = document.getElementById(p.id);
       if(!inp) return;
       inp.oninput = () => {
         if(!DATA||!DATA[currentKey]) return;
+        // Matérialiser TOUS les paliers (passe le mois en per-taux explicite)
+        paliers.forEach(pp => {
+          const el = document.getElementById(pp.id);
+          if(DATA[currentKey][pp.key] === undefined){
+            DATA[currentKey][pp.key] = parseFloat(el?.value)||0;
+          }
+        });
         DATA[currentKey][p.key] = parseFloat(inp.value)||0;
+        // Le total payé devient la somme des paliers ventilés
         DATA[currentKey].paid = paliers.reduce((s,t)=>s+(Number(DATA[currentKey][t.key])||0), 0);
         const h = document.getElementById('paidHours');
         if(h) h.value = DATA[currentKey].paid;
+        // Retirer le bandeau total non-ventilé (désormais ventilé)
+        const mb = document.getElementById('migrationHint');
+        if(mb) mb.remove();
         save(); recalc();
       };
     });
+
+    const backBtn = document.getElementById('backToTotalBtn');
+    if(backBtn) backBtn.onclick = () => {
+      container.dataset.legacyDetail = "0";
+      // Repasser en total : conserver la somme, effacer le détail
+      const tot = (Number(DATA[currentKey].paid1)||0)+(Number(DATA[currentKey].paidInter)||0)+(Number(DATA[currentKey].paid2)||0);
+      DATA[currentKey].paid = tot;
+      delete DATA[currentKey].paid1; delete DATA[currentKey].paid2; delete DATA[currentKey].paidInter;
+      container.innerHTML = '';
+      save(); recalc();
+    };
   }
 
-  paliers.forEach(p => {
+  // Affichage des valeurs par taux.
+  const hasDetailVals = (m.paid1 !== undefined || m.paid2 !== undefined || m.paidInter !== undefined);
+  const legacyPaidNoDetail = !hasDetailVals && (Number(m.paid)||0) > 0;
+
+  paliers.forEach((p) => {
     const inp = document.getElementById(p.id);
     if(!inp) return;
     inp.value = m[p.key] !== undefined ? m[p.key] : 0;
   });
+
+  // Si un total a été payé sans ventilation par taux (mois saisi avant le détail),
+  // on l'affiche clairement pour ne pas donner l'impression d'une perte de données.
+  let migBanner = document.getElementById('migrationHint');
+  if(legacyPaidNoDetail){
+    if(!migBanner){
+      migBanner = document.createElement('div');
+      migBanner.id = 'migrationHint';
+      migBanner.style.cssText = 'background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:10px;padding:8px 10px;font-size:11px;color:#2ecc71;line-height:1.4;margin-top:8px';
+      container.appendChild(migBanner);
+    }
+    migBanner.innerHTML = `\u2705 ${fmtH(Number(m.paid)||0)} d\u00e9j\u00e0 pay\u00e9es sur cette p\u00e9riode <span style="color:var(--muted)">(total non ventil\u00e9 par taux)</span>.<br><span style="color:var(--muted)">Pour d\u00e9tailler : saisissez la r\u00e9partition dans les champs ci-dessus (le total sera remplac\u00e9).</span>`;
+  } else if(migBanner){
+    migBanner.remove();
+  }
+
   const hid = document.getElementById('paidHours');
   if(hid) hid.value = m.paid||0;
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   checkFuturePayments / updateFuturePaymentsAlert
+/* checkFuturePayments / updateFuturePaymentsAlert
    Détecte si des périodes FUTURES ont déjà des paiements enregistrés.
    Affiche un avertissement quand l'utilisateur consulte/modifie une
-   période passée (évite les incohérences silencieuses).
-───────────────────────────────────────────────────────────────────── */
+   période passée (évite les incohérences silencieuses). */
 function checkFuturePayments(){
   const yd = ALL_DATA[currentYear]||{};
   const found=[];
@@ -1522,31 +1916,46 @@ function recalcCascade(){
     rc+=ph-(Number(m.paid)||0);
     if(rc<0)rc=0;
     m.carry=rc;
+    // Mémoriser qu'une période a été soldée (carry 0 avec au moins un paiement).
+    // Sert à distinguer un reliquat anormal (période re-positivée) d'une dette normale.
+    if(rc===0 && (Number(m.paid)||0) > 0){
+      m.wasSettled = true;
+    }
 
     // ── Breakdown par taux figé ──
-    // 1. Heures de CE mois ventilées par taux (calcul hebdo sur la période)
+    // 1. Heures PROPRES de cette période ventilées par paliers
     const {h25, hInter, h50} = calcWeeks(buildDayList(start, end));
-    // 2. On AJOUTE au snapshot reporté du mois précédent
-    due1     += h25;
-    dueInter += (hInter||0);
-    due2     += h50;
-    // 3. On SOUSTRAIT les paiements per-taux de CE mois (sur leur propre taux)
-    //    Si pas de données per-taux, on utilise paid total en FIFO LOCAL (25→inter→50)
-    if(m.paid1!==undefined || m.paid2!==undefined){
-      due1     = Math.max(0, due1     - (Number(m.paid1)||0));
-      dueInter = Math.max(0, dueInter - (Number(m.paidInter)||0));
-      due2     = Math.max(0, due2     - (Number(m.paid2)||0));
-    } else if(m.paid){
-      let rem=Number(m.paid)||0;
-      const p1=Math.min(due1,rem); due1-=p1; rem-=p1;
+    let o1 = h25, oi = (hInter||0), o2 = h50;
+    const ownTotal = o1 + oi + o2;
+    const ownPaid = (m.paid1!==undefined || m.paid2!==undefined)
+      ? (Number(m.paid1)||0)+(Number(m.paidInter)||0)+(Number(m.paid2)||0)
+      : (Number(m.paid)||0);
+    const ownUnpaid = ownTotal - ownPaid; // heures propres restant dues (le reliquat)
+
+    if(ownUnpaid >= -0.01){
+      // 2. Cette période contribue ses heures NON PAYÉES au cumul, ventilées par
+      //    l'allocation manuelle (priorité absolue) + le reste par paliers.
+      clampReliquatAlloc(m, ownUnpaid); // l'alloc ne peut dépasser les heures non payées
+      let a1=0, ai=0, a2=0;
+      if(m.reliquatAlloc){ a1=Number(m.reliquatAlloc.t1)||0; ai=Number(m.reliquatAlloc.ti)||0; a2=Number(m.reliquatAlloc.t2)||0; }
+      const sumA = a1 + ai + a2;
+      const leftover = Math.max(0, ownUnpaid - sumA);
+      const base = ownTotal || 1; // forme paliers d'origine pour répartir le reste
+      due1     += a1 + leftover * (o1 / base);
+      dueInter += ai + leftover * (oi / base);
+      due2     += a2 + leftover * (o2 / base);
+    } else {
+      // Surpaiement : cette période paie plus que ses propres heures →
+      // l'excédent solde le report des périodes précédentes (50%→inter→25% prudent).
+      let rem = -ownUnpaid;
+      const p2=Math.min(due2,rem); due2-=p2; rem-=p2;
       const pI=Math.min(dueInter,rem); dueInter-=pI; rem-=pI;
-      const p2=Math.min(due2,rem); due2-=p2;
+      const p1=Math.min(due1,rem); due1-=p1;
     }
-    // 4. Réconciliation : le total du breakdown doit correspondre au carry réel.
-    //    En cas d'écart (changement CCN, incohérence), on resynchronise sur le carry.
+
+    // 3. Réconciliation de sécurité : le total doit correspondre au carry réel.
     const bdTotal = due1 + dueInter + due2;
     if(Math.abs(bdTotal - rc) > 0.01){
-      // Resynchroniser proportionnellement, ou tout mettre au taux1 si bdTotal=0
       if(bdTotal > 0){
         const ratio = rc / bdTotal;
         due1 *= ratio; dueInter *= ratio; due2 *= ratio;
@@ -1554,7 +1963,7 @@ function recalcCascade(){
         due1 = rc; dueInter = 0; due2 = 0;
       }
     }
-    // 5. Figer le snapshot dans le mois
+    // 4. Figer le snapshot dans le mois
     m.dueBreakdown = { due1, dueInter, due2 };
   });
 }
