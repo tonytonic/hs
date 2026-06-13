@@ -542,6 +542,16 @@
           </div>
         </div>
 
+        <!-- Carte 6 -->
+        <div style="padding:12px 14px;border-radius:12px;border:2px solid rgba(225,112,30,0.4);
+          background:rgba(225,112,30,0.06);display:flex;gap:12px;align-items:flex-start;flex-shrink:0;">
+          <span style="font-size:22px;flex-shrink:0;line-height:1;">🔍</span>
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#b35417;">Vérifiez par vous-même</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">Avant toute décision, faites vos propres recherches ou consultez un professionnel compétent (avocat, juriste, syndicat, service RH…). L'application fournit des informations à titre purement indicatif : elles peuvent ne pas correspondre exactement à votre situation réelle.</div>
+          </div>
+        </div>
+
         <!-- Indicateur fin de scroll -->
         <div style="text-align:center;padding:8px 0 4px;flex-shrink:0;">
           <span style="font-size:11px;color:#4FB3C2;font-weight:700;">✓ Vous êtes arrivé au bout — cochez ci-dessous</span>
@@ -558,7 +568,7 @@
         <input type="checkbox" id="betonCheck" onchange="checkBetonReady()"
           style="width:22px;height:22px;flex-shrink:0;margin-top:1px;cursor:pointer;accent-color:#4FB3C2;">
         <span style="font-size:12.5px;color:#1a1a2e;line-height:1.55;font-weight:600;">
-          J'ai lu et compris — j'utilise cet outil en tant que simulateur indicatif, sans valeur légale.
+          J'ai lu et compris. J'accepte d'utiliser cette application dans l'unique but pédagogique et indicatif : c'est un outil d'aide, pas un outil de décision. Je complète moi-même mes recherches et je reste seul responsable des décisions que je prends. Les résultats n'ont aucune valeur légale et ne sont qu'indicatifs.
         </span>
       </label>
 
@@ -1203,7 +1213,8 @@
 <div style="display:flex;gap:8px;align-items:flex-start;">
   <button class="info-btn" onclick="reopenWizard()" style="flex:2;background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
   <!-- Bouton Favoris (même style doré que le bouton favoris, remplace l'ancien Terrier) -->
-  <div style="position:relative;flex:1;" id="favDropContainer">
+  <!-- OFF PROD : réactiver en retirant "display:none;" ci-dessous -->
+  <div style="position:relative;flex:1;display:none;" id="favDropContainer">
     <button onclick="toggleFavDrop()" title="Mes outils favoris — La caisse à outils"
       style="width:100%;cursor:pointer;border-radius:10px;padding:9px 12px;
              font-family:inherit;font-weight:700;font-size:12px;
@@ -1296,7 +1307,8 @@
 <button class="info-btn" onclick="openSocialPopup()" style="margin-top:-8px;background:linear-gradient(135deg,#e87820,#c85010);border:none;color:#fff;">🎬 Nos réseaux &amp; tutos vidéo</button>
 
 <button class="info-btn" onclick="openBackupPopup()" style="margin-top:-8px;">💾 Sauvegarde générale</button>
-<button class="info-btn" onclick="window.location.href='nouveautes.html'" style="margin-top:-8px;">🆕 Nouveautés &amp; mises à jour</button>
+<!-- OFF PROD : réactiver en retirant "display:none;" ci-dessous -->
+<button class="info-btn" onclick="window.location.href='nouveautes.html'" style="margin-top:-8px;display:none;">🆕 Nouveautés &amp; mises à jour</button>
 <button class="info-btn" id="btnPerso" onclick="togglePersoMode()" style="margin-top:-8px;">✏️ Personnaliser le menu</button>
 <button class="btn-hidden" id="btnHidden" onclick="openHiddenDrawer()" style="margin-top:-8px;">
   👁 Modules masqués&nbsp;<span id="hiddenCount"></span>
