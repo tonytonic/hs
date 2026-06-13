@@ -3,7 +3,7 @@
  * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v8.9.6"; // partage : deux liens (iOS + Android)
+const CACHE_NAME = "heuressup-cache-v10.2.0"; // partage : deux liens (iOS + Android)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -45,7 +45,6 @@ const FILES_TO_CACHE = [
   // === Module 5 — Temps partiel (Mizuki) ===
   "./module5/index.html",
   "./module5/css/main.css",
-  "./module5/assets/mizuki.svg",
   "./module5/js/app.js",
   "./module5/js/core/calc-engine.js",
   "./module5/js/data/ccn-partiel.js",
@@ -107,7 +106,16 @@ const FILES_TO_CACHE = [
   // === Module 7 — Nuit, Astreinte & Primes (Mimizuku) ===
   "./module7/index.html",
   "./module7/Mimizuku.png",
-  "./module7/mimizuku-menu.jpg"
+  "./module7/mimizuku-menu.jpg",
+  // ── Trousse à outils (54 modules) + légal ──
+  "./outils.html",
+  "./mentions-legales.html",
+  "./privacy.html",
+  "./outils/articles-loi.js",
+  // ── Modules « outils » : NON pré-cachés ici (déploiement progressif).
+  //    Ils se mettent en cache à la volée quand l'utilisateur les ouvre,
+  //    via la stratégie cache-puis-réseau du handler fetch ci-dessous.
+  //    Le dashboard (outils.html) détecte par HEAD lesquels sont en ligne.
 ];
 
 // ── INSTALL ───────────────────────────────────────────────────────────────────

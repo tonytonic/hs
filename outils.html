@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Le Terrier — La trousse à outils</title>
+<link rel="manifest" href="../../manifest.json">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<meta name="theme-color" content="#1a1208">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,600;1,700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --gold:#f0c040;--gold-deep:#c8a030;--gold-soft:#ffd166;
+  --ink:#1a1208;--ink-2:#2a1e0e;--ink-3:#3a2c18;
+  --cream:#f7f2e8;--cream-2:#efe7d6;--paper:#fffdf8;
+  --txt:#2a2018;--txt-soft:#8a7a60;--txt-mute:#a89880;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{font-family:'Manrope',-apple-system,sans-serif;background:var(--ink);color:var(--txt);
+  overflow-x:hidden;padding-bottom:calc(72px + env(safe-area-inset-bottom));}
+
+/* HEADER */
+.hdr{background:linear-gradient(180deg,#0f0a04 0%,var(--ink) 100%);
+  padding:calc(14px + env(safe-area-inset-top)) 18px 16px;}
+.hdr-row{display:flex;align-items:center;justify-content:space-between;}
+.hdr-btn{width:46px;height:46px;border-radius:50%;background:rgba(240,192,64,0.08);
+  border:1px solid rgba(240,192,64,0.22);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--gold);transition:.2s;background:none;}
+.hdr-btn:active{transform:scale(0.9);}
+.hdr-title{text-align:center;flex:1;}
+.hdr-title .t{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;
+  font-size:28px;color:var(--gold);line-height:1;}
+.hdr-title .s{font-size:10px;font-weight:700;letter-spacing:3.5px;color:var(--gold-deep);
+  text-transform:uppercase;margin-top:4px;}
+
+/* RECHERCHE */
+.srch-wrap{padding:14px 18px 0;background:var(--ink);}
+.srch{display:flex;align-items:center;gap:11px;background:rgba(255,255,255,0.06);
+  border:1px solid rgba(240,192,64,0.12);border-radius:16px;padding:13px 16px;}
+.srch svg{flex-shrink:0;color:var(--txt-mute);}
+.srch input{flex:1;background:none;border:none;outline:none;color:#fff;
+  font-family:inherit;font-size:16px;font-weight:500;}
+.srch input::placeholder{color:var(--txt-mute);}
+
+/* BANDEAU RENARD */
+.fox-wrap{padding:14px 18px 0;background:var(--ink);}
+.fox-banner{background:linear-gradient(145deg,var(--ink-2),var(--ink-3));
+  border:1px solid rgba(240,192,64,0.14);border-radius:18px;padding:16px;
+  display:flex;gap:14px;align-items:center;}
+.fox-banner .fox{font-size:42px;flex-shrink:0;line-height:1;}
+.fox-banner .t{font-size:15px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:4px;}
+.fox-banner .d{font-size:12.5px;color:var(--gold-soft);opacity:.85;line-height:1.45;}
+
+/* ZONE CLAIRE */
+.light{background:var(--cream);border-radius:26px 26px 0 0;min-height:60vh;
+  padding:22px 16px calc(80px + env(safe-area-inset-bottom));margin-top:14px;}
+
+/* SECTION */
+.section{background:var(--paper);border-radius:20px;padding:16px;
+  margin-bottom:14px;box-shadow:0 4px 18px rgba(26,18,8,0.06);}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-hd .lb{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;color:var(--txt);}
+.sec-hd .lb svg{color:var(--gold-deep);}
+.sec-hd .more{background:none;border:none;color:var(--gold-deep);font-family:inherit;
+  font-size:13.5px;font-weight:700;cursor:pointer;}
+
+/* GRILLE FAVORIS */
+.fav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
+.fav-cell{background:var(--cream);border:1px solid rgba(200,160,48,0.16);border-radius:13px;
+  padding:13px 5px;text-align:center;cursor:pointer;transition:.18s;
+  display:flex;flex-direction:column;align-items:center;gap:7px;min-height:88px;justify-content:center;}
+.fav-cell:active{transform:scale(0.93);}
+.fav-cell .nm{font-size:11px;font-weight:600;color:var(--txt);line-height:1.2;}
+.empty-msg{text-align:center;padding:22px 12px;color:var(--txt-soft);font-size:13.5px;line-height:1.5;}
+.empty-msg .e{font-size:32px;display:block;margin-bottom:8px;}
+
+/* CATÉGORIES ACCORDÉON */
+.cat{background:var(--paper);border-radius:16px;margin-bottom:9px;overflow:hidden;
+  box-shadow:0 3px 12px rgba(26,18,8,0.05);}
+.cat-hd{display:flex;align-items:center;gap:13px;padding:15px;cursor:pointer;transition:background .15s;}
+.cat-hd:active{background:var(--cream);}
+.pill{width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;}
+.pill svg{width:22px;height:22px;color:rgba(40,32,24,0.65);}
+.cat-info{flex:1;min-width:0;}
+.cat-info .t{font-size:16px;font-weight:800;color:var(--txt);line-height:1.2;}
+.cat-info .s{font-size:12.5px;color:var(--txt-soft);margin-top:2px;}
+.cat-info .cnt{font-size:11px;color:var(--gold-deep);font-weight:700;margin-top:2px;}
+.chev{flex-shrink:0;color:var(--txt-mute);transition:transform .25s cubic-bezier(.2,.9,.3,1);}
+.cat.open .chev{transform:rotate(90deg);}
+.cat-body{max-height:0;overflow:hidden;transition:max-height .32s cubic-bezier(.2,.9,.3,1);}
+.cat.open .cat-body{max-height:1600px;}
+.cat-body-in{padding:0 10px 10px;}
+
+/* LIGNE OUTIL */
+.tool-row{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:12px;
+  cursor:pointer;transition:background .15s;position:relative;}
+.tool-row:active{background:var(--cream);}
+.tool-row+.tool-row{border-top:1px solid rgba(200,160,48,0.08);}
+.tool-row .t{font-size:14.5px;font-weight:700;color:var(--txt);line-height:1.2;}
+.tool-row .s{font-size:12px;color:var(--txt-soft);margin-top:1px;}
+.tool-info{flex:1;min-width:0;}
+.pin-btn{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;
+  background:none;cursor:pointer;font-size:18px;transition:.18s;opacity:.35;line-height:1;}
+.pin-btn.on{opacity:1;}
+.pin-btn:active{transform:scale(0.82);}
+
+/* ENCART AIDE */
+.help{background:linear-gradient(135deg,#f5ead0,#eedfc3);border-radius:17px;
+  padding:17px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:.18s;
+  border:1px solid rgba(200,160,48,0.2);margin-top:16px;margin-bottom:20px;}
+.help:active{transform:scale(0.98);}
+.help .t{font-size:16px;font-weight:800;color:var(--txt);}
+.help .d{font-size:12.5px;color:var(--txt-soft);margin-top:2px;line-height:1.4;}
+
+/* NAVIGATION BASSE */
+.tabbar{position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:linear-gradient(180deg,#0f0a04,var(--ink));
+  border-top:1px solid rgba(240,192,64,0.1);display:flex;
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));}
+.tab{flex:1;background:none;border:none;cursor:pointer;font-family:inherit;
+  display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px 0;
+  color:var(--txt-mute);transition:color .18s;}
+.tab svg{width:24px;height:24px;}
+.tab .lb{font-size:10.5px;font-weight:600;}
+.tab.on{color:var(--gold);}
+
+/* VUES */
+.view{display:none;}
+.view.on{display:block;animation:fi .22s ease;}
+@keyframes fi{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.view-t{font-size:20px;font-weight:800;color:var(--txt);margin-bottom:4px;}
+.view-s{font-size:13px;color:var(--txt-soft);margin-bottom:16px;}
+.flat .tool-row{background:var(--paper);margin-bottom:8px;border-radius:14px;
+  box-shadow:0 2px 8px rgba(26,18,8,0.05);}
+.flat .tool-row+.tool-row{border-top:none;margin-top:0;}
+
+/* PLUS */
+.plus-card{background:var(--paper);border-radius:16px;overflow:hidden;margin-bottom:12px;
+  box-shadow:0 3px 12px rgba(26,18,8,0.05);}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));left:50%;
+  transform:translateX(-50%) translateY(16px);background:var(--ink-2);color:var(--gold-soft);
+  padding:11px 20px;border-radius:13px;font-size:14px;font-weight:600;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);border:1px solid rgba(240,192,64,0.22);
+  opacity:0;pointer-events:none;transition:.28s cubic-bezier(.2,.9,.3,1);z-index:200;white-space:nowrap;}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* WIZARD */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(15,10,4,0.94);
+  display:none;align-items:center;justify-content:center;padding:24px;}
+.wiz-ov.on{display:flex;}
+.wiz-box{background:var(--paper);border-radius:24px;max-width:360px;width:100%;
+  padding:28px 22px 22px;text-align:center;}
+.wiz-step{display:none;}
+.wiz-step.on{display:block;animation:fi .28s;}
+.wiz-em{font-size:52px;display:block;margin-bottom:12px;}
+.wiz-h{font-family:'Playfair Display',serif;font-style:italic;font-weight:700;
+  font-size:22px;color:var(--ink);margin-bottom:9px;}
+.wiz-p{font-size:14px;color:var(--txt-soft);line-height:1.55;margin-bottom:6px;}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:18px 0;}
+.wiz-dots span{width:6px;height:6px;border-radius:50%;background:var(--cream-2);transition:.2s;}
+.wiz-dots span.on{background:var(--gold-deep);width:20px;border-radius:3px;}
+.wiz-ok{width:100%;border:none;border-radius:13px;padding:14px;font-family:inherit;
+  font-weight:800;font-size:15px;cursor:pointer;
+  background:linear-gradient(135deg,var(--gold),var(--gold-deep));color:var(--ink);}
+.wiz-ok:active{transform:translateY(2px);}
+.wiz-sk{background:none;border:none;color:var(--txt-mute);font-family:inherit;
+  font-size:13px;cursor:pointer;margin-top:11px;padding:5px;}
+
+/* Catégorie-titre séparateur dans accueil */
+.sec-sep{font-size:18px;font-weight:800;color:var(--txt);margin:22px 4px 13px;}
+</style>
+</head>
+<body>
+
+<!-- WIZARD -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box">
+    <div class="wiz-step on" data-s="0"><span class="wiz-em">🦊</span>
+      <div class="wiz-h">Bienvenue dans Le Terrier</div>
+      <div class="wiz-p">54 outils pour comprendre tes droits, réunis en un seul endroit.</div></div>
+    <div class="wiz-step" data-s="1"><span class="wiz-em">🗂️</span>
+      <div class="wiz-h">Rangés par thème</div>
+      <div class="wiz-p">Touche une catégorie pour dérouler ses outils. Tout est classé.</div></div>
+    <div class="wiz-step" data-s="2"><span class="wiz-em">⭐</span>
+      <div class="wiz-h">Épingle tes préférés</div>
+      <div class="wiz-p">L'étoile ☆ d'un outil l'ajoute à tes Favoris — retrouve-le en un clin d'œil.</div></div>
+    <div class="wiz-dots" id="wDots"></div>
+    <button class="wiz-ok" id="wNext">Continuer</button>
+    <button class="wiz-sk" id="wSkip">Passer</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-row">
+    <button class="hdr-btn" onclick="window.location.href='menu.html'" aria-label="Menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="hdr-title"><div class="t">Le Terrier</div><div class="s">La Famille Renard</div></div>
+    <button class="hdr-btn" id="starBtn" onclick="goTab('favoris')" aria-label="Favoris">
+      <svg id="starSvg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- RECHERCHE (visible sur accueil seulement) -->
+<div class="srch-wrap" id="srchWrap">
+  <div class="srch">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="srchIp" placeholder="Rechercher un outil…" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+
+<!-- BANDEAU RENARD -->
+<div class="fox-wrap" id="foxWrap">
+  <div class="fox-banner">
+    <div class="fox">🦊</div>
+    <div><div class="t">Tous tes outils, réunis en un seul endroit</div>
+      <div class="d">Touche <strong>⭐</strong> pour épingler un outil dans tes Favoris.</div></div>
+  </div>
+</div>
+
+<!-- ZONE CLAIRE -->
+<div class="light">
+
+  <!-- ACCUEIL -->
+  <div class="view on" id="vAccueil">
+    <div class="section" id="favSection">
+      <div class="sec-hd">
+        <div class="lb">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Favoris
+        </div>
+        <button class="more" onclick="goTab('favoris')">Voir tous</button>
+      </div>
+      <div id="favGrid"></div>
+    </div>
+    <div class="sec-sep">Catégories</div>
+    <div id="catList"></div>
+
+  </div>
+
+  <!-- FAVORIS -->
+  <div class="view" id="vFavoris">
+    <div class="view-t">Mes favoris ⭐</div>
+    <div class="view-s">Tes outils épinglés, toujours à portée.</div>
+    <div class="flat" id="favFull"></div>
+  </div>
+
+  <!-- RÉCENTS -->
+  <div class="view" id="vRecents">
+    <div class="view-t">Récemment utilisés 🕐</div>
+    <div class="view-s">Derniers outils ouverts.</div>
+    <div class="flat" id="recentList"></div>
+  </div>
+
+  <!-- PLUS -->
+  <div class="view" id="vPlus">
+    <div class="view-t">Plus ···</div>
+    <div class="view-s">Informations et paramètres.</div>
+    <div class="plus-card" id="plusContent"></div>
+  </div>
+
+</div>
+
+<!-- TABBAR -->
+<div class="tabbar">
+  <button class="tab on" data-t="accueil" onclick="goTab('accueil')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8v10H15V15H9v6H3z"/></svg>
+    <span class="lb">Accueil</span></button>
+  <button class="tab" data-t="favoris" onclick="goTab('favoris')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <span class="lb">Favoris</span></button>
+  <button class="tab" data-t="recents" onclick="goTab('recents')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span class="lb">Récents</span></button>
+  <button class="tab" data-t="plus" onclick="goTab('plus')">
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    <span class="lb">Plus</span></button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== DONNÉES ===== */
+const TOOLS={
+  'module8':{e:'🧳',t:'Carnet de frais pro',s:'Notes de frais'},
+  'module-temps':{e:'⚙️',t:'Temps & Repos',s:'Durées légales'},
+  'module-conges':{e:'🏝️',t:'Congés payés',s:'Calcul & solde'},
+  'module-fincontrat':{e:'🌄',t:'Fin de contrat',s:'Indemnités & rupture'},
+  'module-chomage':{e:'🪂',t:'Droits chômage',s:'ARE & calcul'},
+  'module-famille':{e:'🪺',t:'Congés familiaux',s:'Maternité, paternité…'},
+  'module-arret':{e:'🩺',t:'Arrêt maladie',s:'IJSS & maintien salaire'},
+  'module-tr':{e:'🍽️',t:'Titres-restaurant',s:'Plafonds & règles 2026'},
+  'module-feries':{e:'🎆',t:'Jours fériés',s:'Calendrier 2026'},
+  'module-saisie':{e:'🔒',t:'Saisie sur salaire',s:'Barème & calcul'},
+  'module-anciennete':{e:'🌳',t:'Ancienneté & jalons',s:'Droits par année'},
+  'module-journal':{e:'📓',t:'Journal incidents',s:'Aide-mémoire local'},
+  'module-c2p':{e:'🦺',t:'C2P Pénibilité',s:'Facteurs & points'},
+  'module-lexique':{e:'📚',t:'Lexique bulletin',s:'Ligne par ligne'},
+  'module-fincontrat2':{e:'📋',t:'Solde de tout compte',s:'Checklist départ'},
+  'module-contrats':{e:'📊',t:'CDI · CDD · Intérim',s:'Comparatif droits'},
+  'module-archives':{e:'📁',t:'Conservation docs RH',s:'Durées légales'},
+  'module-convertisseur':{e:'🧮',t:'Convertisseur paie',s:'Horaire/mensuel/annuel'},
+  'module-mutuelle':{e:'🛡️',t:'Mutuelle obligatoire',s:'Règles & dispenses'},
+  'module-transport':{e:'🚌',t:'Transport & Mobilité',s:'TC, FMD, barème km'},
+  'module-cse':{e:'🏛️',t:'CSE & Représentation',s:'Droits & attributions'},
+  'module-rupture':{e:'🤝',t:'Rupture conventionnelle',s:'Indemnité & procédure'},
+  'module-preavis':{e:'⏱️',t:'Préavis',s:'Durée légale & calcul'},
+  'module-preavis-comp':{e:'⚖️',t:'Comparatif ruptures',s:'Démo/Licenc./RC/Faute'},
+  'module-bulletin':{e:'📄',t:'Bulletin décrypté',s:'Cotisations expliquées'},
+  'module-cet':{e:'⏳',t:'Compte Épargne-Temps',s:'CET · Droits & usages'},
+  'module-entretien':{e:'🤝',t:'Entretien professionnel',s:'Échéance & droits'},
+  'module-mobilites':{e:'🚲',t:'Forfait Mobilités',s:'Vélo · Covoiturage · Exo.'},
+  'module-retraite':{e:'🏛️',t:'Retraite',s:'Comprendre ses droits'},
+  'module-egalite':{e:'⚖️',t:'Index Égalité H/F',s:'Score & indicateurs'},
+  'module-astreintes':{e:'📟',t:'Astreintes',s:'Définition & compensation'},
+  'module-precarite':{e:'📄',t:'Prime de précarité',s:'Fin de CDD · 10%'},
+  'module-parentalite':{e:'👶',t:'Parentalité',s:'Maternité · Paternité · Parental'},
+  'module-teletravail':{e:'🏠',t:'Télétravail',s:'Règles & indemnités'},
+  'module-formation':{e:'🎓',t:'CPF & Formation',s:'Droits · Dispositifs · Fraude'},
+  'module-atmp':{e:'🦺',t:'AT / MP',s:'Accident travail · Maladie pro'},
+  'module-nonconcurrence':{e:'⚖️',t:'Non-concurrence',s:'Validité & indemnisation'},
+  'module-epargne':{e:'💰',t:'Épargne salariale',s:'Participation · PEE · PER'},
+  'module-greve':{e:'✊',t:'Grève',s:'Droits & retenue 1/30e'},
+  'module-cumul-retraite':{e:'🏖️',t:'Cumul emploi-retraite',s:'Libéralisé & plafonné'},
+  'module-sabbatique':{e:'🌍',t:'Congé sabbatique',s:'6-11 mois · Conditions'},
+  'module-inaptitude':{e:'🏥',t:'Inaptitude',s:'Procédure & reclassement'},
+  'module-miseapied':{e:'⏸️',t:'Mise à pied',s:'Conservatoire vs disciplinaire'},
+  'module-alternance':{e:'🎓',t:'Alternance',s:'Apprentissage · Contrat pro'},
+  'module-conge-ss':{e:'🌿',t:'Congé sans solde',s:'Durée libre · Accord requis'},
+  'module-delegation':{e:'🏛️',t:'Heures de délégation',s:'Mandats · Crédits · Droits'},
+  'module-proche-aidant':{e:'🤲',t:'Proche aidant',s:'Congé · AJPA · CAF'},
+  'module-invalidite':{e:'♿',t:'Invalidité',s:'Catégories · Pension · Droits'},
+  'module-avantages-nature':{e:'🎁',t:'Avantages en nature',s:'Voiture · Repas · Logement'},
+  'module-modulation':{e:'🎼',t:'Modulation du temps',s:'Annualisation · Lissage salaire'},
+  'module-activite-partielle':{e:'🌿',t:'Activité partielle',s:'AP · APLD · Calcul indemnité'},
+  'module-demission-are':{e:'🚪',t:'Démission légitime',s:'Cas d\'ouverture ARE'},
+  'module-essai':{e:'⏳',t:'Période d\'essai',s:'Délais prévenance'},
+  'module-effectifs':{e:'🏢',t:'Seuils d\'effectif',s:'11 · 50 · 250 · 300 · 1000 sal.'},
+};
+const CATS=[
+  {id:'rupture',label:'Rupture de contrat',sub:'Outils & modèles',icon:'briefcase',color:'#B8A4E0',ids:['module-rupture','module-preavis','module-preavis-comp','module-fincontrat','module-fincontrat2','module-archives','module-miseapied','module-demission-are']},
+  {id:'paie',label:'Paie & cotisations',sub:'Calculs & comparatifs',icon:'calc',color:'#A8D5A8',ids:['module8','module-contrats','module-convertisseur','module-essai','module-lexique','module-bulletin']},
+  {id:'conditions',label:'Conditions de travail',sub:'Durées, congés, repos',icon:'clock',color:'#F0C878',ids:['module-temps','module-conges','module-feries','module-tr','module-transport','module-mutuelle','module-teletravail','module-mobilites','module-astreintes']},
+  {id:'protection',label:'Protection sociale & santé',sub:'Arrêts, famille, accidents',icon:'shield',color:'#F0A8A8',ids:['module-arret','module-famille','module-chomage','module-c2p','module-saisie','module-atmp','module-inaptitude','module-parentalite','module-proche-aidant','module-invalidite']},
+  {id:'droits',label:'Droits & parcours pro',sub:'Carrière, formation, épargne',icon:'growth',color:'#A8D5C8',ids:['module-anciennete','module-cse','module-journal','module-entretien','module-cet','module-formation','module-epargne','module-delegation']},
+  {id:'statuts',label:'Statuts & clauses spéciales',sub:'Contrats particuliers',icon:'doc',color:'#C8B0E0',ids:['module-nonconcurrence','module-precarite','module-greve','module-sabbatique','module-retraite','module-cumul-retraite','module-egalite','module-alternance','module-conge-ss']},
+  {id:'organisation',label:'Organisation & entreprise',sub:'Seuils & dispositifs',icon:'building',color:'#A8C0E0',ids:['module-effectifs','module-avantages-nature','module-modulation','module-activite-partielle']},
+];
+
+/* ===== ICÔNES SVG ===== */
+const SVGP={
+  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
+  calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16.5" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/><line x1="16" y1="14" x2="16.5" y2="14"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  growth:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
+  doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>',
+  building:'<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 21V9"/>'
+};
+function makeSvg(paths,sz){sz=sz||22;return'<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
+function catIcon(catId){return SVGP[CATS.find(function(c){return c.id===catId;})||CATS[0]?CATS.find(function(c){return c.id===catId;}).icon:'doc']||SVGP.doc;}
+function toolCatId(id){var r=CATS.find(function(c){return c.ids.indexOf(id)>=0;});return r?r.id:'doc';}
+
+/* ===== localStorage ===== */
+var LS={P:'OT_PINNED',R:'OT_RECENT',W:'OT_WELCOMED'};
+function lg(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function ls(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function getPinned(){return lg(LS.P,[]);}
+function getRecent(){return lg(LS.R,[]);}
+
+/* ===== Toast ===== */
+var toastT;
+function toast(m){var el=document.getElementById('toast');el.textContent=m;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove('on');},1800);}
+
+/* ===== Épinglage ===== */
+function togglePin(id,ev){if(ev)ev.stopPropagation();var p=getPinned();var i=p.indexOf(id);if(i>=0){p.splice(i,1);toast('Retiré des favoris');}else{p.push(id);toast('⭐ Ajouté aux favoris !');}ls(LS.P,p);render();}
+function isPinned(id){return getPinned().indexOf(id)>=0;}
+
+/* ===== Ouverture outil ===== */
+function openTool(id){
+  // Sécurité : si le module a été retiré du serveur depuis la dernière détection
+  // (fenêtre du cache 1 h), on re-teste à la volée avant d'ouvrir.
+  // Évite d'envoyer l'utilisateur sur une page 404.
+  probe(id).then(function(ok){
+    if(ok){
+      var r=getRecent().filter(function(x){return x!==id;});r.unshift(id);r=r.slice(0,12);ls(LS.R,r);
+      window.location.href='outils/'+id+'/index.html';
+    }else{
+      // Module supprimé entre-temps : on met à jour la dispo, on purge le cache et on re-render
+      if(AVAILABLE)AVAILABLE[id]=false;
+      try{localStorage.removeItem(DEPLOY_CHECK_KEY);}catch(e){}
+      toast('Cet outil n\'est plus disponible');
+      render();
+    }
+  });
+}
+
+/* ===== Ligne outil ===== */
+function rowHTML(id){var t=TOOLS[id];if(!t)return'';var on=isPinned(id);
+  return'<div class="tool-row" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( on?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( on?'⭐':'☆')+'</button></div>';}
+
+/* ===== Grille favoris (accueil) ===== */
+function renderFavGrid(){var p=getPinned().filter(isAvail);var h=document.getElementById('favGrid');
+  if(!p.length){h.innerHTML='<div class="empty-msg"><span class="e">☆</span>Aucun favori pour l\'instant.<br>Touche l\'étoile d\'un outil pour l\'épingler ici.</div>';return;}
+  h.innerHTML='<div class="fav-grid">'+p.slice(0,8).map(function(id){var t=TOOLS[id];if(!t)return'';return'<div class="fav-cell" onclick="openTool(\''+id+'\')"><div style="color:var(--txt)">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'],28)+'</div><div class="nm">'+t.t+'</div></div>';}).join('')+'</div>';}
+
+/* ===== Catégories accordéon ===== */
+var openCats={};
+
+/* Normalise les accents pour la recherche (ex: "conges" trouve "Congés") */
+function normSearch(s){ return s ? s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'') : ''; }
+
+function renderCats(q){var h=document.getElementById('catList');var html='';
+  CATS.forEach(function(cat){
+    var base=availIds(cat.ids);
+    var ids=q?base.filter(function(id){var t=TOOLS[id];return t&&(normSearch(t.t).indexOf(normSearch(q))>=0||normSearch(t.s).indexOf(normSearch(q))>=0);}):base;
+    if(!ids.length)return;
+    var op=q||openCats[cat.id];
+    html+='<div class="cat'+( op?' open':'')+'" id="cat-'+cat.id+'">'
+      +'<div class="cat-hd" onclick="togCat(\''+cat.id+'\')">'+
+      '<div class="pill" style="background:'+cat.color+'38;">'+makeSvg(SVGP[cat.icon])+'</div>'+
+      '<div class="cat-info"><div class="t">'+cat.label+'</div><div class="s">'+cat.sub+'</div>'+
+      '<div class="cnt">'+ids.length+' outil'+(ids.length>1?'s':'')+'</div></div>'+
+      '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg></div>'+
+      '<div class="cat-body"><div class="cat-body-in">'+ids.map(rowHTML).join('')+'</div></div></div>';});
+  if(html===''){
+    html=q?'<div class="empty-msg"><span class="e">🔍</span>Aucun résultat pour « '+q+' ».</div>'
+          :'<div class="empty-msg"><span class="e">🦊</span>Les outils arrivent très bientôt…</div>';
+  }
+  h.innerHTML=html;}
+function togCat(id){openCats[id]=!openCats[id];var el=document.getElementById('cat-'+id);if(el)el.classList.toggle('open',!!openCats[id]);}
+
+/* ===== Vue Favoris pleine page ===== */
+function renderFavFull(){var p=getPinned().filter(isAvail);var h=document.getElementById('favFull');
+  if(!p.length){h.innerHTML='<div class="empty-msg"><span class="e">⭐</span>Aucun favori.<br>Épingle des outils depuis l\'accueil.</div>';return;}
+  h.innerHTML=p.map(rowHTML).join('');}
+
+/* ===== Vue Récents ===== */
+function renderRecents(){var r=getRecent().filter(isAvail);var h=document.getElementById('recentList');
+  if(!r.length){h.innerHTML='<div class="empty-msg"><span class="e">🕐</span>Aucun outil récent.</div>';return;}
+  h.innerHTML=r.map(rowHTML).join('');}
+
+/* ===== Vue Plus ===== */
+function renderPlus(){document.getElementById('plusContent').innerHTML=
+  ['<div class="tool-row" onclick="window.location.href=\'menu.html\'">'+makeSvg(SVGP.briefcase)+'<div class="tool-info"><div class="t">Retour au menu principal</div><div class="s">Les 8 grands modules</div></div></div>',
+   '<div class="tool-row" onclick="window.location.href=\'mentions-legales.html\'">'+makeSvg(SVGP.doc)+'<div class="tool-info"><div class="t">Mentions légales</div><div class="s">LCEN — éditeur & hébergeurs</div></div></div>',
+   '<div class="tool-row" onclick="startWiz()">'+makeSvg(SVGP.growth)+'<div class="tool-info"><div class="t">Revoir le guide</div><div class="s">Comment utiliser la trousse</div></div></div>',
+  ].join('');}
+
+/* ===== Navigation ===== */
+var curTab='accueil';
+function goTab(t){curTab=t;
+  ['vAccueil','vFavoris','vRecents','vPlus'].forEach(function(id){document.getElementById(id).classList.remove('on');});
+  document.getElementById('v'+t.charAt(0).toUpperCase()+t.slice(1)).classList.add('on');
+  document.querySelectorAll('.tab').forEach(function(el){el.classList.toggle('on',el.dataset.t===t);});
+  var onAcc=(t==='accueil');
+  document.getElementById('srchWrap').style.display=onAcc?'block':'none';
+  document.getElementById('foxWrap').style.display=onAcc?'block':'none';
+  if(t==='favoris')renderFavFull();
+  if(t==='recents')renderRecents();
+  if(t==='plus')renderPlus();
+  window.scrollTo(0,0);}
+
+/* ===== Recherche ===== */
+document.getElementById('srchIp').addEventListener('input',function(){renderCats(this.value.toLowerCase().trim());});
+
+/* ===== Wizard ===== */
+var wStep=0,wMax=3;
+function wDots(){var c=document.getElementById('wDots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('span');if(i===wStep)d.className='on';c.appendChild(d);}}
+function wShow(n){wStep=n;document.querySelectorAll('.wiz-step').forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});wDots();document.getElementById('wNext').textContent=(n===wMax-1)?'C\'est parti ! 🦊':'Continuer';document.getElementById('wSkip').style.display=(n===wMax-1)?'none':'block';}
+function wClose(){document.getElementById('wizOv').classList.remove('on');ls(LS.W,1);}
+function resetOutils(){
+  if(!confirm('Reinitialiser la trousse ?\n\nCela efface les favoris, les recents et relance le guide de demarrage.')) return;
+  try{localStorage.removeItem(LS.P);localStorage.removeItem(LS.R);localStorage.removeItem(LS.W);}catch(e){}
+  location.reload();
+}
+function startWiz(){document.getElementById('wizOv').classList.add('on');wShow(0);goTab('accueil');}
+document.getElementById('wNext').addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+document.getElementById('wSkip').addEventListener('click',wClose);
+
+/* ===== DÉTECTION DES MODULES DÉPLOYÉS =====
+   Teste l'existence de chaque outils/<id>/index.html via une requête HEAD.
+   Seuls les modules dont le fichier répond 200 restent visibles.
+   Permet une mise en prod progressive : un module absent du serveur
+   disparaît automatiquement du dashboard (catégories, favoris, récents). */
+var AVAILABLE=null;           // null = pas encore testé → on affiche tout
+var DEPLOY_CHECK_KEY='SH_DEPLOYED_CACHE';
+var DEPLOY_CHECK_TTL=3600000; // 1 h de cache pour éviter de re-tester à chaque visite
+
+function isAvail(id){ return AVAILABLE===null || AVAILABLE[id]===true; }
+
+/* Filtre une liste d'ids selon la disponibilité */
+function availIds(ids){ return ids.filter(isAvail); }
+
+/* Teste un module : résout true si index.html existe, false sinon */
+function probe(id){
+  return fetch('outils/'+id+'/index.html',{method:'HEAD',cache:'no-store'})
+    .then(function(r){return r.ok;})
+    .catch(function(){return false;});
+}
+
+/* Lance la détection de tous les modules en parallèle, puis re-render */
+function detectDeployed(){
+  // Cache court pour ne pas refaire 54 requêtes à chaque ouverture
+  try{
+    var c=JSON.parse(localStorage.getItem(DEPLOY_CHECK_KEY)||'null');
+    if(c&&c.t&&(Date.now()-c.t)<DEPLOY_CHECK_TTL&&c.map){
+      AVAILABLE=c.map; render(); return;
+    }
+  }catch(e){}
+
+  var ids=Object.keys(TOOLS);
+  Promise.all(ids.map(function(id){
+    return probe(id).then(function(ok){return [id,ok];});
+  })).then(function(results){
+    var map={};
+    results.forEach(function(pair){map[pair[0]]=pair[1];});
+    AVAILABLE=map;
+    try{localStorage.setItem(DEPLOY_CHECK_KEY,JSON.stringify({t:Date.now(),map:map}));}catch(e){}
+    render();
+  });
+}
+
+/* ===== RENDU GLOBAL ===== */
+function render(){renderFavGrid();renderCats(document.getElementById('srchIp').value.toLowerCase().trim());if(curTab==='favoris')renderFavFull();if(curTab==='recents')renderRecents();}
+
+render();              // 1er rendu immédiat (tout visible le temps du test)
+detectDeployed();      // puis détection → masque les modules non déployés
+if(!lg(LS.W,0))startWiz();
+</script>
+</body>
+</html>
