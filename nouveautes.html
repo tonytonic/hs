@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nouveautés — Heures Supplémentaires France</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{--gold:#f0c040;--ink:#1a1208;--ink-2:#2a1e0e;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:#fff;
+  padding:0 0 40px;min-height:100vh;}
+.hdr{background:linear-gradient(180deg,#0f0a04,var(--ink));
+  padding:calc(14px + env(safe-area-inset-top)) 18px 16px;
+  display:flex;align-items:center;gap:14px;}
+.back{background:rgba(240,192,64,0.1);border:1px solid rgba(240,192,64,0.25);
+  border-radius:12px;padding:10px 14px;color:var(--gold);font-size:14px;
+  font-weight:600;cursor:pointer;text-decoration:none;white-space:nowrap;}
+.hdr h1{font-size:19px;font-weight:800;color:var(--gold);flex:1;text-align:center;}
+.content{max-width:560px;margin:0 auto;padding:20px 18px;}
+/* Version block */
+.version{margin-bottom:24px;}
+.v-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.v-date{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:rgba(240,192,64,0.6);background:rgba(240,192,64,0.08);
+  padding:4px 10px;border-radius:8px;}
+.v-num{font-size:20px;font-weight:800;color:var(--gold);}
+.v-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px;margin-left:4px;}
+.tag-new{background:rgba(46,204,113,0.18);color:#2ecc71;}
+.tag-fix{background:rgba(52,152,219,0.18);color:#5dade2;}
+.tag-legal{background:rgba(240,192,64,0.18);color:#f0c040;}
+.item{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06);}
+.item:last-child{border-bottom:none;}
+.item .dot{width:7px;height:7px;border-radius:50%;background:rgba(240,192,64,0.5);
+  flex-shrink:0;margin-top:7px;}
+.item .txt{flex:1;font-size:14px;color:rgba(255,255,255,0.85);line-height:1.5;}
+.item .txt b{color:#fff;font-weight:700;}
+.sep{height:1px;background:rgba(240,192,64,0.12);margin:20px 0;}
+/* Badge NEW sur l'entrée la plus récente */
+.v-new-badge{display:inline-block;background:var(--gold);color:var(--ink);
+  font-size:10px;font-weight:800;padding:2px 8px;border-radius:6px;margin-left:8px;
+  vertical-align:middle;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <a href="menu.html" class="back">← Menu</a>
+  <h1>🆕 Nouveautés</h1>
+  <div style="width:70px"></div>
+</div>
+
+<div class="content">
+
+<!-- ════════════════════════════════════════════════════════════
+     ZONE À MODIFIER PAR ANTHONY
+     Ajoute chaque mise à jour ici, en copiant le bloc "version"
+     ci-dessous. La version la plus récente doit être EN HAUT.
+     Voir le guide de saisie tout en bas du fichier.
+     ════════════════════════════════════════════════════════════ -->
+
+<!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.0</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <!-- M1 -->
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M1 Compteur annuel — refonte complète</b> : nouveau design gris-bleu, cartes arrondies, barre contingent redessinée, menu déroulant de période au-dessus du calendrier. Soldes en cartes (Brut / Récupération / Net). Taux horaire permanent dans la configuration. Boutons d'ajout rapide (+15 min, +30 min, +1h, +2h). <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <!-- M2 -->
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 Suivi de paie — heures payées par taux</b> : saisie séparée par palier (25 % / 50 % ou 3 niveaux pour les CCN à taux intermédiaire). Nouvelle section Restant dû ventilée par taux avec estimation en €. Calcul sur tout l'historique avec rétrocompatibilité FIFO. Zone euro : deux toggles indépendants (code d'accès / floutage). Fix coefficient "×21.25" → "×1.25". <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <!-- M3/M4 -->
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 Jumeau numérique — calcul de surcharge revu</b> : fenêtre glissante 28 j pour fatigue/stress/récupération ; 12 semaines pour les risques structurels (cardiovasculaire, cérébral, métabolique). Une semaine à 35 h améliore le score dès la semaine suivante. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Jours fériés et récupération</b> : un férié non travaillé compte désormais comme 7 h base CCN (et non comme une vraie semaine de congé). Le plancher de récupération élevé ne s'applique plus qu'aux vraies vacances déclarées. Fix "0 h travaillées" le week-end et score récupération 99 le dimanche hors vacances. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — lecture seule sur M4</b> : suppression de autoAdapt() et adaptFromCheckin() qui doublaient artificiellement la fatigue affichée. M3 lit les données de M4, il ne les modifie plus. Nettoyage automatique de la clé DTE_COEFS corrompue au lancement. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — messages selon la charge réelle</b> : les messages de Kitsune reflètent désormais les vraies heures de la semaine en cours (3 niveaux : norme / charge modérée / plafond légal Art. L3121-20). Le cache se régénère dès que les saisies M2 changent. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <!-- Trousse à outils -->
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Trousse à outils — 54 modules audités et corrigés</b> : chaque module a été vérifié contre les règles 2026. Corrections majeures : faute grave conserve l'ARE, MAP conservatoire salaire suspendu, délai MP 2 ans, grève au prorata dans le privé (pas le 1/30e), retraite anticipée RACL 58 ans si début avant 16 ans, FMD 600/900 €, dégressivité ARE à 55 ans, C2P 500 €/point. 44/44 points de l'audit conformes. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Référentiel juridique commun</b> : 125 articles de loi, 47 valeurs chiffrées et 16 formules partagées centralisés dans un fichier unique. Toute mise à jour (revalorisation du SMIC, plafonds…) ne nécessite plus de modifier les 54 modules un par un. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Valeurs 2026 à jour</b> : SMIC 12,31 €/h (revalorisation juin 2026), PMSS 4 005 €, PASS 48 060 €, IJSS max 42,97 €/jour, AJPA 64,54 €/jour. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Bouton Favoris</b> : remplace le bouton Terrier dans le menu. Menu déroulant donnant accès direct aux outils épinglés + lien vers la caisse à outils. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Optimiseur de congés</b> : dans le module Jours fériés, un encart calcule automatiquement les meilleurs combos fériés + ponts pour maximiser les jours de repos consécutifs. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Corrections techniques</b> : bouton Réinitialiser réparé dans 41 modules, sélection d'onglets dans Avantages en nature, dialogue de confirmation sans URL, anti-page-blanche sur tous les modules. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v9.0</span>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>La Trousse à outils — Le Terrier</b> : 54 outils accessibles depuis le menu principal. Recherche, favoris, récents, catégories par thème.</div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Menu personnalisable</b> : masque les modules que tu n'utilises pas. Retrouve-les à tout moment.</div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Mentions légales</b> : conformes LCEN, accessibles depuis le menu. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Valeurs 2026</b> : SMIC, PMSS, PASS mis à jour dans tous les modules. <span class="v-tag tag-fix">Mise à jour</span></div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Ancienneté</b> : l'arbre pousse visuellement selon les années d'ancienneté.</div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Mai 2026</span>
+    <span class="v-num">v8.9</span>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>GrillePaye Lumina (M7)</b> : 419 conventions collectives avec grilles de salaires 2026. SMIC 1 867,02 € intégré.</div>
+  </div>
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Zenji (M6)</b> : informations juridiques sur le forfait jours, le forfait heures et le statut cadre dirigeant.</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     FIN DE LA ZONE NOUVEAUTÉS
+     ════════════════════════════════════════════════════════════ -->
+
+</div><!-- fin .content -->
+
+<!-- ════════════════════════════════════════════════════════════
+╔══════════════════════════════════════════════════════════════╗
+║           GUIDE DE SAISIE — POUR ANTHONY UNIQUEMENT          ║
+║  Ce bloc est invisible pour les utilisateurs (commentaire)   ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  COMMENT AJOUTER UNE NOUVEAUTÉ                               ║
+║                                                              ║
+║  1. Ouvre ce fichier dans un éditeur texte.                  ║
+║                                                              ║
+║  2. Copie ce bloc et colle-le JUSTE APRÈS la ligne           ║
+║     "VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER"         ║
+║     (remplace l'ancien bloc "version" au-dessus)             ║
+║                                                              ║
+║  ─ ─ ─ ─ ─ ─ BLOC À COPIER ─ ─ ─ ─ ─ ─                    ║
+║                                                              ║
+║  <div class="version">                                       ║
+║    <div class="v-head">                                      ║
+║      <span class="v-date">MOIS ANNÉE</span>                  ║
+║      <span class="v-num">vX.X</span>                         ║
+║      <span class="v-new-badge">NOUVEAU</span>                ║
+║    </div>                                                    ║
+║                                                              ║
+║    <div class="item">                                        ║
+║      <div class="dot"></div>                                 ║
+║      <div class="txt"><b>Titre du changement</b> :           ║
+║        Description courte. TAG</div>                         ║
+║    </div>                                                    ║
+║  </div>                                                      ║
+║                                                              ║
+║  <div class="sep"></div>                                     ║
+║                                                              ║
+║  ─ ─ ─ ─ ─ ─ FIN DU BLOC ─ ─ ─ ─ ─ ─                      ║
+║                                                              ║
+║  3. REMPLACE les zones en MAJUSCULES :                       ║
+║     MOIS ANNÉE  → ex: "Juillet 2026"                        ║
+║     vX.X        → ex: "v9.1"                                ║
+║     Titre       → le nom du module ou de la fonctionnalité  ║
+║     Description → en 1-2 phrases max, langage simple        ║
+║                                                              ║
+║  4. Pour le TAG (à la fin de chaque item) choisis parmi :   ║
+║                                                              ║
+║     Nouveau  → <span class="v-tag tag-new">Nouveau</span>   ║
+║     Fix      → <span class="v-tag tag-fix">Correction</span>║
+║     Légal    → <span class="v-tag tag-legal">Légal</span>   ║
+║     (ou pas de tag du tout, laisse vide)                     ║
+║                                                              ║
+║  5. Tu peux ajouter autant de <div class="item">             ║
+║     que tu veux dans un même bloc version.                   ║
+║                                                              ║
+║  6. Supprime le badge NOUVEAU des anciennes versions         ║
+║     (retire la ligne <span class="v-new-badge">...)          ║
+║                                                              ║
+║  7. Sauvegarde → commit → push. C'est tout.                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+════════════════════════════════════════════════════════════ -->
+
+<script>
+// Marquer comme vu quand l'utilisateur ouvre la page
+try{ localStorage.setItem('NV_SEEN','1'); }catch(e){}
+</script>
+</body>
+</html>
