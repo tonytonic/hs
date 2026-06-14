@@ -392,7 +392,7 @@ function openTool(id){
   probe(id).then(function(ok){
     if(ok){
       var r=getRecent().filter(function(x){return x!==id;});r.unshift(id);r=r.slice(0,12);ls(LS.R,r);
-      window.location.href='outils/'+id+'/index.html';
+      window.location.href='outils/'+id+'.html';
     }else{
       // Module supprimé entre-temps : on met à jour la dispo, on purge le cache et on re-render
       if(AVAILABLE)AVAILABLE[id]=false;
@@ -502,8 +502,17 @@ function availIds(ids){ return ids.filter(isAvail); }
 
 /* Teste un module : résout true si index.html existe, false sinon */
 function probe(id){
-  return fetch('outils/'+id+'/index.html',{method:'HEAD',cache:'no-store'})
-    .then(function(r){return r.ok;})
+  /* Fichier sentinelle ok.txt (1 octet, text/plain) au lieu de index.html :
+     Cloudflare renvoie un 200 custom pour les fichiers manquants, ce qui
+     rend r.ok inutilisable. On vérifie aussi le Content-Type — les pages
+     d erreur Cloudflare sont text/html, notre sentinelle est text/plain. */
+  return fetch('outils/'+id+'-ok.txt',{method:'GET',cache:'no-store'})
+    .then(function(r){
+      if(!r.ok) return false;
+      var ct=(r.headers.get('content-type')||'').toLowerCase();
+      if(ct.indexOf('text/html')>=0) return false;
+      return true;
+    })
     .catch(function(){return false;});
 }
 
