@@ -1058,14 +1058,17 @@ closingDate.addEventListener("blur",()=>{const cal=document.getElementById("cale
 function scrollToToday(){const today=new Date().toISOString().slice(0,7);if(currentKey!==today)return;const el=document.getElementById("todayCell");if(el)el.scrollIntoView({behavior:"smooth",block:"center"})}
 function renderCalendar(){
   const cal=document.getElementById("calendar");cal.innerHTML="";
-  ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].forEach(d=>{const w=document.createElement("div");w.className="weekday";w.textContent=d;cal.appendChild(w)});
-  const[y,m]=currentKey.split("-").map(Number),today=new Date(),isCurMonth=currentKey===today.toISOString().slice(0,7);
   // Premier jour de la semaine selon les accords CCN (debutSemaine : 1=lun … 7=dim)
   const ds = getCCNRules().debutSemaine || 1; // 1=lundi par défaut
+  // Rotation des headers : si ds=3 (mercredi) → ["Mer","Jeu","Ven","Sam","Dim","Lun","Mar"]
+  const allDays = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+  const rotatedDays = [...allDays.slice(ds-1), ...allDays.slice(0, ds-1)];
+  rotatedDays.forEach(d=>{const w=document.createElement("div");w.className="weekday";w.textContent=d;cal.appendChild(w)});
+  const[y,m]=currentKey.split("-").map(Number),today=new Date(),isCurMonth=currentKey===today.toISOString().slice(0,7);
   // getDay() : 0=dim, 1=lun … 6=sam → convertir en base-1-lundi
   const rawDay = new Date(y,m-1,1).getDay(); // 0=dim..6=sam
   const asMonBase = rawDay === 0 ? 7 : rawDay; // 0→7, autres inchangés (1=lun..6=sam)
-  // Décalage par rapport au premier jour de semaine CCN (ds=1=lun)
+  // Décalage par rapport au premier jour de semaine CCN (ds déjà calculé ci-dessus)
   let firstDay = ((asMonBase - ds + 7) % 7) + 1; // 1..7
   if(firstDay > 7) firstDay = 1;
   const dim=new Date(y,m,0).getDate(),{start,end}=getPeriodBounds(currentKey),isLocked=DATA[currentKey].locked;
