@@ -1001,13 +1001,32 @@ function _kitsuneGetCCN() {
   // Fallback par défaut (droit commun)
   const defaultCCN = { contingent: 220, seuil: 35, taux1: 25, palier1: 8, taux_inter: null, palier_inter: 0, taux2: 50, nom: null };
 
-  if (typeof CCN_API === 'undefined') return defaultCCN;
+  // PRIORITE 1 : accord entreprise ou CCN personnalise (CCN_IDCC supprime, seul CCN_CUSTOM ecrit)
+  try {
+    const _rawCustom = localStorage.getItem('CCN_CUSTOM');
+    if (_rawCustom) {
+      const _c = JSON.parse(_rawCustom);
+      if (_c && typeof _c.seuil === 'number' && _c.seuil > 0) {
+        return Object.assign({}, defaultCCN, _c);
+      }
+    }
+  } catch(_) {}
 
-  const idcc = parseInt((localStorage.getItem('CCN_IDCC') || '0'));
+  // PRIORITE 2 : CCN standard via API
+  if (typeof CCN_API !== 'undefined') {
+    const idcc = parseInt((localStorage.getItem('CCN_IDCC') || '0'));
+    const ccnData = CCN_API.getGroupeForCCN(idcc);
+    if (ccnData && ccnData.contingent) return ccnData;
+  }
 
-  // getGroupeForCCN retourne directement l'objet de règles (pas un nom de groupe)
-  const ccnData = CCN_API.getGroupeForCCN(idcc);
-  return (ccnData && ccnData.contingent) ? ccnData : defaultCCN;
+  // PRIORITE 3 : base contractuelle M1 (BASE_HEBDO_<annee>) sans CCN definie
+  try {
+    const _yr = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
+    const _bh = Number(localStorage.getItem('BASE_HEBDO_' + _yr));
+    if (_bh >= 35) return Object.assign({}, defaultCCN, { seuil: _bh });
+  } catch(_) {}
+
+  return defaultCCN;
 }
 function _kitsuneFormatMsg(msg, h) {
   const r = _kitsuneGetCCN();
@@ -2426,8 +2445,11 @@ function _analyzeLegalSituation() {
   try {
     const year      = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
     const ccnRules  = _kitsuneGetCCN();
-    const baseHebdo = ccnRules.seuil;
-    const baseJour  = ccnRules.seuil / 5;
+    const _seuilLegal = ccnRules.seuil; // seuil LÉGAL de déclenchement des HS (35h en droit commun)
+    // Base CONTRACTUELLE réelle (ex: 39h) — lue depuis M1 (clé BASE_HEBDO_<année>),
+    // même source que module-reader.js. Fallback sur le seuil légal si non défini.
+    const baseHebdo = Number(localStorage.getItem('BASE_HEBDO_' + year)) || _seuilLegal;
+    const baseJour  = baseHebdo / 5;
     const contingentMax = ccnRules.contingent;
 
     function isoWeekKey(dk) {
@@ -2630,12 +2652,14 @@ function _analyzeLegalSituation() {
   } catch(e) {
     console.warn('_analyzeLegalSituation:', e);
     const fallbackCCN = _kitsuneGetCCN();
+    const _fbYear = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
+    const _fbBase = Number(localStorage.getItem('BASE_HEBDO_' + _fbYear)) || fallbackCCN.seuil;
     return {
-      daily:  { hasDailyCrit:false, hasDailyRisk:false, maxDayTotal:0, maxDayExtra:0, baseJour:fallbackCCN.seuil/5, daysOver10:0, daysOver12:0 },
+      daily:  { hasDailyCrit:false, hasDailyRisk:false, maxDayTotal:0, maxDayExtra:0, baseJour:_fbBase/5, daysOver10:0, daysOver12:0 },
       weekly: { hasWeekViol:false, hasAvgViol:false, hasWeekAlert:false, maxWeekTotal:0, maxAvg12:0, weeksOver48:0, weeksOver44:0, totalWeeks:0 },
       period: { current:null, lastClosed:null, hasClosure:false, all:[] },
       annual: { annualOT:0, contingentMax:fallbackCCN.contingent, contingentPct:0, contingentRem:fallbackCCN.contingent, hasContingentAlert:false, hasContingentDanger:false },
-      globalLevel:'ok', baseHebdo:fallbackCCN.seuil, baseJour:fallbackCCN.seuil/5
+      globalLevel:'ok', baseHebdo:_fbBase, baseJour:_fbBase/5
     };
   }
 }
@@ -2790,7 +2814,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   // Corrige le bug : maxWeekTotal = max historique, pas la semaine en cours
   // Ex: samedi avec 10h HS (45h total) → message "semaine à 45h"
   // ══════════════════════════════════════════════════════════════
-  if (s.weekly && s.weekly.currentWeekTotal > 35) {
+  if (s.weekly && s.weekly.currentWeekTotal > (s.baseHebdo || 35)) {
     const cwTotal = s.weekly.currentWeekTotal;
     const cwHS    = s.weekly.currentWeekHS || 0;
     const cwDays  = s.weekly.currentWeekDays || 0;
@@ -2836,7 +2860,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const hs50 = Math.max(0, cwHS - 8);
       return {
         titre: `${jourNow} — semaine à ${_fmtH(cwTotal)}`,
-        message: `${pr_pr}${_fmtH(cwTotal)} cette semaine (base 35h + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36).`,
+        message: `${pr_pr}${_fmtH(cwTotal)} cette semaine (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36).`,
         actions: [
           'Saisies enregistrées dans FOX ✓',
           'Vérifier les majorations sur ta prochaine fiche de paie',
@@ -3788,7 +3812,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
         const _hsf_g = _fmtH(_cwHS_g);
         msg = {
           titre: `Semaine en cours — ${_hsf_g} sup déjà posées`,
-          message: `${_prn_g}on est ${_jr_g}, la semaine n'est pas terminée. Tu as déjà ${_hsf_g} d'heures sup sur ${_cwDay_g} jour${_cwDay_g > 1 ? 's' : ''}. Le total réel et les majorations ne seront connus qu'une fois les jours restants saisis — donc pas de bilan « 35h » tant que la semaine n'est pas bouclée.`,
+          message: `${_prn_g}on est ${_jr_g}, la semaine n'est pas terminée. Tu as déjà ${_hsf_g} d'heures sup sur ${_cwDay_g} jour${_cwDay_g > 1 ? 's' : ''}. Le total réel et les majorations ne seront connus qu'une fois les jours restants saisis — donc pas de bilan « base atteinte » tant que la semaine n'est pas bouclée.`,
           actions: [
             `${_hsf_g} sup déjà enregistrées cette semaine`,
             'Reviens en fin de semaine pour le total réel et les majorations',
@@ -4472,7 +4496,8 @@ function kitsuneNarrateOvertime(deltaH, source) {
         _weekHSKey += _ex;
       }
     } catch(_ek) {}
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_r6';
+    const _baseKey = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_b' + _baseKey + '_r7';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
@@ -4487,7 +4512,10 @@ function kitsuneNarrateOvertime(deltaH, source) {
       const _yr_cw  = _now_cw.getFullYear().toString();
       const _rawM1_cw = JSON.parse(localStorage.getItem('DATA_REPORT_' + _yr_cw) || '{}');
       const _rawM2_cw = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr_cw) || '{}');
-      const _baseJ_cw = (typeof _kitsuneGetCCN === 'function') ? (_kitsuneGetCCN().seuil / 5) : 7;
+      // Base contractuelle : priorite CCN_CUSTOM > CCN_API > BASE_HEBDO_ (via _kitsuneGetCCN).
+      // Ne pas relire BASE_HEBDO_ directement : si accord change, CCN_CUSTOM.seuil doit gagner.
+      const _baseHebdo_cw = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
+      const _baseJ_cw = _baseHebdo_cw / 5;
       // Lundi de la semaine courante
       const _dow_cw = (_now_cw.getDay() + 6) % 7; // 0=lun, 6=dim
       let _weekHS_cw = 0;
@@ -4854,7 +4882,7 @@ function _cappedHoursForXP(years) {
     // ── M1 : DATA_REPORT_YYYY → { "YYYY-MM-DD": { extra, recup, absent } } ──
     try {
       const raw = JSON.parse(localStorage.getItem('DATA_REPORT_' + year) || '{}');
-      const baseHebdo = Number(localStorage.getItem('BASE_HEBDO_' + year)) || 35;
+      const baseHebdo = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
 
       // 1. Grouper par semaine avec plafond journalier
       const weeks = {};
@@ -5300,13 +5328,29 @@ function startSyncPolling() {
 
 // \u2500\u2500 \u00C9couter les changements localStorage (depuis M1/M2) \u2500\u2500\u2500\u2500\u2500\u2500\u2500
 window.addEventListener('storage', (e) => {
-  // R\u00E9agir si M1, M2 ou l'ann\u00E9e active changent
-  if (e.key && (
+  if (!e.key) return;
+
+  // Reagir si M1, M2 ou l'annee active changent
+  if (
     e.key.startsWith('DATA_REPORT_') ||
     e.key.startsWith('CA_HS_TRACKER_V1_DATA_') ||
     e.key === 'ACTIVE_YEAR_SUFFIX'
-  )) {
+  ) {
     setTimeout(() => syncModulesAndAwardXP('storage-event'), 300);
+  }
+
+  // Invalider le cache popup Kitsune si CCN, accord entreprise ou base M1 changent.
+  // Sans ca, le message 35h nickel / base 35h persistait toute la journee
+  // meme apres un changement d'accord dans le menu.
+  const _yr_se = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
+  if (
+    e.key === 'CCN_IDCC'   ||
+    e.key === 'CCN_NOM'    ||
+    e.key === 'CCN_CUSTOM' ||
+    e.key === ('BASE_HEBDO_' + _yr_se)
+  ) {
+    try { localStorage.removeItem('FOX_POPUP_DAILY'); } catch(_) {}
+    console.log('[Kitsune] CCN/base change -> cache popup invalide');
   }
 });
 
