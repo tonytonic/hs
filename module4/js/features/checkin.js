@@ -55,6 +55,45 @@ const SLOT_REGIME = {
   split:     {startH:9,  endH:19, regimeType:'standard'},
 };
 
+/* ── FEATURE TRAJET — 3 questions (spec M4 SimulHeures) ────────────────
+   Affichées uniquement : jour travaillé + M4_COMMUTE_ENABLED='true' + commuteH>0.
+   Q1 mode (statistique) · Q2 durée A/R → commuteTime (min) · Q3 qualité → commuteQual.
+   Télétravail (remote) → commuteTime=0, Q2 et Q3 sautées (géré dans _buildSequence). */
+const Q_COMMUTE_MODE = {
+  id:'commuteMode', text:'Mode de transport aujourd\'hui ?', emoji:'🚦',
+  opts:[
+    {v:'remote',  e:'🏠', l:'Télétravail'},
+    {v:'car',     e:'🚗', l:'Voiture / Moto'},
+    {v:'transit', e:'🚆', l:'Transports en commun'},
+    {v:'bike',    e:'🚲', l:'Vélo / Trottinette'},
+    {v:'walk',    e:'🚶', l:'À pied'},
+  ]
+};
+// Valeurs = minutes A/R représentatives (le facteur durée du moteur est par paliers,
+// la valeur exacte ne sert qu'au stockage / affichage).
+const Q_COMMUTE_TIME = {
+  id:'commuteTime', text:'Durée du trajet aujourd\'hui ? (aller-retour total)', emoji:'⏱️',
+  opts:[
+    {v:20,  e:'⚡', l:'< 30 min'},
+    {v:45,  e:'🕐', l:'30–60 min'},
+    {v:75,  e:'🕜', l:'60–90 min'},
+    {v:105, e:'🕑', l:'> 90 min'},
+  ]
+};
+const Q_COMMUTE_QUAL = {
+  id:'commuteQual', text:'Conditions du trajet ?', emoji:'🛣️',
+  opts:[
+    {v:0, e:'😌', l:'Fluide / Agréable'},
+    {v:1, e:'🙂', l:'Normal'},
+    {v:2, e:'😕', l:'Long ou retard'},
+    {v:3, e:'😣', l:'Difficile / Stressant'},
+  ]
+};
+// Libellés J-1 pour le report dans l'intitulé
+const COMMUTE_MODE_L1 = {remote:'Télétravail', car:'Voiture', transit:'Transports', bike:'Vélo', walk:'À pied'};
+const COMMUTE_TIME_L1 = {20:'< 30 min', 45:'30–60 min', 75:'60–90 min', 105:'> 90 min'};
+const COMMUTE_QUAL_L1 = {0:'Fluide', 1:'Normal', 2:'Long', 3:'Difficile'};
+
 class Checkin {
   constructor(){
     this._modal   = document.getElementById('checkin-modal');
@@ -140,8 +179,41 @@ class Checkin {
     // Injecter la question de confirmation N-1 si lundi matin et pas encore confirmé
     // Question N-1 supprimée : le lundi utilise désormais la moyenne rolling 28j (weeklyExtra28).
     if(!s) this._questions = [Q_STATUS, ...QUESTIONS_WELLBEING];
-    else if(s === 'work') this._questions = [Q_STATUS, Q_SLOT, ...QUESTIONS_WELLBEING];
+    else if(s === 'work') this._questions = [Q_STATUS, Q_SLOT, ...QUESTIONS_WELLBEING, ...this._commuteSequence()];
     else this._questions = [Q_STATUS, ...QUESTIONS_WELLBEING];
+  }
+
+  // Feature Trajet : OFF par défaut. Visible seulement si activée ET trajet au profil.
+  _commuteEnabled(){
+    try {
+      if(localStorage.getItem('M4_COMMUTE_ENABLED') !== 'true') return false;
+      const set = JSON.parse(localStorage.getItem('DTE_SETTINGS')||'{}');
+      return (parseFloat(set.commuteH)||0) > 0;
+    } catch(_){ return false; }
+  }
+
+  // Séquence trajet, avec report J-1 dans l'intitulé. Télétravail → Q2+Q3 sautées.
+  _commuteSequence(){
+    if(!this._commuteEnabled()) return [];
+    const n1 = this._commuteN1();
+    const hint = (base, val) => val !== undefined && val !== null ? `${base} (hier : ${val})` : base;
+    const qMode = {...Q_COMMUTE_MODE, text: hint('Mode de transport aujourd\'hui ?', n1 && COMMUTE_MODE_L1[n1.commuteMode])};
+    if(this._answers.commuteMode === 'remote'){
+      return [qMode]; // télétravail → pas de durée ni de conditions
+    }
+    const qTime = {...Q_COMMUTE_TIME, text: hint('Durée du trajet aujourd\'hui ? (aller-retour total)', n1 && COMMUTE_TIME_L1[n1.commuteTime])};
+    const qQual = {...Q_COMMUTE_QUAL, text: hint('Conditions du trajet ?', n1 && COMMUTE_QUAL_L1[n1.commuteQual])};
+    return [qMode, qTime, qQual];
+  }
+
+  // Dernière entrée trajet (J-1 ou plus récente) pour le report dans les questions.
+  _commuteN1(){
+    try {
+      const h = _safeLS.json('DTE_CHECKIN_HISTORY', []);
+      const today = new Date(); const tdk = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+      for(let i=h.length-1;i>=0;i--){ if(h[i].date!==tdk && h[i].commuteMode!==undefined) return h[i]; }
+    } catch(_){}
+    return null;
   }
 
   _mondayN1Question(){
@@ -322,6 +394,8 @@ class Checkin {
         const val = el.dataset.val;
         this._answers[q.id] = isNaN(val) ? val : parseInt(val);
         if(q.id === 'dayStatus') this._buildSequence();
+        // Trajet : rebuild pour retirer Q2/Q3 si télétravail sélectionné
+        if(q.id === 'commuteMode') this._buildSequence();
 
         // Traitement spécial pour la confirmation N-1
         if(q.id === 'n1confirm') {
@@ -424,10 +498,11 @@ class Checkin {
         <div style="font-family:var(--font-h);font-size:20px;font-weight:700;margin:var(--gap) 0;">Check-in enregistré !</div>
         <div style="color:var(--text-dim);font-size:13px;line-height:1.6;">${statusMsg}<br>Précision du modèle améliorée.</div>
         <div style="display:flex;justify-content:center;gap:var(--gap);margin-top:var(--gap-l);flex-wrap:wrap;">
-          ${Object.entries(this._answers).filter(([k])=>k!=='dayStatus'&&k!=='timeSlot').map(([k,v])=>{
+          ${Object.entries(this._answers).filter(([k])=>k!=='dayStatus'&&k!=='timeSlot'&&!k.startsWith('commute')).map(([k,v])=>{
             const q=QUESTIONS_WELLBEING.find(q=>q.id===k); const o=q?q.opts.find(o=>o.v===v):null;
             return q?`<span style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:4px 10px;font-family:var(--font-mono);font-size:10px;">${q.emoji} ${o?o.e:''}</span>`:'';
           }).join('')}
+          ${this._answers.commuteMode?`<span style="background:var(--surface2);border:1px solid rgba(155,109,255,0.4);border-radius:var(--r);padding:4px 10px;font-family:var(--font-mono);font-size:10px;">🚦 ${COMMUTE_MODE_L1[this._answers.commuteMode]||''}${this._answers.commuteMode!=='remote'&&this._answers.commuteQual!==undefined?' · '+(COMMUTE_QUAL_L1[this._answers.commuteQual]||''):''}</span>`:''}
         </div>
         <button class="btn btn--cyan" style="margin-top:var(--gap-l);" id="ci-done">Fermer</button>
       </div>`;

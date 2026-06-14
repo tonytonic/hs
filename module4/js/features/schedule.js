@@ -263,6 +263,38 @@ function renderSchedulePanel(containerId) {
           font-family:var(--font-mono);">minutes · aller uniquement (×2 = total)</div>
       </div>
 
+      <!-- TOGGLE IMPACT TRAJET (feature SimulHeures, OFF par défaut) -->
+      ${(() => {
+        const commuteOn = localStorage.getItem('M4_COMMUTE_ENABLED') === 'true';
+        const hasCommute = (settings.commuteH || 0) > 0;
+        return `
+      <div style="margin-bottom:12px;padding:10px;border:1px solid rgba(155,109,255,${commuteOn?'0.4':'0.15'});
+        background:rgba(155,109,255,${commuteOn?'0.07':'0.02'});border-radius:4px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:3px;">🚦 Impact Trajet sur la santé</div>
+            <div style="font-size:9px;color:var(--text-dim);line-height:1.5;font-family:var(--font-mono);">
+              ${!hasCommute
+                ? 'Définissez d\'abord un temps de trajet ci-dessus pour activer cette option.'
+                : commuteOn
+                  ? 'Activé : le trajet influe sur fatigue, stress, récupération et risque cardio. 3 questions au check-in.'
+                  : 'Désactivé : le trajet n\'impacte pas les scores. Aucune question au check-in.'}
+            </div>
+          </div>
+          <button onclick="window._schToggleCommute()" id="toggle-commute-btn"
+            ${!hasCommute?'disabled':''}
+            style="min-width:80px;padding:8px 12px;
+              background:${commuteOn?'linear-gradient(135deg,#9b6dff,#6d3fcc)':'rgba(255,255,255,0.05)'};
+              border:1px solid ${commuteOn?'rgba(155,109,255,0.6)':'rgba(255,255,255,0.1)'};
+              color:${commuteOn?'#fff':'#888'};font-family:var(--font-mono);font-size:11px;font-weight:700;
+              cursor:${hasCommute?'pointer':'not-allowed'};opacity:${hasCommute?'1':'0.4'};
+              border-radius:4px;letter-spacing:.1em;transition:all 0.3s;">
+            ${commuteOn?'✓ ACTIVÉ':'✕ DÉSACTIVÉ'}
+          </button>
+        </div>
+      </div>`;
+      })()}
+
       <!-- TYPE DE POSTE -->
       <div style="margin-bottom:12px;">
         <div style="font-size:9px;color:var(--text-dim);font-family:var(--font-mono);
@@ -465,6 +497,26 @@ function renderSchedulePanel(containerId) {
     const s = loadSettings();
     s.commuteH = minutes / 60;
     saveSettings(s);
+    // Si on remet le trajet à 0, désactiver aussi l'impact (cohérence)
+    if (minutes === 0) localStorage.setItem('M4_COMMUTE_ENABLED', 'false');
+    renderSchedulePanel(containerId);
+    _triggerReanalysis();
+  };
+
+  window._schToggleCommute = () => {
+    const s = loadSettings();
+    if ((s.commuteH || 0) <= 0) return; // garde : pas d'activation sans trajet au profil
+    const currentState = localStorage.getItem('M4_COMMUTE_ENABLED') === 'true'; // OFF par défaut
+    const newState = !currentState;
+    localStorage.setItem('M4_COMMUTE_ENABLED', newState ? 'true' : 'false');
+    if (typeof DTE !== 'undefined' && DTE.UI && DTE.UI.notify) {
+      DTE.UI.notify(
+        newState
+          ? '✓ Impact Trajet activé : le trajet influe sur vos scores (fatigue, stress, récupération, cardio)'
+          : '✕ Impact Trajet désactivé : le trajet n\'impacte plus les scores',
+        newState ? 'success' : 'info'
+      );
+    }
     renderSchedulePanel(containerId);
     _triggerReanalysis();
   };
