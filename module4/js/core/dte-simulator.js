@@ -195,7 +195,11 @@ class DTESimulator {
     const timeline = [];
     let totFat = 0, totStr = 0, totPerf = 0;
     let maxFat = fat, daysAlert = 0, daysCrit = 0, daysBurnout = 0;
-    let cumulWeeks   = s._cumulWeeks || 0;
+    // Exposition de départ : fenêtre 12 sem (cumWLong, atteint réellement 10-12),
+    // PAS la fenêtre 28j (s._cumulWeeks, plafonnée à 4) — sinon le simulateur partirait
+    // d'un cumul sous-évalué et son équilibre serait incohérent avec l'état statique.
+    const _nL = (this._engine._lastNorm) || {};
+    let cumulWeeks   = (_nL._cumulWeeksLong != null ? _nL._cumulWeeksLong : (s._cumulWeeks || 0));
     let consecDays   = 0;
 
     for (let i = 0; i < nb; i++) {
@@ -227,30 +231,40 @@ class DTESimulator {
                    : cumulWeeks >= 4  ? BIO.CUMUL_4W    // 1.25
                    : 1.0;
 
-      // ── FATIGUE (INRS — dose-réponse non-linéaire) ──────────────
+      // ── FATIGUE — modèle STABLE par relaxation vers un équilibre de charge ──
+      // CORRECTIF MAJEUR. L'ancien modèle intégrait charge − récupération avec un terme
+      // non-linéaire (1 + fat × k) : équilibre INSTABLE → soit la fatigue décroissait vers
+      // 5% ("tout va bien" faux), soit elle divergeait vers 100% (burnout systématique),
+      // selon d'infimes écarts du point de départ. Désormais la fatigue RELAXE vers un
+      // palier d'équilibre déterminé par la charge hebdo et la durée de surcharge, calibré
+      // pour COÏNCIDER avec le score statique du moteur (45h·10sem → ~0.59 ; 50h → ~0.95).
+      // Converge depuis n'importe quel départ → cohérent état / simulation / prévision.
+      const _eqBase    = weeklyH <= BIO.H_OPTIMAL ? 0.06
+                       : Math.min(0.95, 0.06 + (weeklyH - BIO.H_OPTIMAL) * 0.038);
+      const _eqChronic = 1 + Math.min(0.55, Math.max(0, cumulWeeks - 1) * 0.05);
+      const loadEq     = Math.min(0.97, _eqBase * _eqChronic);
+
       if (isRest || isVacance) {
-        // Récupération weekend : réduite si travail de nuit (INRS : sommeil diurne = 70%)
-        const rec4day    = (restDays.includes(5) || restDays.includes(6)) ? BIO.REC_4DAY_BONUS : 0;
-        const nightPenal = _isNight ? 0.70 : 1.0; // INRS — qualité du repos dégradée nuit
-        const rec        = isVacance ? BIO.REC_VACANCES : (BIO.REC_WEEKEND + rec4day) * nightPenal;
-        fat              = Math.max(0, fat - rec / Math.max(1, cumulF * 0.92));
+        // Repos : tire la fatigue vers le bas, mais bornée par l'équilibre chronique
+        // (Sonnentag 2003 : récupération seulement partielle sous surcharge soutenue).
+        // Les vacances détachent bien plus (de Bloom 2010) → plancher beaucoup plus bas.
+        const nightPenal = _isNight ? 0.70 : 1.0;
+        const restFloor  = isVacance ? loadEq * 0.30 : loadEq * 0.80;
+        const recPull    = (isVacance ? BIO.REC_VACANCES : BIO.REC_WEEKEND) * nightPenal;
+        fat              = Math.max(restFloor, fat - recPull);
         consecDays       = 0;
       } else {
         consecDays++;
-        // Coefficient dynamique selon charge (3 paliers calibrés OMS/INRS/J.Occup.Health)
-        const fatCoef    = hsH <= 1 ? BIO.FAT_PER_HS_BASE
-                         : hsH <= 3 ? BIO.FAT_PER_HS_MID
-                         :            BIO.FAT_PER_HS_HIGH;
-        const nonLinear  = 1 + fat * BIO.FAT_NONLINEAR;
-        const fatLoad    = hsH * fatCoef * nonLinear * cumulF;
-        // Dette de sommeil quotidienne depuis horaires réels (Thompson 2022)
-        // sommeilDispo = 24h - heures travaillées - trajet×2 - 0.75h prépa
+        // Relaxation quotidienne vers l'équilibre (négatif si au-dessus, positif si en dessous)
+        // → toujours convergent, jamais de divergence ni d'effondrement.
+        fat += (loadEq - fat) * 0.14;
+        // Dette de sommeil = légère poussée au-dessus de l'équilibre (Thompson 2022)
         const totalDayH   = D.BASE_JOUR + hsH;
         const sommeilDispo = Math.max(0, 24 - totalDayH - (_schedule.commuteH||0)*2 - 0.75);
         const sommeilReel  = _isNight ? sommeilDispo * 0.70 : Math.min(sommeilDispo, 10.5);
         const detteSommeil = Math.max(0, 8 - sommeilReel);
-        const fatSommeil   = detteSommeil * 0.035 * cumulF; // Thompson 2022 : +14%/nuit
-        fat = Math.min(1, Math.max(BIO.FAT_FLOOR, fat + fatLoad + fatSommeil - D.RECOVERY));
+        fat += detteSommeil * 0.008;
+        fat = Math.min(1, Math.max(BIO.FAT_FLOOR, fat));
       }
 
       // ── STRESS/CORTISOL (Thompson 2022 + ANACT + IARC 2019) ─────────────────
