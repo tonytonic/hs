@@ -1030,8 +1030,27 @@ function loadMonth(){updateYearLabel();
   const[y,m]=currentKey.split("-").map(Number);let needSave=false;
   if(!DATA[currentKey]){DATA[currentKey]={days:{},paid:0,carry:0,closing:getLastClosingDay(y,m-1),locked:false};needSave=true}
   {const ld=new Date(y,m,0).getDate(),cl=DATA[currentKey].closing;if(!cl||cl>ld||new Date(y,m-1,cl).getDay()!==getClosingDow()){DATA[currentKey].closing=getLastClosingDay(y,m-1);needSave=true}}
+  // Auto-verrouiller les périodes antérieures (évite les modifications accidentelles
+  // et les pop-ups intempestifs). L'utilisateur peut déverrouiller manuellement si besoin.
+  autoLockPastPeriods();
   paidInput.value=DATA[currentKey].paid||0;setClosingLimits();syncClosingDate();renderCalendar();recalcCascade();recalc();scrollToToday();if(needSave)save();
 }
+
+/* Verrouille automatiquement toutes les périodes antérieures à currentKey
+   qui ne sont pas encore verrouillées et ont au moins un paiement ou des heures. */
+function autoLockPastPeriods(){
+  const yd = ALL_DATA[currentYear] || {};
+  let changed = false;
+  Object.keys(yd).forEach(k => {
+    if(!/^\d{4}-\d{2}$/.test(k) || k >= currentKey) return;
+    const m = yd[k];
+    if(!m || m.locked) return;
+    const hasActivity = (Number(m.paid)||0)>0 || (m.days && Object.values(m.days).some(h=>(Number(h)||0)>0));
+    if(hasActivity){ m.locked = true; changed = true; }
+  });
+  if(changed) saveYearData(currentYear, yd);
+}
+
 function syncClosingDate(){if(!DATA[currentKey])return;const[y,m]=currentKey.split("-").map(Number),day=DATA[currentKey].closing||31;closingDate.value=`${y}-${String(m).padStart(2,"0")}-${String(day).padStart(2,"0")}`}
 function setClosingLimits(){const[y,m]=currentKey.split("-").map(Number),ld=new Date(y,m,0).getDate();closingDate.min=`${y}-${String(m).padStart(2,"0")}-01`;closingDate.max=`${y}-${String(m).padStart(2,"0")}-${ld}`}
 closingDate.oninput=()=>{if(!closingDate.value)return;const sel=new Date(closingDate.value),[y,m]=currentKey.split("-").map(Number);if(sel.getFullYear()!==y||sel.getMonth()+1!==m){toast("⛔ La date doit être dans le mois sélectionné","error");syncClosingDate();return}if(sel.getDay()!==getClosingDow()){toast("⛔ La clôture doit être un "+getClosingDayLabel(),"error");syncClosingDate();return}DATA[currentKey].closing=sel.getDate();save();renderCalendar();recalc()};
@@ -1041,7 +1060,15 @@ function renderCalendar(){
   const cal=document.getElementById("calendar");cal.innerHTML="";
   ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"].forEach(d=>{const w=document.createElement("div");w.className="weekday";w.textContent=d;cal.appendChild(w)});
   const[y,m]=currentKey.split("-").map(Number),today=new Date(),isCurMonth=currentKey===today.toISOString().slice(0,7);
-  const firstDay=new Date(y,m-1,1).getDay()||7,dim=new Date(y,m,0).getDate(),{start,end}=getPeriodBounds(currentKey),isLocked=DATA[currentKey].locked;
+  // Premier jour de la semaine selon les accords CCN (debutSemaine : 1=lun … 7=dim)
+  const ds = getCCNRules().debutSemaine || 1; // 1=lundi par défaut
+  // getDay() : 0=dim, 1=lun … 6=sam → convertir en base-1-lundi
+  const rawDay = new Date(y,m-1,1).getDay(); // 0=dim..6=sam
+  const asMonBase = rawDay === 0 ? 7 : rawDay; // 0→7, autres inchangés (1=lun..6=sam)
+  // Décalage par rapport au premier jour de semaine CCN (ds=1=lun)
+  let firstDay = ((asMonBase - ds + 7) % 7) + 1; // 1..7
+  if(firstDay > 7) firstDay = 1;
+  const dim=new Date(y,m,0).getDate(),{start,end}=getPeriodBounds(currentKey),isLocked=DATA[currentKey].locked;
   for(let i=1;i<firstDay;i++)cal.appendChild(document.createElement("div"));
   for(let d=1;d<=dim;d++){
     const div=document.createElement("div");div.className="day";
@@ -1060,9 +1087,34 @@ function renderCalendar(){
 /* POPUP HEURES */
 function openHours(d){currentDay=d;const c=document.getElementById("hoursChoices");c.innerHTML="";[0.25,0.5,0.75,1,1.25,1.5,2].forEach(v=>{const b=document.createElement("button");b.textContent="+"+fmtH(v);b.onclick=()=>applyHours(v);c.appendChild(b)});setM2SaisieMode(_m2SaisieMode);document.getElementById("hoursModal").classList.add("open");lockBodyScroll()}
 function closeHours(){document.getElementById("hoursModal").classList.remove("open");unlockBodyScroll()}
-function applyHours(h){if(h<=0)return;const[_y,_m]=currentKey.split("-").map(Number);if(isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}DATA[currentKey].days[currentDay]=(DATA[currentKey].days[currentDay]||0)+h;save();renderCalendar();recalc();maybeShowReliquatPopup();const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)}
+function applyHours(h){
+  if(h<=0)return;
+  const[_y,_m]=currentKey.split("-").map(Number);
+  if(isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}
+  // Tracker l'incrément pour le popup reliquat (seules les heures NOUVELLEMENT ajoutées)
+  if(hasLaterActivity(currentKey)){
+    DATA[currentKey]._reliquatIncrement=(DATA[currentKey]._reliquatIncrement||0)+h;
+  }
+  DATA[currentKey].days[currentDay]=(DATA[currentKey].days[currentDay]||0)+h;
+  save();renderCalendar();recalc();maybeShowReliquatPopup();
+  const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)
+}
 function confirmManual(){const inp=document.getElementById("manualHours"),h=parseFloat(inp.value);if(isNaN(h)||h<=0){toast("⛔ Valeur invalide","error");return}applyHours(h);inp.value=""}
-function deleteDayHours(){const[_y,_m]=currentKey.split("-").map(Number);if(currentDay&&isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}if(!currentDay||!DATA[currentKey].days[currentDay]){toast("ℹ️ Aucune heure à supprimer","info");return}confirmModal(`Supprimer les heures du ${currentDay} ?`,()=>{delete DATA[currentKey].days[currentDay];currentDay=null;save();renderCalendar();recalc();maybeShowReliquatPopup();closeHours();},"Supprimer",true);return;currentDay=null;save();renderCalendar();recalc();closeHours()}
+function deleteDayHours(){
+  const[_y,_m]=currentKey.split("-").map(Number);
+  if(currentDay&&isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}
+  if(!currentDay||!DATA[currentKey].days[currentDay]){toast("ℹ️ Aucune heure à supprimer","info");return}
+  confirmModal(`Supprimer les heures du ${currentDay} ?`,()=>{
+    // Réduire l'incrément si on supprime des heures récemment ajoutées
+    if(hasLaterActivity(currentKey)){
+      const deleted=DATA[currentKey].days[currentDay]||0;
+      DATA[currentKey]._reliquatIncrement=Math.max(0,(DATA[currentKey]._reliquatIncrement||0)-deleted);
+    }
+    delete DATA[currentKey].days[currentDay];
+    currentDay=null;save();renderCalendar();recalc();maybeShowReliquatPopup();closeHours();
+  },"Supprimer",true);
+  return;currentDay=null;save();renderCalendar();recalc();closeHours()
+}
 /* ── MODE SAISIE M2 : HS directes / Heures travaillées ── */
 let _m2SaisieMode=localStorage.getItem('M2_SAISIE_MODE')||'hs';
 function setM2SaisieMode(mode){
@@ -1204,19 +1256,39 @@ function recalc(){
   document.getElementById("carryOver").textContent=fmtH((DATA[currentKey].carry||0));
 
   // Stat-grid dynamique (s'adapte au nombre de paliers CCN)
-  // Affiche la ventilation RÉELLE du restant dû (dueBreakdown), cohérente avec
-  // le report et les choix de taux de l'utilisateur — pas la théorie par paliers.
+  // Stat-grid : ventilation des heures de la période par paliers légaux (brut).
+  // Affiche ce que la loi dit de chaque heure, indépendamment des paiements.
+  // EXCEPTION : si l'utilisateur a manuellement routé les heures via le pop-up
+  // (reliquatAlloc), on affiche sa ventilation choisie — elle prime sur les paliers légaux.
+  // Arrondi à 0.25h pour éviter les décimales parasites (ex: mode heures travaillées 39h).
+  const round25sg = v => Math.round(v * 4) / 4;
+  let t25d = round25sg(t25), tInterd = round25sg(tInter), t50d = round25sg(t50);
+
+  const mCur = DATA[currentKey];
+  if(mCur && mCur.reliquatAlloc){
+    // Ventilation choisie par l'utilisateur dans le pop-up de reliquat.
+    // Elle écrase les paliers légaux pour que la stat-grid soit cohérente
+    // avec ce que l'utilisateur voit dans le report (dueBreakdown).
+    const a1 = Number(mCur.reliquatAlloc.t1)||0;
+    const ai = Number(mCur.reliquatAlloc.ti)||0;
+    const a2 = Number(mCur.reliquatAlloc.t2)||0;
+    const ownH = t25 + tInter + t50;                     // total heures de la période
+    const ownPaid = Number(mCur.paid)||0;
+    const ownUnpaid = Math.max(0, ownH - ownPaid);        // heures non encore payées
+    const sumA = a1 + ai + a2;
+    const leftover = Math.max(0, ownUnpaid - sumA);       // non encore routées → t1 par défaut
+    t25d   = round25sg(a1 + leftover);  // allouées à 25% + non-routées (prudent)
+    tInterd = round25sg(ai);
+    t50d   = round25sg(a2);             // allouées à 50% par choix utilisateur
+  }
+
   const sgc = document.getElementById("statGridContainer");
   if(sgc){
-    const bdReal = (DATA[currentKey] && DATA[currentKey].dueBreakdown) || null;
-    const g25 = bdReal ? (Number(bdReal.due1)||0) : t25;
-    const gInter = bdReal ? (Number(bdReal.dueInter)||0) : tInter;
-    const g50 = bdReal ? (Number(bdReal.due2)||0) : t50;
     const paliers = [
       { val: fmtH(ph),     lbl: 'Total<br>période', color: 'var(--accent)' },
-      { val: fmtH(g25),    lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
-      ...(rules.taux_inter !== null ? [{ val: fmtH(gInter), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
-      { val: fmtH(g50),    lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
+      { val: fmtH(t25d),   lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
+      ...(rules.taux_inter !== null ? [{ val: fmtH(tInterd), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
+      { val: fmtH(t50d),   lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
     ];
     sgc.style.gridTemplateColumns = 'repeat('+paliers.length+',1fr)';
     sgc.innerHTML = paliers.map(p =>
@@ -1251,11 +1323,12 @@ function recalc(){
 ───────────────────────────────────────────────────────────────────── */
 function isLegacyMode(){
   /* Mode legacy = AVANT la migration (le solde n'a jamais atteint zéro).
-     En legacy : total simple, pas de taux, pas de FIFO.
+     En legacy : total simple, pas de taux détaillé.
      La migration s'enregistre sur la période où le solde atteint zéro (migrationKey).
-     Toute période <= migrationKey reste en mode simple ; les périodes > migrationKey sont per-taux. */
+     NOTE : la période de migration elle-même passe en mode per-taux (>= devient >).
+     Seules les périodes STRICTEMENT AVANT migrationKey restent en mode simple. */
   if(!SETTINGS.migrationKey) return true;          // pas encore migré → tout est legacy
-  return currentKey <= SETTINGS.migrationKey;       // période pré/migration → legacy simple
+  return currentKey < SETTINGS.migrationKey;        // STRICTEMENT avant → legacy simple
 }
 
 function checkActivatePerTaux(){
@@ -1370,15 +1443,18 @@ function checkPostMigrationReliquat(){
   if(!cur) return null;
   // Période passée = il existe une période POSTÉRIEURE avec activité.
   if(!hasLaterActivity(currentKey)) return null;
-  const ownH = periodOwnHours(currentKey);
+  // IMPORTANT : on ne montre le pop-up QUE si des heures ont été ajoutées dans
+  // cette session (incrément > 0).  Les anciennes heures non routées restent
+  // silencieusement à 25% (prudent) et ne déclenchent pas de pop-up intempestif.
+  const newHours = Number(cur._reliquatIncrement)||0;
+  if(newHours <= 0.01) return null;
+  // Vérifier que l'incrément ne dépasse pas les heures propres non payées
+  const ownH   = periodOwnHours(currentKey);
   const ownPaid = Number(cur.paid)||0;
-  const ownUnpaid = ownH - ownPaid;        // heures propres non payées (le reliquat)
-  clampReliquatAlloc(cur, ownUnpaid);       // borner l'alloc aux heures réellement présentes
-  const delta = ownUnpaid - reliquatSumAlloc(cur); // non encore routées
-  if(delta > 0.01){
-    return { key: currentKey, carry: ownUnpaid, delta };
-  }
-  return null;
+  const ownUnpaid = Math.max(0, ownH - ownPaid);
+  const effectiveDelta = Math.min(newHours, ownUnpaid);
+  if(effectiveDelta <= 0.01) return null;
+  return { key: currentKey, carry: ownUnpaid, delta: effectiveDelta };
 }
 
 /* Affiche le POP-UP modal de reliquat avec choix du taux.
@@ -1433,51 +1509,60 @@ function updatePostMigrationAlert(){
   modal.classList.add("open");
 }
 
-/* L'utilisateur choisit à quel taux reporter le reliquat. Cible la période _reliquatKey. */
+/* L'utilisateur choisit à quel taux reporter le reliquat. Cible la période _reliquatKey.
+   IMPORTANT : on route UNIQUEMENT les heures nouvellement ajoutées (_reliquatIncrement),
+   pas l'ensemble du reliquat non routé. Les anciennes heures non routées restent
+   affectées à leur taux par défaut (25%, prudent). */
 function handleReliquatTaux(which){
   const key = _reliquatKey || SETTINGS.migrationKey;
   if(!key) return;
-  recalcCascade(); // carry à jour
   const yd = ALL_DATA[currentYear] || {};
   const m = yd[key];
   if(!m) return;
-  // delta = heures propres non payées et non encore routées
-  const ownUnpaid = periodOwnHours(key) - (Number(m.paid)||0);
-  clampReliquatAlloc(m, ownUnpaid);
-  const delta = ownUnpaid - reliquatSumAlloc(m);
-  if(delta <= 0.01) return;
-  // Ajouter le delta à l'allocation CUMULATIVE du taux choisi (sans toucher au reste)
+  // Seules les heures NOUVELLEMENT ajoutées dans cette session sont routées
+  const toRoute = Number(m._reliquatIncrement)||0;
+  if(toRoute <= 0.01){ _reliquatKey=null; _reliquatShownDelta=null; return; }
+  // Vérifier qu'on ne route pas plus que les heures non payées réelles
+  const ownUnpaid = Math.max(0, periodOwnHours(key) - (Number(m.paid)||0));
+  const effectiveRoute = Math.min(toRoute, ownUnpaid);
+  if(effectiveRoute <= 0.01){ _reliquatKey=null; _reliquatShownDelta=null; return; }
+  // Ajouter au taux choisi
   if(!m.reliquatAlloc) m.reliquatAlloc = {t1:0, ti:0, t2:0};
   const slot = which==='taux2' ? 't2' : which==='taux_inter' ? 'ti' : 't1';
-  m.reliquatAlloc[slot] = (Number(m.reliquatAlloc[slot])||0) + delta;
+  m.reliquatAlloc[slot] = (Number(m.reliquatAlloc[slot])||0) + effectiveRoute;
+  // Effacer le compteur d'incrément
+  m._reliquatIncrement = 0;
   const modal = document.getElementById("reliquatModal");
   if(modal) modal.classList.remove("open");
   _reliquatKey = null; _reliquatShownDelta = null;
   save(); recalc();
-  toast(`${fmtH(delta)} reportées à ${rules2pct(which)}`, "success");
+  toast(`${fmtH(effectiveRoute)} reportées à ${rules2pct(which)}`, "success");
 }
 function rules2pct(which){const r=getCCNRules();return which==='taux2'?r.taux2+'%':which==='taux_inter'?(r.taux_inter||0)+'%':r.taux1+'%'}
 
-/* L'utilisateur confirme avoir payé UNIQUEMENT les nouvelles heures (le delta).
-   Les heures déjà reportées à un taux lors d'ajouts précédents restent intactes. */
+/* L'utilisateur confirme que les nouvelles heures ont été payées directement.
+   On augmente UNIQUEMENT m.paid de l'incrément (_reliquatIncrement),
+   sans toucher aux heures précédemment non routées. */
 function handleReliquatSolder(){
   const key = _reliquatKey || SETTINGS.migrationKey;
   if(!key) return;
-  recalcCascade(); // carry à jour
   const yd = ALL_DATA[currentYear] || {};
   const m = yd[key];
   if(!m) return;
-  // delta = heures propres non payées et non encore routées
-  const ownUnpaid = periodOwnHours(key) - (Number(m.paid)||0);
-  clampReliquatAlloc(m, ownUnpaid);
-  const delta = ownUnpaid - reliquatSumAlloc(m);
-  if(delta <= 0.01) return;
-  m.paid = (Number(m.paid)||0) + delta;
+  // Seules les heures nouvellement ajoutées sont soldées
+  const toSolder = Number(m._reliquatIncrement)||0;
+  if(toSolder <= 0.01){ _reliquatKey=null; _reliquatShownDelta=null; return; }
+  const ownUnpaid = Math.max(0, periodOwnHours(key) - (Number(m.paid)||0));
+  const effectiveSolder = Math.min(toSolder, ownUnpaid);
+  if(effectiveSolder <= 0.01){ _reliquatKey=null; _reliquatShownDelta=null; return; }
+  m.paid = (Number(m.paid)||0) + effectiveSolder;
+  // Effacer le compteur d'incrément
+  m._reliquatIncrement = 0;
   const modal = document.getElementById("reliquatModal");
   if(modal) modal.classList.remove("open");
   _reliquatKey = null; _reliquatShownDelta = null;
   save(); recalc();
-  toast(`✅ ${fmtH(delta)} marquées payées`, "success");
+  toast(`✅ ${fmtH(effectiveSolder)} marquées payées`, "success");
 }
 
 function togglePeriodLock(){
@@ -1665,7 +1750,7 @@ function renderPaidInputs(rules){
       migBanner.style.cssText = 'background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:10px;padding:8px 10px;font-size:11px;color:#2ecc71;line-height:1.4;margin-top:8px';
       container.appendChild(migBanner);
     }
-    migBanner.innerHTML = `\u2705 ${fmtH(Number(m.paid)||0)} d\u00e9j\u00e0 pay\u00e9es sur cette p\u00e9riode <span style="color:var(--muted)">(total non ventil\u00e9 par taux)</span>.<br><span style="color:var(--muted)">Pour d\u00e9tailler : saisissez la r\u00e9partition dans les champs ci-dessus (le total sera remplac\u00e9).</span>`;
+    migBanner.innerHTML = `\u2705 ${fmtH(Number(m.paid)||0)} d\u00e9j\u00e0 pay\u00e9es <span style="color:var(--muted)">(total non ventil\u00e9 par taux)</span>.<br><span style="color:var(--accent);font-weight:600">Saisir ci-dessus remplacera ce total par la ventilation par taux.</span>`;
   } else if(migBanner){
     migBanner.remove();
   }
@@ -1922,48 +2007,68 @@ function recalcCascade(){
       m.wasSettled = true;
     }
 
-    // ── Breakdown par taux figé ──
-    // 1. Heures PROPRES de cette période ventilées par paliers
+    // ── Breakdown par taux figé : 3 cas selon le mode de paiement ──
     const {h25, hInter, h50} = calcWeeks(buildDayList(start, end));
-    let o1 = h25, oi = (hInter||0), o2 = h50;
-    const ownTotal = o1 + oi + o2;
-    const ownPaid = (m.paid1!==undefined || m.paid2!==undefined)
-      ? (Number(m.paid1)||0)+(Number(m.paidInter)||0)+(Number(m.paid2)||0)
-      : (Number(m.paid)||0);
-    const ownUnpaid = ownTotal - ownPaid; // heures propres restant dues (le reliquat)
+    const hasPerTaux = m.paid1!==undefined || m.paid2!==undefined || m.paidInter!==undefined;
 
-    if(ownUnpaid >= -0.01){
-      // 2. Cette période contribue ses heures NON PAYÉES au cumul, ventilées par
-      //    l'allocation manuelle (priorité absolue) + le reste par paliers.
-      clampReliquatAlloc(m, ownUnpaid); // l'alloc ne peut dépasser les heures non payées
-      let a1=0, ai=0, a2=0;
-      if(m.reliquatAlloc){ a1=Number(m.reliquatAlloc.t1)||0; ai=Number(m.reliquatAlloc.ti)||0; a2=Number(m.reliquatAlloc.t2)||0; }
-      const sumA = a1 + ai + a2;
-      const leftover = Math.max(0, ownUnpaid - sumA);
-      const base = ownTotal || 1; // forme paliers d'origine pour répartir le reste
-      due1     += a1 + leftover * (o1 / base);
-      dueInter += ai + leftover * (oi / base);
-      due2     += a2 + leftover * (o2 / base);
+    if(hasPerTaux){
+      // ── CAS 1 : paiements per-taux saisis manuellement ──
+      // Soustraction directe par taux (PAS de FIFO, la saisie manuelle fait foi).
+      // Exemple : 8@25 + 2@50, paid1=6 → reste 2@25 + 2@50 (et non 4@25 avec FIFO).
+      due1     += h25;
+      dueInter += (hInter||0);
+      due2     += h50;
+      due1     = Math.max(0, due1     - (Number(m.paid1)||0));
+      dueInter = Math.max(0, dueInter - (Number(m.paidInter)||0));
+      due2     = Math.max(0, due2     - (Number(m.paid2)||0));
+
+    } else if(m.reliquatAlloc && !hasPerTaux){
+      // ── CAS 2 : période legacy avec allocation manuelle rétroactive ──
+      // L'utilisateur a choisi le taux de report pour les heures ajoutées dans le passé.
+      const ownTotal = h25 + (hInter||0) + h50;
+      const ownPaid  = Number(m.paid)||0;
+      const ownUnpaid= Math.max(0, ownTotal - ownPaid);
+      clampReliquatAlloc(m, ownUnpaid);
+      const a1 = Number(m.reliquatAlloc.t1)||0;
+      const ai = Number(m.reliquatAlloc.ti)||0;
+      const a2 = Number(m.reliquatAlloc.t2)||0;
+      const sumA    = a1 + ai + a2;
+      // Heures allouées → leur taux choisi ; reste → taux1 par défaut (prudent)
+      const leftover= Math.max(0, ownUnpaid - sumA);
+      due1     += a1 + leftover;   // les heures non encore routées vont en taux1
+      dueInter += ai;
+      due2     += a2;
+
     } else {
-      // Surpaiement : cette période paie plus que ses propres heures →
-      // l'excédent solde le report des périodes précédentes (50%→inter→25% prudent).
-      let rem = -ownUnpaid;
-      const p2=Math.min(due2,rem); due2-=p2; rem-=p2;
-      const pI=Math.min(dueInter,rem); dueInter-=pI; rem-=pI;
-      const p1=Math.min(due1,rem); due1-=p1;
+      // ── CAS 3 : mode legacy simple (paid total, pas de détail) ──
+      // FIFO prudent : on solde les hauts taux d'abord pour ne pas surestimer.
+      due1     += h25;
+      dueInter += (hInter||0);
+      due2     += h50;
+      if(m.paid){
+        let rem = Number(m.paid)||0;
+        const p2=Math.min(due2,rem); due2-=p2; rem-=p2;
+        const pI=Math.min(dueInter,rem); dueInter-=pI; rem-=pI;
+        const p1=Math.min(due1,rem); due1-=p1;
+      }
     }
 
-    // 3. Réconciliation de sécurité : le total doit correspondre au carry réel.
+    // Réconciliation de sécurité (arrondi 0.25h pour éviter les décimales parasites)
+    const round25 = v => Math.round(v * 4) / 4;
+    due1 = round25(Math.max(0, due1));
+    dueInter = round25(Math.max(0, dueInter));
+    due2 = round25(Math.max(0, due2));
     const bdTotal = due1 + dueInter + due2;
     if(Math.abs(bdTotal - rc) > 0.01){
       if(bdTotal > 0){
         const ratio = rc / bdTotal;
-        due1 *= ratio; dueInter *= ratio; due2 *= ratio;
+        due1 = round25(due1 * ratio);
+        dueInter = round25(dueInter * ratio);
+        due2 = round25(due2 * ratio);
       } else {
         due1 = rc; dueInter = 0; due2 = 0;
       }
     }
-    // 4. Figer le snapshot dans le mois
     m.dueBreakdown = { due1, dueInter, due2 };
   });
 }
