@@ -3,7 +3,7 @@
  * Version : 8.1.0 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.2.1"; // partage : deux liens (iOS + Android)
+const CACHE_NAME = "heuressup-cache-v10.2.0"; // partage : deux liens (iOS + Android)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
