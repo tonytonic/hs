@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Frais Pro — Carnet de route</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#c8a878">
+<meta name="screen-orientation" content="portrait">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Frais Pro">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Special+Elite&family=Courier+Prime:wght@400;700&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<style>
+:root{
+  --paper:#e8dcc4; --paper2:#ddd0b3; --kraft:#c8a878; --kraft-d:#a8895f;
+  --ink:#3a2e21; --ink2:#6b5640; --faded:#8a7355;
+  --stamp-red:#b23a2e; --stamp-green:#3f7a52; --stamp-blue:#2f5a7a;
+  --line:rgba(58,46,33,0.18); --line2:rgba(58,46,33,0.10);
+  --card:#f2e9d6; --card-edge:#d4c4a0;
+  --gold:#b8893a; --accent:#9c6b3f;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--kraft);}
+body{
+  font-family:'Courier Prime','Courier New',monospace;color:var(--ink);padding-bottom:60px;
+  background:
+    repeating-linear-gradient(0deg, rgba(58,46,33,0.012) 0px, rgba(58,46,33,0.012) 1px, transparent 1px, transparent 3px),
+    repeating-linear-gradient(90deg, rgba(58,46,33,0.012) 0px, rgba(58,46,33,0.012) 1px, transparent 1px, transparent 3px),
+    radial-gradient(900px 600px at 85% -5%, rgba(184,137,58,0.18), transparent 60%),
+    radial-gradient(700px 500px at 5% 15%, rgba(168,137,95,0.20), transparent 55%),
+    linear-gradient(170deg, #e8dcc4 0%, #ddd0b3 50%, #d2c3a2 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--kraft);color:var(--ink);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:20px;} #lb .t{font-family:'Caveat',cursive;font-size:30px;font-weight:700;color:var(--accent);}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 14px 16px;}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 14px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(200,168,120,0.97), rgba(200,168,120,0.82) 75%, transparent);
+  backdrop-filter:blur(4px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1.5px solid var(--kraft-d);color:var(--ink);border-radius:4px;
+  padding:8px 12px;font-family:'Special Elite',monospace;font-size:12px;text-decoration:none;flex-shrink:0;
+  box-shadow:2px 2px 0 rgba(58,46,33,0.18);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Caveat',cursive;font-size:25px;font-weight:700;line-height:0.95;color:var(--ink);}
+header .brand .su{font-family:'Special Elite',monospace;font-size:9px;color:var(--ink2);margin-top:1px;letter-spacing:0.5px;}
+header .hbtn{background:var(--card);border:1.5px solid var(--kraft-d);color:var(--ink);border-radius:4px;
+  width:36px;height:36px;font-size:15px;cursor:pointer;flex-shrink:0;box-shadow:2px 2px 0 rgba(58,46,33,0.18);transition:.12s;}
+header .hbtn:active{transform:translate(2px,2px);box-shadow:none;}
+
+.monthbar{display:flex;align-items:center;gap:10px;margin:6px 0 16px;}
+.monthbar button{width:44px;height:44px;border-radius:50%;border:2px dashed var(--kraft-d);
+  background:var(--card);color:var(--ink);font-size:20px;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:.15s;}
+.monthbar button:active{transform:scale(0.9);background:var(--paper2);}
+.monthbar .lbl{flex:1;text-align:center;font-family:'Caveat',cursive;font-size:27px;font-weight:700;
+  color:var(--ink);line-height:1;text-transform:capitalize;}
+.monthbar .lbl small{display:block;font-family:'Special Elite',monospace;font-size:8.5px;font-weight:400;
+  color:var(--faded);letter-spacing:3px;text-transform:uppercase;margin-top:2px;}
+
+.hero{position:relative;border-radius:8px;padding:24px 22px 22px;margin-bottom:20px;overflow:hidden;
+  background:radial-gradient(circle at 50% 0%, #fbf5e6, #f2e9d6 70%);
+  border:2px solid var(--card-edge);
+  box-shadow:0 6px 0 rgba(168,137,95,0.35), 0 14px 28px rgba(58,46,33,0.22);}
+.hero::before{content:"";position:absolute;top:-10px;left:30px;width:80px;height:26px;
+  background:repeating-linear-gradient(45deg,rgba(156,107,63,0.32),rgba(156,107,63,0.32) 6px,rgba(184,137,58,0.32) 6px,rgba(184,137,58,0.32) 12px);
+  transform:rotate(-4deg);box-shadow:0 2px 5px rgba(58,46,33,0.18);}
+.hero::after{content:"";position:absolute;top:-10px;right:30px;width:80px;height:26px;
+  background:repeating-linear-gradient(45deg,rgba(63,122,82,0.30),rgba(63,122,82,0.30) 6px,rgba(184,137,58,0.30) 6px,rgba(184,137,58,0.30) 12px);
+  transform:rotate(5deg);box-shadow:0 2px 5px rgba(58,46,33,0.18);}
+.hero .htag{font-family:'Special Elite',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--faded);text-align:center;}
+.hero .hbig{font-family:'Special Elite',monospace;font-size:46px;font-weight:400;text-align:center;color:var(--stamp-red);
+  line-height:1.05;margin:4px 0 2px;letter-spacing:-1px;transition:color .4s;}
+.hero .hbig.allpaid{color:var(--stamp-green);}
+.hero .hbig small{font-size:15px;color:var(--ink2);}
+.hero .hsub{text-align:center;font-family:'Caveat',cursive;font-size:19px;color:var(--ink2);font-weight:600;margin-top:0;}
+.hbar{height:14px;border-radius:8px;background:rgba(58,46,33,0.12);margin:16px 4px 8px;overflow:hidden;
+  border:1px solid var(--line);position:relative;}
+.hbar .fill{height:100%;background:repeating-linear-gradient(45deg,var(--stamp-green),var(--stamp-green) 8px,#4c8a60 8px,#4c8a60 16px);
+  width:0%;transition:width .7s cubic-bezier(.3,1.2,.5,1);border-radius:8px;}
+.hsplit{display:flex;justify-content:space-between;padding:0 6px;font-family:'Special Elite',monospace;font-size:10px;}
+.hsplit .wait{color:var(--stamp-red);} .hsplit .paid{color:var(--stamp-green);}
+.hsplit b{font-size:12px;}
+
+.qlabel{font-family:'Caveat',cursive;font-size:21px;font-weight:700;color:var(--ink);margin:2px 4px 8px;}
+.quickgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.qbtn{position:relative;background:var(--card);border:2px solid var(--card-edge);border-radius:8px;padding:13px 6px 11px;
+  display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;transition:.14s;
+  box-shadow:3px 3px 0 rgba(168,137,95,0.30);}
+.qbtn:active{transform:translate(3px,3px);box-shadow:none;}
+.qbtn .qe{font-size:25px;line-height:1;filter:saturate(0.85);}
+.qbtn .qn{font-family:'Special Elite',monospace;font-size:9.5px;font-weight:400;color:var(--ink2);text-align:center;line-height:1.25;text-transform:uppercase;letter-spacing:0.3px;}
+.qbtn.km{border-color:var(--gold);box-shadow:3px 3px 0 rgba(184,137,58,0.4);}
+.qbtn.km .qn{color:var(--accent);}
+
+.sectitle{font-family:'Caveat',cursive;font-size:24px;font-weight:700;color:var(--ink);margin:4px 4px 10px;
+  display:flex;align-items:center;gap:8px;}
+.sectitle .ln{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--line),var(--line) 5px,transparent 5px,transparent 10px);}
+.monthstamp{font-family:'Special Elite',monospace;font-size:10px;color:var(--accent);border:1.5px solid var(--accent);
+  border-radius:4px;padding:5px 9px;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:.12s;background:transparent;}
+.monthstamp:active{background:var(--accent);color:var(--paper);}
+
+.exlist{display:flex;flex-direction:column;gap:12px;}
+.exrow{position:relative;background:var(--card);border:1.5px solid var(--card-edge);border-radius:6px;
+  padding:14px 15px;cursor:pointer;transition:.15s;box-shadow:2px 3px 0 rgba(168,137,95,0.28);
+  display:flex;align-items:center;gap:13px;overflow:hidden;}
+.exrow:active{transform:translateY(1px);}
+.exrow::before{content:"";position:absolute;left:6px;top:50%;transform:translateY(-50%);
+  width:7px;height:7px;border-radius:50%;background:rgba(58,46,33,0.16);
+  box-shadow:0 -16px 0 rgba(58,46,33,0.16), 0 16px 0 rgba(58,46,33,0.16);}
+.exrow .exe{font-size:24px;flex-shrink:0;margin-left:10px;filter:saturate(0.85);}
+.exrow .exmid{flex:1;min-width:0;}
+.exrow .extt{font-family:'Special Elite',monospace;font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exrow .exsub{font-family:'Courier Prime',monospace;font-size:10.5px;color:var(--faded);margin-top:2px;}
+.exrow .exval{font-family:'Special Elite',monospace;font-size:16px;font-weight:400;color:var(--ink);flex-shrink:0;}
+.exrow.paid{opacity:0.72;}
+.exrow.paid .exval{color:var(--stamp-green);text-decoration:line-through;text-decoration-color:rgba(63,122,82,0.5);}
+.stamp{position:absolute;right:62px;top:50%;transform:translateY(-50%) rotate(-13deg);
+  font-family:'Special Elite',monospace;font-size:13px;font-weight:400;letter-spacing:1px;
+  color:var(--stamp-red);border:2.5px solid var(--stamp-red);border-radius:6px;padding:2px 7px;
+  text-transform:uppercase;pointer-events:none;opacity:0;mix-blend-mode:multiply;white-space:nowrap;}
+.exrow.paid .stamp{opacity:0.8;animation:stampin .45s cubic-bezier(.2,1.6,.4,1);}
+@keyframes stampin{0%{transform:translateY(-50%) rotate(-13deg) scale(2.4);opacity:0;}
+  60%{transform:translateY(-50%) rotate(-13deg) scale(0.9);opacity:0.95;}100%{transform:translateY(-50%) rotate(-13deg) scale(1);opacity:0.85;}}
+.exrow .extoggle{flex-shrink:0;width:30px;height:30px;border-radius:50%;border:2px solid var(--stamp-green);
+  background:transparent;color:var(--stamp-green);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:.15s;z-index:3;}
+.exrow.paid .extoggle{background:var(--stamp-green);color:var(--paper);}
+.exrow .extoggle:active{transform:scale(0.85);}
+
+.exempty{text-align:center;color:var(--faded);padding:34px 16px;}
+.exempty .e{font-size:46px;display:block;margin-bottom:12px;opacity:.5;}
+.exempty .t{font-family:'Caveat',cursive;font-size:22px;color:var(--ink2);line-height:1.2;}
+
+.btn{display:block;width:100%;border:none;border-radius:6px;padding:14px;font-family:'Special Elite',monospace;
+  font-size:13px;cursor:pointer;transition:.14s;text-align:center;letter-spacing:0.5px;}
+.btn:active{transform:translateY(2px);}
+.btn-main{background:var(--accent);color:#fbf5e6;box-shadow:0 4px 0 #6d4a2b;}
+.btn-main:active{box-shadow:0 1px 0 #6d4a2b;}
+.btn-soft{background:var(--card);color:var(--ink);border:1.5px solid var(--kraft-d);box-shadow:0 3px 0 rgba(168,137,95,0.4);}
+.btn-soft:active{box-shadow:0 1px 0 rgba(168,137,95,0.4);}
+.btn-ghost{background:transparent;color:var(--accent);border:2px dashed var(--accent);}
+.btn-danger{background:transparent;color:var(--stamp-red);border:1.5px solid var(--stamp-red);}
+.export-bar{margin-top:22px;display:flex;flex-direction:column;gap:10px;}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+.foot{margin-top:24px;text-align:center;font-family:'Courier Prime',monospace;font-size:10px;color:var(--faded);line-height:1.6;}
+
+.ov{position:fixed;inset:0;z-index:200;background:rgba(58,46,33,0.55);backdrop-filter:blur(3px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:ovin .25s ease;}
+@keyframes ovin{from{opacity:0;}to{opacity:1;}}
+.box{background:
+    repeating-linear-gradient(0deg,transparent,transparent 27px,rgba(47,90,122,0.10) 27px,rgba(47,90,122,0.10) 28px),
+    linear-gradient(170deg,#fbf5e6,#f0e6d0);
+  border:2px solid var(--card-edge);border-radius:10px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(58,46,33,0.5);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);position:relative;}
+.box::before{content:"";position:absolute;left:38px;top:0;bottom:0;width:1.5px;background:rgba(178,58,46,0.25);}
+@keyframes boxin{from{opacity:0;transform:translateY(20px) scale(.96);}to{opacity:1;transform:none;}}
+.box .hd{padding:22px 22px 14px 50px;position:relative;}
+.box .hd .t{font-family:'Caveat',cursive;font-size:27px;font-weight:700;color:var(--ink);line-height:1;}
+.box .hd .s{font-family:'Courier Prime',monospace;font-size:11px;color:var(--ink2);margin-top:3px;}
+.box .hd .x{position:absolute;top:16px;right:18px;background:var(--card);border:1.5px solid var(--kraft-d);border-radius:50%;
+  width:32px;height:32px;font-size:16px;color:var(--ink);cursor:pointer;}
+.box .bd{padding:0 22px 22px 50px;}
+
+.field{margin-bottom:14px;}
+.field label{display:block;font-family:'Special Elite',monospace;font-size:11px;color:var(--ink2);margin-bottom:6px;letter-spacing:0.3px;}
+.ip{width:100%;background:rgba(255,255,255,0.55);border:1.5px solid var(--kraft-d);border-radius:5px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Courier Prime',monospace;}
+.ip:focus{outline:none;border-color:var(--accent);background:#fff;}
+select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%233a2e21' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .inline .unit{font-family:'Special Elite',monospace;font-size:13px;color:var(--ink2);flex-shrink:0;}
+.hint{font-family:'Courier Prime',monospace;font-size:10.5px;color:var(--faded);margin-top:5px;line-height:1.4;}
+.kmcalc{background:rgba(184,137,58,0.14);border:1.5px dashed var(--gold);border-radius:6px;padding:12px;
+  font-family:'Special Elite',monospace;font-size:13px;color:var(--accent);margin-top:4px;text-align:center;}
+.kmcalc b{font-size:18px;}
+.check-row{display:flex;align-items:center;gap:10px;padding:6px 0;cursor:pointer;}
+.check-row .cb{width:24px;height:24px;border-radius:5px;border:2px solid var(--accent);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--paper);transition:.15s;}
+.check-row.on .cb{background:var(--accent);}
+.check-row div:last-child{font-family:'Courier Prime',monospace;font-size:13px;color:var(--ink);}
+
+.wstep{display:none;text-align:center;padding:10px 4px;}
+.wstep.show{display:block;animation:fade .35s;}
+@keyframes fade{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.wstep .owl{width:120px;height:120px;object-fit:contain;display:inline-block;margin-bottom:8px;
+  filter:drop-shadow(3px 4px 6px rgba(58,46,33,0.3));animation:bob 3s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg);}50%{transform:translateY(-8px) rotate(2deg);}}
+.wstep h2{font-family:'Caveat',cursive;font-size:30px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.05;}
+.wstep p{font-family:'Courier Prime',monospace;font-size:13px;color:var(--ink2);line-height:1.55;margin-bottom:10px;}
+.wstep .accent{color:var(--accent);font-weight:700;}
+.legal{font-family:'Courier Prime',monospace;font-size:10px;color:var(--faded);line-height:1.5;
+  background:rgba(58,46,33,0.05);border-radius:6px;padding:10px;text-align:left;}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(58,46,33,0.2);transition:.2s;}
+.dots .d.on{background:var(--accent);width:22px;border-radius:4px;}
+.feat{display:flex;gap:13px;align-items:flex-start;text-align:left;margin-bottom:14px;}
+.feat .ic{font-size:24px;flex-shrink:0;}
+.feat .tx{font-family:'Courier Prime',monospace;font-size:12.5px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-family:'Special Elite',monospace;color:var(--ink);font-size:12px;margin-bottom:2px;}
+
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--ink);color:var(--paper);font-family:'Special Elite',monospace;font-size:13px;
+  padding:12px 22px;border-radius:6px;box-shadow:0 8px 24px rgba(58,46,33,0.5);opacity:0;
+  transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;letter-spacing:0.5px;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.pop{animation:popk .4s ease;}
+@keyframes popk{0%{transform:scale(1);}40%{transform:scale(1.08);}100%{transform:scale(1);}}
+
+input[type="date"]{-webkit-appearance:none;appearance:none;box-sizing:border-box;max-width:100%;min-width:0;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--kraft);z-index:9999;"></div>
+
+<div id="lb"><div class="i">🧳</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Carnet de frais</div>
+    <div class="su">NOTE · TAMPONNE · RÉCUPÈRE · v2.0</div>
+  </div>
+  <button class="hbtn" id="resetBtn" title="Réglages">⚙</button>
+  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd" style="text-align:center;padding-left:50px;"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="owl" src="Mascotte.png" alt="" onerror="this.style.display='none'">
+      <h2>Ton carnet de frais pro</h2>
+      <p>Chaque euro que tu <span class="accent">avances pour le travail</span> mérite de te revenir. Note-le ici comme une étape de voyage.</p>
+      <p>Et quand l'argent rentre, tu le <span class="accent">tamponnes « remboursé »</span> ✓</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <img class="owl" src="Mascotte.png" alt="" onerror="this.style.display='none'">
+      <h2>En un geste</h2>
+      <p>Touche une <span class="accent">catégorie</span> (🚗 🍽️ 🅿️…), tape le montant. Trois secondes, c'est noté dans le carnet.</p>
+    </div>
+    <div class="wstep" data-step="2">
+      <img class="owl" src="Mascotte.png" alt="" onerror="this.style.display='none'">
+      <h2>Les kilomètres, calculés</h2>
+      <p>Pour la voiture, tu donnes juste les <span class="accent">kilomètres</span>. Le barème officiel fait le calcul. Modifiable si ton entreprise a son taux.</p>
+    </div>
+    <div class="wstep" data-step="3">
+      <img class="owl" src="Mascotte.png" alt="" onerror="this.style.display='none'">
+      <h2>Le compteur « à récupérer »</h2>
+      <p>En haut, tu vois en permanence <span class="accent">combien on te doit encore</span>. À chaque tampon « remboursé », le montant baisse.</p>
+      <div class="legal">Estimations indicatives. Le barème kilométrique est celui de l'administration (arrêté du 27 mars 2023) ; ton employeur ou ta convention peuvent appliquer d'autres règles. Conserve tes justificatifs : seuls eux font foi.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-main" id="wNext">Continuer</button>
+    <button class="btn btn-soft" id="wSkip" style="margin-top:9px;">Passer l'intro</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Le carnet, mode d'emploi</div><div class="s">Simple comme un coup de tampon</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">👆</div><div class="tx"><b>Ajouter un frais</b>Touche une catégorie, tape le montant (ou les km). C'est inscrit dans le carnet du mois.</div></div>
+    <div class="feat"><div class="ic">🪙</div><div class="tx"><b>Marquer remboursé</b>Touche le rond vert d'une ligne pour la tamponner. Le compteur « à récupérer » baisse.</div></div>
+    <div class="feat"><div class="ic">🚗</div><div class="tx"><b>Kilomètres</b>Entre les km : le barème calcule. Modifiable dans les réglages.</div></div>
+    <div class="feat"><div class="ic">📅</div><div class="tx"><b>Mois par mois</b>Les flèches changent de mois.</div></div>
+    <div class="feat"><div class="ic">📄</div><div class="tx"><b>Récap PDF</b>Pour ta demande de remboursement.</div></div>
+    <div class="legal">Outil indicatif et pédagogique — ni avis fiscal ni juridique. Garde tes justificatifs (factures, tickets) : ce sont eux qui font foi.</div>
+    <button class="btn btn-main" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<!-- RESET -->
+<div class="ov" id="resetOv">
+  <div class="box"><div class="hd"><div class="t">Réglages</div><div class="s">Que veux-tu faire ?</div>
+    <button class="x" data-close="resetOv">✕</button></div>
+  <div class="bd">
+    <button class="btn btn-soft" id="reSettings">🚗 Barème kilométrique &amp; taux</button>
+    <button class="btn btn-soft" id="rePin" style="margin-top:9px;">⭐ Épingler au menu principal</button>
+    <button class="btn btn-soft" id="reReplay" style="margin-top:9px;">📖 Revoir l'intro</button>
+    <button class="btn btn-danger" id="reClearMonth" style="margin-top:9px;">🗑 Effacer le mois affiché</button>
+    <button class="btn btn-danger" id="reClearAll" style="margin-top:9px;">🧨 Tout recommencer</button>
+    <button class="btn btn-main" style="margin-top:14px;" data-close="resetOv">Annuler</button>
+  </div></div>
+</div>
+
+<!-- KM SETTINGS -->
+<div class="ov" id="setOv">
+  <div class="box"><div class="hd"><div class="t">Barème kilométrique</div><div class="s">Réglé une fois, repris partout</div>
+    <button class="x" data-close="setOv">✕</button></div>
+  <div class="bd">
+    <div class="field"><label>Puissance fiscale du véhicule</label>
+      <select class="ip" id="sCv">
+        <option value="3">3 CV et moins</option><option value="4">4 CV</option>
+        <option value="5" selected>5 CV</option><option value="6">6 CV</option><option value="7">7 CV et plus</option>
+      </select>
+      <div class="hint">Carte grise, case P.6.</div></div>
+    <div class="field"><label>Taux au kilomètre</label>
+      <div class="inline"><input class="ip" id="sKmRate" type="number" inputmode="decimal" step="0.001" value="0.357"><span class="unit">€ / km</span></div>
+      <div class="hint">Barème officiel pré-rempli. Modifiable selon ton entreprise.</div></div>
+    <div class="check-row" id="sElec"><div class="cb"></div><div>Véhicule électrique (+20 %)</div></div>
+    <button class="btn btn-soft" id="sResetBareme" style="margin-top:4px;">↺ Remettre le barème officiel</button>
+    <button class="btn btn-main" data-close="setOv" style="margin-top:9px;">Enregistrer</button>
+  </div></div>
+</div>
+
+<!-- ADD / EDIT EXPENSE -->
+<div class="ov" id="addEx">
+  <div class="box"><div class="hd"><div class="t" id="aeTitle">Nouveau frais</div><div class="s" id="aeSub">Montant + c'est noté</div>
+    <button class="x" data-close="addEx">✕</button></div>
+  <div class="bd">
+    <div class="field"><label>Date</label><input class="ip" id="aeDate" type="date"></div>
+    <div id="aeKmBlock" style="display:none;">
+      <div class="field"><label>Kilomètres parcourus</label>
+        <div class="inline"><input class="ip" id="aeKm" type="number" inputmode="decimal" value=""><span class="unit">km</span></div></div>
+      <div class="kmcalc" id="aeKmCalc">Montant estimé : <b>0 €</b></div>
+    </div>
+    <div id="aeAmtBlock">
+      <div class="field"><label id="aeAmtLabel">Montant</label>
+        <div class="inline"><input class="ip" id="aeAmt" type="number" inputmode="decimal" value=""><span class="unit">€</span></div></div>
+    </div>
+    <div class="field"><label>Note (facultatif)</label><input class="ip" id="aeNote" placeholder="Ex. trajet client, déjeuner équipe…"></div>
+    <div class="check-row" id="aePaid"><div class="cb"></div><div>Déjà remboursé</div></div>
+    <button class="btn btn-main" id="aeSave" style="margin-top:4px;">Enregistrer</button>
+    <button class="btn btn-danger" id="aeDelete" style="margin-top:8px;display:none;">Supprimer ce frais</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="monthbar">
+    <button id="prevM">‹</button>
+    <div class="lbl" id="monthLbl">—<small>carnet</small></div>
+    <button id="nextM">›</button>
+  </div>
+
+  <div class="hero">
+    <div class="htag">Reste à récupérer · <span id="totMonth">ce mois</span></div>
+    <div class="hbig" id="totWait">0 €<small> dûs</small></div>
+    <div class="hsub" id="heroMsg">Rien à réclamer pour l'instant</div>
+    <div class="hbar"><div class="fill" id="heroFill"></div></div>
+    <div class="hsplit">
+      <span class="wait">À récupérer <b id="sWait">0 €</b></span>
+      <span class="paid">Rentré <b id="sPaid">0 €</b></span>
+    </div>
+  </div>
+
+  <div class="qlabel">✎ Note un frais</div>
+  <div class="quickgrid">
+    <div class="qbtn km" data-cat="km"><div class="qe">🚗</div><div class="qn">Kilomètres</div></div>
+    <div class="qbtn" data-cat="repas"><div class="qe">🍽️</div><div class="qn">Repas</div></div>
+    <div class="qbtn" data-cat="peage"><div class="qe">🅿️</div><div class="qn">Péage / Parking</div></div>
+    <div class="qbtn" data-cat="hotel"><div class="qe">🏨</div><div class="qn">Hôtel</div></div>
+    <div class="qbtn" data-cat="transport"><div class="qe">🚆</div><div class="qn">Transport</div></div>
+    <div class="qbtn" data-cat="autre"><div class="qe">➕</div><div class="qn">Autre</div></div>
+  </div>
+
+  <div class="sectitle">Le carnet du mois<span class="ln"></span>
+    <button class="monthstamp" id="stampAll">Tout remb.</button></div>
+  <div class="exlist" id="exList"></div>
+
+  <div class="export-bar">
+    <button class="btn btn-ghost" id="exportPdfBtn">📄 Récapitulatif PDF du mois</button>
+    <div class="twocol">
+      <button class="btn btn-soft" id="exportJsonBtn">💾 Sauvegarder</button>
+      <button class="btn btn-soft" id="importJsonBtn">📥 Restaurer</button>
+    </div>
+    <input type="file" id="jsonInput" accept=".json,application/json" style="display:none;">
+  </div>
+
+  <div style="background:var(--card);border:1.5px solid var(--kraft-d);border-radius:12px;padding:14px 16px;margin-bottom:14px;">
+    <div style="font-weight:700;font-size:13px;color:var(--ink);margin-bottom:10px;">📋 Règles essentielles sur les frais professionnels</div>
+    <div style="display:flex;flex-direction:column;gap:9px;font-size:12px;color:var(--ink2);line-height:1.45;">
+      <div><strong style="color:var(--ink);">🧾 Justificatifs obligatoires</strong><br>
+      Tout remboursement de frais est en principe appuyé d'un justificatif (ticket, facture, note). Sans justificatif, le remboursement peut être requalifié en avantage en nature et soumis à cotisations.</div>
+      <div><strong style="color:var(--ink);">🚗 Barème kilométrique 2026</strong><br>
+      Barème 2026 identique à 2025 (DGFiP — aucune revalorisation pour 2026). Majoration de +20 % pour les véhicules électriques. Source : DGFiP barème IK 2026. Ce barème intègre l'usure du véhicule, l'assurance et le carburant. Il couvre les déplacements professionnels (pas le trajet domicile-travail habituel).</div>
+      <div><strong style="color:var(--ink);">🏨 Frais d'hébergement</strong><br>
+      Au réel (sur facture) : le remboursement est exonéré de cotisations à 100 % du montant, tant que la dépense reste raisonnable et validée par l'entreprise — il n'y a pas de plafond. Les plafonds URSSAF 2026 : 76,60 €/nuit Paris (dép. 75, 92, 93, 94), 56,80 €/nuit autres dép. métropole (Weblex — source URSSAF, barème grand déplacement 2026) ne s'appliquent qu'à l'indemnité forfaitaire de grand déplacement (somme fixe versée sans facture).</div>
+      <div><strong style="color:var(--ink);">🍽️ Frais de repas</strong><br>
+      Barème URSSAF 2026 (arrêté du 20/12/2002, valeurs actualisées) : repas au restaurant en déplacement → 21,40 €, repas hors résidence non contraint → 10,40 €, panier-repas (travail posté/nuit/lieu isolé) → 7,50 €. Source : URSSAF frais professionnels 2026 — comparateur-notes-de-frais.fr (URSSAF consulté 20/04/2026). Au-delà de ces plafonds forfaitaires, le surplus est réintégré dans le salaire et soumis à cotisations. Pour un remboursement supérieur sans charges, l'entreprise peut opter pour le remboursement au réel sur présentation de la facture.</div>
+      <div><strong style="color:var(--ink);">⚠️ Délai de présentation</strong><br>
+      Les notes de frais doivent être présentées dans un délai raisonnable (généralement 3 mois maximum selon les pratiques d'entreprise ou la politique interne). Passé ce délai, le remboursement peut être refusé.</div>
+    </div>
+  </div>  <div class="foot">
+    <span data-txt="disclaimer_fiscal"></span>. <span data-txt="disclaimer_suivi"></span>.<br>
+    Garde tes justificatifs originaux : seuls eux font foi auprès de ton service RH et des impôts. <span data-txt="ccn_differente"></span>.<br>
+    🧳 Tout reste sur ton appareil.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ MONTHS:'M8_MONTHS', SET:'M8_SETTINGS', WELCOME:'M8_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  function eur(n){ n=Math.round((n||0)*100)/100; return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+  function monthLabel(key){ var p=key.split('-'); var dt=new Date(+p[0],+p[1]-1,1); return dt.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}); }
+
+  var BAREME={3:0.316,4:0.340,5:0.357,6:0.374,7:0.394};
+  var CATS={ km:{e:'🚗',n:'Kilomètres'}, repas:{e:'🍽️',n:'Repas'}, peage:{e:'🅿️',n:'Péage / Parking'},
+    hotel:{e:'🏨',n:'Hôtel'}, transport:{e:'🚆',n:'Transport'}, autre:{e:'➕',n:'Autre'} };
+
+  var settings=get(LS.SET,{cv:5,kmRate:BAREME[5],elec:false});
+  if(settings.cv==null)settings.cv=5; if(settings.kmRate==null)settings.kmRate=BAREME[settings.cv]||0.357; if(settings.elec==null)settings.elec=false;
+  var months=get(LS.MONTHS,{});
+  var curKey=monthKey(new Date());
+
+  function curMonth(){ if(!months[curKey])months[curKey]={items:[]}; if(!months[curKey].items)months[curKey].items=[]; return months[curKey]; }
+  function saveAll(){ set(LS.MONTHS,months); set(LS.SET,settings); }
+  function toast(msg){ var t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._tm); t._tm=setTimeout(function(){t.classList.remove('show');},1700); }
+
+  function kmAmount(km){ var base=(km||0)*(settings.kmRate||0); if(settings.elec)base*=1.2; return base; }
+  function itemAmount(it){ if(it.cat==='km') return kmAmount(it.km||0); return it.amount||0; }
+
+  function monthAgg(key){ var m=months[key]; var total=0,paid=0,wait=0,byCat={};
+    if(m&&m.items){ m.items.forEach(function(it){ var v=itemAmount(it); total+=v; if(it.paid)paid+=v; else wait+=v; byCat[it.cat]=(byCat[it.cat]||0)+v; }); }
+    return {total:total,paid:paid,wait:wait,byCat:byCat,count:(m&&m.items)?m.items.length:0}; }
+  function monthTotal(key){ return monthAgg(key).total; }
+
+  function recalc(){ var g=monthAgg(curKey);
+    var big=$('#totWait');
+    big.innerHTML=eur(g.wait)+'<small> dûs</small>';
+    big.classList.toggle('allpaid', g.count>0 && g.wait<=0.005);
+    $('#sWait').textContent=eur(g.wait); $('#sPaid').textContent=eur(g.paid);
+    var pct = g.total>0 ? (g.paid/g.total*100) : 0;
+    $('#heroFill').style.width=pct+'%';
+    var msg;
+    if(g.count===0) msg='Rien à réclamer pour l\'instant';
+    else if(g.wait<=0.005) msg='Tout est remboursé ! 🎉';
+    else if(g.paid<=0.005) msg='Tout est à récupérer';
+    else msg=Math.round(pct)+'% déjà rentré';
+    $('#heroMsg').textContent=msg;
+    big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+  }
+
+  function shiftMonth(delta){ var p=curKey.split('-'); var d=new Date(+p[0],+p[1]-1+delta,1); curKey=monthKey(d); refreshMonthUI(); }
+  $('#prevM').addEventListener('click',function(){shiftMonth(-1);});
+  $('#nextM').addEventListener('click',function(){shiftMonth(1);});
+  function refreshMonthUI(){ $('#monthLbl').innerHTML=monthLabel(curKey)+'<small>carnet</small>'; $('#totMonth').textContent=monthLabel(curKey); renderList(); recalc(); }
+
+  function fmtDate(d){ try{ var dt=new Date(d); return dt.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}); }catch(e){ return ''; } }
+  function renderList(){ var c=$('#exList'); c.innerHTML=''; var m=curMonth();
+    if(!m.items.length){ c.innerHTML='<div class="exempty"><span class="e">🧳</span><div class="t">Carnet vierge.<br>Note ton premier frais !</div></div>'; updateStampAllBtn(); return; }
+    var items=m.items.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
+    items.forEach(function(it){ var row=document.createElement('div'); row.className='exrow'+(it.paid?' paid':'');
+      var cat=CATS[it.cat]||CATS.autre; var v=itemAmount(it);
+      var sub=fmtDate(it.date)+(it.cat==='km'?(' · '+(it.km||0)+' km'):'')+(it.note?(' · '+it.note):'');
+      row.innerHTML='<button class="extoggle" title="Marquer remboursé">'+(it.paid?'✓':'')+'</button>'+
+        '<div class="exe">'+cat.e+'</div>'+
+        '<div class="exmid"><div class="extt">'+cat.n+'</div><div class="exsub">'+sub+'</div></div>'+
+        '<div class="exval">'+eur(v)+'</div>'+
+        '<div class="stamp">Remboursé</div>';
+      row.querySelector('.extoggle').addEventListener('click',function(e){ e.stopPropagation(); togglePaid(it.id); });
+      row.addEventListener('click',function(){ openEdit(it.id); });
+      c.appendChild(row); });
+    updateStampAllBtn();
+  }
+  function updateStampAllBtn(){ var g=monthAgg(curKey); var btn=$('#stampAll');
+    if(g.count===0){ btn.style.display='none'; return; } btn.style.display='block';
+    btn.textContent = g.wait<=0.005 ? 'Tout rouvrir' : 'Tout remb.';
+  }
+  function togglePaid(id){ var m=curMonth(); var it=m.items.find(function(x){return x.id===id;}); if(!it)return;
+    it.paid=!it.paid; saveAll(); renderList(); recalc(); if(it.paid)toast('Tamponné remboursé ✓'); }
+
+  var aeCat='autre', aeId=null, aePaidState=false;
+  function todayISO(){ var d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function setAePaid(on){ aePaidState=on; $('#aePaid').classList.toggle('on',on); $('#aePaid .cb').textContent=on?'✓':''; }
+  function openAdd(cat){ aeCat=cat; aeId=null; var c=CATS[cat]||CATS.autre;
+    $('#aeTitle').textContent=c.e+' '+c.n; $('#aeSub').textContent='Montant + c\'est noté';
+    $('#aeDelete').style.display='none';
+    var t=todayISO(); $('#aeDate').value = t.slice(0,7)===curKey ? t : (curKey+'-01');
+    $('#aeAmt').value=''; $('#aeKm').value=''; $('#aeNote').value=''; setAePaid(false);
+    toggleKm(cat==='km'); updateKmCalc();
+    $('#addEx').classList.add('show'); setTimeout(function(){ (cat==='km'?$('#aeKm'):$('#aeAmt')).focus(); },150);
+  }
+  function openEdit(id){ var m=curMonth(); var it=m.items.find(function(x){return x.id===id;}); if(!it)return;
+    aeCat=it.cat; aeId=id; var c=CATS[it.cat]||CATS.autre;
+    $('#aeTitle').textContent='Modifier — '+c.n; $('#aeSub').textContent='Corrige, tamponne ou supprime';
+    $('#aeDelete').style.display='block';
+    $('#aeDate').value=it.date||todayISO(); $('#aeAmt').value=it.amount||''; $('#aeKm').value=it.km||''; $('#aeNote').value=it.note||''; setAePaid(!!it.paid);
+    toggleKm(it.cat==='km'); updateKmCalc();
+    $('#addEx').classList.add('show');
+  }
+  function toggleKm(on){ $('#aeKmBlock').style.display=on?'block':'none'; $('#aeAmtBlock').style.display=on?'none':'block'; }
+  function updateKmCalc(){ var km=parseFloat($('#aeKm').value)||0; var v=kmAmount(km);
+    $('#aeKmCalc').innerHTML='Montant estimé : <b>'+eur(v)+'</b>'+(settings.elec?' (+20% élec.)':'')+' · '+settings.kmRate.toLocaleString('fr-FR')+' €/km'; }
+  $('#aeKm').addEventListener('input',updateKmCalc);
+  $('#aePaid').addEventListener('click',function(){ setAePaid(!aePaidState); });
+  $all('.qbtn').forEach(function(b){ b.addEventListener('click',function(){ openAdd(b.dataset.cat); }); });
+  $('#aeSave').addEventListener('click',function(){
+    var m=curMonth(); var date=$('#aeDate').value||todayISO(); var note=$('#aeNote').value.trim();
+    var rec={ id:aeId||('e_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)), cat:aeCat, date:date, note:note, paid:aePaidState };
+    if(aeCat==='km'){ var km=parseFloat($('#aeKm').value)||0; if(km<=0){alert('Indique le nombre de kilomètres 🙂');return;} rec.km=km; }
+    else { var amt=parseFloat($('#aeAmt').value)||0; if(amt<=0){alert('Indique le montant 🙂');return;} rec.amount=amt; }
+    if(aeId){ var idx=m.items.findIndex(function(x){return x.id===aeId;}); if(idx>=0)m.items[idx]=rec; else m.items.push(rec); }
+    else m.items.push(rec);
+    saveAll(); $('#addEx').classList.remove('show'); renderList(); recalc(); toast('Frais noté ✎');
+  });
+  $('#aeDelete').addEventListener('click',function(){ if(!aeId)return; var m=curMonth();
+    m.items=m.items.filter(function(x){return x.id!==aeId;}); saveAll(); $('#addEx').classList.remove('show'); renderList(); recalc(); toast('Frais supprimé'); });
+
+  $('#stampAll').addEventListener('click',function(){ var m=curMonth(); if(!m.items.length)return;
+    var g=monthAgg(curKey); var markPaid = g.wait>0.005;
+    m.items.forEach(function(it){ it.paid=markPaid; }); saveAll(); renderList(); recalc();
+    toast(markPaid?'Tout est tamponné remboursé ✓':'Tout rouvert'); });
+
+  var wizard=$('#wizard'),wStep=0,wMax=4;
+  function renderDots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function showStep(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});renderDots();
+    $('#wNext').textContent=(n===wMax-1)?'C\'est parti !':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  function openWizard(){wizard.classList.add('show');showStep(0);}
+  function closeWizard(){wizard.classList.remove('show');set(LS.WELCOME,1);}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)showStep(wStep+1);else closeWizard();});
+  $('#wSkip').addEventListener('click',closeWizard);
+
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $('#resetBtn').addEventListener('click',function(){$('#resetOv').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show'); if(b.dataset.close==='setOv'){ renderList(); recalc(); } });});
+  $('#reReplay').addEventListener('click',function(){$('#resetOv').classList.remove('show');openWizard();});
+  $('#rePin').addEventListener('click',function(){
+    try{ var p=JSON.parse(localStorage.getItem('pinnedTools')||'[]');
+      if(p.indexOf('module8')===-1){ p.push('module8'); localStorage.setItem('pinnedTools',JSON.stringify(p)); toast('Épinglé au menu principal ⭐'); }
+      else { toast('Déjà épinglé au menu ⭐'); }
+    }catch(e){}
+    $('#resetOv').classList.remove('show');
+  });
+  $('#reSettings').addEventListener('click',function(){$('#resetOv').classList.remove('show');openSettings();});
+  $('#reClearMonth').addEventListener('click',function(){ shConfirm('Effacer ce mois ?', function(){ delete months[curKey]; saveAll(); $('#resetOv').classList.remove('show'); renderList(); recalc(); toast('Mois effacé'); }); });
+  $('#reClearAll').addEventListener('click',function(){ shConfirm('Tout recommencer ?', function(){ months={}; settings={cv:5,kmRate:BAREME[5],elec:false}; saveAll(); $('#resetOv').classList.remove('show'); refreshMonthUI(); toast('Tout est remis à zéro'); }); });
+
+  function openSettings(){ $('#sCv').value=settings.cv; $('#sKmRate').value=settings.kmRate; setElec(settings.elec); $('#setOv').classList.add('show'); }
+  function setElec(on){ $('#sElec').classList.toggle('on',!!on); $('#sElec .cb').textContent=on?'✓':''; }
+  $('#sCv').addEventListener('change',function(){ settings.cv=parseInt($('#sCv').value,10); settings.kmRate=BAREME[settings.cv]||settings.kmRate; $('#sKmRate').value=settings.kmRate; saveAll(); });
+  $('#sKmRate').addEventListener('input',function(){ var v=parseFloat($('#sKmRate').value); if(!isNaN(v))settings.kmRate=v; saveAll(); });
+  $('#sElec').addEventListener('click',function(){ settings.elec=!settings.elec; setElec(settings.elec); saveAll(); });
+  $('#sResetBareme').addEventListener('click',function(){ settings.kmRate=BAREME[settings.cv]||0.357; $('#sKmRate').value=settings.kmRate; saveAll(); toast('Barème officiel rétabli'); });
+
+  $('#exportJsonBtn').addEventListener('click',function(){ try{
+    var payload={app:'SimulHeures',module:'M8',version:2,date:new Date().toISOString(),settings:settings,months:months};
+    var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+    var d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    a.href=url;a.download='frais-pro-sauvegarde-'+stamp+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('Sauvegarde téléchargée 💾');
+  }catch(e){alert('Erreur export : '+e.message);} });
+  $('#importJsonBtn').addEventListener('click',function(){$('#jsonInput').click();});
+  $('#jsonInput').addEventListener('change',function(ev){ var f=ev.target.files&&ev.target.files[0];if(!f)return;var r=new FileReader();
+    r.onload=function(e){ try{ var d=JSON.parse(e.target.result);
+      if(d.module!=='M8'||!d.months){alert('Ce fichier n\'est pas une sauvegarde de Frais Pro.');ev.target.value='';return;}
+      if(!confirm('Restaurer cette sauvegarde ? Tes donnees seront remplacees.')){ev.target.value='';return;}
+      months=d.months||{}; settings=d.settings||settings; saveAll(); curKey=monthKey(new Date()); refreshMonthUI(); toast('Restauré ✨');
+    }catch(err){alert('Impossible de lire le fichier : '+err.message);} ev.target.value=''; };
+    r.readAsText(f); });
+
+  $('#exportPdfBtn').addEventListener('click',function(){ if(!window.jspdf){alert('Le PDF arrive… réessaie dans un instant.');return;}
+    try{ var jsPDF=window.jspdf.jsPDF,doc=new jsPDF({unit:'mm',format:'a4'}),y=18,g=monthAgg(curKey),m=curMonth();
+      doc.setFontSize(16);doc.setTextColor(58,46,33);doc.text('Frais professionnels',14,y);y+=6;
+      doc.setFontSize(9);doc.setTextColor(120);doc.text('Recapitulatif indicatif — '+monthLabel(curKey),14,y);y+=10;
+      function line(l,v,bold){ if(bold)doc.setFont(undefined,'bold'); doc.text(l,14,y);doc.text(v,196,y,{align:'right'}); if(bold)doc.setFont(undefined,'normal'); y+=7; }
+      doc.setFontSize(11);doc.setTextColor(40);
+      Object.keys(CATS).forEach(function(c){ if(g.byCat[c]) line(CATS[c].n, eur(g.byCat[c]), true); });
+      var items=m.items.slice().sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});
+      if(items.length){ y+=2;doc.setFontSize(9);doc.setTextColor(120);doc.text('Detail :',14,y);y+=6;
+        items.forEach(function(it){ if(y>275){doc.addPage();y=18;} var lab='  '+fmtDate(it.date)+' · '+(CATS[it.cat]||CATS.autre).n+(it.cat==='km'?(' ('+(it.km||0)+' km)'):'')+(it.note?(' — '+it.note):'')+(it.paid?'  [REMBOURSE]':'');
+          doc.setFontSize(9);doc.setTextColor(90);line(lab.slice(0,72), eur(itemAmount(it))); }); }
+      y+=2;doc.setDrawColor(200);doc.line(14,y,196,y);y+=8;
+      doc.setFontSize(11);doc.setTextColor(60);line('Total des frais', eur(g.total), true);
+      doc.setTextColor(63,122,82);line('Deja rembourse', eur(g.paid));
+      doc.setFontSize(13);doc.setTextColor(178,58,46);line('RESTE A RECUPERER', eur(g.wait), true);
+      y+=6;doc.setFontSize(7.5);doc.setTextColor(140);
+      var disc='Document indicatif et personnel. Le bareme kilometrique est celui de l administration fiscale (arrete du 27 mars 2023) ; votre employeur ou convention peuvent appliquer d autres regles. Conservez vos justificatifs : seuls eux font foi.';
+      doc.text(doc.splitTextToSize(disc,182),14,y);
+      var dd=new Date(),stamp=dd.getFullYear()+'-'+String(dd.getMonth()+1).padStart(2,'0')+'-'+String(dd.getDate()).padStart(2,'0');
+      var uniq=String(dd.getHours()).padStart(2,'0')+String(dd.getMinutes()).padStart(2,'0')+String(dd.getSeconds()).padStart(2,'0');
+      var fname='frais-pro-'+curKey+'-'+stamp+'-'+uniq+'.pdf';
+      try{ var blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a'); a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},2000); }catch(e2){ doc.save(fname); }
+      toast('PDF généré 📄');
+    }catch(e){alert('Erreur PDF : '+e.message);} });
+
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden){ try{ recalc(); renderList(); }catch(e){} } });
+  window.addEventListener('pageshow',function(){ try{ recalc(); }catch(e){} });
+  refreshMonthUI();
+  if(!get(LS.WELCOME,0)){ openWizard(); }
+})();
+  // resetState global (appelé par onclick)
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function(){
+    shConfirm('Tout remettre à zero ?', function(){
+    try{ localStorage.removeItem('M8_MONTHS'); localStorage.removeItem('M8_SETTINGS'); localStorage.removeItem('M8_WELCOMED'); }catch(e){}
+    location.reload();
+    });
+  };
+</script>
+
+<div style="text-align:center;margin-top:10px;"><button onclick="resetState()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button></div>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

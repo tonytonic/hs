@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Modulation — L'Accordéon</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#5c5c8a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Modulation">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --pur:#5c5c8a;--pur-l:#7a7ab0;--pur-ll:#9898c8;
+  --deep:#2a2a50;--lilac:#e8e8f8;--lilac2:#d5d5f0;--lilac3:#c0c0e0;
+  --ink:#1a1a30;--ink2:#3a3a60;--faded:#7a7a9a;
+  --ok:#2a7a50;--warn:#b07020;--danger:#a03030;
+  --card:#fdfcff;--card-edge:#d0d0e8;--line:rgba(26,26,48,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:radial-gradient(700px 300px at 50% -5%,rgba(92,92,138,0.15),transparent 55%),
+  linear-gradient(180deg,#eeeef8 0%,#e0e0f4 25%,#f8f8fc 65%,#f0f0f8 100%);
+  background-attachment:fixed;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 16px;position:relative;z-index:2;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:#eeeef8;color:var(--pur);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Playfair Display',serif;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(224,224,244,0.97),rgba(224,224,244,0.55) 75%,transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.92);border:none;color:var(--pur);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(26,26,48,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--deep);font-style:italic;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+header .hbtn{background:rgba(255,255,255,0.92);border:none;color:var(--pur);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(26,26,48,0.12);}
+
+.hero{background:linear-gradient(165deg,var(--card),var(--lilac));border-radius:22px;padding:20px;margin:8px 0 16px;
+  box-shadow:0 10px 28px rgba(26,26,48,0.15),inset 0 1px 0 rgba(255,255,255,0.9);}
+.hero .htag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--faded);text-align:center;margin-bottom:8px;}
+.hero .hbig{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;text-align:center;color:var(--deep);line-height:1;}
+.hero .hunit{text-align:center;font-size:13px;color:var(--ink2);font-weight:600;margin-top:4px;}
+.hero .hsub{text-align:center;font-size:11.5px;color:var(--faded);margin-top:8px;}
+.hero .hrow{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.hero .hcell{text-align:center;background:rgba(92,92,138,0.1);border-radius:10px;padding:7px 12px;}
+.hero .hcell .cv{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--pur);}
+.hero .hcell .cl{font-size:10px;color:var(--faded);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+.hero .hcell.warn .cv{color:var(--warn);}
+.hero .hcell.danger .cv{color:var(--danger);}
+.hero .hcell.ok .cv{color:var(--ok);}
+
+.panel{background:rgba(255,255,255,0.95);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:0 5px 18px rgba(26,26,48,0.11);}
+.panel-t{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;font-style:italic;color:var(--deep);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--lilac3);padding-bottom:8px;}
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:12.5px;color:var(--ink2);margin-bottom:6px;}
+.ip{width:100%;background:var(--lilac);border:2px solid var(--card-edge);border-radius:12px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--pur-l);background:#fff;}
+.hint{font-size:11.5px;color:var(--faded);margin-top:5px;line-height:1.4;font-weight:500;}
+
+.result-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);}
+.result-row:last-child{border-bottom:none;}
+.result-row .rl{font-size:13px;color:var(--ink2);font-weight:600;flex:1;}
+.result-row .rv{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--deep);flex-shrink:0;margin-left:10px;}
+.result-row .rv.ok{color:var(--ok);}
+.result-row .rv.warn{color:var(--warn);}
+.result-row .rv.danger{color:var(--danger);}
+
+.info-block{border-radius:10px;padding:11px 12px;margin-bottom:9px;font-size:12.5px;line-height:1.5;}
+.info-block.ok{background:rgba(42,122,80,0.08);border-left:3px solid var(--ok);}
+.info-block.warn{background:rgba(176,112,32,0.08);border-left:3px solid var(--warn);}
+.info-block.danger{background:rgba(160,48,48,0.08);border-left:3px solid var(--danger);}
+.info-block.info{background:rgba(92,92,138,0.08);border-left:3px solid var(--pur-l);}
+.info-block b{display:block;font-weight:700;margin-bottom:3px;}
+
+.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--faded);line-height:1.6;}
+
+/* wizard */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(10,10,30,0.65);backdrop-filter:blur(5px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,var(--card),var(--lilac));border-radius:24px;max-width:430px;width:100%;
+  max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(10,10,30,0.5);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:5px solid var(--pur-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--deep);font-style:italic;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--lilac2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--deep);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-pur{background:linear-gradient(135deg,var(--pur-ll),var(--pur));color:#fff;box-shadow:0 5px 14px rgba(92,92,138,0.4);}
+.btn-ghost{background:transparent;color:var(--pur);border:2px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wemoji{font-size:58px;display:inline-block;margin-bottom:10px;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wstep h2{font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--deep);margin-bottom:10px;font-style:italic;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:10px;font-weight:500;}
+.accent{color:var(--pur-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--deep);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--lilac);border-radius:10px;padding:10px;text-align:left;border-left:3px solid var(--pur-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(92,92,138,0.2);transition:.2s;}
+.dots .d.on{background:var(--pur-l);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--pur);color:#fff;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(10,10,30,0.35);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">🎼</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">L'Accordéon</div>
+    <div class="su">Modulation · Annualisation · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <span class="wemoji">🎼</span>
+      <h2>Modulation & annualisation</h2>
+      <p>Ton entreprise peut faire <span class="accent">varier tes horaires semaine après semaine</span> — des semaines chargées, des semaines légères — sans payer d'heures supplémentaires si le total annuel reste dans les limites.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">⚖️</span>
+      <h2>Les deux principes clés</h2>
+      <div class="feat"><div class="ic">📅</div><div class="tx"><b>Lissage du salaire</b>Ton salaire mensuel reste identique même si les heures varient. La paie est calculée sur la moyenne annuelle (35h).</div></div>
+      <div class="feat"><div class="ic">⏱️</div><div class="tx"><b>Compteur de modulation</b>Chaque heure au-delà du plafond hebdomadaire (en général 44h) est une heure sup. En dessous du plancher : récupération ou crédit.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📋</span>
+      <h2>Accord obligatoire</h2>
+      <p>La modulation <span class="accent">nécessite un accord collectif</span> (branche ou entreprise). Elle ne peut pas être imposée sans accord.</p>
+      <div class="legal">Outil indicatif. Art. L3121-41 à L3121-47 CT. Seuil annuel : 1 607 h (art. L3121-41). Contingent annuel sans accord : 220 h/sal./an (art. D3121-24 CT — confirmé 2026). HS exonérées d'IR jusqu'à 7 500 €/an (LF 2022 — confirmé 2026). Ni avis juridique — consulte ton accord de modulation.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-pur" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- AIDE -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">⚙️</div><div class="tx"><b>Paramètre ton accord</b>Saisis les limites hautes et basses de ton accord de modulation pour que le simulateur soit précis.</div></div>
+    <div class="feat"><div class="ic">📊</div><div class="tx"><b>Simulateur semaine</b>Entre les heures d'une semaine donnée et vois si tu es en zone haute, basse ou normale.</div></div>
+    <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Compteur annuel</b>Visualise le cumul et les heures supplémentaires déclenchées en fin de période.</div></div>
+    <div class="legal">Les heures au-delà du plafond hebdomadaire d'un accord de modulation sont des HS. En fin d'année, les heures excédant 1 607h sont aussi des HS.</div>
+    <button class="btn btn-pur" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="htag">🎼 Compteur de modulation</div>
+    <div class="hbig" id="hBig">—</div>
+    <div class="hunit" id="hUnit">Saisis ta situation ci-dessous</div>
+    <div class="hsub" id="hSub"></div>
+    <div class="hrow" id="hRow" style="display:none;">
+      <div class="hcell" id="hc1"><div class="cv" id="h1v">—</div><div class="cl" id="h1l">Écart moy.</div></div>
+      <div class="hcell" id="hc2"><div class="cv" id="h2v">—</div><div class="cl" id="h2l">HS projetées</div></div>
+      <div class="hcell" id="hc3"><div class="cv" id="h3v">—</div><div class="cl">Semaines</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">⚙️ Paramètres de l'accord</div>
+    <div class="field">
+      <label>Durée de référence hebdomadaire</label>
+      <select class="ip" id="fRef" onchange="recalc()">
+        <option value="35">35h (droit commun)</option>
+        <option value="37">37h (avec RTT)</option>
+        <option value="39">39h (avec heures sup forfaitisées)</option>
+      </select>
+      <div class="hint">La durée sur laquelle le lissage de salaire est calculé.</div>
+    </div>
+    <div class="field">
+      <label>Plafond hebdomadaire (semaines hautes)</label>
+      <select class="ip" id="fPlafond" onchange="recalc()">
+        <option value="44">44h (plafond légal sans accord spécifique)</option>
+        <option value="46">46h (accord de branche fréquent)</option>
+        <option value="48">48h (maximum légal absolu)</option>
+      </select>
+      <div class="hint">Au-delà de ce seuil, les heures sont des heures supplémentaires immédiates.</div>
+    </div>
+    <div class="field">
+      <label>Plancher hebdomadaire (semaines basses)</label>
+      <select class="ip" id="fPlancher" onchange="recalc()">
+        <option value="0">0h (semaines de repos possibles)</option>
+        <option value="14">14h (mi-temps minimum)</option>
+        <option value="21">21h (60% du temps)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">📊 Simulateur semaine</div>
+    <div class="field">
+      <label>Heures travaillées cette semaine</label>
+      <input class="ip" type="number" id="fHSem" min="0" max="60" step="0.5" placeholder="ex: 42" oninput="recalcSemaine()">
+    </div>
+    <div id="semResult" style="display:none;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">🧮 Projection annuelle</div>
+    <div class="field">
+      <label>Nombre de semaines hautes prévues</label>
+      <input class="ip" type="number" id="fNHautes" min="0" max="52" placeholder="ex: 20" oninput="recalc()">
+      <div class="hint">Semaines où tu travailles au plafond de l'accord.</div>
+    </div>
+    <div class="field">
+      <label>Nombre de semaines basses prévues</label>
+      <input class="ip" type="number" id="fNBasses" min="0" max="52" placeholder="ex: 15" oninput="recalc()">
+      <div class="hint">Semaines légères (congés, creux d'activité…). Le reste = semaines normales à la référence.</div>
+    </div>
+    <div id="annuelResult" style="display:none;"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">📚 Principes légaux</div>
+    <div class="info-block info"><b>📋 Accord obligatoire</b>La modulation du temps de travail nécessite un accord collectif (branche ou entreprise). Elle ne peut pas être imposée unilatéralement par l'employeur.</div>
+    <div class="info-block ok"><b>💶 Lissage du salaire</b>Le salaire mensuel reste stable malgré les variations d'horaires. Calculé sur la base de la durée de référence (35h ou autre).</div>
+    <div class="info-block warn"><b>⏱️ Heures sup en fin de période</b>Si le compteur annuel dépasse 1 607 heures (ou la durée conventionnelle), les heures excédentaires sont des heures supplémentaires avec majorations.</div>
+    <div class="info-block danger"><b>🚫 Délai de prévenance</b>L'employeur doit prévenir le salarié des changements d'horaires avec un délai de prévenance (minimum 7 jours ouvrés, souvent plus selon accord). Sans délai : les heures au-delà peuvent être refusées.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:4px;">
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
+  </div>
+  <div class="foot"><span data-txt="disclaimer"></span>.<br>🎼 Tout reste sur ton appareil.</div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS={STATE:'MOD_STATE',WELCOME:'MOD_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function $(s){return document.querySelector(s);}
+function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+function fh(n){return n.toFixed(1)+'h';}
+
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+
+var SEMAINES_AN = 47; // 52 - 5 CP
+
+window.recalcSemaine = function(){
+  var h = parseFloat($('#fHSem').value) || 0;
+  var ref = parseInt($('#fRef').value) || 35;
+  var plafond = parseInt($('#fPlafond').value) || 44;
+  var plancher = parseInt($('#fPlancher').value) || 0;
+  var el = $('#semResult');
+  if(!h){ el.style.display='none'; return; }
+
+  var ecart = h - ref;
+  var cls = h > plafond ? 'danger' : h < plancher ? 'warn' : h > ref ? 'warn' : 'ok';
+  var msg = h > plafond ? '⚠️ Dépasse le plafond — heures supplémentaires immédiates !'
+           : h < plancher ? '⚠️ En dessous du plancher de l\'accord'
+           : h > ref ? '📈 Semaine haute — crédit sur le compteur'
+           : h < ref ? '📉 Semaine basse — débit sur le compteur'
+           : '✅ Semaine normale à la référence';
+
+  el.innerHTML = '<div class="info-block '+cls+'"><b>'+msg+'</b>'+
+    (h > ref ? 'Crédit : +'+fh(ecart)+' sur le compteur de modulation.' : '')+
+    (h < ref ? 'Débit : '+fh(ecart)+'h sur le compteur.' : '')+
+    (h > plafond ? ' Les '+fh(h-plafond)+' heures au-delà du plafond sont des HS immédiates (majorées).' : '')+
+  '</div>';
+  el.style.display='block';
+
+  // Hero
+  $('#hBig').textContent = fh(h);
+  $('#hUnit').textContent = h > plafond ? '⚠️ Heures sup immédiates' : h > ref ? '📈 Semaine haute' : h < ref ? '📉 Semaine basse' : '✅ Semaine normale';
+  $('#hSub').textContent = 'Référence : '+ref+'h · Plafond : '+plafond+'h';
+};
+
+window.recalc = function(){
+  var ref = parseInt($('#fRef').value) || 35;
+  var plafond = parseInt($('#fPlafond').value) || 44;
+  var nH = parseInt($('#fNHautes').value) || 0;
+  var nB = parseInt($('#fNBasses').value) || 0;
+  var plancher = parseInt($('#fPlancher').value) || 0;
+  var el = $('#annuelResult');
+
+  if(!nH && !nB){ el.style.display='none'; return; }
+
+  var nN = Math.max(0, SEMAINES_AN - nH - nB);
+  var totalH = nH * plafond + nN * ref + nB * plancher;
+  var seuil = ref * SEMAINES_AN; // ex: 35 × 47 = 1645
+  var hs = Math.max(0, totalH - seuil);
+  var salLisse = ref + ' h/semaine (lissé)';
+
+  var html = '<div class="result-row"><span class="rl">Semaines hautes ('+plafond+'h)</span><span class="rv">' + nH + '</span></div>'+
+    '<div class="result-row"><span class="rl">Semaines normales ('+ref+'h)</span><span class="rv">' + nN + '</span></div>'+
+    '<div class="result-row"><span class="rl">Semaines basses ('+plancher+'h)</span><span class="rv">' + nB + '</span></div>'+
+    '<div class="result-row"><span class="rl">Total heures annuel projeté</span><span class="rv">'+ fh(totalH)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Seuil de déclenchement HS</span><span class="rv">'+ fh(seuil)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Heures supplémentaires en fin d\'année</span><span class="rv '+(hs>0?'warn':'ok')+'">'+fh(hs)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Salaire mensuel lissé</span><span class="rv ok">'+salLisse+'</span></div>';
+
+  if(hs > 0){
+    html += '<div class="info-block warn" style="margin-top:10px;"><b>⚠️ '+fh(hs)+' heures supplémentaires déclenchées</b>Ces heures doivent être rémunérées avec majorations (25 % ou 50 %) ou compensées en repos (RCR) selon ton accord.</div>';
+  } else {
+    html += '<div class="info-block ok" style="margin-top:10px;"><b>✅ Pas d\'heures supplémentaires en fin de période</b>Le volume annuel reste dans le cadre de la modulation.</div>';
+  }
+
+  el.innerHTML = html;
+  el.style.display='block';
+
+  $('#hBig').textContent = fh(totalH);
+  $('#hUnit').textContent = 'Total annuel projeté';
+  $('#hSub').textContent = hs > 0 ? fh(hs)+' HS en fin de période' : 'Aucune HS en fin de période';
+  $('#h1v').textContent = fh(totalH/SEMAINES_AN);
+  $('#h2v').textContent = fh(hs);
+  $('#h3v').textContent = SEMAINES_AN;
+  $('#hRow').style.display='flex';
+  $('#hc1').className='hcell'; $('#hc2').className='hcell '+(hs>0?'warn':'ok');
+};
+
+window.recalcSemaine();
+window.recalc();
+
+// Wizard
+var wStep=0,wMax=3;
+function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+  $('#wNext').textContent=(n===wMax-1)?'Commencer 🎼':'Continuer';
+  $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+$('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+$('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+$('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+$all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Mutuelle Obligatoire — Le Bouclier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#0d6e5a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mutuelle">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --teal:#0d6e5a; --teal-l:#1a9e82; --teal-ll:#40c8a8; --teal-bg:#e6f7f3;
+  --dark:#071e18; --dark2:#0d2e26;
+  --card:rgba(255,255,255,0.08); --card-edge:rgba(255,255,255,0.14);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --yes:#40c8a8; --no:#f07060; --warn:#f0a840;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'DM Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#071e18 0%,#0d2e26 50%,#071a14 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 80% -10%,rgba(13,110,90,0.35),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:var(--teal-ll);display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-size:26px;font-weight:700;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(7,30,24,0.97),rgba(7,30,24,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;color:#fff;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* hero shield */
+.hero{background:linear-gradient(135deg,rgba(13,110,90,0.4),rgba(13,110,90,0.15));border:1.5px solid rgba(64,200,168,0.3);border-radius:18px;padding:22px;margin:14px 0 16px;text-align:center;}
+.hero .hico{font-size:52px;margin-bottom:8px;}
+.hero .ht{font-weight:800;font-size:22px;color:#fff;margin-bottom:6px;}
+.hero .hd{font-size:13px;color:var(--ink2);line-height:1.5;}
+.hero .hbig{font-weight:800;font-size:44px;color:var(--teal-ll);margin:10px 0 2px;}
+.hero .hsub{font-size:12px;color:var(--faded);}
+
+/* key facts grid */
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.fact{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:14px;text-align:center;}
+.fact .fv{font-weight:800;font-size:22px;color:var(--teal-ll);}
+.fact .fl{font-size:11px;color:var(--faded);margin-top:3px;line-height:1.3;}
+
+/* rules */
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:13px 15px;margin-bottom:8px;display:flex;gap:12px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;color:#fff;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.rb{display:inline-block;margin-top:6px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;}
+.rb.yes{background:rgba(64,200,168,0.15);color:var(--yes);}
+.rb.no{background:rgba(240,112,96,0.15);color:var(--no);}
+.rb.warn{background:rgba(240,168,64,0.15);color:var(--warn);}
+
+/* dispense list */
+.disp-list{background:var(--card);border:1.5px solid var(--card-edge);border-radius:14px;padding:16px;margin-bottom:14px;}
+.disp-list .dt{font-weight:800;font-size:13px;color:var(--teal-ll);margin-bottom:12px;}
+.ditem{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.ditem:last-child{margin-bottom:0;}
+.ditem .di{font-size:16px;flex-shrink:0;}
+.ditem .dx{font-size:12.5px;color:var(--ink2);line-height:1.4;}
+.ditem .dx b{display:block;font-size:12px;font-weight:700;color:#fff;margin-bottom:2px;}
+
+.note{font-size:11.5px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;letter-spacing:0.5px;}
+
+.ov{position:fixed;inset:0;z-index:200;background:rgba(4,14,10,0.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:#0d2e26;border:1.5px solid rgba(255,255,255,0.12);border-radius:16px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:3px solid var(--teal-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 20px 10px;text-align:center;position:relative;}
+.box .hd .t{font-weight:800;font-size:21px;color:var(--teal-ll);}
+.box .hd .s{font-size:12px;color:var(--faded);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:var(--card);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--faded);cursor:pointer;}
+.box .bd{padding:0 20px 20px;}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:13px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;}
+.btn-teal{background:linear-gradient(135deg,var(--teal-l),var(--teal));color:#fff;box-shadow:0 4px 14px rgba(13,110,90,0.5);}
+.btn-ghost{background:transparent;color:var(--ink2);border:1px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .3s;}
+.wemoji{font-size:54px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-weight:800;font-size:22px;color:var(--teal-ll);margin-bottom:10px;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--teal-ll);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:11px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--teal-ll);margin-bottom:2px;}
+.legal{font-size:10.5px;color:var(--faded);line-height:1.5;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;border-left:3px solid var(--teal-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:14px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(13,110,90,0.3);transition:.2s;}
+.dots .d.on{background:var(--teal-l);width:22px;border-radius:4px;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#071e18;z-index:9999;"></div>
+<div id="lb"><div class="i">🛡️</div><div class="t">Tourne ton téléphone</div></div>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Mutuelle Obligatoire</div><div class="su">LE BOUCLIER · V1.0</div></div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0"><div class="wemoji">🛡️</div><h2>Le Bouclier santé</h2>
+      <p>Depuis 2016, tout employeur privé doit proposer une <span class="accent">mutuelle collective</span>. Tes droits : participation employeur, dispenses, portabilité. Tout en clair.</p></div>
+    <div class="wstep" data-step="1"><div class="wemoji">💶</div><h2>50 % minimum</h2>
+      <div class="feat"><div class="ic">🏢</div><div class="tx"><b>L'employeur paie au moins 50 %</b>De la cotisation de la mutuelle. Il peut payer plus — c'est à son choix.</div></div>
+      <div class="feat"><div class="ic">🏥</div><div class="tx"><b>Contrat responsable obligatoire</b>Rembourse intégralement le ticket modérateur, le forfait journalier, et respecte le 100 % Santé.</div></div>
+      <div class="feat"><div class="ic">🔄</div><div class="tx"><b>Portabilité 12 mois max</b>Si tu perds ton emploi et es indemnisé, tu gardes ta mutuelle gratuitement jusqu'à 12 mois.</div></div></div>
+    <div class="wstep" data-step="2"><div class="wemoji">📋</div><h2>Tu peux refuser ?</h2>
+      <p>Oui, dans certains cas. On appelle ça une <span class="accent">dispense d'adhésion</span>. Elle doit être demandée par écrit. Les cas sont listés dans ce module.</p>
+      <div class="legal">Outil indicatif. Loi ANI 2013, généralisée le 1er janv. 2016. Règles stables depuis lors. Ta convention peut prévoir des garanties supérieures. Seul ton employeur et la mutuelle font foi.</div></div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-teal" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">Passer</button>
+  </div></div>
+</div>
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🛡️</div><div class="tx"><b>Règles clés</b>Les obligations de l'employeur, tes droits en tant que salarié.</div></div>
+    <div class="feat"><div class="ic">🚫</div><div class="tx"><b>Dispenses</b>Les situations où tu peux refuser d'adhérer à la mutuelle collective.</div></div>
+    <div class="feat"><div class="ic">🔄</div><div class="tx"><b>Portabilité</b>Comment garder ta mutuelle après la fin du contrat.</div></div>
+    <button class="btn btn-teal" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+<div class="wrap">
+  <div class="hero">
+    <div class="hico">🛡️</div>
+    <div class="ht">Mutuelle collective obligatoire</div>
+    <div class="hd">Tout employeur du secteur privé doit proposer une complémentaire santé à ses salariés.</div>
+    <div class="hbig">50 %</div>
+    <div class="hsub">participation employeur minimum</div>
+  </div>
+  <div class="facts">
+    <div class="fact"><div class="fv">12 mois</div><div class="fl">portabilité max<br>après le départ</div></div>
+    <div class="fact"><div class="fv">100 %</div><div class="fl">ticket modérateur<br>remboursé (contrat resp.)</div></div>
+    <div class="fact"><div class="fv">2016</div><div class="fl">généralisation<br>obligatoire</div></div>
+    <div class="fact"><div class="fv">0 €</div><div class="fl">portabilité sans<br>frais pour le salarié</div></div>
+  </div>
+
+  <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin-bottom:10px;">📋 Règles essentielles</div>
+  <div class="rule"><div class="ri">💶</div><div><div class="rt">Participation employeur ≥ 50 %</div><div class="rd">Au moins la moitié de la cotisation est à la charge de l'entreprise. Il peut faire plus. Ce financement est exonéré de charges sociales dans certaines limites.</div><span class="rb yes">Obligatoire depuis 2016</span></div></div>
+  <div class="rule"><div class="ri">🏥</div><div><div class="rt">Contrat « responsable » obligatoire</div><div class="rd">Rembourse intégralement le ticket modérateur, le forfait journalier hospitalier, les paniers 100 % Santé (optique, dentaire, audiologie).</div><span class="rb yes">Panier ANI minimum</span></div></div>
+  <div class="rule"><div class="ri">🔄</div><div><div class="rt">Portabilité des droits (max 12 mois)</div><div class="rd">Si tu quittes l'entreprise et que tu es indemnisé par France Travail (ARE), tu conserves ta mutuelle gratuitement. Durée = ta durée d'affiliation, max 12 mois. Activation sur justificatif (fournir l'attestation France Travail à l'organisme assureur).</div><span class="rb yes">Gratuit et automatique</span></div></div>
+  <div class="rule"><div class="ri">👨‍👩‍👧</div><div><div class="rt">Ayants droit</div><div class="rd">Selon l'accord d'entreprise ou la convention, conjoint et enfants peuvent être couverts. Ce n'est pas automatique — vérifier les conditions dans ton entreprise.</div><span class="rb warn">Selon accord</span></div></div>
+  <div class="rule"><div class="ri">🚫</div><div><div class="rt">Dispense : si refus, perte de la participation employeur</div><div class="rd">En cas de dispense, tu ne bénéficies plus de la participation de l'employeur. Tu dois alors souscrire une protection individuelle.</div><span class="rb no">À évaluer avant de refuser</span></div></div>
+
+  <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin:18px 0 10px;">🚫 Cas de dispense d'adhésion</div>
+  <div class="disp-list">
+    <div class="dt">Situations où tu peux refuser par écrit (demande obligatoire)</div>
+    <div class="ditem"><div class="di">💍</div><div class="dx"><b>Déjà couvert en tant qu'ayant droit</b>Si ton conjoint a une mutuelle collective qui te couvre, tu peux te dispenser.</div></div>
+    <div class="ditem"><div class="di">📄</div><div class="dx"><b>CDD ou mission &lt; 3 mois</b>Dispense possible. L'employeur verse alors un "versement santé" compensateur.</div></div>
+    <div class="ditem"><div class="di">⏱️</div><div class="dx"><b>Temps partiel à très faibles heures</b>Si la cotisation représente plus de 10 % de ton salaire brut, dispense possible.</div></div>
+    <div class="ditem"><div class="di">🏛️</div><div class="dx"><b>Couverture individuelle en cours</b>Si tu as souscrit une complémentaire individuelle avant l'entrée en vigueur de la mutuelle obligatoire, dispense jusqu'à échéance.</div></div>
+    <div class="ditem"><div class="di">📋</div><div class="dx"><b>Apprentis et alternants</b>Dispense possible si la cotisation dépasse un certain seuil par rapport au salaire.</div></div>
+  </div>
+
+
+  <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin:18px 0 10px;">🏥 Le panier de soins ANI (minimum légal)</div>
+  <div class="rule"><div class="ri">👁️</div><div><div class="rt">Optique — 100 % Santé</div><div class="rd">Montures et verres du panier 100 % Santé remboursés intégralement. Pour les montures hors panier, la mutuelle doit couvrir au moins 100 € (montures) + les verres selon les devis.</div><span class="rb yes">Obligatoire</span></div></div>
+  <div class="rule"><div class="ri">🦷</div><div><div class="rt">Dentaire — 100 % Santé</div><div class="rd">Soins et prothèses du panier dentaire remboursés à 100 % (pas de reste à charge). Prothèses hors panier : plafonnement des honoraires et prise en charge obligatoire minimum.</div><span class="rb yes">Obligatoire depuis 2020</span></div></div>
+  <div class="rule"><div class="ri">👂</div><div><div class="rt">Audiologie — 100 % Santé</div><div class="rd">Aides auditives du panier 100 % Santé remboursées intégralement depuis 2021. Les appareils hors panier restent à charge selon le contrat. Les appareils hors panier restent à charge selon le contrat.</div><span class="rb yes">Obligatoire depuis 2021</span></div></div>
+  <div class="rule"><div class="ri">🏥</div><div><div class="rt">Hospitalisation</div><div class="rd">Le forfait journalier (23 €/jour en 2026 (17 €/jour en psychiatrie) — Arrêté du 27/02/2026) doit être remboursé intégralement, sans limitation de durée.</div><span class="rb yes">Inclus panier ANI</span></div></div>
+
+  <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin:18px 0 10px;">💡 Conseils pratiques</div>
+  <div class="rule"><div class="ri">📊</div><div><div class="rt">Comparer avant de souscrire une surcomplémentaire</div><div class="rd">La mutuelle d'entreprise ne couvre pas tout. Une <strong>surcomplémentaire individuelle</strong> peut combler les écarts sur l'optique haut de gamme, le dentaire complexe ou la chambre individuelle. Facultatif mais parfois utile.</div><span class="rb warn">Option personnelle</span></div></div>
+  <div class="rule"><div class="ri">🔄</div><div><div class="rt">Portabilité : démarche active recommandée</div><div class="rd">La portabilité est automatique mais tu dois informer ta mutuelle de ton départ et fournir justificatifs. Contrôle que la cotisation reste nulle — l'ancien employeur continue de payer sa part.</div><span class="rb yes">Sans frais</span></div></div>
+  <div class="rule"><div class="ri">📋</div><div><div class="rt">Retraite : plus de portabilité</div><div class="rd">Le départ en retraite ne donne pas droit à la portabilité. En revanche, une mutuelle dite "Évin" te permet de maintenir ta couverture à titre individuel, avec un tarif plafonné les 3 premières années (0% hausse · +25% max · +50% max, puis tarifs libres).</div><span class="rb warn">Loi Évin</span></div></div>
+  <div class="note">Outil indicatif. Loi ANI 2013, généralisée le 1er janvier 2016. Ta convention collective peut prévoir des garanties supérieures. Ni avis médical, ni avis juridique — consulter ta mutuelle et ton service RH pour ta situation personnelle. Seul ton employeur et la mutuelle font foi.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">MUTUELLE OBLIGATOIRE · LE BOUCLIER · V1.0<br>🛡️ INDICATIF — RÈGLES 2026</div>
+</div>
+<script>
+(function(){
+  var LS={WELCOME:'MUT_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function $(s){return document.querySelector(s);}
+  function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Voir le module 🛡️':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){document.getElementById(b.dataset.close).classList.remove('show');});});
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'MUT_STATE',WELCOME:'MUT_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

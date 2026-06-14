@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>AT/MP — Accident du Travail & Maladie Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8a2a2a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AT/MP">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#b03a3a;--acc-l:#d05a5a;--acc-d:#8a1a1a;
+  --dark:#1a0808;--dark2:#280e0e;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#1a0808 0%,#280e0e 50%,#160606 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(176,58,58,0.2),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(26,8,8,0.97),rgba(26,8,8,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* Onglets */
+.tabs{display:flex;gap:6px;margin:14px 0;background:rgba(0,0,0,0.3);border-radius:12px;padding:4px;}
+.tab{flex:1;padding:10px 6px;border-radius:9px;border:none;font-family:inherit;font-weight:700;
+  font-size:11px;cursor:pointer;color:var(--faded);background:transparent;transition:.2s;}
+.tab.on{background:var(--acc);color:#fff;}
+.pane{display:none;} .pane.on{display:block;}
+
+/* simulateur */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23d05a5a' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultats */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res{border-radius:14px;padding:16px;}
+.res.main{background:linear-gradient(135deg,rgba(176,58,58,0.25),rgba(176,58,58,0.1));
+  border:1.5px solid rgba(176,58,58,0.5);grid-column:1/-1;}
+.res.half{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:28px;font-weight:800;line-height:1;}
+.res .rsub{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+/* étapes */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.step{display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--card-edge);}
+.step:last-child{border-bottom:none;}
+.step .sn{width:28px;height:28px;border-radius:50%;background:var(--acc);color:#fff;font-weight:800;
+  font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step .st{font-weight:700;font-size:13px;}
+.step .sd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.step .stag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:8px;background:rgba(176,58,58,0.2);color:var(--acc-l);}
+
+/* règles */
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,154,216,0.2);color:var(--info);}
+.ctag.ko{background:rgba(224,80,80,0.15);color:var(--ko);}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">🦺</span>
+      <div class="wiz-h">AT / MP</div>
+      <div class="wiz-p">Accident survenu par le fait ou à l'occasion du travail. Un trajet aussi compte.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Accident du travail · Maladie pro</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">🦺</div><div class="wt"><b>Démarches & droits</b>Déclaration dans les 24 h, certificat médical, indemnisation par la CPAM et l'employeur.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Protections renforcées</b>Licenciement interdit pendant arrêt AT/MP sauf faute grave ou impossibilité maintien.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">🦺</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">AT / MP</div>
+    <div class="su">Accident Travail · Maladie Pro · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('at')">🚨 Accident du travail</button>
+    <button class="tab" onclick="switchTab('mp')">🫁 Maladie pro</button>
+    <button class="tab" onclick="switchTab('indem')">💶 Indemnisation</button>
+  </div>
+
+  <!-- ACCIDENT DU TRAVAIL -->
+  <div class="pane on" id="pane-at">
+    <div class="sec-t" style="margin-top:4px;">📋 Procédure en cas d'accident</div>
+    <div class="panel" style="padding:14px 16px;">
+      <div style="display:flex;flex-direction:column;gap:0;">
+        <div class="step">
+          <div class="sn">1</div>
+          <div><div class="st">Informer l'employeur dans les 24h</div>
+          <div class="sd">Le salarié (ou un tiers) doit déclarer l'accident à l'employeur dans les 24 heures, sauf cas de force majeure. Par tout moyen (oral, écrit, LRAR).</div>
+          <div class="stag">24h — <span data-art="L441-1"></span></div></div>
+        </div>
+        <div class="step">
+          <div class="sn">2</div>
+          <div><div class="st">L'employeur déclare à la CPAM sous 48h</div>
+          <div class="sd">L'employeur doit déclarer l'accident à la CPAM dans les 48h ouvrées suivant la prise de connaissance. Il remet aussi une feuille d'accident au salarié (gratuité des soins).</div>
+          <div class="stag">48h ouvrées — formulaire S6200</div></div>
+        </div>
+        <div class="step">
+          <div class="sn">3</div>
+          <div><div class="st">Consulter un médecin — arrêt de travail</div>
+          <div class="sd">Le médecin établit un certificat médical initial (CMI) décrivant les lésions. Ce document est fondamental pour la reconnaissance AT.</div></div>
+        </div>
+        <div class="step">
+          <div class="sn">4</div>
+          <div><div class="st">Instruction par la CPAM (30 jours, 90 jours si enquête)</div>
+          <div class="sd">La CPAM dispose de 30 jours francs pour statuer ou lancer une enquête. En cas d'investigations complémentaires, le délai total est porté à 90 jours. Sans décision à l'issue de ces délais, le silence vaut reconnaissance implicite.</div>
+          <div class="stag">30 j (base) / 90 j (enquête) — silence vaut acceptation</div></div>
+        </div>
+        <div class="step">
+          <div class="sn">5</div>
+          <div><div class="st">Reconnaissance AT — droits ouverts</div>
+          <div class="sd">En cas de reconnaissance, les soins sont pris en charge à 100% sans avance de frais. Les IJ sont majorées dès le 1er jour (pas de délai de carence).</div>
+          <div class="stag">Prise en charge 100%</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-t">⚖️ Règles essentielles AT</div>
+    <div class="rule"><div class="ri">📍</div><div>
+      <div class="rt">Définition légale de l'AT</div>
+      <div class="rd">Tout accident survenu par le fait ou à l'occasion du travail, quelle qu'en soit la cause. La présomption d'imputabilité joue en faveur du salarié : si l'accident survient pendant le temps et sur le lieu de travail, il est présumé AT.</div>
+      <span class="ctag ok">Présomption en faveur du salarié</span>
+    </div></div>
+    <div class="rule"><div class="ri">🚗</div><div>
+      <div class="rt">Accident de trajet</div>
+      <div class="rd">L'accident survenant sur le trajet habituel domicile-travail (ou lieu de restauration) est assimilé à un AT. Même indemnisation, mais pas de majoration des fautes inexcusables de l'employeur.</div>
+      <span class="ctag info">Même régime que l'AT</span>
+    </div></div>
+    <div class="rule"><div class="ri">🏠</div><div>
+      <div class="rt">Télétravail : même protection</div>
+      <div class="rd">Un accident survenant pendant les heures de télétravail, au domicile ou dans le lieu convenu, bénéficie de la même présomption d'imputabilité qu'un accident au bureau.</div>
+      <span class="ctag ok">Même protection</span>
+    </div></div>
+    <div class="rule"><div class="ri">🛡️</div><div>
+      <div class="rt">Protection contre le licenciement</div>
+      <div class="rd">Pendant l'arrêt AT, le contrat est suspendu. Le licenciement est interdit sauf faute grave ou impossibilité de maintenir le contrat pour motif étranger à l'AT.</div>
+      <span class="ctag ok">Protection renforcée</span>
+    </div></div>
+    <div class="rule"><div class="ri">⚠️</div><div>
+      <div class="rt">Faute inexcusable de l'employeur</div>
+      <div class="rd">Si l'employeur avait ou aurait dû avoir conscience du danger et n'a pas pris les mesures nécessaires, sa faute inexcusable peut être reconnue, majorant significativement l'indemnisation de la victime.</div>
+      <span class="ctag warn">Majoration des indemnités</span>
+    </div></div>
+  </div>
+
+  <!-- MALADIE PROFESSIONNELLE -->
+  <div class="pane" id="pane-mp">
+    <div class="rule" style="margin-top:14px;"><div class="ri">📋</div><div>
+      <div class="rt">Définition de la maladie professionnelle</div>
+      <div class="rd">Maladie contractée en raison de l'exercice habituel d'une profession et figurant dans les tableaux officiels des MP (CPAM). Peut aussi être reconnue hors tableau par le Comité Régional de Reconnaissance des MP (CRRMP).</div>
+      <span class="ctag info">Tableaux officiels CPAM</span>
+    </div></div>
+    <div class="rule"><div class="ri">📅</div><div>
+      <div class="rt">Délai de déclaration : 2 ans</div>
+      <div class="rd">Le salarié dispose de 2 ans pour déclarer la maladie professionnelle à sa CPAM. Ce délai court à partir de la date du certificat médical initial (CMI) qui établit le lien entre la maladie et le travail, ou de la cessation d'activité. La déclaration se fait via le formulaire Cerfa n°60-3950.</div>
+      <span class="ctag warn">2 ans pour déclarer — formulaire Cerfa</span>
+    </div></div>
+    <div class="rule"><div class="ri">🔍</div><div>
+      <div class="rt">Instruction par la CPAM (120 jours — 4 mois)</div>
+      <div class="rd">La CPAM dispose de 120 jours francs pour instruire la demande (consultation des tableaux, enquête si nécessaire). Si l'enquête est complexe, le délai peut être prolongé. Sans décision dans ce délai, la demande peut être considérée tacitement acceptée selon les cas.</div>
+      <span class="ctag ok">Silence = reconnaissance</span>
+    </div></div>
+    <div class="rule"><div class="ri">🫁</div><div>
+      <div class="rt">Exemples de maladies professionnelles</div>
+      <div class="rd">Troubles musculo-squelettiques (TMS — tableau n°57), surdité professionnelle (tableau n°42), amiante/mésothéliome (tableau n°30), lombalgies (tableau n°98), affections psychiques liées au travail (hors tableau — CRRMP).</div>
+    </div></div>
+    <div class="rule"><div class="ri">🏥</div><div>
+      <div class="rt">Médecin du travail : interlocuteur clé</div>
+      <div class="rd">Le médecin du travail peut établir un certificat d'exposition, rédiger un rapport circonstancié et orienter vers la bonne procédure. Consultation gratuite et confidentielle.</div>
+      <span class="ctag ok">Gratuit et confidentiel</span>
+    </div></div>
+    <div class="rule"><div class="ri">📊</div><div>
+      <div class="rt">Taux d'incapacité permanente (IPP)</div>
+      <div class="rd">Après consolidation (état stabilisé), un médecin conseil évalue le taux d'IPP. En dessous de 10% : capital. Au-dessus de 10% : rente viagère. Ce taux détermine l'indemnisation à vie.</div>
+      <span class="ctag info">Rente si IPP ≥ 10%</span>
+    </div></div>
+  </div>
+
+  <!-- INDEMNISATION -->
+  <div class="pane" id="pane-indem">
+    <div class="panel" style="margin-top:14px;">
+      <div class="panel-t">🧮 Estimer les IJ AT/MP</div>
+      <div class="field">
+        <label>Salaire journalier de référence</label>
+        <div class="inline">
+          <input class="ip" id="fSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <span class="unit">€/jour</span>
+        </div>
+        <div class="hint">Saisis ton salaire mensuel brut (M-1). Le SJR est calculé automatiquement : salaire ÷ 30,42.</div>
+      </div>
+      <div class="field">
+        <label>Période d'arrêt</label>
+        <select class="ip" id="fPeriode">
+          <option value="j1_28">Du 1er au 28e jour</option>
+          <option value="j29">À partir du 29e jour</option>
+        </select>
+      </div>
+    </div>
+    <div id="indemResults" style="display:none;">
+      <div class="res-grid">
+        <div class="res main">
+          <div class="rl">Indemnité journalière AT/MP</div>
+          <div class="rbig" id="rIJ">—</div>
+          <div class="rsub" id="rIJDetail"></div>
+        </div>
+        <div class="res half">
+          <div class="rl">Taux appliqué</div>
+          <div class="rbig" id="rTaux">—</div>
+          <div class="rsub">Du salaire journalier</div>
+        </div>
+        <div class="res half">
+          <div class="rl">Délai de carence</div>
+          <div class="rbig" style="color:var(--ok);">0 jour</div>
+          <div class="rsub">Dès le 1er jour d'arrêt</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-t">⚖️ Barème d'indemnisation AT/MP</div>
+    <div class="rule"><div class="ri">💰</div><div>
+      <div class="rt">IJ supérieures à la maladie ordinaire</div>
+      <div class="rd">J1 à J28 : 60 % du salaire journalier de référence. À partir du J29 : 80 % du salaire journalier. Pas de délai de carence (contrairement à la maladie ordinaire : 3 jours).</div>
+      <span class="ctag ok">60% puis 80% — sans carence</span>
+    </div></div>
+    <div class="rule"><div class="ri">🏥</div><div>
+      <div class="rt">Soins à 100% sans avance</div>
+      <div class="rd">Tous les soins médicaux liés à l'AT/MP sont pris en charge à 100% par la CPAM, sans avance de frais ni ticket modérateur. La feuille d'accident (remise par l'employeur) permet cette prise en charge.</div>
+      <span class="ctag ok">Tiers payant intégral</span>
+    </div></div>
+    <div class="rule"><div class="ri">📈</div><div>
+      <div class="rt">Rente en cas d'incapacité permanente</div>
+      <div class="rd">Si le taux d'IPP ≥ 10% après consolidation, une rente viagère est versée. Son montant = salaire annuel × taux d'IPP (pondéré). En cas de décès, une rente est versée aux ayants droit.</div>
+      <span class="ctag info">Rente viagère si IPP ≥ 10%</span>
+    </div></div>
+  </div>
+
+  <div class="note"><span data-art="L411-1"></span> à <span data-art="L452-5"></span> · <span data-art="L461-1"></span> à <span data-art="L461-7"></span> — Conforme au Code de la sécurité sociale.<br>
+    IJ AT/MP 2026 : 60% (J1–J28) puis 80% (J29+). Sans délai de carence.<br>
+    🦺 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Outil indicatif & pédagogique · Seule la CPAM fait foi pour la reconnaissance et l'indemnisation</div>
+</div>
+
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#280e0e;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      3 onglets : procédure AT, reconnaissance MP, et simulateur d'indemnisation.<br><br>
+      En cas d'accident, la priorité est de déclarer dans les 24h à l'employeur, puis de consulter un médecin pour le certificat médical initial.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+
+window.switchTab = function(t){
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('on',['at','mp','indem'][i]===t);
+  });
+  document.querySelectorAll('.pane').forEach(function(el){
+    el.classList.toggle('on',el.id==='pane-'+t);
+  });
+};
+
+function calcIndem(){
+  var sal = parseFloat($('fSalJour').value)||0;
+  var per = $('fPeriode').value;
+  if(sal<=0){$('indemResults').style.display='none';return;}
+  var taux = per==='j1_28' ? 0.60 : 0.80;
+  var ij = sal * taux;
+  $('rIJ').textContent = eur(ij)+' / jour';
+  $('rIJDetail').textContent = eur(sal)+'/j × '+(taux*100)+'% · '+
+    (per==='j1_28'?'Jours 1 à 28':'À partir du 29e jour');
+  $('rTaux').textContent = (taux*100)+'%';
+  $('indemResults').style.display='block';
+}
+['fSalJour','fPeriode'].forEach(function(id){
+  $(id).addEventListener('input',calcIndem);
+  $(id).addEventListener('change',calcIndem);
+});
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'AT_STATE',WELCOME:'AT_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{salJour:'',periode:'j1_28'});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='AT_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 🦺':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

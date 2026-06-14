@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>CDI / CDD / Intérim — Le Comparatif</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a3a6a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Contrats Comparatif">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+:root{
+  --cdi:#1a3a6a; --cdi-l:#2a5a9a; --cdi-bg:#e8f0fa;
+  --cdd:#6a1a3a; --cdd-l:#9a2a5a; --cdd-bg:#fae8f0;
+  --int:#1a5a3a; --int-l:#2a8a5a; --int-bg:#e8faf0;
+  --dark:#0e1a2e; --dark2:#1a2a40;
+  --ink:#0e1a2e; --ink2:#2a3a55; --faded:#6a7a8a;
+  --card:#fff; --card-edge:#dde6f5;
+  --ok:#1a7a3a; --no:#c03030;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Inter',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(170deg,#0e1a2e 0%,#1a2a40 50%,#0e2238 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(800px 400px at 50% -10%,rgba(42,90,154,0.2),transparent 55%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-size:26px;font-weight:700;color:#fff;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(14,26,46,0.97),rgba(14,26,46,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:6px;padding:9px 13px;font-weight:600;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;color:#fff;}
+header .brand .su{font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* contract selector tabs */
+.contract-tabs{display:flex;gap:8px;margin:14px 0 16px;}
+.ctab{flex:1;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;
+  padding:12px 8px;text-align:center;cursor:pointer;transition:.15s;}
+.ctab .ce{font-size:24px;display:block;margin-bottom:4px;}
+.ctab .cn{font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);}
+.ctab.cdi.on{background:var(--cdi-bg);border-color:var(--cdi-l);} .ctab.cdi.on .cn{color:var(--cdi);}
+.ctab.cdd.on{background:var(--cdd-bg);border-color:var(--cdd-l);} .ctab.cdd.on .cn{color:var(--cdd);}
+.ctab.int.on{background:var(--int-bg);border-color:var(--int-l);} .ctab.int.on .cn{color:var(--int);}
+
+/* main card */
+.main-card{background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;
+  padding:20px;margin-bottom:14px;backdrop-filter:blur(4px);}
+.mc-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.mc-head .mhi{font-size:36px;}
+.mc-head .mht{font-weight:800;font-size:22px;color:#fff;}
+.mc-head .mhs{font-size:12px;color:rgba(255,255,255,0.65);margin-top:3px;line-height:1.3;}
+
+/* rows */
+.rows{display:flex;flex-direction:column;gap:10px;}
+.row{background:rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;}
+.row .rl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;}
+.row .rv{font-size:13.5px;color:#fff;line-height:1.45;}
+.row .rv .ok{color:#5dc87a;font-weight:700;}
+.row .rv .no{color:#e07070;font-weight:700;}
+.row .rv .mid{color:#f0c040;font-weight:700;}
+
+/* compare grid — all 3 side by side */
+.compare-hd{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.compare-hd .ch{text-align:center;font-size:11px;font-weight:700;padding:6px;border-radius:8px;}
+.ch.cdi{background:var(--cdi-bg);color:var(--cdi);}
+.ch.cdd{background:var(--cdd-bg);color:var(--cdd);}
+.ch.int{background:var(--int-bg);color:var(--int);}
+.compare-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;}
+.cr-cell{background:rgba(255,255,255,0.06);border-radius:8px;padding:9px 8px;text-align:center;font-size:11.5px;color:rgba(255,255,255,0.9);line-height:1.3;}
+.cr-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:0.5px;text-transform:uppercase;margin:10px 0 6px;padding:0 2px;}
+
+/* bottom action */
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:13px;font-family:'Inter',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;transition:.15s;}
+.btn-cta{background:linear-gradient(135deg,var(--cdi-l),var(--cdi));color:#fff;}
+.btn-ghost{background:transparent;color:rgba(255,255,255,0.7);border:1.5px solid rgba(255,255,255,0.2);}
+
+.note{font-size:11.5px;color:rgba(255,255,255,0.45);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:rgba(255,255,255,0.3);line-height:1.7;letter-spacing:0.5px;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(10,18,30,0.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:#1a2a40;border:1.5px solid rgba(255,255,255,0.12);border-radius:16px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:4px solid var(--cdi-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 20px 10px;text-align:center;position:relative;}
+.box .hd .t{font-weight:800;font-size:21px;color:#fff;}
+.box .hd .s{font-size:12.5px;color:rgba(255,255,255,0.5);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:rgba(255,255,255,0.7);cursor:pointer;}
+.box .bd{padding:0 20px 20px;}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .3s;}
+.wemoji{font-size:54px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-weight:800;font-size:22px;color:#fff;margin-bottom:10px;}
+.wstep p{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--cdi-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:11px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:rgba(255,255,255,0.65);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--cdi-l);margin-bottom:2px;}
+.legal{font-size:10.5px;color:rgba(255,255,255,0.35);line-height:1.5;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;border-left:3px solid var(--cdi-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:14px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(42,90,154,0.3);transition:.2s;}
+.dots .d.on{background:var(--cdi-l);width:22px;border-radius:4px;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#0e1a2e;z-index:9999;"></div>
+<div id="lb"><div class="i">📊</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">CDI · CDD · Intérim</div>
+    <div class="su">LE COMPARATIF · V1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <div class="wemoji">📊</div>
+      <h2>Les 3 contrats en clair</h2>
+      <p>CDI, CDD, Intérim : trois logiques très différentes. <span class="accent">Les droits fondamentaux sont identiques</span> — mais la stabilité, les indemnités et la flexibilité varient beaucoup.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <div class="wemoji">⚖️</div>
+      <h2>Ce qui ne change pas</h2>
+      <div class="feat"><div class="ic">✅</div><div class="tx"><b>SMIC garanti pour tous</b>Salaire minimum identique quel que soit le type de contrat.</div></div>
+      <div class="feat"><div class="ic">✅</div><div class="tx"><b>Congés payés pour tous</b>2,5 jours ouvrables par mois travaillé (souvent payés sous forme d'indemnité en CDD/intérim).</div></div>
+      <div class="feat"><div class="ic">✅</div><div class="tx"><b>Protection sociale identique</b>Sécu, retraite, accident du travail — mêmes droits quel que soit le contrat.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <div class="wemoji">📋</div>
+      <h2>Comment lire ce module</h2>
+      <p>Trois onglets — un par contrat — avec ses caractéristiques. <span class="accent">Tape sur un onglet</span> pour explorer ses droits, ses limites, et ce qu'il te rapporte en fin de contrat.</p>
+      <div class="legal">Outil indicatif et pédagogique. Règles du Code du travail commun. <span data-txt="ccn_favorable"></span>. Avant de signer, lis toujours l'intégralité du contrat.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-cta" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Lire le comparatif</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">👆</div><div class="tx"><b>Onglets CDI / CDD / Intérim</b>Tape pour explorer les droits et caractéristiques de chaque contrat.</div></div>
+    <div class="feat"><div class="ic">📊</div><div class="tx"><b>Tableau comparatif</b>En bas, un tableau côte à côte pour comparer les 3 sur les points clés.</div></div>
+    <div class="legal">Les règles présentées sont les minimums du Code du travail. Ta convention et ton accord d'entreprise peuvent être plus favorables.</div>
+    <button class="btn btn-cta" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+  <div class="contract-tabs" id="tabs">
+    <div class="ctab cdi on" data-type="cdi"><span class="ce">💼</span><span class="cn">CDI</span></div>
+    <div class="ctab cdd" data-type="cdd"><span class="ce">📅</span><span class="cn">CDD</span></div>
+    <div class="ctab int" data-type="int"><span class="ce">🏭</span><span class="cn">Intérim</span></div>
+  </div>
+
+  <div class="main-card" id="mainCard"></div>
+
+  <!-- Tableau comparatif -->
+  <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;padding:16px;margin-bottom:14px;">
+    <div style="font-weight:800;font-size:14px;color:#fff;margin-bottom:14px;letter-spacing:0.3px;">📊 Comparatif côte à côte</div>
+    <div class="compare-hd">
+      <div class="ch cdi">💼 CDI</div>
+      <div class="ch cdd">📅 CDD</div>
+      <div class="ch int">🏭 Intérim</div>
+    </div>
+    <div class="cr-label">Durée</div>
+    <div class="compare-row">
+      <div class="cr-cell">Indéterminée</div>
+      <div class="cr-cell">Max 18 mois (renouvellements inclus)</div>
+      <div class="cr-cell">Max 18 mois (24 mois en certains cas)</div>
+    </div>
+    <div class="cr-label">Fin de contrat — indemnité</div>
+    <div class="compare-row">
+      <div class="cr-cell">Indemnité légale (≥8 mois anc.) si licencié</div>
+      <div class="cr-cell" style="color:#5dc87a;font-weight:700;">+10 % prime de précarité</div>
+      <div class="cr-cell" style="color:#5dc87a;font-weight:700;">+10 % prime de précarité (IFM)</div>
+    </div>
+    <div class="cr-label">Rupture à l'initiative du salarié</div>
+    <div class="compare-row">
+      <div class="cr-cell">Démission avec préavis</div>
+      <div class="cr-cell">Très encadrée (embauche CDI seulement)</div>
+      <div class="cr-cell">Encadrée — préavis court</div>
+    </div>
+    <div class="cr-label">Droit au chômage en fin de contrat</div>
+    <div class="compare-row">
+      <div class="cr-cell" style="color:#e07070;">Pas en démission (sauf légit.)</div>
+      <div class="cr-cell" style="color:#5dc87a;">✓ Oui</div>
+      <div class="cr-cell" style="color:#5dc87a;">✓ Oui</div>
+    </div>
+    <div class="cr-label">Congés payés</div>
+    <div class="compare-row">
+      <div class="cr-cell">Pris pendant le contrat</div>
+      <div class="cr-cell">+10 % ICCP versés en fin</div>
+      <div class="cr-cell">+10 % ICCP versés en fin</div>
+    </div>
+    <div class="cr-label">Accès au crédit / logement</div>
+    <div class="compare-row">
+      <div class="cr-cell" style="color:#5dc87a;">✓ Très favorable</div>
+      <div class="cr-cell" style="color:#e07070;">⚠ Difficile</div>
+      <div class="cr-cell" style="color:#e07070;">⚠ Difficile</div>
+    </div>
+  </div>
+
+  <div style="background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.1);border-radius:14px;padding:14px 16px;margin-bottom:14px;">
+    <div style="font-weight:800;font-size:13px;color:#fff;margin-bottom:10px;">💼 Et aussi : le portage salarial</div>
+    <div style="font-size:12.5px;color:rgba(255,255,255,0.7);line-height:1.5;">Le portage salarial permet à un indépendant (consultant, expert) d'exercer en bénéficiant du statut de salarié via une société de portage. Il perçoit un salaire, cotise à la retraite et bénéficie de l'assurance chômage. En échange, la société de portage prélève une commission (8-12 % en général). Encadré par ordonnance depuis 2015.</div>
+  </div>
+  <div class="note">Règles du Code du travail commun (2026). <span data-txt="ccn_favorable"></span>. Outil indicatif et pédagogique — ni avis juridique. Avant de signer tout contrat, lis-le intégralement et consulte un professionnel si nécessaire.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">CDI · CDD · INTÉRIM · LE COMPARATIF · V1.0<br>📊 INDICATIF — TON CONTRAT ET UN PROFESSIONNEL FONT FOI</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={WELCOME:'CMP_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function $(s,r){return(r||document).querySelector(s);}
+  function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+
+  var DATA={
+    cdi:{icon:'💼',title:'CDI',sub:'Contrat à Durée Indéterminée — Le contrat de droit commun',color:'var(--cdi)',rows:[
+      {l:'Durée',v:'Sans limite de temps. Pas de date de fin dans le contrat.'},
+      {l:'Période d\'essai légale',v:'2 mois (ouvriers/employés) · 3 mois (techniciens) · 4 mois (cadres). Renouvelable une fois si : (1) prévu par la CCN de branche, (2) mentionné dans le contrat, (3) accord écrit du salarié obtenu pendant la période initiale.'},
+      {l:'Motifs de rupture',v:'<span class="ok">Démission</span> (préavis 1 à 3 mois), <span class="no">licenciement</span> (motif réel et sérieux, procédure), <span class="ok">rupture conventionnelle</span> (amiable avec chômage).'},
+      {l:'Indemnité de rupture',v:'Indemnité légale de licenciement dès 8 mois d\'ancienneté (1/4 mois/an). Rupture conventionnelle : même base, négociable à la hausse.'},
+      {l:'En fin de contrat',v:'Pas de prime de précarité. Indemnité compensatrice de congés payés non pris.'},
+      {l:'Avantages pour le salarié',v:'<span class="ok">✓ Stabilité</span> · <span class="ok">✓ Accès au crédit et logement</span> · <span class="ok">✓ Formation CPF pleine</span> · <span class="ok">✓ Participation/intéressement</span>'},
+      {l:'Attention',v:'La démission ne donne pas droit au chômage (sauf démission légitime ou reconversion validée). Rupture conventionnelle : oui.'}
+    ]},
+    cdd:{icon:'📅',title:'CDD',sub:'Contrat à Durée Déterminée — Uniquement pour des motifs précis',color:'var(--cdd)',rows:[
+      {l:'Durée maximale',v:'18 mois (renouvellements inclus). 9 mois en attente de l\'arrivée d\'un salarié en CDI (pas pour le remplacement d\'absent). Remplacement d\'absent : sans terme précis si retour incertain. 24 mois pour départ définitif.'},
+      {l:'Motifs légaux',v:'Remplacement de salarié absent · Accroissement temporaire d\'activité · Emploi saisonnier · Contrats spécifiques (apprentissage, vendanges…).'},
+      {l:'Rupture avant terme',v:'Très encadrée. Salarié : possible uniquement si embauche en CDI (préavis = 1j/semaine restante, max 2 sem.). Employeur : faute grave, force majeure, ou inaptitude constatée par le médecin du travail. Un accord amiable entre les parties est aussi possible (rupture d'un commun accord).'},
+      {l:'Fin de contrat — prime',v:'<span class="ok">+10 % de prime de précarité</span> du brut total (sauf CDD saisonnier, apprentissage, poursuite en CDI).'},
+      {l:'Congés payés',v:'<span class="ok">+10 % ICCP</span> (Indemnité Compensatrice de Congés Payés) versée à la fin, sauf si congés pris pendant le contrat.'},
+      {l:'Droits au chômage',v:'<span class="ok">✓ Oui</span>, à la fin du CDD (sauf refus d\'un CDI proposé sur le même poste — 2 refus peuvent suspendre les droits).'},
+      {l:'Attention',v:'Un CDD renouvelé plusieurs fois pour le même motif peut faire l\'objet d\'une requalification en CDI. Vérifier le délai de carence entre deux CDD.'}
+    ]},
+    int:{icon:'🏭',title:'Intérim (contrat de mission)',sub:'Travail temporaire via une agence — Employeur = l\'agence',color:'var(--int)',rows:[
+      {l:'Contrat de mission',v:'Chaque mission est un contrat distinct entre l\'agence (employeur), l\'entreprise utilisatrice et toi. Le contrat de mise à disposition est séparé.'},
+      {l:'CDII — CDI Intérimaire',v:'<span class="ok">✓ Option stable</span> Certaines agences proposent un CDI Intérimaire (CDII) : contrat permanent avec l\'agence, succession de missions. Avantages : revenus garantis entre missions, accès au crédit facilité.'},
+      {l:'Structure',v:'3 parties : l\'agence d\'intérim (ton employeur juridique) · l\'entreprise utilisatrice (lieu de travail) · toi (salarié temporaire).'},
+      {l:'Durée',v:'Mission de 18 mois maximum (24 mois dans certains cas, 36 mois pour apprentis). Renouvelable 2 fois dans la limite de la durée max.'},
+      {l:'Rémunération',v:'Au moins égale à celle d\'un salarié permanent de l\'entreprise utilisatrice occupant le même poste (règle d\'égalité de traitement).'},
+      {l:'Fin de mission — primes',v:'<span class="ok">+10 % IFM</span> (Indemnité de Fin de Mission = prime de précarité) <span class="ok">+10 % ICCP</span> de congés payés. Soit jusqu\'à +20 % du brut total.'},
+      {l:'Droits au chômage',v:'<span class="ok">✓ Oui</span>, après chaque mission (si conditions d\'affiliation remplies). Attention : 2 refus d\'un CDI proposé par l\'entreprise utilisatrice sur un poste équivalent en 12 mois peuvent suspendre les droits ARE (même règle que pour les CDD).'},
+      {l:'Protection sociale',v:'Sécu, retraite : identiques. Mutuelle : via le régime d\'intérim (automatique dès 3 mois ou 414 h sur 12 mois).'},
+      {l:'Avantages spécifiques',v:'Accès au FASTT : aides au logement, crédit auto, garde d\'enfant, formation. CDII (CDI intérimaire) disponible dans certaines agences pour plus de stabilité.'}
+    ]}
+  };
+
+  var cur='cdi';
+  function renderCard(){
+    var d=DATA[cur]; var card=$('#mainCard'); card.innerHTML='';
+    var hd=document.createElement('div'); hd.className='mc-head';
+    hd.innerHTML='<div class="mhi">'+d.icon+'</div><div><div class="mht">'+d.title+'</div><div class="mhs">'+d.sub+'</div></div>';
+    card.appendChild(hd);
+    var rows=document.createElement('div'); rows.className='rows';
+    d.rows.forEach(function(r){
+      var row=document.createElement('div'); row.className='row';
+      row.innerHTML='<div class="rl">'+r.l+'</div><div class="rv">'+r.v+'</div>';
+      rows.appendChild(row);
+    });
+    card.appendChild(rows);
+  }
+
+  $all('.ctab').forEach(function(t){
+    t.addEventListener('click',function(){
+      cur=t.dataset.type;
+      $all('.ctab').forEach(function(x){x.classList.remove('on');});
+      t.classList.add('on'); renderCard();
+    });
+  });
+
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Voir le comparatif 📊':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  renderCard();
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'CON_STATE',WELCOME:'CON_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

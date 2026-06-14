@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Ancienneté — L'Arbre</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#3a6b3a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ancienneté">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+:root{
+  --bark:#5a3e28; --bark-l:#7a5538; --bark-ll:#a07050;
+  --forest:#1e3d1e; --forest-l:#2d5a2d; --forest-ll:#3a7a3a;
+  --leaf:#4a9a4a; --leaf-l:#6ab86a; --leaf-ll:#9ad89a;
+  --soil:#3a2a1a; --soil-l:#5a4a3a;
+  --sun:#f0c040; --sun-l:#f8dc78;
+  --cream:#f8f4ec; --cream2:#f0e8dc; --cream3:#e4d8c8;
+  --ink:#2a1e14; --ink2:#5a4a3a; --faded:#9a8a7a;
+  --ring1:#c8783a; --ring2:#a05a28; --ring3:#784020;
+  --done:#3a7a3a; --next:#c87820; --future:#9a8a7a;
+  --card:#fffdf8; --card-edge:#e0d0b8;
+  --line:rgba(42,30,20,0.12);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:
+    radial-gradient(800px 400px at 50% -10%, rgba(74,154,74,0.15), transparent 55%),
+    radial-gradient(600px 500px at 10% 60%, rgba(90,62,40,0.12), transparent 55%),
+    linear-gradient(180deg, #e8f4e8 0%, #d8ecd8 25%, #f0e8dc 60%, #e8d8c8 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;position:relative;
+}
+/* soil band at bottom */
+body::after{content:"";position:fixed;bottom:0;left:0;right:0;height:80px;z-index:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(58,42,26,0.25));
+  -webkit-mask:linear-gradient(180deg,transparent,#000);mask:linear-gradient(180deg,transparent,#000);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:linear-gradient(180deg,#d8ecd8,#e8d8c8);color:var(--forest);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Playfair Display',serif;font-size:28px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(216,236,216,0.97), rgba(216,236,216,0.55) 75%, transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.9);border:none;color:var(--forest-l);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(42,30,20,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-weight:700;font-size:21px;line-height:1;color:var(--forest);font-style:italic;}
+header .brand .su{font-weight:600;font-size:9px;color:var(--bark-l);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:rgba(255,255,255,0.9);border:none;color:var(--forest-l);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(42,30,20,0.12);}
+
+/* tree trunk hero */
+.trunk{background:linear-gradient(165deg,var(--card),var(--cream2));border-radius:22px;padding:20px;margin:8px 0 16px;
+  box-shadow:0 12px 32px rgba(58,42,26,0.25),inset 0 1px 0 rgba(255,255,255,0.8);position:relative;overflow:hidden;}
+/* wood grain rings behind */
+.trunk::before{content:"";position:absolute;right:-30px;top:50%;transform:translateY(-50%);
+  width:140px;height:140px;border-radius:50%;opacity:0.08;
+  background:
+    radial-gradient(circle,transparent 25%,var(--ring3) 26%,var(--ring3) 28%,transparent 29%,transparent 40%,var(--ring2) 41%,var(--ring2) 43%,transparent 44%,transparent 55%,var(--ring1) 56%,var(--ring1) 58%,transparent 59%);}
+.trunk .ttag{font-weight:700;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--bark-l);text-align:center;margin-bottom:8px;}
+.trunk .tbig{font-family:'Playfair Display',serif;font-weight:700;font-size:52px;text-align:center;line-height:1;color:var(--forest);margin:2px 0;}
+.trunk .tunit{text-align:center;font-size:13px;color:var(--ink2);font-weight:600;margin-top:3px;}
+.trunk .tsub{text-align:center;font-family:'Courier Prime',monospace;font-size:11.5px;color:var(--faded);margin-top:8px;}
+.trunk .tdetail{display:flex;justify-content:center;gap:14px;margin-top:12px;flex-wrap:wrap;}
+.trunk .td{text-align:center;background:rgba(58,106,58,0.08);border-radius:10px;padding:8px 12px;}
+.trunk .td .dv{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--forest);}
+.trunk .td .dl{font-size:11px;color:var(--bark-l);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+
+/* input */
+.panel{background:rgba(255,255,255,0.94);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:0 6px 20px rgba(58,42,26,0.16);}
+.panel-t{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;font-style:italic;color:var(--forest);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--leaf-ll);padding-bottom:8px;}
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:12.5px;color:var(--ink2);margin-bottom:6px;letter-spacing:0.2px;}
+.ip{width:100%;background:var(--cream2);border:2px solid var(--card-edge);border-radius:12px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--forest-l);background:#fff;}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%232d5a2d' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:28px;}
+.hint{font-weight:500;font-size:11.5px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* timeline / milestones */
+.timeline{position:relative;padding-left:32px;display:flex;flex-direction:column;gap:0;}
+.timeline::before{content:"";position:absolute;left:10px;top:12px;bottom:12px;width:3px;
+  background:linear-gradient(180deg,var(--leaf-l),var(--bark-l),var(--soil-l));border-radius:2px;}
+.milestone{position:relative;padding:0 0 16px 20px;}
+.milestone:last-child{padding-bottom:0;}
+.milestone .mdot{position:absolute;left:-22px;top:6px;width:20px;height:20px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;
+  border:3px solid var(--card);z-index:1;}
+.milestone.done .mdot{background:var(--done);box-shadow:0 0 0 2px var(--leaf-l);}
+.milestone.next .mdot{background:var(--next);box-shadow:0 0 0 2px var(--sun),0 0 12px rgba(200,120,32,0.4);animation:glow 2s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 0 2px var(--sun),0 0 8px rgba(200,120,32,0.3);}50%{box-shadow:0 0 0 3px var(--sun),0 0 16px rgba(200,120,32,0.55);}}
+.milestone.future .mdot{background:var(--cream3);box-shadow:0 0 0 2px var(--card-edge);}
+.milestone .mc{background:var(--card);border-radius:14px;padding:12px 14px;box-shadow:0 3px 10px rgba(58,42,26,0.12);}
+.milestone.done .mc{border-left:3px solid var(--done);}
+.milestone.next .mc{border-left:3px solid var(--next);background:linear-gradient(135deg,#fffdf0,#fff8e4);}
+.milestone.future .mc{opacity:0.7;}
+.milestone .mt{font-weight:800;font-size:13.5px;color:var(--ink);display:flex;align-items:center;gap:6px;}
+.milestone.done .mt{color:var(--forest);}
+.milestone.next .mt{color:var(--ring1);}
+.milestone .md{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.milestone .meta{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap;}
+.mbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;display:inline-flex;align-items:center;gap:3px;}
+.mbadge.done{background:#e8f5e8;color:var(--forest);}
+.mbadge.next{background:#fff3cd;color:#8a5c00;}
+.mbadge.future{background:var(--cream2);color:var(--faded);}
+.mbadge.date{background:var(--cream2);color:var(--bark-l);font-family:'Courier Prime',monospace;}
+
+.empty-tree{text-align:center;padding:30px 16px;color:var(--faded);}
+.empty-tree .e{font-size:48px;display:block;margin-bottom:12px;opacity:.7;}
+.empty-tree .t{font-family:'Playfair Display',serif;font-size:20px;font-style:italic;color:var(--bark-l);}
+
+.note{font-size:12px;color:var(--ink2);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;font-weight:600;}
+.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--faded);line-height:1.6;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(26,20,14,0.6);backdrop-filter:blur(5px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,#fffdf8,#f4ecdc);border-radius:24px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(26,20,14,0.55);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:5px solid var(--forest-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Playfair Display',serif;font-weight:700;font-size:23px;color:var(--forest);font-style:italic;}
+.box .hd .s{font-size:13px;color:var(--ink2);margin-top:4px;font-weight:600;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--cream2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--forest);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-forest{background:linear-gradient(135deg,var(--forest-ll),var(--forest));color:#fff;box-shadow:0 5px 14px rgba(30,61,30,0.4);}
+.btn-ghost{background:transparent;color:var(--forest);border:2px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wmasc{width:120px;height:120px;object-fit:contain;display:inline-block;margin-bottom:6px;
+  filter:drop-shadow(2px 6px 10px rgba(26,20,14,0.3));animation:sway 4s ease-in-out infinite;}
+@keyframes sway{0%,100%{transform:rotate(-3deg) translateY(0)}50%{transform:rotate(3deg) translateY(-6px)}}
+.wemoji{font-size:60px;display:inline-block;margin-bottom:8px;animation:sway 4s ease-in-out infinite;}
+.wstep h2{font-family:'Playfair Display',serif;font-weight:700;font-size:25px;color:var(--forest);margin-bottom:10px;font-style:italic;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;font-weight:500;}
+.wstep .accent{color:var(--forest-ll);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--forest);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--cream2);border-radius:10px;padding:10px;text-align:left;border-left:3px solid var(--leaf-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(58,122,58,0.2);transition:.2s;}
+.dots .d.on{background:var(--forest-ll);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--forest);color:#fff;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(26,20,14,0.4);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.pop{animation:popk .4s;} @keyframes popk{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
+
+input[type="date"]{-webkit-appearance:none;appearance:none;box-sizing:border-box;max-width:100%;min-width:0;}
+
+/* Arbre qui pousse selon l'anciennete */
+.tree-grow{text-align:center;line-height:1;margin:4px 0 2px;min-height:48px;display:flex;align-items:flex-end;justify-content:center;overflow:visible;}
+.tree-emoji{display:inline-block;font-size:44px;transition:font-size .8s cubic-bezier(.2,1.3,.4,1),transform .8s cubic-bezier(.2,1.3,.4,1),filter .8s ease;transform-origin:bottom center;filter:drop-shadow(0 4px 8px rgba(42,80,40,0.25));}
+.tree-emoji.sprout{font-size:38px;}
+.tree-emoji.young{font-size:58px;}
+.tree-emoji.grown{font-size:82px;}
+.tree-emoji.mature{font-size:108px;}
+.tree-emoji.ancient{font-size:132px;filter:drop-shadow(0 8px 18px rgba(42,80,40,0.4));}
+@keyframes treePulse{0%{transform:scale(0.7);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+.tree-emoji.justgrew{animation:treePulse .9s cubic-bezier(.2,1.3,.4,1);}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#d8ecd8;z-index:9999;"></div>
+<div id="lb"><div class="i">🌳</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">L'Arbre</div>
+    <div class="su">Ancienneté & jalons · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="wmasc" src="Mascotte.png" alt="" onerror="this.outerHTML='<span class=\'wemoji\'>🌳</span>'">
+      <h2>Ton arbre d'ancienneté</h2>
+      <p>Chaque année dans une entreprise, c'est un <span class="accent">anneau qui se forme</span>. Et chaque anneau apporte de nouveaux droits.</p>
+      <p>Entrez ta date d'embauche, l'arbre pousse sous tes yeux.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">🌿</span>
+      <h2>Les jalons importants</h2>
+      <div class="feat"><div class="ic">🌱</div><div class="tx"><b>Les premiers mois</b>Fin de période d'essai, premiers droits à l'indemnisation maladie, participation…</div></div>
+      <div class="feat"><div class="ic">🌲</div><div class="tx"><b>1 an et au-delà</b>Maintien de salaire maladie obligatoire, préavis plus long, paliers d'indemnité de licenciement…</div></div>
+      <div class="feat"><div class="ic">✨</div><div class="tx"><b>Le prochain jalon</b>L'outil te dit combien de temps avant d'atteindre ta prochaine étape.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📋</span>
+      <h2>Règles communes</h2>
+      <p>Ces jalons sont ceux du <span class="accent">Code du travail commun</span>. Ta convention collective peut prévoir des droits supplémentaires à d'autres anciennetés.</p>
+      <div class="legal">Outil indicatif et pédagogique. Les durées de période d'essai varient selon le contrat et la convention. Les jalons affichés sont les minimums légaux communs. Seul ton employeur, ta convention et un professionnel font foi.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-forest" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Lire ton arbre</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">📅</div><div class="tx"><b>Date d'embauche</b>Le premier jour de ton contrat de travail actuel.</div></div>
+    <div class="feat"><div class="ic">🟢</div><div class="tx"><b>Jalons verts</b>Déjà atteints — ces droits sont acquis.</div></div>
+    <div class="feat"><div class="ic">🟡</div><div class="tx"><b>Jalon orange clignotant</b>Le prochain à venir — avec la date exacte et le compte à rebours.</div></div>
+    <div class="feat"><div class="ic">⚪</div><div class="tx"><b>Jalons gris</b>Encore dans le futur.</div></div>
+    <div class="legal">Les jalons affichés sont les minimums légaux communs (Code du travail). Ta convention collective peut offrir des droits à d'autres anciennetés. Outil indicatif.</div>
+    <button class="btn btn-forest" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <!-- TRUNK -->
+  <div class="trunk">
+    <div class="ttag">🌳 Ancienneté dans l'entreprise</div>
+    <div class="tree-grow" id="treeGrow"><span class="tree-emoji" id="treeEmoji">🌱</span></div>
+    <div class="tbig pop" id="tBig">—</div>
+    <div class="tunit" id="tUnit">an</div>
+    <div class="tsub" id="tSub">Entre ta date d'embauche ci-dessous</div>
+    <div class="tdetail" id="tDetail" style="display:none;">
+      <div class="td"><div class="dv" id="dAns">—</div><div class="dl">Ans</div></div>
+      <div class="td"><div class="dv" id="dMois">—</div><div class="dl">Mois</div></div>
+      <div class="td"><div class="dv" id="dJours">—</div><div class="dl">Jours</div></div>
+    </div>
+  </div>
+
+  <!-- INPUT -->
+  <div class="panel">
+    <div class="panel-t">🌱 Ta situation</div>
+    <div class="field">
+      <label>Date d'embauche (1er jour de contrat)</label>
+      <input class="ip" id="fDate" type="date">
+      <div class="hint">Le premier jour de ton contrat de travail actuel dans cette entreprise.</div>
+    </div>
+    <div class="field">
+      <label>Type de contrat</label>
+      <select class="ip" id="fType">
+        <option value="ouvrier">Ouvrier / Employé (CDI)</option>
+        <option value="technicien">Technicien / Agent de maîtrise (CDI)</option>
+        <option value="cadre">Cadre (CDI)</option>
+        <option value="cdd">CDD</option>
+      </select>
+      <div class="hint">Influe sur la durée de la période d'essai légale.</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="panel">
+    <div class="panel-t">🌿 Ta frise de droits</div>
+    <div id="timelineHost">
+      <div class="empty-tree">
+        <span class="e">🌱</span>
+        <div class="t">L'arbre attend ta date d'embauche</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">💶 Comment se calcule l'indemnité légale</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--wood);">Formule légale (depuis 2017)</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">• <strong>1/4 de mois de salaire</strong> par année d'ancienneté jusqu'à 10 ans<br>• <strong>1/3 de mois de salaire</strong> par année au-delà de 10 ans<br>• Salaire de référence = 1/12 de la rémunération des 12 derniers mois <em>ou</em> 1/3 des 3 derniers mois (le plus favorable)</div>
+      </div>
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--wood);">Exemple : 7 ans d'ancienneté, 2 000 € brut/mois</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">7 × (2 000 ÷ 4) = 7 × 500 = <strong>3 500 €</strong> bruts. Cette indemnité est exonérée d'impôt sur le revenu et de cotisations dans certaines limites.</div>
+      </div>
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--wood);">⚠️ Rupture conventionnelle</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">L'indemnité de rupture conventionnelle doit être au moins égale à l'indemnité légale de licenciement. Elle peut être négociée à la hausse.</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:14px;">
+    <div class="panel-t">📊 Récapitulatif des jalons clés</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+        <thead>
+          <tr style="background:rgba(58,106,58,0.15);">
+            <th style="padding:7px 10px;text-align:left;color:var(--forest);font-weight:700;">Ancienneté</th>
+            <th style="padding:7px 10px;text-align:left;color:var(--forest);font-weight:700;">Droit ou protection</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--line);"><td style="padding:6px 10px;color:var(--ink);">3 mois</td><td style="padding:6px 10px;color:var(--ink2);">IJSS Sécu (affiliation)</td></tr>
+          <tr style="border-bottom:1px solid var(--line);background:rgba(58,106,58,0.04);"><td style="padding:6px 10px;color:var(--ink);">3 mois max</td><td style="padding:6px 10px;color:var(--ink2);">Participation / intéressement (<span data-art="L3342-1"></span> — ancienneté max légale : 3 mois)</td></tr>
+          <tr style="border-bottom:1px solid var(--line);"><td style="padding:6px 10px;color:var(--ink);">8 mois</td><td style="padding:6px 10px;color:var(--ink2);">Indemnité légale de licenciement</td></tr>
+          <tr style="border-bottom:1px solid var(--line);background:rgba(58,106,58,0.04);"><td style="padding:6px 10px;color:var(--ink);">1 an</td><td style="padding:6px 10px;color:var(--ink2);">Maintien salaire maladie (30 à 90j) + CP complets</td></tr>
+          <tr style="border-bottom:1px solid var(--line);"><td style="padding:6px 10px;color:var(--ink);">2 ans</td><td style="padding:6px 10px;color:var(--ink2);">Préavis 2 mois (le taux ¼ mois/an s'applique dès l'ouverture du droit à 8 mois)</td></tr>
+          <tr style="border-bottom:1px solid var(--line);background:rgba(58,106,58,0.04);"><td style="padding:6px 10px;color:var(--ink);">4 ans</td><td style="padding:6px 10px;color:var(--ink2);">Éligibilité mandat CSE · protection élu</td></tr>
+          <tr style="border-bottom:1px solid var(--line);"><td style="padding:6px 10px;color:var(--ink);">5 ans</td><td style="padding:6px 10px;color:var(--ink2);">Paliers conventionnels (prime ancienneté…)</td></tr>
+          <tr style="background:rgba(58,106,58,0.04);"><td style="padding:6px 10px;color:var(--ink);">10 ans</td><td style="padding:6px 10px;color:var(--ink2);">ILL passe à ⅓ mois/an</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="note">Jalons du Code du travail commun. Ta convention collective peut prévoir d'autres droits.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot"><span data-txt="disclaimer"></span>.<br>🌳 Tout reste sur ton appareil.</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ STATE:'ANC_STATE', WELCOME:'ANC_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+
+  // Periode essai legale (mois)
+  var ESSAI = { ouvrier:2, technicien:3, cadre:4, cdd:0 };
+  var ESSAI_LABEL = { ouvrier:'2 mois', technicien:'3 mois', cadre:'4 mois', cdd:'selon contrat' };
+
+  // Jalons: { months, icon, title, desc, badge }
+  // months = ancienneté requise en mois
+  function buildJalons(type){
+    var essaiMois=ESSAI[type]||2;
+    var essaiLabel=ESSAI_LABEL[type]||'2 mois';
+    return [
+      { months:0, icon:'🌱', title:'Embauche', desc:'Début du contrat. La période d\'essai commence.', badge:'Jour J' },
+      { months:essaiMois, icon:'🔓', title:'Fin de période d\'essai',
+        desc:'Période d\'essai légale : '+essaiLabel+'. Le contrat est définitivement établi.',
+        badge:'Essai terminé', note:'Ta convention peut prévoir une durée différente.' },
+      { months:3, icon:'🏥', title:'Indemnisation maladie (Sécu)',
+        desc:'Après 3 mois de travail : tu remplis la condition d\'affiliation pour les indemnités journalières CPAM.',
+        badge:'IJSS ouvertes' },
+      { months:3, icon:'💰', title:'Participation & intéressement',
+        desc:'Après 3 mois au maximum ('+(window.SH?SH.art('L3342-1'):'Art. L3342-1 CT')+' — la loi prévoit que le maximum légal est de 3 mois). Tu peux bénéficier de la participation et de l\'intéressement.',
+        badge:'Épargne salariale', note:'Selon accord d\'entreprise.' },
+      { months:8, icon:'⚖️', title:'Droit à l\'indemnité de licenciement',
+        desc:'Il faut au moins 8 mois d\'ancienneté pour avoir droit à l\'indemnité légale de licenciement.',
+        badge:'ILL ouverte' },
+      { months:12, icon:'🛡️', title:'Maintien de salaire maladie',
+        desc:'Dès 1 an d\'ancienneté, la loi prévoit en principe un maintien de salaire pendant un arrêt maladie (90 % puis 66 %).',
+        badge:'Maintien obligatoire' },
+      { months:12, icon:'🏖️', title:'Droits à congés complets',
+        desc:'Après une année complète de référence, tu peux prendre la totalité de tes congés payés annuels.',
+        badge:'Congés pleins' },
+      { months:24, icon:'📢', title:'Préavis de licenciement : 2 mois',
+        desc:'À partir de 2 ans d\'ancienneté, le préavis légal passe à 2 mois (contre 1 mois avant).',
+        badge:'Préavis 2 mois' },
+      { months:60, icon:'🌟', title:'5 ans — Palier conventionnel',
+        desc:'Beaucoup de conventions collectives prévoient une prime d\'ancienneté ou des droits supplémentaires à 5 ans.',
+        badge:'5 ans', note:'Vérifier ta convention collective.' },
+      { months:120, icon:'🏆', title:'10 ans — Indemnité de licenciement majorée',
+        desc:'Au-delà de 10 ans d\'ancienneté, la fraction est de 1/3 de mois par année (contre 1/4 avant).',
+        badge:'1/3 mois/an' },
+      { months:180, icon:'💎', title:'15 ans — Palier conventionnel',
+        desc:'Certaines conventions prévoient des droits supplémentaires à 15 ans (congés, primes d\'ancienneté…).',
+        badge:'15 ans', note:'Vérifier ta convention collective.' },
+      { months:48, icon:'🏛️', title:'4 ans — Élu CSE possible',
+        desc:'Après 1 an d\'ancienneté, tu peux être candidat aux élections CSE. À partir de 4 ans, tu auras accompli un premier mandat complet. Les représentants du personnel bénéficient d\'une protection spéciale contre le licenciement.',
+        badge:'Mandat CSE', note:'Licenciement d\'un élu CSE : autorisation obligatoire de l\'inspection du travail.' },
+      { months:240, icon:'👑', title:'20 ans — Fidélité',
+        desc:'20 ans dans la même entreprise — un parcours exceptionnel, souvent reconnu par des avantages conventionnels.',
+        badge:'20 ans', note:'Vérifier ta convention collective.' }
+    ];
+  }
+
+  function diffFull(start, end){
+    var y=end.getFullYear()-start.getFullYear();
+    var m=end.getMonth()-start.getMonth();
+    var d=end.getDate()-start.getDate();
+    if(d<0){ m--; var prev=new Date(end.getFullYear(),end.getMonth(),0); d+=prev.getDate(); }
+    if(m<0){ y--; m+=12; }
+    var totalDays=Math.round((end-start)/86400000);
+    var totalMonths=y*12+m;
+    return {years:y,months:m,days:d,totalMonths:totalMonths,totalDays:totalDays};
+  }
+
+  function addMonths(d,m){ var r=new Date(d); r.setMonth(r.getMonth()+m); return r; }
+
+  function fmtDate(d){ return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'}); }
+  function fmtShort(d){ return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+
+  function countdown(target){
+    var now=new Date(); now.setHours(0,0,0,0);
+    var diff=Math.round((target-now)/86400000);
+    if(diff<=0) return null;
+    if(diff===1) return 'demain';
+    if(diff<30) return 'dans '+diff+' jours';
+    var m=Math.floor(diff/30.44);
+    if(m<12) return 'dans '+m+' mois';
+    var y=Math.floor(m/12); var rm=m%12;
+    return 'dans '+y+' an'+(y>1?'s':'')+(rm?' et '+rm+' mois':'');
+  }
+
+  var state=get(LS.STATE,{date:'',type:'ouvrier'});
+
+  function recalc(){
+    var dateStr=state.date;
+    var type=state.type||'ouvrier';
+    if(!dateStr){ showEmpty(); set(LS.STATE,state); return; }
+
+    var start=new Date(dateStr+'T00:00:00'); var now=new Date(); now.setHours(0,0,0,0);
+    if(isNaN(start.getTime())||start>now){ showEmpty(); set(LS.STATE,state); return; }
+
+    var diff=diffFull(start,now);
+
+    // hero
+    var bigEl=$('#tBig'); bigEl.classList.remove('pop'); void bigEl.offsetWidth; bigEl.classList.add('pop');
+    // ── Arbre qui pousse selon l'anciennete ──
+    (function(){
+      var te=$('#treeEmoji'); if(!te) return;
+      var yrs=diff.years||0; var emoji,cls;
+      if(yrs<1){ emoji='🌱'; cls='sprout'; }
+      else if(yrs<3){ emoji='🌿'; cls='young'; }
+      else if(yrs<7){ emoji='🌳'; cls='grown'; }
+      else if(yrs<15){ emoji='🌳'; cls='mature'; }
+      else { emoji='🌳'; cls='ancient'; }
+      var prevCls=te.className.replace('tree-emoji','').replace('justgrew','').trim();
+      te.textContent=emoji;
+      te.className='tree-emoji '+cls;
+      if(prevCls!==cls){ void te.offsetWidth; te.classList.add('justgrew'); }
+    })();
+    if(diff.years>=1){ bigEl.textContent=diff.years; $('#tUnit').textContent='an'+(diff.years>1?'s':''); }
+    else if(diff.totalMonths>=1){ bigEl.textContent=diff.totalMonths; $('#tUnit').textContent='mois'; }
+    else { bigEl.textContent=diff.totalDays; $('#tUnit').textContent='jours'; }
+    $('#tSub').textContent='depuis le '+fmtDate(start);
+    $('#dAns').textContent=diff.years; $('#dMois').textContent=diff.months; $('#dJours').textContent=diff.days;
+    $('#tDetail').style.display='flex';
+
+    // timeline
+    var jalons=buildJalons(type);
+    var host=$('#timelineHost'); host.innerHTML='';
+    var tl=document.createElement('div'); tl.className='timeline'; host.appendChild(tl);
+
+    var nextFound=false;
+    jalons.forEach(function(j){
+      var target=addMonths(start,j.months);
+      var reached=now>=target;
+      var isNext=!reached&&!nextFound;
+      if(isNext) nextFound=true;
+      var cls=reached?'done':isNext?'next':'future';
+      var cd=isNext?countdown(target):null;
+
+      var m=document.createElement('div'); m.className='milestone '+cls;
+
+      var dotTxt=reached?'✓':isNext?'→':'·';
+      m.innerHTML='<div class="mdot">'+dotTxt+'</div>'+
+        '<div class="mc">'+
+          '<div class="mt">'+j.icon+' '+j.title+'</div>'+
+          '<div class="md">'+j.desc+'</div>'+
+          '<div class="meta">'+
+            (reached?'<span class="mbadge done">✓ Acquis</span>':'')+
+            (isNext?'<span class="mbadge next">⏳ '+cd+'</span>':'')+
+            (j.months>0?'<span class="mbadge date">'+fmtShort(target)+'</span>':'')+
+            '<span class="mbadge '+(reached?'done':isNext?'next':'future')+'">'+j.badge+'</span>'+
+          '</div>'+
+          (j.note?'<div style="font-size:10.5px;color:var(--faded);margin-top:5px;font-style:italic;">ℹ️ '+j.note+'</div>':'')+
+        '</div>';
+      tl.appendChild(m);
+    });
+
+    set(LS.STATE,state);
+  }
+
+  function showEmpty(){
+    var te=$('#treeEmoji'); if(te){ te.textContent='🌱'; te.className='tree-emoji sprout'; }
+    $('#tBig').textContent='—'; $('#tUnit').textContent='an'; $('#tSub').textContent='Entre ta date d\'embauche ci-dessous';
+    $('#tDetail').style.display='none';
+    $('#timelineHost').innerHTML='<div class="empty-tree"><span class="e">🌱</span><div class="t">L\'arbre attend ta date d\'embauche</div></div>';
+  }
+
+  $('#fDate').value=state.date; $('#fType').value=state.type;
+  $('#fDate').addEventListener('input',function(){state.date=this.value;recalc();});
+  $('#fType').addEventListener('change',function(){state.type=this.value;recalc();});
+
+  // wizard
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Planter l\'arbre 🌳':'Continuer';
+    $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  recalc();
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

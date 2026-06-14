@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Droits Chômage — Le filet de sécurité</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#3b6fb5">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Droits Chômage">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&family=Spline+Sans+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --sky1:#aee0f5; --sky2:#7fc4ec; --sky3:#4f9fdd; --sky4:#3b6fb5; --sky5:#2a4f8a;
+  --cloud:#fdfeff; --soft:#eaf5fc;
+  --ink:#1f3a52; --ink2:#48657e; --faded:#7d96aa;
+  --card:#ffffff; --card-edge:#d4e8f5;
+  --safe:#34b3a0; --safe-d:#1f8c7c;
+  --warn:#e8a13f; --bad:#e07070; --gold:#f5c451;
+  --line:rgba(31,58,82,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Nunito',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(180deg,#aee0f5 0%,#7fc4ec 35%,#4f9fdd 70%,#3b6fb5 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;position:relative;
+}
+/* soft clouds */
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5;
+  background:
+    radial-gradient(60px 28px at 18% 14%, #fff, transparent 70%),
+    radial-gradient(80px 34px at 78% 9%, #fff, transparent 70%),
+    radial-gradient(50px 24px at 60% 22%, #fff, transparent 70%),
+    radial-gradient(70px 30px at 30% 30%, rgba(255,255,255,0.7), transparent 70%);}
+/* safety net at bottom */
+body::after{content:"";position:fixed;bottom:0;left:0;right:0;height:120px;z-index:0;pointer-events:none;opacity:0.18;
+  background-image:
+    repeating-linear-gradient(45deg, #1f3a52 0 1.5px, transparent 1.5px 18px),
+    repeating-linear-gradient(-45deg, #1f3a52 0 1.5px, transparent 1.5px 18px);
+  -webkit-mask:linear-gradient(180deg,transparent,#000);mask:linear-gradient(180deg,transparent,#000);}
+
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:linear-gradient(180deg,#7fc4ec,#3b6fb5);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-weight:800;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(127,196,236,0.95), rgba(127,196,236,0.5) 75%, transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.95);border:none;color:var(--sky4);border-radius:20px;
+  padding:9px 14px;font-weight:800;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 3px 10px rgba(31,58,82,0.15);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:900;font-size:20px;line-height:1;color:#fff;text-shadow:0 2px 8px rgba(31,58,82,0.2);}
+header .brand .su{font-weight:700;font-size:9px;color:rgba(255,255,255,0.92);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+header .hbtn{background:rgba(255,255,255,0.95);border:none;color:var(--sky4);border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 3px 10px rgba(31,58,82,0.15);}
+
+/* eligibility badge */
+.eligbar{border-radius:18px;padding:13px 16px;margin:8px 0 16px;display:flex;align-items:center;gap:12px;
+  font-weight:700;font-size:13px;line-height:1.35;box-shadow:0 6px 16px rgba(31,58,82,0.18);}
+.eligbar .ei{font-size:26px;flex-shrink:0;}
+.eligbar.ok{background:linear-gradient(135deg,#d4f3ed,#b0e8de);color:var(--safe-d);}
+.eligbar.no{background:linear-gradient(135deg,#fbe0e0,#f5cccc);color:#b04545;}
+.eligbar.neutral{background:linear-gradient(135deg,#fff,#eaf5fc);color:var(--ink2);}
+
+/* hero parachute */
+.hero{position:relative;border-radius:28px;padding:22px 20px;margin-bottom:16px;overflow:hidden;
+  background:linear-gradient(165deg,#fff,#f3faff);box-shadow:0 16px 40px rgba(42,79,138,0.3);}
+.hero .chute{position:absolute;top:14px;right:18px;font-size:40px;opacity:0.14;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.hero .htag{font-weight:800;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--sky4);text-align:center;}
+.hero .hbig{font-weight:900;font-size:50px;text-align:center;line-height:1.02;color:var(--sky4);margin:4px 0 0;}
+.hero .hbig small{font-size:17px;color:var(--ink2);font-weight:700;}
+.hero .hsub{text-align:center;font-size:13px;color:var(--ink2);margin-top:4px;font-weight:600;}
+.hero .hnet{text-align:center;font-family:'Spline Sans Mono',monospace;font-size:12px;color:var(--faded);margin-top:8px;}
+
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.metric{background:var(--soft);border-radius:14px;padding:13px;text-align:center;}
+.metric .ml{font-weight:700;font-size:10px;letter-spacing:0.5px;text-transform:uppercase;color:var(--faded);}
+.metric .mv{font-weight:900;font-size:21px;color:var(--sky4);margin-top:3px;}
+.metric .ms{font-size:10px;color:var(--ink2);font-weight:600;margin-top:1px;}
+
+.panel{background:rgba(255,255,255,0.96);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(42,79,138,0.16);}
+.panel-t{font-weight:800;font-size:15px;color:var(--sky4);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:13px;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;background:var(--soft);border:2px solid var(--card-edge);border-radius:13px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Nunito',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--sky3);background:#fff;}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234f9fdd' stroke-width='1.8' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-weight:700;font-size:13px;color:var(--ink2);flex-shrink:0;}
+.hint{font-weight:600;font-size:11.5px;color:var(--faded);margin-top:6px;line-height:1.4;}
+
+.btn{display:block;width:100%;border:none;border-radius:15px;padding:14px;font-weight:800;font-size:14px;cursor:pointer;transition:.15s;font-family:'Nunito',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-sky{background:linear-gradient(135deg,var(--sky3),var(--sky5));color:#fff;box-shadow:0 6px 18px rgba(42,79,138,0.4);}
+.btn-ghost{background:transparent;color:var(--sky4);border:2px solid var(--card-edge);}
+.btn-link{background:var(--soft);color:var(--sky4);border:2px solid var(--card-edge);}
+
+.official{background:linear-gradient(135deg,#eef7fe,#dbeefb);border-radius:16px;padding:14px;margin-bottom:14px;text-align:center;}
+.official .ot{font-weight:800;font-size:13px;color:var(--sky4);margin-bottom:4px;}
+.official .od{font-size:12px;color:var(--ink2);line-height:1.4;margin-bottom:10px;}
+
+.note{font-weight:600;font-size:12px;color:rgba(255,255,255,0.95);line-height:1.5;text-align:center;margin-top:6px;padding:0 8px;}
+.foot{margin-top:20px;text-align:center;font-weight:600;font-size:11px;color:rgba(255,255,255,0.88);line-height:1.6;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(31,58,82,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,#fff,#eef7fe);border-radius:24px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(31,58,82,0.5);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);position:relative;}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:22px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-weight:900;font-size:22px;color:var(--sky4);}
+.box .hd .s{font-weight:700;font-size:13px;color:var(--ink2);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--soft);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--sky4);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+
+.wstep{display:none;text-align:center;}
+.wstep.show{display:block;animation:fade .35s;}
+.wmasc{width:130px;height:130px;object-fit:contain;display:inline-block;margin-bottom:6px;filter:drop-shadow(0 6px 14px rgba(31,58,82,0.25));animation:float 3.5s ease-in-out infinite;}
+.wemoji{font-size:64px;display:inline-block;margin-bottom:8px;animation:float 3.5s ease-in-out infinite;}
+.wstep h2{font-weight:900;font-size:24px;color:var(--sky4);margin-bottom:10px;}
+.wstep p{font-size:15px;color:var(--ink2);line-height:1.5;margin-bottom:10px;font-weight:600;}
+.wstep .accent{color:var(--safe-d);font-weight:800;}
+.feat{display:flex;gap:13px;align-items:flex-start;text-align:left;margin-bottom:13px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;font-weight:600;}
+.feat .tx b{display:block;font-weight:800;font-size:13px;color:var(--sky4);margin-bottom:2px;}
+.legal{font-weight:600;font-size:11px;color:var(--faded);line-height:1.5;background:var(--soft);border-radius:12px;padding:11px;text-align:left;}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(79,159,221,0.25);transition:.2s;}
+.dots .d.on{background:var(--sky4);width:22px;border-radius:4px;}
+
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;background:var(--ink);color:#fff;
+  font-weight:800;font-size:13px;padding:12px 22px;border-radius:30px;box-shadow:0 8px 24px rgba(0,0,0,0.4);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.pop2{animation:popk .4s ease;}
+@keyframes popk{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#aee0f5;z-index:9999;"></div>
+<div id="lb"><div class="i">🪂</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Le Filet</div>
+    <div class="su">Droits chômage (ARE) · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="wmasc" src="Mascotte.png" alt="" onerror="this.outerHTML='<span class=\'wemoji\'>🪂</span>'">
+      <h2>Ton filet de sécurité</h2>
+      <p>Perdre son emploi, c'est un saut dans le vide. L'assurance chômage est là pour <span class="accent">amortir la chute</span>.</p>
+      <p>Cet outil estime ton allocation (ARE) : montant, durée, et si tu y as droit.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">🧮</span>
+      <h2>Une estimation, pas un verdict</h2>
+      <p>Le vrai calcul de France Travail prend en compte des <span class="accent">dizaines de paramètres</span> (24 mois de salaires, primes, jours exacts…).</p>
+      <p>Ici, on donne un <span class="accent">ordre de grandeur</span> à partir de ton salaire et de ta durée de travail.</p>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">🛟</span>
+      <h2>Ce qu'on regarde</h2>
+      <div class="feat"><div class="ic">✅</div><div class="tx"><b>Éligibilité</b>As-tu assez travaillé (6 mois mini sur 24 mois) ?</div></div>
+      <div class="feat"><div class="ic">💶</div><div class="tx"><b>Montant</b>L'allocation mensuelle estimée.</div></div>
+      <div class="feat"><div class="ic">📅</div><div class="tx"><b>Durée &amp; total</b>Combien de temps, et le total sur la période.</div></div>
+    </div>
+    <div class="wstep" data-step="3">
+      <span class="wemoji">⚓</span>
+      <h2>À prendre avec des pincettes</h2>
+      <p>Les règles changent souvent (revalorisations, réformes, conjoncture). <span class="accent">Seul France Travail fait foi.</span></p>
+      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Estimations basées sur la convention assurance chômage du 15/11/2024 et la circulaire Unédic 2025-03 d'avril 2025 (partie fixe 13,18 €, formule 57 % ou 40,4 %+fixe, coefficient 0,75 en conjoncture favorable — chômage < 9 %). Dégressivité : seuil abaissé à 55 ans depuis janv. 2025 (Unédic circ. 2025-03). Revalorisation ARE attendue au 1er juillet 2026. Le montant et la durée réels te seront notifiés par France Travail. Démission et fins de CDD ont des règles spécifiques.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-sky" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Comment lire l'estimation</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">💶</div><div class="tx"><b>Salaire brut mensuel</b>Ton salaire habituel des derniers mois (primes incluses si régulières).</div></div>
+    <div class="feat"><div class="ic">📆</div><div class="tx"><b>Mois travaillés</b>Sur les 24 derniers mois (36 si 55 ans et +). Détermine éligibilité et durée.</div></div>
+    <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Formule ARE</b>Le plus élevé entre 57 % du salaire journalier et 40,4 % + 13,18 €/jour. Plancher ≈ 32 €/j, plafond 75 %.</div></div>
+    <div class="feat"><div class="ic">📉</div><div class="tx"><b>Durée</b>≈ ta durée travaillée, plafonnée (548 j si < 55 ans (= 24 mois × coef 0,75 en conjoncture favorable)). Un coefficient peut la réduire de 25 %.</div></div>
+    <div class="legal">Conditions générales (hors démission). L'ARE est versée après d'éventuels différés (congés payés, indemnités supra-légales). Net après CSG/CRDS ≈ -3 à -6,7 %. Le calcul officiel peut différer sensiblement.</div>
+    <button class="btn btn-sky" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="eligbar neutral" id="eligBar">
+    <div class="ei">🛟</div>
+    <div id="eligTxt">Renseigne ta situation pour estimer tes droits.</div>
+  </div>
+
+  <div class="hero">
+    <div class="chute">🪂</div>
+    <div class="htag">Allocation mensuelle estimée</div>
+    <div class="hbig" id="hBig">— €<small> brut/mois</small></div>
+    <div class="hsub" id="hSub">Une estimation indicative</div>
+    <div class="hnet" id="hNet"></div>
+    <div class="metrics">
+      <div class="metric"><div class="ml">Par jour</div><div class="mv" id="mDay">—</div><div class="ms">ARE brute</div></div>
+      <div class="metric"><div class="ml">Durée estimée</div><div class="mv" id="mDur">—</div><div class="ms" id="mDurS">indemnisation</div></div>
+    </div>
+    <div class="metrics" style="grid-template-columns:1fr;">
+      <div class="metric"><div class="ml">Total estimé sur la période</div><div class="mv" id="mTotal">—</div><div class="ms">brut, hors revalorisations</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">🧾 Ta situation</div>
+    <div class="field"><label>Salaire brut mensuel (avant la perte d'emploi)</label>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2200"><span class="unit">€</span></div>
+      <div class="hint">Moyenne de tes derniers mois, primes régulières incluses.</div></div>
+    <div class="field"><label>Mois travaillés (24 derniers mois — 30 mois si 53-54 ans, 36 mois si 55 ans et +)</label>
+      <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="36"><span class="unit">mois</span></div>
+      <div class="hint">Il faut au moins 6 mois (130 jours / 910 h) pour ouvrir des droits. Depuis avr. 2026, seuil abaissé à 5 mois pour primo-entrants et saisonniers.</div></div>
+    <div class="field"><label>Ton âge à la fin du contrat</label>
+      <select class="ip" id="fAge">
+        <option value="moins55">Moins de 55 ans</option>
+        <option value="55a56">55 à 56 ans</option>
+        <option value="57plus">57 ans et plus</option>
+      </select>
+      <div class="hint">L'âge influe sur la durée maximale d'indemnisation.</div></div>
+  </div>
+
+  <div class="rule-row"><div class="re">⏳</div><div>
+    <div class="rt">DIFFERÉ D'INDEMNISATION</div>
+    <div class="rd">Avant de toucher l'ARE, 3 délais s'accumulent : délai d'attente de 7 jours (systématique) + différé congés payés (jours CP non pris) + différé spécifique (indemnités supra-légales de rupture). Ce dernier peut aller jusqu'à 150 jours. France Travail calcule le délai exact.</div>
+    <span class="rb gold">Avant le 1er versement</span></div></div>
+  <div class="rule-row"><div class="re">💡</div><div>
+    <div class="rt">DÉMISSION LÉGITIME : exceptions au chômage</div>
+    <div class="rd">Certaines démissions ouvrent droit à l'ARE malgré tout : suivi du conjoint muté, non-paiement de salaire, situation de souffrance au travail reconnue, reconversion (CPF de transition), reprise d'activité abandonnée… Liste officielle sur France Travail.</div>
+    <span class="rb safe">Cas spécifiques</span></div></div>
+  <div class="rule-row"><div class="re">💶</div><div>
+    <div class="rt">ARE NETTE : environ -6,7 % (CSG/CRDS) + Prélèvement à la source</div>
+    <div class="rd">L'ARE brute est potentiellement soumise à la CSG (6,2 %) et CRDS (0,5 %), soit 6,7 % au total — sous réserve d'écrêtement selon les revenus. L'ARE nette représente environ 93,3 % de l'ARE brute. <strong>L'ARE est soumise au prélèvement à la source</strong> : France Travail applique ton taux d'imposition (personnalisé ou neutre transmis par les impôts) avant chaque versement. Pour les petites allocations, exonération partielle ou totale possible (écrêtement).</div>
+    <span class="rb gold">Net ≈ brut × 0,933 (hors écrêtement pour faibles allocations)</span></div></div>
+  <div class="rule-row"><div class="re">📉</div><div>
+    <div class="rt">DÉGRESSIVITÉ POUR LES HAUTS SALAIRES</div>
+    <div class="rd">Pour les salariés dont le SJR dépasse 159,68 €/jour (soit environ 4 900 €/mois brut), l'ARE est réduite de 30 % au bout de 6 mois d'indemnisation (182 jours exactement), si le bénéficiaire a moins de 55 ans à la fin du contrat (seuil abaissé de 57 à 55 ans depuis le 1er janvier 2025). Plancher : l'ARE ne descend jamais sous 92,57 €/jour.</div>
+    <span class="rb danger">Hauts revenus</span></div></div>
+  <div class="official">
+    <div class="ot">🔗 Le calcul officiel</div>
+    <div class="od">Pour une estimation précise et à jour, le simulateur de France Travail fait référence.</div>
+    <a class="btn btn-link" href="https://www.francetravail.fr" target="_blank" rel="noopener">Ouvrir France Travail</a>
+  </div>
+
+  <div class="note">Estimation indicative. Les règles évoluent souvent ; seul France Travail fait foi. Ta convention collective peut prévoir des droits supplémentaires. Outil pédagogique — ni avis juridique.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+
+  <div class="foot">
+    Outil indicatif &amp; pédagogique — ni avis juridique, ni officiel.<br>
+    Règles connues 2025-2026, hors démission/CDD spécifiques.<br>
+    🪂 Tout reste sur ton appareil.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ STATE:'CH_STATE', WELCOME:'CH_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function eur(n){ n=Math.round((n||0)); return n.toLocaleString('fr-FR')+' €'; }
+  function eur2(n){ n=Math.round((n||0)*100)/100; return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
+
+  // ARE params (connus 2025-2026)
+  var PART_FIXE=13.18, TAUX1=0.404, TAUX2=0.57, PLANCHER=31.97, PLAFOND_PCT=0.75;
+  var JOURS_MOIS=30.42;
+  // durée plafonds (jours) en conjoncture favorable (coef 0.75 déjà appliqué officiellement -> on affiche le plafond effectif)
+  var DUR_MAX={ moins55:548, '55a56':685, '57plus':822 };
+  var DUR_MIN=182;
+  var COEF=0.75; // contracyclicité (chômage < 9%)
+
+  var state=get(LS.STATE,{ sal:'', months:0, age:'moins55' });
+  function save(){ set(LS.STATE,state); }
+  function toast(m){ var t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},1600); }
+
+  function recalc(){
+    var sal=parseFloat(state.sal)||0;
+    var months=parseInt(state.months,10)||0;
+    var age=state.age||'moins55';
+
+    // eligibility
+    var eligible = months>=6;
+    var eb=$('#eligBar'), et=$('#eligTxt');
+    if(months<=0 && sal<=0){ eb.className='eligbar neutral'; et.textContent='Renseigne ta situation pour estimer tes droits.'; }
+    else if(!eligible){ eb.className='eligbar no'; eb.querySelector('.ei').textContent='⚠️';
+      et.innerHTML='Avec '+months+' mois, tu n\'atteins pas le minimum de <b>6 mois</b> (130 j / 910 h) sur 24 mois. Pas de droits estimés ici — mais France Travail peut tenir compte de contrats antérieurs.'; }
+    else { eb.className='eligbar ok'; eb.querySelector('.ei').textContent='✅';
+      et.innerHTML='Avec '+months+' mois travaillés, tu remplis a priori la condition d\'affiliation (6 mois minimum, 5 mois pour primo-entrants depuis avr. 2026). 👍'; }
+
+    if(!eligible || sal<=0){
+      $('#hBig').innerHTML='— €<small> brut/mois</small>'; $('#hSub').textContent= eligible? 'Renseigne ton salaire' : 'Conditions non réunies pour estimer';
+      $('#hNet').textContent=''; $('#mDay').textContent='—'; $('#mDur').textContent='—'; $('#mTotal').textContent='—';
+      save(); return;
+    }
+
+    // SJR
+    var sjr = sal / JOURS_MOIS;
+    // ARE/jour
+    var f1 = TAUX1*sjr + PART_FIXE;
+    var f2 = TAUX2*sjr;
+    var are = Math.max(f1,f2);
+    are = Math.max(are, PLANCHER);
+    are = Math.min(are, PLAFOND_PCT*sjr);
+
+    var mensuel = are*JOURS_MOIS;
+    var net = mensuel*0.933; // -6,7% CSG/CRDS (100% - 6,7% = 93,3%)
+
+    // durée: ~ jours travaillés = months*30.42 (1j travaillé=1j indemnisé), capped, coef 0.75
+    var dureeBrute = months*JOURS_MOIS;
+    var duree = Math.min(dureeBrute, DUR_MAX[age]/COEF); // affiliation cap (avant coef)
+    duree = duree*COEF; // contracyclicité
+    duree = Math.max(DUR_MIN*COEF<duree?duree:Math.min(dureeBrute,DUR_MIN), duree); // plancher logique
+    if(duree<DUR_MIN && dureeBrute>=DUR_MIN) duree=DUR_MIN;
+    duree=Math.round(duree);
+    var moisDuree = duree/JOURS_MOIS;
+    var total = are*duree;
+
+    $('#hBig').innerHTML=eur(mensuel)+'<small> brut/mois</small>';
+    var big=$('#hBig'); big.classList.remove('pop2'); void big.offsetWidth; big.classList.add('pop2');
+    $('#hSub').textContent='soit '+eur2(are)+' par jour';
+    $('#hNet').textContent='≈ '+eur(net)+' net/mois (après CSG/CRDS estimée)';
+    $('#mDay').textContent=eur2(are);
+    $('#mDur').textContent=Math.round(moisDuree)+' mois';
+    $('#mDurS').textContent='≈ '+duree+' jours';
+    $('#mTotal').textContent=eur(total);
+    save();
+  }
+
+  $('#fSal').value=state.sal; $('#fMonths').value=state.months; $('#fAge').value=state.age;
+  $('#fSal').addEventListener('input',function(){state.sal=this.value;recalc();});
+  $('#fMonths').addEventListener('input',function(){state.months=Math.min(36,parseInt(this.value,10)||0);recalc();});
+  $('#fAge').addEventListener('change',function(){state.age=this.value;recalc();});
+
+  /* wizard */
+  var wStep=0,wMax=4;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'C\'est parti ! 🪂':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){ if(wStep<wMax-1)show(wStep+1); else { $('#wizard').classList.remove('show'); set(LS.WELCOME,1); } });
+  $('#wSkip').addEventListener('click',function(){ $('#wizard').classList.remove('show'); set(LS.WELCOME,1); });
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  /* init */
+  recalc();
+  if(!get(LS.WELCOME,0)){ $('#wizard').classList.add('show'); show(0); }
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

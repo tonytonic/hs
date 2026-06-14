@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Saisie sur Salaire — Le Coffre</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2a3540">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Saisie Salaire">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --steel1:#3a4550; --steel2:#2a3540; --steel3:#1e2830; --steel4:#141e26;
+  --chrome:#c8d4dc; --chrome-l:#e0eaf0; --chrome-d:#8a9aaa;
+  --gold:#c8a84b; --gold-l:#e0c06a; --gold-d:#8a6e2a;
+  --safe:#3a7a5a; --safe-l:#4a9a72; --danger:#c84a3a;
+  --ink:#f0f4f8; --ink2:#c0ccd8; --faded:#6a7a88;
+  --panel:rgba(255,255,255,0.06); --panel2:rgba(255,255,255,0.10);
+  --border:rgba(200,212,220,0.2); --border2:rgba(200,168,75,0.35);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Exo 2',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.008) 0 1px, transparent 1px 4px),
+    linear-gradient(170deg, #3a4550 0%, #2a3540 40%, #1e2830 75%, #141e26 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(600px 400px at 15% -5%, rgba(200,168,75,0.08), transparent 55%),
+    radial-gradient(500px 300px at 90% 20%, rgba(58,122,90,0.06), transparent 50%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:#1e2830;color:var(--chrome-l);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;letter-spacing:2px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(30,40,48,0.97), rgba(30,40,48,0.6) 75%, transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--panel2);border:1px solid var(--border);color:var(--chrome);
+  border-radius:6px;padding:9px 13px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:12px;text-decoration:none;flex-shrink:0;letter-spacing:1px;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;color:var(--chrome-l);letter-spacing:2px;}
+header .brand .su{font-family:'Share Tech Mono',monospace;font-size:8.5px;color:var(--faded);margin-top:2px;letter-spacing:2px;}
+header .hbtn{background:var(--panel2);border:1px solid var(--border);color:var(--chrome);border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* coffre-fort hero */
+.safe{background:
+    radial-gradient(circle at 50% 30%, #3a4550, #1e2830 80%);
+  border:3px solid var(--chrome-d);border-radius:16px;padding:22px 20px;margin:8px 0 16px;
+  box-shadow:
+    inset 0 2px 8px rgba(255,255,255,0.06),
+    inset 0 -2px 8px rgba(0,0,0,0.5),
+    0 8px 0 #0f151c,
+    0 16px 40px rgba(0,0,0,0.6);
+  position:relative;overflow:hidden;}
+/* rivets */
+.safe::before,.safe::after{content:"";position:absolute;width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,var(--chrome-l),var(--chrome-d));
+  box-shadow:inset 0 1px 2px rgba(0,0,0,0.5);}
+.safe::before{top:14px;left:14px;} .safe::after{top:14px;right:14px;}
+.safe .stag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold);text-align:center;margin-bottom:10px;}
+.safe .sbig{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:50px;text-align:center;line-height:1;
+  color:var(--chrome-l);margin:4px 0 2px;}
+.safe .sbig.protected{color:var(--safe-l);}
+.safe .sbig.seized{color:var(--danger);}
+.safe .ssub{text-align:center;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ink2);margin-top:4px;letter-spacing:1px;}
+.safe .sdial{width:70px;height:70px;border-radius:50%;margin:14px auto 10px;
+  background:radial-gradient(circle at 40% 35%,#4a5560,#1e2830);
+  border:4px solid var(--chrome-d);
+  box-shadow:0 4px 12px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.08);
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  position:relative;}
+.safe .sdial::after{content:"";position:absolute;top:6px;left:50%;transform:translateX(-50%);
+  width:3px;height:14px;background:var(--gold);border-radius:2px;}
+
+.bars{display:flex;flex-direction:column;gap:6px;margin-top:14px;}
+.barrow{display:flex;align-items:center;gap:10px;}
+.barrow .bl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faded);flex-shrink:0;width:80px;letter-spacing:0.5px;line-height:1.2;}
+.barrow .bt{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;}
+.barrow .bt .bf{height:100%;border-radius:4px;transition:width .7s cubic-bezier(.3,1.2,.5,1);}
+.barrow .bv{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;min-width:60px;text-align:right;color:var(--chrome-l);}
+
+/* result boxes */
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.rbox{background:var(--panel);border:1.5px solid var(--border);border-radius:12px;padding:12px;text-align:center;}
+.rbox .rl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--faded);margin-bottom:4px;}
+.rbox .rv{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;color:var(--chrome-l);}
+.rbox.protected .rv{color:var(--safe-l);}
+.rbox.seized .rv{color:var(--danger);}
+.rbox.min-box{border-color:var(--gold-d);background:rgba(200,168,75,0.08);}
+.rbox.min-box .rv{color:var(--gold-l);}
+
+/* panel input */
+.panel{background:var(--panel);border:1.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:14px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);}
+.panel-t{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:var(--gold-l);letter-spacing:1px;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);padding-bottom:8px;}
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ink2);margin-bottom:6px;letter-spacing:0.5px;}
+.ip{width:100%;background:rgba(0,0,0,0.3);border:1.5px solid var(--border2);border-radius:8px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.ip:focus{outline:none;border-color:var(--gold);background:rgba(0,0,0,0.45);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23c8a84b' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-color:rgba(0,0,0,0.3);padding-right:30px;}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--faded);flex-shrink:0;}
+.hint{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* tranche detail table */
+.ttable{width:100%;border-collapse:collapse;font-family:'Share Tech Mono',monospace;font-size:11px;margin-top:10px;}
+.ttable th{padding:7px 8px;text-align:left;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;
+  color:var(--gold);letter-spacing:0.5px;border-bottom:1px solid var(--border);background:rgba(200,168,75,0.06);}
+.ttable td{padding:7px 8px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--ink2);}
+.ttable tr.active td{color:var(--chrome-l);background:rgba(255,255,255,0.04);}
+.ttable tr.active td:last-child{color:var(--danger);font-weight:700;}
+.ttable tr.total td{color:var(--chrome);font-family:'Rajdhani',sans-serif;font-size:12px;font-weight:700;
+  border-top:1px solid var(--border);background:rgba(255,255,255,0.06);}
+
+/* rules */
+.rule-row{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:12px 14px;
+  margin-bottom:8px;display:flex;gap:11px;align-items:flex-start;}
+.rule-row .re{font-size:20px;flex-shrink:0;}
+.rule-row .rt{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--chrome-l);letter-spacing:0.5px;}
+.rule-row .rd{font-family:'Share Tech Mono',monospace;font-size:10.5px;color:var(--ink2);margin-top:3px;line-height:1.4;}
+.rule-row .rb{display:inline-block;margin-top:6px;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:0.5px;}
+.rb.gold{background:rgba(200,168,75,0.2);color:var(--gold-l);border:1px solid var(--gold-d);}
+.rb.safe{background:rgba(58,122,90,0.2);color:var(--safe-l);}
+.rb.danger{background:rgba(200,74,58,0.15);color:#e07060;}
+
+.note{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faded);line-height:1.6;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faded);line-height:1.7;letter-spacing:0.5px;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(14,20,26,0.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(165deg,#2a3540,#1e2830);border:2px solid var(--border);border-radius:14px;
+  max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,255,255,0.06);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:3px solid var(--gold);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:22px;color:var(--gold-l);letter-spacing:1px;}
+.box .hd .s{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--ink2);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--panel2);border:1px solid var(--border);border-radius:50%;
+  width:32px;height:32px;font-size:15px;color:var(--chrome);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:8px;padding:14px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;letter-spacing:1px;}
+.btn:active{transform:translateY(2px);}
+.btn-gold{background:linear-gradient(135deg,var(--gold-l),var(--gold-d));color:#1e2830;box-shadow:0 4px 0 #5a3e10;}
+.btn-gold:active{box-shadow:0 1px 0 #5a3e10;}
+.btn-ghost{background:transparent;color:var(--chrome);border:1.5px solid var(--border);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wmasc{width:120px;height:120px;object-fit:contain;display:inline-block;margin-bottom:6px;
+  filter:drop-shadow(0 4px 12px rgba(0,0,0,0.5));animation:rotate 8s linear infinite;}
+@keyframes rotate{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.wemoji{font-size:60px;display:inline-block;margin-bottom:8px;animation:rotate 8s linear infinite;}
+.wstep h2{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:24px;color:var(--gold-l);margin-bottom:10px;letter-spacing:1px;}
+.wstep p{font-family:'Exo 2',sans-serif;font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--gold-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;color:var(--gold-l);margin-bottom:2px;letter-spacing:0.5px;}
+.legal{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faded);line-height:1.5;
+  background:rgba(0,0,0,0.3);border-radius:6px;padding:10px;text-align:left;border-left:2px solid var(--gold-d);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(200,168,75,0.2);transition:.2s;}
+.dots .d.on{background:var(--gold);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--gold-d);color:#fff;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;
+  padding:12px 22px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,0.5);opacity:0;
+  transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.pop{animation:popk .4s;} @keyframes popk{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#1e2830;z-index:9999;"></div>
+<div id="lb"><div class="i">🔒</div><div class="t">TOURNEZ VOTRE TELEPHONE</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← TROUSSE</a>
+  <div class="brand">
+    <div class="ti">SAISIE SALAIRE</div>
+    <div class="su">LE COFFRE · V1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="wmasc" src="Mascotte.png" alt="" onerror="this.outerHTML='<span class=\'wemoji\'>🔒</span>'">
+      <h2>LE COFFRE</h2>
+      <p>Une <span class="accent">saisie sur salaire</span> limite ce qu'un creancier peut prelever sur ta remuneration. Une partie de ton salaire est <span class="accent">toujours protegee</span>.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">⚖️</span>
+      <h2>UN BAREME PROGRESSIF</h2>
+      <div class="feat"><div class="ic">📊</div><div class="tx"><b>7 TRANCHES</b>De 1/20e sur les revenus les plus bas jusqu'a la totalite au-dela de 25 810 €/an.</div></div>
+      <div class="feat"><div class="ic">👨‍👩‍👧</div><div class="tx"><b>PERSONNES A CHARGE</b>Chaque personne a charge augmente les seuils de 145 €/mois.</div></div>
+      <div class="feat"><div class="ic">🛡️</div><div class="tx"><b>MINIMUM VITAL</b>Tu conserves toujours au moins 651,69 €/mois (montant du RSA).</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📋</span>
+      <h2>CE QUE J'ESTIME</h2>
+      <p>Tu saisis ton <span class="accent">salaire net mensuel</span> et ton nombre de <span class="accent">personnes a charge</span>. L'outil calcule la quotite saisissable et ce qu'il te resterait.</p>
+    </div>
+    <div class="wstep" data-step="3">
+      <span class="wemoji">🔐</span>
+      <h2>ATTENTION</h2>
+      <p>Ce calcul est <span class="accent">indicatif</span>. Le commissaire de justice ou le tribunal applique le bareme officiel avec ta situation exacte.</p>
+      <div class="legal">Bareme 2026 — decret n°2025-1299 du 24/12/2025. Tranches annuelles divisees par 12 pour le mensuel. Majoration de 145,00 €/mois par personne a charge (1 740 €/an — Décret n°2025-1299, art. R3252-3 CT). Minimum insaisissable : 651,69 €/mois (RSA personne seule depuis 1er avril 2026 — Décret n°2026-220 du 30/03/2026). Outil indicatif, ni avis juridique ni officiel.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-gold" id="wNext">CONTINUER</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">PASSER</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">MODE D'EMPLOI</div><div class="s">Lire les resultats</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">💶</div><div class="tx"><b>SALAIRE NET</b>Ton salaire net mensuel apres impots (prelevement a la source deduit).</div></div>
+    <div class="feat"><div class="ic">👨‍👩‍👧</div><div class="tx"><b>PERSONNES A CHARGE</b>Conjoint/partenaire (revenus &lt; RSA), enfants a charge, ascendants vivant avec toi (revenus &lt; RSA).</div></div>
+    <div class="feat"><div class="ic">📊</div><div class="tx"><b>QUOTITE SAISISSABLE</b>Le maximum que peut prelever le creancier par mois, calcule tranche par tranche.</div></div>
+    <div class="feat"><div class="ic">🛡️</div><div class="tx"><b>MINIMUM VITAL</b>651,69 €/mois toujours garanti, meme si le bareme donnerait moins.</div></div>
+    <div class="legal">Bareme 2026 : decret 2025-1299. 7 tranches : 1/20, 1/10, 1/5, 1/4, 1/3, 2/3, totalite. Mensualise (annuel / 12). Majoration 145 €/mois/personne a charge. Seul le commissaire de justice fait foi.</div>
+    <button class="btn btn-gold" style="margin-top:14px;" data-close="help">COMPRIS</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <!-- SAFE UI -->
+  <div class="safe">
+    <div class="stag">— QUOTIENT SAISISSABLE —</div>
+    <div class="sdial" id="dialEl">🔒</div>
+    <div class="sbig" id="sBig">— €</div>
+    <div class="ssub" id="sSub">SAISISSABLE / MOIS MAX</div>
+    <div class="results">
+      <div class="rbox protected"><div class="rl">PROTEGE</div><div class="rv" id="rProt">— €</div></div>
+      <div class="rbox seized"><div class="rl">SAISISSABLE</div><div class="rv" id="rSeiz">— €</div></div>
+      <div class="rbox min-box" style="grid-column:1/-1;"><div class="rl">MINIMUM VITAL GARANTI</div><div class="rv">651,69 €</div></div>
+    </div>
+    <div class="bars" id="barViz" style="display:none;margin-top:16px;"></div>
+  </div>
+
+  <!-- INPUTS -->
+  <div class="panel">
+    <div class="panel-t">⚙️ PARAMETRES</div>
+    <div class="field"><label>SALAIRE NET MENSUEL</label>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 1800"><span class="unit">€/MOIS</span></div>
+      <div class="hint">APRES PRELEVEMENT A LA SOURCE</div></div>
+    <div class="field"><label>PERSONNES A CHARGE</label>
+      <select class="ip" id="fCharge">
+        <option value="0">0 — Aucune</option>
+        <option value="1">1 personne a charge</option>
+        <option value="2">2 personnes a charge</option>
+        <option value="3">3 personnes a charge</option>
+        <option value="4">4 personnes ou plus</option>
+      </select>
+      <div class="hint">CONJOINT/PARTENAIRE, ENFANTS, ASCENDANTS A CHARGE</div></div>
+  </div>
+
+  <!-- DETAIL TABLE -->
+  <div class="panel" id="tablePanel" style="display:none;">
+    <div class="panel-t">📊 DETAIL TRANCHE PAR TRANCHE</div>
+    <table class="ttable" id="tranTable">
+      <thead><tr><th>TRANCHE</th><th>FRACTION</th><th>BASE</th><th>SAISI</th></tr></thead>
+      <tbody id="tranBody"></tbody>
+    </table>
+  </div>
+
+  <!-- RULES -->
+  <div class="panel-t" style="color:var(--gold-l);font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;margin-bottom:10px;display:flex;gap:8px;">
+    <span>📋</span> REGLES ESSENTIELLES
+  </div>
+  <div class="rule-row"><div class="re">⚖️</div><div><div class="rt">BAREME PROGRESSIF 2026</div><div class="rd">7 tranches, de 1/20e sur les bas revenus a la totalite au-dela de 25 810 €/an (2 151 €/mois). Revi revalorise chaque annee par decret.</div><span class="rb gold">DECRET 2025-1299</span></div></div>
+  <div class="rule-row"><div class="re">🛡️</div><div><div class="rt">MINIMUM VITAL ABSOLU</div><div class="rd">Quoi qu'il arrive, tu conserves au moins 651,69 €/mois — montant du RSA personne seule. Meme si le bareme donnerait moins.</div><span class="rb safe">TOUJOURS GARANTI</span></div></div>
+  <div class="rule-row"><div class="re">👨‍👩‍👧</div><div><div class="rt">MAJORATION PERSONNES A CHARGE</div><div class="rd">Chaque personne a charge (conjoint, enfant, ascendant) augmente les seuils de 145 €/mois, reduisant la quotite saisissable.</div><span class="rb gold">+145 €/PERSONNE</span></div></div>
+  <div class="rule-row"><div class="re">🏛️</div><div><div class="rt">DEPUIS JUILLET 2025</div><div class="rd">La procédure est déjudiciarisée : c'est le commissaire de justice (ex-huissier) qui gere directement la saisie, sans passer par le tribunal.</div><span class="rb danger">REFORME 2025</span></div></div>
+  <div class="rule-row"><div class="re">💰</div><div><div class="rt">PENSION ALIMENTAIRE : REGLES DIFFERENTES</div><div class="rd">Pour une pension alimentaire, la totalité du salaire peut être saisie, à l'exception d'une somme égale au RSA (651,69 €), sans majoration pour personne à charge (651,69 €). Les tranches et taux peuvent aussi differer.</div><span class="rb danger">CAS SPECIFIQUE</span></div></div>
+
+  <div class="panel">
+    <div class="panel-t" style="color:var(--gold-l);">⚖️ Cas particuliers</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);border-radius:10px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--chrome-l);">🍼 Pension alimentaire : règles différentes</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.4;">Pour une pension alimentaire, le barème par tranches ne s'applique pas. La totalité du salaire dépassant le minimum vital (RSA : 651,69 €) peut être saisie directement pour payer le mois en cours et les arriérés. Procédure de paiement direct (CAF ou créancier) ou saisie sur rémunération.</div>
+      </div>
+      <div style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);border-radius:10px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--chrome-l);">🛡️ Éléments insaisissables du salaire</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.4;">Certains éléments ne peuvent pas être saisis, même partiellement : remboursements de frais professionnels, allocations familiales (sauf créances alimentaires). <strong>Attention : les indemnités journalières AT/MP sont saisissables</strong> (elles s'ajoutent au salaire et suivent le barème progressif standard — idée reçue fréquente de les croire insaisissables). Vérifier avec un professionnel si ces éléments figurent dans la base de calcul.</div>
+      </div>
+      <div style="background:rgba(200,168,75,0.1);border:1px solid rgba(200,168,75,0.3);border-radius:10px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--chrome-l);">📋 Procédure depuis juillet 2025</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.4;">Depuis la réforme de juillet 2025, c'est le <strong>commissaire de justice</strong> (ex-huissier) qui gère directement la saisie sans passer par le tribunal. L'employeur est tenu de reverser la fraction saisie chaque mois. Tout manquement expose l'employeur à des pénalités.</div>
+      </div>
+    </div>
+  </div>
+  <div class="note">BAREME 2026 — DECRET N°2025-1299 DU 24/12/2025. Ta convention collective ou un accord d'entreprise peut modifier les modalités applicables. Outil indicatif — ni avis juridique. Seul le commissaire de justice fait foi.<br>ESTIMATION INDICATIVE. SEUL LE COMMISSAIRE DE JUSTICE FAIT FOI.<br>OUTIL PEDAGOGIQUE, NI AVIS JURIDIQUE.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">OUTIL INDICATIF — NI AVIS JURIDIQUE.<br>LE COFFRE · SAISIE SUR SALAIRE · V1.0<br>🔒 TOUT RESTE SUR TON APPAREIL.</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ STATE:'SS_STATE', WELCOME:'SS_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function eur(n){ return (Math.round((n||0)*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR'; }
+  function eur0(n){ return Math.round(n||0).toLocaleString('fr-FR')+' EUR'; }
+
+  // Bareme 2026 — decret 2025-1299 — tranches ANNUELLES, division par 12 pour mensuel
+  var TRANCHES=[
+    {max:4480,  frac:1/20,  label:'1/20'},
+    {max:8730,  frac:1/10,  label:'1/10'},
+    {max:13000, frac:1/5,   label:'1/5'},
+    {max:17230, frac:1/4,   label:'1/4'},
+    {max:21470, frac:1/3,   label:'1/3'},
+    {max:25810, frac:2/3,   label:'2/3'},
+    {max:Infinity, frac:1,  label:'TOUT'}
+  ];
+  var MAJORATION_ANNUEL=1740; // par personne a charge
+  var MIN_VITAL=651.69; // RSA mensuel depuis 1er avril 2026 — Décret 2026-220
+
+  var state=get(LS.STATE,{sal:'',charge:0});
+
+  function calcSaisie(salMensuel, charge){
+    var salAnnuel=salMensuel*12;
+    var majorAnnuel=charge*MAJORATION_ANNUEL;
+    var total=0;
+    var detail=[];
+    var prev=0;
+
+    for(var i=0;i<TRANCHES.length;i++){
+      var t=TRANCHES[i];
+      var plafond=(t.max===Infinity?Infinity:t.max)+majorAnnuel;
+      var plancher=prev+majorAnnuel;
+      if(i===0){plancher=0; plafond=TRANCHES[0].max+majorAnnuel;}
+      if(i>0){plancher=TRANCHES[i-1].max+majorAnnuel;}
+
+      if(salAnnuel<=plancher) break;
+      var base=Math.min(salAnnuel,plafond)-plancher;
+      if(base<=0) break;
+      var saisi=base*t.frac;
+      total+=saisi;
+      detail.push({label:t.label,plancher:plancher/12,plafond:t.max===Infinity?null:plafond/12,base:base/12,saisi:saisi/12,active:true});
+    }
+
+    var saissiMensuel=total/12;
+    // apply minimum vital: net - saisi must be >= MIN_VITAL
+    var reste=salMensuel-saissiMensuel;
+    if(reste<MIN_VITAL){
+      saissiMensuel=Math.max(0,salMensuel-MIN_VITAL);
+    }
+    saissiMensuel=Math.round(saissiMensuel*100)/100;
+    return {saisi:saissiMensuel, protege:Math.round((salMensuel-saissiMensuel)*100)/100, detail:detail};
+  }
+
+  function recalc(){
+    var sal=parseFloat(state.sal)||0;
+    var charge=parseInt(state.charge,10)||0;
+
+    if(sal<=0){
+      $('#sBig').textContent='— EUR'; $('#sSub').textContent='ENTREZ VOTRE SALAIRE NET';
+      $('#rProt').textContent='—'; $('#rSeiz').textContent='—';
+      $('#barViz').style.display='none'; $('#tablePanel').style.display='none';
+      $('#dialEl').textContent='🔒';
+      set(LS.STATE,state); return;
+    }
+
+    var r=calcSaisie(sal,charge);
+    var pct=sal>0?(r.saisi/sal*100):0;
+
+    var big=$('#sBig');
+    big.textContent=eur(r.saisi);
+    big.className='sbig seized';
+    big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+    $('#sSub').textContent='SAISISSABLE / MOIS MAX ESTIMATIF';
+    $('#rProt').textContent=eur(r.protege);
+    $('#rSeiz').textContent=eur(r.saisi);
+
+    // dial emoji based on severity
+    var dialEmoji = pct>60?'🚨': pct>30?'⚠️': '🔐';
+    $('#dialEl').textContent=dialEmoji;
+
+    // bar visualization
+    var bv=$('#barViz'); bv.style.display='block'; bv.innerHTML='';
+    function mkBar(label,pctVal,color){
+      var row=document.createElement('div'); row.className='barrow';
+      row.innerHTML='<div class="bl">'+label+'</div>'+
+        '<div class="bt"><div class="bf" style="width:'+Math.min(100,pctVal).toFixed(1)+'%;background:'+color+';"></div></div>'+
+        '<div class="bv">'+Math.round(pctVal)+'%</div>';
+      bv.appendChild(row);
+    }
+    mkBar('PROTEGE',100-pct,'rgba(58,122,90,0.8)');
+    mkBar('SAISI',pct,'rgba(200,74,58,0.8)');
+
+    // detail table
+    $('#tablePanel').style.display='block';
+    var tb=$('#tranBody'); tb.innerHTML='';
+    var totalSaisi=0;
+    r.detail.forEach(function(d){
+      totalSaisi+=d.saisi;
+      var tr=document.createElement('tr'); tr.className='active';
+      var plafStr=d.plafond?eur0(d.plafond):'TOUT';
+      tr.innerHTML='<td>'+eur0(d.plancher)+' - '+plafStr+'</td><td>'+d.label+'</td><td>'+eur(d.base)+'</td><td>'+eur(d.saisi)+'</td>';
+      tb.appendChild(tr);
+    });
+    var totRow=document.createElement('tr'); totRow.className='total';
+    totRow.innerHTML='<td colspan="3">TOTAL SAISI (avant min vital)</td><td>'+eur(totalSaisi)+'</td>';
+    tb.appendChild(totRow);
+    if(r.saisi<totalSaisi){
+      var capRow=document.createElement('tr'); capRow.className='total';
+      capRow.innerHTML='<td colspan="3">APRES MINIMUM VITAL (651,69 EUR)</td><td style="color:var(--gold-l);">'+eur(r.saisi)+'</td>';
+      tb.appendChild(capRow);
+    }
+
+    set(LS.STATE,state);
+  }
+
+  $('#fSal').value=state.sal; $('#fCharge').value=state.charge;
+  $('#fSal').addEventListener('input',function(){state.sal=this.value;recalc();});
+  $('#fCharge').addEventListener('change',function(){state.charge=parseInt(this.value,10)||0;recalc();});
+
+  // wizard
+  var wStep=0,wMax=4;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    var next=$('#wNext'); next.textContent=(n===wMax-1)?'OUVRIR LE COFFRE':'CONTINUER';
+    $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){ if(wStep<wMax-1)show(wStep+1); else { $('#wizard').classList.remove('show'); set(LS.WELCOME,1); } });
+  $('#wSkip').addEventListener('click',function(){ $('#wizard').classList.remove('show'); set(LS.WELCOME,1); });
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  recalc();
+  if(!get(LS.WELCOME,0)){ $('#wizard').classList.add('show'); show(0); }
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

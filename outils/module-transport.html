@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Transport & Mobilité — La Route</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a4a8a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Transport">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap">
+<style>
+:root{
+  --blue:#1a4a8a; --blue-l:#2a6acc; --blue-ll:#60a0f0;
+  --green:#1a7a3a; --green-l:#2aaa5a;
+  --orange:#d47020; --orange-l:#f09040;
+  --dark:#0a1428; --dark2:#101e38;
+  --card:rgba(255,255,255,0.08); --card-edge:rgba(255,255,255,0.14);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Nunito',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#0a1428 0%,#101e38 50%,#0a1628 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 20% -5%,rgba(26,74,138,0.3),transparent 55%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-size:26px;font-weight:800;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(10,20,40,0.97),rgba(10,20,40,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:900;font-size:18px;color:#fff;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* transport types */
+.ttabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 16px;}
+.ttab{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;transition:.14s;}
+.ttab.on{background:rgba(42,106,204,0.3);border-color:var(--blue-ll);}
+.ttab .te{font-size:24px;display:block;margin-bottom:4px;}
+.ttab .tl{font-size:11px;font-weight:700;color:var(--ink2);}
+.ttab.on .tl{color:#fff;}
+
+/* content panels */
+.tpanel{display:none;} .tpanel.show{display:block;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+/* info cards */
+.icard{background:var(--card);border:1.5px solid var(--card-edge);border-radius:14px;padding:16px;margin-bottom:10px;}
+.icard .it{font-weight:800;font-size:14px;color:var(--blue-ll);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.icard .ib{font-size:13px;color:var(--ink2);line-height:1.5;}
+.icard .ibig{font-weight:900;font-size:32px;color:#fff;margin:6px 0 2px;}
+.icard .isub{font-size:11.5px;color:var(--faded);}
+.ibadge{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;}
+.ibadge.obl{background:rgba(42,170,90,0.2);color:#40d070;}
+.ibadge.opt{background:rgba(240,144,64,0.2);color:var(--orange-l);}
+.ibadge.new{background:rgba(96,160,240,0.2);color:var(--blue-ll);}
+
+/* km calculator */
+.calc{background:rgba(26,74,138,0.2);border:1.5px solid rgba(96,160,240,0.3);border-radius:14px;padding:16px;margin-bottom:10px;}
+.calc .ct{font-weight:800;font-size:13px;color:var(--blue-ll);margin-bottom:12px;}
+.field{margin-bottom:12px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:11.5px;font-weight:700;color:var(--ink2);margin-bottom:6px;}
+.ip{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid var(--card-edge);border-radius:8px;padding:11px;color:#fff;font-size:15px;font-family:'Nunito',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--blue-ll);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%2360a0f0' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;background-color:rgba(255,255,255,0.07);padding-right:28px;}
+.inline{display:flex;gap:10px;align-items:center;} .inline .ip{flex:1;}
+.unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.res-row{background:rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;}
+.res-row .rl{font-size:12px;color:var(--faded);} .res-row .rv{font-weight:800;font-size:20px;color:#fff;}
+
+/* km bareme table */
+.km-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px;}
+.km-table th{padding:7px 8px;text-align:left;font-size:11px;font-weight:700;color:var(--faded);letter-spacing:0.5px;border-bottom:1px solid var(--card-edge);}
+.km-table td{padding:7px 8px;color:var(--ink2);border-bottom:1px solid rgba(255,255,255,0.04);}
+.km-table tr.hl td{color:#fff;background:rgba(255,255,255,0.04);}
+
+.note{font-size:11.5px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+.ov{position:fixed;inset:0;z-index:200;background:rgba(5,10,20,0.88);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+.box{background:#101e38;border:1.5px solid rgba(255,255,255,0.12);border-radius:16px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:3px solid var(--blue-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 20px 10px;text-align:center;position:relative;}
+.box .hd .t{font-weight:800;font-size:21px;color:#fff;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:var(--card);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--faded);cursor:pointer;}
+.box .bd{padding:0 20px 20px;}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:13px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;}
+.btn-blue{background:linear-gradient(135deg,var(--blue-l),var(--blue));color:#fff;}
+.btn-ghost{background:transparent;color:var(--ink2);border:1px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .3s;}
+.wemoji{font-size:54px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-weight:800;font-size:22px;color:#fff;margin-bottom:10px;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--blue-ll);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:11px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--blue-ll);margin-bottom:2px;}
+.legal{font-size:10.5px;color:var(--faded);line-height:1.5;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;border-left:3px solid var(--blue-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:14px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(26,74,138,0.3);transition:.2s;}
+.dots .d.on{background:var(--blue-l);width:22px;border-radius:4px;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#0a1428;z-index:9999;"></div>
+<div id="lb"><div class="i">🚌</div><div class="t">Tourne ton téléphone</div></div>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Transport & Mobilité</div><div class="su">LA ROUTE · V1.0</div></div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0"><div class="wemoji">🚌</div><h2>Frais de transport</h2>
+      <p>Entre domicile et travail, plusieurs aides existent. <span class="accent">TC obligatoire à 50 %</span>, forfait mobilités durables, barème kilométrique. Tout en un module.</p></div>
+    <div class="wstep" data-step="1"><div class="wemoji">🚲</div><h2>3 dispositifs</h2>
+      <div class="feat"><div class="ic">🚌</div><div class="tx"><b>Transports en commun</b>50 % de l'abonnement remboursé par l'employeur (obligatoire). La LF 2026 proroge l'exonération jusqu'à 75 % (25 % supplémentaire facultatif exonéré). Source : art. 68 LF 2026 — BOFiP 07/04/2026.</div></div>
+      <div class="feat"><div class="ic">🚲</div><div class="tx"><b>Forfait mobilités durables</b>Jusqu'à 700 €/an exonéré pour vélo, covoiturage, trottinette…</div></div>
+      <div class="feat"><div class="ic">🚗</div><div class="tx"><b>Barème kilométrique 2026</b>Pour les déplacements pro en véhicule personnel. Exonéré de charges.</div></div></div>
+    <div class="wstep" data-step="2"><div class="wemoji">📋</div><h2>Barème 2026 = 2025</h2>
+      <p>Le barème kilométrique <span class="accent">n'a pas changé en 2026</span>. Il est identique à celui de 2025. Nouveauté : les deux-roues sont utilisables même si tu n'en es pas propriétaire. <span class="accent">+20 %</span> pour les véhicules 100 % électriques.</p>
+      <div class="legal">Sources : DGFiP (brochure fiscale 2026), URSSAF. Barème kilométrique 2026 identique à 2025 (DGFiP, pas de revalorisation). TC : prise en charge jusqu'à 75 % exonérée en 2026 (art. 68 LF 2026 — BOFiP 07/04/2026). FMD : 700 €/an seul, 800 €/an en cumul TC (LF 2026). Forfait mobilités durables : exonéré jusqu'à 700 €/an (FMD seul, secteur privé) ou 800 €/an en cumul avec la prise en charge des transports en commun. Outil indicatif.</div></div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-blue" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">Passer</button>
+  </div></div>
+</div>
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🚌</div><div class="tx"><b>TC</b> Remboursement 50 % abonnement — obligatoire, exonéré d'impôt.</div></div>
+    <div class="feat"><div class="ic">🚲</div><div class="tx"><b>Mobilités durables</b> Facultatif côté employeur, mais exonéré jusqu'à 700 €/an.</div></div>
+    <div class="feat"><div class="ic">🚗</div><div class="tx"><b>Barème km</b> Pour les déplacements professionnels (pas domicile-travail en voiture). Calculateur intégré.</div></div>
+    <button class="btn btn-blue" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap">
+  <div class="ttabs" id="ttabs">
+    <div class="ttab on" data-t="tc"><span class="te">🚌</span><span class="tl">Transports communs</span></div>
+    <div class="ttab" data-t="mob"><span class="te">🚲</span><span class="tl">Mobilités durables</span></div>
+    <div class="ttab" data-t="km"><span class="te">🚗</span><span class="tl">Barème km</span></div>
+  </div>
+
+  <!-- TC -->
+  <div class="tpanel show" id="p-tc">
+    <div class="icard">
+      <div class="it">🚌 Transports en commun</div>
+      <div class="ibig">50 %</div><div class="isub">de l'abonnement remboursé par l'employeur</div>
+      <div class="ib" style="margin-top:10px;">L'employeur est <strong>obligatoirement</strong> tenu de rembourser au moins 50 % du coût de l'abonnement de transport collectif (métro, bus, train, tramway, vélo libre-service).<br><br>Ce remboursement est <strong>exonéré d'impôt et de cotisations</strong> pour les deux parties.</div>
+      <span class="ibadge obl">Obligatoire — tous les employeurs</span>
+    </div>
+    <div class="icard">
+      <div class="it">📋 Ce que tu dois faire</div>
+      <div class="ib">Remettre à ton employeur la preuve de ton abonnement (titre de transport, justificatif mensuel ou annuel). Le remboursement peut être mensuel ou annuel selon les accords de l'entreprise.</div>
+    </div>
+    <div class="icard">
+      <div class="it">⚠️ Cas particuliers</div>
+      <div class="ib">• Plusieurs abonnements (ex. train + métro) : l'employeur rembourse 50 % de chaque.<br>• Pas de remboursement pour la voiture (sauf accord ou zones blanches)<br>• En télétravail : l'employeur ne peut pas proratiser le remboursement si le salarié utilise l'abonnement. Obligation de 50 % maintenue (art. L3261-2 CT). Un accord peut prévoir un remboursement supérieur.</div>
+    </div>
+  </div>
+
+    <div class="icard">
+      <div class="it">🗺️ Trajet anormal — indemnité kilométrique spécifique</div>
+      <div class="ib">Si l'entreprise est mal desservie par les transports en commun, ou si tes horaires ne sont pas compatibles (nuit, très tôt, zone blanche), un accord d'entreprise peut prévoir le remboursement des frais de véhicule personnel.<br><br>Sans accord spécifique, l'employeur n'est pas légalement tenu de rembourser les frais de voiture domicile-travail — même en zone rurale.</div>
+      <span class="ibadge opt">Selon accord entreprise</span>
+    </div>
+    <div class="icard">
+      <div class="it">🏠 Double résidence</div>
+      <div class="ib">Si ton lieu de travail est éloigné de ton domicile principal et que tu as une résidence proche du travail, des frais de double résidence peuvent être pris en charge (loyer, trajets week-end). Cela dépend entièrement de ton contrat ou d'un accord.</div>
+      <span class="ibadge opt">Contractuel / accord</span>
+    </div>
+  <!-- Mobilités durables -->
+  <div class="tpanel" id="p-mob">
+    <div class="icard">
+      <div class="it">🚲 Forfait Mobilités Durables (FMD)</div>
+      <div class="ibig">600 €</div><div class="isub">par an maximum, exonéré (2026)</div>
+      <div class="ib" style="margin-top:10px;">L'employeur <em>peut</em> (ce n'est pas obligatoire sauf accord de branche) verser un forfait pour les trajets domicile-travail en :<br><br>🚲 Vélo (électrique ou non) · 🛴 Trottinette électrique · 🤝 Covoiturage · 🛵 Deux-roues motorisé partagé · 🚶 Marche (avec équipement)</div>
+      <span class="ibadge opt">Facultatif — sauf accord branche</span>
+      <span class="ibadge new" style="margin-left:6px;">700 €/an 2026</span>
+    </div>
+    <div class="icard">
+      <div class="it">💡 Cumul avec les TC</div>
+      <div class="ib">Le FMD est <strong>cumulable avec le remboursement TC</strong> dans la limite de 800 €/an au total. Par exemple : 50 % TC + 400 € FMD = possible.<br><br>Le forfait est exonéré d'impôt et de cotisations dans la limite de 700 €/an.</div>
+    </div>
+    <div class="icard">
+      <div class="it">📋 Comment en bénéficier</div>
+      <div class="ib">Vérifier si ton entreprise ou ta convention de branche le prévoit. Conserver les justificatifs (factures vélo, attestation covoiturage…). L'employeur peut utiliser des "titres-mobilité" pour flécher le paiement.</div>
+    </div>
+  </div>
+
+    <div class="icard">
+      <div class="it">🛵 Nouveauté 2026 : deux-roues motorisés</div>
+      <div class="ib">Le barème kilométrique moto/scooter est utilisable même si tu n'es pas propriétaire (LOA/LLD à ton nom) du véhicule (location longue durée, leasing). Le loyer est considéré comme couvert par le barème.</div>
+      <span class="ibadge new">Nouveauté 2026</span>
+    </div>
+    <div class="icard">
+      <div class="it">🚲 Entretien vélo : déductible fiscalement</div>
+      <div class="ib">Les frais d'entretien du vélo utilisé pour les trajets domicile-travail (réparations, accessoires de sécurité) peuvent être déduits des revenus imposables en cas d'option pour les frais réels.</div>
+      <span class="ibadge opt">Frais réels</span>
+    </div>
+  <!-- Barème km -->
+  <div class="tpanel" id="p-km">
+    <div class="icard">
+      <div class="it">🚗 Barème kilométrique 2026</div>
+      <div class="ib">Identique à 2025 (inchangé). S'applique aux déplacements <strong>professionnels</strong> en véhicule personnel. Exonéré de charges si le montant respecte le barème officiel.</div>
+      <span class="ibadge obl">+20 % pour véhicules électriques</span>
+    </div>
+    <div class="calc">
+      <div class="ct">🧮 Calculateur d'indemnité kilométrique</div>
+      <div class="field"><label>Puissance fiscale du véhicule</label>
+        <select class="ip" id="kmCv">
+          <option value="3">3 CV et moins</option>
+          <option value="4">4 CV</option>
+          <option value="5" selected>5 CV</option>
+          <option value="6">6 CV</option>
+          <option value="7">7 CV et plus</option>
+        </select></div>
+      <div class="field"><label>Distance aller-retour par jour (km)</label>
+        <div class="inline"><input class="ip" id="kmDist" type="number" inputmode="decimal" value="30"><span class="unit">km/j</span></div></div>
+      <div class="field"><label>Jours travaillés dans l'année</label>
+        <div class="inline"><input class="ip" id="kmJours" type="number" inputmode="numeric" value="228"><span class="unit">jours</span></div></div>
+      <div class="field"><label>Véhicule électrique ?</label>
+        <select class="ip" id="kmElec">
+          <option value="0">Non</option>
+          <option value="1">Oui (+20 %)</option>
+        </select></div>
+      <div class="res-row"><div class="rl">Indemnité annuelle estimée</div><div class="rv" id="kmResult">— €</div></div>
+    </div>
+    <!-- Barème simplifié -->
+    <div class="icard">
+      <div class="it">📊 Barème auto 2026 (extrait — tranche 5 001 à 20 000 km)</div>
+      <table class="km-table">
+        <thead><tr><th>Puissance</th><th>Formule</th></tr></thead>
+        <tbody>
+          <tr><td>3 CV</td><td>d × 0,368</td></tr>
+          <tr class="hl"><td>4 CV</td><td>d × 0,347 + 572</td></tr>
+          <tr><td>5 CV</td><td>d × 0,357 + 1 395</td></tr>
+          <tr class="hl"><td>6 CV</td><td>d × 0,374 + 1 263</td></tr>
+          <tr><td>7 CV+</td><td>d × 0,394 + 1 666</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:10.5px;color:var(--faded);margin-top:8px;">d = distance annuelle en km. 3 tranches : &lt;5 000 km, 5 001-20 000 km, &gt;20 000 km. Source : DGFiP 2026.</div>
+    </div>
+  </div>
+
+  <div class="note">Barème DGFiP 2026 (inchangé vs 2025). Forfait mobilités durables 700 €/an (FMD seul) · Cumul FMD + TC : 800 €/an. Remboursement TC 50 % obligatoire. Ta convention collective ou un accord d'entreprise peut prévoir des conditions plus favorables. Outil indicatif — ni avis fiscal, ni avis juridique. URSSAF et DGFiP font foi.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">TRANSPORT & MOBILITÉ · LA ROUTE · V1.0<br>🚌 RÈGLES 2026 — INDICATIF</div>
+</div>
+
+<script>
+(function(){
+  var LS={STATE:'TR2_STATE',WELCOME:'TR2_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function $(s){return document.querySelector(s);}
+  function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+  function eur(n){return Math.round(n||0).toLocaleString('fr-FR')+' €';}
+
+  // Barème km 2026 (identique 2025) — tranche principale 5001-20000 km
+  var BAREME={
+    3:[0.502,0,0.368],// [≤5000: d*a, ≤20000: d*b+c, >20000: d*d]
+    4:[0.575,572,0.347,0.407],
+    5:[0.603,1395,0.357,0.428],
+    6:[0.668,1263,0.374,0.450],
+    7:[0.773,1666,0.394,0.478]
+  };
+  function calcKm(cv,km,elec){
+    var b=BAREME[cv]||BAREME[5];
+    var val;
+    if(km<=5000) val=km*b[0];
+    else if(km<=20000) val=km*b[2]+b[1];
+    else val=km*b[3];
+    if(elec) val*=1.2;
+    return val;
+  }
+
+  function recalcKm(){
+    var cv=parseInt($('#kmCv').value)||5;
+    var dist=parseFloat($('#kmDist').value)||0;
+    var jours=parseInt($('#kmJours').value)||228;
+    var elec=parseInt($('#kmElec').value)===1;
+    var kmAn=dist*jours;
+    $('#kmResult').textContent=kmAn>0?eur(calcKm(cv,kmAn,elec)):'— €';
+  }
+
+  $all('#kmCv,#kmDist,#kmJours,#kmElec').forEach(function(el){
+    el.addEventListener('change',recalcKm); el.addEventListener('input',recalcKm);
+  });
+  recalcKm();
+
+  // tabs
+  $all('.ttab').forEach(function(t){
+    t.addEventListener('click',function(){
+      $all('.ttab').forEach(function(x){x.classList.remove('on');});
+      t.classList.add('on');
+      $all('.tpanel').forEach(function(p){p.classList.remove('show');});
+      document.getElementById('p-'+t.dataset.t).classList.add('show');
+    });
+  });
+
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Voir le module 🚌':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){document.getElementById(b.dataset.close).classList.remove('show');});});
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'TRA_STATE',WELCOME:'TRA_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

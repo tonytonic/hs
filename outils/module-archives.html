@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Conservation Documents RH — Les Archives</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#6b4a1e">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Documents RH">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;600;700&display=swap">
+<style>
+:root{
+  --wood:#6b4a1e; --wood-l:#8b6a3e; --wood-ll:#b08a5e;
+  --leather:#4a2e0e; --amber:#c8901e; --amber-l:#e8b040;
+  --paper:#fdf8f0; --paper2:#f5eede; --paper3:#ede0c8;
+  --ink:#2a1e0e; --ink2:#4a3820; --faded:#8a7a60;
+  --card:#fff; --card-edge:#d8c8a8;
+  --d1y:#c03030; --d3y:#c87820; --d5y:#1a6b3a; --d10y:#1a3a6b; --d50y:#6a1a6a;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:
+    repeating-linear-gradient(90deg,transparent,transparent 36px,rgba(107,74,30,0.06) 36px,rgba(107,74,30,0.06) 37px),
+    linear-gradient(170deg,#fdf8f0 0%,#f5eede 40%,#ede0c8 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;left:0;top:0;bottom:0;width:12px;z-index:0;pointer-events:none;
+  background:linear-gradient(90deg,var(--leather),var(--wood),transparent);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--paper);color:var(--wood);display:flex!important;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Merriweather',serif;font-size:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(253,248,240,0.97),rgba(253,248,240,0.6) 75%,transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:var(--wood);color:var(--paper);border:none;border-radius:4px;padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:1px 2px 0 var(--leather);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Merriweather',serif;font-weight:700;font-size:17px;color:var(--wood);}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--wood);color:var(--paper);border:none;border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:1px 2px 0 var(--leather);}
+
+/* search */
+.search-wrap{position:relative;margin-bottom:14px;}
+.search-wrap .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;}
+.search-ip{width:100%;background:var(--card);border:2px solid var(--card-edge);border-radius:10px;
+  padding:12px 12px 12px 40px;color:var(--ink);font-size:15px;font-family:'Lato',sans-serif;font-weight:600;}
+.search-ip:focus{outline:none;border-color:var(--wood);}
+
+/* filter tabs */
+.ftabs{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:2px;}
+.ft{flex-shrink:0;padding:6px 11px;border-radius:14px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;}
+.ft.all{background:var(--wood);color:var(--paper);}
+.ft[data-dur="1"]{background:#fde8e8;color:var(--d1y);}
+.ft[data-dur="3"]{background:#fff3e0;color:var(--d3y);}
+.ft[data-dur="5"]{background:#e8f5ee;color:var(--d5y);}
+.ft[data-dur="10"]{background:#e8f0fa;color:var(--d10y);}
+.ft[data-dur="50"]{background:#f3e8fa;color:var(--d50y);}
+.ft.inactive{opacity:0.4;}
+
+/* document cards */
+.dlist{display:flex;flex-direction:column;gap:8px;}
+.dcard{background:var(--card);border:1.5px solid var(--card-edge);border-radius:10px;padding:13px 15px;
+  display:flex;align-items:flex-start;gap:12px;box-shadow:2px 3px 0 rgba(107,74,30,0.1);}
+.dcard .di{font-size:22px;flex-shrink:0;}
+.dcard .dc{flex:1;min-width:0;}
+.dcard .dt{font-weight:700;font-size:13.5px;color:var(--ink);}
+.dcard .dd{font-size:12px;color:var(--faded);margin-top:3px;line-height:1.35;}
+.dcard .df{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap;align-items:center;}
+.dbadge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px;flex-shrink:0;}
+.dbadge.d1{background:#fde8e8;color:var(--d1y);}
+.dbadge.d3{background:#fff3e0;color:var(--d3y);}
+.dbadge.d5{background:#e8f5ee;color:var(--d5y);}
+.dbadge.d10{background:#e8f0fa;color:var(--d10y);}
+.dbadge.d50{background:#f3e8fa;color:var(--d50y);}
+.dref{font-family:'Courier New',monospace;font-size:9.5px;color:var(--faded);}
+
+/* legend */
+.legend{background:var(--card);border:1.5px solid var(--card-edge);border-radius:10px;padding:14px;
+  margin-bottom:14px;box-shadow:2px 3px 0 rgba(107,74,30,0.1);}
+.legend .lt{font-family:'Merriweather',serif;font-weight:700;font-size:13px;color:var(--wood);margin-bottom:10px;}
+.legend .lr{display:flex;flex-wrap:wrap;gap:6px;}
+
+/* tip banner */
+.tip-band{background:var(--paper2);border:1.5px solid var(--card-edge);border-left:4px solid var(--amber);border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;}
+.tip-band .ti{font-size:18px;flex-shrink:0;} .tip-band .tt{font-size:12.5px;color:var(--ink2);line-height:1.4;}
+
+.btn{display:block;width:100%;border:none;border-radius:8px;padding:13px;font-family:'Lato',sans-serif;font-weight:700;font-size:13.5px;cursor:pointer;transition:.15s;}
+.btn-wood{background:var(--wood);color:var(--paper);box-shadow:0 3px 0 var(--leather);}
+.btn-ghost{background:transparent;color:var(--wood);border:1.5px solid var(--card-edge);}
+
+.note{font-size:12px;color:var(--faded);line-height:1.5;text-align:center;margin-top:8px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;font-family:'Courier New',monospace;letter-spacing:0.5px;}
+
+.empty{text-align:center;padding:28px 16px;color:var(--faded);}
+.empty .ee{font-size:40px;display:block;margin-bottom:10px;opacity:.6;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(42,30,14,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:var(--paper);border-radius:16px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(42,30,14,0.55);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:4px solid var(--wood);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 20px 10px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Merriweather',serif;font-weight:700;font-size:21px;color:var(--wood);}
+.box .hd .s{font-size:12.5px;color:var(--ink2);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:var(--paper2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--ink2);cursor:pointer;}
+.box .bd{padding:0 20px 20px;}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .3s;}
+.wemoji{font-size:56px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-family:'Merriweather',serif;font-weight:700;font-size:22px;color:var(--wood);margin-bottom:10px;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--wood);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:11px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--wood);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--paper2);border-radius:8px;padding:10px;border-left:3px solid var(--wood);}
+.dots{display:flex;gap:7px;justify-content:center;margin:14px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(107,74,30,0.2);transition:.2s;}
+.dots .d.on{background:var(--wood);width:22px;border-radius:4px;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:var(--paper);z-index:9999;"></div>
+<div id="lb"><div class="i">📁</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Les Archives</div>
+    <div class="su">Conservation documents RH · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <div class="wemoji">📁</div>
+      <h2>Les Archives</h2>
+      <p>Combien de temps garder tes bulletins de paie, ton contrat, tes arrêts maladie ? Combien de temps la loi prévoit-elle leur conservation ?</p>
+      <p>Un guide clair, avec les durées légales pour chaque document.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <div class="wemoji">⏳</div>
+      <h2>Deux angles différents</h2>
+      <div class="feat"><div class="ic">👤</div><div class="tx"><b>Toi, le salarié</b>Les documents que tu dois garder (bulletins, contrat, arrêts…) en cas de litige ou pour ta retraite.</div></div>
+      <div class="feat"><div class="ic">🏢</div><div class="tx"><b>Ton employeur</b>Ce que l'employeur est légalement tenu de conserver et pendant combien de temps.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <div class="wemoji">💡</div>
+      <h2>Conseil pratique</h2>
+      <p>En cas de doute, <span class="accent">garde plus longtemps que le minimum légal</span>. Une réclamation retraite peut survenir 30 ans après. Un litige professionnel peut se prescrire à 2 ou 3 ans.</p>
+      <div class="legal">Durées légales en vigueur en 2026. Sources : Code du travail, Code civil, Code général des impôts. Certaines situations spécifiques (accidents du travail, contentieux en cours) peuvent allonger les délais. Outil indicatif.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-wood" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Naviguer dans les archives</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🔍</div><div class="tx"><b>Rechercher</b>Tape un mot-clé pour retrouver un document spécifique.</div></div>
+    <div class="feat"><div class="ic">🎨</div><div class="tx"><b>Filtrer par durée</b>Les onglets colorés permettent de filtrer par durée légale (1 an, 3 ans, 5 ans…).</div></div>
+    <div class="feat"><div class="ic">👤🏢</div><div class="tx"><b>Salarié vs Employeur</b>Chaque fiche indique si c'est une obligation du salarié, de l'employeur, ou des deux.</div></div>
+    <button class="btn btn-wood" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="tip-band">
+    <div class="ti">💡</div>
+    <div class="tt">Les bulletins de paie numériques sont à disposition <strong>50 ans</strong> par l'employeur ou jusqu'aux 75 ans du salarié. Pour toi : garde-les à vie pour la retraite.</div>
+  </div>
+
+  <div class="legend">
+    <div class="lt">🗓️ Durées légales de conservation</div>
+    <div class="lr">
+      <span class="dbadge d1">1 an</span>
+      <span class="dbadge d3">3 ans</span>
+      <span class="dbadge d5">5 ans</span>
+      <span class="dbadge d10">10 ans</span>
+      <span class="dbadge d50">50 ans / vie</span>
+    </div>
+  </div>
+
+    <!-- Récap visuel par durée -->
+  <div class="legend" style="margin-bottom:14px;">
+    <div class="lt">⚡ Récapitulatif rapide par durée</div>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px;font-size:12px;">
+      <div style="display:flex;gap:8px;align-items:center;"><span class="dbadge d1">1 an</span><span style="color:var(--faded);">Suivi des heures, pointages, astreintes</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span class="dbadge d3">3 ans</span><span style="color:var(--faded);">Forfait-jours, charges sociales URSSAF, taxe salaires</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span class="dbadge d5">5 ans</span><span style="color:var(--faded);">Bulletins papier, contrat, rupture, registre, accords</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span class="dbadge d10">10 ans</span><span style="color:var(--faded);">Dossier médical, DSN/paie comptable, AT</span></div>
+      <div style="display:flex;gap:8px;align-items:center;"><span class="dbadge d50">50 ans</span><span style="color:var(--faded);">Bulletins numériques (dispo salarié), retraite</span></div>
+    </div>
+  </div><div class="search-wrap">
+    <span class="si">🔍</span>
+    <input class="search-ip" id="searchIp" type="text" placeholder="Rechercher un document…">
+  </div>
+
+  <div class="ftabs" id="ftabs">
+    <div class="ft all" data-dur="all">Tous</div>
+    <div class="ft" data-dur="1">1 an</div>
+    <div class="ft" data-dur="3">3 ans</div>
+    <div class="ft" data-dur="5">5 ans</div>
+    <div class="ft" data-dur="10">10 ans</div>
+    <div class="ft" data-dur="50">50 ans / vie</div>
+  </div>
+
+  <div class="dlist" id="docList"></div>
+  <div class="empty" id="noRes" style="display:none;"><span class="ee">📁</span><div>Aucun document trouvé</div></div>
+
+  <div class="note">Durées légales 2026. Sources : Code du travail, Code civil, CGI. En cas de litige en cours, conservez toujours jusqu'à résolution définitive. Ta convention collective peut imposer des durées différentes. Outil indicatif — ni avis juridique. Votre expert-comptable ou juriste RH fait foi.e expert-comptable ou juriste RH fait foi.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">LES ARCHIVES · CONSERVATION DOCUMENTS RH · V1.0<br>📁 INDICATIF — DURÉES LÉGALES 2026</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={WELCOME:'ARC_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  function $(s,r){return(r||document).querySelector(s);}
+  function $all(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s));}
+
+  var DOCS=[
+    // 1 an
+    {icon:'⏱️',t:'Suivi du temps de travail',d:'Relevés d\'heures, pointages, planning. Obligation légale : 1 an ('+(window.SH?SH.art('R3171-16'):'Art. R3171-16 CT')+'). Conseil : conserver 3 ans (délai de prescription des rappels de salaire). En cas de contentieux en cours, conserver jusqu\'à résolution définitive.',who:'Employeur',dur:1,ref:''+(window.SH?SH.art('R3171-16'):'Art. R3171-16 CT')+' — conseil : 3 ans (prescription salariale)'},
+    {icon:'📊',t:'Comptabilisation horaires d\'astreinte',d:'Registre des heures d\'astreinte et de leur compensation.',who:'Employeur',dur:1,ref:'CNIL GRH'},
+    // 3 ans
+    {icon:'📅',t:'Suivi jours/forfait-jours',d:'Comptabilisation des jours travaillés pour les salariés sous convention de forfait en jours.',who:'Employeur',dur:3,ref:(window.SH?SH.art('L3171-3'):'Art. L3171-3 CT')},
+    {icon:'💸',t:'Documents relatifs aux charges sociales',d:'Déclarations URSSAF, borderaux de versement des cotisations sociales.',who:'Employeur',dur:3,ref:(window.SH?SH.art('L243-16'):'Art. L243-16 CSS')},
+    {icon:'🧾',t:'Taxe sur les salaires',d:'Déclarations et pièces justificatives relatives à la taxe sur les salaires.',who:'Employeur',dur:3,ref:'Code général des impôts'},
+    // 5 ans
+    {icon:'📄',t:'Bulletins de paie (papier ou numérique)',d:'Double conservé par l\'employeur. Pour le salarié : garder à vie pour la retraite. Bulletin numérique : 50 ans de disponibilité obligatoire par l\'employeur.',who:'Employeur + Salarié',dur:5,ref:(window.SH?SH.art('L3243-4'):'Art. L3243-4 CT')},
+    {icon:'📝',t:'Contrat de travail et avenants',d:'Le contrat initial, toutes les modifications, les clauses particulières. Recommandé : garder jusqu\'à la retraite.',who:'Employeur + Salarié',dur:5,ref:'Prescription civile'},
+    {icon:'📑',t:'Documents de rupture',d:'Lettre de démission, de licenciement, convention de rupture, solde de tout compte, certificat de travail.',who:'Employeur + Salarié',dur:5,ref:(window.SH?SH.art('L1471-1'):'Art. L1471-1 CT')},
+    {icon:'🏛️',t:'Attestation France Travail',d:'Attestation employeur remise à la fin du contrat pour ouvrir les droits au chômage.',who:'Employeur + Salarié',dur:5,ref:'Droit commun'},
+    {icon:'👥',t:'Registre unique du personnel',d:'Liste de tous les salariés avec leurs informations. Délai courant à partir du départ du salarié.',who:'Employeur',dur:5,ref:(window.SH?SH.art('R1221-26'):'Art. R1221-26 CT')},
+    {icon:'📋',t:'Observation / courrier inspection du travail',d:'Documents remis par l\'inspection du travail ou le CHSCT.',who:'Employeur',dur:5,ref:'Droit commun'},
+    {icon:'⚖️',t:'Accords collectifs d\'entreprise',d:'Accords d\'intéressement, participation, NAO, PSE, accord APLD…',who:'Employeur',dur:5,ref:'Droit commun'},
+    {icon:'💰',t:'Primes, indemnités, soldes de tout compte',d:'Toutes les pièces justificatives des versements lors de la rupture.',who:'Employeur + Salarié',dur:5,ref:(window.SH?SH.art('L1471-1'):'Art. L1471-1 CT')},
+    {icon:'🎓',t:'Attestations de formation CPF/plan',d:'Certifications, diplômes acquis via le CPF ou le plan de développement.',who:'Salarié',dur:5,ref:'Recommandation CNIL'},
+    // 10 ans
+    {icon:'🏥',t:'Dossier médical professionnel (DMST)',d:'Le DMST (Dossier Médical en Santé au Travail) est conservé 40 ans par le SPST (Service de Prévention et de Santé au Travail), pas par l\'employeur. L\'employeur ne conserve que les avis d\'aptitude/inaptitude transmis par le médecin du travail (5 ans).',who:'SPST — 40 ans (employeur : avis aptitude 5 ans)',dur:10,ref:''+(window.SH?SH.art('R4624-46'):'Art. R4624-46 CT')+' — DMST : 40 ans min'},
+    {icon:'📉',t:'Documents liés à la paie (DSN, éléments comptables)',d:'Pièces justificatives comptables, déclarations sociales nominatives (DSN) archivées.',who:'Employeur',dur:10,ref:'Art. L102 B LPF'},
+    // 50 ans / vie
+    {icon:'⚖️',t:'Représentants du personnel — protection',d:'Documents relatifs aux mandats électifs, désignations syndicales, heures de délégation. Conservation recommandée pendant le mandat + durée de prescription.',who:'Employeur',dur:5,ref:(window.SH?SH.art('L2411-1'):'Art. L2411-1 CT')},
+    {icon:'🦺',t:'Dossier accident du travail (AT)',d:'Déclaration AT, certificat médical initial, rapport d\'enquête. Délai courant à compter de la consolidation ou de la reconnaissance.',who:'Employeur',dur:10,ref:(window.SH?SH.art('L431-1'):'Art. L102 B LPF (10 ans, prescription AT)')},
+    {icon:'📊',t:'Registre des accidents bénins',d:'Si l\'entreprise dispose d\'une infirmière et d\'un accord permettant de ne pas déclarer les AT mineurs, le registre est en principe conservé 10 ans selon la réglementation.',who:'Employeur',dur:5,ref:(window.SH?SH.art('R441-3'):'Art. R441-3 CSS')},
+    {icon:'💳',t:'Bulletins de paie numériques — disponibilité salarié',d:'La réglementation prévoit la disponibilité du bulletin numérique pendant 50 ans OU jusqu\'aux 75 ans du salarié.',who:'Employeur',dur:50,ref:(window.SH?SH.art('D3243-8'):'Art. D3243-8 CT')},
+    {icon:'🏖️',t:'Bulletins de paie — conservation salarié',d:'Conserve tes bulletins à vie. Ils servent à calculer ta retraite (salaires des 25 meilleures années) et à prouver tes droits en cas de litige tardif.',who:'Salarié',dur:50,ref:'Recommandation retraite'},
+    {icon:'📗',t:'Contrat de travail — conservation salarié recommandée',d:'Garde ton contrat aussi longtemps que possible. Une clause de non-concurrence, une clause de dédit-formation peuvent être invoquées des années après.',who:'Salarié',dur:50,ref:'Recommandation pratique'}
+  ];
+
+  var curDur='all', curQ='';
+
+  function filtered(){
+    return DOCS.filter(function(d){
+      var matchDur=(curDur==='all'||String(d.dur)===String(curDur));
+      var q=curQ.toLowerCase();
+      var matchQ=!q||(d.t.toLowerCase().indexOf(q)>=0||d.d.toLowerCase().indexOf(q)>=0||d.who.toLowerCase().indexOf(q)>=0);
+      return matchDur&&matchQ;
+    });
+  }
+
+  function durClass(n){return n<=1?'d1':n<=3?'d3':n<=5?'d5':n<=10?'d10':'d50';}
+  function durLabel(n){return n>=50?'50 ans / vie':n+' an'+(n>1?'s':'');}
+
+  function render(){
+    var list=filtered();
+    var el=$('#docList'); el.innerHTML='';
+    $('#noRes').style.display=list.length?'none':'block';
+    list.forEach(function(d){
+      var card=document.createElement('div'); card.className='dcard';
+      card.innerHTML='<div class="di">'+d.icon+'</div>'+
+        '<div class="dc">'+
+          '<div class="dt">'+d.t+'</div>'+
+          '<div class="dd">'+d.d+'</div>'+
+          '<div class="df">'+
+            '<span class="dbadge '+durClass(d.dur)+'">'+durLabel(d.dur)+'</span>'+
+            '<span style="font-size:11px;color:var(--faded);padding:3px 8px;background:var(--paper2);border-radius:10px;">'+d.who+'</span>'+
+            '<span class="dref">'+d.ref+'</span>'+
+          '</div>'+
+        '</div>';
+      el.appendChild(card);
+    });
+  }
+
+  $('#searchIp').addEventListener('input',function(){curQ=this.value;curDur='all';
+    $all('.ft').forEach(function(t){t.className='ft'+(t.dataset.dur==='all'?' all':''+(t.dataset.dur?' ':'')+(t.dataset.dur?t.dataset.dur:''));});
+    render();});
+
+  $all('.ft').forEach(function(t){
+    t.addEventListener('click',function(){
+      curDur=t.dataset.dur; curQ=''; $('#searchIp').value='';
+      $all('.ft').forEach(function(x){x.className='ft'+(x.dataset.dur?(' '+x.dataset.dur):'');});
+      t.className='ft'+(t.dataset.dur?(' '+t.dataset.dur):'');
+      if(t.dataset.dur==='all') t.className='ft all';
+      render();
+    });
+  });
+
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Ouvrir les archives 📁':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  render();
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'ARC_STATE',WELCOME:'ARC_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

@@ -118,10 +118,12 @@
      Usage : <span data-txt="disclaimer"></span> ou SH.txt('disclaimer')
      ────────────────────────────────────────────────────────────────────── */
   var TEXTES = {
-    disclaimer:        "Outil indicatif et pédagogique — ni avis juridique, ni valeur légale.",
-    disclaimer_court:  "Outil indicatif & pédagogique.",
-    disclaimer_fiscal: "Estimations indicatives — ni avis fiscal, ni avis juridique.",
-    disclaimer_suivi:  "Outil pédagogique pour ton suivi personnel.",
+    disclaimer:        "Outil indicatif et pédagogique — tous les résultats sont fournis à titre indicatif uniquement et ne constituent pas un avis juridique, fiscal ou comptable.",
+    disclaimer_court:  "À titre indicatif — outil pédagogique, pas un avis juridique.",
+    disclaimer_fiscal: "Estimations à titre indicatif uniquement — ni avis fiscal, ni avis juridique. Consultez un professionnel.",
+    disclaimer_suivi:  "Outil pédagogique pour ton suivi personnel — résultats indicatifs, non opposables.",
+    mention_calculs:   "À titre indicatif",
+    mention_montant:   "montant indicatif",
     ccn_differente:    "Ta convention collective peut prévoir des règles différentes.",
     ccn_favorable:     "Ta convention collective peut prévoir des conditions plus favorables.",
     ccn_court:         "Ta convention peut être plus favorable.",

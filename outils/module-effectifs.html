@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Seuils d'effectif — Le Palier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a5276">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Seuils effectif">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --blue:#1a5276;--blue-l:#2471a3;--blue-ll:#3498db;
+  --navy:#0d2b45;--sky:#d4e6f1;--sky2:#a9cce3;
+  --cream:#f4f6f9;--cream2:#eaf0f7;--cream3:#d5e8f5;
+  --ink:#0d1b2a;--ink2:#2c3e50;--faded:#7f8c8d;
+  --ok:#1a7a4a;--warn:#c07820;--card:#fff;--card-edge:#cde;
+  --line:rgba(13,27,42,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:radial-gradient(700px 300px at 50% -5%,rgba(26,82,118,0.15),transparent 55%),
+  linear-gradient(180deg,#e8f0fb 0%,#d5e8f5 25%,#f4f6f9 65%,#edf2f7 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--cream);color:var(--blue);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Playfair Display',serif;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(212,230,241,0.97),rgba(212,230,241,0.55) 75%,transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.92);border:none;color:var(--blue);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(13,27,42,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--navy);font-style:italic;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+header .hbtn{background:rgba(255,255,255,0.92);border:none;color:var(--blue);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(13,27,42,0.12);}
+
+.hero{background:linear-gradient(165deg,#fff,var(--cream2));border-radius:22px;padding:20px;margin:8px 0 16px;
+  box-shadow:0 10px 28px rgba(13,27,42,0.15),inset 0 1px 0 rgba(255,255,255,0.9);}
+.hero .htag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--faded);text-align:center;margin-bottom:10px;}
+.seuil-sel{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;}
+.seuil-btn{background:var(--cream2);border:2px solid var(--card-edge);border-radius:12px;
+  padding:8px 14px;font-weight:700;font-size:13px;color:var(--ink2);cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.seuil-btn:active{transform:scale(0.97);}
+.seuil-btn.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(26,82,118,0.35);}
+.hero .hinfo{text-align:center;margin-top:12px;font-size:12px;color:var(--faded);font-weight:600;}
+
+.panel{background:rgba(255,255,255,0.95);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:0 5px 18px rgba(13,27,42,0.12);}
+.panel-t{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;font-style:italic;color:var(--navy);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--sky2);padding-bottom:8px;}
+
+.seuil-card{border-radius:14px;margin-bottom:10px;overflow:hidden;}
+.seuil-card .sc-hd{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;}
+.seuil-card .sc-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#fff;
+  background:var(--blue);border-radius:10px;padding:4px 12px;flex-shrink:0;}
+.seuil-card .sc-title{font-weight:700;font-size:14px;color:var(--ink);}
+.seuil-card .sc-sub{font-size:11px;color:var(--faded);margin-top:2px;}
+.seuil-card .sc-arrow{margin-left:auto;font-size:16px;color:var(--faded);transition:.2s;}
+.seuil-card.open .sc-arrow{transform:rotate(180deg);}
+.seuil-card .sc-body{display:none;padding:0 14px 14px;}
+.seuil-card.open .sc-body{display:block;}
+.seuil-card.seuil-11 .sc-num{background:var(--ok);}
+.seuil-card.seuil-50 .sc-num{background:var(--blue);}
+.seuil-card.seuil-250 .sc-num{background:#6c3483;}
+.seuil-card.seuil-300 .sc-num{background:#a04000;}
+.seuil-card.seuil-1000 .sc-num{background:#1a3a1a;}
+
+.oblig-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
+.oblig-item:last-child{border-bottom:none;}
+.oblig-item .oi{font-size:18px;flex-shrink:0;margin-top:1px;}
+.oblig-item .ot{font-size:13px;color:var(--ink2);line-height:1.4;}
+.oblig-item .ot b{display:block;font-weight:700;color:var(--ink);font-size:12.5px;margin-bottom:2px;}
+.oblig-item .otag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;
+  margin-top:4px;background:var(--sky);color:var(--blue);}
+
+.timeline-seuils{position:relative;padding-left:24px;}
+.timeline-seuils::before{content:"";position:absolute;left:8px;top:0;bottom:0;width:3px;
+  background:linear-gradient(180deg,var(--ok),var(--blue),#6c3483,#a04000,#1a3a1a);border-radius:2px;}
+.ts-item{position:relative;margin-bottom:16px;}
+.ts-item .ts-dot{position:absolute;left:-20px;top:6px;width:16px;height:16px;border-radius:50%;
+  border:3px solid #fff;box-shadow:0 0 0 2px var(--blue-ll);}
+.ts-item .ts-n{font-family:'Playfair Display',serif;font-weight:700;font-size:18px;color:var(--blue);}
+.ts-item .ts-t{font-size:12.5px;color:var(--ink2);line-height:1.4;margin-top:2px;}
+.ts-item.on .ts-n{color:var(--ok);}
+.ts-item.on .ts-dot{background:var(--ok);box-shadow:0 0 0 3px rgba(26,122,74,0.3);}
+.ts-item:not(.on) .ts-dot{background:var(--cream3);}
+
+.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--faded);line-height:1.6;}
+
+/* wizard */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(10,20,40,0.65);backdrop-filter:blur(5px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,#fff,#eaf0f7);border-radius:24px;max-width:430px;width:100%;
+  max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(10,20,40,0.5);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:5px solid var(--blue-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--navy);font-style:italic;}
+.box .hd .s{font-size:13px;color:var(--ink2);margin-top:4px;font-weight:600;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--cream2);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:15px;color:var(--navy);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:14px;
+  cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-blue{background:linear-gradient(135deg,var(--blue-ll),var(--blue));color:#fff;box-shadow:0 5px 14px rgba(26,82,118,0.4);}
+.btn-ghost{background:transparent;color:var(--blue);border:2px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wemoji{font-size:58px;display:inline-block;margin-bottom:10px;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wstep h2{font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--navy);margin-bottom:10px;font-style:italic;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:10px;font-weight:500;}
+.accent{color:var(--blue-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--navy);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--cream2);border-radius:10px;
+  padding:10px;text-align:left;border-left:3px solid var(--blue-l);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(26,82,118,0.2);transition:.2s;}
+.dots .d.on{background:var(--blue-l);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--blue);color:#fff;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(10,20,40,0.35);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">🏢</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Le Palier</div>
+    <div class="su">Seuils d'effectif · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <span class="wemoji">🏢</span>
+      <h2>Les seuils d'effectif</h2>
+      <p>À chaque palier de salariés, de <span class="accent">nouvelles obligations s'ouvrent</span> — pour l'employeur comme pour les représentants du personnel.</p>
+      <p>5 seuils clés : 11, 50, 250, 300 et 1 000 salariés.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">📊</span>
+      <h2>Neutre des deux côtés</h2>
+      <div class="feat"><div class="ic">👤</div><div class="tx"><b>Côté salarié</b>Vérifie si ton entreprise respecte ses obligations légales à ton niveau d'effectif.</div></div>
+      <div class="feat"><div class="ic">🏢</div><div class="tx"><b>Côté employeur</b>Anticipe les obligations qui s'ouvrent avant d'atteindre le prochain seuil.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📋</span>
+      <h2>Données stables</h2>
+      <p>Les seuils légaux bougent rarement. Ce module est <span class="accent">quasi-statique</span> — la loi du 22 mai 2019 (PACTE) les a simplifiés et stabilisés.</p>
+      <div class="legal">Outil indicatif et pédagogique. Certaines obligations dépendent du mode de calcul de l'effectif (ETP, CDI/CDD…). Vérifie toujours sur Légifrance pour ta situation précise.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-blue" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- AIDE -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🔢</div><div class="tx"><b>Sélectionne un seuil</b>Tape sur un bouton pour voir toutes les obligations qui s'ouvrent à partir de cet effectif.</div></div>
+    <div class="feat"><div class="ic">📋</div><div class="tx"><b>Cumul ascendant</b>Les obligations des seuils inférieurs restent applicables. À 50 sal., les obligations de 11 s'appliquent aussi.</div></div>
+    <div class="feat"><div class="ic">📅</div><div class="tx"><b>Calcul de l'effectif</b>Mesuré sur 12 mois glissants. Les salariés à temps partiel comptent au prorata.</div></div>
+    <div class="legal">Source : Code du travail, loi PACTE 2019. Seuils stabilisés.</div>
+    <button class="btn btn-blue" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="htag">🏢 Effectif de l'entreprise</div>
+    <div class="seuil-sel" id="seuilSel">
+      <button class="seuil-btn" data-s="11" onclick="selectSeuil(11)">11 sal.</button>
+      <button class="seuil-btn" data-s="50" onclick="selectSeuil(50)">50 sal.</button>
+      <button class="seuil-btn" data-s="250" onclick="selectSeuil(250)">250 sal.</button>
+      <button class="seuil-btn" data-s="300" onclick="selectSeuil(300)">300 sal.</button>
+      <button class="seuil-btn" data-s="1000" onclick="selectSeuil(1000)">1 000 sal.</button>
+    </div>
+    <div class="hinfo" id="heroInfo">Sélectionne un seuil pour voir les obligations</div>
+  </div>
+
+  <div class="panel" id="seuilPanel" style="display:none;">
+    <div class="panel-t" id="panelTitle">📋 Obligations applicables</div>
+    <div id="seuilContent"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">📈 La frise des seuils</div>
+    <div class="timeline-seuils" id="frise">
+      <div class="ts-item" id="ts11">
+        <div class="ts-dot"></div>
+        <div class="ts-n">11 salariés</div>
+        <div class="ts-t">CSE obligatoire · Registre DP · DUER · Affichages · Mutuelle</div>
+      </div>
+      <div class="ts-item" id="ts50">
+        <div class="ts-dot"></div>
+        <div class="ts-n">50 salariés</div>
+        <div class="ts-t">CSE complet · Participation · BDESE · Plan de formation · Médecin du travail renforcé · Index H/F</div>
+      </div>
+      <div class="ts-item" id="ts250">
+        <div class="ts-dot"></div>
+        <div class="ts-n">250 salariés</div>
+        <div class="ts-t">DS spécifique · Accord de méthode GPEC · Bilan social · Référent harcèlement</div>
+      </div>
+      <div class="ts-item" id="ts300">
+        <div class="ts-dot"></div>
+        <div class="ts-n">300 salariés</div>
+        <div class="ts-t">Accord GPEC obligatoire · Bilan social complet · Consultations CSE renforcées</div>
+      </div>
+      <div class="ts-item" id="ts1000">
+        <div class="ts-dot"></div>
+        <div class="ts-n">1 000 salariés</div>
+        <div class="ts-t">Intéressement obligatoire (si bénéfices) · Représentants de proximité · RSE renforcée</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">🧮 Comment compter les effectifs ?</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="background:var(--cream2);border-radius:10px;padding:11px 12px;font-size:12.5px;color:var(--ink2);line-height:1.5;">
+        <strong style="color:var(--navy);">CDI temps plein</strong> = 1 salarié<br>
+        <strong style="color:var(--navy);">CDI temps partiel</strong> = prorata (ex: 0,5 à mi-temps)<br>
+        <strong style="color:var(--navy);">CDD</strong> = prorata de la durée sur 12 mois<br>
+        <strong style="color:var(--navy);">Intérimaires</strong> = prorata de la durée de la mission
+      </div>
+      <div style="background:var(--cream2);border-radius:10px;padding:11px 12px;font-size:12.5px;color:var(--ink2);line-height:1.5;">
+        <strong style="color:var(--navy);">Mesure sur 12 mois glissants</strong><br>
+        Un seuil est franchi lorsqu'il est atteint pendant <strong>5 années consécutives</strong> (loi PACTE 2019). En dessous, un dépassement ponctuel ne déclenche pas les dispositions prévues par la loi.
+      </div>
+      <div style="background:rgba(192,120,32,0.08);border-left:3px solid var(--warn);border-radius:10px;padding:11px 12px;font-size:12.5px;color:var(--ink2);line-height:1.5;">
+        <strong style="color:var(--warn);">⚠️ Avant la loi PACTE (2019)</strong><br>
+        Les seuils se déclenchaient dès un an de dépassement. La loi PACTE a instauré le délai de 5 ans pour réduire les effets de seuil.
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:4px;">
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
+  </div>
+  <div class="foot"><span data-txt="disclaimer"></span>.<br>🏢 Tout reste sur ton appareil.</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS={STATE:'EFF_STATE',WELCOME:'EFF_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function $(s){return document.querySelector(s);}
+function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+
+var DATA = {
+  11: {
+    color:"var(--ok)",
+    title:"✅ À partir de 11 salariés",
+    items:[
+      {i:"🏛️", t:"CSE obligatoire", d:"Comité Social et Économique : élections obligatoires. Mandat de 4 ans. Attributions : réclamations, santé-sécurité, droits d'alerte.", tag:(window.SH?SH.art('L2311-2'):'Art. L2311-2 CT')},
+      {i:"📋", t:"Document Unique (DUER)", d:"Évaluation des risques professionnels obligatoire, mise à jour annuelle et après tout accident ou modification des conditions de travail.", tag:(window.SH?SH.art('R4121-1'):'Art. R4121-1 CT')},
+      {i:"🛡️", t:"Mutuelle obligatoire", d:"La loi prévoit en principe la mise en place d'une complémentaire santé collective financée à au moins 50 % par l'entreprise.", tag:"Loi Evin / ANI 2013"},
+      {i:"📌", t:"Affichages obligatoires", d:"Consignes incendie, horaires de travail, coordonnées inspection du travail, médecin du travail, harcèlement sexuel…", tag:(window.SH?SH.art('D4711-1'):'Art. D4711-1 CT')},
+      {i:"🏥", t:"Médecine du travail", d:"Adhésion obligatoire à un Service de Prévention et de Santé au Travail (SPST). Visites d\\'embauche, périodiques et à la demande.", tag:(window.SH?SH.art('L4622-1'):'Art. L4622-1 CT')},
+    ]
+  },
+  50: {
+    color:"var(--blue)",
+    title:"🔵 À partir de 50 salariés",
+    items:[
+      {i:"🏛️", t:"CSE avec attributions étendues", d:"Le CSE dispose désormais de la consultation obligatoire (orientations stratégiques, situation économique, politique sociale). Commission santé-sécurité (CSSCT) obligatoire à 300 sal.", tag:(window.SH?SH.art('L2312-8'):'Art. L2312-8 CT')},
+      {i:"💰", t:"Participation aux bénéfices", d:"Obligation de verser une participation si l'entreprise réalise des bénéfices. Formule légale : (B - 5%C) × S/VA × 1/2. Bloquée 5 ans par défaut.", tag:(window.SH?SH.art('L3322-1'):'Art. L3322-1 CT')},
+      {i:"📊", t:"BDESE / BDESEE", d:"Base de Données Économiques, Sociales et Environnementales : mise à disposition du CSE de l'ensemble des informations sur la vie de l'entreprise.", tag:(window.SH?SH.art('L2312-36'):'Art. L2312-36 CT')},
+      {i:"📈", t:"Index Égalité H/F obligatoire", d:"Calcul et publication annuelle (avant le 1er mars) de l'index sur 5 indicateurs. Score < 75 : plan de rattrapage obligatoire.", tag:"Loi avenir pro 2018"},
+      {i:"🎓", t:"Plan de développement des compétences", d:"Consultation obligatoire du CSE sur la politique de formation. Bilan annuel à présenter.", tag:(window.SH?SH.art('L2312-24'):'Art. L2312-24 CT')},
+      {i:"🤝", t:"Négociation annuelle obligatoire (NAO)", d:"NAO sur les salaires, le temps de travail et le partage de la valeur. En l'absence d'accord, l'employeur décide unilatéralement.", tag:(window.SH?SH.art('L2242-1'):'Art. L2242-1 CT')},
+    ]
+  },
+  250: {
+    color:"#6c3483",
+    title:"🟣 À partir de 250 salariés",
+    items:[
+      {i:"👤", t:"Référent harcèlement sexuel", d:"En plus du référent CSE, la loi prévoit la désignation d'un référent chargé de l\\'orientation, de l\\'information et de la prévention.", tag:(window.SH?SH.art('L1153-5-1'):'Art. L1153-5-1 CT')},
+      {i:"📊", t:"Bilan social", d:"Document annuel regroupant les principales données chiffrées sur le personnel : effectifs, rémunérations, conditions de travail, formation, relations sociales.", tag:(window.SH?SH.art('L2312-28'):'Art. L2312-28 CT')},
+      {i:"🌍", t:"Plan de mobilité obligatoire", d:"Plan visant à réduire les déplacements domicile-travail et optimiser les flux de personnes (covoiturage, TC, vélo…).", tag:"'+(window.SH?SH.art('L1214-8-2'):'Art. L1214-8-2')+' Code transports"},
+      {i:"♿", t:"OETH renforcée", d:"Obligation d\\'Emploi des Travailleurs Handicapés : 6 % de l\\'effectif. Déclaration annuelle DOETH. Contribution URSSAF si non atteint.", tag:(window.SH?SH.art('L5212-1'):'Art. L5212-1 CT')},
+    ]
+  },
+  300: {
+    color:"#a04000",
+    title:"🟤 À partir de 300 salariés",
+    items:[
+      {i:"📋", t:"GEPP obligatoire", d:"Accord de Gestion des Emplois et Parcours Professionnels (ex-GPEC) à négocier tous les 3 ans : anticipation des évolutions d\\'emplois, mobilités, formation.", tag:(window.SH?SH.art('L2242-20'):'Art. L2242-20 CT')},
+      {i:"🏛️", t:"CSSCT obligatoire", d:"Commission Santé, Sécurité et Conditions de Travail au sein du CSE, avec au minimum 3 membres et des réunions trimestrielles.", tag:(window.SH?SH.art('L2315-36'):'Art. L2315-36 CT')},
+      {i:"📊", t:"Bilan social complet", d:"La réglementation prévoit un bilan social encore plus détaillé. Consultation étendue du CSE avec documents complémentaires selon les dispositions applicables.", tag:(window.SH?SH.art('L2312-28'):'Art. L2312-28 CT')},
+      {i:"🤝", t:"Consultations CSE renforcées", d:"Consultations obligatoires supplémentaires sur les orientations stratégiques, avec droit à l\\'expertise économique et sociale financée par l\\'entreprise.", tag:(window.SH?SH.art('L2315-78'):'Art. L2315-78 CT')},
+    ]
+  },
+  1000: {
+    color:"#1a3a1a",
+    title:"⚫ À partir de 1 000 salariés",
+    items:[
+      {i:"💰", t:"Intéressement fortement encouragé", d:"Bien que non formellement obligatoire, la loi de 2023 sur le partage de la valeur impose des négociations d\\'intéressement ou de participation volontaire si bénéfices sur 3 ans.", tag:"Loi partage valeur 2023"},
+      {i:"🌍", t:"Rapport RSE (extra-financier)", d:"Déclaration de Performance Extra-Financière (DPEF) obligatoire : impacts environnementaux, sociaux et gouvernance.", tag:(window.SH?SH.art('L225-102-1'):'Art. L225-102-1 Code com.')},
+      {i:"🏛️", t:"Représentants de proximité", d:"Accord collectif possible pour créer des représentants de proximité en complément du CSE central, notamment pour les entreprises multi-sites.", tag:(window.SH?SH.art('L2313-7'):'Art. L2313-7 CT')},
+      {i:"⚖️", t:"Devoir de vigilance", d:"Plan de vigilance obligatoire sur les risques humains et environnementaux liés à l\\'activité, y compris sous-traitants et fournisseurs.", tag:"Loi vigilance 2017"},
+    ]
+  }
+};
+
+var curSeuil = null;
+
+window.selectSeuil = function(s){
+  curSeuil = s;
+  set(LS.STATE, {seuil:s});
+  $all('.seuil-btn').forEach(function(b){b.classList.toggle('on', +b.dataset.s===s);});
+  var d = DATA[s];
+  $('#heroInfo').textContent = d.title;
+  $('#panelTitle').textContent = d.title;
+  var html = '';
+  d.items.forEach(function(item){
+    html += '<div class="oblig-item"><div class="oi">'+item.i+'</div><div class="ot"><b>'+item.t+'</b>'+item.d+'<span class="otag">'+item.tag+'</span></div></div>';
+  });
+  // Ajouter note cumul
+  if(s > 11) html += '<div style="margin-top:10px;font-size:11px;color:var(--faded);font-style:italic;padding-top:8px;border-top:1px solid var(--line);">⬆️ Les obligations des seuils inférieurs restent applicables.</div>';
+  $('#seuilContent').innerHTML = html;
+  $('#seuilPanel').style.display = 'block';
+  // Frise
+  [11,50,250,300,1000].forEach(function(n){
+    var el = $('#ts'+n);
+    if(el) el.classList.toggle('on', n <= s);
+  });
+};
+
+// Restaurer état
+var state = get(LS.STATE, {seuil:null});
+if(state.seuil) selectSeuil(state.seuil);
+
+// Wizard
+var wStep=0,wMax=3;
+function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+  $('#wNext').textContent=(n===wMax-1)?'Commencer 🏢':'Continuer';
+  $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+$('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+$('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+$('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+$all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>
