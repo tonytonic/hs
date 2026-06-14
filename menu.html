@@ -1213,8 +1213,7 @@
 <div style="display:flex;gap:8px;align-items:flex-start;">
   <button class="info-btn" onclick="reopenWizard()" style="flex:2;background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
   <!-- Bouton Favoris (même style doré que le bouton favoris, remplace l'ancien Terrier) -->
-  <!-- OFF PROD : réactiver en retirant "display:none;" ci-dessous -->
-  <div style="position:relative;flex:1;display:none;" id="favDropContainer">
+  <div style="position:relative;flex:1;" id="favDropContainer">
     <button onclick="toggleFavDrop()" title="Mes outils favoris — La caisse à outils"
       style="width:100%;cursor:pointer;border-radius:10px;padding:9px 12px;
              font-family:inherit;font-weight:700;font-size:12px;
@@ -1307,8 +1306,7 @@
 <button class="info-btn" onclick="openSocialPopup()" style="margin-top:-8px;background:linear-gradient(135deg,#e87820,#c85010);border:none;color:#fff;">🎬 Nos réseaux &amp; tutos vidéo</button>
 
 <button class="info-btn" onclick="openBackupPopup()" style="margin-top:-8px;">💾 Sauvegarde générale</button>
-<!-- OFF PROD : réactiver en retirant "display:none;" ci-dessous -->
-<button class="info-btn" onclick="window.location.href='nouveautes.html'" style="margin-top:-8px;display:none;">🆕 Nouveautés &amp; mises à jour</button>
+<button class="info-btn" onclick="window.location.href='nouveautes.html'" style="margin-top:-8px;">🆕 Nouveautés &amp; mises à jour</button>
 <button class="info-btn" id="btnPerso" onclick="togglePersoMode()" style="margin-top:-8px;">✏️ Personnaliser le menu</button>
 <button class="btn-hidden" id="btnHidden" onclick="openHiddenDrawer()" style="margin-top:-8px;">
   👁 Modules masqués&nbsp;<span id="hiddenCount"></span>
