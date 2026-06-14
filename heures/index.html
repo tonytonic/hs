@@ -855,10 +855,29 @@ const DAILY_WORK_HOURS=7,ALLOW_RECUP_FREE=true;
 
 /* ── CCN : règles actives ── */
 function getCCNRules() {
+  // 1. Accord personnalisé (défini depuis le menu) — priorité absolue
+  const customRaw = localStorage.getItem('CCN_CUSTOM');
+  if (customRaw) {
+    try {
+      const c = JSON.parse(customRaw);
+      return {
+        seuil:        c.seuil        || 35,
+        taux1:        c.taux1        || 25,
+        palier1:      c.palier1      || 8,
+        taux_inter:   c.taux_inter   ?? null,
+        palier_inter: c.palier_inter ?? null,
+        taux2:        c.taux2        || 50,
+        contingent:   c.contingent   || 220,
+        debutSemaine: c.debutSemaine || 1
+      };
+    } catch(e) {}
+  }
+  // 2. CCN officielle par IDCC
   if (typeof window.CCN_API !== 'undefined') {
     const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0');
     return window.CCN_API.getGroupeForCCN(idcc) || window.CCN_API.getGroupeForCCN(0);
   }
+  // 3. Droit commun (fallback)
   return { seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50, contingent:220, debutSemaine:1 };
 }
 // Retourne le premier jour (ou debut CCN) de la semaine contenant 'date'
@@ -1123,8 +1142,9 @@ function calculate(){
     totalRecup+=v.recup||0;
   });
 
-  // BASE_HEBDO fixe (35h) — la semaine civile est indivisible en droit du travail
+  // BASE_HEBDO suit le seuil CCN/accord (35h légal, 39h accord de branche, etc.)
   const rules=getCCNRules();
+  BASE_HEBDO = rules.seuil;
   let h1=0,hInter=0,h2=0;
   Object.entries(weeks).forEach(([week,extra])=>{
     const absent=absences[week]||0;
@@ -1293,6 +1313,7 @@ async function importFeries(){const by=Number(currentSuffix),years=[by-1,by,by+1
    La récupération ne réduit PAS le contingent. */
 function updateContingent(){
   const rules=getCCNRules();
+  BASE_HEBDO = rules.seuil;
   const LIMIT=rules.contingent;
   // Reconstruire via la même logique semaine que calculate()
   // sur l'ensemble de l'exercice (toutes les périodes)
@@ -1323,7 +1344,7 @@ function updateContingent(){
     const absent=absences[wk]||0;
     const base=Math.max(0,BASE_HEBDO-absent);
     const totalW=base+extra;
-    // BASE_HEBDO fixe — semaine civile indivisible (pas de récup au contingent, cf. L3121-30)
+    // BASE_HEBDO suit le seuil CCN — semaine civile indivisible (pas de récup au contingent, cf. L3121-30)
     if(totalW>BASE_HEBDO)total+=totalW-BASE_HEBDO;
   });
   const pct=Math.min(100,total/LIMIT*100);
@@ -2237,7 +2258,7 @@ function wizLastSunday(year,month){
   if(diff!==0)last.setDate(last.getDate()-diff);
   return dateKeyLocal(last);
 }
-function wizShowSummary(){const sd=document.getElementById("wizStartDate").value;const ad=document.getElementById("wizAnnualDate").value;const rate=document.getElementById("wizHourlyRate").value||"—";const feries=document.getElementById("wizImportFeries").checked?"Oui":"Non";const autoF=document.getElementById("wizAutoFerie").checked?"Oui":"Non";const cm=wizClosureMode==="auto"?"Automatique (derniers jours de mois)":"Manuel (12 dates saisies)";document.getElementById("wizSummaryContent").innerHTML=`📅 Début d'exercice : <b>${sd?new Date(sd).toLocaleDateString():"Non définie"}</b><br>🏁 Clôture annuelle : <b>${ad?new Date(ad).toLocaleDateString():"Non définie"}</b><br>📆 Clôtures : <b>${cm}</b><br>⏱️ Base hebdomadaire : <b>35 h</b><br>🎌 Jours fériés importés : <b>${feries}</b><br>⚙️ Mode auto-férié : <b>${autoF}</b><br>💶 Taux horaire : <b>${rate} €/h</b>`;document.getElementById("wizSummary").style.display="block";document.getElementById("wizSummaryBtn").style.display="none";document.getElementById("wizFinishBtn").style.display="inline-block";}
+function wizShowSummary(){const sd=document.getElementById("wizStartDate").value;const ad=document.getElementById("wizAnnualDate").value;const rate=document.getElementById("wizHourlyRate").value||"—";const feries=document.getElementById("wizImportFeries").checked?"Oui":"Non";const autoF=document.getElementById("wizAutoFerie").checked?"Oui":"Non";const cm=wizClosureMode==="auto"?"Automatique (derniers jours de mois)":"Manuel (12 dates saisies)";document.getElementById("wizSummaryContent").innerHTML=`📅 Début d'exercice : <b>${sd?new Date(sd).toLocaleDateString():"Non définie"}</b><br>🏁 Clôture annuelle : <b>${ad?new Date(ad).toLocaleDateString():"Non définie"}</b><br>📆 Clôtures : <b>${cm}</b><br>⏱️ Base hebdomadaire : <b>${getCCNRules().seuil} h</b><br>🎌 Jours fériés importés : <b>${feries}</b><br>⚙️ Mode auto-férié : <b>${autoF}</b><br>💶 Taux horaire : <b>${rate} €/h</b>`;document.getElementById("wizSummary").style.display="block";document.getElementById("wizSummaryBtn").style.display="none";document.getElementById("wizFinishBtn").style.display="inline-block";}
 async function finishWiz(){
   let sd=document.getElementById("wizStartDate").value;if(!sd){toast("❌ Date de début manquante","error");return;}
   sd=forceMonday(sd);
