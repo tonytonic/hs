@@ -8,6 +8,7 @@ class Dashboard {
   constructor(){}
 
   render(state, risks, advice){
+    this._lastRisks = risks || []; // mémorisé pour _renderHero (score global stable)
     // Pas de données M1/M2 → bandeau info
     const noData = state && state.scores && !state.scores._hasData;
     const noDataBanner = document.getElementById('no-data-banner');
@@ -22,8 +23,9 @@ class Dashboard {
     }
         if(!state||!state.scores) return;
     const {scores, norm, raw}=state;
-    this._renderHero(scores, norm, raw);
+    this._renderHero(scores, norm, raw, risks||[]);
     this._renderScores(scores);
+    this._renderCommuteActivation(scores);
     this._renderRisks(risks||[]);
     this._renderAdvice(advice||[]);
     this._renderRadar(scores, norm);
@@ -36,7 +38,18 @@ class Dashboard {
     if(!el) return;
     // Pas de données → afficher "--" et pas CRITIQUE
     const hasData = scores && scores._hasData;
-    const sg = hasData ? (window.DTE&&window.DTE.app ? window.DTE.app.scoreGlobal : this._calcGlobal(scores)) : null;
+    // CORRECTIF : formule unique identique à app.js (avec pénalités risques).
+    // Avant : DTE.app.scoreGlobal (défini après sync) vs _calcGlobal (sans pénalités)
+    // → score sautait de 41 à l'ouverture à 35 après sync.
+    // Maintenant : risks est passé depuis render(), même formule dès le premier affichage.
+    const _risks = this._lastRisks || [];
+    const sg = hasData ? (() => {
+      const worst = Math.max(scores.fatigue||0, scores.stress||0, scores.cogRisk||0);
+      const base  = Math.max(0, 100 - worst);
+      const dangers = _risks.filter(x => x.level === 'CRITIQUE').length;
+      const alertes = _risks.filter(x => x.level !== 'CRITIQUE').length;
+      return Math.max(0, Math.min(99, Math.round(base - dangers*5 - alertes*2)));
+    })() : null;
     el.textContent = sg !== null ? sg : '--';
     const levelMap={EXCELLENT:'excellent',BON:'bon',MOYEN:'moyen',FAIBLE:'faible',CRITIQUE:'critique'};
     const level = sg === null ? 'En attente de données' : sg>=80?'EXCELLENT':sg>=60?'BON':sg>=40?'MOYEN':sg>=20?'FAIBLE':'CRITIQUE';
@@ -131,7 +144,7 @@ class Dashboard {
             if (!v || v <= 0) return '0h sup. cette semaine';
             return '+'+v.toFixed(1)+'h sup. cette semaine';
         }},
-        { label:'Moyenne quotidienne (28j)', key:'_avgExtra7', fmt: (v, get) => {
+        { label:'Moyenne quotidienne (28j)', key:'_avgExtraDay28', fmt: (v, get) => {
             if (v <= 0) return '0h/j — rythme légal';
             const isProj = get && get('_isProjection');
             const impact = v < 1 ? 'impact léger' : v < 2 ? 'impact modéré' : 'impact élevé';
@@ -139,23 +152,16 @@ class Dashboard {
             return '+'+v.toFixed(1)+'h/jour ('+impact+')'+suffix;
         }},
         // _consecOT : calculé en arrière-plan (bio) mais non affiché — évite confusion utilisateur
-        { label:'Semaines de surcharge cumulées', key:'_cumulWeeks', fmt: v => {
+        { label:'Surcharge chronique (12 sem.)', key:'_cumulWeeksLong', fmt: v => {
             const vR = Math.round(v * 10) / 10;
-            if (vR <= 0) return 'Aucun cumul (rythme normal)';
-            // Échelle :
-            //  - < 1   : effet partiel d'une seule semaine (charge légère ponctuelle)
-            //  - 1-3   : 1 à 3 semaines en surcharge — phase de vigilance
-            //  - 4-7   : phase P2 INRS — fatigue chronique modérée
-            //  - 8-15  : phase P3 INRS — surmenage installé
-            //  - 16+   : phase P4 INRS — risque burn-out
-            let phase, multiplier;
-            if (vR < 1)        { phase = 'effet partiel (semaine légère)'; multiplier = '×1.00'; }
-            else if (vR < 4)   { phase = 'phase P1 — vigilance';            multiplier = '×1.00'; }
-            else if (vR < 8)   { phase = 'phase P2 — fatigue chronique';   multiplier = '×1.12'; }
-            else if (vR < 16)  { phase = 'phase P3 — surmenage';            multiplier = '×1.25'; }
-            else if (vR < 24)  { phase = 'phase P4 — risque burn-out';     multiplier = '×1.40'; }
-            else               { phase = 'phase P4+ — épuisement critique';multiplier = '×1.55'; }
-            return vR.toFixed(1)+' sem. — '+phase+' '+multiplier;
+            if (vR <= 0) return 'Aucune surcharge chronique';
+            // Phases alignées sur le panneau Stress (même fenêtre 12 sem, mêmes seuils)
+            let phase;
+            if (vR < 4)        phase = 'phase P1 — vigilance';
+            else if (vR < 8)   phase = 'phase P2 — fatigue chronique';
+            else if (vR < 16)  phase = 'phase P3 — surmenage';
+            else               phase = 'phase P4 — risque burn-out';
+            return vR.toFixed(1)+' sem. en surcharge — '+phase;
         }},
       ],
       facteurs_vie: [
@@ -188,9 +194,10 @@ class Dashboard {
             if (vR <= 0) return 'Sous le seuil (12 sem.)';
             if (vR < 1) return 'Effet partiel d\'1 semaine légère';
             if (vR < 4) return vR.toFixed(1)+' sem. — vigilance';
-            if (vR < 8) return vR.toFixed(1)+' sem. — fatigue chronique';
-            if (vR < 16) return vR.toFixed(1)+' sem. — surmenage';
-            return vR.toFixed(1)+' sem. — risque burn-out';
+            if (vR < 4) return vR.toFixed(1)+' sem. — phase P1 vigilance';
+            if (vR < 8) return vR.toFixed(1)+' sem. — phase P2 fatigue chronique';
+            if (vR < 16) return vR.toFixed(1)+' sem. — phase P3 surmenage';
+            return vR.toFixed(1)+' sem. — phase P4 risque burn-out';
         }},
       ],
       facteurs_vie: [
@@ -245,7 +252,7 @@ class Dashboard {
       source: 'OMS/OIT 2021 (Pega et al.) · Lancet 2021 (Ervasti) · Kivimäki 2015',
       facteurs_heures: [
         { label:'Heures hebdo vs seuil OMS (48h)', key:'_recentWeeklyH', fmt: v => v>=55?'≥55h : RR=1.35 AVC, RR=1.17 cardio':v>=48?v.toFixed(0)+'h : au-delà du légal (48h)':'Dans les normes (<48h)' },
-        { label:'Durée d\'exposition (dose-temps)', key:'_cumulMonths', fmt: v => {
+        { label:'Durée d\'exposition (12 sem.)', key:'_cumulMonthsLong', fmt: v => {
             const vR = Math.round(v * 100) / 100; // 2 décimales pour voir le decay
             const norm3 = window.DTE&&window.DTE._state&&window.DTE._state.norm;
             const isRest = norm3&&norm3._isVacationWeek;
@@ -279,8 +286,17 @@ class Dashboard {
       facteurs_heures: [
         { label:'Seuil ≥52h/sem', key:'_recentWeeklyH', fmt: (v, n) => {
             const src = n('_weeklyHSource');
-            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
-            return (v>=52?'Actif : '+v.toFixed(0)+'h/sem':'Sous le seuil ('+v.toFixed(0)+'h < 52h)')+badge;
+            // CORRECTIF : si source='seuil' (semaine non saisie), afficher la moyenne
+            // 28j réelle plutôt que 35h (base) qui induit en erreur "35h < 52h" alors
+            // que l'historique récent est à 45h.
+            const dispH = (src === 'seuil' && (n('_avgExtraDay28')||0) > 0)
+              ? (35 + (n('_avgExtraDay28')||0) * 5) : v;
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>'
+              : src==='avg' ?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
+              : (n('_avgExtraDay28')||0) > 0
+                ? ' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
+                : ' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            return (dispH>=52?'Actif : '+dispH.toFixed(0)+'h/sem':'Sous le seuil ('+dispH.toFixed(0)+'h < 52h)')+badge;
           } },
         { label:'Durée exposition (12 sem.)', key:'_cumulWeeksLong', fmt: v => {
             const vR = Math.round(v * 10) / 10;
@@ -302,7 +318,7 @@ class Dashboard {
       desc: 'Capacité à récupérer. Diminue avec l\'accumulation. Sonnentag 2003 : le détachement psychologique est clé.',
       source: 'INRS · Sonnentag 2003 (J.Applied Psychology) · Nature 2025 (Fan)',
       facteurs_heures: [
-        { label:'Fatigue accumulée', key:'_cumulWeeks', fmt: v => {
+        { label:'Fatigue accumulée (12 sem.)', key:'_cumulWeeksLong', fmt: v => {
             const isRest = (window.DTE&&window.DTE._state&&window.DTE._state.norm&&window.DTE._state.norm._isVacationWeek);
             const vR = Math.round(v * 10) / 10;
             if (isRest && vR > 0) {
@@ -470,6 +486,49 @@ class Dashboard {
             </div>
           </div>
 
+          <!-- DÉTAIL COMPLET DU CALCUL (transparence — depuis scores._detail) -->
+          ${(() => {
+            const det = scores2 && scores2._detail && scores2._detail[key];
+            const cmt = scores2 && scores2._commute;
+            const badScore = !['performance','recovery'].includes(key);
+            let html = '';
+            if (det && det.components) {
+              const rows = det.components.filter(c => c.points !== 0 || c.reconcile).map(c => {
+                const sign = c.points > 0 ? '+' : '';
+                const colr = c.points === 0 ? 'rgba(255,255,255,0.5)'
+                  : (c.points > 0) === badScore ? '#ff8888' : '#88ddaa';
+                return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:5px;">
+                  <div style="flex:1;font-size:11px;color:rgba(255,255,255,0.78);line-height:1.35;">${c.label}
+                    <span style="display:block;font-size:8px;color:rgba(255,255,255,0.32);font-family:var(--font-mono);">${c.study||''}</span></div>
+                  <div style="font-size:12px;font-weight:700;color:${colr};font-family:var(--font-mono);white-space:nowrap;">${sign}${c.points} pts</div>
+                </div>`;
+              }).join('');
+              html += `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);padding:10px;margin-bottom:8px;">
+                <div style="font-size:10px;font-family:var(--font-mono);color:rgba(255,255,255,0.65);letter-spacing:.1em;margin-bottom:8px;display:flex;justify-content:space-between;">
+                  <span>🧮 DÉTAIL DU CALCUL</span><span style="color:${col};font-weight:700;">= ${det.total}</span></div>
+                ${rows}
+                ${det.note ? `<div style="font-size:9px;color:rgba(255,255,255,0.42);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08);line-height:1.5;">ℹ️ ${det.note}</div>` : ''}
+              </div>`;
+            }
+            // Section Trajet — feature active + score concerné
+            if (cmt && cmt.enabled && ['fatigue','stress','recovery','cvRisk'].includes(key)) {
+              const t = cmt.today;
+              const imp = cmt.impact[key];
+              html += `<div style="background:rgba(155,109,255,0.06);border:1px solid rgba(155,109,255,0.25);padding:10px;margin-bottom:8px;">
+                <div style="font-size:10px;font-family:var(--font-mono);color:#b18bff;letter-spacing:.1em;margin-bottom:8px;">🚦 TRAJET DOMICILE-TRAVAIL</div>
+                ${t ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;">
+                  <div><span style="color:rgba(255,255,255,0.4);">Mode</span><br><b style="color:#fff;">${t.modeLabel}</b></div>
+                  <div><span style="color:rgba(255,255,255,0.4);">Durée A/R</span><br><b style="color:#fff;">${t.timeMin} min</b></div>
+                  <div><span style="color:rgba(255,255,255,0.4);">Conditions</span><br><b style="color:#fff;">${t.qualLabel}</b></div>
+                  <div><span style="color:rgba(255,255,255,0.4);">Impact</span><br><b style="color:#b18bff;">${imp>0?'+':''}${imp} pts</b></div>
+                </div>` : `<div style="font-size:11px;color:rgba(255,255,255,0.5);">Pas de saisie aujourd'hui — charge moyenne calculée sur ${cmt.nbDays28} jour(s).</div>`}
+                <div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:7px;padding-top:6px;border-top:1px solid rgba(155,109,255,0.15);line-height:1.5;">
+                  Charge trajet 28j : <b style="color:#b18bff;">${cmt.level}</b>${key==='cvRisk'?'<br>⚠️ '+cmt.cvRiskNote:''}</div>
+              </div>`;
+            }
+            return html;
+          })()}
+
           <!-- Note explicative (optionnelle) -->
           ${meta.note ? `<div style="font-size:10px;color:rgba(255,255,255,0.45);padding:7px 8px;margin-bottom:6px;background:rgba(255,255,255,0.04);border-left:2px solid rgba(0,200,255,0.3);">ℹ️ ${meta.note}</div>` : ''}
 
@@ -480,6 +539,99 @@ class Dashboard {
         </div>`;
       modal.querySelector('.modal-overlay').addEventListener('click',()=>modal.classList.add('hidden'));
       modal.classList.remove('hidden');
+    };
+  }
+
+  // ── CARTE D'ACTIVATION DU SUIVI TRANSPORT (module optionnel) ───────────────
+  // Le suivi transport est ajouté par-dessus l'original. OFF par défaut : sans
+  // activation, l'utilisateur reste sur les scores de base (études d'origine).
+  // Cette carte est le point d'activation depuis le Dashboard.
+  _renderCommuteActivation(scores){
+    const grid = document.getElementById('scores-grid');
+    const anchor = grid ? (grid.closest('.panel') || grid.parentElement) : document.querySelector('.dashboard-main');
+    const old = document.getElementById('commute-activation-card');
+    if(old) old.remove();
+    if(!anchor || !scores || !scores._hasData) return; // rien à enrichir sans données
+
+    let enabled = false, commuteH = 0;
+    try { enabled = localStorage.getItem('M4_COMMUTE_ENABLED') === 'true'; } catch(_){}
+    try { commuteH = parseFloat((JSON.parse(localStorage.getItem('DTE_SETTINGS')||'{}')).commuteH)||0; } catch(_){}
+    const pickerOpen = !!window._dashCommutePickerOpen;
+
+    const card = document.createElement('div');
+    card.id = 'commute-activation-card';
+    card.style.cssText = 'margin:12px 16px;padding:14px 16px;border-radius:10px;border:1px solid rgba(155,109,255,'
+      + (enabled?'0.35':'0.2') + ');background:rgba(155,109,255,' + (enabled?'0.06':'0.03') + ');';
+
+    const btn = (onclick,label,solid)=>`<button onclick="${onclick}" style="white-space:nowrap;padding:8px 14px;border-radius:6px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.08em;border:1px solid rgba(155,109,255,0.5);`
+      + (solid?'background:linear-gradient(135deg,#9b6dff,#6d3fcc);color:#fff;':'background:rgba(255,255,255,0.05);color:#b18bff;') + '">' + label + '</button>';
+
+    if(enabled){
+      const cmt = scores._commute || {};
+      const lvl = (cmt.level && cmt.level !== 'off') ? cmt.level : null;
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">🚦 Suivi transport activé</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px;line-height:1.5;">
+              Vos trajets domicile-travail influent sur fatigue, stress, récupération et risque cardio.${lvl?' Charge actuelle : <b style="color:#b18bff;">'+lvl+'</b>.':''}
+            </div>
+          </div>
+          ${btn('window._dashDeactivateCommute()','Désactiver',false)}
+        </div>`;
+    } else if(pickerOpen){
+      // Activer nécessite une durée de trajet → mini-sélecteur (aller, comme les réglages)
+      const opts = [15,30,45,60,90].map(m =>
+        `<button onclick="window._dashCommutePick(${m})" style="flex:1;padding:8px 2px;border-radius:5px;cursor:pointer;font-family:var(--font-mono);font-size:11px;font-weight:700;border:1px solid rgba(155,109,255,0.3);background:rgba(0,10,25,0.6);color:#fff;">${m}</button>`
+      ).join('');
+      card.innerHTML = `
+        <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px;">🚦 Durée de votre trajet ?</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-bottom:10px;line-height:1.5;">Minutes par trajet (aller). Vous pourrez l'ajuster chaque jour au check-in.</div>
+        <div style="display:flex;gap:6px;">${opts}</div>
+        <div style="text-align:right;margin-top:8px;"><button onclick="window._dashCommuteCancel()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;">Annuler</button></div>`;
+    } else {
+      card.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:700;color:#fff;">🚦 Suivi transport <span style="font-size:9px;color:#b18bff;font-family:var(--font-mono);border:1px solid rgba(155,109,255,0.4);border-radius:3px;padding:1px 5px;margin-left:4px;">OPTIONNEL</span></div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:3px;line-height:1.5;">
+              Intégrez l'impact de vos trajets domicile-travail à vos scores santé. Sinon, votre analyse reste sur les études de base.
+            </div>
+          </div>
+          ${btn('window._dashActivateCommute()','Activer',true)}
+        </div>`;
+    }
+    anchor.insertAdjacentElement('afterend', card);
+
+    // Handlers (réattachés à chaque rendu — idempotent)
+    window._dashActivateCommute = () => {
+      let cH = 0; try { cH = parseFloat((JSON.parse(localStorage.getItem('DTE_SETTINGS')||'{}')).commuteH)||0; } catch(_){}
+      if(cH > 0){
+        try { localStorage.setItem('M4_COMMUTE_ENABLED','true'); } catch(_){}
+        window._dashCommutePickerOpen = false;
+        if(window._fullSync) window._fullSync();
+      } else {
+        window._dashCommutePickerOpen = true; // pas de durée → demander
+        if(window.DTE && window.DTE._state) this._renderCommuteActivation(window.DTE._state.scores);
+      }
+    };
+    window._dashCommutePick = (min) => {
+      try {
+        const s = JSON.parse(localStorage.getItem('DTE_SETTINGS')||'{}');
+        s.commuteH = min/60; localStorage.setItem('DTE_SETTINGS', JSON.stringify(s));
+        localStorage.setItem('M4_COMMUTE_ENABLED','true');
+      } catch(_){}
+      window._dashCommutePickerOpen = false;
+      if(window._fullSync) window._fullSync();
+    };
+    window._dashCommuteCancel = () => {
+      window._dashCommutePickerOpen = false;
+      if(window.DTE && window.DTE._state) this._renderCommuteActivation(window.DTE._state.scores);
+    };
+    window._dashDeactivateCommute = () => {
+      try { localStorage.setItem('M4_COMMUTE_ENABLED','false'); } catch(_){}
+      window._dashCommutePickerOpen = false;
+      if(window._fullSync) window._fullSync();
     };
   }
 
