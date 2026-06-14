@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Journal d'Incidents — Le Carnet</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#2c3e50">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Journal Incidents">
+<meta name="mobile-web-app-capable" content="yes">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@400;600&family=Lato:wght@400;600;700&display=swap">
+<style>
+:root{
+  --paper:#faf8f4; --paper2:#f0ece4; --paper3:#e4ddd0;
+  --ink:#1a1a2e; --ink2:#3a3a5a; --faded:#8a8aaa;
+  --red-line:rgba(180,50,50,0.2); --blue-rule:rgba(60,80,160,0.08);
+  --leather:#4a3020; --leather-l:#6a4a32;
+  --stamp-red:#c83030; --stamp-blue:#2050a0; --stamp-green:#207040;
+  --cat-mat:#e07830; --cat-pre:#c83030; --cat-con:#2050a0;
+  --cat-att:#8030a0; --cat-aut:#606060;
+  --card:#fff; --card-edge:#d8d0c4;
+  --line:rgba(26,26,46,0.1);
+  --safe:#207040; --danger:#c83030;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:
+    repeating-linear-gradient(0deg, transparent 0px, transparent 27px, var(--blue-rule) 27px, var(--blue-rule) 28px),
+    linear-gradient(180deg, #f5f0e8 0%, #ece6da 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+/* red margin */
+body::before{content:"";position:fixed;left:44px;top:0;bottom:0;width:2px;background:var(--red-line);z-index:0;pointer-events:none;}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:#f5f0e8;color:var(--leather);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;}
+  #lb .t{font-family:'Libre Baskerville',serif;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(245,240,232,0.97), rgba(245,240,232,0.6) 75%, transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:var(--paper2);border:1.5px solid var(--card-edge);color:var(--leather);
+  border-radius:4px;padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;
+  box-shadow:1px 2px 0 rgba(26,26,46,0.15);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Libre Baskerville',serif;font-weight:700;font-size:18px;color:var(--ink);letter-spacing:0.3px;}
+header .brand .su{font-family:'Source Code Pro',monospace;font-size:8.5px;color:var(--faded);margin-top:3px;letter-spacing:1.5px;}
+header .hbtn{background:var(--paper2);border:1.5px solid var(--card-edge);color:var(--ink2);border-radius:4px;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* stats banner */
+.stats{display:flex;gap:8px;margin:8px 0 14px;flex-wrap:wrap;}
+.stat{background:var(--card);border:1.5px solid var(--card-edge);border-radius:8px;padding:10px 12px;flex:1;min-width:80px;
+  box-shadow:1px 2px 0 rgba(26,26,46,0.08);}
+.stat .sv{font-family:'Libre Baskerville',serif;font-weight:700;font-size:22px;color:var(--ink);}
+.stat .sl{font-family:'Source Code Pro',monospace;font-size:9px;color:var(--faded);letter-spacing:1px;text-transform:uppercase;margin-top:2px;}
+
+/* add incident button */
+.add-btn{background:var(--leather);color:var(--paper);border:none;border-radius:8px;padding:14px;
+  width:100%;font-family:'Libre Baskerville',serif;font-weight:700;font-size:15px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;
+  box-shadow:0 4px 0 var(--leather-l),0 8px 16px rgba(74,48,32,0.3);transition:.15s;}
+.add-btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--leather-l);}
+
+/* filter strip */
+.filters{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:2px;}
+.filter{flex-shrink:0;background:var(--paper2);border:1.5px solid var(--card-edge);color:var(--ink2);
+  border-radius:16px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s;}
+.filter.on{background:var(--leather);color:var(--paper);border-color:var(--leather);}
+
+/* incident entries */
+.entries{display:flex;flex-direction:column;gap:10px;}
+.entry{background:var(--card);border:1.5px solid var(--card-edge);border-radius:8px;padding:14px 15px;
+  box-shadow:2px 3px 0 rgba(26,26,46,0.08);position:relative;overflow:hidden;}
+.entry::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;}
+.entry[data-cat="materiel"]::before{background:var(--cat-mat);}
+.entry[data-cat="pression"]::before{background:var(--cat-pre);}
+.entry[data-cat="consigne"]::before{background:var(--cat-con);}
+.entry[data-cat="atteinte"]::before{background:var(--cat-att);}
+.entry[data-cat="autre"]::before{background:var(--cat-aut);}
+.entry .ehead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;}
+.entry .ecat{font-family:'Source Code Pro',monospace;font-size:10px;font-weight:600;letter-spacing:1px;
+  padding:3px 8px;border-radius:10px;text-transform:uppercase;flex-shrink:0;}
+.entry[data-cat="materiel"] .ecat{background:#fff3e0;color:var(--cat-mat);}
+.entry[data-cat="pression"] .ecat{background:#fde8e8;color:var(--cat-pre);}
+.entry[data-cat="consigne"] .ecat{background:#e8eeff;color:var(--cat-con);}
+.entry[data-cat="atteinte"] .ecat{background:#f3e8ff;color:var(--cat-att);}
+.entry[data-cat="autre"] .ecat{background:var(--paper2);color:var(--cat-aut);}
+.entry .etime{font-family:'Source Code Pro',monospace;font-size:10px;color:var(--faded);}
+.entry .ebody{font-size:13.5px;color:var(--ink);line-height:1.5;}
+.entry .efoot{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.entry .eloc{font-size:11px;color:var(--faded);display:flex;align-items:center;gap:3px;}
+.entry .eloc::before{content:"📍";font-size:10px;}
+.entry .etemoins{font-size:11px;color:var(--faded);display:flex;align-items:center;gap:3px;}
+.entry .etemoins::before{content:"👁";font-size:10px;}
+.entry .edelete{margin-left:auto;background:none;border:none;color:var(--faded);font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;}
+.entry .edelete:active{background:#fde8e8;color:var(--danger);}
+
+.empty-journal{text-align:center;padding:36px 16px;color:var(--faded);}
+.empty-journal .e{font-size:46px;display:block;margin-bottom:12px;opacity:.6;}
+.empty-journal .t{font-family:'Libre Baskerville',serif;font-size:18px;font-style:italic;color:var(--ink2);}
+.empty-journal .d{font-size:12px;margin-top:8px;line-height:1.5;}
+
+/* export + actions bar */
+.actions{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.btn{display:block;width:100%;border:none;border-radius:8px;padding:13px;font-weight:700;font-size:13.5px;cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-leather{background:var(--leather);color:var(--paper);box-shadow:0 3px 0 var(--leather-l);}
+.btn-leather:active{box-shadow:0 1px 0 var(--leather-l);}
+.btn-ghost{background:transparent;color:var(--leather);border:1.5px solid var(--card-edge);}
+.btn-danger{background:transparent;color:var(--danger);border:1.5px solid rgba(200,48,48,0.3);}
+
+.rgpd-banner{background:var(--paper2);border:1.5px solid var(--card-edge);border-radius:8px;padding:12px 14px;
+  margin-bottom:14px;font-size:11.5px;color:var(--ink2);line-height:1.5;display:flex;gap:10px;align-items:flex-start;}
+.rgpd-banner .ri{font-size:18px;flex-shrink:0;}
+
+.note{font-size:12px;color:var(--faded);line-height:1.5;text-align:center;margin-top:8px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;font-family:'Source Code Pro',monospace;letter-spacing:0.5px;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(26,26,46,0.55);backdrop-filter:blur(4px);
+  display:none;align-items:flex-end;justify-content:center;padding:0;}
+.ov.show{display:flex;animation:fade .2s;}
+.ov.center{align-items:center;padding:16px;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+/* bottom sheet */
+.sheet{background:var(--paper);border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:92vh;
+  overflow-y:auto;padding:20px 20px 32px;box-shadow:0 -8px 40px rgba(26,26,46,0.35);
+  animation:slideup .3s cubic-bezier(.2,.9,.3,1);}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+/* modal box */
+.box{background:var(--paper);border-radius:16px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(26,26,46,0.5);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);position:relative;border-top:4px solid var(--leather);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 20px 10px;position:relative;text-align:center;}
+.box .hd .t{font-family:'Libre Baskerville',serif;font-weight:700;font-size:20px;color:var(--leather);}
+.box .hd .s{font-size:13px;color:var(--ink2);margin-top:3px;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:var(--paper2);border:none;border-radius:50%;
+  width:30px;height:30px;font-size:14px;color:var(--ink2);cursor:pointer;}
+.box .bd{padding:0 20px 20px;}
+
+.sheet-title{font-family:'Libre Baskerville',serif;font-weight:700;font-size:20px;color:var(--leather);
+  margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+.sheet-sub{font-size:12px;color:var(--faded);margin-bottom:18px;font-family:'Source Code Pro',monospace;}
+.sheet-handle{width:40px;height:4px;background:var(--card-edge);border-radius:2px;margin:0 auto 16px;}
+
+/* form fields */
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:12px;color:var(--ink2);margin-bottom:6px;letter-spacing:0.3px;text-transform:uppercase;}
+.ip{width:100%;background:var(--paper2);border:1.5px solid var(--card-edge);border-radius:8px;padding:12px;
+  color:var(--ink);font-size:15px;font-family:'Lato',sans-serif;}
+.ip:focus{outline:none;border-color:var(--leather);background:#fff;}
+textarea.ip{resize:vertical;min-height:90px;font-size:14px;line-height:1.5;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.cat-btn{padding:10px 8px;border-radius:8px;border:2px solid var(--card-edge);background:var(--paper2);
+  cursor:pointer;text-align:center;transition:.14s;}
+.cat-btn.on{border-width:2px;}
+.cat-btn[data-c="materiel"].on{background:#fff3e0;border-color:var(--cat-mat);}
+.cat-btn[data-c="pression"].on{background:#fde8e8;border-color:var(--cat-pre);}
+.cat-btn[data-c="consigne"].on{background:#e8eeff;border-color:var(--cat-con);}
+.cat-btn[data-c="atteinte"].on{background:#f3e8ff;border-color:var(--cat-att);}
+.cat-btn[data-c="autre"].on{background:var(--paper3);border-color:var(--cat-aut);}
+.cat-btn .ce{font-size:20px;display:block;}
+.cat-btn .cn{font-size:11px;font-weight:700;margin-top:3px;color:var(--ink2);}
+
+.ts-badge{background:var(--paper2);border:1.5px solid var(--card-edge);border-radius:6px;padding:8px 12px;
+  font-family:'Source Code Pro',monospace;font-size:12px;color:var(--leather);text-align:center;margin-bottom:14px;}
+
+/* wizard */
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wemoji{font-size:58px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-family:'Libre Baskerville',serif;font-weight:700;font-size:23px;color:var(--leather);margin-bottom:10px;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--leather);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--leather);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--paper2);border-radius:8px;padding:10px;
+  text-align:left;border-left:3px solid var(--leather);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(74,48,32,0.2);transition:.2s;}
+.dots .d.on{background:var(--leather);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--leather);color:var(--paper);font-weight:700;font-size:13px;padding:12px 22px;
+  border-radius:6px;box-shadow:0 6px 20px rgba(26,26,46,0.4);opacity:0;
+  transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#f5f0e8;z-index:9999;"></div>
+<div id="lb"><div class="i">📓</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Journal d'incidents</div>
+    <div class="su">LE CARNET · V1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov center" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <div class="wemoji">📓</div>
+      <h2>Le Carnet</h2>
+      <p>Un <span class="accent">journal factuel et horodaté</span> pour consigner tout incident ou friction au travail. Discret, sécurisé, toujours avec toi.</p>
+      <p>Si un jour tu en as besoin — voie de recours, inspection — tu as un historique.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <div class="wemoji">⏱️</div>
+      <h2>Deux clics, c'est noté</h2>
+      <div class="feat"><div class="ic">📋</div><div class="tx"><b>Choisis la catégorie</b>Matériel défaillant, pression, consigne contradictoire, atteinte, autre.</div></div>
+      <div class="feat"><div class="ic">✍️</div><div class="tx"><b>Décris les faits</b>En deux phrases, factuel, sans émotion. L'horodatage est automatique.</div></div>
+      <div class="feat"><div class="ic">📄</div><div class="tx"><b>Exporte en PDF</b>Un récapitulatif propre et chronologique, prêt à être joint ou envoyé.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <div class="wemoji">🔒</div>
+      <h2>100 % sur ton appareil</h2>
+      <p>Aucune donnée ne sort de ton téléphone. <span class="accent">Rien n'est envoyé</span> nulle part. C'est ton carnet, pas le nôtre.</p>
+      <div class="legal">RGPD strict : traitement entièrement local, aucune collecte, aucun serveur. Le contenu de ce journal est sous ta seule responsabilité. Outil indicatif — ni avis juridique, ni preuve légale certifiée. En cas de litige, consulte un professionnel.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-leather" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov center" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Tenir son journal</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">✍️</div><div class="tx"><b>Écrire factuel, pas émotionnel</b>« La machine est tombée en panne à 14h, reportée 3 fois sans intervention » plutôt que « mon responsable s'en fout ».</div></div>
+    <div class="feat"><div class="ic">⏱️</div><div class="tx"><b>Horodatage automatique</b>Date et heure exactes gravées à l'enregistrement. Non modifiable après coup — pour l'intégrité.</div></div>
+    <div class="feat"><div class="ic">📄</div><div class="tx"><b>Export PDF</b>Récapitulatif chronologique propre. Idéal à joindre à une lettre ou un courrier.</div></div>
+    <div class="feat"><div class="ic">🔒</div><div class="tx"><b>100 % local</b>Rien ne quitte ton téléphone. Sauvegarde régulièrement via le bouton Exporter.</div></div>
+    <div class="legal">Outil indicatif. Ce journal n'est pas une preuve légale certifiée. En cas de litige réel, consulte un avocat ou les représentants du personnel.</div>
+    <button class="btn btn-leather" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<!-- ADD INCIDENT SHEET -->
+<div class="ov" id="addOv">
+  <div class="sheet" id="addSheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">✍️ Nouvel incident</div>
+    <div class="sheet-sub" id="addTs">Horodatage automatique</div>
+    <div class="field"><label>Catégorie</label>
+      <div class="cat-grid">
+        <div class="cat-btn on" data-c="materiel"><div class="ce">🔧</div><div class="cn">Matériel</div></div>
+        <div class="cat-btn" data-c="pression"><div class="ce">🔥</div><div class="cn">Pression</div></div>
+        <div class="cat-btn" data-c="consigne"><div class="ce">❓</div><div class="cn">Consigne contradictoire</div></div>
+        <div class="cat-btn" data-c="atteinte"><div class="ce">⚠️</div><div class="cn">Atteinte / Harcelement</div></div>
+        <div class="cat-btn" data-c="autre" style="grid-column:1/-1;"><div class="ce">📝</div><div class="cn">Autre</div></div>
+      </div>
+    </div>
+    <div class="field"><label>Description factuelle des faits</label>
+      <textarea class="ip" id="addDesc" placeholder="Décris les faits de manière factuelle : qui, quoi, quand, où, conséquences. Évite les jugements ou émotions." rows="4"></textarea></div>
+    <div class="field"><label>Lieu (facultatif)</label>
+      <input class="ip" id="addLieu" type="text" placeholder="Ex. atelier B, bureau 214, entrepôt…"></div>
+    <div class="field"><label>Témoins (facultatif)</label>
+      <input class="ip" id="addTemoins" type="text" placeholder="Ex. collègue présent, prénom…"></div>
+    <button class="btn btn-leather" id="addSave" style="margin-top:4px;">📓 Inscrire au carnet</button>
+    <button class="btn btn-ghost" data-close="addOv" style="margin-top:8px;">Annuler</button>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM -->
+<div class="ov center" id="delOv">
+  <div class="box"><div class="hd"><div class="t">Supprimer cet incident ?</div>
+    <div class="s">Cette action est irréversible.</div></div>
+  <div class="bd">
+    <button class="btn btn-danger" id="delConfirm">Supprimer définitivement</button>
+    <button class="btn btn-ghost" data-close="delOv" style="margin-top:8px;">Annuler</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="rgpd-banner">
+    <div class="ri">🔒</div>
+    <div>Tout reste sur ton appareil. Aucune donnée envoyée. Exporte régulièrement ton carnet pour ne rien perdre.</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="sv" id="stTotal">0</div><div class="sl">Incidents</div></div>
+    <div class="stat"><div class="sv" id="stMois">0</div><div class="sl">Ce mois</div></div>
+    <div class="stat"><div class="sv" id="stDernier">—</div><div class="sl">Dernier</div></div>
+  </div>
+
+    <div class="panel" style="margin-bottom:14px;">
+    <div class="panel-t">✍️ Comment bien rédiger un incident</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--leather);">✅ À faire — rédaction factuelle</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">Répondre aux questions : <strong>Qui ? Quoi ? Quand ? Où ? Conséquences ?</strong><br>Exemple : "Le 3 juin 2026 à 15h00, en salle de réunion B, consigne contradictoire reçue de deux responsables différents sur la procédure X. Tâche non réalisable en l'état."</div>
+      </div>
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--leather);">🚫 À éviter — éléments subjectifs</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">Éviter : les jugements ("c'était scandaleux"), les suppositions ("je pense qu'il voulait…"), les émotions ("j'étais très stressé"). Se limiter aux faits observables et vérifiables.</div>
+      </div>
+      <div style="background:var(--paper2);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:13px;color:var(--leather);">🔒 Confidentialité</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.45;">Ce journal est entièrement local. Personne ne peut y accéder sans avoir ton téléphone en main. Pense à activer le verrouillage par code ou biométrie sur ton appareil pour une protection optimale.</div>
+      </div>
+    </div>
+  </div><button class="add-btn" id="openAdd">✍️ Noter un incident</button>
+
+  <div class="filters">
+    <div class="filter on" data-f="all">Tous</div>
+    <div class="filter" data-f="materiel">🔧 Matériel</div>
+    <div class="filter" data-f="pression">🔥 Pression</div>
+    <div class="filter" data-f="consigne">❓ Consigne</div>
+    <div class="filter" data-f="atteinte">⚠️ Atteinte</div>
+    <div class="filter" data-f="autre">📝 Autre</div>
+  </div>
+
+  <div class="entries" id="entryList"></div>
+
+  <div class="actions" id="actBar" style="display:none;margin-top:16px;">
+    <button class="btn btn-leather" id="exportPdf">📄 Exporter en PDF</button>
+    <button class="btn btn-ghost" id="exportJson">💾 Sauvegarde JSON</button>
+    <button class="btn btn-danger" id="clearAll">🗑 Effacer tout le carnet</button>
+  </div>
+
+  <div class="note" id="noNote" style="display:none;">Aucun incident dans cette catégorie.</div>
+  <div class="note" style="margin-top:14px;">Ce journal n'est pas une preuve légale certifiée. Son contenu ne peut pas être produit en justice comme tel sans autre démarche (constat d'huissier, témoignages…). Il constitue un aide-mémoire factuel à usage personnel. En cas de litige réel, consultez un professionnel.</div>
+  <div class="note">Ce journal est un aide-mémoire factuel à usage personnel. Il ne constitue pas une preuve légale certifiée. Ta convention collective ou accord peut prévoir des procédures spécifiques. Outil indicatif — ni avis juridique. En cas de litige, consulter un professionnel. RGPD : traitement 100 % local, aucune collecte.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">LE CARNET · 100% LOCAL · AUCUNE COLLECTE<br>📓 Tes données t'appartiennent.</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ DATA:'JI_DATA', WELCOME:'JI_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function toast(m){ var t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},1800); }
+
+  var CAT_LABEL={materiel:'Matériel',pression:'Pression',consigne:'Consigne contradictoire',atteinte:'Atteinte / Pression grave',autre:'Autre'};
+  var CAT_ICON={materiel:'🔧',pression:'🔥',consigne:'❓',atteinte:'⚠️',autre:'📝'};
+
+  var incidents=get(LS.DATA,[]);
+  var curCat='all';
+  var pendingDelete=null;
+  var curAddCat='materiel';
+
+  function fmtTs(ts){
+    var d=new Date(ts);
+    return d.toLocaleDateString('fr-FR',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})+' · '+
+      d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  }
+  function fmtShort(ts){
+    var d=new Date(ts); var now=new Date();
+    var diff=Math.round((now-d)/86400000);
+    if(diff===0) return 'Aujourd\'hui';
+    if(diff===1) return 'Hier';
+    if(diff<7) return 'il y a '+diff+' j';
+    return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});
+  }
+
+  function saveAll(){ set(LS.DATA,incidents); }
+
+  function renderStats(){
+    var now=new Date(); var m0=new Date(now.getFullYear(),now.getMonth(),1).getTime();
+    var month=incidents.filter(function(i){return i.ts>=m0;}).length;
+    var last=incidents.length?fmtShort(incidents[incidents.length-1].ts):'—';
+    $('#stTotal').textContent=incidents.length;
+    $('#stMois').textContent=month;
+    $('#stDernier').textContent=last;
+    $('#actBar').style.display=incidents.length?'flex':'none';
+    if(incidents.length) $('#actBar').style.flexDirection='column';
+  }
+
+  function renderList(){
+    var list=$('#entryList');
+    var filtered=curCat==='all'?incidents:incidents.filter(function(i){return i.cat===curCat;});
+    // sort newest first
+    var sorted=filtered.slice().sort(function(a,b){return b.ts-a.ts;});
+    list.innerHTML='';
+    $('#noNote').style.display='none';
+    if(!sorted.length){
+      if(incidents.length){
+        $('#noNote').style.display='block';
+      } else {
+        list.innerHTML='<div class="empty-journal"><span class="e">📓</span>'+
+          '<div class="t">Le carnet est vierge</div>'+
+          '<div class="d">Note ton premier incident ci-dessus.<br>Factuel, daté, protégé.</div></div>';
+      }
+      return;
+    }
+    sorted.forEach(function(inc){
+      var el=document.createElement('div'); el.className='entry'; el.dataset.cat=inc.cat;
+      var lieux=inc.lieu?'<span class="eloc">'+inc.lieu+'</span>':'';
+      var tem=inc.temoins?'<span class="etemoins">'+inc.temoins+'</span>':'';
+      el.innerHTML=
+        '<div class="ehead">'+
+          '<span class="ecat">'+CAT_ICON[inc.cat]+' '+CAT_LABEL[inc.cat]+'</span>'+
+          '<span class="etime">'+fmtTs(inc.ts)+'</span>'+
+        '</div>'+
+        '<div class="ebody">'+escHtml(inc.desc)+'</div>'+
+        '<div class="efoot">'+lieux+tem+
+          '<button class="edelete" data-id="'+inc.id+'" title="Supprimer">🗑</button>'+
+        '</div>';
+      el.querySelector('.edelete').addEventListener('click',function(){pendingDelete=inc.id;$('#delOv').classList.add('show');});
+      list.appendChild(el);
+    });
+  }
+
+  function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+
+  function render(){ renderStats(); renderList(); }
+
+  // cat buttons in add form
+  $all('.cat-btn').forEach(function(b){
+    b.addEventListener('click',function(){
+      $all('.cat-btn').forEach(function(x){x.classList.remove('on');});
+      b.classList.add('on'); curAddCat=b.dataset.c;
+    });
+  });
+
+  // open add
+  $('#openAdd').addEventListener('click',function(){
+    var now=new Date();
+    $('#addTs').textContent='📅 '+fmtTs(now.getTime());
+    $('#addDesc').value=''; $('#addLieu').value=''; $('#addTemoins').value='';
+    curAddCat='materiel';
+    $all('.cat-btn').forEach(function(b){b.classList.toggle('on',b.dataset.c==='materiel');});
+    $('#addOv').classList.add('show');
+    setTimeout(function(){$('#addDesc').focus();},300);
+  });
+
+  // save incident
+  $('#addSave').addEventListener('click',function(){
+    var desc=$('#addDesc').value.trim();
+    if(!desc){ alert('Décris les faits (quelques mots suffisent).'); return; }
+    var inc={ id:'i_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      ts:Date.now(), cat:curAddCat, desc:desc,
+      lieu:$('#addLieu').value.trim(), temoins:$('#addTemoins').value.trim() };
+    incidents.push(inc); saveAll();
+    $('#addOv').classList.remove('show'); render(); toast('Incident inscrit au carnet 📓');
+  });
+
+  // delete
+  $('#delConfirm').addEventListener('click',function(){
+    incidents=incidents.filter(function(i){return i.id!==pendingDelete;});
+    saveAll(); $('#delOv').classList.remove('show'); pendingDelete=null; render(); toast('Incident supprimé');
+  });
+
+  // filters
+  $all('.filter').forEach(function(f){
+    f.addEventListener('click',function(){
+      curCat=f.dataset.f; $all('.filter').forEach(function(x){x.classList.toggle('on',x===f);}); renderList();
+    });
+  });
+
+  // export PDF
+  $('#exportPdf').addEventListener('click',function(){
+    if(!window.jspdf){alert('Le PDF arrive... réessaie dans un instant.');return;}
+    try{
+      var jsPDF=window.jspdf.jsPDF;
+      var doc=new jsPDF({unit:'mm',format:'a4'});
+      var y=18;
+      doc.setFontSize(16);doc.setTextColor(74,48,32);
+      doc.text('Journal d\'incidents professionnel',14,y);y+=7;
+      doc.setFontSize(9);doc.setTextColor(130);
+      doc.text('Export du '+new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})+
+        ' · '+incidents.length+' incidents enregistres',14,y);y+=4;
+      doc.setDrawColor(200);doc.line(14,y,196,y);y+=8;
+      var sorted=incidents.slice().sort(function(a,b){return a.ts-b.ts;});
+      sorted.forEach(function(inc){
+        if(y>265){doc.addPage();y=18;}
+        doc.setFontSize(9);doc.setTextColor(100);
+        doc.text('['+fmtTs(inc.ts)+'] ['+CAT_LABEL[inc.cat]+']'+(inc.lieu?' - '+inc.lieu:''),14,y);y+=6;
+        doc.setFontSize(11);doc.setTextColor(26);
+        var lines=doc.splitTextToSize(inc.desc,178);
+        doc.text(lines,14,y);y+=lines.length*5+2;
+        if(inc.temoins){doc.setFontSize(9);doc.setTextColor(130);doc.text('Temoins : '+inc.temoins,14,y);y+=5;}
+        y+=4;doc.setDrawColor(230);doc.line(14,y,196,y);y+=6;
+      });
+      y+=4;doc.setFontSize(8);doc.setTextColor(150);
+      doc.text('Document genere par SimulHeures - Journal d\'incidents. Outil indicatif, ni preuve legale certifiee.',14,y);
+      var dd=new Date();
+      var fname='journal-incidents-'+dd.getFullYear()+String(dd.getMonth()+1).padStart(2,'0')+String(dd.getDate()).padStart(2,'0')+
+        '-'+String(dd.getHours()).padStart(2,'0')+String(dd.getMinutes()).padStart(2,'0')+'.pdf';
+      try{var blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a');
+        a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);
+        setTimeout(function(){URL.revokeObjectURL(url);},2000);}catch(e2){doc.save(fname);}
+      toast('PDF exporté 📄');
+    }catch(e){alert('Erreur PDF : '+e.message);}
+  });
+
+  // export JSON
+  $('#exportJson').addEventListener('click',function(){
+    var data={app:'SimulHeures',module:'JournalIncidents',exported:new Date().toISOString(),incidents:incidents};
+    var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    var url=URL.createObjectURL(blob);var a=document.createElement('a');
+    a.href=url;a.download='journal-incidents-'+Date.now()+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(url);},1000); toast('Sauvegarde téléchargée 💾');
+  });
+
+  // clear all
+  $('#clearAll').addEventListener('click',function(){
+    
+    incidents=[]; saveAll(); render(); toast('Carnet effacé');
+  });
+
+  // close overlays
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+  // tap outside sheet to close
+  $('#addOv').addEventListener('click',function(e){if(e.target===$('#addOv'))$('#addOv').classList.remove('show');});
+
+  // pin button (same pattern as other modules)
+  // handled via outils.html ☆ star button
+
+  // wizard
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'Ouvrir le carnet 📓':'Continuer';
+    $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+
+  render();
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'JI_STATE',WELCOME:'JI_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{data:[]});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

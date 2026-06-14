@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Avantages en nature — La Cantine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#6d4c41">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Avantages nature">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --brown:#6d4c41;--brown-l:#8d6e63;--brown-ll:#a1887f;
+  --warm:#3e2723;--amber:#f57f17;--amber-l:#ffb300;
+  --cream:#fdf6ee;--cream2:#f5e8d8;--cream3:#ede0cc;
+  --ink:#2c1810;--ink2:#5d4037;--faded:#9e7b6a;
+  --ok:#2e7d50;--warn:#c07820;--card:#fffdf9;--card-edge:#ddd0bb;
+  --line:rgba(44,24,16,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:radial-gradient(700px 300px at 50% -5%,rgba(109,76,65,0.15),transparent 55%),
+  linear-gradient(180deg,#f9ede0 0%,#f0dfc8 25%,#fdf6ee 65%,#f5eadb 100%);
+  background-attachment:fixed;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 16px;position:relative;z-index:2;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--cream);color:var(--brown);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Playfair Display',serif;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(240,223,200,0.97),rgba(240,223,200,0.55) 75%,transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.92);border:none;color:var(--brown);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(44,24,16,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--warm);font-style:italic;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+header .hbtn{background:rgba(255,255,255,0.92);border:none;color:var(--brown);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(44,24,16,0.12);}
+
+.hero{background:linear-gradient(165deg,var(--card),var(--cream2));border-radius:22px;padding:20px;margin:8px 0 16px;
+  box-shadow:0 10px 28px rgba(44,24,16,0.18),inset 0 1px 0 rgba(255,255,255,0.9);}
+.hero .htag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--faded);text-align:center;margin-bottom:8px;}
+.hero .hbig{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;text-align:center;color:var(--warm);line-height:1;}
+.hero .hunit{text-align:center;font-size:13px;color:var(--ink2);font-weight:600;margin-top:4px;}
+.hero .hsub{text-align:center;font-size:11.5px;color:var(--faded);margin-top:8px;}
+.hero .hrow{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.hero .hcell{text-align:center;background:rgba(109,76,65,0.1);border-radius:10px;padding:7px 12px;}
+.hero .hcell .cv{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:var(--brown);}
+.hero .hcell .cl{font-size:10px;color:var(--faded);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+.panel{background:rgba(255,255,255,0.95);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:0 5px 18px rgba(44,24,16,0.12);}
+.panel-t{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;font-style:italic;color:var(--warm);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--cream3);padding-bottom:8px;}
+
+.an-tabs{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.an-tab{background:var(--cream2);border:2px solid var(--card-edge);border-radius:10px;padding:7px 12px;
+  font-weight:700;font-size:12px;color:var(--ink2);cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.an-tab.on{background:var(--brown);border-color:var(--brown);color:#fff;}
+
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:12.5px;color:var(--ink2);margin-bottom:6px;}
+.ip{width:100%;background:var(--cream2);border:2px solid var(--card-edge);border-radius:12px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--brown-l);background:#fff;}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238d6e63' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:28px;}
+.hint{font-size:11.5px;color:var(--faded);margin-top:5px;line-height:1.4;font-weight:500;}
+
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);}
+.result-row:last-child{border-bottom:none;}
+.result-row .rl{font-size:13px;color:var(--ink2);font-weight:600;}
+.result-row .rv{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--warm);}
+.result-row .rs{font-size:11px;color:var(--faded);}
+
+.info-block{border-radius:10px;padding:11px 12px;margin-bottom:9px;font-size:12.5px;line-height:1.5;}
+.info-block.ok{background:rgba(46,125,80,0.08);border-left:3px solid var(--ok);}
+.info-block.warn{background:rgba(192,120,32,0.08);border-left:3px solid var(--warn);}
+.info-block.info{background:rgba(109,76,65,0.08);border-left:3px solid var(--brown-l);}
+.info-block b{color:var(--warm);display:block;margin-bottom:3px;}
+
+.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--faded);line-height:1.6;}
+
+/* wizard */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(20,10,5,0.65);backdrop-filter:blur(5px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,var(--card),var(--cream2));border-radius:24px;max-width:430px;width:100%;
+  max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(20,10,5,0.5);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:5px solid var(--brown-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--warm);font-style:italic;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--cream2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--warm);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-brown{background:linear-gradient(135deg,var(--brown-ll),var(--brown));color:#fff;box-shadow:0 5px 14px rgba(109,76,65,0.4);}
+.btn-ghost{background:transparent;color:var(--brown);border:2px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wemoji{font-size:58px;display:inline-block;margin-bottom:10px;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wstep h2{font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--warm);margin-bottom:10px;font-style:italic;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:10px;font-weight:500;}
+.accent{color:var(--brown-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--warm);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--cream2);border-radius:10px;padding:10px;text-align:left;border-left:3px solid var(--brown-ll);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(109,76,65,0.2);transition:.2s;}
+.dots .d.on{background:var(--brown-l);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--brown);color:#fff;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(20,10,5,0.35);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">🎁</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">La Cantine</div>
+    <div class="su">Avantages en nature · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <span class="wemoji">🎁</span>
+      <h2>Les avantages en nature</h2>
+      <p>Voiture, logement, repas, téléphone… Ces avantages sont <span class="accent">intégrés au salaire</span> pour le calcul des cotisations sociales.</p>
+      <p>L'URSSAF fixe chaque année un barème forfaitaire ou réel.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">⚖️</span>
+      <h2>Neutre des deux côtés</h2>
+      <div class="feat"><div class="ic">👤</div><div class="tx"><b>Côté salarié</b>Vérifie la valeur déclarée sur ton bulletin et si l'évaluation correspond au barème légal.</div></div>
+      <div class="feat"><div class="ic">🏢</div><div class="tx"><b>Côté employeur</b>Calculer exactement la base de cotisation pour ne pas sous-évaluer (risque redressement) ni sur-évaluer.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📅</span>
+      <h2>Mise à jour annuelle</h2>
+      <p>Le barème URSSAF est <span class="accent">révisé chaque janvier</span>. Les valeurs ci-dessous sont celles de 2026.</p>
+      <div class="legal">Outil indicatif et pédagogique. Barème forfaitaire URSSAF 2026. L'évaluation au réel reste possible si elle est plus favorable. Ni avis fiscal ni juridique.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-brown" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- AIDE -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🗂️</div><div class="tx"><b>Sélectionne un avantage</b>Voiture, repas, logement, outils numériques — chaque onglet donne le barème 2026.</div></div>
+    <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Simulateur</b>Saisis ta situation pour obtenir la valeur à intégrer dans la base de cotisation.</div></div>
+    <div class="legal">Barème URSSAF 2026. En cas de doute, consulte un expert-comptable.</div>
+    <button class="btn btn-brown" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="htag">🎁 Avantage sélectionné</div>
+    <div class="hbig" id="hBig">—</div>
+    <div class="hunit" id="hUnit">Choisir un avantage ci-dessous</div>
+    <div class="hsub" id="hSub"></div>
+    <div class="hrow" id="hRow" style="display:none;">
+      <div class="hcell"><div class="cv" id="hCot">—</div><div class="cl">Base cotis./mois</div></div>
+      <div class="hcell"><div class="cv" id="hNet">—</div><div class="cl">Avantage brut</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">🗂️ Choisir l'avantage</div>
+    <div class="an-tabs">
+      <button class="an-tab" onclick="setTab('voiture')">🚗 Voiture</button>
+      <button class="an-tab" onclick="setTab('repas')">🍽️ Repas</button>
+      <button class="an-tab" onclick="setTab('logement')">🏠 Logement</button>
+      <button class="an-tab" onclick="setTab('numerique')">📱 Numérique</button>
+    </div>
+    <div id="tabContent"></div>
+  </div>
+
+  <div id="resultPanel" class="panel" style="display:none;">
+    <div class="panel-t">📊 Évaluation 2026</div>
+    <div id="resultContent"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">💡 Règles générales</div>
+    <div class="info-block ok"><b>✅ Barème forfaitaire</b>L'employeur peut évaluer l'avantage selon le barème URSSAF. Simple, pas de justificatif de dépenses réelles.</div>
+    <div class="info-block info"><b>📋 Évaluation au réel</b>Si les dépenses réelles sont inférieures au forfait, l'évaluation au réel est possible. Justificatifs obligatoires.</div>
+    <div class="info-block warn"><b>⚠️ Mention sur le bulletin</b>Tout avantage en nature doit figurer sur le bulletin de paie : valeur brute, cotisations calculées dessus, et déduction du net si retenu sur salaire.</div>
+    <div class="info-block info"><b>🔄 Révision annuelle</b>Le barème URSSAF est publié en début d'année dans une circulaire. La valeur du SMIC sert de référence pour certains calculs (logement, repas).</div>
+  </div>
+
+  <div style="text-align:center;margin-top:4px;">
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
+  </div>
+  <div class="foot">Barème URSSAF 2026 — outil indicatif & pédagogique. Repas : 5,50 € (source : urssaf.fr/avantages-en-nature, mis à jour 2026). Voiture > 5 ans : taux 6 %. Logement : barème PMSS 2026. Ni avis fiscal ni juridique.<br>🎁 Tout reste sur ton appareil.</div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS={STATE:'AN_STATE',WELCOME:'AN_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function $(s){return document.querySelector(s);}
+function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+function fmt(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+
+// Barème URSSAF 2026
+// SMIC horaire brut (juin 2026) : 12,31 € → mensuel 35h = 1 867,02 €
+var SMIC_H = (window.SH && SH.val('smic_h')) || 12.31;
+var SMIC_M = (window.SH && SH.val('smic_mensuel')) || 1867.02;
+
+var state = get(LS.STATE, {tab:'', vals:{}});
+
+window.setTab = function setTab(tab){
+  state.tab = tab;
+  set(LS.STATE, state);
+  $all('.an-tab').forEach(function(b){ b.classList.toggle('on', b.textContent.indexOf(tab)>=0 || b.getAttribute('onclick').indexOf(tab)>=0); });
+  var html = '';
+  if(tab==='voiture'){
+    html = '<div class="field"><label>Mode de mise à disposition</label><select class="ip" id="vMode" onchange="calcVoiture()"><option value="cump">Employeur paie carburant pro + perso</option><option value="cup">Employeur paie carburant perso seulement</option><option value="sans">Salarié paie son carburant</option></select></div>'+
+      '<div class="field"><label>Valeur d\'achat TTC du véhicule (€)</label><input class="ip" type="number" id="vPrix" placeholder="ex: 25000" oninput="calcVoiture()"><div class="hint">Prix catalogue TTC. Si véhicule > 5 ans : le taux forfaitaire passe à 6 % (au lieu de 9 % sans carburant, 12 % avec carburant).</div></div>'+
+      '<div class="field"><label>Âge du véhicule</label><select class="ip" id="vAge" onchange="calcVoiture()"><option value="neuf">Moins de 5 ans</option><option value="ancien">5 ans et plus (taux 6 %)</option></select></div>';
+    $('#tabContent').innerHTML = html;
+    $('#hBig').textContent='🚗'; $('#hUnit').textContent='Voiture de fonction'; $('#hSub').textContent='Barème forfaitaire URSSAF 2026';
+  } else if(tab==='repas'){
+    html = '<div class="info-block info" style="margin-bottom:0;"><b>🍽️ Barème repas 2026</b>'+
+      '<div class="result-row"><span class="rl">Repas pris à la cantine d\'entreprise</span><span class="rv">5,50 €</span></div>'+
+      '<div class="result-row"><span class="rl">Repas fourni par l\'employeur (en nature)</span><span class="rv">5,50 €</span></div>'+
+      '<div class="result-row"><span class="rl">Panier-repas (travail continu ≥ 6h)</span><span class="rv">10,30 €</span></div>'+
+      '<div class="result-row"><span class="rl">Panier travail en équipe</span><span class="rv">10,30 €</span></div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Valeurs exonérées de cotisations si l\'employeur ne fournit pas de cantine et verse une indemnité de repas dans ces limites. Au-delà : soumis à cotisations.</div></div>';
+    $('#tabContent').innerHTML = html;
+    $('#resultPanel').style.display='none';
+    $('#hBig').textContent='🍽️'; $('#hUnit').textContent='Repas'; $('#hSub').textContent='Barème 2026 — exonération si dans les limites'; $('#hRow').style.display='none';
+  } else if(tab==='logement'){
+    html = '<div class="field"><label>Rémunération mensuelle brute (€)</label><input class="ip" type="number" id="lSal" placeholder="ex: 2500" oninput="calcLogement()"><div class="hint">Le barème logement est progressif selon la rémunération (en % du SMIC mensuel).</div></div>'+
+      '<div class="field"><label>Nombre de pièces principales du logement</label><select class="ip" id="lPieces" onchange="calcLogement()"><option value="1">1 pièce</option><option value="2">2 pièces</option><option value="3">3 pièces</option><option value="4">4 pièces</option><option value="5">5 pièces et +</option></select></div>';
+    $('#tabContent').innerHTML = html;
+    $('#hBig').textContent='🏠'; $('#hUnit').textContent='Logement de fonction'; $('#hSub').textContent='Barème forfaitaire URSSAF 2026';
+  } else if(tab==='numerique'){
+    html = '<div class="info-block info" style="margin-bottom:0;"><b>📱 Outils numériques 2026</b>'+
+      '<div class="result-row"><span class="rl">Téléphone mobile (usage mixte)</span><span class="rv">10 % de la valeur d\'achat TTC / mois</span></div>'+
+      '<div class="result-row"><span class="rl">Ordinateur portable (usage mixte)</span><span class="rv">10 % de la valeur d\'achat TTC / mois</span></div>'+
+      '<div class="result-row"><span class="rl">Tablette (usage mixte)</span><span class="rv">10 % de la valeur d\'achat TTC / mois</span></div>'+
+      '<div class="result-row"><span class="rl">Abonnement internet (partiel pro)</span><span class="rv">jusqu\'à 50 % de l\'abonnement</span></div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Si l\'outil est mis à disposition pour usage <strong>exclusivement professionnel</strong> : aucun avantage en nature. L\'avantage n\'existe qu\'en cas d\'usage personnel autorisé.</div></div>';
+    $('#tabContent').innerHTML = html;
+    $('#resultPanel').style.display='none';
+    $('#hBig').textContent='📱'; $('#hUnit').textContent='Outils numériques'; $('#hSub').textContent='Barème URSSAF 2026'; $('#hRow').style.display='none';
+  }
+}
+
+window.calcVoiture = function(){
+  var mode = $('#vMode') ? $('#vMode').value : 'sans';
+  var prix = parseFloat($('#vPrix') ? $('#vPrix').value : 0) || 0;
+  var ancien = $('#vAge') && $('#vAge').value === 'ancien';
+  if(!prix){ $('#resultPanel').style.display='none'; return; }
+  // Barème URSSAF : 9% du prix TTC/an si employeur paye le carburant, 6% sinon
+  // Abattement 15% si > 5 ans
+  var pct = (mode==='cump') ? 0.12 : (mode==='cup') ? 0.09 : 0.09;
+  // Mode sans carburant perso : 9% ; avec carburant perso uniquement : +pct carburant
+  var base = prix * pct;
+  if(ancien) base = base * 0.85;
+  var html = '<div class="result-row"><span class="rl">Base annuelle de cotisation</span><span class="rv">'+fmt(base)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Base mensuelle de cotisation</span><span class="rv">'+fmt(base/12)+'</span></div>'+
+    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Méthode : '+pct*100+' % du prix TTC'+(ancien?' × 0,85 (véhicule ≥ 5 ans)':'')+'. Barème forfaitaire URSSAF 2026.</div>';
+  if(mode==='cup') html += '<div class="info-block warn" style="margin-top:10px;"><b>⚠️ Carburant usage perso</b>Le carburant perso payé par l\'employeur s\'ajoute à l\'évaluation forfaitaire.</div>';
+  $('#resultContent').innerHTML = html;
+  $('#resultPanel').style.display='block';
+  $('#hBig').textContent=fmt(base/12); $('#hUnit').textContent='Base cotis./mois'; $('#hSub').textContent='Évaluation forfaitaire voiture';
+  $('#hRow').style.display='none';
+};
+
+window.calcLogement = function(){
+  var sal = parseFloat($('#lSal') ? $('#lSal').value : 0) || 0;
+  var pieces = parseInt($('#lPieces') ? $('#lPieces').value : 1) || 1;
+  if(!sal){ $('#resultPanel').style.display='none'; return; }
+  // Barème URSSAF logement 2026 par tranche de rémunération (en SMIC)
+  // Valeurs par pièce selon tranche
+  var tranches = [
+    {max:1*SMIC_M, vals:[77.6,41.4,54.8,68.5,82.3]},
+    {max:2*SMIC_M, vals:[90.3,48.3,64.4,80.5,96.6]},
+    {max:3*SMIC_M, vals:[103.1,55.2,73.5,92.0,110.3]},
+    {max:4*SMIC_M, vals:[128.8,69.0,92.0,115.0,138.0]},
+    {max:5*SMIC_M, vals:[154.5,82.8,110.4,138.0,165.6]},
+    {max:Infinity, vals:[180.2,96.6,128.8,161.0,193.2]},
+  ];
+  var vpp = tranches[tranches.length-1].vals;
+  for(var t=0;t<tranches.length;t++){if(sal<=tranches[t].max){vpp=tranches[t].vals;break;}}
+  var pIdx = Math.min(pieces-1, 4);
+  var val = vpp[pIdx];
+  var html = '<div class="result-row"><span class="rl">Avantage mensuel à intégrer</span><span class="rv">'+fmt(val)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Avantage annuel</span><span class="rv">'+fmt(val*12)+'</span></div>'+
+    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Barème URSSAF 2026 — logement '+pieces+' pièce'+(pieces>1?'s':'')+', tranche de rémunération : '+sal.toLocaleString('fr-FR')+' €/mois.</div>';
+  $('#resultContent').innerHTML = html;
+  $('#resultPanel').style.display='block';
+  $('#hBig').textContent=fmt(val); $('#hUnit').textContent='Avantage logement/mois'; $('#hSub').textContent='Barème forfaitaire 2026';
+  $('#hRow').style.display='none';
+};
+
+// Restaurer
+var s = get(LS.STATE, {tab:''});
+if(s.tab) setTab(s.tab);
+
+// Wizard
+var wStep=0,wMax=3;
+function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+  $('#wNext').textContent=(n===wMax-1)?'Commencer 🎁':'Continuer';
+  $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+$('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+$('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+// Tap outside box to dismiss
+$('#wizard').addEventListener('click',function(e){if(e.target===this){$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+$('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+$all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

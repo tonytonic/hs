@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Temps & Repos — Durées légales</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#37474f">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Temps & Repos">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --grey:#37474f;--grey-l:#546e7a;--grey-ll:#78909c;
+  --cream:#f5f7f8;--card:#fff;--card-edge:#cfd8dc;
+  --ink:#1a2327;--ink2:#37474f;--faded:#90a4ae;
+  --ok:#2e7d50;--warn:#c07820;--red:#c62828;--blue:#1565C0;
+  --line:rgba(55,71,79,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:var(--cream);}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--cream);color:var(--ink);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:20px;} #lb .t{font-size:28px;font-weight:700;color:var(--grey);}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 20px;}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:rgba(245,247,248,0.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--card-edge);
+  max-width:480px;margin:0 auto;}
+header a.back{background:var(--card);border:1.5px solid var(--card-edge);color:var(--ink);border-radius:10px;
+  padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);}
+header .brand .su{font-size:9.5px;color:var(--faded);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+header .hbtn{background:var(--card);border:1.5px solid var(--card-edge);color:var(--grey);border-radius:50%;
+  width:36px;height:36px;font-size:15px;cursor:pointer;flex-shrink:0;}
+
+.sec{background:var(--card);border-radius:18px;padding:18px;margin-bottom:12px;
+  border:1px solid var(--card-edge);box-shadow:0 2px 8px rgba(55,71,79,0.05);}
+.sec-hd{font-size:12px;font-weight:800;color:var(--grey-ll);letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+
+.rule-row{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+.rule-row:last-child{border-bottom:none;padding-bottom:0;}
+.rule-ico{font-size:22px;flex-shrink:0;margin-top:1px;}
+.rule-body{flex:1;}
+.rule-title{font-size:13.5px;font-weight:700;color:var(--ink);}
+.rule-value{font-size:15px;font-weight:800;color:var(--grey);margin:2px 0;}
+.rule-ref{font-size:10.5px;color:var(--faded);}
+
+.badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:10.5px;font-weight:700;margin-left:6px;}
+.badge.ok{background:#e8f5e9;color:#2e7d32;}
+.badge.warn{background:#fff3e0;color:#e65100;}
+.badge.red{background:#fce4ec;color:#c62828;}
+.badge.blue{background:#e3eaff;color:#1565C0;}
+
+.hero{background:linear-gradient(135deg,var(--grey),var(--grey-l));color:#fff;
+  border-radius:18px;padding:20px;margin:16px 0;text-align:center;}
+.hero .t{font-size:16px;font-weight:800;margin-bottom:8px;}
+.hero .chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:12px;}
+.hero .chip{background:rgba(255,255,255,0.18);border-radius:16px;padding:5px 14px;font-size:12px;font-weight:700;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">⚙️</div><div class="t">Passe en portrait pour utiliser cet outil</div></div>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">⚙️ Temps & Repos</div><div class="su">Durées légales · Code du travail 2026</div></div>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="t">Référentiels temps de travail</div>
+    <div style="font-size:12px;opacity:0.8;">Code du travail · Directives UE · Jurisprudence 2026</div>
+    <div class="chips">
+      <div class="chip">35h légales</div><div class="chip">48h max/sem</div><div class="chip">11h repos quotidien</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">⏱ Durées journalières</div>
+    <div class="rule-row"><div class="rule-ico">📏</div><div class="rule-body">
+      <div class="rule-title">Durée maximale journalière</div>
+      <div class="rule-value">10h / jour <span class="badge red">Plafond</span></div>
+      <div class="rule-ref"><span data-art="L3121-18"></span> · Peut être porté à 12h par accord de branche ou en cas de circonstances exceptionnelles</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">🌙</div><div class="rule-body">
+      <div class="rule-title">Repos quotidien minimum</div>
+      <div class="rule-value">11h consécutives <span class="badge ok">Obligatoire</span></div>
+      <div class="rule-ref"><span data-art="L3131-1"></span> · Directive UE 2003/88/CE · Entre deux journées de travail</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">☕</div><div class="rule-body">
+      <div class="rule-title">Pause obligatoire</div>
+      <div class="rule-value">20 min après 6h de travail <span class="badge ok">Obligatoire</span></div>
+      <div class="rule-ref"><span data-art="L3121-16"></span> · Applicable dès que le temps de travail continu dépasse 6h</div>
+    </div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">📅 Durées hebdomadaires</div>
+    <div class="rule-row"><div class="rule-ico">🎯</div><div class="rule-body">
+      <div class="rule-title">Durée légale de référence</div>
+      <div class="rule-value">35h par semaine</div>
+      <div class="rule-ref"><span data-art="L3121-27"></span> · Seuil de déclenchement des heures supplémentaires</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">⚠️</div><div class="rule-body">
+      <div class="rule-title">Durée maximale hebdomadaire absolue</div>
+      <div class="rule-value">48h sur 1 semaine <span class="badge red">Plafond absolu</span></div>
+      <div class="rule-ref"><span data-art="L3121-20"></span> · Non dérogeable · Sauf circonstances exceptionnelles (autorisation inspecteur)</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">📊</div><div class="rule-body">
+      <div class="rule-title">Durée moyenne sur 12 semaines</div>
+      <div class="rule-value">44h en moyenne <span class="badge warn">Plafond glissant</span></div>
+      <div class="rule-ref"><span data-art="L3121-22"></span> · Calculée sur toute période de 12 semaines consécutives</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">🏋️</div><div class="rule-body">
+      <div class="rule-title">Contingent annuel d'heures supp.</div>
+      <div class="rule-value">220h / an (défaut légal) <span class="badge blue">Contingent</span></div>
+      <div class="rule-ref"><span data-art="L3121-30"></span> · Peut être modifié par accord de branche ou d'entreprise</div>
+    </div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">🛌 Repos hebdomadaire</div>
+    <div class="rule-row"><div class="rule-ico">✅</div><div class="rule-body">
+      <div class="rule-title">Repos hebdomadaire minimum</div>
+      <div class="rule-value">35h consécutives <span class="badge ok">Obligatoire</span></div>
+      <div class="rule-ref"><span data-art="L3132-2"></span> · Soit 24h de repos + 11h de repos quotidien = 35h consécutives</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">📆</div><div class="rule-body">
+      <div class="rule-title">Repos dominical (principe)</div>
+      <div class="rule-value">Dimanche de préférence</div>
+      <div class="rule-ref"><span data-art="L3132-3"></span> · Nombreuses dérogations possibles (commerces, tourisme, santé…)</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">🔴</div><div class="rule-body">
+      <div class="rule-title">Jours consécutifs maximum</div>
+      <div class="rule-value">6 jours consécutifs <span class="badge red">Interdit au-delà</span></div>
+      <div class="rule-ref"><span data-art="L3132-1"></span> · Le salarié ne peut travailler plus de 6 jours consécutifs</div>
+    </div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">💰 Majorations heures supp.</div>
+    <div class="rule-row"><div class="rule-ico">1️⃣</div><div class="rule-body">
+      <div class="rule-title">HS de 36h à 43h (8 premières)</div>
+      <div class="rule-value">+25% de majoration <span class="badge ok">Légal</span></div>
+      <div class="rule-ref"><span data-art="L3121-36"></span> · Sauf accord de branche fixant un taux différent (min 10%)</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">2️⃣</div><div class="rule-body">
+      <div class="rule-title">HS à partir de la 9e heure (>43h)</div>
+      <div class="rule-value">+50% de majoration</div>
+      <div class="rule-ref"><span data-art="L3121-36"></span> · Ou taux conventionnel supérieur</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">🔄</div><div class="rule-body">
+      <div class="rule-title">Repos compensateur de remplacement</div>
+      <div class="rule-value">Possible à la place du paiement</div>
+      <div class="rule-ref"><span data-art="L3121-33"></span> · Par accord collectif : RCO remplace tout ou partie de la majoration</div>
+    </div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">🌙 Travail de nuit</div>
+    <div class="rule-row"><div class="rule-ico">🔔</div><div class="rule-body">
+      <div class="rule-title">Plage horaire nocturne</div>
+      <div class="rule-value">21h → 6h</div>
+      <div class="rule-ref"><span data-art="L3122-20"></span> · Peut être modifiée par accord collectif (ex: 22h-7h)</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">👷</div><div class="rule-body">
+      <div class="rule-title">Travailleur de nuit (statut)</div>
+      <div class="rule-value">≥3h entre 21h-6h, ≥2×/semaine</div>
+      <div class="rule-ref"><span data-art="L3122-5"></span> · Ouvre droit à compensations spécifiques (repos, surv. médicale…)</div>
+    </div></div>
+    <div class="rule-row"><div class="rule-ico">⏰</div><div class="rule-body">
+      <div class="rule-title">Durée max travailleur de nuit</div>
+      <div class="rule-value">8h / nuit · 40h / semaine</div>
+      <div class="rule-ref"><span data-art="L3122-6"></span> · Dérogations possibles par accord collectif dans certains cas</div>
+    </div></div>
+  </div>
+
+  <p style="font-size:11px;color:var(--faded);text-align:center;padding:8px 0 16px;line-height:1.6;">
+    <span data-txt="disclaimer_fiscal"></span>.<br><span data-txt="disclaimer_suivi"></span>.<br><span data-txt="ccn_differente"></span>.
+  </p>
+</div>
+
+<div id="helpOv" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(55,71,79,0.75);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:20px;padding:24px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;">
+    <div style="font-size:40px;text-align:center;margin-bottom:12px;">⚙️</div>
+    <h2 style="font-family:'Playfair Display',serif;text-align:center;color:var(--ink);margin-bottom:14px;">Temps & Repos</h2>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.55;margin-bottom:10px;">Ce module récapitule les <b>durées légales</b> du Code du travail : journée, semaine, repos obligatoires, heures supplémentaires et travail de nuit.</p>
+    <p style="font-size:12px;color:var(--faded);line-height:1.5;margin-bottom:14px;">Les durées peuvent être modifiées par accord de branche ou d'entreprise. Consulte ta convention collective pour les règles qui te sont applicables.</p>
+    <button onclick="document.getElementById('helpOv').style.display='none'" style="display:block;width:100%;background:var(--grey);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;">Compris ✓</button>
+  </div>
+</div>
+
+<script>
+var LS={WELCOME:'TPS_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+document.getElementById('helpBtn').addEventListener('click',function(){document.getElementById('helpOv').style.display='flex';});
+if(!get(LS.WELCOME,0)){document.getElementById('helpOv').style.display='flex';set(LS.WELCOME,1);}
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

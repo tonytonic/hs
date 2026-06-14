@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Retraite — Comprendre ses Droits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#4a3a6a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Retraite">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#6a4a9a;--acc-l:#8a6aba;--acc-d:#4a2a7a;
+  --dark:#100c1c;--dark2:#1a1228;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#100c1c 0%,#1a1228 50%,#0e0c18 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(106,74,154,0.22),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(16,12,28,0.97),rgba(16,12,28,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a6aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+/* résultat âge */
+.age-res{border-radius:14px;padding:16px;margin-bottom:10px;
+  background:linear-gradient(135deg,rgba(106,74,154,0.25),rgba(106,74,154,0.1));
+  border:1.5px solid rgba(106,74,154,0.5);}
+.age-res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--acc-l);margin-bottom:8px;}
+.age-res .ages{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.age-box{background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;text-align:center;}
+.age-box .av{font-size:24px;font-weight:800;line-height:1;}
+.age-box .al{font-size:10px;color:var(--ink2);margin-top:4px;line-height:1.3;}
+.age-note{font-size:11px;color:var(--faded);margin-top:10px;line-height:1.4;}
+.trim-info{font-size:12px;color:var(--ink2);margin-top:12px;
+  background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;line-height:1.5;}
+/* tableau */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.gen-table{background:var(--card);border:1.5px solid var(--card-edge);border-radius:14px;overflow:hidden;}
+.gen-row{display:grid;grid-template-columns:1.3fr 1fr 1fr 0.8fr;
+  padding:9px 12px;border-bottom:1px solid var(--card-edge);}
+.gen-row:last-child{border-bottom:none;}
+.gen-row.hd{background:rgba(106,74,154,0.2);font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;color:var(--acc-l);}
+.gen-row span{font-size:12px;line-height:1.3;}
+.gen-row span.hi{color:var(--ok);font-weight:800;}
+/* concepts */
+.concept{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:14px 15px;margin-bottom:8px;}
+.concept .ct{font-weight:800;font-size:13px;margin-bottom:5px;}
+.concept .cd{font-size:12px;color:var(--ink2);line-height:1.45;}
+.ctag{display:inline-block;margin-top:6px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,154,216,0.2);color:var(--info);}
+/* trimestres */
+.trim-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;}
+.trim-box{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:12px;}
+.trim-box .tbh{font-size:11px;font-weight:700;color:var(--acc-l);margin-bottom:4px;}
+.trim-box .tbd{font-size:11.5px;color:var(--ink2);line-height:1.35;}
+/* liens */
+.ext-btn{display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(74,170,122,0.15),rgba(74,170,122,0.05));
+  border:1.5px solid rgba(74,170,122,0.4);border-radius:14px;padding:16px;
+  text-decoration:none;color:#fff;margin-bottom:8px;}
+.ext-btn .ebt{font-weight:800;font-size:14px;color:var(--ok);}
+.ext-btn .ebs{font-size:11.5px;color:var(--ink2);margin-top:3px;}
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">🏛️</span>
+      <div class="wiz-h">Retraite</div>
+      <div class="wiz-p">Âge légal, durée de cotisation, taux plein : les règles issues de la réforme 2023.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Comprendre ses droits</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">🏛️</div><div class="wt"><b>Âge légal</b>Progressif selon génération (réforme 2023 + suspension LFSS 2026 pour gen. 1964-1968). Taux plein auto. à 67 ans. Départ anticipé possible sous conditions.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Calcul de la pension</b>50 % du salaire annuel moyen des 25 meilleures années pour le régime général.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">🏛️</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Retraite</div>
+    <div class="su">Comprendre ses droits · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <!-- Simulateur âge légal -->
+  <div class="panel">
+    <div class="panel-t">🎂 Ton âge légal de départ</div>
+    <div class="field">
+      <label>Année de naissance</label>
+      <select class="ip" id="fNaiss">
+        <option value="">— Sélectionne ton année —</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Trimestres cotisés (estimation)</label>
+      <select class="ip" id="fTrim">
+        <option value="">— Je ne sais pas encore —</option>
+        <option value="low">Moins de 100 trimestres</option>
+        <option value="mid">Entre 100 et 150 trimestres</option>
+        <option value="full">150 trimestres ou plus</option>
+      </select>
+      <div class="hint">Consultable sur info-retraite.fr → "Mon relevé de carrière".</div>
+    </div>
+  </div>
+
+  <div id="ageResult" style="display:none;">
+    <div class="age-res">
+      <div class="rl">Âge légal de départ — Réforme 2023</div>
+      <div class="ages">
+        <div class="age-box">
+          <div class="av" id="rAgeLegal">—</div>
+          <div class="al">Âge légal minimal<br>(avec ou sans taux plein)</div>
+        </div>
+        <div class="age-box">
+          <div class="av" id="rAgeTauxPlein">—</div>
+          <div class="al">Taux plein automatique<br>(sans décote)</div>
+        </div>
+      </div>
+      <div class="trim-info" id="rTrimInfo"></div>
+      <div class="age-note">⚠️ Ces âges sont des minimaux légaux. Ton relevé sur info-retraite.fr est la seule source fiable pour ta situation réelle.</div>
+    </div>
+  </div>
+
+  <!-- Tableau générations -->
+  <div class="sec-t">📊 Âges légaux par génération — Réforme 2023</div>
+  <div class="gen-table" id="genTable">
+    <div class="gen-row hd">
+      <span>Naissance</span><span>Âge légal</span><span>Taux plein</span><span>Trim.</span>
+    </div>
+    <div class="gen-row" data-min="1900" data-max="1957"><span>Avant 1958</span><span>62 ans</span><span>67 ans</span><span>166</span></div>
+    <div class="gen-row" data-min="1958" data-max="1960"><span>1958–1960</span><span>62 ans</span><span>67 ans</span><span>167</span></div>
+    <div class="gen-row" data-min="1961" data-max="1963"><span>1961–1963</span><span>62 ans</span><span>67 ans</span><span>168</span></div>
+    <div class="gen-row" data-min="1964" data-max="1966"><span>1964–1968</span><span>62 ans 9 mois ★</span><span>67 ans</span><span>170</span></div>
+    <div class="gen-row" data-min="1967" data-max="1969"><span>1967–1969</span><span>63 ans ½</span><span>67 ans</span><span>170</span></div>
+    <div class="gen-row" data-min="1970" data-max="1972"><span>1970–1972</span><span>64 ans</span><span>67 ans</span><span>171</span></div>
+    <div class="gen-row" data-min="1973" data-max="2010"><span>1973 et +</span><span>64 ans</span><span>67 ans</span><span>172</span></div>
+    <div style="font-size:11px;color:var(--ink2);padding:8px 12px;line-height:1.5;">★ LFSS 2026 (loi n°2025-1403 du 30/12/2025) : âge légal gelé à 62 ans 9 mois pour les générations 1964 à 1968, pour les retraites prenant effet à compter du 1er septembre 2026. Source : OFCE jan. 2026 · altis-conseil.fr.</div>
+  </div>
+
+  <!-- Concepts clés -->
+  <div class="sec-t">📚 Les concepts clés</div>
+
+  <div class="concept">
+    <div class="ct">🧩 Le trimestre</div>
+    <div class="cd">Unité de base. On valide 1 trimestre pour chaque tranche de 150h au SMIC cotisées. Maximum 4 trimestres par an, quelle que soit la durée travaillée.</div>
+    <span class="ctag info">Max 4 par an</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">🎯 Le taux plein</div>
+    <div class="cd">Taux de liquidation de 50 % de la pension de base. Obtenu soit en atteignant la durée requise (ex. 172 trimestres), soit automatiquement à 67 ans quelle que soit la durée cotisée.</div>
+    <span class="ctag ok">50 % du salaire de référence</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">📉 La décote</div>
+    <div class="cd">Si tu pars avant le taux plein, ta pension de base est réduite de 1,25 % par trimestre manquant (−25 % maximum). La décote sur la pension de base entraîne généralement une décote spécifique sur la retraite complémentaire Agirc-Arrco (selon ses propres coefficients d'anticipation, non calqués sur les 1,25 %/trimestre de la Sécu). La mention « pension de base uniquement » est un raccourci trompeur.</div>
+    <span class="ctag warn">−1,25 % par trimestre manquant</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">📈 La surcote</div>
+    <div class="cd">Si tu continues à travailler après avoir atteint le taux plein, ta pension augmente de 1,25 % par trimestre supplémentaire, sans limite de durée.</div>
+    <span class="ctag ok">+1,25 % par trimestre en plus</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">💰 Le salaire de référence</div>
+    <div class="cd">Calculé sur la moyenne des 25 meilleures années de salaire brut (revalorisées). C'est sur cette base que s'applique le taux de pension.</div>
+    <span class="ctag info">25 meilleures années</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">🎁 Trimestres assimilés</div>
+    <div class="cd">Certaines périodes non travaillées ouvrent des droits : maladie (60 j = 1 trim.), chômage indemnisé (50 j = 1 trim.), maternité (1 trim./enfant), invalidité, service militaire.</div>
+    <span class="ctag ok">Comptent comme cotisés</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">👶 Majoration enfants</div>
+    <div class="cd">8 trimestres supplémentaires par enfant (4 pour la maternité/adoption + 4 pour l'éducation). Répartissables entre les deux parents selon leur choix.</div>
+    <span class="ctag ok">+8 trimestres / enfant</span>
+  </div>
+
+  <div class="concept">
+    <div class="ct">🏃 Retraite anticipée carrière longue</div>
+    <div class="cd">🆕 <b>Retraite progressive</b> depuis le 1er sept. 2025 : accessible dès <b>60 ans</b> (décrets du 15/07/2025 — JO 23/07/2025). Réduire son temps de travail 40-80% tout en touchant une fraction de la pension. Age autonome, non affecté par la suspension LFSS 2026. Source : décrets 2025-937 et 2025-938.</div>
+    <div class="cd">Retraite anticipée carrière longue (RACL) — 4 bornes selon l'âge de début : dès 58 ans si début avant 16 ans, dès 60 ans si début avant 18 ans, dès 62 ans si début avant 20 ans, dès 63 ans si début avant 21 ans. Conditions strictes de trimestres cotisés — à vérifier sur info-retraite.fr.</div>
+    <span class="ctag warn">Conditions strictes</span>
+  </div>
+
+  <!-- Ce qui compte -->
+  <div class="sec-t">🗂️ Ce qui compte dans tes trimestres</div>
+  <div class="trim-grid">
+    <div class="trim-box"><div class="tbh">✅ Cotisés</div><div class="tbd">Périodes travaillées avec cotisations versées</div></div>
+    <div class="trim-box"><div class="tbh">🤒 Maladie</div><div class="tbd">60 jours d'arrêt indemnisés cumulés = 1 trimestre (pas forcément consécutifs — <span data-art="R351-12"></span>)</div></div>
+    <div class="trim-box"><div class="tbh">👶 Maternité</div><div class="tbd">1 trimestre par période de maternité ou adoption</div></div>
+    <div class="trim-box"><div class="tbh">💼 Chômage</div><div class="tbd">50 jours indemnisés (ARE) = 1 trimestre</div></div>
+    <div class="trim-box"><div class="tbh">♿ Invalidité</div><div class="tbd">Périodes en pension d'invalidité</div></div>
+    <div class="trim-box"><div class="tbh">🎓 Formation</div><div class="tbd">Certaines formations rémunérées</div></div>
+  </div>
+
+  <!-- Liens officiels -->
+  <div class="sec-t">🔗 Les sources officielles</div>
+  <a class="ext-btn" href="https://www.info-retraite.fr" target="_blank" rel="noopener">
+    <div><div class="ebt">info-retraite.fr</div><div class="ebs">Relevé de carrière · Estimation personnalisée · Mon compte retraite</div></div>
+    <span style="font-size:20px;">→</span>
+  </a>
+  <a class="ext-btn" href="https://www.agirc-arrco.fr" target="_blank" rel="noopener">
+    <div><div class="ebt">agirc-arrco.fr</div><div class="ebs">Retraite complémentaire · Points Agirc-Arrco · Salariés du privé</div></div>
+    <span style="font-size:20px;">→</span>
+  </a>
+
+  <div class="note">
+    Outil pédagogique — hors conseil juridique et financier.<br>
+    Les âges légaux sont issus de la réforme 2023 (Loi n°2023-270).<br>
+    Seul ton relevé de carrière sur info-retraite.fr reflète ta situation réelle.<br>
+    🏛️ Tout reste sur ton appareil.
+  
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Loi n°2023-270 du 14 avril 2023 · Réforme des retraites · Outil pédagogique</div>
+</div>
+
+<!-- Aide -->
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#1a1228;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Sélectionne ton année de naissance pour voir ton âge légal de départ selon la réforme 2023.<br><br>
+      Ce module est <strong>pédagogique</strong> : il explique les concepts et te renvoie vers les sources officielles pour ton estimation personnelle.<br><br>
+      Ton relevé de carrière exact est disponible sur <strong>info-retraite.fr</strong>.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+// Données réforme 2023 (loi n°2023-270) + suspension LFSS 2026 (loi n°2025-1403)
+// Gen. 1964-1968 gelées à 62 ans 9 mois dès le 1er septembre 2026
+// [annéeMin, annéeMax, âgeLégal(mois), âgeTauxPlein(mois), trimestres requis]
+var GEN = [
+  [1900,1957, 62*12, 65*12, 166],
+  [1958,1960, 62*12, 67*12, 167],
+  [1961,1963, 62*12, 67*12, 168],
+  [1964,1968, 62*12+9, 67*12, 170], // LFSS 2026 — gel à 62 ans 9 mois
+  
+  [1970,1972, 64*12, 67*12, 171],
+  [1973,2010, 64*12, 67*12, 172]
+];
+
+function moisStr(m){
+  var a=Math.floor(m/12), mo=m%12;
+  if(mo===0) return a+' ans';
+  if(mo===6) return a+' ans ½';
+  return a+' ans '+mo+' mois';
+}
+
+function getGen(y){
+  for(var i=0;i<GEN.length;i++) if(y>=GEN[i][0]&&y<=GEN[i][1]) return GEN[i];
+  return null;
+}
+
+// Remplir années
+var sel=document.getElementById('fNaiss');
+for(var y=new Date().getFullYear()-15;y>=1950;y--){
+  var o=document.createElement('option');
+  o.value=y; o.textContent=y; sel.appendChild(o);
+}
+
+function highlightRow(year){
+  document.querySelectorAll('.gen-row:not(.hd)').forEach(function(r){
+    r.querySelectorAll('span').forEach(function(s){ s.classList.remove('hi'); });
+    var min=parseInt(r.dataset.min), max=parseInt(r.dataset.max);
+    if(year>=min&&year<=max) r.querySelectorAll('span').forEach(function(s){ s.classList.add('hi'); });
+  });
+}
+
+function recalc(){
+  var year=parseInt(sel.value);
+  var trim=document.getElementById('fTrim').value;
+  var res=document.getElementById('ageResult');
+  if(!year){ res.style.display='none'; highlightRow(-1); return; }
+  var g=getGen(year);
+  if(!g){ res.style.display='none'; return; }
+
+  document.getElementById('rAgeLegal').textContent=moisStr(g[2]);
+  document.getElementById('rAgeTauxPlein').textContent=moisStr(g[3]);
+
+  var req=g[4];
+  var txt='<strong>'+req+' trimestres</strong> requis pour le taux plein.';
+  if(trim==='full') txt+=' ✅ Avec 150+ trimestres tu t\'approches de la durée requise — vérifie ton relevé.';
+  else if(trim==='mid') txt+=' ⏳ Il te manque potentiellement des trimestres — surveille ton relevé régulièrement.';
+  else if(trim==='low') txt+=' ⚠️ Avec moins de 100 trimestres, une décote s\'appliquera si tu pars à l\'âge légal. Taux plein automatique à 67 ans.';
+  else txt+=' 👉 Consulte ton relevé sur info-retraite.fr pour connaître ton nombre exact.';
+
+  document.getElementById('rTrimInfo').innerHTML=txt;
+  res.style.display='block';
+  highlightRow(year);
+}
+
+sel.addEventListener('change',recalc);
+document.getElementById('fTrim').addEventListener('change',recalc);
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'RET_STATE',WELCOME:'RET_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{naiss:'',trim:''});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='RET_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 🏛️':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

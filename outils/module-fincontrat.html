@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Fin de contrat — Nouveau départ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#e88a5a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fin de contrat">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --dawn1:#fce4c4; --dawn2:#f7b58a; --dawn3:#e88a5a; --dawn4:#c96b8e; --dawn5:#7d6a9c;
+  --road:#5a4a3f; --road-d:#3d322b;
+  --ink:#3a2e2a; --ink2:#6e5d56; --faded:#9a877f;
+  --card:#fffaf3; --card-edge:#f0dcc4;
+  --hill:#b88a6a; --hill2:#a06b8a;
+  --gold:#d99a4e; --accent:#d96b4e;
+  --line:rgba(58,46,42,0.1);
+  --good:#5a9e6f; --warn:#e0913f; --info:#6a7fa8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Inter',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(180deg,#fce4c4 0%,#f7b58a 24%,#e88a5a 44%,#c96b8e 68%,#7d6a9c 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;position:relative;
+}
+/* rising sun */
+body::before{content:"";position:fixed;top:11%;left:50%;transform:translateX(-50%);width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,#fff4d6,#ffd98c 58%,rgba(255,217,140,0) 72%);z-index:0;pointer-events:none;
+  box-shadow:0 0 90px rgba(255,217,140,0.6);}
+/* layered hills + road silhouette at bottom */
+body::after{content:"";position:fixed;bottom:0;left:0;right:0;height:30%;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% 130%, var(--road-d) 0%, var(--road-d) 30%, transparent 31%),
+    radial-gradient(80% 70% at 20% 130%, rgba(160,107,138,0.6), transparent 60%),
+    radial-gradient(80% 70% at 85% 130%, rgba(184,138,106,0.6), transparent 60%);
+  -webkit-mask:linear-gradient(180deg,transparent,#000 55%);mask:linear-gradient(180deg,transparent,#000 55%);}
+
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:linear-gradient(180deg,#f7b58a,#7d6a9c);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Fraunces',serif;font-size:28px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(247,181,138,0.95), rgba(247,181,138,0.5) 75%, transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.92);border:none;color:var(--dawn3);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Fraunces',serif;font-weight:600;font-size:21px;line-height:1;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.2);}
+header .brand .su{font-weight:600;font-size:9px;color:rgba(255,255,255,0.92);margin-top:3px;letter-spacing:1px;text-transform:uppercase;}
+header .hbtn{background:rgba(255,255,255,0.92);border:none;color:var(--dawn3);border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 3px 10px rgba(0,0,0,0.12);}
+
+/* case selector */
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 16px;}
+.case{background:rgba(255,255,255,0.88);border:2px solid transparent;border-radius:16px;padding:12px 6px;text-align:center;cursor:pointer;transition:.18s;
+  box-shadow:0 4px 12px rgba(125,106,156,0.2);}
+.case.on{border-color:var(--dawn3);background:#fff;box-shadow:0 6px 18px rgba(232,138,90,0.35);transform:translateY(-2px);}
+.case .ce{font-size:24px;}
+.case .cn{font-weight:700;font-size:10.5px;color:var(--ink2);margin-top:4px;line-height:1.2;}
+.case.on .cn{color:var(--dawn3);}
+
+/* hero result */
+.hero{position:relative;border-radius:26px;padding:22px 20px;margin-bottom:16px;overflow:hidden;
+  background:linear-gradient(165deg, rgba(255,255,255,0.96), rgba(255,250,243,0.92));
+  box-shadow:0 16px 40px rgba(125,106,156,0.35);}
+.hero .road{position:absolute;bottom:-2px;left:0;right:0;height:50px;opacity:0.1;
+  background:radial-gradient(120% 100% at 50% 130%, var(--road) 40%, transparent 41%);}
+.hero .htag{font-weight:700;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dawn3);text-align:center;}
+.hero .hbig{font-family:'Fraunces',serif;font-weight:700;font-size:46px;text-align:center;line-height:1.05;
+  color:var(--dawn3);margin:6px 0 0;}
+.hero .hbig small{font-size:18px;color:var(--ink2);font-family:'Inter',sans-serif;font-weight:600;}
+.hero .hsub{text-align:center;font-size:13px;color:var(--ink2);margin-top:6px;line-height:1.4;}
+
+/* breakdown */
+.break{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+.brk{display:flex;align-items:center;gap:12px;background:rgba(252,228,196,0.5);border-radius:13px;padding:12px 14px;}
+.brk .be{font-size:20px;flex-shrink:0;}
+.brk .bc{flex:1;min-width:0;}
+.brk .bt{font-weight:600;font-size:13px;color:var(--ink);}
+.brk .bd{font-size:11px;color:var(--faded);margin-top:1px;line-height:1.3;}
+.brk .bv{font-family:'Fraunces',serif;font-weight:600;font-size:17px;color:var(--ink);flex-shrink:0;}
+.brk.muted .bv{color:var(--faded);font-size:13px;font-family:'Inter',sans-serif;}
+
+.panel{background:rgba(255,255,255,0.94);border-radius:20px;padding:18px;margin-bottom:14px;box-shadow:0 8px 24px rgba(125,106,156,0.18);}
+.panel-t{font-family:'Fraunces',serif;font-weight:600;font-size:15px;color:var(--dawn3);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:600;font-size:13px;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;background:#fdf6ec;border:2px solid var(--card-edge);border-radius:13px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Inter',sans-serif;font-weight:600;}
+.ip:focus{outline:none;border-color:var(--dawn3);background:#fff;}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.unit{font-weight:600;font-size:13px;color:var(--ink2);flex-shrink:0;}
+.hint{font-weight:500;font-size:11.5px;color:var(--faded);margin-top:6px;line-height:1.4;}
+.helpbtn{background:none;border:none;color:var(--dawn3);font-weight:600;font-size:12px;cursor:pointer;text-decoration:underline;padding:0;margin-top:6px;}
+
+.btn{display:block;width:100%;border:none;border-radius:15px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:'Inter',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-sun{background:linear-gradient(135deg,var(--dawn2),var(--dawn4));color:#fff;box-shadow:0 6px 18px rgba(201,107,142,0.4);}
+.btn-ghost{background:transparent;color:var(--dawn3);border:2px solid var(--card-edge);}
+.btn-soft{background:#fdf6ec;color:var(--dawn3);border:2px solid var(--card-edge);}
+
+.note{font-weight:500;font-size:12px;color:rgba(255,255,255,0.92);line-height:1.5;text-align:center;margin-top:6px;padding:0 8px;}
+.foot{margin-top:20px;text-align:center;font-weight:500;font-size:11px;color:rgba(255,255,255,0.85);line-height:1.6;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(58,46,42,0.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,#fffaf3,#fdeed9);border-radius:24px;max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(58,46,42,0.5);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);position:relative;}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:22px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Fraunces',serif;font-weight:600;font-size:23px;color:var(--dawn3);}
+.box .hd .s{font-weight:600;font-size:13px;color:var(--ink2);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:#fdf6ec;border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--dawn3);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+
+.wstep{display:none;text-align:center;}
+.wstep.show{display:block;animation:fade .35s;}
+.wmasc{width:130px;height:130px;object-fit:contain;display:inline-block;margin-bottom:6px;filter:drop-shadow(0 6px 14px rgba(0,0,0,0.25));animation:walk 3s ease-in-out infinite;}
+@keyframes walk{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-7px) rotate(2deg)}}
+.wemoji{font-size:64px;display:inline-block;margin-bottom:8px;animation:walk 3s ease-in-out infinite;}
+.wstep h2{font-family:'Fraunces',serif;font-weight:600;font-size:25px;color:var(--dawn3);margin-bottom:10px;}
+.wstep p{font-size:15px;color:var(--ink2);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--dawn4);font-weight:700;}
+.feat{display:flex;gap:13px;align-items:flex-start;text-align:left;margin-bottom:13px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--dawn3);margin-bottom:2px;}
+.legal{font-weight:500;font-size:11px;color:var(--faded);line-height:1.5;background:#fdf6ec;border-radius:12px;padding:11px;text-align:left;}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(232,138,90,0.25);transition:.2s;}
+.dots .d.on{background:var(--dawn3);width:22px;border-radius:4px;}
+
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;background:var(--ink);color:#fff;
+  font-weight:700;font-size:13px;padding:12px 22px;border-radius:30px;box-shadow:0 8px 24px rgba(0,0,0,0.4);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.pop2{animation:popk .4s ease;}
+@keyframes popk{0%{transform:scale(1)}40%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#fce4c4;z-index:9999;"></div>
+<div id="lb"><div class="i">🌄</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Nouveau départ</div>
+    <div class="su">Fin de contrat · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <img class="wmasc" src="Mascotte.png" alt="" onerror="this.outerHTML='<span class=\'wemoji\'>🧭</span>'">
+      <h2>Vers un nouveau départ</h2>
+      <p>Une fin de contrat, c'est aussi un <span class="accent">nouveau chemin</span>. Cet outil estime ce que tu peux percevoir au moment du départ.</p>
+      <p>Licenciement, rupture conventionnelle ou démission : on regarde ensemble.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">🛤️</span>
+      <h2>Trois chemins</h2>
+      <div class="feat"><div class="ic">📩</div><div class="tx"><b>Licenciement</b>Indemnité légale + préavis + congés non pris.</div></div>
+      <div class="feat"><div class="ic">🤝</div><div class="tx"><b>Rupture conventionnelle</b>Indemnité au moins égale au légal, négociable.</div></div>
+      <div class="feat"><div class="ic">👋</div><div class="tx"><b>Démission</b>Pas d'indemnité de rupture, mais congés non pris payés.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">🧳</span>
+      <h2>Deux chiffres suffisent</h2>
+      <p>Ton <span class="accent">salaire de référence</span> et ton <span class="accent">ancienneté</span>. Je m'occupe du reste, décomposé poste par poste.</p>
+      <p style="font-size:13px;">Tu ne connais pas ton salaire de référence ? Un coup de main est prévu.</p>
+    </div>
+    <div class="wstep" data-step="3">
+      <span class="wemoji">🌅</span>
+      <h2>Un mot d'honnêteté</h2>
+      <p>Ce sont les <span class="accent">minimums légaux</span> du Code du travail. Ta convention collective peut prévoir bien plus.</p>
+      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni constat. Le calcul suppose un licenciement hors faute grave/lourde et au moins 8 mois d'ancienneté pour l'indemnité. Des situations particulières (CDD, faute, inaptitude, barèmes conventionnels) ne sont pas couvertes. Seul ton solde de tout compte fait foi.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-sun" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Comprendre l'estimation</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🛤️</div><div class="tx"><b>Choisis ton cas</b>Licenciement, rupture conventionnelle ou démission : les droits diffèrent.</div></div>
+    <div class="feat"><div class="ic">💶</div><div class="tx"><b>Salaire de référence</b>Le plus avantageux entre la moyenne de tes 12 derniers mois et le 1/3 de tes 3 derniers mois (primes incluses au prorata).</div></div>
+    <div class="feat"><div class="ic">📐</div><div class="tx"><b>Indemnité légale</b>1/4 de mois par année jusqu'à 10 ans, 1/3 au-delà. Années incomplètes au prorata.</div></div>
+    <div class="feat"><div class="ic">⏳</div><div class="tx"><b>Préavis</b>1 mois (6 mois→2 ans d'ancienneté), 2 mois (au-delà). En démission, c'est toi qui le dois (durée selon convention).</div></div>
+    <div class="legal">L'indemnité légale suppose 8 mois d'ancienneté minimum et un licenciement hors faute grave/lourde. La rupture conventionnelle ouvre droit au chômage ; pas la démission (sauf cas particuliers). Ta convention peut être plus favorable.</div>
+    <button class="btn btn-sun" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<!-- SALARY HELPER -->
+<div class="ov" id="salHelp">
+  <div class="box"><div class="hd"><div class="t">Salaire de référence</div><div class="s">On prend le plus avantageux</div>
+    <button class="x" data-close="salHelp">✕</button></div>
+  <div class="bd">
+    <div class="field"><label>Moyenne de tes 12 derniers mois (brut)</label>
+      <div class="inline"><input class="ip" id="sh12" type="number" inputmode="decimal" placeholder="ex. 2400"><span class="unit">€ / mois</span></div></div>
+    <div class="field"><label>Total de tes 3 derniers mois (brut, primes incluses)</label>
+      <div class="inline"><input class="ip" id="sh3" type="number" inputmode="decimal" placeholder="ex. 7500"><span class="unit">€</span></div>
+      <div class="hint">On en prendra le tiers. Inclus les primes/13e mois au prorata.</div></div>
+    <button class="btn btn-sun" id="shApply" style="margin-top:4px;">Utiliser le plus avantageux</button>
+    <div class="hint" id="shResult" style="text-align:center;margin-top:10px;"></div>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <div class="cases" id="caseSel">
+    <div class="case on" data-case="licenciement"><div class="ce">📩</div><div class="cn">Licenciement</div></div>
+    <div class="case" data-case="rupture"><div class="ce">🤝</div><div class="cn">Rupture convent.</div></div>
+    <div class="case" data-case="demission"><div class="ce">👋</div><div class="cn">Démission</div></div>
+  </div>
+
+  <div class="hero">
+    <div class="road"></div>
+    <div class="htag" id="heroTag">Total estimé au départ</div>
+    <div class="hbig" id="hBig">0 €</div>
+    <div class="hsub" id="hSub">Renseigne ta situation ci-dessous</div>
+    <div class="break" id="breakdown"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">💼 Ta situation</div>
+    <div class="field"><label>Salaire de référence (brut mensuel)</label>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2400"><span class="unit">€</span></div>
+      <button class="helpbtn" id="openSalHelp">Je ne sais pas le calculer →</button></div>
+    <div class="field"><label>Ancienneté dans l'entreprise</label>
+      <div class="two">
+        <div class="inline"><input class="ip" id="fYears" type="number" inputmode="numeric" value="0" min="0"><span class="unit">ans</span></div>
+        <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="11"><span class="unit">mois</span></div>
+      </div>
+      <div class="hint">Comptée jusqu'à la fin du préavis.</div></div>
+    <div class="field" id="cpField"><label>Congés payés acquis non pris (facultatif)</label>
+      <div class="inline"><input class="ip" id="fCP" type="number" inputmode="decimal" value="0" min="0"><span class="unit">jours ouvrés</span></div>
+      <div class="hint">Ils sont payés quel que soit le motif de départ.</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">📋 Points souvent oubliés</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="background:var(--sand);border-radius:12px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--ink);">⚠️ Clause de non-concurrence</div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.45;">Si ton contrat contient une clause de non-concurrence, une <strong>contrepartie financière</strong> est légalement prévue pendant toute la durée d'application. Il peut aussi y renoncer expressément. Sans contrepartie prévue dans le contrat → clause nulle. Durée et zone géographique doivent être raisonnables.</div>
+      </div>
+      <div style="background:var(--sand);border-radius:12px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--ink);">🤝 Transaction</div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.45;">Après une rupture, employeur et salarié peuvent signer une transaction pour mettre fin à tout litige moyennant une indemnité transactionnelle. Attention : elle n'est valable que <strong>après</strong> la rupture définitive du contrat. Elle est définitive et interdit tout recours ultérieur.</div>
+      </div>
+      <div style="background:var(--sand);border-radius:12px;padding:13px;">
+        <div style="font-weight:700;font-size:13px;color:var(--ink);">📋 Plan de Sauvegarde de l'Emploi (PSE)</div>
+        <div style="font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.45;">En cas de licenciement économique collectif (10+ salariés en 30 jours dans les entreprises de 50+), un PSE est obligatoire. Il prévoit des mesures de reclassement, des indemnités supra-légales et un accompagnement. Les droits sont alors différents de ceux présentés ici.</div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:14px;">
+    <div class="panel-t">📊 Comparatif des motifs de rupture</div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:11.5px;">
+        <thead>
+          <tr style="background:rgba(255,255,255,0.08);">
+            <th style="padding:7px 9px;text-align:left;color:var(--sand);font-weight:700;">Motif</th>
+            <th style="padding:7px 9px;text-align:center;color:var(--sand);font-weight:700;">Préavis</th>
+            <th style="padding:7px 9px;text-align:center;color:var(--sand);font-weight:700;">Indemnité</th>
+            <th style="padding:7px 9px;text-align:center;color:var(--sand);font-weight:700;">Chômage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Licenciement éco.</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Oui</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">Oui</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);">
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Licenciement pers.</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Oui</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">Si ≥ 8 mois</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Rupture conv.</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Non</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">≥ ILL</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">✓</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.03);">
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Démission</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Oui</td>
+            <td style="padding:7px 9px;text-align:center;color:#e07070;">Non</td>
+            <td style="padding:7px 9px;text-align:center;color:#e07070;">✗ (sauf légit.)</td>
+          </tr>
+          <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Fin de CDD</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Non</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">+10 % précarité</td>
+            <td style="padding:7px 9px;text-align:center;color:#5dc87a;">✓</td>
+          </tr>
+          <tr>
+            <td style="padding:7px 9px;color:var(--ink);font-weight:600;">Retraite</td>
+            <td style="padding:7px 9px;text-align:center;color:var(--ink);">Oui</td>
+            <td style="padding:7px 9px;text-align:center;color:#e0a040;">Spécifique</td>
+            <td style="padding:7px 9px;text-align:center;color:#e07070;">✗</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:14px;">
+    <div class="panel-t">🤝 Rupture conventionnelle — focus</div>
+    <div style="display:flex;flex-direction:column;gap:9px;">
+      <div style="background:var(--sand);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:12.5px;color:var(--ink);">📋 La procédure en 5 étapes</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.45;">1. Entretien(s) préalable(s) — au moins 1 requis<br>2. Signature du formulaire CERFA n°14598<br>3. Délai de rétractation : 15 jours calendaires pour chaque partie<br>4. Homologation par la DREETS (15 jours ouvrables)<br>5. Rupture effective au lendemain de l'homologation</div>
+      </div>
+      <div style="background:var(--sand);border-radius:8px;padding:11px 12px;">
+        <div style="font-weight:700;font-size:12.5px;color:var(--ink);">⚠️ Cas d'exclusion</div>
+        <div style="font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.45;">La rupture conventionnelle est possible pendant un arrêt AT/MP (Cass. soc. — sauf fraude ou vice du consentement). Elle est exclue uniquement dans le cadre d'un PSE, d'une procédure d'inaptitude pour contourner le reclassement, ou sans autorisation de l'inspecteur du travail pour un salarié protégé (accident du travail ou maladie professionnelle) sauf accord exprès, ni avec un salarié protégé sans autorisation de l'inspection du travail.</div>
+      </div>
+    </div>
+  </div>
+  <div class="note" id="caseNote"></div>
+
+  <div class="foot">
+    Outil indicatif &amp; pédagogique — ni avis juridique, ni constat.<br>
+    Minimums légaux ; ta convention peut être plus favorable.<br>
+    🌄 Tout reste sur ton appareil.
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ STATE:'FC_STATE', WELCOME:'FC_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+  function eur(n){ n=Math.round((n||0)*100)/100; return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
+
+  var state=get(LS.STATE,{ cas:'licenciement', sal:'', years:0, months:0, cp:0 });
+  if(!state.cas)state.cas='licenciement';
+  function save(){ set(LS.STATE,state); }
+  function toast(m){ var t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove('show');},1600); }
+
+  // legal indemnity
+  function totalYears(){ return (+state.years||0) + (+state.months||0)/12; }
+  function legalIndemnity(sal){
+    var y=totalYears(); if(y<=0||sal<=0) return 0;
+    // eligibility 8 months
+    if(y < 8/12) return 0;
+    var first=Math.min(y,10);
+    var beyond=Math.max(0,y-10);
+    return sal*0.25*first + sal*(1/3)*beyond;
+  }
+  function preavisMonths(){
+    var y=totalYears();
+    if(y < 6/12) return 0;      // <6 months: convention/usage
+    if(y < 2) return 1;
+    return 2;
+  }
+
+  function recalc(){
+    var sal=parseFloat(state.sal)||0;
+    var y=totalYears();
+    var cas=state.cas;
+    var rows=[]; var total=0;
+
+    var indemnity=0, indemnityLabel='', indemnityDesc='';
+    if(cas==='licenciement'){ indemnity=legalIndemnity(sal); indemnityLabel='Indemnité légale de licenciement'; indemnityDesc='1/4 mois/an (≤10 ans), 1/3 au-delà'; }
+    else if(cas==='rupture'){ indemnity=legalIndemnity(sal); indemnityLabel='Indemnité de rupture conventionnelle'; indemnityDesc='Minimum légal — négociable à la hausse'; }
+    else { indemnity=0; indemnityLabel='Indemnité de rupture'; indemnityDesc='Aucune en cas de démission'; }
+
+    // preavis
+    var pm=preavisMonths();
+    var preavisPay = (cas==='licenciement')? sal*pm : 0; // only counted as money for licenciement (if dispensed)
+    var preavisLabel, preavisDesc, preavisVal, preavisMuted=false;
+    if(cas==='licenciement'){
+      preavisLabel='Préavis'; preavisDesc=(pm===0?'Selon convention (ancienneté < 6 mois)':pm+' mois'); 
+    } else if(cas==='rupture'){
+      preavisLabel='Préavis'; preavisDesc='Aucun (date fixée dans la convention)'; preavisMuted=true; preavisPay=0;
+    } else {
+      preavisLabel='Préavis'; preavisDesc='À effectuer par toi (durée selon convention)'; preavisMuted=true; preavisPay=0;
+    }
+
+    // CP non pris
+    var cpDays=parseFloat(state.cp)||0;
+    var cpPay = cpDays>0 && sal>0 ? (sal/21.67)*cpDays : 0; // approx working days/month
+
+    // build rows
+    if(cas==='demission'){
+      rows.push({e:'🚫',t:indemnityLabel,d:indemnityDesc,v:0,muted:true});
+    } else {
+      rows.push({e:(cas==='rupture'?'🤝':'📩'),t:indemnityLabel,d:indemnityDesc,v:indemnity});
+      total+=indemnity;
+    }
+    if(cas==='licenciement'){
+      if(pm>0){ rows.push({e:'⏳',t:'Indemnité compensatrice de préavis',d:preavisDesc+' (si non effectué)',v:preavisPay}); total+=preavisPay; }
+      else rows.push({e:'⏳',t:preavisLabel,d:preavisDesc,v:0,muted:true});
+    } else {
+      rows.push({e:'⏳',t:preavisLabel,d:preavisDesc,v:0,muted:true});
+    }
+    rows.push({e:'🏖️',t:'Indemnité de congés payés non pris',d:cpDays>0?(cpDays+' jours estimés'):'Saisis tes jours non pris',v:cpPay});
+    total+=cpPay;
+
+    // render hero
+    $('#hBig').textContent=eur(total);
+    var big=$('#hBig'); big.classList.remove('pop2'); void big.offsetWidth; big.classList.add('pop2');
+    var tag = cas==='demission'?'Total estimé (congés inclus)':'Total estimé au départ';
+    $('#heroTag').textContent=tag;
+
+    var sub;
+    if(sal<=0) sub='Renseigne ton salaire pour estimer';
+    else if(cas==='demission') sub='En démission, surtout tes congés non pris';
+    else if(y<8/12 && cas==='licenciement') sub='Moins de 8 mois : pas d\'indemnité légale, mais préavis et congés';
+    else sub='Estimation du minimum légal — négociable ou conventionnel en plus';
+    $('#hSub').textContent=sub;
+
+    // breakdown
+    var bc=$('#breakdown'); bc.innerHTML='';
+    rows.forEach(function(r){ var d=document.createElement('div'); d.className='brk'+(r.muted?' muted':'');
+      d.innerHTML='<div class="be">'+r.e+'</div><div class="bc"><div class="bt">'+r.t+'</div><div class="bd">'+r.d+'</div></div><div class="bv">'+(r.muted?(r.v>0?eur(r.v):'—'):eur(r.v))+'</div>';
+      bc.appendChild(d); });
+
+    // case note
+    var note='';
+    if(cas==='licenciement') note='Hypothèse : licenciement hors faute grave/lourde. Le préavis n\'est de l\'argent que s\'il est non effectué (sinon il est déjà dans ton salaire).';
+    else if(cas==='rupture') note='La rupture conventionnelle ouvre droit aux allocations chômage. L\'indemnité est négociable au-dessus du minimum.';
+    else note='La démission n\'ouvre pas droit au chômage (sauf cas particuliers : démission légitime, reconversion…). Tes congés non pris restent dus.';
+    $('#caseNote').textContent=note;
+
+    save();
+  }
+
+  /* inputs */
+  $('#fSal').value=state.sal; $('#fYears').value=state.years; $('#fMonths').value=state.months; $('#fCP').value=state.cp;
+  $('#fSal').addEventListener('input',function(){state.sal=this.value;recalc();});
+  $('#fYears').addEventListener('input',function(){state.years=parseInt(this.value,10)||0;recalc();});
+  $('#fMonths').addEventListener('input',function(){state.months=Math.min(11,parseInt(this.value,10)||0);recalc();});
+  $('#fCP').addEventListener('input',function(){state.cp=parseFloat(this.value)||0;recalc();});
+
+  $all('.case').forEach(function(c){ c.addEventListener('click',function(){
+    state.cas=c.dataset.case; $all('.case').forEach(function(x){x.classList.toggle('on',x===c);}); recalc();
+  }); });
+
+  /* salary helper */
+  $('#openSalHelp').addEventListener('click',function(){$('#salHelp').classList.add('show');});
+  $('#shApply').addEventListener('click',function(){
+    var m12=parseFloat($('#sh12').value)||0; var t3=parseFloat($('#sh3').value)||0;
+    var third=t3/3; var best=Math.max(m12,third);
+    if(best<=0){ $('#shResult').textContent='Saisis au moins une valeur.'; return; }
+    $('#shResult').textContent='Retenu : '+eur(best)+' / mois '+(best===m12?'(moyenne 12 mois)':'(1/3 des 3 mois)');
+    state.sal=Math.round(best*100)/100; $('#fSal').value=state.sal; recalc();
+    setTimeout(function(){$('#salHelp').classList.remove('show');},900);
+  });
+
+  /* wizard */
+  var wStep=0,wMax=4;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'En route ! 🌄':'Continuer';$('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){ if(wStep<wMax-1)show(wStep+1); else { $('#wizard').classList.remove('show'); set(LS.WELCOME,1); } });
+  $('#wSkip').addEventListener('click',function(){ $('#wizard').classList.remove('show'); set(LS.WELCOME,1); });
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  /* init */
+  $all('.case').forEach(function(x){x.classList.toggle('on',x.dataset.case===state.cas);});
+  recalc();
+  if(!get(LS.WELCOME,0)){ $('#wizard').classList.add('show'); show(0); }
+})();
+</script>
+
+<div style="text-align:center;margin-top:10px;"><button onclick="resetState()" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button></div>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

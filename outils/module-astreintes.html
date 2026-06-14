@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Astreintes — Définition & Compensation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a3a6a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Astreintes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#2a5a9a;--acc-l:#4a7aba;--acc-d:#1a3a7a;
+  --dark:#080e1c;--dark2:#0e1828;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#080e1c 0%,#0e1828 50%,#061018 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(42,90,154,0.22),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(8,14,28,0.97),rgba(8,14,28,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;
+  padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234a7aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* distinction clé */
+.distinction{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.dist-box{border-radius:12px;padding:14px;}
+.dist-box.ast{background:rgba(42,90,154,0.2);border:1.5px solid rgba(42,90,154,0.4);}
+.dist-box.trav{background:rgba(74,170,122,0.15);border:1.5px solid rgba(74,170,122,0.35);}
+.dist-box .dh{font-size:11px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;
+  margin-bottom:6px;}
+.dist-box.ast .dh{color:var(--info);}
+.dist-box.trav .dh{color:var(--ok);}
+.dist-box .db{font-size:12px;color:var(--ink2);line-height:1.4;}
+.dist-box .dtag{display:inline-block;margin-top:6px;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:6px;}
+.dist-box.ast .dtag{background:rgba(42,90,154,0.3);color:var(--info);}
+.dist-box.trav .dtag{background:rgba(74,170,122,0.2);color:var(--ok);}
+
+/* résultat simulateur */
+.res{border-radius:14px;padding:16px;margin-bottom:10px;}
+.res.main{background:linear-gradient(135deg,rgba(42,90,154,0.25),rgba(42,90,154,0.1));
+  border:1.5px solid rgba(42,90,154,0.5);}
+.res.info{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:32px;font-weight:800;line-height:1;}
+.res .rsub{font-size:12px;color:var(--ink2);margin-top:5px;line-height:1.4;}
+
+/* règles */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:6px;}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.info{background:rgba(90,154,216,0.2);color:var(--info);}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">📟</span>
+      <div class="wiz-h">Astreintes</div>
+      <div class="wiz-p">L'astreinte n'est pas du travail effectif, mais elle est encadrée et compensée.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Définition & compensation</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">📟</div><div class="wt"><b>Quelle compensation ?</b>Temps d'intervention = travail effectif. Période d'astreinte hors intervention = repos ou prime.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Règles légales</b>L'employeur fixe les astreintes par accord ou décision unilatérale. Délai de prévenance : 15 jours minimum.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">📟</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Astreintes</div>
+    <div class="su">Définition · Compensation · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <!-- Distinction clé -->
+  <div class="sec-t" style="margin-top:14px;">⚡ La distinction fondamentale</div>
+  <div class="distinction">
+    <div class="dist-box ast">
+      <div class="dh">📟 Astreinte</div>
+      <div class="db">Tu es chez toi, disponible, mais pas forcément sollicité. Tu peux vaquer à des occupations personnelles.</div>
+      <div class="dtag">Pas du temps de travail effectif</div>
+    </div>
+    <div class="dist-box trav">
+      <div class="dh">⚙️ Intervention</div>
+      <div class="db">Tu es effectivement sollicité et tu travailles. Chaque minute d'intervention compte comme du temps de travail.</div>
+      <div class="dtag">Temps de travail effectif</div>
+    </div>
+  </div>
+
+  <!-- Simulateur -->
+  <div class="panel">
+    <div class="panel-t">🧮 Simuler une période d'astreinte</div>
+    <div class="field">
+      <label>Salaire horaire brut</label>
+      <div class="inline">
+        <input class="ip" id="fTaux" type="number" min="0" step="0.01" placeholder="0">
+        <span class="unit">€ brut/mois</span>
+      </div>
+      <div class="hint">Salaire brut mensuel ÷ 151,67 pour un temps plein 35h.</div>
+    </div>
+    <div class="field">
+      <label>Durée de l'astreinte (hors intervention)</label>
+      <div class="inline">
+        <input class="ip" id="fDuree" type="number" min="0" step="0.5" placeholder="0">
+        <span class="unit">heures</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Durée d'intervention effective</label>
+      <div class="inline">
+        <input class="ip" id="fIntervention" type="number" min="0" step="0.5" placeholder="0">
+        <span class="unit">heures</span>
+      </div>
+      <div class="hint">Comptabilisées comme heures supplémentaires si elles dépassent la durée légale.</div>
+    </div>
+    <div class="field">
+      <label>Compensation astreinte prévue par accord</label>
+      <select class="ip" id="fComp">
+        <option value="10">110 % du taux horaire (exemple classique d'accord d'entreprise)</option>
+        <option value="15">15 % du taux horaire</option>
+        <option value="25">25 % du taux horaire</option>
+        <option value="custom">Autre (vérifier convention)</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="results" style="display:none;">
+    <div class="res main">
+      <div class="rl">Compensation astreinte estimée</div>
+      <div class="rbig" id="rAstreinte">—</div>
+      <div class="rsub" id="rAstreinteDetail"></div>
+    </div>
+    <div class="res info">
+      <div class="rl">Rémunération intervention</div>
+      <div style="font-size:22px;font-weight:800;" id="rIntervention">—</div>
+      <div class="rsub" id="rInterventionDetail"></div>
+    </div>
+    <div class="res info">
+      <div class="rl">⚠️ Important</div>
+      <div class="rsub">Ces montants sont des estimations. La compensation réelle dépend de ton accord d'entreprise ou de branche, qui peut prévoir des montants forfaitaires ou des majorations différentes.</div>
+    </div>
+  </div>
+
+  <!-- Règles -->
+  <div class="sec-t">⚖️ Règles essentielles</div>
+
+  <div class="rule"><div class="ri">📋</div><div>
+    <div class="rt">Mise en place obligatoirement par accord</div>
+    <div class="rd">Les astreintes ne peuvent être mises en place que par accord collectif (branche ou entreprise) ou, à défaut, après avis du CSE et information de l'inspection du travail. <span data-art="L3121-11"></span>.</div>
+    <span class="ctag info"><span data-art="L3121-11"></span></span>
+  </div></div>
+
+  <div class="rule"><div class="ri">💶</div><div>
+    <div class="rt">Compensation financière ou en repos obligatoire</div>
+    <div class="rd">Chaque période d'astreinte doit donner lieu à une compensation, financière ou sous forme de repos. Le montant est fixé par accord. Sans accord, aucune règle légale de taux minimum n'existe — c'est l'accord qui prime.</div>
+    <span class="ctag warn">Montant fixé par accord</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">⚙️</div><div>
+    <div class="rt">L'intervention = temps de travail effectif</div>
+    <div class="rd">Dès la première minute d'intervention (y compris le déplacement aller/retour), le salarié est en temps de travail effectif. Ces heures s'ajoutent au compteur hebdomadaire et peuvent générer des heures supplémentaires.</div>
+    <span class="ctag ok">S'ajoute au temps de travail</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">🛏️</div><div>
+    <div class="rt">Repos quotidien et hebdomadaire</div>
+    <div class="rd">L'astreinte seule (sans intervention) ne suspend pas les repos obligatoires. En revanche, une intervention en astreinte déclenche un nouveau décompte du repos quotidien de 11h consécutives.</div>
+    <span class="ctag warn">Repos de 11h à respecter après intervention</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">📄</div><div>
+    <div class="rt">Planning d'astreinte à l'avance</div>
+    <div class="rd">Le planning des astreintes doit être communiqué au salarié au moins 15 jours à l'avance, sauf circonstances exceptionnelles où le délai peut être réduit à 1 jour franc.</div>
+    <span class="ctag info">15 jours à l'avance minimum</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">📊</div><div>
+    <div class="rt">Document mensuel obligatoire</div>
+    <div class="rd">À la fin de chaque mois, l'entreprise remet au salarié un document récapitulant les astreintes effectuées et les compensations correspondantes. Ce document est conservé pendant 1 an.</div>
+  </div></div>
+
+  <div class="note"><span data-art="L3121-9"></span> à <span data-art="L3121-12"></span> CT — Outil indicatif & pédagogique.<br>
+    La compensation réelle dépend de ton accord d'entreprise ou de branche.<br>
+    📟 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Code du travail français · Outil pédagogique · ni avis juridique</div>
+</div>
+
+<!-- Aide -->
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0e1828;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Entre ton taux horaire, la durée de l'astreinte et le temps d'intervention effectif. Le module estime la compensation selon le taux de ton accord.<br><br>
+      La distinction clé : l'astreinte seule n'est pas du temps de travail effectif, mais l'intervention l'est toujours.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+function $(id){ return document.getElementById(id); }
+function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+
+function recalc(){
+  var taux  = parseFloat($('fTaux').value)||0;
+  var tauxH = taux / 151.67; // taux horaire réel
+  var duree = parseFloat($('fDuree').value)||0;
+  var inter = parseFloat($('fIntervention').value)||0;
+  var comp  = $('fComp').value;
+  if(taux<=0||duree<=0){ $('results').style.display='none'; return; }
+
+  var pct = comp==='custom' ? 10 : parseInt(comp);
+  var compAst  = taux * (pct/100) * duree;
+  var compInter = taux * inter; // au taux normal — les majorations dépendent de la convention
+
+  $('rAstreinte').textContent = eur(compAst);
+  $('rAstreinteDetail').textContent = duree+'h d\'astreinte × '+taux.toFixed(2)+' €/h × '+pct+' % = '+eur(compAst)+
+    (comp==='custom' ? ' — Vérifie le taux exact dans ton accord.' : '');
+
+  $('rIntervention').textContent = inter > 0 ? eur(compInter) : '0 € — Aucune intervention';
+  $('rInterventionDetail').textContent = inter > 0
+    ? inter+'h d\'intervention × '+taux.toFixed(2)+' €/h (hors majorations heures sup. éventuelles)'
+    : 'Si tu es sollicité, chaque heure compte comme du temps de travail effectif.';
+
+  $('results').style.display='block';
+}
+
+['fTaux','fDuree','fIntervention','fComp'].forEach(function(id){
+  $(id).addEventListener('input', recalc);
+  $(id).addEventListener('change', recalc);
+});
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'AST_STATE',WELCOME:'AST_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{taux:'',duree:'',intervention:''});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='AST_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 📟':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

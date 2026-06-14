@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Index Égalité — Comprendre l'Index H/F</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8a2a6a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Égalité H/F">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#a03a7a;--acc-l:#c05a9a;--acc-d:#802a5a;
+  --dark:#1a0c14;--dark2:#24121e;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#1a0c14 0%,#24121e 50%,#160a10 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(160,58,122,0.22),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(26,12,20,0.97),rgba(26,12,20,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:17px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* Jauge score */
+.score-panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;
+  padding:18px;margin:14px 0;overflow:hidden;}
+.score-panel .sp-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:16px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* Jauge */
+.gauge-wrap{margin:16px 0 8px;}
+.gauge-bar{height:14px;border-radius:7px;background:rgba(255,255,255,0.1);overflow:hidden;position:relative;}
+.gauge-fill{height:100%;border-radius:7px;transition:width 0.8s cubic-bezier(.2,1,.4,1);
+  background:linear-gradient(90deg,#e06050,#e8a030,#4aaa7a);}
+.gauge-fill.ko{background:#e06050;}
+.gauge-fill.warn{background:#e8a030;}
+.gauge-fill.ok{background:#4aaa7a;}
+.gauge-labels{display:flex;justify-content:space-between;margin-top:4px;
+  font-size:10px;color:var(--faded);}
+.score-badge{text-align:center;margin:12px 0 4px;}
+.score-num{font-size:52px;font-weight:800;line-height:1;}
+.score-num.ko{color:var(--ko);}
+.score-num.warn{color:var(--warn);}
+.score-num.ok{color:var(--ok);}
+.score-label{font-size:12px;color:var(--ink2);margin-top:4px;}
+
+/* Indicateurs */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.indic{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:14px 15px;margin-bottom:8px;}
+.indic-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.indic-t{font-weight:800;font-size:13px;flex:1;}
+.indic-pts{font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;
+  background:rgba(160,58,122,0.2);color:var(--acc-l);white-space:nowrap;margin-left:8px;}
+.indic-d{font-size:12px;color:var(--ink2);line-height:1.4;}
+.indic-note{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.3;}
+
+/* Niveaux */
+.levels{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.level{display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-radius:10px;border:1.5px solid;}
+.level.ko{background:rgba(224,80,80,0.12);border-color:rgba(224,80,80,0.35);}
+.level.warn{background:rgba(232,160,48,0.12);border-color:rgba(232,160,48,0.35);}
+.level.ok{background:rgba(74,170,122,0.12);border-color:rgba(74,170,122,0.35);}
+.level .lv{font-size:14px;font-weight:800;}
+.level.ko .lv{color:var(--ko);} .level.warn .lv{color:var(--warn);} .level.ok .lv{color:var(--ok);}
+.level .ll{font-size:12px;color:var(--ink2);}
+.level .lc{font-size:11px;color:var(--faded);margin-top:2px;}
+
+/* Règles */
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+
+/* Lien */
+.ext-btn{display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(74,170,122,0.15),rgba(74,170,122,0.05));
+  border:1.5px solid rgba(74,170,122,0.4);border-radius:14px;padding:16px;
+  text-decoration:none;color:#fff;margin-bottom:8px;}
+.ext-btn .ebt{font-weight:800;font-size:14px;color:var(--ok);}
+.ext-btn .ebs{font-size:11.5px;color:var(--ink2);margin-top:3px;}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">⚖️</span>
+      <div class="wiz-h">Index Égalité H/F</div>
+      <div class="wiz-p">Toute entreprise de 50+ salariés doit calculer et publier son index chaque année.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Score & indicateurs</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>5 indicateurs</b>Écarts de rémunération, d'augmentations, de promotions, congé maternité, représentation.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>📊 Score & obligations</b>Score sur 100. En dessous de 75 : plan de correction obligatoire. En dessous de 85 : objectifs de progression.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">⚖️</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Index Égalité H/F</div>
+    <div class="su">Comprendre l'index · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <!-- Score de l'entreprise -->
+  <div class="score-panel">
+    <div class="sp-t">🔍 Le score de ton entreprise</div>
+    <div class="field">
+      <label>Score sur 100 publié par ton entreprise</label>
+      <input class="ip" id="fScore" type="number" min="0" max="100" step="1" placeholder="Ex : 78">
+      <div class="hint">Publié chaque année avant le 1er mars sur le site de l'entreprise et déclaré sur Index-egapro.travail.gouv.fr.</div>
+    </div>
+
+    <div id="gaugeBlock" style="display:none;">
+      <div class="gauge-wrap">
+        <div class="gauge-bar"><div class="gauge-fill" id="gaugeFill" style="width:0%"></div></div>
+        <div class="gauge-labels"><span>0</span><span>75 — seuil légal</span><span>100</span></div>
+      </div>
+      <div class="score-badge">
+        <div class="score-num" id="scoreNum">—</div>
+        <div class="score-label" id="scoreLabel">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Niveaux de lecture -->
+  <div class="sec-t">📊 Comment lire ce score</div>
+  <div class="levels">
+    <div class="level ko">
+      <div><div class="lv">Moins de 75 / 100</div><div class="lc">Plan de rattrapage obligatoire sous 3 ans</div></div>
+      <div style="font-size:20px;">🔴</div>
+    </div>
+    <div class="level warn">
+      <div><div class="lv">75 à 84 / 100</div><div class="lc">Conforme au seuil légal — des axes d'amélioration existent</div></div>
+      <div style="font-size:20px;">🟡</div>
+    </div>
+    <div class="level ok">
+      <div><div class="lv">85 à 99 / 100</div><div class="lc">Bon niveau — entreprise engagée</div></div>
+      <div style="font-size:20px;">🟢</div>
+    </div>
+    <div class="level ok" style="border-color:rgba(90,154,216,0.4);background:rgba(90,154,216,0.1);">
+      <div><div class="lv" style="color:var(--info);">100 / 100</div><div class="lc">Score parfait</div></div>
+      <div style="font-size:20px;">⭐</div>
+    </div>
+  </div>
+
+  <!-- Les 5 indicateurs -->
+  <div class="sec-t">🧮 Les 5 indicateurs qui composent le score</div>
+
+  <div class="indic">
+    <div class="indic-head">
+      <div class="indic-t">1. Écart de rémunération</div>
+      <div class="indic-pts">40 pts max</div>
+    </div>
+    <div class="indic-d">Différence de salaire moyen entre les femmes et les hommes, à poste et âge comparables. C'est l'indicateur le plus pesant.</div>
+    <div class="indic-note">Calculé par catégorie socioprofessionnelle et tranche d'âge.</div>
+  </div>
+
+  <div class="indic">
+    <div class="indic-head">
+      <div class="indic-t">2. Écart de taux d'augmentations individuelles</div>
+      <div class="indic-pts">20 pts max</div>
+    </div>
+    <div class="indic-d">Différence de proportion de femmes et d'hommes ayant bénéficié d'une augmentation individuelle dans l'année.</div>
+    <div class="indic-note">Applicable à toutes les entreprises ≥ 50 salariés. Pour les 50–250 salariés, cet indicateur fusionne augmentations et promotions (vaut 35 pts au lieu de 20).</div>
+  </div>
+
+  <div class="indic">
+    <div class="indic-head">
+      <div class="indic-t">3. Écart de taux de promotions</div>
+      <div class="indic-pts">15 pts max</div>
+    </div>
+    <div class="indic-d">Différence de proportion de femmes et d'hommes ayant été promus dans l'année (changement de niveau ou de coefficient).</div>
+    <div class="indic-note">Entreprises > 250 salariés uniquement (pour les 50–250 salariés, cet indicateur est fusionné avec l'indicateur 2).</div>
+  </div>
+
+  <div class="indic">
+    <div class="indic-head">
+      <div class="indic-t">4. Retour de congé maternité</div>
+      <div class="indic-pts">15 pts max</div>
+    </div>
+    <div class="indic-d">Les salariées revenues de congé maternité ont-elles bénéficié des augmentations générales intervenues pendant leur absence ? Oui = 15 pts, Non = 0 pt.</div>
+    <div class="indic-note">Indicateur binaire — 15 ou 0.</div>
+  </div>
+
+  <div class="indic">
+    <div class="indic-head">
+      <div class="indic-t">5. Parité dans les 10 plus hautes rémunérations</div>
+      <div class="indic-pts">10 pts max</div>
+    </div>
+    <div class="indic-d">Nombre de femmes parmi les 10 salariés les mieux rémunérés. 4 ou 5 femmes = 10 pts. 2 ou 3 femmes = 5 pts. 0 ou 1 femme = 0 pt.</div>
+    <div class="indic-note">Indicateur clé sur la représentation au sommet.</div>
+  </div>
+
+  <!-- Règles -->
+  <div class="sec-t">⚖️ Règles essentielles</div>
+  <div class="rule"><div class="ri">📅</div><div><div class="rt">Publication obligatoire avant le 1er mars</div><div class="rd">Toute entreprise de 50 salariés et plus doit calculer et publier son index chaque année avant le 1er mars sur son site internet et le déclarer sur Index-egapro.</div></div></div>
+  <div class="rule"><div class="ri">⚠️</div><div><div class="rt">Seuil de 75 : plan de rattrapage obligatoire</div><div class="rd">Un score inférieur à 75 impose la mise en place de mesures correctives sous 3 ans. Sans amélioration, l'entreprise s'expose à une pénalité pouvant atteindre 1 % de la masse salariale.</div></div></div>
+  <div class="rule"><div class="ri">👥</div><div><div class="rt">À partir de 50 salariés</div><div class="rd">L'index s'applique aux entreprises de 50 salariés et plus. Les entreprises de 50 à 250 salariés calculent 4 indicateurs sur 5 (l'indicateur promotions étant fusionné avec les augmentations dans un barème sur 35 points — les promotions sont donc bien évaluées, mais intégrées à l'indicateur 2).</div></div></div>
+  <div class="rule"><div class="ri">🔍</div><div><div class="rt">Consultable par tous</div><div class="rd">L'index est public. Tout salarié peut consulter le score de son entreprise sur Index-egapro.travail.gouv.fr en cherchant par nom ou SIREN.</div></div></div>
+
+  <!-- Lien officiel -->
+  <div class="sec-t">🔗 Source officielle</div>
+  <a class="ext-btn" href="https://index-egapro.travail.gouv.fr" target="_blank" rel="noopener">
+    <div><div class="ebt">index-egapro.travail.gouv.fr</div>
+    <div class="ebs">Consulter le score de ton entreprise · Déclaration · Résultats publics</div></div>
+    <span style="font-size:20px;">→</span>
+  </a>
+
+  <div class="note">Outil pédagogique — Loi Avenir Professionnel du 5 sept. 2018.<br>
+    <span data-art="L1142-7"></span> à <span data-art="L1142-9"></span> CT · Décret n°2019-15 du 8 janvier 2019.<br>
+    🔄 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Index égalité professionnelle · Outil indicatif & pédagogique</div>
+</div>
+
+<!-- Aide -->
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#24121e;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Entre le score de ton entreprise pour voir où elle se situe. Le score est publié chaque année avant le 1er mars sur le site de l'entreprise.<br><br>
+      Ce module explique comment est calculé l'index et ce que chaque indicateur mesure.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var inp = document.getElementById('fScore');
+if(!inp) return;
+inp.addEventListener('input', function(){
+  var s = parseInt(this.value);
+  var block = document.getElementById('gaugeBlock');
+  if(isNaN(s)||s<0||s>100){ block.style.display='none'; return; }
+  block.style.display='block';
+  var fill = document.getElementById('gaugeFill');
+  var num  = document.getElementById('scoreNum');
+  var lbl  = document.getElementById('scoreLabel');
+  fill.style.width = s+'%';
+  num.textContent  = s+' / 100';
+  if(s < 75){
+    num.className='score-num ko'; fill.className='gauge-fill ko';
+    lbl.textContent='🔴 Score insuffisant — plan de rattrapage obligatoire sous 3 ans';
+  } else if(s < 85){
+    num.className='score-num warn'; fill.className='gauge-fill warn';
+    lbl.textContent='🟡 Conforme au seuil légal — des axes d\'amélioration existent';
+  } else if(s < 100){
+    num.className='score-num ok'; fill.className='gauge-fill ok';
+    lbl.textContent='🟢 Bon niveau — entreprise engagée dans l\'égalité';
+  } else {
+    num.className='score-num ok'; fill.className='gauge-fill ok';
+    lbl.textContent='⭐ Score parfait';
+  }
+});
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'EGA_STATE',WELCOME:'EGA_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  window.resetState = 
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{score:''});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='EGA_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer ⚖️':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

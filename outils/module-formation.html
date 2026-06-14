@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>CPF & Formation — Comprendre ses Droits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a5a4a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CPF Formation">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#2a8a6a;--acc-l:#4aaa8a;--acc-d:#1a6a4a;
+  --dark:#081410;--dark2:#0e1e18;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#081410 0%,#0e1e18 50%,#081210 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(42,138,106,0.22),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(8,20,16,0.97),rgba(8,20,16,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:17px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* Simulateur crédit */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234aaa8a' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultats */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res{border-radius:14px;padding:16px;}
+.res.main{background:linear-gradient(135deg,rgba(42,138,106,0.25),rgba(42,138,106,0.1));
+  border:1.5px solid rgba(42,138,106,0.5);grid-column:1/-1;}
+.res.half{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:28px;font-weight:800;line-height:1;}
+.res .rsub{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+/* dispositifs */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.disp{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:14px 15px;margin-bottom:8px;}
+.disp .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.disp .dt{font-weight:800;font-size:13px;}
+.disp .dd{font-size:12px;color:var(--ink2);line-height:1.4;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,154,216,0.2);color:var(--info);}
+.ctag.ko{background:rgba(224,80,80,0.15);color:var(--ko);}
+
+/* alerte fraude */
+.alert{background:rgba(224,80,80,0.1);border:1.5px solid rgba(224,80,80,0.35);
+  border-radius:12px;padding:14px 15px;margin-bottom:8px;}
+.alert .at{font-weight:800;font-size:13px;color:var(--ko);}
+.alert .ad{font-size:12px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+/* lien */
+.ext-btn{display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(74,170,122,0.15),rgba(74,170,122,0.05));
+  border:1.5px solid rgba(74,170,122,0.4);border-radius:14px;padding:16px;
+  text-decoration:none;color:#fff;margin-bottom:8px;}
+.ext-btn .ebt{font-weight:800;font-size:14px;color:var(--ok);}
+.ext-btn .ebs{font-size:11.5px;color:var(--ink2);margin-top:3px;}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">🎓</span>
+      <div class="wiz-h">CPF & Formation</div>
+      <div class="wiz-p">Le Compte Personnel de Formation finance des formations tout au long de la carrière.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Droits · Dispositifs · Fraude</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">🎓</div><div class="wt"><b>Mon solde CPF</b>Alimenté chaque année selon le temps de travail. Consultable sur moncompteformation.gouv.fr</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚠️ Attention à la fraude</b>Ne jamais partager ses identifiants. Les arnaques au CPF sont nombreuses.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">🎓</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">CPF & Formation</div>
+    <div class="su">Droits · Dispositifs · Fraude · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <!-- Simulateur CPF -->
+  <div class="panel">
+    <div class="panel-t">💰 Estimer ton crédit CPF</div>
+    <div class="field">
+      <label>Années travaillées à temps plein</label>
+      <div class="inline">
+        <input class="ip" id="fAns" type="number" min="0" max="40" step="1" placeholder="0">
+        <span class="unit">années</span>
+      </div>
+      <div class="hint">Depuis le 1er janvier 2015 (date de création du CPF). Avant = DIF converti.</div>
+    </div>
+    <div class="field">
+      <label>Situation</label>
+      <select class="ip" id="fSit">
+        <option value="plein">Temps plein (500 €/an)</option>
+        <option value="partiel">Temps partiel ou sans qualification (800 €/an)</option>
+        <option value="handicap">Reconnaissance handicap (800 €/an)</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="results" style="display:none;">
+    <div class="res-grid">
+      <div class="res main">
+        <div class="rl">Crédit CPF estimé</div>
+        <div class="rbig" id="rCredit">—</div>
+        <div class="rsub" id="rDetail"></div>
+      </div>
+      <div class="res half">
+        <div class="rl">Par an</div>
+        <div class="rbig" id="rAnnuel">—</div>
+        <div class="rsub">Crédit annuel</div>
+      </div>
+      <div class="res half">
+        <div class="rl">Plafond total</div>
+        <div class="rbig">5 000 €</div>
+        <div class="rsub">8 000 € si peu qualifié</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dispositifs formation -->
+  <div class="sec-t">📚 Les dispositifs de formation</div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">💰 CPF — Compte Personnel de Formation</div></div>
+    <div class="dd">500 €/an (800 € si peu qualifié ou handicap). Utilisable à l'initiative du salarié, sans accord de l'employeur si la formation a lieu hors temps de travail. Accessible sur moncompteformation.gouv.fr.</div>
+    <span class="ctag ok">À l'initiative du salarié</span>
+  </div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">🏢 Plan de développement des compétences</div></div>
+    <div class="dd">Formation décidée par l'employeur, dans le cadre de la politique de formation de l'entreprise. Financement à 100 % par l'entreprise. Le salarié peut refuser certaines formations qualifiantes sans que ce refus soit une faute.</div>
+    <span class="ctag info">À l'initiative de l'employeur</span>
+  </div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">🎯 CPF de transition (ex-CIF)</div></div>
+    <div class="dd">Permet de financer une formation longue pour changer de métier ou se qualifier. Nécessite une ancienneté de 24 mois (dont 12 dans l'entreprise). Financé par Transitions Pro (ex-FONGECIF). Accord de l'employeur requis pour une formation pendant le temps de travail.</div>
+    <span class="ctag warn">24 mois d'ancienneté requis</span>
+  </div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">📜 VAE — Validation des Acquis de l'Expérience</div></div>
+    <div class="dd">Permet d'obtenir un diplôme ou titre professionnel grâce à son expérience (sans repasser par les bancs de l'école). Accessible sans durée minimale d'activité en lien avec la certification visée. Finançable via le CPF.</div>
+    <span class="ctag ok">Accessible sans durée minimale (depuis 2022)</span>
+  </div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">🔍 Bilan de compétences</div></div>
+    <div class="dd">Analyse de tes compétences, aptitudes et motivations pour définir un projet professionnel. Durée max : 24h. Finançable par le CPF (jusqu'à 3 000 €). Peut se faire pendant ou hors temps de travail.</div>
+    <span class="ctag info">Finançable CPF</span>
+  </div>
+
+  <div class="disp">
+    <div class="dh"><div class="dt">🎓 Pro-A — Reconversion par alternance</div></div>
+    <div class="dd">Permet aux salariés peu qualifiés de se reconvertir via l'alternance, en restant dans l'entreprise. Financé par les OPCO. L'employeur et le salarié doivent être d'accord.</div>
+    <span class="ctag warn">Accord des deux parties</span>
+  </div>
+
+  <!-- Réforme 2026 -->
+  <div class="sec-t">🆕 Réforme CPF 2026 — ce qui change</div>
+  <div class="disp">
+    <div class="dh"><div class="dt">💸 Reste à charge porté à 150 €</div></div>
+    <div class="dd">Depuis le 2 avril 2026, une participation forfaitaire de 150 € est demandée pour mobiliser ses droits CPF (contre 103,20 € auparavant). Demandeurs d'emploi exonérés, ou si l'employeur cofinance la formation.</div>
+    <span class="ctag warn">150 € depuis le 2 avril 2026</span>
+  </div>
+  <div class="disp">
+    <div class="dh"><div class="dt">🎯 Nouveaux plafonds par type de formation</div></div>
+    <div class="dd">Depuis le 26 février 2026 : certifications du Répertoire Spécifique (langues, CACES, habilitations) plafonnées à 1 500 €. Bilan de compétences : 1 600 €. Permis de conduire : 900 €. Les certifications RNCP (diplômes, titres pro) restent sans plafond d'utilisation.</div>
+    <span class="ctag warn">Plafonds RS : 1 500 € · Permis : 900 €</span>
+  </div>
+
+  <!-- Alerte fraude -->
+  <div class="sec-t">🚨 Fraude au CPF — Comment se protéger</div>
+  <div class="alert">
+    <div class="at">⚠️ Les arnaques au CPF sont fréquentes</div>
+    <div class="ad">Des démarcheurs (téléphone, SMS, email) proposent d'utiliser ton CPF pour des formations fictives ou inutiles afin de toucher les fonds eux-mêmes. Ces pratiques sont illégales.</div>
+  </div>
+  <div class="disp">
+    <div class="dh"><div class="dt">🛡️ Comment se protéger</div></div>
+    <div class="dd">• Ne communique jamais ton numéro de sécurité sociale ou tes codes d'accès à un démarcheur<br>• Accède toujours à ton CPF directement via moncompteformation.gouv.fr<br>• Si tu es démarché, tu peux signaler sur signal.conso.gouv.fr<br>• Vérifie la certification Qualiopi de l'organisme sur le site officiel du Ministère du Travail (datadock.fr est fermé depuis 2022, remplacé par Qualiopi)</div>
+    <span class="ctag ok">Toujours passer par moncompteformation.gouv.fr</span>
+  </div>
+
+  <!-- Lien officiel -->
+  <div class="sec-t">🔗 Source officielle</div>
+  <a class="ext-btn" href="https://www.moncompteformation.gouv.fr" target="_blank" rel="noopener">
+    <div><div class="ebt">moncompteformation.gouv.fr</div>
+    <div class="ebs">Consulter son solde · Choisir une formation · Se connecter avec FranceConnect</div></div>
+    <span style="font-size:20px;">→</span>
+  </a>
+
+  <div class="note"><span data-art="L6323-1"></span> · Loi Avenir Professionnel du 5 sept. 2018.<br>
+    Crédit : 500 €/an (5 000 € max) · 800 €/an (8 000 € max, peu qualifié/handicap). Réforme du 26 fév. 2026.<br>
+    🎓 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Outil indicatif & pédagogique · Seul moncompteformation.gouv.fr fait foi pour le solde réel</div>
+</div>
+
+<!-- Aide -->
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0e1e18;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Entre tes années travaillées depuis 2015 pour estimer ton crédit CPF. Le solde exact est sur moncompteformation.gouv.fr.<br><br>
+      Ce module explique aussi tous les dispositifs de formation et comment éviter les arnaques au CPF.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var TAUX = { plein:500, partiel:800, handicap:800 };
+var PLAF = { plein:5000, partiel:8000, handicap:8000 };
+
+function $(id){ return document.getElementById(id); }
+function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'; }
+
+function recalc(){
+  var ans = parseFloat($('fAns').value)||0;
+  var sit = $('fSit').value;
+  if(ans<=0){ $('results').style.display='none'; return; }
+  var taux = TAUX[sit];
+  var plaf = PLAF[sit];
+  var credit = Math.min(ans * taux, plaf);
+  $('rCredit').textContent = eur(credit);
+  $('rDetail').textContent = ans+' an'+(ans>1?'s':'')+' × '+eur(taux)+'/an · plafonné à '+eur(plaf);
+  $('rAnnuel').textContent = eur(taux);
+  $('results').style.display='block';
+}
+['fAns','fSit'].forEach(function(id){
+  $(id).addEventListener('input',recalc);
+  $(id).addEventListener('change',recalc);
+});
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'FOR_STATE',WELCOME:'FOR_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{ans:'',sit:'plein'});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='FOR_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 🎓':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

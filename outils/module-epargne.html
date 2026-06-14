@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Épargne Salariale — Participation & Intéressement</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a5a3a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Épargne Salariale">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#2a7a4a;--acc-l:#4a9a6a;--acc-d:#1a5a3a;
+  --gold:#c8a030;--gold-l:#e8c050;
+  --dark:#081410;--dark2:#0e2018;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#081410 0%,#0e2018 50%,#061010 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(42,122,74,0.2),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(8,20,16,0.97),rgba(8,20,16,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:16px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* Onglets */
+.tabs{display:flex;gap:6px;margin:14px 0;background:rgba(0,0,0,0.3);border-radius:12px;padding:4px;}
+.tab{flex:1;padding:9px 6px;border-radius:9px;border:none;font-family:inherit;font-weight:700;
+  font-size:11px;cursor:pointer;color:var(--faded);background:transparent;transition:.2s;}
+.tab.on{background:var(--acc);color:#fff;}
+.pane{display:none;} .pane.on{display:block;}
+
+/* dispositifs */
+.disp{background:var(--card);border:1.5px solid var(--card-edge);border-radius:14px;padding:16px;margin-bottom:10px;}
+.disp .dh{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:8px;}
+.disp .dt{font-weight:800;font-size:14px;}
+.disp .dbadge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap;flex-shrink:0;}
+.dbadge.oblig{background:rgba(74,170,122,0.2);color:var(--ok);}
+.dbadge.opt{background:rgba(232,160,48,0.2);color:var(--warn);}
+.disp .dd{font-size:12px;color:var(--ink2);line-height:1.45;}
+.disp .dinfo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.disp .di{background:rgba(0,0,0,0.2);border-radius:8px;padding:9px;text-align:center;}
+.disp .div{font-size:16px;font-weight:800;color:var(--acc-l);}
+.disp .dil{font-size:10px;color:var(--faded);margin-top:2px;}
+
+/* déblocage anticipé */
+.unlock-grid{display:flex;flex-direction:column;gap:8px;}
+.unlock{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:12px 14px;display:flex;gap:12px;align-items:flex-start;}
+.unlock .ui{font-size:18px;flex-shrink:0;}
+.unlock .ut{font-weight:700;font-size:12.5px;}
+.unlock .ud{font-size:11.5px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+
+/* simulateur */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultats */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res{border-radius:14px;padding:16px;}
+.res.main{background:linear-gradient(135deg,rgba(42,122,74,0.25),rgba(42,122,74,0.1));
+  border:1.5px solid rgba(42,122,74,0.5);grid-column:1/-1;}
+.res.gold{background:linear-gradient(135deg,rgba(200,160,48,0.2),rgba(200,160,48,0.05));
+  border:1.5px solid rgba(200,160,48,0.4);}
+.res.half{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rlg{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold-l);margin-bottom:6px;}
+.res .rbig{font-size:26px;font-weight:800;line-height:1;}
+.res .rsub{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.gold{background:rgba(200,160,48,0.2);color:var(--gold-l);}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">💰</span>
+      <div class="wiz-h">Épargne salariale</div>
+      <div class="wiz-p">Participation, intéressement, PEE et PER collectif : tes droits à l'épargne en entreprise.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Participation · PEE · PER</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">💰</div><div class="wt"><b>Participation & intéressement</b>La participation est obligatoire dès 50 salariés. L'intéressement est facultatif mais défiscalisé.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Plans d'épargne</b>PEE (5 ans min) et PER collectif (jusqu'à la retraite) permettent de placer les sommes versées.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">💰</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Épargne Salariale</div>
+    <div class="su">Participation · Intéressement · PEE · PER · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('dispositifs')">📊 Dispositifs</button>
+    <button class="tab" onclick="switchTab('deblocage')">🔓 Déblocage</button>
+    <button class="tab" onclick="switchTab('calcul')">🧮 Calcul</button>
+  </div>
+
+  <!-- DISPOSITIFS -->
+  <div class="pane on" id="pane-dispositifs">
+
+    <div class="disp" style="margin-top:14px;">
+      <div class="dh">
+        <div class="dt">💼 Participation aux bénéfices</div>
+        <div class="dbadge oblig">Obligatoire ≥ 50 sal.</div><div style="font-size:10px;margin-top:3px;padding:3px 8px;border-radius:8px;background:rgba(109,76,65,0.12);color:var(--brown,#6d4c41);font-weight:600;">* Loi Partage Valeur : obligation simplifiée 11–49 sal.</div>
+      </div>
+      <div class="dd">Part des bénéfices de l'entreprise redistribuée aux salariés selon une formule légale. Bloquée 5 ans (sauf déblocage anticipé). Exonérée d'impôt sur le revenu si placée sur un PEE.<br><small>* Loi du 29/11/2023 (Partage de la Valeur) : les entreprises de 11 à 49 salariés réalisant un bénéfice net ≥ 1 % du CA pendant 3 ans consécutifs doivent mettre en place un dispositif (participation, intéressement ou prime PPV).</small></div>
+      <div class="dinfo">
+        <div class="di"><div class="div">5 ans</div><div class="dil">Durée de blocage</div></div>
+        <div class="di"><div class="div">≥ 50</div><div class="dil">Salariés (obligatoire)</div></div>
+        <div class="di"><div class="div">Formule</div><div class="dil">Légale ou dérogatoire</div></div>
+        <div class="di"><div class="div">Exo. IR</div><div class="dil">Si placée sur PEE</div></div>
+      </div>
+    </div>
+
+    <div class="disp">
+      <div class="dh">
+        <div class="dt">🎯 Intéressement</div>
+        <div class="dbadge opt">Facultatif — accord requis</div>
+      </div>
+      <div class="dd">Prime liée aux résultats ou aux performances de l'entreprise selon des critères définis par accord. Disponible immédiatement ou placée sur PEE (exonération IR). Non soumise à cotisations sociales dans la limite du plafond.</div>
+      <div class="dinfo">
+        <div class="di"><div class="div">Immédiat</div><div class="dil">Ou placé sur PEE</div></div>
+        <div class="di"><div class="div">75% PASS</div><div class="dil">Plafond individuel/an</div></div>
+        <div class="di"><div class="div">Accord</div><div class="dil">3 ans max, renouvelable</div></div>
+        <div class="di"><div class="div">Exo. IR</div><div class="dil">Si placé sur PEE</div></div>
+      </div>
+    </div>
+
+    <div class="disp">
+      <div class="dh">
+        <div class="dt">🏦 PEE — Plan d'Épargne Entreprise</div>
+        <div class="dbadge opt">Facultatif</div>
+      </div>
+      <div class="dd">Support de placement collectif pour les sommes issues de la participation, l'intéressement et les versements volontaires. L'entreprise peut abonder (jusqu'à 3× les versements du salarié). Blocage 5 ans sauf cas de déblocage.</div>
+      <div class="dinfo">
+        <div class="di"><div class="div">3 844,80 €</div><div class="dil">Plafond abondement/an 2026</div></div>
+        <div class="di"><div class="div">5 ans</div><div class="dil">Durée de blocage</div></div>
+      </div>
+    </div>
+
+    <div class="disp">
+      <div class="dh">
+        <div class="dt">🏛️ PER — Plan d'Épargne Retraite Collectif</div>
+        <div class="dbadge opt">Facultatif</div>
+      </div>
+      <div class="dd">Épargne retraite longue durée. Fonds disponibles uniquement à la retraite (sauf cas de déblocage). Versements déductibles du revenu imposable dans certaines limites. Abondement possible de l'employeur.</div>
+      <div class="dinfo">
+        <div class="di"><div class="div">Retraite</div><div class="dil">Disponible à la retraite</div></div>
+        <div class="di"><div class="div">Déductible</div><div class="dil">Du revenu imposable</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DÉBLOCAGE ANTICIPÉ -->
+  <div class="pane" id="pane-deblocage">
+    <div style="font-size:12px;color:var(--faded);margin:14px 0 10px;line-height:1.4;">
+      Ces cas permettent de récupérer les sommes bloquées sur le PEE avant le délai de 5 ans, <strong>sans pénalité et en exonération d'impôt</strong>.
+    </div>
+    <div class="unlock-grid">
+      <div class="unlock"><div class="ui">💍</div><div><div class="ut">Mariage ou PACS</div><div class="ud">Du salarié. Déblocage possible dans les 6 mois suivant l'événement.</div></div></div>
+      <div class="unlock"><div class="ui">👶</div><div><div class="ut">Naissance ou adoption d'un 3e enfant</div><div class="ud">À partir du 3e enfant (ou plus) à charge. Dans les 6 mois suivant la naissance.</div></div></div>
+      <div class="unlock"><div class="ui">💔</div><div><div class="ut">Divorce, séparation, dissolution du PACS</div><div class="ud">Avec jugement définitif et garde d'au moins un enfant.</div></div></div>
+      <div class="unlock"><div class="ui">♿</div><div><div class="ut">Invalidité</div><div class="ud">Du salarié, de son conjoint ou d'un enfant. Toutes catégories d'invalidité.</div></div></div>
+      <div class="unlock"><div class="ui">💀</div><div><div class="ut">Décès du salarié ou du conjoint</div><div class="ud">Les héritiers peuvent débloquer les fonds.</div></div></div>
+      <div class="unlock"><div class="ui">🏠</div><div><div class="ut">Acquisition de la résidence principale</div><div class="ud">Achat ou construction (pas les travaux). Valable pour le PEE <strong>et pour le PER</strong> (versements volontaires, intéressement et participation sur le PER — loi Pacte).</div></div></div>
+      <div class="unlock"><div class="ui">🔨</div><div><div class="ut">Remise en état de la résidence principale</div><div class="ud">Suite à catastrophe naturelle ou technologique reconnue.</div></div></div>
+      <div class="unlock"><div class="ui">💼</div><div><div class="ut">Rupture du contrat de travail</div><div class="ud">Licenciement, démission, fin de CDD, rupture conventionnelle — tout motif de rupture ouvre ce cas de déblocage (pas seulement la "perte d'emploi").</div></div></div>
+      <div class="unlock"><div class="ui">🏢</div><div><div class="ut">Création ou reprise d'entreprise</div><div class="ud">Par le salarié, son conjoint ou ses enfants.</div></div></div>
+      <div class="unlock"><div class="ui">💸</div><div><div class="ut">Surendettement</div><div class="ud">Sur demande de la commission de surendettement ou du juge.</div></div></div>
+    </div>
+  </div>
+
+  <!-- CALCUL -->
+  <div class="pane" id="pane-calcul">
+    <div class="panel" style="margin-top:14px;">
+      <div class="panel-t">🧮 Simuler l'abondement PEE</div>
+      <div class="field">
+        <label>Versement volontaire du salarié</label>
+        <div class="inline">
+          <input class="ip" id="fVers" type="number" min="0" step="100" placeholder="0">
+          <span class="unit">€</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Taux d'abondement de l'entreprise</label>
+        <div class="inline">
+          <input class="ip" id="fAbo" type="number" min="0" max="300" step="10" placeholder="100">
+          <span class="unit">%</span>
+        </div>
+        <div class="hint">L'entreprise peut abonder jusqu'à 300% du versement salarié, dans la limite de 3 844,80 €/an (2026).</div>
+      </div>
+    </div>
+    <div id="calcResults" style="display:none;">
+      <div class="res-grid">
+        <div class="res main">
+          <div class="rl">Total épargné (salarié + abondement)</div>
+          <div class="rbig" id="rTotal">—</div>
+          <div class="rsub" id="rTotalDetail"></div>
+        </div>
+        <div class="res gold">
+          <div class="rlg">Abondement employeur</div>
+          <div class="rbig" id="rAbondo" style="color:var(--gold-l);">—</div>
+          <div class="rsub">Exonéré d'IR et de cotisations sociales (hors CSG-CRDS prélevée à la source)</div>
+        </div>
+        <div class="res half">
+          <div class="rl">Gain fiscal estimé</div>
+          <div class="rbig" id="rGain">—</div>
+          <div class="rsub">Sur l'abondement (exo. IR+charges)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-t">⚖️ Règles clés</div>
+    <div class="rule"><div class="ri">💶</div><div>
+      <div class="rt">Participation : exonération si placée sur PEE</div>
+      <div class="rd">La participation est exonérée d'impôt sur le revenu si elle est investie sur le PEE. Si le salarié choisit de la percevoir immédiatement, elle est imposable comme un salaire.</div>
+      <span class="ctag ok">Exo. IR si PEE</span>
+    </div></div>
+    <div class="rule"><div class="ri">🎯</div><div>
+      <div class="rt">Intéressement : choix immédiat ou différé</div>
+      <div class="rd">Le salarié a 15 jours pour choisir entre percevoir l'intéressement (imposable) ou le placer sur PEE/PER (exonéré IR). Sans réponse dans ce délai, la somme est investie par défaut sur le PEE.</div>
+      <span class="ctag warn">15 jours pour choisir</span>
+    </div></div>
+    <div class="rule"><div class="ri">🏦</div><div>
+      <div class="rt">Abondement : un cadeau de l'employeur</div>
+      <div class="rd">L'abondement est versé par l'entreprise en plus du versement du salarié. Il est exonéré de cotisations sociales et d'IR dans la limite de 3 844,80 €/an pour le PEE (2026). C'est un avantage souvent sous-utilisé.</div>
+      <span class="ctag gold">3 844,80 €/an max 2026</span>
+    </div></div>
+    <div class="rule"><div class="ri">📋</div><div>
+      <div class="rt">Vérifier son accord d'entreprise</div>
+      <div class="rd">Les dispositifs d'épargne salariale sont négociés par accord collectif. Tous les salariés n'y ont pas accès — cela dépend de l'existence d'un accord dans leur entreprise.</div>
+      <span class="ctag warn">Accord collectif requis</span>
+    </div></div>
+  </div>
+
+  <div class="note"><span data-art="L3311-1"></span> à <span data-art="L3333-6"></span> CT · Loi Pacte 2019 · Plafonds 2026.<br>
+    Outil indicatif & pédagogique — ni avis fiscal ni juridique.<br>
+    💰 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Loi Pacte du 22 mai 2019 · Barèmes URSSAF/DGFiP 2026 · Outil pédagogique</div>
+</div>
+
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0e2018;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      3 onglets : les dispositifs (participation, intéressement, PEE, PER), les 10 cas de déblocage anticipé du PEE, et un simulateur d'abondement.<br><br>
+      Ces dispositifs sont souvent sous-utilisés — vérife si ton entreprise en propose !
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PLAF_ABO = 3850; // PEE 2026
+
+window.switchTab = function(t){
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('on',['dispositifs','deblocage','calcul'][i]===t);
+  });
+  document.querySelectorAll('.pane').forEach(function(el){
+    el.classList.toggle('on',el.id==='pane-'+t);
+  });
+};
+
+function $(id){ return document.getElementById(id); }
+function eur(n){ return Math.round(n).toLocaleString('fr-FR')+' €'; }
+
+function calcAbo(){
+  var v = parseFloat($('fVers').value)||0;
+  var a = parseFloat($('fAbo').value)||100;
+  if(v<=0){$('calcResults').style.display='none';return;}
+  var abond = Math.min(v * a/100, PLAF_ABO);
+  var total = v + abond;
+  var gain  = Math.round(abond * 0.47); // estimation gain IR+charges (~47%)
+  $('rTotal').textContent      = eur(total);
+  $('rTotalDetail').textContent = eur(v)+' (toi) + '+eur(abond)+' (employeur)';
+  $('rAbondo').textContent     = eur(abond);
+  $('rGain').textContent       = '≈ '+eur(gain);
+  $('calcResults').style.display='block';
+}
+['fVers','fAbo'].forEach(function(id){
+  $(id).addEventListener('input',calcAbo);
+});
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'EPA_STATE',WELCOME:'EPA_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{vers:'',abo:100});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='EPA_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 💰':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

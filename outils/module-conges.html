@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Mes Congés Payés</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#e07a4a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mes Congés">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --orange:#e07a4a;--orange-l:#f0965e;--orange-d:#c25e30;
+  --cream:#fff8f0;--cream2:#fff0e0;--cream3:#ffe5cc;
+  --card:#fffdf9;--card-edge:#f0c8a0;
+  --ink:#3e1a00;--ink2:#6b3010;--faded:#c08060;
+  --ok:#2e7d50;--warn:#c07820;--red:#c62828;
+  --line:rgba(62,26,0,0.10);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;background:linear-gradient(160deg,#ffe8d0,#fff5ea 60%,#fff8f0);}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--cream);color:var(--ink);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:20px;} #lb .t{font-size:28px;font-weight:700;color:var(--orange);}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 20px;}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:rgba(255,245,234,0.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--card-edge);
+  max-width:480px;margin:0 auto;}
+header a.back{background:var(--card);border:1.5px solid var(--card-edge);color:var(--ink);border-radius:10px;
+  padding:7px 14px;font-size:12px;font-weight:700;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--ink);font-style:italic;}
+header .brand .su{font-size:9.5px;color:var(--faded);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+header .hbtn{background:var(--card);border:1.5px solid var(--card-edge);color:var(--orange);border-radius:50%;
+  width:36px;height:36px;font-size:15px;cursor:pointer;flex-shrink:0;}
+
+/* Toggle jours ouvrables / ouvrés */
+.toggle-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;}
+.tog-btn{background:var(--card);border:2px solid var(--card-edge);border-radius:14px;padding:12px;
+  text-align:center;cursor:pointer;transition:.18s;user-select:none;}
+.tog-btn.on{background:var(--orange);border-color:var(--orange);color:#fff;}
+.tog-btn .lab{font-size:14px;font-weight:800;}
+.tog-btn .sub{font-size:11px;margin-top:3px;opacity:0.7;}
+
+.sec{background:var(--card);border-radius:18px;padding:18px 18px;margin-bottom:12px;
+  border:1px solid var(--card-edge);box-shadow:0 2px 8px rgba(62,26,0,0.05);}
+.sec h3{font-size:13.5px;font-weight:800;color:var(--orange);margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;}
+.field .hint{font-size:11px;color:var(--faded);margin-top:4px;line-height:1.4;}
+.ip{width:100%;border:2px solid var(--card-edge);border-radius:12px;padding:13px 14px;
+  font-size:15px;font-weight:700;color:var(--ink);background:var(--cream2);
+  font-family:'Lato',sans-serif;outline:none;-webkit-appearance:none;}
+.ip:focus{border-color:var(--orange);background:#fff;}
+
+/* Result panel */
+.result-card{background:linear-gradient(135deg,var(--orange),var(--orange-l));border-radius:18px;
+  padding:22px;margin-bottom:12px;color:#fff;text-align:center;}
+.result-card .big{font-size:52px;font-weight:800;line-height:1;}
+.result-card .unit{font-size:14px;opacity:0.85;margin-top:4px;}
+.result-card .sub{font-size:12px;opacity:0.7;margin-top:8px;}
+
+.detail-row{display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid var(--line);}
+.detail-row:last-child{border-bottom:none;}
+.detail-row .dl{font-size:13px;color:var(--ink2);}
+.detail-row .dv{font-size:14px;font-weight:800;color:var(--orange);}
+
+.warn-box{background:#fff8e1;border:1.5px solid #ffe082;border-radius:12px;padding:12px 14px;margin-top:12px;}
+.warn-box p{font-size:12px;color:#5d4037;line-height:1.5;}
+
+/* Info cards */
+.info-card{background:var(--card);border-radius:16px;padding:16px 18px;margin-bottom:12px;
+  border:1px solid var(--card-edge);}
+.info-card h3{font-size:14px;font-weight:800;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.info-card li{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-bottom:5px;}
+.info-card ul{padding-left:16px;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">🏝️</div><div class="t">Passe en portrait pour utiliser cet outil</div></div>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Mes Congés</div><div class="su">Cap sur l'évasion · V1.0</div></div>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
+</header>
+
+<div class="wrap">
+  <!-- Mode jours -->
+  <div id="resultCard" class="result-card" style="display:none;margin-top:16px;">
+    <div class="big" id="rDays">--</div>
+    <div class="unit" id="rUnit">jours acquis à ce jour</div>
+    <div class="sub" id="rSub"></div>
+  </div>
+  <div class="sec" style="margin-top:16px;">
+    <h3>📅 Comment comptes-tu ?</h3>
+    <div class="toggle-row">
+      <div class="tog-btn on" id="togOuvrables" onclick="setMode('ouvrables')">
+        <div class="lab">Jours ouvrables</div><div class="sub">30/an · lun→sam</div>
+      </div>
+      <div class="tog-btn" id="togOuvres" onclick="setMode('ouvres')">
+        <div class="lab">Jours ouvrés</div><div class="sub">25/an · lun→ven</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3>📍 Ta situation</h3>
+    <div class="field">
+      <label>Début de la période de référence</label>
+      <input class="ip" type="date" id="iPeriodeDebut" oninput="calc()">
+      <div class="hint">Le 1er juin par défaut. Mets ta date d'embauche si tu es arrivé après, ou la date de début de ta période d'entreprise.</div>
+    </div>
+    <div class="field">
+      <label>Jours de congés déjà posés sur cette période</label>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input class="ip" type="number" id="iPoses" min="0" max="60" step="0.5" placeholder="0" oninput="calc()" style="flex:1;">
+        <span style="font-size:13px;color:var(--faded);white-space:nowrap;" id="unitPoses">jours ouvrables</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>Projection — Combien j'aurai acquis à cette date :</label>
+      <input class="ip" type="date" id="iProjectDate" oninput="calc()">
+    </div>
+  </div>
+
+  <div class="sec" id="resultSec" style="display:none;">
+    <h3>🌴 Résultats</h3>
+    <div id="detailRows"></div>
+  </div>
+
+  <div class="info-card">
+    <h3>📌 Points essentiels souvent méconnus</h3>
+    <ul>
+      <li><b>Période de référence :</b> du 1er juin N au 31 mai N+1 par défaut. Elle peut être calée sur l'année civile par accord d'entreprise.</li>
+      <li><b>Acquisition :</b> 2,5 jours ouvrables (ou 2,08 jours ouvrés) par mois de travail effectif — soit 30 j.ouv. ou 25 j.ouv. par an.</li>
+      <li><b>Prise :</b> les congés acquis pendant la période de référence (du 1er juin N au 31 mai N+1) peuvent être pris du 1er juin N+1 au 31 mai N+2. La loi prévoit en principe une information de chaque salarié sur l'ordre des départs au moins 1 mois avant son départ effectif (art. D3141-6). La période principale (1er mai–31 oct.) est portée à la connaissance des salariés 2 mois avant son ouverture. Sauf accord ou report pour maladie.</li>
+      <li><b>Fractionnement :</b> si tu prends moins de 12 j.ouv. en continu en période légale (1er mai–31 oct.), tu peux avoir droit à 1 ou 2 jours supplémentaires.</li>
+      <li><b>Congés maladie :</b> depuis la loi DDADUE n°2024-364 du 22/04/2024 (art. L3141-3 à L3141-5-1 CT), les congés s'acquièrent pendant un arrêt maladie ordinaire : 2 j.ouv./mois (max 24 j/an par période de référence — apprécié période par période, Cass. janv. 2026) ou AT/MP : 2,5 j.ouv./mois. Report possible en cas de maladie pendant les congés (mise en demeure France du 18/06/2025).</li>
+    </ul>
+  </div>
+
+  <p style="font-size:11px;color:var(--faded);text-align:center;padding:8px 0 16px;line-height:1.6;">
+    <span data-txt="disclaimer_fiscal"></span>.<br><span data-txt="disclaimer_suivi"></span>.<br><span data-txt="ccn_differente"></span>.
+  </p>
+</div>
+
+<div id="helpOv" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(62,26,0,0.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:20px;padding:24px;max-width:360px;width:100%;max-height:80vh;overflow-y:auto;">
+    <div style="font-size:40px;text-align:center;margin-bottom:12px;">🏝️</div>
+    <h2 style="font-family:'Playfair Display',serif;text-align:center;color:var(--ink);margin-bottom:14px;">Mes Congés Payés</h2>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.55;margin-bottom:10px;">Renseigne la <b>date de début de ta période</b> (généralement le 1er juin) et le nombre de jours <b>déjà posés</b> pour voir ton solde en temps réel.</p>
+    <p style="font-size:13px;color:var(--ink2);line-height:1.55;margin-bottom:10px;">Utilise la <b>projection</b> pour savoir combien tu auras acquis à une date future (ex: avant tes vacances).</p>
+    <p style="font-size:12px;color:var(--faded);line-height:1.5;margin-bottom:14px;">Choisis entre <b>jours ouvrables</b> (lun→sam, base 30/an) et <b>jours ouvrés</b> (lun→ven, base 25/an) selon ta convention.</p>
+    <button onclick="document.getElementById('helpOv').style.display='none'" style="display:block;width:100%;background:var(--orange);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;">Compris ✓</button>
+  </div>
+</div>
+
+<script>
+var LS={STATE:'CP_STATE',WELCOME:'CP_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+
+var mode='ouvrables'; // 'ouvrables' = 30j/an, 'ouvres' = 25j/an
+var state=get(LS.STATE,{mode:'ouvrables',periodeDebut:'',poses:0,projectDate:''});
+mode=state.mode||'ouvrables';
+
+function setMode(m){
+  mode=m;
+  document.getElementById('togOuvrables').classList.toggle('on',m==='ouvrables');
+  document.getElementById('togOuvres').classList.toggle('on',m==='ouvres');
+  document.getElementById('unitPoses').textContent=m==='ouvrables'?'jours ouvrables':'jours ouvrés';
+  calc();
+}
+
+function pad(n){return String(n).padStart(2,'0');}
+function toDateInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function parseDate(s){if(!s)return null;var p=s.split('-');return new Date(+p[0],+p[1]-1,+p[2]);}
+
+// Nombre de jours ouvrables (lun-sam) entre deux dates
+function countOuvrables(from,to){
+  var count=0;var d=new Date(from);d.setHours(0,0,0,0);
+  var t=new Date(to);t.setHours(0,0,0,0);
+  while(d<t){var dw=d.getDay();if(dw!==0)count++;d.setDate(d.getDate()+1);}
+  return count;
+}
+// Nombre de jours ouvrés (lun-ven)
+function countOuvres(from,to){
+  var count=0;var d=new Date(from);d.setHours(0,0,0,0);
+  var t=new Date(to);t.setHours(0,0,0,0);
+  while(d<t){var dw=d.getDay();if(dw>=1&&dw<=5)count++;d.setDate(d.getDate()+1);}
+  return count;
+}
+
+function calc(){
+  var periodeDebutVal=document.getElementById('iPeriodeDebut').value;
+  var posesVal=parseFloat(document.getElementById('iPoses').value)||0;
+  var projectVal=document.getElementById('iProjectDate').value;
+  
+  // Save state
+  state={mode:mode,periodeDebut:periodeDebutVal,poses:posesVal,projectDate:projectVal};
+  set(LS.STATE,state);
+  
+  var periodeDebut=parseDate(periodeDebutVal);
+  if(!periodeDebut){
+    document.getElementById('resultCard').style.display='none';
+    document.getElementById('resultSec').style.display='none';
+    return;
+  }
+  
+  var today=new Date();today.setHours(0,0,0,0);
+  // Jours acquis : 2.5 j.ouvrables / 30 j.calendaire
+  // Méthode : mois complets écoulés × taux mensuel
+  var ratePerDay = mode==='ouvrables' ? 30/365 : 25/365; // jours par jour calendaire
+  
+  // Calcul par jours réels écoulés depuis début période
+  var elapsed=Math.max(0,(today-periodeDebut)/864e5); // jours
+  var acquis=Math.min(mode==='ouvrables'?30:25, elapsed*ratePerDay);
+  acquis=Math.round(acquis*10)/10;
+  var solde=Math.max(0,Math.round((acquis-posesVal)*10)/10);
+  
+  // Projection
+  var projAcquis=null;
+  if(projectVal){
+    var projDate=parseDate(projectVal);
+    if(projDate){
+      var elapsedProj=Math.max(0,(projDate-periodeDebut)/864e5);
+      projAcquis=Math.min(mode==='ouvrables'?30:25, elapsedProj*ratePerDay);
+      projAcquis=Math.round(projAcquis*10)/10;
+    }
+  }
+  
+  var typeLabel=mode==='ouvrables'?'jours ouvrables':'jours ouvrés';
+  
+  // Result card
+  document.getElementById('resultCard').style.display='block';
+  document.getElementById('rDays').textContent=solde;
+  document.getElementById('rUnit').textContent='jours de solde disponible';
+  document.getElementById('rSub').textContent=acquis+' acquis − '+posesVal+' posés = '+solde+' '+typeLabel;
+  
+  // Detail rows
+  document.getElementById('resultSec').style.display='block';
+  var html='';
+  html+='<div class="detail-row"><span class="dl">🗓️ Jours acquis à ce jour</span><span class="dv">'+acquis+' '+typeLabel+'</span></div>';
+  html+='<div class="detail-row"><span class="dl">✈️ Jours déjà posés</span><span class="dv">'+posesVal+' '+typeLabel+'</span></div>';
+  html+='<div class="detail-row"><span class="dl">🌴 Solde disponible</span><span class="dv">'+solde+' '+typeLabel+'</span></div>';
+  if(projAcquis!==null){
+    var projSolde=Math.max(0,Math.round((projAcquis-posesVal)*10)/10);
+    html+='<div class="detail-row" style="border-top:2px dashed var(--line);margin-top:8px;padding-top:14px;"><span class="dl">🔮 Acquis à la date de projection</span><span class="dv">'+projAcquis+' '+typeLabel+'</span></div>';
+    html+='<div class="detail-row"><span class="dl">🌴 Solde projeté (après posés)</span><span class="dv">'+projSolde+' '+typeLabel+'</span></div>';
+  }
+  document.getElementById('detailRows').innerHTML=html;
+}
+
+// Init
+document.getElementById('helpBtn').addEventListener('click',function(){document.getElementById('helpOv').style.display='flex';});
+
+// Set defaults
+var today=new Date();
+var defaultDebut=new Date(today.getFullYear(),5,1); // 1er juin
+if(today<defaultDebut)defaultDebut=new Date(today.getFullYear()-1,5,1);
+document.getElementById('iPeriodeDebut').value=state.periodeDebut||toDateInput(defaultDebut);
+document.getElementById('iPoses').value=state.poses||0;
+var defaultProj=new Date();defaultProj.setDate(defaultProj.getDate()+30);
+document.getElementById('iProjectDate').value=state.projectDate||toDateInput(defaultProj);
+document.getElementById('unitPoses').textContent=mode==='ouvrables'?'jours ouvrables':'jours ouvrés';
+document.getElementById('togOuvrables').classList.toggle('on',mode==='ouvrables');
+document.getElementById('togOuvres').classList.toggle('on',mode==='ouvres');
+calc();
+if(!get(LS.WELCOME,0)){document.getElementById('helpOv').style.display='flex';set(LS.WELCOME,1);}
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

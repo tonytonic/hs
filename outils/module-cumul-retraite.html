@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Cumul Emploi-Retraite</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a5a7a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cumul Emploi-Retraite">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#3a7a9a;--acc-l:#5a9aba;--acc-d:#2a5a7a;
+  --dark:#080e18;--dark2:#0e1828;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5ab0e0;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#080e18 0%,#0e1828 50%,#061020 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(58,122,154,0.2),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(8,14,24,0.97),rgba(8,14,24,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:17px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* deux régimes */
+.regime-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0;}
+.regime{border-radius:14px;padding:14px;border:1.5px solid;}
+.regime.libre{background:rgba(74,170,122,0.12);border-color:rgba(74,170,122,0.4);}
+.regime.plafonne{background:rgba(232,160,48,0.1);border-color:rgba(232,160,48,0.35);}
+.regime .rh{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.regime.libre .rh{color:var(--ok);}
+.regime.plafonne .rh{color:var(--warn);}
+.regime .rt{font-weight:800;font-size:13px;margin-bottom:5px;}
+.regime .rd{font-size:11.5px;color:var(--ink2);line-height:1.35;}
+
+/* simulateur */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a9aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultats */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res{border-radius:14px;padding:16px;}
+.res.main{background:linear-gradient(135deg,rgba(58,122,154,0.25),rgba(58,122,154,0.1));
+  border:1.5px solid rgba(58,122,154,0.5);grid-column:1/-1;}
+.res.ok{background:rgba(74,170,122,0.1);border:1.5px solid rgba(74,170,122,0.35);}
+.res.warn{background:rgba(232,160,48,0.1);border:1.5px solid rgba(232,160,48,0.35);}
+.res.half{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:26px;font-weight:800;line-height:1;}
+.res .rsub{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,176,224,0.2);color:var(--info);}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">🏖️</span>
+      <div class="wiz-h">Cumul emploi-retraite</div>
+      <div class="wiz-p">Depuis 2023, les règles ont changé : le cumul peut ouvrir de nouveaux droits.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Libéralisé & plafonné</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">🏖️</div><div class="wt"><b>Deux régimes</b>Libéralisé si toutes retraites liquidées à taux plein. Plafonné sinon.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Plafond & déclaration</b>En cumul plafonné : pension + salaire ≤ dernier salaire. Déclaration obligatoire.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">🏖️</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Cumul Emploi-Retraite</div>
+    <div class="su">Travailler & percevoir sa retraite · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <!-- 2 régimes -->
+  <div class="sec-t" style="margin-top:14px;">📊 Deux régimes selon ta situation</div>
+  <div class="regime-grid">
+    <div class="regime libre">
+      <div class="rh">✅ Cumul libéralisé</div>
+      <div class="rt">Sans plafond</div>
+      <div class="rd">Si tu as liquidé ta retraite à taux plein (toutes conditions remplies) : tu cumules sans limite de revenus.</div>
+    </div>
+    <div class="regime plafonne">
+      <div class="rh">⚠️ Cumul plafonné</div>
+      <div class="rt">Avec plafond</div>
+      <div class="rd">Si ta retraite n'est pas à taux plein ou si tu reprends chez le même employeur avant 6 mois : plafond applicable.</div>
+    </div>
+  </div>
+
+  <!-- Simulateur -->
+  <div class="panel">
+    <div class="panel-t">🧮 Vérifier ton plafond de cumul</div>
+    <div class="field">
+      <label>Situation de ta retraite</label>
+      <select class="ip" id="fSit">
+        <option value="plein">Retraite à taux plein (toutes conditions remplies)</option>
+        <option value="partiel">Retraite sans taux plein (décote ou âge anticipé)</option>
+        <option value="meme">Reprise chez le même employeur (dans les 6 mois)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Pension de retraite mensuelle brute</label>
+      <div class="inline">
+        <input class="ip" id="fPension" type="number" min="0" step="50" placeholder="0">
+        <span class="unit">€/mois</span>
+      </div>
+    </div>
+    <div class="field" id="fieldSal">
+      <label>Dernier salaire mensuel brut avant retraite</label>
+      <div class="inline">
+        <input class="ip" id="fSalaire" type="number" min="0" step="50" placeholder="0">
+        <span class="unit">€/mois</span>
+      </div>
+      <div class="hint">Sert à calculer le plafond (160% du SMIC ou dernier salaire, le plus favorable).</div>
+    </div>
+  </div>
+
+  <div id="results" style="display:none;">
+    <div class="res-grid">
+      <div class="res main">
+        <div class="rl">Situation</div>
+        <div class="rbig" id="rSit">—</div>
+        <div class="rsub" id="rSitDetail"></div>
+      </div>
+      <div class="res half">
+        <div class="rl">Plafond revenus activité</div>
+        <div class="rbig" id="rPlafond">—</div>
+        <div class="rsub" id="rPlafondDetail"></div>
+      </div>
+      <div class="res half">
+        <div class="rl">Marge disponible</div>
+        <div class="rbig" id="rMarge">—</div>
+        <div class="rsub" id="rMargeDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Règles -->
+  <div class="sec-t">⚖️ Règles essentielles</div>
+
+  <div class="rule"><div class="ri">✅</div><div>
+    <div class="rt">Cumul libéralisé : taux plein requis</div>
+    <div class="rd">Depuis la réforme 2023, le cumul emploi-retraite libéralisé (sans plafond) est ouvert à tout retraité ayant liquidé sa pension à taux plein (durée de cotisation atteinte ou âge de 67 ans). Les nouvelles cotisations ouvrent de nouveaux droits à pension.</div>
+    <span class="ctag ok">Nouveaux droits retraite générés</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">⚠️</div><div>
+    <div class="rt">Cumul plafonné : cas particuliers</div>
+    <div class="rd">Si la retraite n'est pas à taux plein, ou si la reprise a lieu chez le même employeur dans les 6 mois suivant la liquidation : le cumul est plafonné. Le dépassement entraîne la réduction de la pension à due concurrence.</div>
+    <span class="ctag warn">Réduction de pension si dépassement</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">💶</div><div>
+    <div class="rt">Plafond du cumul plafonné</div>
+    <div class="rd">Le plafond s'applique sur la somme pension + revenu d'activité. Si pension + revenu > plafond (160 % SMIC ≈ 2 987,30 €/mois ou dernier salaire si plus favorable), la pension est réduite à due concurrence. La marge disponible pour l'activité = plafond − pension.</div>
+    <span class="ctag info">160% SMIC ou dernier salaire</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">🏢</div><div>
+    <div class="rt">Reprise chez le même employeur : 6 mois minimum</div>
+    <div class="rd">Le délai de 6 mois ne concerne que la reprise chez le dernier employeur dans le cadre d'un cumul plafonné (avant taux plein) pour éviter la suspension de la pension. Si le salarié a liquidé sa retraite à taux plein, il peut reprendre immédiatement chez le même employeur, sans délai de carence.</div>
+    <span class="ctag warn">6 mois d'attente</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">📋</div><div>
+    <div class="rt">Déclaration obligatoire à la caisse de retraite</div>
+    <div class="rd">Le retraité qui reprend une activité doit en informer sa caisse de retraite. La non-déclaration peut entraîner la suspension de la pension et le remboursement des sommes indûment perçues.</div>
+    <span class="ctag warn">Déclaration obligatoire</span>
+  </div></div>
+
+  <div class="rule"><div class="ri">🏛️</div><div>
+    <div class="rt">Cumul retraite de base + complémentaire</div>
+    <div class="rd">Les règles s'appliquent à la fois pour la retraite de base (CNAV) et la retraite complémentaire (Agirc-Arrco). Il est nécessaire d'avoir liquidé toutes ses pensions pour bénéficier du cumul libéralisé.</div>
+    <span class="ctag info">Toutes pensions liquidées</span>
+  </div></div>
+
+  <div class="note">Loi n°2023-270 du 14 avril 2023 · <span data-art="L161-22"></span>.<br>
+    Plafond 2026 : 160% SMIC ≈ 2 987,30 €/mois. Règles info-retraite.fr.<br>
+    🏖️ Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Réforme des retraites 2023 · Outil indicatif & pédagogique · Seule ta caisse de retraite fait foi</div>
+</div>
+
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0e1828;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Sélectionne ta situation et entre ta pension pour voir si tu es en cumul libéralisé (sans plafond) ou plafonné, et calculer ta marge disponible.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var SMIC_MENS = (window.SH && SH.val('smic_mensuel')) || 1867.02;
+var PLAF_PCT  = 1.60; // 160% SMIC
+
+function $(id){ return document.getElementById(id); }
+function eur(n){ return Math.round(n).toLocaleString('fr-FR')+' €'; }
+
+function recalc(){
+  var sit     = $('fSit').value;
+  var pension = parseFloat($('fPension').value)||0;
+  var salaire = parseFloat($('fSalaire').value)||0;
+  var fieldSal= $('fieldSal');
+
+  // Afficher/masquer le champ salaire selon situation
+  fieldSal.style.display = (sit !== 'plein') ? 'block' : 'none';
+
+  if(pension <= 0){ $('results').style.display='none'; return; }
+
+  var rSit     = $('rSit');
+  var rSitD    = $('rSitDetail');
+  var rPlafond = $('rPlafond');
+  var rPlafD   = $('rPlafondDetail');
+  var rMarge   = $('rMarge');
+  var rMargeD  = $('rMargeDetail');
+
+  if(sit === 'plein'){
+    rSit.textContent  = '✅ Libéralisé';
+    rSit.style.color  = 'var(--ok)';
+    rSitD.textContent = 'Taux plein atteint — cumul sans plafond de revenus.';
+    rPlafond.textContent  = 'Aucun';
+    rPlafD.textContent    = 'Revenus d\'activité illimités';
+    rMarge.textContent    = 'Illimitée';
+    rMargeD.textContent   = 'Les nouvelles cotisations ouvrent de nouveaux droits.';
+  } else {
+    var plafSmic = SMIC_MENS * PLAF_PCT;
+    var plafSal  = salaire > 0 ? salaire : 0;
+    var plaf     = Math.max(plafSmic, plafSal);
+    var marge    = Math.max(0, plaf - pension);
+
+    rSit.textContent  = '⚠️ Plafonné';
+    rSit.style.color  = 'var(--warn)';
+    rSitD.textContent = sit === 'meme'
+      ? 'Reprise chez le même employeur dans les 6 mois.'
+      : 'Retraite sans taux plein.';
+    rPlafond.textContent = eur(plaf)+'/mois';
+    rPlafD.textContent   = '160% SMIC ('+eur(plafSmic)+')'+
+      (salaire > plafSmic ? ' ou dernier salaire ('+eur(salaire)+') — le + favorable' : '');
+    rMarge.textContent  = eur(marge)+'/mois';
+    rMargeD.textContent = marge > 0
+      ? 'Tu peux gagner jusqu\'à '+eur(marge)+'/mois en activité.'
+      : '⚠️ Ta pension dépasse déjà le plafond — risque de réduction.';
+  }
+  $('results').style.display = 'block';
+}
+
+['fSit','fPension','fSalaire'].forEach(function(id){
+  $(id).addEventListener('input',recalc);
+  $(id).addEventListener('change',recalc);
+});
+recalc();
+})();
+  // resetState global (appelé par onclick)
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function(){
+    shConfirm('Tout remettre à zero ?', function(){
+    try{ localStorage.removeItem('CUM_STATE'); localStorage.removeItem('CUM_WELCOMED'); }catch(e){}
+    location.reload();
+    });
+  };
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='CUM_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 🏖️':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

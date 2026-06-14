@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Activité Partielle — Le Filet Vert</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#1a6b4a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Activité partielle">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Lato:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --green:#1a6b4a;--green-l:#2a8a60;--green-ll:#3aaa78;
+  --forest:#0d3d2a;--mint:#d4f0e4;--mint2:#b8e6d0;--mint3:#9adcba;
+  --ink:#0a2018;--ink2:#1e4a34;--faded:#6a8c7a;
+  --ok:#1a6b4a;--warn:#c07820;--danger:#a03030;
+  --card:#f8fdf9;--card-edge:#b8d8c8;--line:rgba(10,32,24,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:radial-gradient(700px 300px at 50% -5%,rgba(26,107,74,0.15),transparent 55%),
+  linear-gradient(180deg,#e4f5ec 0%,#d0eede 25%,#f4faf7 65%,#eaf5ef 100%);
+  background-attachment:fixed;overflow-x:hidden;-webkit-text-size-adjust:100%;}
+.wrap{max-width:480px;margin:0 auto;padding:0 16px 16px;position:relative;z-index:2;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:#e4f5ec;color:var(--green);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Playfair Display',serif;font-size:26px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(208,238,222,0.97),rgba(208,238,222,0.55) 75%,transparent);
+  backdrop-filter:blur(5px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.92);border:none;color:var(--green);border-radius:20px;
+  padding:9px 14px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;box-shadow:0 2px 8px rgba(10,32,24,0.12);}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Playfair Display',serif;font-weight:700;font-size:20px;color:var(--forest);font-style:italic;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:3px;letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+header .hbtn{background:rgba(255,255,255,0.92);border:none;color:var(--green);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;box-shadow:0 2px 8px rgba(10,32,24,0.12);}
+
+.hero{background:linear-gradient(165deg,var(--card),var(--mint));border-radius:22px;padding:20px;margin:8px 0 16px;
+  box-shadow:0 10px 28px rgba(10,32,24,0.15),inset 0 1px 0 rgba(255,255,255,0.9);}
+.hero .htag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--faded);text-align:center;margin-bottom:8px;}
+.hero .hbig{font-family:'Playfair Display',serif;font-size:44px;font-weight:700;text-align:center;color:var(--forest);line-height:1;}
+.hero .hunit{text-align:center;font-size:13px;color:var(--ink2);font-weight:600;margin-top:4px;}
+.hero .hsub{text-align:center;font-size:11.5px;color:var(--faded);margin-top:8px;}
+.hero .hrow{display:flex;justify-content:center;gap:12px;margin-top:12px;flex-wrap:wrap;}
+.hero .hcell{text-align:center;background:rgba(26,107,74,0.1);border-radius:10px;padding:7px 12px;}
+.hero .hcell .cv{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--green);}
+.hero .hcell .cl{font-size:10px;color:var(--faded);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+.panel{background:rgba(255,255,255,0.95);border-radius:18px;padding:16px;margin-bottom:14px;
+  box-shadow:0 5px 18px rgba(10,32,24,0.11);}
+.panel-t{font-family:'Playfair Display',serif;font-weight:700;font-size:15px;font-style:italic;color:var(--forest);
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--mint3);padding-bottom:8px;}
+.field{margin-bottom:14px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-weight:700;font-size:12.5px;color:var(--ink2);margin-bottom:6px;}
+.ip{width:100%;background:var(--mint);border:2px solid var(--card-edge);border-radius:12px;padding:12px;
+  color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--green-l);background:#fff;}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%232a8a60' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:28px;}
+.hint{font-size:11.5px;color:var(--faded);margin-top:5px;line-height:1.4;font-weight:500;}
+
+.result-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);}
+.result-row:last-child{border-bottom:none;}
+.result-row .rl{font-size:13px;color:var(--ink2);font-weight:600;flex:1;}
+.result-row .rv{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--green);flex-shrink:0;margin-left:10px;}
+.result-row .rs{font-size:11px;color:var(--faded);}
+
+.info-block{border-radius:10px;padding:11px 12px;margin-bottom:9px;font-size:12.5px;line-height:1.5;}
+.info-block.ok{background:rgba(26,107,74,0.08);border-left:3px solid var(--ok);}
+.info-block.warn{background:rgba(192,120,32,0.08);border-left:3px solid var(--warn);}
+.info-block.info{background:rgba(26,107,74,0.05);border-left:3px solid var(--green-ll);}
+.info-block b{display:block;font-weight:700;margin-bottom:3px;}
+.info-block b.ok{color:var(--ok);}
+.info-block b.warn{color:var(--warn);}
+
+.step-list{display:flex;flex-direction:column;gap:0;}
+.step-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);}
+.step-item:last-child{border-bottom:none;}
+.step-item .sn{width:26px;height:26px;background:var(--green);color:#fff;border-radius:50%;
+  font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.step-item .st{font-weight:700;font-size:13px;color:var(--forest);}
+.step-item .sd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+
+.foot{margin-top:20px;text-align:center;font-size:11px;color:var(--faded);line-height:1.6;}
+
+/* wizard */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(5,20,12,0.65);backdrop-filter:blur(5px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:linear-gradient(170deg,var(--card),var(--mint));border-radius:24px;max-width:430px;width:100%;
+  max-height:90vh;overflow-y:auto;box-shadow:0 24px 60px rgba(5,20,12,0.5);
+  animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);border-top:5px solid var(--green-l);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(15px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 12px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Playfair Display',serif;font-weight:700;font-size:22px;color:var(--forest);font-style:italic;}
+.box .hd .x{position:absolute;top:14px;right:16px;background:var(--mint2);border:none;border-radius:50%;width:32px;height:32px;font-size:15px;color:var(--forest);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:14px;padding:14px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s;font-family:'Lato',sans-serif;}
+.btn:active{transform:translateY(2px);}
+.btn-green{background:linear-gradient(135deg,var(--green-ll),var(--green));color:#fff;box-shadow:0 5px 14px rgba(26,107,74,0.4);}
+.btn-ghost{background:transparent;color:var(--green);border:2px solid var(--card-edge);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .35s;}
+.wemoji{font-size:58px;display:inline-block;margin-bottom:10px;animation:float 4s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wstep h2{font-family:'Playfair Display',serif;font-weight:700;font-size:24px;color:var(--forest);margin-bottom:10px;font-style:italic;}
+.wstep p{font-size:14px;color:var(--ink2);line-height:1.55;margin-bottom:10px;font-weight:500;}
+.accent{color:var(--green-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:22px;flex-shrink:0;}
+.feat .tx{font-size:14px;color:var(--ink2);line-height:1.4;}
+.feat .tx b{display:block;font-weight:700;font-size:13px;color:var(--forest);margin-bottom:2px;}
+.legal{font-size:11px;color:var(--faded);line-height:1.5;background:var(--mint2);border-radius:10px;padding:10px;text-align:left;border-left:3px solid var(--green-ll);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(26,107,74,0.2);transition:.2s;}
+.dots .d.on{background:var(--green-l);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--green);color:#fff;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;
+  box-shadow:0 8px 24px rgba(5,20,12,0.35);opacity:0;transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+<div id="lb"><div class="i">🌿</div><div class="t">Tourne ton téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Le Filet Vert</div>
+    <div class="su">Activité partielle · v1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <span class="wemoji">🌿</span>
+      <h2>Activité partielle</h2>
+      <p>Quand l'entreprise réduit ou suspend l'activité, l'État compense une partie du salaire. <span class="accent">Ni le salarié ni l'employeur ne perdent tout.</span></p>
+      <p>Distinct du chômage : le contrat reste en vigueur.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <span class="wemoji">⚖️</span>
+      <h2>Deux niveaux</h2>
+      <div class="feat"><div class="ic">🟡</div><div class="tx"><b>Activité partielle classique (AP)</b>Pour des raisons économiques, techniques, naturelles. Indemnité = 60 % du brut (plancher SMIC).</div></div>
+      <div class="feat"><div class="ic">🟢</div><div class="tx"><b>APLD — Longue Durée</b>Pour restructuration profonde. Taux maintenu à 70 % avec accord de branche ou d'entreprise.</div></div>
+    </div>
+    <div class="wstep" data-step="2">
+      <span class="wemoji">📋</span>
+      <h2>Neutre des deux côtés</h2>
+      <p>L'outil calcule <span class="accent">l'indemnité due au salarié</span> et le <span class="accent">reste à charge pour l'employeur</span> après remboursement de l'État.</p>
+      <div class="legal">Outil indicatif. Taux 2026 hors crise. Allocation employeur : plancher 8,57 €/h (AP classique) et 9,52 €/h (APLD) — Décret n°2026-35 du 29/01/2026 (JO 30/01/2026), applicable aux heures chômées depuis le 1er janvier 2026. Indemnité salarié : 60 % brut min. Plancher salarié ≈ 9,52 €/h net. En cas de crise, des taux dérogatoires peuvent s'appliquer. <span data-art="L5122-1"></span>. Ni avis juridique.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-green" id="wNext">Continuer</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:9px;">Passer</button>
+  </div></div>
+</div>
+
+<!-- AIDE -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">💶</div><div class="tx"><b>Calcul salarié</b>Entre ton salaire brut et les heures non travaillées pour estimer ton indemnité.</div></div>
+    <div class="feat"><div class="ic">🏢</div><div class="tx"><b>Calcul employeur</b>L'État rembourse une partie à l'employeur. Le reste à charge est affiché.</div></div>
+    <div class="legal">Taux standard 2026. Hors crise, sans mesure dérogatoire. Le calcul exact dépend du SMIC en vigueur et des accords de branche.</div>
+    <button class="btn btn-green" style="margin-top:14px;" data-close="help">Compris</button>
+  </div></div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="htag">🌿 Indemnité activité partielle</div>
+    <div class="hbig" id="hBig">—</div>
+    <div class="hunit" id="hUnit">Saisis ta situation ci-dessous</div>
+    <div class="hsub" id="hSub"></div>
+    <div class="hrow" id="hRow" style="display:none;">
+      <div class="hcell"><div class="cv" id="h1v">—</div><div class="cl">Net maintenu</div></div>
+      <div class="hcell"><div class="cv" id="h2v">—</div><div class="cl">% du brut</div></div>
+      <div class="hcell"><div class="cv" id="h3v">—</div><div class="cl">Reste/jr employeur</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">⚙️ Ma situation</div>
+    <div class="field">
+      <label>Type d'activité partielle</label>
+      <select class="ip" id="fType" onchange="recalc()">
+        <option value="ap">Activité partielle classique (AP) — 60 % du brut</option>
+        <option value="apld">APLD — Activité Partielle Longue Durée — 70 % du brut</option>
+      </select>
+      <div class="hint">L'APLD nécessite un accord de branche ou d'entreprise homologué par la DREETS.</div>
+    </div>
+    <div class="field">
+      <label>Salaire brut mensuel (€)</label>
+      <input class="ip" type="number" id="fSal" min="0" step="50" placeholder="ex: 2 400" oninput="recalc()">
+    </div>
+    <div class="field">
+      <label>Heures non travaillées ce mois (en AP)</label>
+      <input class="ip" type="number" id="fHeurs" min="0" max="220" step="1" placeholder="ex: 40" oninput="recalc()">
+      <div class="hint">Heures habituellement travaillées mais non effectuées du fait de l'AP. Maximum : durée légale (151,67h/mois pour 35h).</div>
+    </div>
+  </div>
+
+  <div id="resultPanel" class="panel" style="display:none;">
+    <div class="panel-t" id="resultTitle">📊 Résultat</div>
+    <div id="resultContent"></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">📋 La procédure employeur</div>
+    <div class="step-list">
+      <div class="step-item"><div class="sn">1</div><div><div class="st">Demande d'autorisation préalable</div><div class="sd">Sur le portail activitepartielle.emploi.gouv.fr. L'employeur doit justifier le motif (conjoncture éco, sinistre, travaux…). Délai de réponse : 15 jours.</div></div></div>
+      <div class="step-item"><div class="sn">2</div><div><div class="st">Information et consultation du CSE</div><div class="sd">Avant ou concomitamment à la demande. Le CSE doit être informé des raisons et de la durée envisagée.</div></div></div>
+      <div class="step-item"><div class="sn">3</div><div><div class="st">Mise en œuvre</div><div class="sd">L'employeur verse l'indemnité au salarié (même si l'État n'a pas encore remboursé). Il ne peut pas imposer la prise de congés à la place.</div></div></div>
+      <div class="step-item"><div class="sn">4</div><div><div class="st">Remboursement par l'État (ASP)</div><div class="sd">L'Agence de Services et de Paiement rembourse l'allocation à l'employeur. Le délai est généralement de quelques semaines.</div></div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-t">🛡️ Droits du salarié pendant l'AP</div>
+    <div class="info-block ok"><b class="ok">✅ Contrat maintenu</b>Le contrat de travail est suspendu — pas rompu. Aucun licenciement ne peut intervenir pour ce motif pendant l'AP.</div>
+    <div class="info-block ok"><b class="ok">✅ Protection sociale maintenue</b>La Sécu, la mutuelle et la prévoyance continuent de fonctionner normalement. Les cotisations sont calculées sur le salaire maintenu.</div>
+    <div class="info-block ok"><b class="ok">✅ Acquisition des congés payés</b>Les heures en AP ouvrent droit à des congés payés comme si elles avaient été travaillées.</div>
+    <div class="info-block warn"><b class="warn">⚠️ Plancher SMIC</b>L'indemnité ne peut pas être inférieure au SMIC net horaire (plancher = 9,52 €/h net (Décret n°2026-35 du 29/01/2026 + SMIC 12,31 €)) pour les heures indemnisées. Si le calcul donne moins, le plancher s'applique.</div>
+    <div class="info-block warn"><b class="warn">⚠️ Plafond</b>L'indemnité est plafonnée à 4,5 fois le SMIC horaire brut par heure indemnisée.</div>
+  </div>
+
+  <div style="text-align:center;margin-top:4px;">
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
+  </div>
+  <div class="foot"><span data-txt="disclaimer"></span>.<br>Taux AP 2026 — hors mesures dérogatoires. Tout reste sur ton appareil.</div>
+</div>
+<div id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+var LS={STATE:'AP_STATE',WELCOME:'AP_WELCOMED'};
+function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function $(s){return document.querySelector(s);}
+function $all(s){return Array.prototype.slice.call(document.querySelectorAll(s));}
+function fmt(n){return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+
+// Constantes 2026
+var SMIC_H_BRUT = (window.SH && SH.val('smic_h')) || 12.31;
+var SMIC_H_NET  = (window.SH && SH.val('smic_h_net')) || 9.52;  // plancher indemnité AP — Décret 2026-35 du 29/01/2026 (JO 30/01/2026)
+var HEURES_MOIS = 151.67; // base 35h/sem
+
+window.recalc = function(){
+  var type  = $('#fType').value;
+  var sal   = parseFloat($('#fSal').value) || 0;
+  var hAP   = parseFloat($('#fHeurs').value) || 0;
+  var el    = $('#resultPanel');
+
+  // Sauvegarder
+  var s = get(LS.STATE,{});
+  s.type=type; s.sal=sal; s.hAP=hAP;
+  set(LS.STATE,s);
+
+  if(!sal || !hAP){ el.style.display='none'; $('#hRow').style.display='none'; return; }
+
+  var tauxAP  = type==='apld' ? 0.70 : 0.60;
+  var tauxRST = type==='apld' ? 0.70 : 0.36; // remboursement État
+
+  // Taux horaire brut
+  var txH = sal / HEURES_MOIS;
+  // Indemnité brute horaire AP
+  var indemH = Math.max(txH * tauxAP, SMIC_H_NET);
+  // Plafond : 4,5 × SMIC brut
+  var plafH = SMIC_H_BRUT * 4.5;
+  indemH = Math.min(indemH, plafH);
+  // Total indemnité mois
+  var indemTotal = indemH * hAP;
+  // Salaire brut partie travaillée
+  var hTrav = Math.max(0, HEURES_MOIS - hAP);
+  var salTrav = txH * hTrav;
+  // Remboursement État à l'employeur
+  var allocState = Math.min(txH * tauxRST * hAP, SMIC_H_BRUT * 4.5 * hAP);
+  var resteCharge = indemTotal - allocState;
+  // Taux maintenu
+  var pctMaintenu = ((salTrav + indemTotal) / sal * 100);
+
+  var html =
+    '<div class="result-row"><span class="rl">Taux horaire brut de référence</span><span class="rv">'+fmt(txH)+'/h</span></div>'+
+    '<div class="result-row"><span class="rl">Indemnité AP horaire ('+Math.round(tauxAP*100)+' %)</span><span class="rv">'+fmt(indemH)+'/h</span></div>'+
+    '<div class="result-row"><span class="rl">Heures indemnisées</span><span class="rv">'+hAP+' h</span></div>'+
+    '<div class="result-row"><span class="rl">💶 Indemnité AP totale (mois)</span><span class="rv" style="color:var(--green)">'+fmt(indemTotal)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Salaire brut partie travaillée</span><span class="rv">'+fmt(salTrav)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Total brut maintenu</span><span class="rv">'+fmt(salTrav+indemTotal)+'</span></div>'+
+    '<div class="result-row"><span class="rl">% du salaire brut habituel maintenu</span><span class="rv" style="color:var(--green)">'+Math.round(pctMaintenu)+' %</span></div>'+
+    '<div style="height:1px;background:var(--line);margin:8px 0;"></div>'+
+    '<div class="result-row"><span class="rl">🏢 Allocation remboursée par l\'État</span><span class="rv">'+fmt(allocState)+'</span></div>'+
+    '<div class="result-row"><span class="rl">Reste à charge employeur (AP)</span><span class="rv" style="color:var(--warn)">'+fmt(resteCharge)+'</span></div>';
+
+  if(indemH <= SMIC_H_NET * 1.02){
+    html += '<div class="info-block warn" style="margin-top:10px;"><b class="warn">⚠️ Plancher SMIC appliqué</b>Le taux horaire est proche ou inférieur au SMIC. L\'indemnité a été plafonnée au minimum légal ('+SMIC_H_NET+' €/h net).</div>';
+  }
+
+  $('#resultTitle').textContent = type==='apld' ? '📊 APLD — 70 % du brut' : '📊 AP classique — 60 % du brut';
+  $('#resultContent').innerHTML = html;
+  el.style.display='block';
+
+  // Hero
+  $('#hBig').textContent = fmt(indemTotal);
+  $('#hUnit').textContent = 'Indemnité AP du mois';
+  $('#hSub').textContent = (type==='apld'?'APLD 70 %':'AP 60 %')+' · '+hAP+'h non travaillées';
+  $('#h1v').textContent = fmt(salTrav+indemTotal);
+  $('#h2v').textContent = Math.round(pctMaintenu)+' %';
+  $('#h3v').textContent = fmt(resteCharge/hAP)+'/h';
+  $('#hRow').style.display='flex';
+};
+
+// Restaurer
+var saved = get(LS.STATE,{});
+if(saved.type){ $('#fType').value=saved.type; }
+if(saved.sal){ $('#fSal').value=saved.sal; }
+if(saved.hAP){ $('#fHeurs').value=saved.hAP; }
+recalc();
+
+// Wizard
+var wStep=0,wMax=3;
+function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+  $('#wNext').textContent=(n===wMax-1)?'Commencer 🌿':'Continuer';
+  $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+$('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+$('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+$('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+$all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Parentalité — Congés & Droits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6a3a8a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parentalité">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#7a4aaa;--acc-l:#9a6aca;--acc-d:#5a2a8a;
+  --dark:#120a1e;--dark2:#1c1030;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--info:#5a9ad8;--pink:#e06090;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#120a1e 0%,#1c1030 50%,#100818 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(122,74,170,0.22),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(18,10,30,0.97),rgba(18,10,30,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* Onglets */
+.tabs{display:flex;gap:8px;margin:14px 0;background:rgba(0,0,0,0.3);border-radius:12px;padding:4px;}
+.tab{flex:1;padding:10px 8px;border-radius:9px;border:none;font-family:inherit;font-weight:700;
+  font-size:12px;cursor:pointer;color:var(--faded);background:transparent;transition:.2s;}
+.tab.on{background:var(--acc);color:#fff;}
+
+/* Panneaux */
+.pane{display:none;} .pane.on{display:block;}
+
+/* Blocs durée */
+.dur-card{background:linear-gradient(135deg,rgba(122,74,170,0.25),rgba(122,74,170,0.1));
+  border:1.5px solid rgba(122,74,170,0.5);border-radius:16px;padding:16px;margin-bottom:10px;}
+.dur-card .dc-t{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--acc-l);margin-bottom:6px;}
+.dur-card .dc-v{font-size:28px;font-weight:800;line-height:1;}
+.dur-card .dc-s{font-size:12px;color:var(--ink2);margin-top:5px;line-height:1.4;}
+.dur-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.dur-box{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;padding:13px;}
+.dur-box .dbt{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  color:var(--acc-l);margin-bottom:5px;}
+.dur-box .dbv{font-size:20px;font-weight:800;line-height:1;}
+.dur-box .dbs{font-size:11px;color:var(--ink2);margin-top:3px;line-height:1.3;}
+
+/* Simulateur */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin-bottom:14px;overflow:hidden;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%239a6aca' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultats */
+.res{border-radius:14px;padding:16px;margin-bottom:10px;}
+.res.main{background:linear-gradient(135deg,rgba(122,74,170,0.25),rgba(122,74,170,0.1));
+  border:1.5px solid rgba(122,74,170,0.5);}
+.res.info{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:30px;font-weight:800;line-height:1;}
+.res .rsub{font-size:12px;color:var(--ink2);margin-top:5px;line-height:1.4;}
+
+/* règles */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;
+  padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,154,216,0.2);color:var(--info);}
+.ctag.pink{background:rgba(224,96,144,0.2);color:var(--pink);}
+
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">👶</span>
+      <div class="wiz-h">Parentalité</div>
+      <div class="wiz-p">Naissance, adoption, congé parental : tes droits complets autour de la parentalité.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Maternité · Paternité · Parental</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">👶</div><div class="wt"><b>Congé maternité</b>16 semaines minimum (6 avant + 10 après). Indemnisé par la CPAM sous conditions d'affiliation.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>👶 Congé paternité</b>28 jours calendaires depuis 2021, dont 7 obligatoires. Indemnisé par la CPAM.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">👶</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand">
+    <div class="ti">Parentalité</div>
+    <div class="su">Congés · Indemnités · Droits · V1.0</div>
+  </div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('maternite')">🤱 Maternité</button>
+    <button class="tab" onclick="switchTab('paternite')">👨 Paternité</button>
+    <button class="tab" onclick="switchTab('parental')">🌱 Parental</button>
+  </div>
+
+  <!-- MATERNITÉ -->
+  <div class="pane on" id="pane-maternite">
+    <div class="dur-card">
+      <div class="dc-t">Durée légale du congé maternité</div>
+      <div class="dc-v">16 semaines</div>
+      <div class="dc-s">6 semaines avant + 10 semaines après (1er enfant). Durée augmentée selon le rang de naissance et les grossesses multiples.</div>
+    </div>
+    <div class="dur-grid">
+      <div class="dur-box"><div class="dbt">1er ou 2e enfant</div><div class="dbv">16 sem.</div><div class="dbs">6 av. + 10 ap.</div></div>
+      <div class="dur-box"><div class="dbt">3e enfant et +</div><div class="dbv">26 sem.</div><div class="dbs">8 av. + 18 ap.</div></div>
+      <div class="dur-box"><div class="dbt">Jumeaux</div><div class="dbv">34 sem.</div><div class="dbs">12 av. + 22 ap.</div></div>
+      <div class="dur-box"><div class="dbt">Triplés et +</div><div class="dbv">46 sem.</div><div class="dbs">24 av. + 22 ap.</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-t">🧮 Indemnité journalière maternité</div>
+      <div class="field">
+        <label>Salaire brut mensuel de référence</label>
+        <div class="inline">
+          <input class="ip" id="mSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <span class="unit">€/mois</span>
+        </div>
+        <div class="hint">Moyenne des 3 derniers mois. Plafonné au PMSS (4 005 €). IJ max : 104,02 €/jour en 2026 (PMSS 4 005 € — source : Légisocial).</div>
+      </div>
+      <div class="field">
+        <label>Rang de naissance</label>
+        <select class="ip" id="mRang">
+          <option value="16">1er ou 2e enfant (16 semaines)</option>
+          <option value="26">3e enfant et + (26 semaines)</option>
+          <option value="34">Jumeaux (34 semaines)</option>
+          <option value="46">Triplés et + (46 semaines)</option>
+        </select>
+      </div>
+    </div>
+    <div id="mResults" style="display:none;">
+      <div class="res main">
+        <div class="rl">Indemnité journalière estimée</div>
+        <div class="rbig" id="mIJ">—</div>
+        <div class="rsub" id="mIJDetail"></div>
+      </div>
+      <div class="res info">
+        <div class="rl">Total sur la durée du congé</div>
+        <div style="font-size:22px;font-weight:800;" id="mTotal">—</div>
+        <div class="rsub">Brut avant CSG/CRDS (6,2 % + 0,5 % = 6,7 %). Net ≈ −6,7 %. Versé par la CPAM.</div>
+      </div>
+    </div>
+
+    <div class="sec-t">⚖️ Règles clés</div>
+    <div class="rule"><div class="ri">✅</div><div><div class="rt">Conditions d'éligibilité CPAM</div><div class="rd">Être affiliée depuis au moins 6 mois (durée réduite depuis le décret n°2023-1410), avoir cotisé sur un salaire d'au moins 1 015 fois le SMIC horaire dans les 6 derniers mois, ou avoir travaillé au moins 150h sur les 3 derniers mois.</div><span class="ctag info"><span data-art="L331-3"></span></span></div></div>
+    <div class="rule"><div class="ri">🛡️</div><div><div class="rt">Protection contre le licenciement</div><div class="rd">Aucun licenciement ne peut être notifié ni prendre effet pendant le congé maternité. La protection débute dès la déclaration de grossesse et dure 10 semaines après le retour de congé.</div><span class="ctag ok">Protection renforcée</span></div></div>
+    <div class="rule"><div class="ri">📅</div><div><div class="rt">Report de congé possible</div><div class="rd">La salariée peut réduire le congé prénatal de 3 semaines maximum (reportées après l'accouchement), sur avis médical.</div></div></div>
+    <div class="rule"><div class="ri">💶</div><div><div class="rt">Maintien de salaire selon convention</div><div class="rd">La loi n'impose pas de maintien de salaire pendant le congé maternité (la CPAM verse les IJ). Mais de nombreuses conventions collectives prévoient un maintien à 100 % (complément employeur).</div><span class="ctag warn">Vérifier ta convention</span></div></div>
+  </div>
+
+  <!-- PATERNITÉ -->
+  <div class="pane" id="pane-paternite">
+    <div class="dur-card">
+      <div class="dc-t">Durée du congé paternité (depuis 2021)</div>
+      <div class="dc-v">25 jours calendaires</div>
+      <div class="dc-s">3 jours de naissance (employeur) + 4 jours obligatoires + 18 jours facultatifs (CPAM). 32 jours si naissance multiple.</div>
+    </div>
+    <div class="dur-grid">
+      <div class="dur-box"><div class="dbt">Naissance simple</div><div class="dbv">25 jours</div><div class="dbs">3+4 oblig. + 18 fac.</div></div>
+      <div class="dur-box"><div class="dbt">Naissance multiple</div><div class="dbv">32 jours</div><div class="dbs">3+4 oblig. + 25 fac.</div></div>
+      <div class="dur-box"><div class="dbt">Délai pour poser</div><div class="dbv">6 mois</div><div class="dbs">À partir de la naissance</div></div>
+      <div class="dur-box"><div class="dbt">Préavis employeur</div><div class="dbv">1 mois</div><div class="dbs">Avant le départ</div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-t">🧮 Indemnité journalière paternité</div>
+      <div class="field">
+        <label>Salaire brut mensuel de référence</label>
+        <div class="inline">
+          <input class="ip" id="pSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <span class="unit">€/mois</span>
+        </div>
+        <div class="hint">Moyenne des 3 derniers mois. Plafonné au PMSS. IJ max : 104,02 €/jour (2026 — Légisocial).</div>
+      </div>
+      <div class="field">
+        <label>Type de naissance</label>
+        <select class="ip" id="pType">
+          <option value="22">Naissance simple (22 jours CPAM)</option>
+          <option value="29">Naissance multiple (29 jours CPAM)</option>
+        </select>
+      </div>
+    </div>
+    <div id="pResults" style="display:none;">
+      <div class="res main">
+        <div class="rl">Indemnité journalière CPAM</div>
+        <div class="rbig" id="pIJ">—</div>
+        <div class="rsub" id="pIJDetail"></div>
+      </div>
+      <div class="res info">
+        <div class="rl">Total CPAM sur la période</div>
+        <div style="font-size:22px;font-weight:800;" id="pTotal">—</div>
+        <div class="rsub">Hors les 3 jours de naissance payés par l'employeur. Brut avant CSG/CRDS (−21%).</div>
+      </div>
+    </div>
+
+    <div class="sec-t">⚖️ Règles clés</div>
+    <div class="rule"><div class="ri">⚠️</div><div><div class="rt">7 jours d'arrêt obligatoire au total</div><div class="rd">3 jours de congé de naissance (employeur) + 4 jours de congé paternité (CPAM) doivent être pris consécutivement et immédiatement après la naissance. Cette semaine d'arrêt est obligatoire et l'employeur ne peut s'y opposer.</div><span class="ctag ok">3 + 4 = 7 jours obligatoires</span></div></div>
+    <div class="rule"><div class="ri">📋</div><div><div class="rt">18 jours facultatifs fractionnables</div><div class="rd">Après les 7 jours obligatoires, les 18 jours restants (25 si naissance multiple) sont facultatifs, fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance.</div><span class="ctag info">2 fractions de 5 jours min.</span></div></div>
+    <div class="rule"><div class="ri">💶</div><div><div class="rt">Éligibilité CPAM identique à la maternité</div><div class="rd">Mêmes conditions de cotisation que pour les IJ maternité. Le père ou le second parent (mariage, PACS, concubinage) est éligible.</div></div></div>
+    <div class="rule"><div class="ri">👥</div><div><div class="rt">Ouvert au second parent</div><div class="rd">Le congé paternité est ouvert au père, ou au conjoint/partenaire de la mère (marié, pacsé ou en concubinage notoire), quel que soit le sexe.</div><span class="ctag ok">Tous les seconds parents</span></div></div>
+    <div class="rule"><div class="ri">🆕</div><div><div class="rt">Congé supplémentaire de naissance (effectif dès le 1er juillet 2026 — LFSS 2026)</div><div class="rd">LFSS 2026 (loi n°2025-1403 du 30/12/2025), effectif le 1er juillet 2026 : un congé supplémentaire de 1 à 2 mois par parent, cumulable avec le congé paternité, indemnisé à 70 % du salaire net le 1er mois puis 60 % le 2e. Concerne les enfants nés ou adoptés à partir du 1er janvier 2026.</div><span class="ctag info">Jusqu'à ~3 mois de présence au total</span></div></div>
+  </div>
+
+  <!-- PARENTAL -->
+  <div class="pane" id="pane-parental">
+    <div class="dur-card">
+      <div class="dc-t">Congé parental d'éducation</div>
+      <div class="dc-v">Jusqu'aux 3 ans de l'enfant</div>
+      <div class="dc-s">Chaque parent peut prendre jusqu'à 3 ans de congé parental (non rémunéré par l'employeur). Indemnisé par la CAF via la PreParE sous conditions.</div>
+    </div>
+    <div class="dur-grid">
+      <div class="dur-box"><div class="dbt">Durée initiale</div><div class="dbv">1 an</div><div class="dbs">Renouvelable 2 fois</div></div>
+      <div class="dur-box"><div class="dbt">Durée max</div><div class="dbv">3 ans</div><div class="dbs">Jusqu'aux 3 ans de l'enfant</div></div>
+      <div class="dur-box"><div class="dbt">Préavis</div><div class="dbv">1 mois</div><div class="dbs">Avant le début du congé</div></div>
+      <div class="dur-box"><div class="dbt">PreParE 2026</div><div class="dbv">≈ 455 €</div><div class="dbs">/mois (taux plein)</div></div>
+    </div>
+
+    <div class="sec-t">⚖️ Règles clés</div>
+    <div class="rule"><div class="ri">✅</div><div><div class="rt">Conditions d'accès</div><div class="rd">1 an d'ancienneté dans l'entreprise au jour de la naissance ou de l'adoption. Ouvert aux deux parents, pour chaque enfant. Peut se prendre en temps plein ou temps partiel (≥ 16h/semaine).</div><span class="ctag info">1 an d'ancienneté requis</span></div></div>
+    <div class="rule"><div class="ri">💶</div><div><div class="rt">PreParE — Prestation Partagée d'Éducation</div><div class="rd">Versée par la CAF. Taux plein ≈ 455 €/mois (enfant né après 2015). <strong>Aucune condition de ressources</strong> — accessible à tous les parents quelle que soit leur rémunération. Condition d'activité antérieure uniquement (8 trimestres cotisés). Si les deux parents prennent le congé, la durée totale peut être allongée.</div><span class="ctag ok">CAF — condition d'activité uniquement</span></div></div>
+    <div class="rule"><div class="ri">🛡️</div><div><div class="rt">Contrat suspendu, pas rompu</div><div class="rd">Pendant le congé parental à temps plein, le contrat est suspendu. Le salarié ne perçoit pas de salaire de son employeur. L'ancienneté est conservée à 50 % seulement pour un congé à temps plein (<span data-art="L1225-54"></span>). Pour un congé à temps partiel, l'ancienneté est conservée à 100 %.</div><span class="ctag warn">Ancienneté conservée à 50 % (temps plein)</span></div></div>
+    <div class="rule"><div class="ri">🔄</div><div><div class="rt">Retour anticipé possible</div><div class="rd">Le salarié peut reprendre son emploi avant le terme en cas de décès de l'enfant, de réduction importante des ressources du ménage ou de nouveau départ en congé maternité. Préavis d'1 mois.</div></div></div>
+    <div class="rule"><div class="ri">📋</div><div><div class="rt">Droit à retrouver son emploi</div><div class="rd">À l'issue du congé parental, le salarié retrouve son emploi précédent ou un emploi similaire avec rémunération équivalente. Un entretien professionnel doit être organisé au retour.</div><span class="ctag ok">Emploi garanti au retour</span></div></div>
+  </div>
+
+  <div class="note"><span data-art="L1225-1"></span> à <span data-art="L1225-65"></span> CT · <span data-art="L331-3"></span> · Loi du 16 mars 2012.<br>
+    Montants CPAM 2026 — PASS 2026 : 48 060 €. PreParE : vérifier sur caf.fr.<br>
+    👶 Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Outil indicatif & pédagogique · Seule la CPAM/CAF fait foi pour les montants</div>
+</div>
+
+<!-- Aide -->
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#1c1030;border:1.5px solid var(--card-edge);border-radius:16px;
+    max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      3 onglets : Maternité, Paternité, Parental.<br><br>
+      Entre ton salaire journalier pour estimer les indemnités CPAM. Les montants sont des estimations — seule la CPAM fait foi pour le calcul officiel.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;
+      border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+var PMSS = (window.SH && SH.val('pmss')) || 4005; // Plafond mensuel SS 2026
+var PLAFOND_IJ = (window.SH && SH.val('ijss_max_paternite')) || 104.02; // IJ maternité/paternité max 2026 (PMSS 4005 €×100%÷28×0,7287 — Légisocial)
+
+function $(id){ return document.getElementById(id); }
+function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €'; }
+
+function switchTab(t){
+  document.querySelectorAll('.tab').forEach(function(el,i){
+    el.classList.toggle('on', ['maternite','paternite','parental'][i]===t);
+  });
+  document.querySelectorAll('.pane').forEach(function(el){
+    el.classList.toggle('on', el.id==='pane-'+t);
+  });
+}
+window.switchTab = switchTab;
+
+// Maternité
+function calcMat(){
+  var sal = parseFloat($('mSalJour').value)||0;
+  var sem = parseInt($('mRang').value)||16;
+  if(sal<=0){$('mResults').style.display='none';return;}
+  var sjb = Math.min(sal, PMSS) * 3 / 91.25; var ij = Math.min(sjb * 0.79, PLAFOND_IJ); // SJB -21% charges, plafonné
+  var jours = sem * 7;
+  var total = ij * jours;
+  $('mIJ').textContent = eur(ij)+' / jour';
+  $('mIJDetail').textContent = 'SJB '+eur(sjb)+'/j − 21% charges · Plafond CPAM : '+eur(PLAFOND_IJ)+'/j';
+  $('mTotal').textContent = eur(total);
+  $('mResults').style.display='block';
+}
+['mSalJour','mRang'].forEach(function(id){ $(id).addEventListener('input',calcMat); $(id).addEventListener('change',calcMat); });
+
+// Paternité
+function calcPat(){
+  var sal = parseFloat($('pSalJour').value)||0;
+  var jours = parseInt($('pType').value)||22;
+  if(sal<=0){$('pResults').style.display='none';return;}
+  var sjb = Math.min(sal, PMSS) * 3 / 91.25; var ij = Math.min(sjb * 0.79, PLAFOND_IJ);
+  var total = ij * jours;
+  $('pIJ').textContent = eur(ij)+' / jour';
+  $('pIJDetail').textContent = 'SJB '+eur(sjb)+'/j − 21% · Pour '+jours+' jours · Plafond '+eur(PLAFOND_IJ)+'/j';
+  $('pTotal').textContent = eur(total);
+  $('pResults').style.display='block';
+}
+['pSalJour','pType'].forEach(function(id){ $(id).addEventListener('input',calcPat); $(id).addEventListener('change',calcPat); });
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'PAR_STATE',WELCOME:'PAR_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{mSalJour:'',mRang:'16',pSalJour:'',pType:'22'});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='PAR_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer 👶':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

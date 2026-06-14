@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>C2P Pénibilité — Le Chantier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#e87820">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="C2P Pénibilité">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --orange:#e87820; --orange-d:#b85a10; --orange-l:#f0a050;
+  --yellow:#f5c820; --yellow-d:#c8a010;
+  --dark:#1a1e26; --dark2:#252c38; --dark3:#303844;
+  --steel:#4a5568; --steel-l:#6a7585; --steel-ll:#9aabb8;
+  --white:#f8fafc; --off:#f0f4f8;
+  --ink:#1a1e26; --ink2:#3a4555; --faded:#7a8898;
+  --card:#ffffff; --card-edge:#dde4ee;
+  --c2p:#2080c0; --c2p-l:#4aa0e0; --c2p-bg:#e8f4fc;
+  --duerp:#8040a0; --duerp-bg:#f4eafc;
+  --good:#207840; --warn:#c87820;
+  --stripe:repeating-linear-gradient(45deg,rgba(232,120,32,0.12) 0 6px,transparent 6px 12px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{
+  font-family:'Barlow',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(180deg,#1a1e26 0%,#252c38 50%,#1e2530 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;
+}
+/* chevrons warning stripe en haut */
+body::before{content:"";position:fixed;top:0;left:0;right:0;height:6px;z-index:100;
+  background:repeating-linear-gradient(90deg,var(--yellow) 0 20px,var(--dark) 20px 24px);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:var(--orange);display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+  #lb .i{font-size:60px;margin-bottom:16px;} #lb .t{font-family:'Barlow Condensed',sans-serif;font-size:30px;font-weight:800;letter-spacing:2px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+
+header{position:sticky;top:6px;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg, rgba(26,30,38,0.97), rgba(26,30,38,0.6) 75%, transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--white);
+  border-radius:6px;padding:9px 13px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;
+  text-decoration:none;flex-shrink:0;letter-spacing:1px;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--orange);letter-spacing:2px;}
+header .brand .su{font-size:9px;color:rgba(255,255,255,0.55);margin-top:2px;letter-spacing:2px;text-transform:uppercase;}
+header .hbtn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:var(--white);
+  border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* hero panel */
+.hero{background:var(--orange);border-radius:14px;padding:20px;margin:14px 0 16px;
+  box-shadow:0 8px 0 var(--orange-d),0 16px 30px rgba(232,120,32,0.4);
+  background-image:var(--stripe);}
+.hero .htag{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:3px;
+  color:rgba(255,255,255,0.8);text-transform:uppercase;margin-bottom:8px;}
+.hero .hbig{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:34px;color:#fff;line-height:1.15;letter-spacing:0.5px;}
+.hero .hsub{font-size:13px;color:rgba(255,255,255,0.9);margin-top:6px;line-height:1.4;}
+.hero .hchips{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.hchip{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:20px;
+  padding:5px 12px;font-size:12px;font-weight:700;color:#fff;letter-spacing:0.3px;}
+
+/* section titles */
+.secti{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;
+  text-transform:uppercase;margin:20px 0 10px;display:flex;align-items:center;gap:10px;}
+.secti.orange{color:var(--orange);}
+.secti.blue{color:var(--c2p-l);}
+.secti.purple{color:#c080f0;}
+.secti::after{content:"";flex:1;height:2px;border-radius:1px;}
+.secti.orange::after{background:linear-gradient(90deg,var(--orange),transparent);}
+.secti.blue::after{background:linear-gradient(90deg,var(--c2p-l),transparent);}
+.secti.purple::after{background:linear-gradient(90deg,#c080f0,transparent);}
+
+/* factor cards */
+.fcard{background:var(--dark2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:15px 16px;
+  margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+.fcard.c2p{border-color:rgba(64,160,224,0.3);}
+.fcard.duerp{border-color:rgba(128,64,160,0.3);}
+.fcard .fhead{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.fcard .ficon{font-size:26px;flex-shrink:0;}
+.fcard .fti{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:16px;letter-spacing:0.5px;color:var(--white);}
+.fcard .fseuil{font-size:11.5px;color:var(--steel-ll);line-height:1.4;margin-bottom:8px;}
+.fcard .ftags{display:flex;gap:6px;flex-wrap:wrap;}
+.ftag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:10px;letter-spacing:0.3px;}
+.ftag.c2p{background:var(--c2p-bg);color:var(--c2p);}
+.ftag.duerp-only{background:var(--duerp-bg);color:var(--duerp);}
+.ftag.pts{background:rgba(232,120,32,0.15);color:var(--orange-l);}
+.ftag.sep{background:rgba(255,255,255,0.06);color:var(--steel-ll);}
+
+/* how points work */
+.pts-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.pts-box{background:var(--dark2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center;}
+.pts-box .pv{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:28px;color:var(--orange);}
+.pts-box .pl{font-size:11px;color:var(--steel-ll);margin-top:3px;line-height:1.3;}
+.pts-box.wide{grid-column:1/-1;}
+
+/* usage cards */
+.usage-cards{display:flex;flex-direction:column;gap:10px;}
+.usage-card{background:var(--dark2);border:1.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 16px;
+  display:flex;gap:12px;align-items:flex-start;}
+.usage-card .ui{font-size:24px;flex-shrink:0;}
+.usage-card .ut{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--white);letter-spacing:0.3px;}
+.usage-card .ud{font-size:12.5px;color:var(--steel-ll);margin-top:3px;line-height:1.4;}
+.usage-card .ubadge{display:inline-block;margin-top:7px;background:rgba(232,120,32,0.15);color:var(--orange-l);
+  border:1px solid rgba(232,120,32,0.3);border-radius:6px;padding:3px 9px;font-size:11px;font-weight:700;letter-spacing:0.3px;}
+
+/* alert banner */
+.alert-band{background:var(--dark2);border-left:4px solid var(--yellow);border-radius:0 10px 10px 0;
+  padding:12px 15px;margin-bottom:14px;display:flex;gap:10px;}
+.alert-band .ai{font-size:20px;flex-shrink:0;}
+.alert-band .at{font-size:13px;color:var(--white);line-height:1.4;}
+.alert-band .at b{color:var(--yellow);font-family:'Barlow Condensed',sans-serif;font-size:14px;letter-spacing:0.5px;}
+
+/* link button */
+.link-btn{display:block;background:var(--dark2);border:1.5px solid rgba(64,160,224,0.4);border-radius:10px;
+  padding:13px 16px;text-align:center;text-decoration:none;
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--c2p-l);letter-spacing:0.5px;
+  margin-bottom:10px;}
+.link-btn:active{opacity:0.8;}
+
+.note{font-size:12px;color:var(--steel-ll);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:11px;color:var(--faded);line-height:1.7;letter-spacing:0.5px;}
+
+/* overlays */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(10,14,20,0.85);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.ov.show{display:flex;animation:fade .25s;}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.box{background:var(--dark2);border:1.5px solid rgba(255,255,255,0.1);border-radius:16px;
+  max-width:430px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(0,0,0,0.7);animation:boxin .3s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--orange);}
+@keyframes boxin{from{opacity:0;transform:scale(.95) translateY(12px)}to{opacity:1;transform:none}}
+.box .hd{padding:20px 22px 10px;text-align:center;position:relative;}
+.box .hd .t{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:22px;color:var(--orange);letter-spacing:1px;}
+.box .hd .s{font-size:12px;color:var(--steel-ll);margin-top:4px;}
+.box .hd .x{position:absolute;top:14px;right:14px;background:rgba(255,255,255,0.08);border:none;border-radius:50%;
+  width:32px;height:32px;font-size:15px;color:var(--steel-ll);cursor:pointer;}
+.box .bd{padding:0 22px 22px;}
+.btn{display:block;width:100%;border:none;border-radius:10px;padding:14px;font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;font-size:15px;cursor:pointer;transition:.15s;letter-spacing:1px;}
+.btn:active{transform:translateY(2px);}
+.btn-orange{background:var(--orange);color:#fff;box-shadow:0 4px 0 var(--orange-d);}
+.btn-orange:active{box-shadow:0 1px 0 var(--orange-d);}
+.btn-ghost{background:transparent;color:var(--steel-ll);border:1px solid rgba(255,255,255,0.15);}
+.wstep{display:none;text-align:center;padding:8px 2px;}
+.wstep.show{display:block;animation:fade .3s;}
+.wemoji{font-size:56px;display:inline-block;margin-bottom:8px;}
+.wstep h2{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:26px;color:var(--orange);margin-bottom:10px;letter-spacing:1px;}
+.wstep p{font-size:14px;color:var(--steel-ll);line-height:1.5;margin-bottom:10px;}
+.wstep .accent{color:var(--orange-l);font-weight:700;}
+.feat{display:flex;gap:12px;align-items:flex-start;text-align:left;margin-bottom:12px;}
+.feat .ic{font-size:20px;flex-shrink:0;}
+.feat .tx{font-size:13.5px;color:var(--steel-ll);line-height:1.4;}
+.feat .tx b{display:block;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--orange-l);margin-bottom:2px;letter-spacing:0.3px;}
+.legal{font-size:10.5px;color:var(--faded);line-height:1.5;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px;text-align:left;border-left:3px solid var(--orange-d);}
+.dots{display:flex;gap:7px;justify-content:center;margin:16px 0;}
+.dots .d{width:8px;height:8px;border-radius:50%;background:rgba(232,120,32,0.2);transition:.2s;}
+.dots .d.on{background:var(--orange);width:22px;border-radius:4px;}
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);z-index:9999;
+  background:var(--orange);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:1px;
+  padding:12px 22px;border-radius:8px;box-shadow:0 6px 20px rgba(232,120,32,0.5);opacity:0;
+  transition:.35s cubic-bezier(.2,.9,.3,1.3);pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+<body>
+
+<div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#1a1e26;z-index:9999;"></div>
+<div id="lb"><div class="i">🦺</div><div class="t">TOURNE TON TÉLÉPHONE</div></div>
+
+<header>
+  <a href="../outils.html" class="back">← TROUSSE</a>
+  <div class="brand">
+    <div class="ti">C2P PÉNIBILITÉ</div>
+    <div class="su">LE CHANTIER · V1.0</div>
+  </div>
+  <button class="hbtn" id="helpBtn">?</button>
+</header>
+
+<!-- WIZARD -->
+<div class="ov" id="wizard">
+  <div class="box"><div class="hd"></div><div class="bd">
+    <div class="wstep show" data-step="0">
+      <div class="wemoji">🦺</div>
+      <h2>TON COMPTE PÉNIBILITÉ</h2>
+      <p>Si ton travail t'expose à des risques physiques, tu as peut-être des <span class="accent">droits que tu ignores</span> : formation gratuite, temps partiel payé, retraite anticipée.</p>
+    </div>
+    <div class="wstep" data-step="1">
+      <div class="wemoji">⚠️</div>
+      <h2>6 FACTEURS OUVRENT DES DROITS</h2>
+      <div class="feat"><div class="ic">🔊</div><div class="tx"><b>ENVIRONNEMENT PHYSIQUE</b>Bruit intense, températures extrêmes, milieu hyperbare (sous-marin, tunnels…)</div></div>
+      <div class="feat"><div class="ic">🌙</div><div class="tx"><b>RYTHMES DE TRAVAIL</b>Travail de nuit, équipes alternantes (2x8/3x8), travail répétitif à la cadence.</div></div>
+      <p>Ces 6 facteurs génèrent des points sur ton C2P quand les seuils légaux sont dépassés.</p>
+    </div>
+    <div class="wstep" data-step="2">
+      <div class="wemoji">📋</div>
+      <h2>C'EST L'EMPLOYEUR QUI DÉCLARE</h2>
+      <p>Tu ne calcules pas tes points toi-même. C'est <span class="accent">l'employeur qui évalue et déclare</span> l'exposition via la DSN. Tes points sont visibles sur <b>compteprofessionnelprevention.fr</b>.</p>
+      <div class="legal">Outil informatif et pédagogique. Aucun calcul officiel de points — seul l'employeur et la Carsat/CPAM font foi. Consulte compteprofessionnelprevention.fr ou un médecin du travail pour ta situation personnelle.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="dots" id="wdots"></div>
+    <button class="btn btn-orange" id="wNext">CONTINUER</button>
+    <button class="btn btn-ghost" id="wSkip" style="margin-top:8px;">PASSER</button>
+  </div></div>
+</div>
+
+<!-- HELP -->
+<div class="ov" id="help">
+  <div class="box"><div class="hd"><div class="t">MODE D'EMPLOI</div><div class="s">Comprendre le C2P</div>
+    <button class="x" data-close="help">✕</button></div>
+  <div class="bd">
+    <div class="feat"><div class="ic">🎯</div><div class="tx"><b>QUI EST CONCERNÉ</b>Tout salarié en CDI ou CDD de plus d'un mois exposé à au moins un des 6 facteurs au-delà des seuils.</div></div>
+    <div class="feat"><div class="ic">📊</div><div class="tx"><b>COMMENT VOIR SES POINTS</b>Sur compteprofessionnelprevention.fr rubrique C2P, ou en contactant la Carsat de ta région.</div></div>
+    <div class="feat"><div class="ic">⚠️</div><div class="tx"><b>C2P VS DUERP</b>Les 4 facteurs exclus du C2P (manutention, postures, vibrations, chimiques) restent dans le Document Unique de ton entreprise et peuvent ouvrir une retraite anticipée pour incapacité permanente.</div></div>
+    <div class="feat"><div class="ic">🏥</div><div class="tx"><b>MÉDECIN DU TRAVAIL</b>Ton interlocuteur naturel pour toute question sur tes conditions d'exposition. Gratuit et confidentiel.</div></div>
+    <button class="btn btn-orange" style="margin-top:14px;" data-close="help">COMPRIS</button>
+  </div></div>
+</div>
+
+<div class="wrap" id="app">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="htag">⚠️ COMPTE PROFESSIONNEL DE PRÉVENTION</div>
+    <div class="hbig">Tes droits face<br>à la pénibilité</div>
+    <div class="hsub">6 facteurs de risque ouvrent des points. Ces points = formation, temps partiel ou retraite anticipée.</div>
+    <div class="hchips">
+      <div class="hchip">1 pt / facteur / trimestre</div>
+      <div class="hchip">Max 8 pts / an</div>
+      <div class="hchip">Jusqu'à 2 ans anticipés</div>
+    </div>
+  </div>
+
+  <!-- ALERTE EMPLOYEUR -->
+  <div class="alert-band">
+    <div class="ai">ℹ️</div>
+    <div class="at"><b>C'EST L'EMPLOYEUR QUI DÉCLARE</b><br>
+    Tu ne gères pas tes points directement. L'employeur évalue et déclare l'exposition via la DSN chaque année. Tes points sont consultables sur <b>compteprofessionnelprevention.fr</b>.</div>
+  </div>
+
+  <!-- 6 FACTEURS C2P -->
+  <div class="secti blue">🔵 6 Facteurs C2P</div>
+  <p style="font-size:12.5px;color:var(--steel-ll);margin-bottom:12px;line-height:1.5;">Ces 6 facteurs génèrent des points sur ton C2P si les seuils sont dépassés. Évaluation par l'employeur.</p>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">🔊</div><div class="fti">BRUIT INTENSE</div></div>
+    <div class="fseuil">Exposition supérieure à 81 dB(A) en moyenne sur 8h, sur au moins 600 heures par an. Ou niveau de crête ≥ 135 dB(C).</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Environnement physique</span></div>
+  </div>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">🌡️</div><div class="fti">TEMPÉRATURES EXTRÊMES</div></div>
+    <div class="fseuil">Exposition à une température ≤ 5 °C ou ≥ 30 °C, pendant 900 heures par an minimum.</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Environnement physique</span></div>
+  </div>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">🤿</div><div class="fti">MILIEU HYPERBARE</div></div>
+    <div class="fseuil">Intervention en milieu où la pression est supérieure à la pression atmosphérique (tunnels, plongée, caissons). Niveau 1 200 hPa, au moins 60 interventions par an.</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Environnement physique</span></div>
+  </div>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">🌙</div><div class="fti">TRAVAIL DE NUIT</div></div>
+    <div class="fseuil">Au moins 1 heure de travail entre minuit et 5h, sur 100 nuits minimum par an (seuil abaissé — selon conditions articles L3122-2 à L3122-5).</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Rythmes de travail</span></div>
+  </div>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">🔄</div><div class="fti">ÉQUIPES ALTERNANTES (2×8, 3×8…)</div></div>
+    <div class="fseuil">Travail en équipes successives alternantes (ex. 2×8 ou 3×8) impliquant au moins une heure de nuit entre minuit et 5h — 30 nuits minimum par an (seuil abaissé).</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Rythmes de travail</span></div>
+  </div>
+
+  <div class="fcard c2p">
+    <div class="fhead"><div class="ficon">⚙️</div><div class="fti">TRAVAIL RÉPÉTITIF</div></div>
+    <div class="fseuil">Répétition d'un même geste à une fréquence élevée, imposée par une machine ou une cadence — au moins 900 heures par an.</div>
+    <div class="ftags"><span class="ftag c2p">C2P ✓</span><span class="ftag pts">1 pt/trimestre</span><span class="ftag sep">Rythmes de travail</span></div>
+  </div>
+
+  <!-- 4 FACTEURS HORS C2P -->
+  <div class="secti purple" style="margin-top:22px;">🟣 4 Facteurs hors C2P</div>
+  <div class="alert-band" style="border-color:var(--duerp);">
+    <div class="ai">⚠️</div>
+    <div class="at"><b style="color:#c080f0;">EXCLUS DU C2P DEPUIS 2017-2018</b><br>
+    Ces 4 facteurs ne génèrent plus de points C2P, mais ils doivent obligatoirement figurer dans le <b>DUERP</b> de l'entreprise et peuvent ouvrir une <b>retraite anticipée</b> pour incapacité permanente.</div>
+  </div>
+
+  <div class="fcard duerp">
+    <div class="fhead"><div class="ficon">📦</div><div class="fti">MANUTENTION MANUELLE DE CHARGES</div></div>
+    <div class="fseuil">Port, poussée, traction de charges lourdes. Hors C2P depuis l'ordonnance du 22 septembre 2017 (application 2018), mais reste dans le DUERP. Peut ouvrir une retraite anticipée pour incapacité permanente ≥ 10 %.</div>
+    <div class="ftags"><span class="ftag duerp-only">DUERP obligatoire</span><span class="ftag sep">Hors C2P depuis 2017</span></div>
+  </div>
+
+  <div class="fcard duerp">
+    <div class="fhead"><div class="ficon">🧎</div><div class="fti">POSTURES PÉNIBLES</div></div>
+    <div class="fseuil">Positions forcées des articulations — accroupi, à genoux, bras en l'air, torsion du tronc. Hors C2P, dans le DUERP. Même dispositif retraite anticipée.</div>
+    <div class="ftags"><span class="ftag duerp-only">DUERP obligatoire</span><span class="ftag sep">Hors C2P depuis 2017</span></div>
+  </div>
+
+  <div class="fcard duerp">
+    <div class="fhead"><div class="ficon">📳</div><div class="fti">VIBRATIONS MÉCANIQUES</div></div>
+    <div class="fseuil">Vibrations transmises aux mains/bras ou à l'ensemble du corps (engins, outils vibrants). Hors C2P, dans le DUERP. Même dispositif retraite anticipée.</div>
+    <div class="ftags"><span class="ftag duerp-only">DUERP obligatoire</span><span class="ftag sep">Hors C2P depuis 2017</span></div>
+  </div>
+
+  <div class="fcard duerp">
+    <div class="fhead"><div class="ficon">☣️</div><div class="fti">AGENTS CHIMIQUES DANGEREUX</div></div>
+    <div class="fseuil">Exposition à des produits chimiques cancérogènes, mutagènes ou reprotoxiques (CMR). Hors C2P, dans le DUERP. Même dispositif retraite anticipée.</div>
+    <div class="ftags"><span class="ftag duerp-only">DUERP obligatoire</span><span class="ftag sep">Hors C2P depuis 2017</span></div>
+  </div>
+
+  <!-- POINTS & USAGE -->
+  <div class="secti orange" style="margin-top:22px;">🟠 Comment fonctionnent les points</div>
+
+  <div class="pts-grid">
+    <div class="pts-box"><div class="pv">1</div><div class="pl">point par facteur<br>par trimestre exposé</div></div>
+    <div class="pts-box"><div class="pv">8</div><div class="pl">points maximum<br>par année civile</div></div>
+    <div class="pts-box"><div class="pv">10</div><div class="pl">premiers points réservés<br>obligatoirement à la formation</div></div>
+    <div class="pts-box wide"><div class="pv" style="font-size:22px;">Sans plafond</div><div class="pl">Le plafond de 100 pts a été supprimé. Les points s'accumulent tout au long de la carrière sans limite globale (travailleurs handicapés : règles spécifiques).</div></div>
+  </div>
+
+  <div class="usage-cards">
+    <div class="usage-card">
+      <div class="ui">🎓</div><div>
+        <div class="ut">FORMATION PROFESSIONNELLE</div>
+        <div class="ud">1 point = 500 € de crédit formation. Les 10 premiers points sont obligatoirement affectés à la formation. Utilisables sur Mon Compte Formation.</div>
+        <span class="ubadge">1 pt = 500 €</span></div></div>
+    <div class="usage-card">
+      <div class="ui">⏱️</div><div>
+        <div class="ut">RÉDUCTION DU TEMPS DE TRAVAIL</div>
+        <div class="ud">Passer à temps partiel sans perte de salaire. 10 points = 4 mois à mi-temps payé plein (durée portée de 3 à 4 mois par la réforme de septembre 2023). Sans condition d'âge (la limite de 55 ans a été supprimée pour cette option).</div>
+        <span class="ubadge">10 pts = 4 mois mi-temps</span></div></div>
+    <div class="usage-card">
+      <div class="ui">🏖️</div><div>
+        <div class="ut">RETRAITE ANTICIPÉE</div>
+        <div class="ud">Partir jusqu'à 2 ans avant l'âge légal. 10 points = 1 trimestre de majoration. À partir de 55 ans. Cumulable avec la retraite pour carrières longues.</div>
+        <span class="ubadge">10 pts = 1 trimestre anticipé</span></div></div>
+  </div>
+
+  <!-- LIENS UTILES -->
+  <div class="secti orange" style="margin-top:22px;">🔗 Ressources officielles</div>
+  <a class="link-btn" href="https://www.compteprofessionnelprevention.fr" target="_blank" rel="noopener">🖥️ Mon Compte Formation (consulter ses points C2P)</a>
+  <a class="link-btn" href="https://www.compteprofessionnelprevention.fr" target="_blank" rel="noopener">📋 Compte Professionnel de Prévention (officiel)</a>
+  <a class="link-btn" href="https://www.inrs.fr/demarche/penibilite/ce-qu-il-faut-retenir.html" target="_blank" rel="noopener">🏥 INRS — Pénibilité au travail</a>
+
+  <div class="note">Outil indicatif, informatif et pédagogique. Aucun calcul officiel de points. Seuls l'employeur, la Carsat et la CPAM font foi. Ta convention collective peut prévoir des mesures de prévention supplémentaires. Ni avis médical, ni avis juridique — consulter le médecin du travail pour ta situation.ulte le médecin du travail pour ta situation personnelle.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">C2P PÉNIBILITÉ · LE CHANTIER · V1.0<br>🦺 INFORMATIF — NI AVIS MÉDICAL NI JURIDIQUE</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  var LS={ WELCOME:'C2P_WELCOMED' };
+  function get(k,d){ try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;} }
+  function set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch(e){} }
+  function $(s,r){ return (r||document).querySelector(s); }
+  function $all(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); }
+
+  // wizard
+  var wStep=0,wMax=3;
+  function dots(){var c=$('#wdots');c.innerHTML='';for(var i=0;i<wMax;i++){var d=document.createElement('div');d.className='d'+(i===wStep?' on':'');c.appendChild(d);}}
+  function show(n){wStep=n;$all('.wstep').forEach(function(s){s.classList.toggle('show',+s.dataset.step===n);});dots();
+    $('#wNext').textContent=(n===wMax-1)?'VOIR LE MODULE':'CONTINUER';
+    $('#wSkip').style.display=(n===wMax-1)?'none':'block';}
+  $('#wNext').addEventListener('click',function(){if(wStep<wMax-1)show(wStep+1);else{$('#wizard').classList.remove('show');set(LS.WELCOME,1);}});
+  $('#wSkip').addEventListener('click',function(){$('#wizard').classList.remove('show');set(LS.WELCOME,1);});
+  $('#helpBtn').addEventListener('click',function(){$('#help').classList.add('show');});
+  $all('[data-close]').forEach(function(b){b.addEventListener('click',function(){$('#'+b.dataset.close).classList.remove('show');});});
+
+  if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'C2P_STATE',WELCOME:'C2P_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{});
+  // ──────────────────────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script src="../articles-loi.js"></script>
+<meta charset="UTF-8">
+<title>Invalidité — Catégories & Droits</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a4a6a">
+<link rel="manifest" href="../manifest.json">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Invalidité">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --acc:#3a6aaa;--acc-l:#5a8aca;--acc-d:#1a4a8a;
+  --dark:#060e1a;--dark2:#0e1a28;
+  --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5ab0e0;
+  --c1:#3a9a7a;--c2:#e8a030;--c3:#e06050;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{min-height:100%;}
+body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
+  background:linear-gradient(165deg,#060e1a 0%,#0e1a28 50%,#040c18 100%);
+  background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(600px 400px at 60% 0%,rgba(58,106,170,0.2),transparent 60%);}
+.wrap{position:relative;z-index:2;max-width:480px;margin:0 auto;padding:0 16px 16px;}
+@media screen and (orientation:landscape) and (max-device-width:1024px){
+  body>*:not(#lb){display:none!important;}
+  #lb{position:fixed;inset:0;z-index:99999;background:var(--dark);color:#fff;display:flex!important;
+    flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;}
+}
+@media screen and (orientation:portrait){#lb{display:none!important;}}
+header{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;
+  padding:12px 16px;padding-top:max(12px,env(safe-area-inset-top));
+  background:linear-gradient(180deg,rgba(6,14,26,0.97),rgba(6,14,26,0.6) 75%,transparent);
+  backdrop-filter:blur(6px);max-width:480px;margin:0 auto;}
+header .back{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:8px;
+  padding:9px 13px;font-weight:700;font-size:12px;text-decoration:none;flex-shrink:0;}
+header .brand{flex:1;text-align:center;}
+header .brand .ti{font-weight:800;font-size:18px;}
+header .brand .su{font-size:9px;color:var(--faded);margin-top:2px;letter-spacing:1.5px;text-transform:uppercase;}
+header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff;border-radius:50%;
+  width:38px;height:38px;font-size:16px;cursor:pointer;flex-shrink:0;}
+
+/* simulateur */
+.panel{background:var(--card);border:1.5px solid var(--card-edge);border-radius:16px;padding:18px;margin:14px 0;}
+.panel-t{font-weight:800;font-size:14px;color:var(--acc-l);margin-bottom:14px;}
+.field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
+.ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
+  border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
+  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+.ip:focus{outline:none;border-color:var(--acc-l);}
+select.ip{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a8aca' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;
+  background-color:rgba(255,255,255,0.07);}
+.inline{display:flex;align-items:center;gap:10px;}
+.inline .ip{flex:1;} .unit{font-size:12px;font-weight:700;color:var(--faded);flex-shrink:0;}
+.hint{font-size:11px;color:var(--faded);margin-top:5px;line-height:1.4;}
+
+/* résultat */
+.res-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.res{border-radius:14px;padding:16px;}
+.res.main{background:linear-gradient(135deg,rgba(58,106,170,0.25),rgba(58,106,170,0.1));
+  border:1.5px solid rgba(58,106,170,0.5);grid-column:1/-1;}
+.res.half{background:var(--card);border:1.5px solid var(--card-edge);}
+.res .rl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--acc-l);margin-bottom:6px;}
+.res .rbig{font-size:28px;font-weight:800;line-height:1;}
+.res .rsub{font-size:11.5px;color:var(--ink2);margin-top:4px;line-height:1.4;}
+
+/* 3 catégories */
+.sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
+.cat{border-radius:14px;padding:16px;margin-bottom:10px;border:1.5px solid;}
+.cat.c1{background:rgba(58,154,122,0.12);border-color:rgba(58,154,122,0.4);}
+.cat.c2{background:rgba(232,160,48,0.1);border-color:rgba(232,160,48,0.35);}
+.cat.c3{background:rgba(224,80,80,0.1);border-color:rgba(224,80,80,0.3);}
+.cat .ch{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.cat.c1 .ch{color:var(--c1);} .cat.c2 .ch{color:var(--c2);} .cat.c3 .ch{color:var(--c3);}
+.cat .ct{font-weight:800;font-size:14px;margin-bottom:6px;}
+.cat .cd{font-size:12px;color:var(--ink2);line-height:1.4;}
+.cat .ctaux{font-size:20px;font-weight:800;margin-top:8px;}
+.cat.c1 .ctaux{color:var(--c1);} .cat.c2 .ctaux{color:var(--c2);} .cat.c3 .ctaux{color:var(--c3);}
+
+.rule{background:var(--card);border:1.5px solid var(--card-edge);border-radius:12px;
+  padding:13px 15px;display:flex;gap:12px;margin-bottom:8px;}
+.rule .ri{font-size:20px;flex-shrink:0;}
+.rule .rt{font-weight:700;font-size:13px;}
+.rule .rd{font-size:12px;color:var(--ink2);margin-top:3px;line-height:1.35;}
+.ctag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;}
+.ctag.ok{background:rgba(74,170,122,0.2);color:var(--ok);}
+.ctag.warn{background:rgba(232,160,48,0.2);color:var(--warn);}
+.ctag.info{background:rgba(90,176,224,0.2);color:var(--info);}
+
+.ext-btn{display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(135deg,rgba(74,170,122,0.15),rgba(74,170,122,0.05));
+  border:1.5px solid rgba(74,170,122,0.4);border-radius:14px;padding:16px;
+  text-decoration:none;color:#fff;margin-bottom:8px;}
+.ext-btn .ebt{font-weight:800;font-size:14px;color:var(--ok);}
+.ext-btn .ebs{font-size:11.5px;color:var(--ink2);margin-top:3px;}
+.note{font-size:11px;color:var(--faded);line-height:1.5;text-align:center;margin-top:14px;padding:0 8px;}
+.foot{margin-top:18px;text-align:center;font-size:10px;color:var(--faded);line-height:1.7;}
+
+/* ── WIZARD ─────────────────────────────────────────── */
+.wiz-ov{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.72);backdrop-filter:blur(6px);
+  display:none;align-items:center;justify-content:center;padding:16px;}
+.wiz-ov.show{display:flex;animation:wizFadeIn .25s;}
+@keyframes wizFadeIn{from{opacity:0}to{opacity:1}}
+.wiz-box{background:linear-gradient(170deg,#1e1a14,#2a2018);border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:22px;max-width:420px;width:100%;max-height:88vh;overflow-y:auto;
+  box-shadow:0 28px 70px rgba(0,0,0,0.7);animation:wizBoxIn .32s cubic-bezier(.2,.9,.3,1.2);
+  border-top:4px solid var(--acc,#e07030);}
+@keyframes wizBoxIn{from{opacity:0;transform:scale(.94) translateY(18px)}to{opacity:1;transform:none}}
+.wiz-bd{padding:22px 22px 24px;}
+.wiz-step{display:none;text-align:center;}
+.wiz-step.on{display:block;animation:wizFadeIn .3s;}
+.wiz-emoji{font-size:58px;display:block;margin:0 auto 10px;animation:wizFloat 4s ease-in-out infinite;}
+@keyframes wizFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.wiz-h{font-family:inherit;font-weight:800;font-size:22px;color:#fff;margin-bottom:8px;line-height:1.2;}
+.wiz-p{font-size:13.5px;color:rgba(255,255,255,0.7);line-height:1.55;margin-bottom:10px;}
+.wiz-accent{color:var(--acc-l,#f09050);font-weight:700;}
+.wiz-feat{display:flex;gap:11px;align-items:flex-start;text-align:left;margin-bottom:11px;
+  background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;}
+.wiz-feat .wi{font-size:20px;flex-shrink:0;}
+.wiz-feat .wt{font-size:13px;color:rgba(255,255,255,0.75);line-height:1.4;}
+.wiz-feat .wt b{display:block;font-weight:700;font-size:12.5px;color:#fff;margin-bottom:2px;}
+.wiz-legal{font-size:11px;color:rgba(255,255,255,0.38);line-height:1.5;
+  background:rgba(255,255,255,0.04);border-radius:8px;padding:9px 11px;text-align:left;
+  border-left:2px solid var(--acc,#e07030);}
+.wiz-dots{display:flex;gap:6px;justify-content:center;margin:16px 0 14px;}
+.wiz-dots span{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.18);transition:.2s;}
+.wiz-dots span.on{background:var(--acc-l,#f09050);width:20px;border-radius:3px;}
+.wiz-btn{display:block;width:100%;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:14px;
+  cursor:pointer;font-family:inherit;background:linear-gradient(135deg,var(--acc-l,#f09050),var(--acc,#e07030));
+  color:#fff;box-shadow:0 5px 16px rgba(0,0,0,0.35);}
+.wiz-btn:active{transform:translateY(2px);}
+.wiz-skip{display:block;width:100%;margin-top:9px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:11px;font-weight:600;font-size:13px;cursor:pointer;
+  background:transparent;color:rgba(255,255,255,0.45);font-family:inherit;}
+/* ── END WIZARD ─────────────────────────────────────── */
+
+body.pageBlancheGuard>*{display:block!important;}
+
+/* Mini-dialog confirm custom (sans URL) */
+#sh-confirm-ov{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);
+  display:flex;align-items:center;justify-content:center;padding:20px;}
+#sh-confirm-box{background:#fff;border-radius:16px;padding:22px 20px;max-width:280px;
+  width:100%;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.35);}
+#sh-confirm-msg{font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:18px;line-height:1.4;}
+.sh-confirm-btns{display:flex;gap:10px;}
+.sh-confirm-btns button{flex:1;padding:11px;border:none;border-radius:10px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;}
+.sh-confirm-yes{background:#e53935;color:#fff;}
+.sh-confirm-no{background:#f0f0f0;color:#444;}
+
+/* ── SimulHeures disclaimer footer ── */
+.sh-disclaimer{
+  margin:24px 0 8px;
+  padding:14px 16px;
+  background:rgba(0,0,0,0.18);
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.10);
+  font-size:11px;
+  line-height:1.65;
+  color:rgba(255,255,255,0.55);
+  text-align:center;
+}
+.sh-disclaimer strong{color:rgba(255,255,255,0.75);}
+.sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
+
+</style>
+</head>
+<body>
+
+<!-- ── WIZARD BIENVENUE ── -->
+<div class="wiz-ov" id="wizOv">
+  <div class="wiz-box"><div class="wiz-bd">
+    <div class="wiz-step on" data-s="0">
+      <span class="wiz-emoji">♿</span>
+      <div class="wiz-h">Invalidité</div>
+      <div class="wiz-p">L'invalidité est reconnue par la CPAM, distincte de l'inaptitude constatée par le médecin du travail.</div>
+      <div class="wiz-p" style="font-size:12px;opacity:.6;">Catégories · Pension · Droits</div>
+    </div>
+    <div class="wiz-step" data-s="1">
+      <div class="wiz-feat"><div class="wi">♿</div><div class="wt"><b>3 catégories</b>Cat. 1 : réduite. Cat. 2 : totale. Cat. 3 : totale + tierce personne. Pension variable.</div></div>
+    </div>
+    <div class="wiz-step" data-s="2">
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Cumul & emploi</b>La pension d'invalidité peut se cumuler avec un salaire dans certaines limites selon la catégorie.</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+    </div>
+    <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
+    <div class="wiz-dots" id="wizDots"></div>
+    <button class="wiz-btn" id="wizNext">Continuer</button>
+    <button class="wiz-skip" id="wizSkip">Passer</button>
+  </div></div>
+</div>
+<!-- ── END WIZARD ── -->
+<div id="lb"><div style="font-size:60px;">♿</div>
+  <div style="font-size:26px;font-weight:700;">Tournez votre téléphone</div></div>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Invalidité</div>
+    <div class="su">Catégories · Pension · Emploi · V1.0</div></div>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+</header>
+<div class="wrap">
+
+  <!-- Simulateur pension -->
+  <div class="panel">
+    <div class="panel-t">🧮 Estimer la pension d'invalidité</div>
+    <div class="field">
+      <label>Catégorie d'invalidité</label>
+      <select class="ip" id="fCat" onchange="calc()">
+        <option value="">— Sélectionne ta catégorie —</option>
+        <option value="1">Catégorie 1 — Capable d'exercer une activité rémunérée</option>
+        <option value="2">Catégorie 2 — Incapable d'exercer une activité rémunérée</option>
+        <option value="3">Catégorie 3 — Nécessite l'aide d'une tierce personne</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Salaire annuel moyen de référence</label>
+      <div class="inline">
+        <input class="ip" id="fSalaire" type="number" min="0" step="100" placeholder="0" oninput="calc()">
+        <span class="unit">€/an</span>
+      </div>
+      <div class="hint">Moyenne des 10 meilleures années de salaire brut soumis à cotisations (plafonné).</div>
+    </div>
+  </div>
+
+  <div id="pensionResults" style="display:none;">
+    <div class="res-grid">
+      <div class="res main">
+        <div class="rl">Pension mensuelle estimée (brut)</div>
+        <div class="rbig" id="rPension">—</div>
+        <div class="rsub" id="rPensionDetail"></div>
+      </div>
+      <div class="res half">
+        <div class="rl">Taux appliqué</div>
+        <div class="rbig" id="rTaux">—</div>
+        <div class="rsub">Du salaire annuel moyen</div>
+      </div>
+      <div class="res half">
+        <div class="rl">Plancher légal</div>
+        <div class="rbig" id="rPlancher">—</div>
+        <div class="rsub" id="rPlancherDetail"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Les 3 catégories -->
+  <div class="sec-t">📊 Les 3 catégories d'invalidité</div>
+
+  <div class="cat c1">
+    <div class="ch">Catégorie 1</div>
+    <div class="ct">Invalidité partielle — activité possible</div>
+    <div class="cd">Capacité de travail réduite d'au moins 2/3, mais le salarié peut encore exercer une activité rémunérée à temps partiel. Peut cumuler pension + salaire dans certaines limites.</div>
+    <div class="ctaux">30 % du SAM</div>
+  </div>
+
+  <div class="cat c2">
+    <div class="ch">Catégorie 2</div>
+    <div class="ct">Invalidité totale — activité impossible</div>
+    <div class="cd">Incapacité absolue d'exercer une profession quelconque. Pas d'activité rémunérée possible (sauf activités thérapeutiques ou bénévoles).</div>
+    <div class="ctaux">50 % du SAM</div>
+  </div>
+
+  <div class="cat c3">
+    <div class="ch">Catégorie 3</div>
+    <div class="ct">Invalidité totale + aide d'une tierce personne</div>
+    <div class="cd">Invalidité de catégorie 2 avec nécessité d'une aide permanente pour les actes essentiels de la vie (toilette, habillage, alimentation…). Majoration pour tierce personne ajoutée à la pension.</div>
+    <div class="ctaux">50 % + MTP</div>
+  </div>
+
+  <!-- Règles -->
+  <div class="sec-t">⚖️ Règles essentielles</div>
+  <div class="rule"><div class="ri">✅</div><div>
+    <div class="rt">Conditions d'attribution</div>
+    <div class="rd">Être affilié à l'Assurance Maladie depuis au moins 12 mois + avoir cotisé sur un salaire d'au moins 2 030 × SMIC horaire dans les 12 mois précédents, ou avoir travaillé 600h. La CPAM statue sur le classement.</div>
+    <span class="ctag info">CPAM statue sur la catégorie</span>
+  </div></div>
+  <div class="rule"><div class="ri">💼</div><div>
+    <div class="rt">Catégorie 1 : cumul emploi + pension</div>
+    <div class="rd">En catégorie 1, la pension est cumulable avec un salaire, dans la limite d'un plafond (salaire + pension ≤ salaire avant invalidité). Au-delà, la pension est réduite du dépassement.</div>
+    <span class="ctag warn">Plafond : salaire antérieur</span>
+  </div></div>
+  <div class="rule"><div class="ri">🏢</div><div>
+    <div class="rt">Maintien dans l'emploi et reclassement</div>
+    <div class="rd">La reconnaissance d'invalidité n'entraîne pas automatiquement la rupture du contrat. L'employeur doit rechercher un reclassement si le médecin du travail déclare une inaptitude (voir module Inaptitude).</div>
+    <span class="ctag ok">Contrat non automatiquement rompu</span>
+  </div></div>
+  <div class="rule"><div class="ri">📅</div><div>
+    <div class="rt">Durée de la pension</div>
+    <div class="rd">La pension d'invalidité est versée jusqu'à 64 ans et remplacée automatiquement par la retraite. Exception : si le bénéficiaire est en activité professionnelle à 64 ans, la bascule n'est pas automatique — il peut prolonger sa pension d'invalidité et continuer à travailler jusqu'à ses 67 ans (âge du taux plein automatique) s'il ne demande pas la liquidation de sa retraite.</div>
+    <span class="ctag info">64 ans en inactivité — peut prolonger jusqu'à 67 ans si en activité</span>
+  </div></div>
+  <div class="rule"><div class="ri">🔄</div><div>
+    <div class="rt">Révision possible</div>
+    <div class="rd">La CPAM peut réviser la catégorie (à la hausse ou à la baisse) si l'état de santé évolue. Le salarié peut également demander une révision. La pension est réajustée en conséquence.</div>
+  </div></div>
+
+  <div class="sec-t">🔗 Source officielle</div>
+  <a class="ext-btn" href="https://www.ameli.fr/assure/droits-demarches/maladie-accident-hospitalisation/invalidite/pension-invalidite" target="_blank" rel="noopener">
+    <div><div class="ebt">ameli.fr — Pension d'invalidité</div>
+    <div class="ebs">Conditions · Montants · Démarches · Simulateur officiel</div></div>
+    <span style="font-size:20px;">→</span>
+  </a>
+
+  <div class="note"><span data-art="L341-1"></span> à <span data-art="L341-16"></span> CSS · Outil indicatif & pédagogique.<br>
+    Valeurs 2026 : taux 30 % (cat.1) / 50 % (cat.2-3). Plancher ≈ 338 €/mois (+0,9 % jan. 2026 — instr. DSS/3A/DB 2025/174). MTP : 1 298,44 €/mois (1er avril 2026 — signal-alpha.fr). Plafond cat.1 : 1 201,50 € · cat.2 : 2 002,50 €. SAM = moy. 10 meilleures années plafonné PASS (48 060 €/an). La catégorie est fixée par le médecin-conseil de la CPAM — seule la CPAM fait foi.<br>
+    ♿ Tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="foot">Outil pédagogique · <span data-art="L341-1"></span> · ni avis médical ni juridique</div>
+</div>
+
+<div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
+  <div style="background:#0e1a28;border:1.5px solid var(--card-edge);border-radius:16px;max-width:430px;width:100%;padding:20px;">
+    <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">
+      Sélectionne ta catégorie d'invalidité et ton salaire de référence pour estimer ta pension. Les 3 catégories sont expliquées en détail.<br><br>
+      La catégorie est fixée par le médecin-conseil de la CPAM — ce module est pédagogique.
+    </div>
+    <button onclick="document.getElementById('help').style.display='none'"
+      style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
+  </div>
+</div>
+<script>
+(function(){
+// Taux et planchers catégorie 1/2/3 — Art. L341-3 à L341-5 CSS 2026
+var CONFIG = {
+  '1': { taux:0.30, plancher:338.31, plafond:1201.50, label:'30% du SAM · Plancher ≈ 338,31 €/mois · Plafond 1 201,50 €/mois (2026 — source : signal-alpha.fr, art. L341-3 CSS)' },
+  '2': { taux:0.50, plancher:338.31, plafond:2002.50, label:'50% du SAM · Plancher ≈ 338,31 €/mois · Plafond 2 002,50 €/mois (2026 — art. L341-4 CSS)' },
+  '3': { taux:0.50, mtp:1298.44, label:'50% du SAM + MTP 1 298,44 €/mois (revalorisation 1er avril 2026 — source : signal-alpha.fr, art. L341-5 CSS)' },
+};
+
+function calc(){
+  var cat = document.getElementById('fCat').value;
+  var sal = parseFloat(document.getElementById('fSalaire').value)||0;
+  if(!cat||!sal){ document.getElementById('pensionResults').style.display='none'; return; }
+  var c = CONFIG[cat];
+  var pension = sal * c.taux / 12;
+  if(c.plancher && pension < c.plancher) {
+    pension = c.plancher;
+    document.getElementById('rPlancherNote').textContent = 'Pension minimale légale appliquée (votre calcul théorique de ' + (sam * c.taux / 12).toFixed(2) + ' € étant inférieur au minimum légal de ' + c.plancher.toFixed(2) + ' €).';
+    document.getElementById('rPlancherNote').style.display = 'block';
+  } else {
+    if(document.getElementById('rPlancherNote')) document.getElementById('rPlancherNote').style.display = 'none';
+  }
+  var total = cat==='3' ? pension + c.mtp : pension;
+
+  document.getElementById('rPension').textContent = total.toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €/mois';
+  document.getElementById('rPensionDetail').textContent = c.label+(cat==='3'?' · Pension '+pension.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+'€ + MTP '+c.mtp+'€':'');
+  document.getElementById('rTaux').textContent = (c.taux*100)+'%';
+  if(cat==='3'){
+    document.getElementById('rPlancher').textContent = '≈ 338 €';
+    document.getElementById('rPlancherDetail').textContent = '+ MTP ≈ 1 266 €/mois (actualisé)';
+  } else {
+    document.getElementById('rPlancher').textContent = '≈ 338 €';
+    document.getElementById('rPlancherDetail').textContent = 'Montant minimum légal';
+  }
+  document.getElementById('pensionResults').style.display='block';
+}
+window.calc = calc;
+})();
+
+  // ── LocalStorage ──────────────────────────────────────────────
+  var LS={STATE:'INV_STATE',WELCOME:'INV_WELCOMED'};
+  function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+  function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+  
+// Dialog confirm custom sans URL
+function shConfirm(msg, cb){
+  var ov=document.createElement('div'); ov.id='sh-confirm-ov';
+  ov.innerHTML='<div id="sh-confirm-box">' +
+    '<div id="sh-confirm-msg">'+msg+'</div>' +
+    '<div class="sh-confirm-btns">' +
+    '<button class="sh-confirm-no" onclick="document.getElementById(\'sh-confirm-ov\').remove()">Annuler</button>' +
+    '<button class="sh-confirm-yes" onclick="document.getElementById(\'sh-confirm-ov\').remove();(window._shCb||function(){})()">Remettre a zero</button>' +
+    '</div></div>';
+  window._shCb=cb; document.body.appendChild(ov);
+}
+
+  window.resetState = function resetState(){
+    shConfirm('Tout remettre à zero ?', function(){
+    localStorage.removeItem(LS.STATE);
+    localStorage.removeItem(LS.WELCOME);
+    location.reload();
+    });
+  }
+  var state=get(LS.STATE,{cat:'',salaire:''});
+  // ──────────────────────────────────────────────────────────────
+
+  // ── Wizard bienvenue ──────────────────────────────────────────
+  (function(){
+    var WK='INV_WELCOMED';
+    function wGet(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
+    function wSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+    var wStep=0,wMax=3;
+    var ov=document.getElementById('wizOv');
+    if(!ov)return;
+    function wDots(){var c=document.getElementById('wizDots');if(!c)return;c.innerHTML='';
+      for(var i=0;i<wMax;i++){var d=document.createElement('span');d.className=i===wStep?'on':'';c.appendChild(d);}}
+    function wShow(n){wStep=n;
+      var steps=document.querySelectorAll('.wiz-step');
+      steps.forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});
+      wDots();
+      var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+      if(nb)nb.textContent=(n===wMax-1)?'Commencer ♿':'Continuer';
+      if(sk)sk.style.display=(n===wMax-1)?'none':'block';}
+    function wClose(){ov.classList.remove('show');wSet(WK,1);}
+    var nb=document.getElementById('wizNext');var sk=document.getElementById('wizSkip');
+    if(nb)nb.addEventListener('click',function(){if(wStep<wMax-1)wShow(wStep+1);else wClose();});
+    if(sk)sk.addEventListener('click',wClose);
+    if(!wGet(WK,0)){ov.classList.add('show');wShow(0);}
+  })();
+  // ── End Wizard ───────────────────────────────────────────────
+</script>
+
+<script>
+// Guard anti-page-blanche: si apres 800ms le contenu n'est pas affiche, forcer
+(function(){
+  var _t = setTimeout(function(){
+    if(document.body){
+      var visible = false;
+      for(var i=0;i<document.body.children.length;i++){
+        var el=document.body.children[i];
+        if(el.id!=='lb' && window.getComputedStyle(el).display!=='none'){visible=true;break;}
+      }
+      if(!visible){ document.body.classList.add('pageBlancheGuard'); }
+    }
+  }, 800);
+  // pageBlancheGuard: afficher tout
+})();
+</script>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
+  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+</body>
+</html>
