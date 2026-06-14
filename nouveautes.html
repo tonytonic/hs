@@ -63,8 +63,202 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <div class="version">
   <div class="v-head">
     <span class="v-date">Juin 2026</span>
-    <span class="v-num">v10.0</span>
+    <span class="v-num">v10.5</span>
     <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Trousse à outils — déploiement progressif</b> : les 54 modules apparaissent uniquement s'ils sont réellement en ligne sur le serveur. Au chargement, le dashboard teste chaque module (fichier sentinelle). Un module non déployé est invisible — catégories, favoris et récents se recalculent automatiquement. Compatible Cloudflare. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Trousse à outils — retrait automatique</b> : si un module est retiré du serveur, il disparaît du dashboard à la prochaine détection (cache 1 h max). Un clic sur un module retiré affiche un message au lieu d'une page 404. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Audit légal juin 2026 — valeurs corrigées</b> : SMIC mensuel 1 867,02 €, titre-restaurant 7,32 €, RSA/saisie 651,69 €, majoration par charge 145 €/mois, forfait hospitalier 23/17 €, AJPA 66,64/33,32 €, IJ maternité 104,02 €/j, repas URSSAF 5,50 €, FMD cumul 800 €, grand déplacement 76,60/56,80 €. Sources : JO, URSSAF, Décrets 2026-220 et 2025-1299, Arrêté 27/02/2026. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Audit légal juin 2026 — textes de loi corrigés</b> : délégué syndical 12 h (50–150 sal.) — art. L2143-13 ; jours fériés 3 mois ancienneté — art. L3133-3 ; congé naissance effectif 1er juillet 2026 (loi n°2025-1403) ; retraite progressive dès 60 ans (décrets 2025-937/938) ; âge légal retraite gelé 62 ans 9 mois gen. 1964–1968 (LFSS 2026) ; CP pendant arrêt maladie 2 j/mois (loi DDADUE 2024) ; TC 75 % exonéré (LF 2026) ; 5e semaine CET non monétisable ; CEG/CET Agirc-Arrco ajoutés au simulateur bulletin. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.4</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Architecture cumulWeeks refondée sur fenêtre glissante</b> : le calcul de surcharge ne remonte plus sur 52 semaines. La fatigue, le stress et le score global utilisent désormais une fenêtre de <b>28 jours</b> (4 semaines) : une semaine à 35 h efface sa contribution dès qu'elle sort de la fenêtre. Les risques cardiovasculaire, cérébral et métabolique conservent une fenêtre de <b>12 semaines</b> (risques structurels long terme — Kivimäki 2015, Jang/OEM 2025). Une surcharge de janvier–mars ne plombe plus le score en juin. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Fériés : méthode d'origine restaurée</b> : un jour férié non travaillé comptait à tort comme une semaine de vacances, déclenchant une réduction de −0,45 point sur le cumul de surcharge. Corrigé : un férié vaut 7 h base CCN, la semaine garde sa base 35 h complète. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 — Lecture seule sur M4 (architecture)</b> : la fonction <code>autoAdapt()</code> laissait M3 modifier les coefficients biologiques de M4 en comparant le burnout RPG à la fatigue calculée. Les coefficients montaient jusqu'à ×2, doublant la fatigue affichée. M3 est désormais strictement en lecture seule. La clé <code>DTE_COEFS</code> corrompue est nettoyée automatiquement au premier lancement. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — lecture de la semaine courante</b> : le popup affichait « 35 h : dans la norme » même avec 10 h de HS saisies dans la semaine. Corrigé : Kitsune calcule le total réel lun–sam depuis M1/M2 en temps réel. Trois niveaux de message : norme (35–44 h), charge modérée avec détail des majorations (+25 %/+50 %), plafond légal au-delà de 48 h (Art. L3121-20). Le cache se régénère automatiquement dès que les saisies changent. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — message 44 h contextualisé</b> : une semaine à 45 h déclenchait systématiquement « moyenne 12 semaines dépassée (Art. L3121-22) », même quand la moyenne réelle était basse. Le message indique maintenant la vraie moyenne 12 semaines et ne déclenche l'alerte Art. L3121-22 que si cette moyenne dépasse réellement 44 h. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Performance et Récupération corrigées le week-end</b> : le panneau Performance affichait « 0 h travaillées » le samedi même quand des données M2 existaient pour lun–ven. La base CCN (35 h) est maintenant affichée à la place. Le score Récupération ne monte plus à 99 un dimanche hors vacances : le plancher de récupération élevé s'applique uniquement aux vraies vacances déclarées dans DTE_VACANCES. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Feature Impact Trajet (optionnelle)</b> : nouveau module activable dans les paramètres (désactivé par défaut). À l'activation, le check-in propose 3 questions séquentielles : mode de transport, durée réelle du trajet et conditions du jour (report J-1 pour saisie rapide). Le moteur calcule une charge trajet en moyenne mobile 28 j (sans accumulation : un trajet quotidien identique produit une charge stable, jamais croissante) et 12 semaines pour le risque cardiovasculaire. Sources : Künn-Nelen 2016, Evans 2002, Novaco 2004, ANACT 2015. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.3</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — FIFO supprimé sur les paiements par taux</b> : la période de migration elle-même était traitée en mode total (FIFO 50 % payé en premier), même après activation des champs « À 25 % payées / À 50 % payées ». Résultat : saisir 6 h@25 % donnait 4 h@25 % en report au lieu de 2 h@25 + 2 h@50. Corrigé : dès la migration, la soustraction directe par taux s'applique. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — Pop-up reliquat : heures exactes ajoutées</b> : le pop-up affichait le total de toutes les heures non routées de la période (ex. 18 h) au lieu des heures que l'on venait d'ajouter (ex. 2 h). Corrigé : le pop-up ne porte que sur l'incrément net de la session en cours. Les anciennes heures non routées restent à 25 % par défaut, sans déclencher de pop-up. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — Routage reliquat ciblé</b> : valider « Reporter à 50 % » routait l'ensemble des heures non payées de la période, pas seulement celles du pop-up. Corrigé : seules les heures nouvellement ajoutées passent au taux choisi ; les heures antérieures non routées ne sont pas affectées. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — Stat-grid cohérente avec le choix de taux</b> : après avoir répondu au pop-up (ex. « 2 h à 50 % »), la grille continuait d'afficher les paliers légaux automatiques (2 h@25 %). Elle reflète maintenant la ventilation choisie : 0 h@25 % + 2 h@50 %. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — Calendrier dynamique selon l'accord d'entreprise</b> : le calendrier commençait toujours le lundi, quelles que soient les CCN configurées. Il démarre maintenant sur le bon jour (lundi, mercredi, dimanche…) selon l'accord d'entreprise. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M2 — Décimales parasites supprimées</b> : en mode « heures travaillées » avec un seuil non divisible (ex. 39 h), la stat-grid affichait des valeurs fractionnées (9 h 14, 46 min). Les valeurs sont maintenant arrondies au quart d'heure. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.2</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Scores cohérents après 10+ semaines de surcharge</b> : un bug bloquait l'amplification chronique à 4 semaines, quelle que soit la durée réelle. À 10 semaines à 45 h, la fatigue affichait 31 au lieu de ~60, le score global était 69 « BON » au lieu de ~40 « MOYEN ». Corrigé : la durée réelle (jusqu'à 12 semaines) est maintenant prise en compte. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 Simulation — la fatigue ne descend plus à charge constante</b> : le simulateur 90 jours montrait la fatigue décroître (24 % → 8 %) à 45 h/sem constant, et la prévision affichait « tout va bien, maintenez ce rythme ». Le modèle a été stabilisé : à 45 h, la fatigue atteint un plateau ~58 % (VIGILANCE) et la prévision recommande désormais de réduire la charge. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Scores stables tout au long de la semaine</b> : les scores variaient selon le jour (plus bas le lundi, saut le vendredi), car le compteur d'exposition 12 semaines incluait la semaine en cours incomplète. Il se base désormais sur les 12 semaines <i>complètes</i> précédentes : le compteur ne bouge qu'au passage d'une semaine et affiche enfin la bonne durée (12 sem au lieu de 11). <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Fausse pénalité cerveau supprimée sous 52 h</b> : le panneau « Risque cérébral » affichait une pénalité horaire (+4,8 pts « Charge ≥52 h ») même à 45 h/sem. Cette ligne ne doit s'activer qu'à partir de 52 h réels (seuil de l'étude Jang/OEM 2025). Corrigé : la composante horaire est désormais nulle sous 52 h, comme l'indique le message « Sous le seuil ». <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Résolution restaurée au-delà de 48 h</b> : auparavant, tout rythme ≥ 48 h/sem saturait à 100 % de fatigue — l'appli ne distinguait plus 48 h, 52 h ou 60 h. La courbe est désormais progressive jusqu'à 60 h (48 h → 84, 52 h → 93, 55 h → 96, 60 h → 100). <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Scores cohérents le week-end et en début de semaine</b> : sans saisie de la semaine en cours, la fatigue tombait à 4 et la performance à 99, même après 12 semaines de surcharge. Un plancher chronique (McEwen 1998 — charge allostatique) garantit désormais que la fatigue accumulée reste visible le samedi et le lundi matin : 12 sem à 45 h → fatigue ≥ 35 %, stress ≥ 28 %, performance ≤ 75 %, récupération ≤ 60 %. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M4 — Affichage « Moyenne 28 j » et heures cerveau corrigés</b> : le panneau Fatigue affichait « 0 h/j — rythme légal » le week-end (fenêtre 7 jours vide), alors que les 4 semaines précédentes étaient à 2 h supp/jour. Il affiche maintenant la vraie moyenne 28 jours. De même, le panneau Cerveau indiquait « 35 h » (base CCN) au lieu des ~43 h réels moyennés sur 28 jours. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.1</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — message milieu de semaine corrigé</b> : le popup n'affiche plus « 35h nickel » en cours de semaine si des heures supplémentaires ont déjà été saisies. Tant que jeudi et vendredi ne sont pas enregistrés, Kitsune indique les HS déjà posées sans présumer du total final. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — base contractuelle dynamique</b> : la base horaire affichée dans les messages (« base 39h » au lieu de « base 35h ») est désormais lue depuis l'accord d'entreprise ou la CCN configurée, et non figée à 35h par défaut. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — accord d'entreprise pris en compte immédiatement</b> : changer de CCN ou d'accord dans le menu invalide automatiquement le cache du popup. Le message Kitsune se recalcule dès la prochaine ouverture, sans attendre le lendemain. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>M3 Kitsune — priorité CCN sur données M1 existantes</b> : si l'utilisateur avait des données enregistrées à 35h et bascule sur un accord à 39h, la nouvelle base est désormais appliquée immédiatement. L'accord d'entreprise prime sur la configuration historique de M1. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.0</span>
   </div>
 
   <!-- M1 -->
@@ -76,7 +270,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
   <!-- M2 -->
   <div class="item">
     <div class="dot"></div>
-    <div class="txt"><b>M2 Suivi de paie — heures payées par taux</b> : saisie séparée par palier (25 % / 50 % ou 3 niveaux pour les CCN à taux intermédiaire). Nouvelle section Restant dû ventilée par taux avec estimation en €. Calcul sur tout l'historique avec rétrocompatibilité FIFO. Zone euro : deux toggles indépendants (code d'accès / floutage). Fix coefficient "×21.25" → "×1.25". <span class="v-tag tag-new">Nouveau</span></div>
+    <div class="txt"><b>M2 Suivi de paie — heures payées par taux</b> : saisie séparée par palier (25 % / 50 % ou 3 niveaux pour les CCN à taux intermédiaire). Nouvelle section Restant dû ventilée par taux avec estimation en €. Calcul sur tout l'historique avec rétrocompatibilité FIFO. Zone euro : deux toggles indépendants (code d'accès / floutage). Fix coefficient «&nbsp;×21.25&nbsp;» → «&nbsp;×1.25&nbsp;». <span class="v-tag tag-new">Nouveau</span></div>
   </div>
 
   <!-- M3/M4 -->
@@ -86,7 +280,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
   </div>
   <div class="item">
     <div class="dot"></div>
-    <div class="txt"><b>M4 — Jours fériés et récupération</b> : un férié non travaillé compte désormais comme 7 h base CCN (et non comme une vraie semaine de congé). Le plancher de récupération élevé ne s'applique plus qu'aux vraies vacances déclarées. Fix "0 h travaillées" le week-end et score récupération 99 le dimanche hors vacances. <span class="v-tag tag-fix">Correction</span></div>
+    <div class="txt"><b>M4 — Jours fériés et récupération</b> : un férié non travaillé compte désormais comme 7 h base CCN (et non comme une vraie semaine de congé). Le plancher de récupération élevé ne s'applique plus qu'aux vraies vacances déclarées. Fix «&nbsp;0 h travaillées&nbsp;» le week-end et score récupération 99 le dimanche hors vacances. <span class="v-tag tag-fix">Correction</span></div>
   </div>
   <div class="item">
     <div class="dot"></div>
