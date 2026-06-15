@@ -2531,6 +2531,14 @@ function _analyzeLegalSituation() {
       maxDayDate, daysOver10, daysOver12,
       hasDailyRisk: maxDayTotal >= 10,
       hasDailyCrit: maxDayTotal >= 12,
+      // Jour de violation recent ? (<= 21 jours) — sert a NE PAS afficher dans la bulle/popup
+      // une vieille journee >10h/12h comme si elle etait actuelle. Les COMPTEURS annuels
+      // (daysOver10/12) restent eux non bornes (stats reelles de l'annee).
+      dailyRecent: (function(){
+        if (!maxDayDate) return false;
+        const _d = new Date(maxDayDate + 'T12:00:00');
+        return (Date.now() - _d.getTime()) <= 21 * 24 * 60 * 60 * 1000;
+      })(),
     };
 
     // 2. HEBDOMADAIRE lun–dim ISO — Art. L3121-20 (48h) + L3121-22 (moy 44h/12sem)
@@ -2584,6 +2592,16 @@ function _analyzeLegalSituation() {
       const avg = win.reduce((s, w) => s + w.total, 0) / win.length;
       if (avg > maxAvg12) maxAvg12 = avg;
     }
+    // ── Semaine ISO COURANTE et derniere semaine COMPLETE (calcul correct base+extra-recup-absent) ──
+    // Reutilise weekArr (deja correct) au lieu de recompter manuellement ailleurs.
+    const _todayK = new Date().toISOString().slice(0,10);
+    const _curWkISO = isoWeekKey(_todayK);
+    const _curMon   = mondayOf(_todayK);
+    const _curWeekEntry = weekArr.find(w => w.wk === _curWkISO) || null;
+    // Derniere semaine complete = semaine la plus recente dont le lundi est < lundi courant
+    const _completedWeeks = weekArr.filter(w => w.mon < _curMon);
+    const _lastWeekEntry = _completedWeeks.length ? _completedWeeks[_completedWeeks.length - 1] : null;
+    const _isVacWk = (mon) => _isVacWeekM4(mon) || weeksWithDayOff.has(isoWeekKey(mon || ''));
     const weekly = {
       maxWeekTotal: Math.round(maxWeekTotal * 100) / 100,
       maxWeekMon, weeksOver48, weeksOver44,
@@ -2596,6 +2614,16 @@ function _analyzeLegalSituation() {
       // Pas d'alerte sous-seuil — le seuil légal est 44h, point.
       hasWeekAlert: false,
       totalWeeks:   weekArr.length,
+      // Semaine ISO courante (peut etre partielle) — total correct via weekArr
+      isoWeekTotal: _curWeekEntry ? Math.round(_curWeekEntry.total * 100) / 100 : 0,
+      isoWeekHS:    _curWeekEntry ? Math.round(_curWeekEntry.ot * 100) / 100 : 0,
+      isoWeekMon:   _curMon,
+      isoWeekIsVac: _curWeekEntry ? _isVacWk(_curWeekEntry.mon) : false,
+      // Derniere semaine COMPLETE (pour bilan du lundi)
+      lastWeekTotal: _lastWeekEntry ? Math.round(_lastWeekEntry.total * 100) / 100 : 0,
+      lastWeekHS:    _lastWeekEntry ? Math.round(_lastWeekEntry.ot * 100) / 100 : 0,
+      lastWeekMon:   _lastWeekEntry ? _lastWeekEntry.mon : '',
+      lastWeekIsVac: _lastWeekEntry ? _isVacWk(_lastWeekEntry.mon) : false,
     };
 
     // 3. PÉRIODE COMPTABLE (clôtures = dimanches de fin de période)
@@ -2655,7 +2683,7 @@ function _analyzeLegalSituation() {
     const _fbYear = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
     const _fbBase = Number(localStorage.getItem('BASE_HEBDO_' + _fbYear)) || fallbackCCN.seuil;
     return {
-      daily:  { hasDailyCrit:false, hasDailyRisk:false, maxDayTotal:0, maxDayExtra:0, baseJour:_fbBase/5, daysOver10:0, daysOver12:0 },
+      daily:  { hasDailyCrit:false, hasDailyRisk:false, dailyRecent:false, maxDayTotal:0, maxDayExtra:0, baseJour:_fbBase/5, daysOver10:0, daysOver12:0 },
       weekly: { hasWeekViol:false, hasAvgViol:false, hasWeekAlert:false, maxWeekTotal:0, maxAvg12:0, weeksOver48:0, weeksOver44:0, totalWeeks:0 },
       period: { current:null, lastClosed:null, hasClosure:false, all:[] },
       annual: { annualOT:0, contingentMax:fallbackCCN.contingent, contingentPct:0, contingentRem:fallbackCCN.contingent, hasContingentAlert:false, hasContingentDanger:false },
@@ -2823,12 +2851,15 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     const jourNow = jours[now_pr.getDay()];
     const name_pr = localStorage.getItem('FOX_USER_NAME') || '';
     const pr_pr   = name_pr ? name_pr + ', ' : '';
+    const _isPrevW = !!(s.weekly && s.weekly.isPrevWeek);
+    const _semLbl  = _isPrevW ? 'La semaine passée' : 'Ta semaine';
+    const _semLbl2 = _isPrevW ? 'la semaine passée' : 'cette semaine';
 
     // Choisir le message selon le niveau de surcharge
     if (cwTotal >= 48) {
       return {
-        titre: `🚨 Semaine à ${_fmtH(cwTotal)} — plafond légal`,
-        message: `${pr_pr}Ta semaine atteint ${_fmtH(cwTotal)} (${_fmtH(cwHS)} de HS). Le plafond légal de 48h est dépassé (Art. L3121-20). Ces heures doivent être majorées et figurer sur ta fiche de paie.`,
+        titre: `🚨 ${_isPrevW ? 'Sem. passée' : 'Semaine'} à ${_fmtH(cwTotal)} — plafond légal`,
+        message: `${pr_pr}${_semLbl} atteint ${_fmtH(cwTotal)} (${_fmtH(cwHS)} de HS). Le plafond légal de 48h est dépassé (Art. L3121-20). Ces heures doivent être majorées et figurer sur ta fiche de paie.`,
         actions: [
           `HS semaine : ${_fmtH(cwHS)} (${cwHS <= 8 ? '+25%' : '8h à +25% puis +50%'})`,
           'Conserve un relevé de tes horaires journaliers',
@@ -2841,10 +2872,10 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const avg12 = (s && s.weekly && s.weekly.maxAvg12) ? Math.round(s.weekly.maxAvg12 * 10) / 10 : 0;
       const avg12Over = avg12 >= 44;
       return {
-        titre: `⚠️ Semaine à ${_fmtH(cwTotal)} — semaine chargée`,
+        titre: `⚠️ ${_isPrevW ? 'Sem. passée' : 'Semaine'} à ${_fmtH(cwTotal)} — semaine chargée`,
         message: avg12Over
-          ? `${pr_pr}${_fmtH(cwTotal)} cette semaine (${_fmtH(cwHS)} de HS). Ta moyenne sur 12 semaines atteint ${_fmtH(avg12)} — au-delà de la limite de 44h (Art. L3121-22).`
-          : `${pr_pr}${_fmtH(cwTotal)} cette semaine (${_fmtH(cwHS)} de HS). C'est au-dessus de 44h mais ta moyenne sur 12 semaines reste raisonnable. Si ce rythme se répète, surveille la tendance (Art. L3121-22).`,
+          ? `${pr_pr}${_fmtH(cwTotal)} ${_semLbl2} (${_fmtH(cwHS)} de HS). Ta moyenne sur 12 semaines atteint ${_fmtH(avg12)} — au-delà de la limite de 44h (Art. L3121-22).`
+          : `${pr_pr}${_fmtH(cwTotal)} ${_semLbl2} (${_fmtH(cwHS)} de HS). C'est au-dessus de 44h mais ta moyenne sur 12 semaines reste raisonnable. Si ce rythme se répète, surveille la tendance (Art. L3121-22).`,
         actions: [
           `HS majorées : ${cwHS <= 8 ? _fmtH(cwHS) + ' à +25%' : '8h à +25% + ' + _fmtH(cwHS-8) + ' à +50%'}`,
           avg12Over ? 'Deux seuils franchis — en parler à ton responsable' : 'Semaine ponctuelle — continue à saisir pour suivre la tendance',
@@ -2947,7 +2978,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   // ══════════════════════════════════════════════════════════════
 
   // ── Violations critiques : Journée > 12h (25 variations) ──
-  if (s.daily?.hasDailyCrit && !msg.titre) {
+  if (s.daily?.hasDailyCrit && s.daily?.dailyRecent && !msg.titre) {
     const total = s.daily.maxDayTotal;
     const extra = s.daily.maxDayExtra;
     const base = s.daily.baseJour;
@@ -3034,7 +3065,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   }
   
   // ── Journée 10-12h (25 variations) ──
-  else if (s.daily?.hasDailyRisk) {
+  else if (s.daily?.hasDailyRisk && s.daily?.dailyRecent) {
     const total = s.daily.maxDayTotal;
     const extra = s.daily.maxDayExtra;
     const base = s.daily.baseJour;
@@ -3333,7 +3364,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       { titre: 'Moyenne hebdo de '+avg+'h sur 12 sem', message: 'Le seuil de 44h en moyenne sur 12 semaines est dépassé. En transport/logistique, l\'accord de branche peut prévoir des aménagements, mais pas au-delà de 46h.', actions: ['Vérifie ton accord de branche pour le plafond applicable', 'Si >44h conventionnel : en parler à ton responsable', 'Consulte le médecin du travail si fatigue'] },
       { titre: 'Alerte durable : moy. '+avg+'h/sem', message: 'Cette moyenne montre une charge structurellement élevée. La loi protège les salariés même quand aucune semaine isolée ne dépasse 48h (Art. L3121-22).', actions: ['Prends conscience que la moyenne compte autant que les pics', 'Documente avec FOX Rapport', 'Envisage une discussion avec les RH sur ta charge de travail'] },
       { titre: 'Moy. '+avg+'h/sem — comment y remédier ?', message: 'Dépasser 44h en moyenne est un signal fort à discuter avec ton responsable. Pour toi, c\'est aussi un signal de surcharge chronique qui impacte ta santé à long terme (Art. L3121-22).', actions: ['Identifie les semaines les plus chargées dans FOX', 'Propose à ton responsable un plan de lissage de la charge', 'Consulte le médecin du travail si besoin'] },
-      { titre: '🔴 '+avg+'h/sem en moyenne sur 12 semaines', message: 'La limite de 44h/sem en moyenne est dépassée. Avec '+wk+' semaines analysées, cette tendance est fiable et documentable. C\'est le moment d\'en parler à ton responsable.', actions: ['Génère et sauvegarde le rapport FOX complet', 'Prépare un point avec ton responsable', 'Consulte le médecin du travail'] },
+      { titre: '🔴 '+avg+'h/sem en moyenne sur 12 semaines', message: 'La limite de 44h/sem en moyenne est dépassée. Avec '+(s.weekly.totalWeeks||12)+' semaines analysées, cette tendance est fiable et documentable. C\'est le moment d\'en parler à ton responsable.', actions: ['Génère et sauvegarde le rapport FOX complet', 'Prépare un point avec ton responsable', 'Consulte le médecin du travail'] },
     ];
     msg = msgs[typeof _nextMsgIdx === "function" ? _nextMsgIdx(msgs) : Math.floor(Math.random() * msgs.length)];
     } // fin else recovery
@@ -3676,10 +3707,24 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   }
   
   // ── Pas d'heures sup (10 variations) ──
-  // GUARD : si situation légale en danger/warning malgré deltaH=0
-  // (appel popup avec h=0 mais données M1/M2 critiques) → jamais de message positif
-  else if (s && s.globalLevel && s.globalLevel !== 'ok') {
-    if (s.globalLevel === 'danger') {
+  // GUARD : si situation légale en danger/warning malgré deltaH=0.
+  // RECENCE : on ne declenche ce garde-fou que pour une preoccupation ACTUELLE
+  // (violation recente, ou contingent annuel — cumul qui reste d'actualite).
+  // Une vieille violation (janvier) ne doit PLUS afficher 'Violations dans tes donnees' en juin.
+  // NB : on ne touche pas s.globalLevel (barre de risque) — uniquement l'affichage popup.
+  else if (s && (function(){
+    const _wViolR = s.weekly && s.weekly.hasWeekViol && (function(){
+      if (!s.weekly.maxWeekMon) return true;
+      const _d = new Date(s.weekly.maxWeekMon + 'T12:00:00');
+      return (Date.now() - _d.getTime()) <= 21 * 24 * 60 * 60 * 1000;
+    })();
+    const _dCritR = s.daily && s.daily.hasDailyCrit && s.daily.dailyRecent;
+    const _dRiskR = s.daily && s.daily.hasDailyRisk && s.daily.dailyRecent;
+    s._effDanger  = _dCritR || _wViolR || (s.annual && s.annual.hasContingentDanger);
+    s._effWarning = _dRiskR || (s.weekly && s.weekly.hasAvgViol) || (s.annual && s.annual.hasContingentAlert);
+    return s._effDanger || s._effWarning;
+  })()) {
+    if (s._effDanger) {
       return { titre: '⚠️ Violations dans tes données',
         message: 'Des dépassements légaux sont présents dans tes heures enregistrées. Consulte l\'onglet Violations pour le détail complet.',
         actions: ['Ouvre l\'historique des violations', 'Vérifie les semaines concernées', 'Compare avec tes bulletins de paie'] };
@@ -4255,6 +4300,66 @@ function _fmtH(dec) {
   return h + 'h' + String(m).padStart(2, '0');
 }
 
+// ── Injecte le contexte 'semaine courante / bilan lundi' dans s.weekly ────────
+// Extrait de la boucle de rendu pour etre testable. Lit M1/M2 + lastWeek* de weekArr.
+function _injectCurrentWeekContext(s) {
+  // ── Semaine COURANTE (HS posees jusqu'ici) + bilan du LUNDI ──────────
+    // S'appuie sur le calcul correct par semaine ISO (s.weekly.lastWeek* issu de weekArr).
+    // On NE recompte plus la base a la main et on N'ecrase plus maxWeekTotal.
+    try {
+      const _now_cw = new Date();
+      const _yr_cw  = _now_cw.getFullYear().toString();
+      const _rawM1_cw = JSON.parse(localStorage.getItem('DATA_REPORT_' + _yr_cw) || '{}');
+      const _rawM2_cw = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr_cw) || '{}');
+      const _baseHebdo_cw = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
+      const _baseJ_cw = _baseHebdo_cw / 5;
+      const _dow_cw = (_now_cw.getDay() + 6) % 7; // 0=lun, 6=dim
+
+      // HS deja posees sur les jours ECOULES de la semaine courante
+      let _weekHS_cw = 0, _weekDays_cw = 0;
+      for (let _d = 0; _d <= _dow_cw && _d < 7; _d++) {
+        const _dt = new Date(_now_cw);
+        _dt.setDate(_now_cw.getDate() - _dow_cw + _d);
+        const _dk = _dt.getFullYear() + '-' + String(_dt.getMonth()+1).padStart(2,'0') + '-' + String(_dt.getDate()).padStart(2,'0');
+        const _eM1 = _rawM1_cw[_dk];
+        const _eM2 = (() => {
+          const _ym = _dk.substring(0,7); const _dd = parseInt(_dk.substring(8));
+          return _rawM2_cw[_ym] && _rawM2_cw[_ym].days ? (_rawM2_cw[_ym].days[_dd] || 0) : 0;
+        })();
+        const _extra = _eM1 ? (_eM1.extra || 0) : _eM2;
+        if (_extra > 0 || (_eM1 && (_eM1.absent >= 7 || _eM1.recup >= 7))) { _weekDays_cw++; _weekHS_cw += _extra; }
+      }
+
+      if (!s.weekly) s.weekly = {};
+
+      if (_weekDays_cw > 0 || _weekHS_cw > 0) {
+        // Semaine EN COURS : estimation 'jusqu'ici' = jours ecoules x base + HS
+        const _weekBase_cw = (_dow_cw < 5 ? (_dow_cw + 1) : 5) * _baseJ_cw;
+        const _weekTotal_cw = _weekBase_cw + _weekHS_cw;
+        s.weekly.currentWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
+        s.weekly.currentWeekHS    = Math.round(_weekHS_cw * 10) / 10;
+        s.weekly.currentWeekDays  = _weekDays_cw;
+        s.weekly.isPrevWeek       = false;
+      } else if (_dow_cw === 0) {
+        // LUNDI sans saisie du jour : bilan de la derniere semaine COMPLETE
+        // (valeur correcte issue de weekArr, et seulement si recente : < 10 jours)
+        const _lwTotal = s.weekly.lastWeekTotal || 0;
+        const _lwMon   = s.weekly.lastWeekMon || '';
+        let _recent = false;
+        if (_lwMon) {
+          const _lwd = new Date(_lwMon + 'T12:00:00');
+          _recent = (_now_cw - _lwd) <= 10 * 24 * 60 * 60 * 1000;
+        }
+        if (_recent && _lwTotal > 0 && !s.weekly.lastWeekIsVac) {
+          s.weekly.currentWeekTotal = _lwTotal;
+          s.weekly.currentWeekHS    = s.weekly.lastWeekHS || 0;
+          s.weekly.currentWeekDays  = 0;
+          s.weekly.isPrevWeek       = true;
+        }
+      }
+    } catch(_e_cw) {}
+}
+
 function _buildDailyLoop5(s, h, todayOT) {
   const xh   = todayOT ? todayOT.extra : 0;
   const th   = todayOT ? todayOT.total : 0;
@@ -4304,9 +4409,19 @@ function _buildDailyLoop5(s, h, todayOT) {
   }
 
   // ── Flags violations (lus directement depuis s) ─────────────────
-  const vCrit    = s.daily.hasDailyCrit;                    // jour > 12h
-  const vRisk    = s.daily.hasDailyRisk;                    // jour >= 10h
-  const vWeek48  = s.weekly.hasWeekViol;                    // semaine > 48h
+  const vCrit    = s.daily.hasDailyCrit && s.daily.dailyRecent;  // jour > 12h (recent)
+  const vRisk    = s.daily.hasDailyRisk && s.daily.dailyRecent;  // jour >= 10h (recent)
+  // GARDE DE RECENCE : hasWeekViol reste true toute l'annee des qu'une semaine
+  // historique a depasse 48h. Sans garde, la bulle affichait '49h plafond depasse'
+  // un lundi a partir d'une vieille semaine. On n'alerte que si la semaine violee
+  // est dans les 21 derniers jours.
+  const _wkViolRecent = (function(){
+    if (!s.weekly.hasWeekViol) return false;
+    if (!s.weekly.maxWeekMon) return true;
+    const _d = new Date(s.weekly.maxWeekMon + 'T12:00:00');
+    return (now - _d) <= 21 * 24 * 60 * 60 * 1000;
+  })();
+  const vWeek48  = s.weekly.hasWeekViol && _wkViolRecent;  // semaine > 48h (recente)
   const vAvg44   = s.weekly.hasAvgViol;                     // moy 12 sem > 44h
   const vAlert44 = s.weekly.hasWeekAlert;                   // semaine > 44h
   const vCont    = s.annual.hasContingentDanger;            // contingent dépassé
@@ -4512,100 +4627,14 @@ function kitsuneNarrateOvertime(deltaH, source) {
       }
     } catch(_ek) {}
     const _baseKey = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_b' + _baseKey + '_r7';
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_b' + _baseKey + '_r9';
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
       if (_pc.key === _popupKey) _cachedPopup = _pc.msg;
     } catch(e) {}
 
-    // ── Calcul des HS de la SEMAINE COURANTE (lun–sam) ──────────────────────
-    // Correction bug : s.weekly.maxWeekTotal = max historique annuel, pas la semaine en cours
-    // On calcule le total réel lun–sam depuis M1+M2 et on l'injecte dans s.weekly
-    try {
-      const _now_cw = new Date();
-      const _yr_cw  = _now_cw.getFullYear().toString();
-      const _rawM1_cw = JSON.parse(localStorage.getItem('DATA_REPORT_' + _yr_cw) || '{}');
-      const _rawM2_cw = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _yr_cw) || '{}');
-      // Base contractuelle : priorite CCN_CUSTOM > CCN_API > BASE_HEBDO_ (via _kitsuneGetCCN).
-      // Ne pas relire BASE_HEBDO_ directement : si accord change, CCN_CUSTOM.seuil doit gagner.
-      const _baseHebdo_cw = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
-      const _baseJ_cw = _baseHebdo_cw / 5;
-      // Lundi de la semaine courante
-      const _dow_cw = (_now_cw.getDay() + 6) % 7; // 0=lun, 6=dim
-      let _weekHS_cw = 0;
-      let _weekDays_cw = 0;
-      for (let _d = 0; _d <= _dow_cw && _d < 7; _d++) {
-        const _dt = new Date(_now_cw);
-        _dt.setDate(_now_cw.getDate() - _dow_cw + _d);
-        const _dk = _dt.getFullYear() + '-'
-          + String(_dt.getMonth()+1).padStart(2,'0') + '-'
-          + String(_dt.getDate()).padStart(2,'0');
-        // M1 prioritaire
-        const _eM1 = _rawM1_cw[_dk];
-        const _eM2 = (() => {
-          const _ym = _dk.substring(0,7);
-          const _dd = parseInt(_dk.substring(8));
-          return _rawM2_cw[_ym] && _rawM2_cw[_ym].days ? (_rawM2_cw[_ym].days[_dd] || 0) : 0;
-        })();
-        const _extra = _eM1 ? (_eM1.extra || 0) : _eM2;
-        if (_extra > 0 || (_eM1 && (_eM1.absent >= 7 || _eM1.recup >= 7))) {
-          _weekDays_cw++;
-          _weekHS_cw += _extra;
-        }
-      }
-      // weekTotal = jours effectifs × base + HS
-      // CAS LUNDI (dow=0) : la boucle ne tourne qu'une fois (aujourd'hui, pas de saisie encore).
-      // On regarde alors la SEMAINE PRECEDENTE pour afficher un bilan coherent plutot
-      // que de laisser hasWeekViol (historique) prendre la main avec un vieux 49h.
-      if (_weekDays_cw === 0 && _weekHS_cw === 0 && _dow_cw === 0) {
-        // Lire la semaine precedente (lun-dim J-7 a J-1)
-        let _prevHS = 0, _prevDays = 0;
-        const _prevYr = new Date(_now_cw); _prevYr.setDate(_now_cw.getDate() - 7);
-        const _rawM1_prev = JSON.parse(localStorage.getItem('DATA_REPORT_' + _prevYr.getFullYear()) || '{}');
-        const _rawM2_prev = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _prevYr.getFullYear()) || '{}');
-        for (let _pd = 0; _pd < 7; _pd++) {
-          const _pdt = new Date(_now_cw); _pdt.setDate(_now_cw.getDate() - 7 + _pd);
-          const _pdk = _pdt.getFullYear() + '-' + String(_pdt.getMonth()+1).padStart(2,'0') + '-' + String(_pdt.getDate()).padStart(2,'0');
-          const _pM1 = _rawM1_prev[_pdk];
-          const _pM2 = (() => {
-            const _ym = _pdk.substring(0,7); const _dd = parseInt(_pdk.substring(8));
-            return _rawM2_prev[_ym] && _rawM2_prev[_ym].days ? (_rawM2_prev[_ym].days[_dd] || 0) : 0;
-          })();
-          const _pExtra = _pM1 ? (_pM1.extra || 0) : _pM2;
-          if (_pExtra > 0 || (_pM1 && (_pM1.absent >= 7 || _pM1.recup >= 7))) {
-            _prevDays++; _prevHS += _pExtra;
-          }
-        }
-        if (_prevDays > 0 || _prevHS > 0) {
-          const _prevBase = Math.min(_prevDays, 5) * _baseJ_cw;
-          const _prevTotal = _prevBase + _prevHS;
-          if (!s.weekly) s.weekly = {};
-          // Taguer comme 'semaine precedente' pour que _generateDynamicMessage adapte le titre
-          s.weekly.currentWeekTotal = Math.round(_prevTotal * 10) / 10;
-          s.weekly.currentWeekHS    = Math.round(_prevHS * 10) / 10;
-          s.weekly.currentWeekDays  = _prevDays;
-          s.weekly.isPrevWeek       = true; // flag : ce sont les donnees de la sem. precedente
-          if (_prevTotal > (s.weekly.maxWeekTotal || 0))
-            s.weekly.maxWeekTotal = Math.round(_prevTotal * 10) / 10;
-        }
-      }
-      // Semaine courante (mar-dim) OU lundi avec donnees deja saisies
-      if (_weekDays_cw > 0 || _weekHS_cw > 0) {
-        const _weekBase_cw = _dow_cw < 5 ? (_dow_cw + 1) * _baseJ_cw : 5 * _baseJ_cw;
-        const _weekTotal_cw = _weekBase_cw + _weekHS_cw;
-        // Injecter dans s.weekly pour que _generateDynamicMessage l'utilise
-        if (!s.weekly) s.weekly = {};
-        s.weekly.currentWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
-        s.weekly.currentWeekHS    = Math.round(_weekHS_cw * 10) / 10;
-        s.weekly.currentWeekDays  = _weekDays_cw;
-        s.weekly.isPrevWeek       = false;
-        // Si la semaine courante est la plus chargée → l'exposer comme maxWeekTotal aussi
-        if (_weekTotal_cw > (s.weekly.maxWeekTotal || 0)) {
-          s.weekly.maxWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
-        }
-      }
-    } catch(_e_cw) {}
+    _injectCurrentWeekContext(s);
 
     let dynamicMsg;
     if (_cachedPopup) {
@@ -5404,6 +5433,133 @@ window.addEventListener('storage', (e) => {
     console.log('[Kitsune] CCN/base change -> cache popup invalide');
   }
 });
+
+// ════════════════════════════════════════════════════════════════
+// DIAGNOSTIC FOX — lance _foxDiag() dans la console pour voir
+// exactement ce que le moteur calcule (base, semaines, max, verdict).
+// Sert a reperer les artefacts de test (base 39h restante, mois M2
+// charge non cloture, semaine fantome...).
+// ════════════════════════════════════════════════════════════════
+window._foxDiag = function() {
+  const out = [];
+  const log = (s) => { out.push(s); console.log(s); };
+  const year = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
+
+  log('========== FOX DIAG — annee ' + year + ' ==========');
+
+  // 1) BASE utilisee + source
+  let baseSrc = 'defaut (35h droit commun)';
+  let baseVal = 35;
+  try {
+    const cust = localStorage.getItem('CCN_CUSTOM');
+    const idcc = localStorage.getItem('CCN_IDCC');
+    const ccnNom = localStorage.getItem('CCN_NOM') || '';
+    const bh = Number(localStorage.getItem('BASE_HEBDO_' + year));
+    if (typeof _kitsuneGetCCN === 'function') baseVal = _kitsuneGetCCN().seuil;
+    if (cust) {
+      const c = JSON.parse(cust);
+      if (c && c.seuil > 0) baseSrc = 'CCN_CUSTOM / accord entreprise (' + (c.nom || 'sans nom') + ') seuil=' + c.seuil;
+    } else if (idcc && idcc !== '0') {
+      baseSrc = 'CCN standard IDCC ' + idcc + ' (' + ccnNom + ')';
+    } else if (bh >= 35) {
+      baseSrc = 'BASE_HEBDO_' + year + ' (M1) = ' + bh;
+    }
+    log('BASE utilisee : ' + baseVal + 'h  | source : ' + baseSrc);
+    if (cust) log('  ⚠️ CCN_CUSTOM present — si tu ne voulais PAS d accord manuel, c est un artefact de test a supprimer.');
+  } catch(e) { log('Erreur lecture base: ' + e); }
+
+  // 2) Reconstruire les semaines depuis M1 + M2 (independamment du moteur)
+  const rawM1 = JSON.parse(localStorage.getItem('DATA_REPORT_' + year) || '{}');
+  const rawM2 = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + year) || '{}');
+  const isoWk = (dk) => {
+    const d = new Date(dk), dow = (d.getDay()+6)%7;
+    const thu = new Date(d); thu.setDate(d.getDate()-dow+3);
+    const yS = new Date(thu.getFullYear(),0,4);
+    return thu.getFullYear()+'-W'+String(1+Math.round(((thu-yS)/86400000-3+((yS.getDay()+6)%7))/7)).padStart(2,'0');
+  };
+  const monOf = (dk) => { const d=new Date(dk),dow=(d.getDay()+6)%7; d.setDate(d.getDate()-dow); return d.toISOString().slice(0,10); };
+
+  // M2 -> jours (en signalant les mois non clotures)
+  const days = {};
+  let m2Months = 0, m2OpenMonths = [];
+  Object.entries(rawM2).forEach(([mk, mv]) => {
+    if (!/^\d{4}-\d{2}$/.test(mk) || !mv || !mv.days) return;
+    m2Months++;
+    if (mv.closed !== true) m2OpenMonths.push(mk);
+    if (mv.closed === true) return;
+    const [y,m] = mk.split('-').map(Number);
+    Object.entries(mv.days).forEach(([ds,hrs]) => {
+      const dk = y+'-'+String(m).padStart(2,'0')+'-'+String(parseInt(ds)).padStart(2,'0');
+      days[dk] = { extra: Number(hrs)||0, src:'M2' };
+    });
+  });
+  // M1 prioritaire
+  Object.entries(rawM1).forEach(([dk,val]) => {
+    if (typeof val !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
+    days[dk] = { extra: Number(val.extra||0), recup:Number(val.recup||0), absent:Number(val.absent||0), src:'M1' };
+  });
+  log('Jours M1: ' + Object.keys(rawM1).length + ' | Mois M2: ' + m2Months + ' (non clotures: ' + (m2OpenMonths.join(',')||'aucun') + ')');
+
+  // Agreger en semaines
+  const wk = {};
+  Object.entries(days).forEach(([dk,v]) => {
+    const k = isoWk(dk);
+    if (!wk[k]) wk[k] = { mon: monOf(dk), extra:0, recup:0, absent:0, srcs:new Set() };
+    wk[k].extra += v.extra||0; wk[k].recup += v.recup||0; wk[k].absent += v.absent||0;
+    wk[k].srcs.add(v.src);
+  });
+  const weeks = Object.entries(wk).map(([k,w]) => ({
+    wk:k, mon:w.mon,
+    total: Math.max(0, baseVal + w.extra - w.recup - w.absent),
+    hs: Math.max(0, w.extra - w.recup - w.absent),
+    srcs: [...w.srcs].join('+')
+  })).sort((a,b)=>a.mon.localeCompare(b.mon));
+
+  log('--- SEMAINES (total = base ' + baseVal + 'h + HS) ---');
+  weeks.forEach(w => {
+    const flag = w.total >= 48 ? ' 🚨>48' : w.total >= 44 ? ' ⚠️>44' : '';
+    log('  ' + w.mon + ' (' + w.wk + ') : ' + w.total + 'h  [HS ' + w.hs + 'h, ' + w.srcs + ']' + flag);
+  });
+  if (!weeks.length) log('  (aucune semaine avec donnees)');
+
+  // 3) Max + verdict
+  const maxW = weeks.reduce((m,w) => w.total > m.total ? w : m, {total:0, mon:'-'});
+  log('--- VERDICT ---');
+  log('  Semaine MAX : ' + maxW.total + 'h le ' + maxW.mon);
+  log('  Semaines >48h : ' + weeks.filter(w=>w.total>=48).length + ' | >44h : ' + weeks.filter(w=>w.total>=44).length);
+
+  // 4) Ce que le MOTEUR officiel calcule
+  try {
+    if (typeof _analyzeLegalSituation === 'function') {
+      const s = _analyzeLegalSituation();
+      log('--- MOTEUR _analyzeLegalSituation ---');
+      log('  baseHebdo moteur : ' + s.baseHebdo + 'h');
+      log('  maxWeekTotal : ' + s.weekly.maxWeekTotal + 'h le ' + (s.weekly.maxWeekMon||'-'));
+      log('  hasWeekViol : ' + s.weekly.hasWeekViol + ' | globalLevel : ' + s.globalLevel);
+      log('  semaine ISO courante : ' + s.weekly.isoWeekTotal + 'h (HS ' + s.weekly.isoWeekHS + 'h)');
+      log('  derniere sem. complete : ' + s.weekly.lastWeekTotal + 'h le ' + (s.weekly.lastWeekMon||'-'));
+    }
+  } catch(e) { log('Erreur moteur: ' + e); }
+
+  // 5) Caches potentiellement perimes
+  log('--- CACHES ---');
+  log('  FOX_POPUP_DAILY : ' + (localStorage.getItem('FOX_POPUP_DAILY') ? 'present' : 'vide'));
+  log('========== FIN DIAG ==========');
+  log('Astuce : pour repartir propre cote test -> _foxResetTest()');
+  return out.join('\n');
+};
+
+// Nettoyage cible des artefacts de TEST (ne touche PAS aux vraies donnees M1/M2)
+window._foxResetTest = function() {
+  const removed = [];
+  ['CCN_CUSTOM','FOX_POPUP_DAILY'].forEach(k => {
+    if (localStorage.getItem(k) !== null) { localStorage.removeItem(k); removed.push(k); }
+  });
+  console.log('[FOX] Artefacts test supprimes : ' + (removed.join(', ') || 'aucun'));
+  console.log('[FOX] (CCN standard, base M1 et donnees M1/M2 sont conservees)');
+  return removed;
+};
+
 
 // \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 document.addEventListener('DOMContentLoaded', () => {
