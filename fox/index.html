@@ -2855,12 +2855,18 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
           : { niveau: 'info', texte: `📊 ${_fmtH(cwTotal)} cette semaine — moy. 12 sem : ${avg12 > 0 ? _fmtH(avg12) : 'calcul en cours'}` }
       };
     } else {
-      // Entre 35h et 44h
+      // Entre baseHebdo et 44h
       const hs25 = Math.min(8, cwHS);
       const hs50 = Math.max(0, cwHS - 8);
+      // isPrevWeek : on est lundi sans saisie du jour → on affiche le bilan de la sem. passee
+      const _isPrev = !!(s.weekly && s.weekly.isPrevWeek);
       return {
-        titre: `${jourNow} — semaine à ${_fmtH(cwTotal)}`,
-        message: `${pr_pr}${_fmtH(cwTotal)} cette semaine (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36).`,
+        titre: _isPrev
+          ? `Sem. passee — ${_fmtH(cwTotal)} (${_fmtH(cwHS)} de HS)`
+          : `${jourNow} — semaine à ${_fmtH(cwTotal)}`,
+        message: _isPrev
+          ? `${pr_pr}la semaine passée totalisait ${_fmtH(cwTotal)} (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36). Vérifie ton prochain bulletin.`
+          : `${pr_pr}${_fmtH(cwTotal)} cette semaine (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36).`,
         actions: [
           'Saisies enregistrées dans FOX ✓',
           'Vérifier les majorations sur ta prochaine fiche de paie',
@@ -3126,7 +3132,16 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
   }
   
   // ── Semaine > 48h (30 variations) ──
-  else if (s.weekly?.hasWeekViol) {
+  // GARDE DE RECENCE : hasWeekViol reste true toute l'annee des qu'une semaine historique
+  // a depasse 48h. Sans garde, le lundi matin (pas de currentWeekTotal) on affichait
+  // la violation de janvier comme si c'etait la semaine courante. Fix : n'afficher
+  // ce message que si la semaine violee est dans les 21 derniers jours.
+  else if (s.weekly?.hasWeekViol && (() => {
+    if (!s.weekly.maxWeekMon) return true; // pas de date = on garde le message
+    const _mwm = new Date(s.weekly.maxWeekMon + 'T12:00:00');
+    const _now_g = new Date();
+    return (_now_g - _mwm) <= 21 * 24 * 60 * 60 * 1000; // 21 jours
+  })()) {
     const total = s.weekly.maxWeekTotal;
     const sem = s.weekly.maxWeekMon || 'cette semaine';
     
@@ -4540,7 +4555,42 @@ function kitsuneNarrateOvertime(deltaH, source) {
         }
       }
       // weekTotal = jours effectifs × base + HS
-      // Si aucun jour saisi cette semaine → on ne surécrit pas
+      // CAS LUNDI (dow=0) : la boucle ne tourne qu'une fois (aujourd'hui, pas de saisie encore).
+      // On regarde alors la SEMAINE PRECEDENTE pour afficher un bilan coherent plutot
+      // que de laisser hasWeekViol (historique) prendre la main avec un vieux 49h.
+      if (_weekDays_cw === 0 && _weekHS_cw === 0 && _dow_cw === 0) {
+        // Lire la semaine precedente (lun-dim J-7 a J-1)
+        let _prevHS = 0, _prevDays = 0;
+        const _prevYr = new Date(_now_cw); _prevYr.setDate(_now_cw.getDate() - 7);
+        const _rawM1_prev = JSON.parse(localStorage.getItem('DATA_REPORT_' + _prevYr.getFullYear()) || '{}');
+        const _rawM2_prev = JSON.parse(localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + _prevYr.getFullYear()) || '{}');
+        for (let _pd = 0; _pd < 7; _pd++) {
+          const _pdt = new Date(_now_cw); _pdt.setDate(_now_cw.getDate() - 7 + _pd);
+          const _pdk = _pdt.getFullYear() + '-' + String(_pdt.getMonth()+1).padStart(2,'0') + '-' + String(_pdt.getDate()).padStart(2,'0');
+          const _pM1 = _rawM1_prev[_pdk];
+          const _pM2 = (() => {
+            const _ym = _pdk.substring(0,7); const _dd = parseInt(_pdk.substring(8));
+            return _rawM2_prev[_ym] && _rawM2_prev[_ym].days ? (_rawM2_prev[_ym].days[_dd] || 0) : 0;
+          })();
+          const _pExtra = _pM1 ? (_pM1.extra || 0) : _pM2;
+          if (_pExtra > 0 || (_pM1 && (_pM1.absent >= 7 || _pM1.recup >= 7))) {
+            _prevDays++; _prevHS += _pExtra;
+          }
+        }
+        if (_prevDays > 0 || _prevHS > 0) {
+          const _prevBase = Math.min(_prevDays, 5) * _baseJ_cw;
+          const _prevTotal = _prevBase + _prevHS;
+          if (!s.weekly) s.weekly = {};
+          // Taguer comme 'semaine precedente' pour que _generateDynamicMessage adapte le titre
+          s.weekly.currentWeekTotal = Math.round(_prevTotal * 10) / 10;
+          s.weekly.currentWeekHS    = Math.round(_prevHS * 10) / 10;
+          s.weekly.currentWeekDays  = _prevDays;
+          s.weekly.isPrevWeek       = true; // flag : ce sont les donnees de la sem. precedente
+          if (_prevTotal > (s.weekly.maxWeekTotal || 0))
+            s.weekly.maxWeekTotal = Math.round(_prevTotal * 10) / 10;
+        }
+      }
+      // Semaine courante (mar-dim) OU lundi avec donnees deja saisies
       if (_weekDays_cw > 0 || _weekHS_cw > 0) {
         const _weekBase_cw = _dow_cw < 5 ? (_dow_cw + 1) * _baseJ_cw : 5 * _baseJ_cw;
         const _weekTotal_cw = _weekBase_cw + _weekHS_cw;
@@ -4549,6 +4599,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
         s.weekly.currentWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
         s.weekly.currentWeekHS    = Math.round(_weekHS_cw * 10) / 10;
         s.weekly.currentWeekDays  = _weekDays_cw;
+        s.weekly.isPrevWeek       = false;
         // Si la semaine courante est la plus chargée → l'exposer comme maxWeekTotal aussi
         if (_weekTotal_cw > (s.weekly.maxWeekTotal || 0)) {
           s.weekly.maxWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
