@@ -4341,15 +4341,19 @@ function _injectCurrentWeekContext(s) {
         s.weekly.currentWeekHS    = Math.round(_weekHS_cw * 10) / 10;
         s.weekly.currentWeekDays  = _weekDays_cw;
         s.weekly.isPrevWeek       = false;
-      } else if (_dow_cw === 0) {
-        // LUNDI sans saisie du jour : bilan de la derniere semaine COMPLETE
-        // (valeur correcte issue de weekArr, et seulement si recente : < 10 jours)
+      } else {
+        // Semaine en cours encore VIDE (aucune HS saisie cette semaine), N'IMPORTE QUEL JOUR :
+        // on affiche le bilan de la derniere semaine COMPLETE (valeur issue de weekArr),
+        // seulement si elle est RECENTE (<= 15 jours : couvre la semaine precedente du lundi
+        // au dimanche, mais exclut une vieille semaine d'il y a plusieurs semaines).
+        // Avant, ce bilan ne s'affichait QUE le lundi -> les autres jours, le popup disait
+        // a tort 'Pas d'heures sup' alors que la semaine passee avait des HS.
         const _lwTotal = s.weekly.lastWeekTotal || 0;
         const _lwMon   = s.weekly.lastWeekMon || '';
         let _recent = false;
         if (_lwMon) {
           const _lwd = new Date(_lwMon + 'T12:00:00');
-          _recent = (_now_cw - _lwd) <= 10 * 24 * 60 * 60 * 1000;
+          _recent = (_now_cw - _lwd) <= 15 * 24 * 60 * 60 * 1000;
         }
         if (_recent && _lwTotal > 0 && !s.weekly.lastWeekIsVac) {
           s.weekly.currentWeekTotal = _lwTotal;
@@ -5450,7 +5454,7 @@ window.addEventListener('storage', (e) => {
 //    ouverture (restauration de sauvegarde, import, edition), le cache popup/bulle
 //    est purge automatiquement -> recalcul propre, sans rien taper.
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
-const FOX_BUILD = '2026-06-15.12';  // version du moteur Kitsune (affichee par _foxDiag)
+const FOX_BUILD = '2026-06-15.13';  // version du moteur Kitsune (affichee par _foxDiag)
 (function _foxAutoClean(){
   // (0) Changement de VERSION du code -> purge du cache d'affichage.
   // Garantit qu'apres un deploiement, l'ancien message en cache (ex: '35h nickel'
