@@ -1299,16 +1299,47 @@
 
 
 
-<button class="info-btn" onclick="openPresentation()">📄 Présentation du projet</button>
+<!-- ══ BOUTONS UTILITAIRES ══════════════════════════════════ -->
+<div style="width:90%;max-width:340px;display:flex;flex-direction:column;align-items:center;gap:14px;margin:0 auto;">
 
-<button class="info-btn" onclick="openSharePopup()" style="margin-top:-8px;">📲 Partager l'application</button>
+  <!-- Barre bouton : Partage QR code -->
+  <button onclick="openQrPopup()" style="
+    width:100%;padding:13px 16px;border:none;border-radius:16px;cursor:pointer;
+    background:linear-gradient(135deg,#1a1a2e,#0d2a3a);
+    color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.28);letter-spacing:.01em;">
+    <span style="font-size:20px;">📱</span> Partager en QR code
+  </button>
 
-<button class="info-btn" onclick="openSocialPopup()" style="margin-top:-8px;background:linear-gradient(135deg,#e87820,#c85010);border:none;color:#fff;">🎬 Nos réseaux &amp; tutos vidéo</button>
+  <!-- Nid d'abeille : 5 cercles colorés -->
+  <div style="position:relative;width:300px;height:196px;">
+    <button onclick="openBackupPopup()" style="position:absolute;top:0;left:0;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#2196a6,#0d7a8a);">
+      <span style="font-size:26px;line-height:1;">💾</span>Sauvegarde
+    </button>
+    <button onclick="window.location.href='nouveautes.html'" style="position:absolute;top:0;left:107px;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#e65c00,#f9a825);">
+      <span style="font-size:26px;line-height:1;">🆕</span>Nouveautés
+      <span id="badgeNew" style="display:none;position:absolute;top:4px;right:8px;background:#b71c1c;color:#fff;border-radius:6px;font-size:9px;padding:1px 5px;font-weight:700;">NEW</span>
+    </button>
+    <button id="btnPerso" onclick="togglePersoMode()" style="position:absolute;top:0;left:214px;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#6a1b9a,#ab47bc);">
+      <span style="font-size:26px;line-height:1;">✏️</span>Perso
+    </button>
+    <button onclick="openPresentation()" style="position:absolute;top:102px;left:53px;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#1565c0,#42a5f5);">
+      <span style="font-size:26px;line-height:1;">📄</span>Présentation
+    </button>
+    <button onclick="openSharePopup()" style="position:absolute;top:102px;left:160px;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#2e7d32,#66bb6a);">
+      <span style="font-size:26px;line-height:1;">📲</span>Partager
+    </button>
+  </div>
 
-<button class="info-btn" onclick="openBackupPopup()" style="margin-top:-8px;">💾 Sauvegarde générale</button>
-<button class="info-btn" onclick="window.location.href='nouveautes.html'" style="margin-top:-8px;">🆕 Nouveautés &amp; mises à jour</button>
-<button class="info-btn" id="btnPerso" onclick="togglePersoMode()" style="margin-top:-8px;">✏️ Personnaliser le menu</button>
-<button class="btn-hidden" id="btnHidden" onclick="openHiddenDrawer()" style="margin-top:-8px;">
+  <!-- Réseaux : cercle solo centré -->
+  <button onclick="openSocialPopup()" style="width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#c62828,#ef5350);">
+    <span style="font-size:26px;line-height:1;">🎬</span>Réseaux
+  </button>
+
+</div>
+<button class="btn-hidden" id="btnHidden" onclick="openHiddenDrawer()"
+  style="width:90%;max-width:340px;margin:14px auto 0;display:block;">
   👁 Modules masqués&nbsp;<span id="hiddenCount"></span>
 </button>
 
@@ -1675,6 +1706,113 @@ document.addEventListener('keydown', function(e){
   }
 });
 </script>
+
+<!-- ══ POPUP QR CODE ══════════════════════════════════════════ -->
+<div id="qr-popup-overlay" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.60);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:16px;"
+  onclick="closeQrPopup()">
+  <div onclick="event.stopPropagation()" style="
+    background:#fff;border-radius:20px;max-width:420px;width:100%;
+    box-shadow:0 16px 56px rgba(0,0,0,0.35);overflow:hidden;">
+
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#1a1a2e,#0d2a3a);padding:20px 20px 16px;position:relative;">
+      <div style="font-size:22px;font-weight:700;color:#fff;margin-bottom:4px;">📱 Partager en QR code</div>
+      <div style="font-size:13px;color:rgba(255,255,255,0.8);">Faites scanner le QR correspondant à l'appareil</div>
+      <button onclick="closeQrPopup()" style="
+        position:absolute;top:14px;right:16px;
+        background:rgba(255,255,255,0.2);border:none;border-radius:50%;
+        width:32px;height:32px;font-size:18px;color:#fff;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+
+    <!-- Body -->
+    <div style="padding:20px;">
+
+      <!-- Onglets -->
+      <div style="display:flex;gap:8px;margin-bottom:18px;">
+        <button id="qr-tab-android" onclick="switchQrTab('android')" style="
+          flex:1;padding:11px;border:none;border-radius:12px;cursor:pointer;
+          font-size:14px;font-weight:700;
+          background:linear-gradient(135deg,#43a047,#1b5e20);color:#fff;">
+          🤖 Google / Android
+        </button>
+        <button id="qr-tab-ios" onclick="switchQrTab('ios')" style="
+          flex:1;padding:11px;border:none;border-radius:12px;cursor:pointer;
+          font-size:14px;font-weight:700;
+          background:#eee;color:#888;">
+          🍎 Apple / iPhone
+        </button>
+      </div>
+
+      <!-- Zone QR iOS -->
+      <div id="qr-pane-ios" style="text-align:center;display:none;">
+        <div style="display:inline-block;padding:16px;background:#fff;border:2px solid #4FB3C2;border-radius:18px;box-shadow:0 6px 20px rgba(33,150,166,.18);">
+          <img src="data:image/png;base64,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" alt="QR code Apple" style="width:200px;height:200px;display:block;image-rendering:pixelated;">
+        </div>
+        <div style="margin-top:14px;font-size:13px;color:#2196a6;font-weight:700;">Application web (iPhone / iPad)</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;word-break:break-all;">simulateurheuressupfrance.pages.dev/menu</div>
+      </div>
+
+      <!-- Zone QR Android -->
+      <div id="qr-pane-android" style="text-align:center;">
+        <div style="display:inline-block;padding:16px;background:#fff;border:2px solid #43a047;border-radius:18px;box-shadow:0 6px 20px rgba(67,160,71,.18);">
+          <img src="data:image/png;base64,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" alt="QR code Google Play" style="width:200px;height:200px;display:block;image-rendering:pixelated;">
+        </div>
+        <div style="margin-top:14px;font-size:13px;color:#2e7d32;font-weight:700;">Google Play Store (Android)</div>
+        <div style="font-size:12px;color:#888;margin-top:4px;word-break:break-all;">play.google.com/store/apps/details?id=com.tonytonic.heuressup</div>
+      </div>
+
+      <button onclick="closeQrPopup()" style="
+        width:100%;padding:11px;border:1px solid #ddd;border-radius:12px;margin-top:18px;
+        background:#f5f5f5;color:#555;font-size:14px;font-weight:600;cursor:pointer;">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+function openQrPopup() {
+  var o = document.getElementById('qr-popup-overlay');
+  if (!o) return;
+  switchQrTab('android');
+  o.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeQrPopup() {
+  var o = document.getElementById('qr-popup-overlay');
+  if (!o) return;
+  o.style.display = 'none';
+  document.body.style.overflow = '';
+}
+function switchQrTab(which) {
+  var isIos = (which === 'ios');
+  var paneI = document.getElementById('qr-pane-ios');
+  var paneA = document.getElementById('qr-pane-android');
+  var tabI  = document.getElementById('qr-tab-ios');
+  var tabA  = document.getElementById('qr-tab-android');
+  if (paneI) paneI.style.display = isIos ? 'block' : 'none';
+  if (paneA) paneA.style.display = isIos ? 'none' : 'block';
+  if (tabI) {
+    tabI.style.background = isIos ? 'linear-gradient(135deg,#4FB3C2,#2196a6)' : '#eee';
+    tabI.style.color = isIos ? '#fff' : '#888';
+  }
+  if (tabA) {
+    tabA.style.background = isIos ? '#eee' : 'linear-gradient(135deg,#43a047,#1b5e20)';
+    tabA.style.color = isIos ? '#888' : '#fff';
+  }
+}
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    var o = document.getElementById('qr-popup-overlay');
+    if (o && o.style.display === 'flex') closeQrPopup();
+  }
+});
+</script>
+
 
 <div id="ccnModal">
   <div class="ccn-box">
