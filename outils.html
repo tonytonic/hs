@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Le Terrier — La trousse à outils</title>
@@ -175,15 +176,121 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--ink);color:
 /* Catégorie-titre séparateur dans accueil */
 .sec-sep{font-size:18px;font-weight:800;color:var(--txt);margin:22px 4px 13px;}
 </style>
+<style id="atelier-skin">
+/* ============ PEAU « ATELIER » — décor en fond + menu en verre dépoli ============ */
+:root{ --ink:#0a1626; --ink-2:#11273e; --ink-3:#1b3a5c; --glass:rgba(10,22,40,.60); --edge:rgba(240,192,64,.20); }
+
+/* fond fixe : le décor reste en place pendant que le menu défile par-dessus */
+body{ background:#0a1626; }
+.atelier-bg{ position:fixed; inset:0; z-index:-2;
+  background:#0a1626 url('atelier-bg.jpg') center top / cover no-repeat; }
+.atelier-bg::after{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(7,14,26,0) 30%, rgba(7,14,26,.34) 50%,
+                                     rgba(8,16,30,.76) 74%, rgba(8,16,30,.94) 100%); }
+
+/* header transparent superposé (ne pousse plus le contenu) */
+.hdr{ position:fixed; top:0; left:0; right:0; z-index:30; background:transparent; }
+.hdr-title{ display:none; }                 /* le titre vit sur l'enseigne */
+.hdr-btn{ background:rgba(9,18,32,.45);
+  -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+  border:1px solid rgba(240,192,64,.28); }
+
+/* hero : simple réserve d'espace pour laisser respirer le haut du décor */
+.atelier-hero{ position:relative; height:42vh; }
+
+/* le bandeau renard est masqué : le renard est déjà dans le décor */
+.fox-wrap{ display:none !important; }
+
+/* zones rendues transparentes */
+.srch-wrap{ background:transparent; padding-top:0; }
+.light{ background:transparent; border-radius:0; min-height:0; margin-top:0; padding-top:4px; }
+
+/* barre de recherche en verre */
+.srch{ background:rgba(11,22,38,.56);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  border:1px solid var(--edge); box-shadow:0 8px 24px rgba(0,0,0,.30); }
+.srch svg{ color:var(--gold-soft); }
+.srch input{ color:#fff; }
+.srch input::placeholder{ color:rgba(247,242,232,.55); }
+
+/* libellé de section « Catégories » */
+.sec-sep{ color:#f3e6c8; text-shadow:0 2px 10px rgba(0,0,0,.5);
+  display:flex; align-items:center; gap:10px; }
+.sec-sep::before{ content:''; width:18px; height:2px; border-radius:2px;
+  background:var(--gold); box-shadow:0 0 10px rgba(240,192,64,.55); }
+
+/* cartes catégories en verre dépoli */
+.cat{ background:var(--glass);
+  -webkit-backdrop-filter:blur(16px) saturate(1.1); backdrop-filter:blur(16px) saturate(1.1);
+  border:1px solid var(--edge); box-shadow:0 10px 30px rgba(0,0,0,.34); margin-bottom:11px; }
+.cat-hd:active{ background:rgba(240,192,64,.08); }
+.cat-info .t{ color:#fbf4e6; }
+.cat-info .s{ color:rgba(247,242,232,.62); }
+.cat-info .cnt{ color:var(--gold-soft); }
+.chev{ color:var(--gold-soft); }
+.pill svg{ color:rgba(255,250,240,.92); }
+
+/* lignes-outils à l'intérieur d'une catégorie (sur verre) */
+.cat-body .tool-row+.tool-row{ border-top:1px solid rgba(240,192,64,.12); }
+.cat-body .tool-row:active{ background:rgba(240,192,64,.10); }
+.cat-body .tool-row .t{ color:#f7f0e2; }
+.cat-body .tool-row .s{ color:rgba(247,242,232,.58); }
+
+/* autres onglets (Favoris/Récents/Plus) : titres lisibles sur le décor */
+.view-t{ color:#fbf4e6; text-shadow:0 2px 10px rgba(0,0,0,.5); }
+.view-s{ color:rgba(247,242,232,.7); }
+.empty-msg{ color:rgba(247,242,232,.8); }
+
+/* barre d'onglets en verre */
+.tabbar{ background:rgba(8,16,28,.74);
+  -webkit-backdrop-filter:blur(20px) saturate(1.1); backdrop-filter:blur(20px) saturate(1.1);
+  border-top:1px solid rgba(240,192,64,.16); }
+.tab{ color:rgba(247,242,232,.55); }
+.tab.on{ color:var(--gold); }
+
+/* wizard d'accueil accordé au thème bleu nuit */
+.wiz-ov{ background:rgba(6,12,22,.95); }
+.wiz-box{ background:linear-gradient(180deg,#13283f,#0d1d2f);
+  border:1px solid rgba(240,192,64,.22); box-shadow:0 22px 60px rgba(0,0,0,.55); }
+.wiz-h{ color:#f6d98a; }
+.wiz-p{ color:rgba(247,242,232,.82); }
+.wiz-dots span{ background:rgba(247,242,232,.22); }
+.wiz-dots span.on{ background:var(--gold); }
+.wiz-sk{ color:rgba(247,242,232,.55); }
+
+/* le header est désormais fixed : sur les vues sans hero (Favoris/Récents/Plus),
+   on réserve l'espace pour qu'il ne chevauche pas le texte */
+#vFavoris, #vRecents, #vPlus{ padding-top:calc(86px + env(safe-area-inset-top)); }
+#vFavoris .view-t, #vRecents .view-t, #vPlus .view-t,
+#vFavoris .view-s, #vRecents .view-s, #vPlus .view-s{ position:relative; z-index:1; }
+#vFavoris::before, #vRecents::before, #vPlus::before{
+  content:''; position:absolute; left:0; right:0; top:0; height:120px;
+  background:linear-gradient(180deg, rgba(7,14,26,.62), rgba(7,14,26,0)); pointer-events:none; }
+#vFavoris, #vRecents, #vPlus{ position:relative; }
+
+/* étoile favoris : le ☆ (non épinglé) héritait d'une couleur sombre, invisible sur le verre nuit */
+.pin-btn{ color:rgba(247,242,232,.6); }
+.pin-btn.on{ color:#ffd966; }
+
+/* disclaimer en pied de menu (vue Accueil) */
+.menu-disclaimer{ margin:22px 4px 6px; padding:13px 15px; border-radius:13px;
+  background:rgba(10,22,40,.55); border:1px solid rgba(240,192,64,.18);
+  font-size:10.5px; line-height:1.6; color:rgba(247,242,232,.6); text-align:center; }
+.menu-disclaimer strong{ color:rgba(247,242,232,.8); }
+.menu-disclaimer a{ color:rgba(247,242,232,.6); text-decoration:underline; }
+
+@media (prefers-reduced-motion: reduce){ .cat-body{ transition:none; } }
+</style>
 </head>
 <body>
+<div class="atelier-bg" aria-hidden="true"></div>
 
 <!-- WIZARD -->
 <div class="wiz-ov" id="wizOv">
   <div class="wiz-box">
     <div class="wiz-step on" data-s="0"><span class="wiz-em">🦊</span>
       <div class="wiz-h">Bienvenue dans Le Terrier</div>
-      <div class="wiz-p">54 outils pour comprendre tes droits, réunis en un seul endroit.</div></div>
+      <div class="wiz-p">Plein d'outils pour comprendre tes droits et gérer ton quotidien, réunis en un seul endroit.</div></div>
     <div class="wiz-step" data-s="1"><span class="wiz-em">🗂️</span>
       <div class="wiz-h">Rangés par thème</div>
       <div class="wiz-p">Touche une catégorie pour dérouler ses outils. Tout est classé.</div></div>
@@ -209,6 +316,9 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--ink);color:
   </div>
 </div>
 
+<!-- HERO ATELIER (espace qui révèle le haut du décor : renard + enseigne) -->
+<div class="atelier-hero" id="atelierHero" aria-hidden="true"></div>
+
 <!-- RECHERCHE (visible sur accueil seulement) -->
 <div class="srch-wrap" id="srchWrap">
   <div class="srch">
@@ -231,18 +341,13 @@ body{font-family:'Manrope',-apple-system,sans-serif;background:var(--ink);color:
 
   <!-- ACCUEIL -->
   <div class="view on" id="vAccueil">
-    <div class="section" id="favSection">
-      <div class="sec-hd">
-        <div class="lb">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Favoris
-        </div>
-        <button class="more" onclick="goTab('favoris')">Voir tous</button>
-      </div>
-      <div id="favGrid"></div>
-    </div>
     <div class="sec-sep">Catégories</div>
     <div id="catList"></div>
+
+    <div class="menu-disclaimer">
+      <strong>⚠️ Outil pédagogique — pas un avis juridique.</strong><br>
+      Le Terrier aide à comprendre la législation du travail et tes finances perso. Tous les résultats sont fournis à titre indicatif uniquement et ne sauraient engager la responsabilité de l'auteur. Vos saisies restent sur votre appareil. <a href="mentions-legales.html">Mentions légales</a>
+    </div>
 
   </div>
 
@@ -344,6 +449,58 @@ const TOOLS={
   'module-demission-are':{e:'🚪',t:'Démission légitime',s:'Cas d\'ouverture ARE'},
   'module-essai':{e:'⏳',t:'Période d\'essai',s:'Délais prévenance'},
   'module-effectifs':{e:'🏢',t:'Seuils d\'effectif',s:'11 · 50 · 250 · 300 · 1000 sal.'},
+  'module-prix-unitaire':{e:'🏷️',t:'Prix au kilo/litre',s:'Comparer 2 formats'},
+  'module-credit-cout':{e:'🏛️',t:"Coût d'un crédit",s:'Mensualité & intérêts'},
+  'module-conso-electrique':{e:'💡',t:"Coût d'un appareil",s:'Électricité'},
+  'module-conso-auto':{e:'⛽',t:"Coût d'un trajet",s:'Carburant'},
+  'module-surface':{e:'🎨',t:'Peinture & surface',s:'Litres nécessaires'},
+  'module-loyer-prorata':{e:'🏘️',t:'Loyer au prorata',s:"Entrée en cours de mois"},
+  'module-francs-euros':{e:'💶',t:'Francs ↔ Euros',s:'Conversion officielle'},
+  'module-dates':{e:'📅',t:'Calcul de dates',s:'Durée & ajout de jours'},
+  'module-budget':{e:'🐷',t:'Budget 50/30/20',s:'Reste à vivre'},
+  'module-demarche-demenagement':{e:'📦',t:'Déménagement',s:'Checklist complète'},
+  'module-demarche-naissance':{e:'🍼',t:'Naissance — démarches',s:'Checklist complète'},
+  'module-demarche-pacs-mariage':{e:'💍',t:'PACS ou mariage',s:'Checklist complète'},
+  'module-demarche-papiers-perdus':{e:'🪪',t:'Perte de papiers',s:'Que faire, étape par étape'},
+  'module-demarche-deces':{e:'🕊️',t:"Décès d'un proche",s:'Checklist complète'},
+  'module-demarche-premier-emploi':{e:'🎒',t:'Premier emploi',s:'Checklist du salarié'},
+  'module-demarche-permis':{e:'🚗',t:'Permis de conduire',s:'Étapes & démarches'},
+  'module-unites':{e:'📐',t:"Convertisseur d'unités",s:'Cuisine, distances...'},
+  'module-fuseaux':{e:'🌍',t:'Fuseaux horaires',s:'Heure ailleurs'},
+  'module-imc':{e:'⚖️',t:'IMC & besoins caloriques',s:'Information générale'},
+  'module-salaire-cout-employeur':{e:'💼',t:'Net · Brut · Coût employeur',s:'Ordre de grandeur'},
+  'module-abonnements':{e:'📱',t:'Coût des abonnements',s:'Total mensuel & annuel'},
+  'module-devises':{e:'💱',t:'Convertisseur de devises',s:'Taux manuel'},
+  'module-cout-voiture':{e:'🚙',t:"Coût complet d'une voiture",s:'Au mois & au km'},
+  'module-partage-depenses':{e:'🤝',t:'Partage de dépenses',s:'Coloc, voyage entre amis'},
+  'module-livrets-epargne':{e:'🏦',t:'Livrets réglementés',s:'Livret A · LDDS · LEP'},
+  'module-remboursement-sante':{e:'🩺',t:'Remboursement santé',s:'Sécu + mutuelle'},
+  'module-impot-revenu':{e:'🧮',t:'Impôt sur le revenu',s:'Estimation par tranches'},
+  'module-allocations-familiales':{e:'👨‍👩‍👧‍👦',t:'Allocations familiales',s:'Montants de référence'},
+  'module-pension-alimentaire':{e:'⚖️',t:'Pension alimentaire',s:'Barème indicatif (Justice)'},
+  'module-dpe-decodeur':{e:'🏡',t:'Décodeur de DPE',s:'Classes & interdictions'},
+  'module-bonus-malus-eco':{e:'🚦',t:'Bonus/malus écologique',s:'Repères 2026'},
+  'module-droits-passagers':{e:'✈️',t:'Droits des passagers',s:'Retard, annulation'},
+  'module-comparateur-forfaits':{e:'📶',t:'Comparateur de forfaits',s:'Mobile, box internet'},
+  'module-cash-vs-credit':{e:'💳',t:'Paiement 3-4× vs crédit',s:'Coût réel'},
+  'module-decodeur-sigles':{e:'🔠',t:'Décodeur de sigles',s:'Administration française'},
+  'module-reperes-consommateur':{e:'🛒',t:'Repères droits consommateur',s:'Rétractation, garanties'},
+  'module-numeros-urgence':{e:'🆘',t:'Numéros utiles & urgences',s:'Aide-mémoire'},
+  'module-demarche-depot-garantie':{e:'🔑',t:'Dépôt de garantie & préavis',s:'Checklist locataire'},
+  'module-demarche-arrivee-france':{e:'🛂',t:'Arrivée en France',s:'Checklist nouvel arrivant'},
+  'module-demarche-voiture-occasion':{e:'🚘',t:"Achat/vente voiture d'occasion",s:'Checklist'},
+  'module-demarche-micro-entreprise':{e:'🧾',t:'Créer une micro-entreprise',s:'Checklist'},
+  'module-demarche-logement-etudiant':{e:'🎓',t:'Premier logement étudiant',s:'Checklist'},
+  'module-demarche-valise-voyage':{e:'🧳',t:'Préparer son voyage',s:'Checklist valise'},
+  'module-demarche-securite-numerique':{e:'🔐',t:'Sécurité numérique de base',s:'Checklist'},
+  'module-demarche-eco-gestes':{e:'🌱',t:'Éco-gestes & économies',s:'Checklist maison'},
+  'module-solde-points-permis':{e:'🚗',t:'Solde de points du permis',s:'Barème & récupération'},
+  'module-tva':{e:'🧾',t:'HT · TTC · TVA',s:'Calcul de TVA'},
+  'module-partage-addition':{e:'🍽️',t:"Partage d'addition",s:'Diviser & pourboire'},
+  'module-remise':{e:'🔖',t:'Remises & soldes',s:'Prix après réduction'},
+  'module-pourcentages':{e:'➗',t:'Pourcentages',s:'Calculs courants'},
+  'module-interets-composes':{e:'📈',t:'Épargne & intérêts',s:'Intérêts composés'},
+
 };
 const CATS=[
   {id:'rupture',label:'Rupture de contrat',sub:'Outils & modèles',icon:'briefcase',color:'#B8A4E0',ids:['module-rupture','module-preavis','module-preavis-comp','module-fincontrat','module-fincontrat2','module-archives','module-miseapied','module-demission-are']},
@@ -353,10 +510,20 @@ const CATS=[
   {id:'droits',label:'Droits & parcours pro',sub:'Carrière, formation, épargne',icon:'growth',color:'#A8D5C8',ids:['module-anciennete','module-cse','module-journal','module-entretien','module-cet','module-formation','module-epargne','module-delegation']},
   {id:'statuts',label:'Statuts & clauses spéciales',sub:'Contrats particuliers',icon:'doc',color:'#C8B0E0',ids:['module-nonconcurrence','module-precarite','module-greve','module-sabbatique','module-retraite','module-cumul-retraite','module-egalite','module-alternance','module-conge-ss']},
   {id:'organisation',label:'Organisation & entreprise',sub:'Seuils & dispositifs',icon:'building',color:'#A8C0E0',ids:['module-effectifs','module-avantages-nature','module-modulation','module-activite-partielle']},
+  {id:'calc-quotidien',label:'Calculs du quotidien',sub:'Prix, %, conversions',icon:'calc',color:'#7FD3C4',ids:['module-prix-unitaire','module-tva','module-partage-addition','module-remise','module-pourcentages','module-interets-composes','module-unites','module-fuseaux','module-imc','module-abonnements','module-devises','module-dates']},
+  {id:'argent-admin',label:'Argent & administratif',sub:'Crédit, épargne, impôts, aides',icon:'coin',color:'#F0D060',ids:['module-credit-cout','module-cash-vs-credit','module-salaire-cout-employeur','module-budget','module-livrets-epargne','module-remboursement-sante','module-impot-revenu','module-allocations-familiales','module-pension-alimentaire','module-comparateur-forfaits']},
+  {id:'logement-transport',label:'Logement & transport',sub:'Loyer, voiture, énergie, DPE',icon:'home',color:'#88C0DC',ids:['module-loyer-prorata','module-cout-voiture','module-conso-electrique','module-conso-auto','module-surface','module-dpe-decodeur','module-bonus-malus-eco','module-droits-passagers','module-solde-points-permis','module-partage-depenses']},
+  {id:'etapes-vie',label:'Étapes de vie',sub:'Naissance, mariage, déménagement…',icon:'flag',color:'#F0A8C8',ids:['module-demarche-demenagement','module-demarche-naissance','module-demarche-pacs-mariage','module-demarche-deces','module-demarche-premier-emploi','module-demarche-permis','module-demarche-papiers-perdus']},
+  {id:'demarches-pratiques',label:'Démarches pratiques',sub:'Logement, papiers, numérique',icon:'doc',color:'#E0B888',ids:['module-demarche-depot-garantie','module-demarche-arrivee-france','module-demarche-voiture-occasion','module-demarche-micro-entreprise','module-demarche-logement-etudiant','module-demarche-valise-voyage','module-demarche-securite-numerique','module-demarche-eco-gestes']},
+  {id:'reperes-pratiques',label:'Repères pratiques',sub:'Sigles, urgences, francs/euros',icon:'info',color:'#B8D888',ids:['module-decodeur-sigles','module-reperes-consommateur','module-numeros-urgence','module-francs-euros']},
 ];
 
 /* ===== ICÔNES SVG ===== */
 const SVGP={
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M15.2 8.7a4 4 0 0 0-3.2-1.5c-2.3 0-4 1.8-4 4.8s1.7 4.8 4 4.8a4 4 0 0 0 3.2-1.5"/><line x1="6.5" y1="10" x2="13" y2="10"/><line x1="6.5" y1="13" x2="13" y2="13"/>',
+  flag:'<path d="M6 21V4"/><path d="M6 4h13l-3.2 4.2L19 12.5H6"/>',
+  info:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16"/><line x1="12" y1="7.3" x2="12" y2="7.5"/>',
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><rect x="10" y="14" width="4" height="7"/>',
   briefcase:'<rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
   calc:'<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="12" y1="10" x2="14" y2="10"/><line x1="16" y1="10" x2="16.5" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="12" y1="14" x2="14" y2="14"/><line x1="16" y1="14" x2="16.5" y2="14"/>',
   clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
@@ -408,7 +575,7 @@ function rowHTML(id){var t=TOOLS[id];if(!t)return'';var on=isPinned(id);
   return'<div class="tool-row" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( on?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( on?'⭐':'☆')+'</button></div>';}
 
 /* ===== Grille favoris (accueil) ===== */
-function renderFavGrid(){var p=getPinned().filter(isAvail);var h=document.getElementById('favGrid');
+function renderFavGrid(){var h=document.getElementById('favGrid');if(!h)return;var p=getPinned().filter(isAvail);
   if(!p.length){h.innerHTML='<div class="empty-msg"><span class="e">☆</span>Aucun favori pour l\'instant.<br>Touche l\'étoile d\'un outil pour l\'épingler ici.</div>';return;}
   h.innerHTML='<div class="fav-grid">'+p.slice(0,8).map(function(id){var t=TOOLS[id];if(!t)return'';return'<div class="fav-cell" onclick="openTool(\''+id+'\')"><div style="color:var(--txt)">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'],28)+'</div><div class="nm">'+t.t+'</div></div>';}).join('')+'</div>';}
 
@@ -464,6 +631,7 @@ function goTab(t){curTab=t;
   var onAcc=(t==='accueil');
   document.getElementById('srchWrap').style.display=onAcc?'block':'none';
   document.getElementById('foxWrap').style.display=onAcc?'block':'none';
+  var ah=document.getElementById('atelierHero');if(ah)ah.style.display=onAcc?'block':'none';
   if(t==='favoris')renderFavFull();
   if(t==='recents')renderRecents();
   if(t==='plus')renderPlus();
@@ -478,8 +646,8 @@ function wDots(){var c=document.getElementById('wDots');c.innerHTML='';for(var i
 function wShow(n){wStep=n;document.querySelectorAll('.wiz-step').forEach(function(s){s.classList.toggle('on',+s.dataset.s===n);});wDots();document.getElementById('wNext').textContent=(n===wMax-1)?'C\'est parti ! 🦊':'Continuer';document.getElementById('wSkip').style.display=(n===wMax-1)?'none':'block';}
 function wClose(){document.getElementById('wizOv').classList.remove('on');ls(LS.W,1);}
 function resetOutils(){
-  if(!confirm('Reinitialiser la trousse ?\n\nCela efface les favoris, les recents et relance le guide de demarrage.')) return;
-  try{localStorage.removeItem(LS.P);localStorage.removeItem(LS.R);localStorage.removeItem(LS.W);}catch(e){}
+  if(!confirm('Reinitialiser la trousse ?\n\nCela efface les favoris, les recents, le cache de detection des outils, et relance le guide de demarrage.')) return;
+  try{localStorage.removeItem(LS.P);localStorage.removeItem(LS.R);localStorage.removeItem(LS.W);localStorage.removeItem(DEPLOY_CHECK_KEY);}catch(e){}
   location.reload();
 }
 function startWiz(){document.getElementById('wizOv').classList.add('on');wShow(0);goTab('accueil');}
@@ -518,10 +686,18 @@ function probe(id){
 
 /* Lance la détection de tous les modules en parallèle, puis re-render */
 function detectDeployed(){
-  // Cache court pour ne pas refaire 54 requêtes à chaque ouverture
+  /* Garde-fou : une carte ou presque rien n'est disponible trahit presque
+     toujours un souci de test (file://, hors-ligne, CORS) plutot qu'une
+     vraie indisponibilite de masse -- dans ce cas on l'ignore. */
+  function suspicious(map){
+    var n=Object.keys(map).length, ok=0;
+    for(var k in map){ if(map[k]===true) ok++; }
+    return n>0 && (ok/n)<0.05;
+  }
+  // Cache court pour ne pas refaire ~100 requêtes à chaque ouverture
   try{
     var c=JSON.parse(localStorage.getItem(DEPLOY_CHECK_KEY)||'null');
-    if(c&&c.t&&(Date.now()-c.t)<DEPLOY_CHECK_TTL&&c.map){
+    if(c&&c.t&&(Date.now()-c.t)<DEPLOY_CHECK_TTL&&c.map&&!suspicious(c.map)){
       AVAILABLE=c.map; render(); return;
     }
   }catch(e){}
@@ -532,6 +708,10 @@ function detectDeployed(){
   })).then(function(results){
     var map={};
     results.forEach(function(pair){map[pair[0]]=pair[1];});
+    if(suspicious(map)){
+      try{localStorage.removeItem(DEPLOY_CHECK_KEY);}catch(e){}
+      return;
+    }
     AVAILABLE=map;
     try{localStorage.setItem(DEPLOY_CHECK_KEY,JSON.stringify({t:Date.now(),map:map}));}catch(e){}
     render();
