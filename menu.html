@@ -1343,6 +1343,11 @@
   👁 Modules masqués&nbsp;<span id="hiddenCount"></span>
 </button>
 
+<!-- Trousse à outils du Renard — même style que les autres modules, un cran plus petite -->
+<div class="btn" id="btn-trousse" onclick="location.href='outils.html';" style="max-width:190px;background:linear-gradient(160deg,#0d1420,#1a2030);">
+  <img src="icon-renard.png" loading="eager" alt="Trousse à outils du Renard" style="border-radius:28px;">
+</div>
+
 <!-- ══ DROIT À L'ERREUR — BAS DE PAGE ════════════════════════ -->
 <div style="margin:24px 14px 0;background:#12192a;border-radius:16px;overflow:hidden;
   box-shadow:0 4px 20px rgba(0,0,0,0.4);">
@@ -3419,7 +3424,7 @@ function hasConsent(){
       var em = t ? t.e : '';
       var nm = t ? t.t : id.replace('module-','');
       var sub = t ? t.s : '';
-      return '<a class="fav-drop-item" href="outils/'+id+'/index.html" onclick="var m=document.getElementById(\'favDropMenu\');if(m)m.style.display=\'none\';_favDropOpen=false;var a=document.getElementById(\'favDropArrow\');if(a)a.textContent=\'▼\';">' +
+      return '<a class="fav-drop-item" href="outils/'+id+'.html" onclick="var m=document.getElementById(\'favDropMenu\');if(m)m.style.display=\'none\';_favDropOpen=false;var a=document.getElementById(\'favDropArrow\');if(a)a.textContent=\'▼\';">' +
         (em ? '<span class="fdi-e">'+em+'</span>' : '') +
         '<span style="flex:1;"><span style="display:block;">'+nm+'</span>' +
         (sub ? '<span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:400;">'+sub+'</span>' : '') +
