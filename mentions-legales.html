@@ -17,13 +17,13 @@
         li { margin-bottom: 4px; }
         .updated { color: #888; font-size: 0.9em; }
             .back-btn{display:inline-block;margin-bottom:18px;padding:9px 16px;background:#4FB3C2;color:#fff;
-          text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;transition:background .2s;}
+          text-decoration:none;border-radius:10px;font-size:14px;font-weight:600;transition:background .2s;cursor:pointer;border:none;font-family:inherit;}
         .back-btn:hover{background:#2196a6;}
 </style>
 </head>
 <body>
 
-    <a href="menu.html" class="back-btn">← Retour au menu</a>
+    <a href="menu.html" class="back-btn" id="backBtnTop">← Retour au menu</a>
 
     <h1>Mentions Légales</h1>
     <p class="updated">Dernière mise à jour : juin 2026</p>
@@ -127,7 +127,29 @@
 
 
     <div style="text-align:center;margin-top:30px;">
-      <a href="menu.html" class="back-btn">← Retour au menu</a>
+      <a href="menu.html" class="back-btn" id="backBtnBottom">← Retour au menu</a>
     </div>
+
+    <script>
+    // Retour intelligent : revient à la page d'où l'utilisateur est venu
+    // (menu.html OU outils.html selon le point d'entrée), au lieu d'un lien fixe.
+    (function(){
+      function smartBack(e){
+        e.preventDefault();
+        var ref = document.referrer || '';
+        if(ref && /outils\.html(\?|#|$)/.test(ref)){
+          window.location.href = 'outils.html';
+        } else if(window.history.length > 1 && ref && ref.indexOf(window.location.host) !== -1){
+          window.history.back();
+        } else {
+          window.location.href = 'menu.html';
+        }
+      }
+      var top = document.getElementById('backBtnTop');
+      var bottom = document.getElementById('backBtnBottom');
+      if(top) top.addEventListener('click', smartBack);
+      if(bottom) bottom.addEventListener('click', smartBack);
+    })();
+    </script>
 </body>
 </html>
