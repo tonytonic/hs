@@ -273,6 +273,17 @@ body{ background:#0a1626; }
   color:#0d1420; background:linear-gradient(135deg,#ffd966,#f0c040); border-radius:6px;
   padding:2px 6px; vertical-align:middle; margin-left:4px; }
 
+/* État d'activation d'un module (déploiement progressif) :
+   pastille verte = activé/disponible · puce « 🔒 Bientôt » + ligne grisée = pas encore en ligne. */
+.st-dot{ display:inline-block; width:8px; height:8px; border-radius:50%; vertical-align:middle; margin-left:5px; }
+.st-on{ background:#46c478; box-shadow:0 0 0 3px rgba(70,196,120,.18); }
+.st-soon{ display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.2px;
+  color:#eef3fa; background:rgba(92,109,135,.92); border-radius:6px; padding:2px 6px;
+  vertical-align:middle; margin-left:5px; white-space:nowrap; }
+.tool-row.soon{ opacity:.5; }
+.tool-row.soon:active{ background:transparent; }
+.fav-cell.soon{ opacity:.5; }
+
 /* étoile favoris : le ☆ (non épinglé) héritait d'une couleur sombre, invisible sur le verre nuit */
 .pin-btn{ color:rgba(247,242,232,.6); }
 .pin-btn.on{ color:#ffd966; }
@@ -349,7 +360,8 @@ body{ background:#0a1626; }
     <div id="rolloutBanner" style="display:none;margin:4px 4px 14px;padding:11px 14px;border-radius:13px;
       background:linear-gradient(135deg,rgba(240,192,64,.16),rgba(240,192,64,.08));
       border:1px solid rgba(240,192,64,.3);font-size:11.5px;color:rgba(247,242,232,.85);text-align:center;line-height:1.5;">
-      🚧 <b>Déploiement progressif tout l'été</b> — de nouveaux outils arrivent au fil des semaines. Les modules « <span class="new-badge" style="margin:0;">Nouveau</span> » viennent juste d'être activés.
+      🚧 <b>Déploiement progressif tout l'été</b> — de nouveaux outils arrivent au fil des semaines.<br>
+      Repère : <span class="st-dot st-on" style="margin:0 2px;"></span> module <b>disponible</b> · <span class="st-soon" style="margin:0 2px;">🔒 Bientôt</span> <b>pas encore en ligne</b> · « <span class="new-badge" style="margin:0;">Nouveau</span> » vient d'être activé.
     </div>
     <div class="sec-sep">Catégories</div>
     <div id="catList"></div>
@@ -581,13 +593,15 @@ function openTool(id){
 }
 
 /* ===== Ligne outil ===== */
-function rowHTML(id){var t=TOOLS[id];if(!t)return'';var on=isPinned(id);var nw=isNew(id);
-  return'<div class="tool-row" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+(nw?' <span class="new-badge">Nouveau</span>':'')+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( on?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( on?'⭐':'☆')+'</button></div>';}
+function rowHTML(id){var t=TOOLS[id];if(!t)return'';var pin=isPinned(id);var live=isOn(id);var nw=isNew(id);
+  var status = live ? (nw?'<span class="new-badge">Nouveau</span>':'<span class="st-dot st-on" title="Disponible" aria-label="Disponible"></span>')
+                    : '<span class="st-soon" title="Pas encore en ligne" aria-label="Bientôt disponible">🔒 Bientôt</span>';
+  return'<div class="tool-row'+(live?'':' soon')+'" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+' '+status+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( pin?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( pin?'⭐':'☆')+'</button></div>';}
 
 /* ===== Grille favoris (accueil) ===== */
 function renderFavGrid(){var h=document.getElementById('favGrid');if(!h)return;var p=getPinned().filter(isAvail);
   if(!p.length){h.innerHTML='<div class="empty-msg"><span class="e">☆</span>Aucun favori pour l\'instant.<br>Touche l\'étoile d\'un outil pour l\'épingler ici.</div>';return;}
-  h.innerHTML='<div class="fav-grid">'+p.slice(0,8).map(function(id){var t=TOOLS[id];if(!t)return'';return'<div class="fav-cell" onclick="openTool(\''+id+'\')"><div style="color:var(--txt)">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'],28)+'</div><div class="nm">'+t.t+'</div></div>';}).join('')+'</div>';}
+  h.innerHTML='<div class="fav-grid">'+p.slice(0,8).map(function(id){var t=TOOLS[id];if(!t)return'';return'<div class="fav-cell'+(isOn(id)?'':' soon')+'" onclick="openTool(\''+id+'\')"><div style="color:var(--txt)">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'],28)+'</div><div class="nm">'+t.t+'</div></div>';}).join('')+'</div>';}
 
 /* ===== Catégories accordéon ===== */
 var openCats={};
@@ -600,12 +614,13 @@ function renderCats(q){var h=document.getElementById('catList');var html='';
     var base=availIds(cat.ids);
     var ids=q?base.filter(function(id){var t=TOOLS[id];return t&&(normSearch(t.t).indexOf(normSearch(q))>=0||normSearch(t.s).indexOf(normSearch(q))>=0);}):base;
     if(!ids.length)return;
+    var av=ids.filter(isOn).length;
     var op=q||openCats[cat.id];
     html+='<div class="cat'+( op?' open':'')+'" id="cat-'+cat.id+'">'
       +'<div class="cat-hd" onclick="togCat(\''+cat.id+'\')">'+
       '<div class="pill" style="background:'+cat.color+'38;">'+makeSvg(SVGP[cat.icon])+'</div>'+
       '<div class="cat-info"><div class="t">'+cat.label+'</div><div class="s">'+cat.sub+'</div>'+
-      '<div class="cnt">'+ids.length+' outil'+(ids.length>1?'s':'')+'</div></div>'+
+      '<div class="cnt">'+(av<ids.length?av+' / '+ids.length+' dispo':ids.length+' outil'+(ids.length>1?'s':''))+'</div></div>'+
       '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9 6 15 12 9 18"/></svg></div>'+
       '<div class="cat-body"><div class="cat-body-in">'+ids.map(rowHTML).join('')+'</div></div></div>';});
   if(html===''){
@@ -677,6 +692,12 @@ var DEPLOY_CHECK_TTL=3600000; // 1 h de cache pour éviter de re-tester à chaqu
    mise en ligne (vitrine de ce qui arrive) — le blocage réel se fait uniquement à l'ouverture,
    dans openTool(). AVAILABLE reste calculé (badge "Nouveau", anti-404 à l'ouverture). */
 function isAvail(id){ return true; }
+
+/* État d'activation pour l'AFFICHAGE (pastille verte / « Bientôt ») :
+   tant que la détection n'a pas tourné (AVAILABLE===null) ou qu'elle est jugée non fiable
+   (hors-ligne / file://), on considère tout comme disponible — on n'affiche JAMAIS « Bientôt »
+   par erreur. Sinon, on reflète la vraie disponibilité testée via outils/<id>-ok.txt. */
+function isOn(id){ return AVAILABLE===null ? true : AVAILABLE[id]===true; }
 
 /* Filtre une liste d'ids selon la disponibilité */
 function availIds(ids){ return ids.filter(isAvail); }
@@ -768,7 +789,7 @@ function updateRolloutBanner(){
 function render(){renderFavGrid();renderCats(document.getElementById('srchIp').value.toLowerCase().trim());if(curTab==='favoris')renderFavFull();if(curTab==='recents')renderRecents();updateRolloutBanner();}
 
 render();              // 1er rendu immédiat (tout visible le temps du test)
-detectDeployed();      // puis détection → masque les modules non déployés
+detectDeployed();      // puis détection → marque les modules : pastille verte (en ligne) ou « 🔒 Bientôt »
 if(!lg(LS.W,0))startWiz();
 </script>
 </body>
