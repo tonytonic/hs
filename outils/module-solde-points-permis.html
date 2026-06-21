@@ -74,12 +74,15 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 .res .lbl{font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.5px;}
 .res .sub{font-size:13px;margin-top:8px;font-weight:600;opacity:.85;line-height:1.5;}
 .res .line{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;font-weight:600;}
+
+/* Correctif iPhone : le texte long des options de <select> était tronqué sans ellipse (Safari iOS n'applique pas text-overflow sur l'apparence native). On reprend l'apparence à zéro, on redessine un chevron discret assorti au thème, et on tronque proprement avec des points de suspension. */
+select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23ffffff' stroke-opacity='0.62' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
 </style>
 </head>
 <body>
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
-  <div class="brand"><div class="ti">Solde de points du permis</div><div class="su">Barème & récupération</div></div>
+  <div class="brand"><div class="ti">Solde de points du permis</div><div class="su">Barème, amendes & récupération</div></div>
   <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 <div class="hero">
@@ -88,14 +91,45 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
   <p>Comprends combien de points retire une infraction, et au bout de combien de temps ils reviennent.</p>
 </div>
 <div class="card">
-<div class="field"><label for="infraction">Type d'infraction</label><select class="ip" id="infraction" aria-label="Type d'infraction"><option value="leger">Excès de vitesse < 20 km/h (hors agglomération)</option><option value="moyen">Téléphone tenu en main, défaut de ceinture, excès 20-30 km/h</option><option value="grave">Feu rouge/stop, excès 30-40 km/h, refus de priorité</option><option value="tresgrave">Alcool ≥ 0,8 g/L, stupéfiants, excès ≥ 50 km/h, délit de fuite</option></select></div>
+<div class="field"><label for="infraction">Type d'infraction</label><select class="ip" id="infraction" aria-label="Type d'infraction">
+  <optgroup label="🚗 Vitesse">
+    <option value="v1a">Excès &lt; 20 km/h (zone limitée à 50 km/h ou moins)</option>
+    <option value="v1b">Excès &lt; 20 km/h (zone limitée à plus de 50 km/h)</option>
+    <option value="v2">Excès de 20 à 29 km/h</option>
+    <option value="v3">Excès de 30 à 39 km/h</option>
+    <option value="v4">Excès de 40 à 49 km/h</option>
+    <option value="v5">Excès ≥ 50 km/h (délit)</option>
+  </optgroup>
+  <optgroup label="📱 Comportement au volant">
+    <option value="tel">Téléphone tenu en main</option>
+    <option value="ceinture">Défaut de ceinture de sécurité</option>
+    <option value="casque">Défaut de casque (moto/scooter)</option>
+    <option value="feu">Feu rouge ou stop non respecté</option>
+    <option value="priorite">Refus de priorité</option>
+    <option value="distance">Non-respect des distances de sécurité</option>
+    <option value="ligne">Franchissement d'une ligne continue</option>
+  </optgroup>
+  <optgroup label="🅿️ Stationnement">
+    <option value="stat_genant">Stationnement gênant</option>
+    <option value="stat_danger">Stationnement très gênant ou dangereux</option>
+  </optgroup>
+  <optgroup label="🍷 Alcool & stupéfiants">
+    <option value="alcool1">Alcool : 0,5 à 0,79 g/L de sang</option>
+    <option value="alcool2">Alcool ≥ 0,8 g/L de sang (délit)</option>
+    <option value="stup">Stupéfiants au volant (délit)</option>
+  </optgroup>
+  <optgroup label="⚖️ Délits routiers">
+    <option value="fuite">Délit de fuite</option>
+    <option value="obtemperer">Refus d'obtempérer</option>
+  </optgroup>
+</select></div>
 </div>
 <div id="result"></div>
 <button class="reset" onclick="resetState()">🔄 Réinitialiser</button>
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension du droit du travail et de la vie quotidienne. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de décision importante, consultez un professionnel ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>).<br>
-  Barème indicatif et simplifié. Délais de récupération automatique : 6 mois (infractions à 1 point), 2 ans (classes 1-3), 3 ans (classe 4-5/délits) — sous réserve d'aucune nouvelle infraction. Stage volontaire : jusqu'à 4 points, 1 fois par an maximum. Vérifie ton solde exact sur le site officiel Mes Points Permis.<br>
+  Barème indicatif. Montants = amendes forfaitaires de base (hors majoration). Délai de récupération automatique : 6 mois si l'infraction retire 1 point, 2 ans pour les autres contraventions, 3 ans pour les délits — sous réserve d'aucune nouvelle infraction. Stage volontaire : jusqu'à 4 points, 1 fois par an maximum. Vérifie ton solde exact sur le site officiel Mes Points Permis.<br>
   <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 <div class="ov" id="help" role="dialog" aria-modal="true" aria-label="Aide">
@@ -104,7 +138,7 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
     <div class="wico" aria-hidden="true">🚗</div>
     <h2>Solde de points du permis</h2>
     <div class="step">Le permis dispose de <b>12 points</b> (6 points en période probatoire).</div>
-    <div class="step">Choisis une infraction pour voir les points retirés et le délai de récupération automatique.</div>
+    <div class="step">Choisis une infraction pour voir les points retirés, le montant de l'amende et le délai de récupération automatique.</div>
     <div class="step">En plus de la récupération automatique, un stage volontaire rend jusqu'à 4 points (1 fois par an max).</div>
     <button class="ok" data-close="help">Compris</button>
   </div>
@@ -126,19 +160,43 @@ function saveState(){
 function restoreState(){
   try{var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');if(o['infraction']!=null)document.getElementById('infraction').value=o['infraction'];}catch(e){}
 }
+var INFRA={
+  v1a:{pts:1,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'6 mois'},
+  v1b:{pts:1,af:68,am:45,maj:180,classe:'Contravention 3ᵉ classe',delai:'6 mois'},
+  v2:{pts:2,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  v3:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  v4:{pts:4,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans',note:'Retrait immédiat du permis possible (rétention jusqu\'à 72 h).'},
+  v5:{pts:6,af:300,am:250,maj:600,classe:'Délit (depuis le 29/12/2025)',delai:'3 ans',note:'Amende forfaitaire délictuelle ; comparution devant le juge possible.'},
+  tel:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  ceinture:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  casque:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  feu:{pts:4,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  priorite:{pts:4,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  distance:{pts:1,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'6 mois'},
+  ligne:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  stat_genant:{pts:0,af:35,am:22,maj:75,classe:'Contravention 2ᵉ classe',delai:'—',note:'Aucun retrait de points.'},
+  stat_danger:{pts:3,af:135,am:90,maj:375,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  alcool1:{pts:6,af:135,am:null,maj:null,classe:'Contravention 4ᵉ classe',delai:'2 ans'},
+  alcool2:{pts:6,af:null,classe:'Délit',delai:'3 ans',note:'Jusqu\'à 4 500 € d\'amende (peut doubler en cas de récidive), suspension ou annulation du permis possible, stage obligatoire.'},
+  stup:{pts:6,af:null,classe:'Délit',delai:'3 ans',note:'Jusqu\'à 4 500 € d\'amende, suspension ou annulation du permis possible, stage obligatoire.'},
+  fuite:{pts:6,af:null,classe:'Délit',delai:'3 ans',note:'Jusqu\'à 75 000 € d\'amende et 3 ans d\'emprisonnement (Art. 434-10 du Code pénal).'},
+  obtemperer:{pts:6,af:null,classe:'Délit',delai:'3 ans',note:'Jusqu\'à 15 000 € d\'amende ; bien plus sévère en cas de mise en danger d\'autrui (jusqu\'à 5 ans, 75 000 €).'}
+};
 function calc(){
   saveState();
-
-  var d={
-    leger:{pts:1,delai:'6 mois',classe:'Classe 1-2'},
-    moyen:{pts:3,delai:'2 ans',classe:'Classe 3-4'},
-    grave:{pts:4,delai:'3 ans',classe:'Classe 4 / délit'},
-    tresgrave:{pts:6,delai:'3 ans',classe:'Délit'},
-  }[val('infraction')];
-  box('<div class="lbl">Points retirés</div><div class="big">-'+d.pts+'</div>'
-   +'<div class="line" style="margin-top:8px;"><span>Récupération automatique après</span><b>'+d.delai+'</b></div>'
-   +'<div class="sub">Sans nouvelle infraction pendant ce délai. '+d.classe+'.</div>');
-
+  var d=INFRA[val('infraction')]||INFRA.v1a;
+  var ptsLine='<div class="line" style="margin-top:8px;"><span>Récupération automatique après</span><b>'+(d.delai==='—'?'—':d.delai)+'</b></div>';
+  var amendeHtml;
+  if(d.af==null){
+    amendeHtml='<div class="line"><span>Amende</span><b>Variable (tribunal)</b></div>';
+  }else{
+    amendeHtml='<div class="line"><span>Amende forfaitaire</span><b>'+eur(d.af)+'</b></div>'
+      +(d.am!=null?'<div class="line" style="opacity:.75;font-size:12px;"><span>Minorée (paiement rapide)</span><b>'+eur(d.am)+'</b></div>':'')
+      +(d.maj!=null?'<div class="line" style="opacity:.75;font-size:12px;"><span>Majorée (retard)</span><b>'+eur(d.maj)+'</b></div>':'');
+  }
+  box('<div class="lbl">Points retirés</div><div class="big">'+(d.pts>0?'-'+d.pts:'0')+'</div>'
+   +amendeHtml+ptsLine
+   +'<div class="sub">'+d.classe+(d.note?'. '+d.note:'.')+'</div>');
 }
 function resetState(){
   try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}

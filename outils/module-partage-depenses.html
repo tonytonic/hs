@@ -74,6 +74,9 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 .res .lbl{font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.5px;}
 .res .sub{font-size:13px;margin-top:8px;font-weight:600;opacity:.85;line-height:1.5;}
 .res .line{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;font-weight:600;}
+.addp{display:block;width:100%;margin-top:6px;background:rgba(255,255,255,0.07);border:1.5px dashed var(--line);
+  border-radius:11px;padding:11px;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;}
+.addp:active{background:rgba(255,255,255,0.12);}
 </style>
 </head>
 <body>
@@ -88,9 +91,8 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
   <p>Qui doit combien à qui ? Saisis ce que chacun a payé.</p>
 </div>
 <div class="card">
-<div class="row"><div class="field"><label for="nA">Nom personne A</label><input class="ip" id="nA" type="number" inputmode="decimal" step="any" placeholder="A" aria-label="Nom personne A"></div><div class="field"><label for="mA">A a payé (€)</label><input class="ip" id="mA" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="A a payé (€)"></div></div>
-<div class="row"><div class="field"><label for="nB">Nom personne B</label><input class="ip" id="nB" type="number" inputmode="decimal" step="any" placeholder="B" aria-label="Nom personne B"></div><div class="field"><label for="mB">B a payé (€)</label><input class="ip" id="mB" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="B a payé (€)"></div></div>
-<div class="row"><div class="field"><label for="nC">Nom personne C (optionnel)</label><input class="ip" id="nC" type="number" inputmode="decimal" step="any" placeholder="C" aria-label="Nom personne C (optionnel)"></div><div class="field"><label for="mC">C a payé (€)</label><input class="ip" id="mC" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="C a payé (€)"></div></div>
+<div id="peopleRows"></div>
+<button type="button" class="addp" id="btnAddPerson" onclick="addPerson()">➕ Ajouter une personne</button>
 </div>
 <div id="result"></div>
 <button class="reset" onclick="resetState()">🔄 Réinitialiser</button>
@@ -106,7 +108,7 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
     <div class="wico" aria-hidden="true">🤝</div>
     <h2>Partage de dépenses</h2>
     <div class="step">Pratique pour un voyage ou une colocation : chacun avance des sommes différentes.</div>
-    <div class="step">Saisis ce qu'a payé chaque personne (3 max pour ce calcul simple).</div>
+    <div class="step">Saisis ce qu'a payé chaque personne (jusqu'à 8 — appuie sur « Ajouter une personne » pour en saisir plus de 3).</div>
     <div class="step">L'outil calcule la part de chacun et qui doit rembourser qui.</div>
     <button class="ok" data-close="help">Compris</button>
   </div>
@@ -114,6 +116,9 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 
 <script>
 var LS={STATE:'PARTAGE_DEPENSES_STATE',WELCOME:'PARTAGE_DEPENSES_WELCOMED'};
+var LETTERS=['A','B','C','D','E','F','G','H'];
+var MIN_VISIBLE=3; // A, B, C visibles par défaut (comme avant) ; D à H via "Ajouter une personne"
+var visibleCount=MIN_VISIBLE;
 function num(id){var e=document.getElementById(id);if(!e)return 0;return parseFloat(String(e.value).replace(/\s/g,'').replace(',','.'))||0;}
 function val(id){var e=document.getElementById(id);return e?e.value:'';}
 function fmt(n,d){d=(d==null?2:d);return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
@@ -122,24 +127,62 @@ function show(h){var r=document.getElementById('result');r.innerHTML=h;}
 function hint(t){show('<div class="hint">'+t+'</div>');}
 function box(h){show('<div class="res">'+h+'</div>');}
 
+function buildRow(letter){
+  var optionnel=(letter==='C')?' (optionnel)':'';
+  return '<div class="row" id="row'+letter+'" style="display:none;">'
+    +'<div class="field"><label for="n'+letter+'">Nom personne '+letter+optionnel+'</label>'
+    +'<input class="ip" id="n'+letter+'" type="text" autocapitalize="words" autocomplete="off" maxlength="24" placeholder="'+letter+'" aria-label="Nom personne '+letter+'"></div>'
+    +'<div class="field"><label for="m'+letter+'">'+letter+' a payé (€)</label>'
+    +'<input class="ip" id="m'+letter+'" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="'+letter+' a payé (€)"></div>'
+    +'</div>';
+}
+function applyVisible(n){
+  visibleCount=Math.max(2,Math.min(n,LETTERS.length));
+  LETTERS.forEach(function(L,i){
+    var row=document.getElementById('row'+L);
+    if(row) row.style.display=(i<visibleCount)?'':'none';
+  });
+  var btn=document.getElementById('btnAddPerson');
+  if(btn) btn.style.display=(visibleCount>=LETTERS.length)?'none':'';
+}
+function addPerson(){
+  applyVisible(visibleCount+1);
+  saveState();
+  calc();
+}
+
 function saveState(){
-  try{var o={};o['nA']=val('nA');o['mA']=val('mA');o['nB']=val('nB');o['mB']=val('mB');o['nC']=val('nC');o['mC']=val('mC');localStorage.setItem(LS.STATE,JSON.stringify(o));}catch(e){}
+  try{
+    var o={visibleCount:visibleCount};
+    LETTERS.forEach(function(L){o['n'+L]=val('n'+L);o['m'+L]=val('m'+L);});
+    localStorage.setItem(LS.STATE,JSON.stringify(o));
+  }catch(e){}
 }
 function restoreState(){
-  try{var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');if(o['nA']!=null)document.getElementById('nA').value=o['nA'];if(o['mA']!=null)document.getElementById('mA').value=o['mA'];if(o['nB']!=null)document.getElementById('nB').value=o['nB'];if(o['mB']!=null)document.getElementById('mB').value=o['mB'];if(o['nC']!=null)document.getElementById('nC').value=o['nC'];if(o['mC']!=null)document.getElementById('mC').value=o['mC'];}catch(e){}
+  try{
+    var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');
+    applyVisible(o.visibleCount||MIN_VISIBLE);
+    LETTERS.forEach(function(L){
+      if(o['n'+L]!=null)document.getElementById('n'+L).value=o['n'+L];
+      if(o['m'+L]!=null)document.getElementById('m'+L).value=o['m'+L];
+    });
+  }catch(e){ applyVisible(MIN_VISIBLE); }
 }
 function calc(){
   saveState();
 
-  var people=[
-    {n:val('nA')||'A', m:num('mA')},
-    {n:val('nB')||'B', m:num('mB')},
-  ];
-  if(document.getElementById('mC').value!=='') people.push({n:val('nC')||'C', m:num('mC')});
+  var people=[];
+  LETTERS.forEach(function(L,i){
+    if(i>=visibleCount) return;
+    var montantSaisi=document.getElementById('m'+L).value!=='';
+    if(i<2||montantSaisi) people.push({n:val('n'+L)||L, m:num('m'+L)});
+  });
   var tot=people.reduce(function(s,p){return s+p.m;},0);
   if(!tot){hint('Saisis au moins deux montants payés.');return;}
   var part=tot/people.length;
-  var out='<div class="lbl">Part de chacun</div><div class="big">'+eur(part)+'</div><div style="margin-top:10px;">';
+  var out='<div class="lbl">Montant total</div><div class="big">'+eur(tot)+'</div>'
+    +'<div class="sub">Part de chacun : '+eur(part)+' ('+people.length+' personnes)</div>'
+    +'<div style="margin-top:10px;">';
   people.forEach(function(p){
     var diff=p.m-part;
     out+='<div class="line"><span>'+p.n+'</span><b>'+(diff>=0?'doit recevoir ':'doit ')+eur(Math.abs(diff))+'</b></div>';
@@ -156,6 +199,7 @@ function openHelp(){document.getElementById('help').classList.add('show');}
 function closeHelp(){document.getElementById('help').classList.remove('show');try{localStorage.setItem(LS.WELCOME,'1');}catch(e){}}
 
 document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('peopleRows').innerHTML=LETTERS.map(buildRow).join('');
   document.getElementById('helpBtn').addEventListener('click',openHelp);
   Array.prototype.forEach.call(document.querySelectorAll('[data-close="help"]'),function(b){b.addEventListener('click',closeHelp);});
   Array.prototype.forEach.call(document.querySelectorAll('.ip'),function(el){
@@ -166,6 +210,7 @@ document.addEventListener('DOMContentLoaded',function(){
   try{if(!localStorage.getItem(LS.WELCOME))openHelp();}catch(e){openHelp();}
 });
 window.resetState=resetState;
+window.addPerson=addPerson;
 </script>
 </body>
 </html>
