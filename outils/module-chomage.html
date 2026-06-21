@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Droits Chômage — Le filet de sécurité</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,14 +21,14 @@
 :root{
   --sky1:#aee0f5; --sky2:#7fc4ec; --sky3:#4f9fdd; --sky4:#3b6fb5; --sky5:#2a4f8a;
   --cloud:#fdfeff; --soft:#eaf5fc;
-  --ink:#1f3a52; --ink2:#48657e; --faded:#7d96aa;
+  --ink:#1f3a52; --ink2:#48657e; --faded:#4f5e6b;
   --card:#ffffff; --card-edge:#d4e8f5;
   --safe:#34b3a0; --safe-d:#1f8c7c;
   --warn:#e8a13f; --bad:#e07070; --gold:#f5c451;
   --line:rgba(31,58,82,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Nunito',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(180deg,#aee0f5 0%,#7fc4ec 35%,#4f9fdd 70%,#3b6fb5 100%);
@@ -186,6 +187,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -198,7 +201,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Le Filet</div>
     <div class="su">Droits chômage (ARE) · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+  <button class="hbtn" id="helpBtn" title="Aide" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -227,7 +230,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="wemoji">⚓</span>
       <h2>À prendre avec des pincettes</h2>
       <p>Les règles changent souvent (revalorisations, réformes, conjoncture). <span class="accent">Seul France Travail fait foi.</span></p>
-      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Estimations basées sur la convention assurance chômage du 15/11/2024 et la circulaire Unédic 2025-03 d'avril 2025 (partie fixe 13,18 €, formule 57 % ou 40,4 %+fixe, coefficient 0,75 en conjoncture favorable — chômage < 9 %). Dégressivité : seuil abaissé à 55 ans depuis janv. 2025 (Unédic circ. 2025-03). Revalorisation ARE attendue au 1er juillet 2026. Le montant et la durée réels te seront notifiés par France Travail. Démission et fins de CDD ont des règles spécifiques.</div>
+      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Estimations basées sur la convention assurance chômage du 15/11/2024 et la à jour juin 2026 · circulaire Unédic 2025-03 d'avril 2025 + convention du 15/11/2024 (partie fixe 13,18 €, plancher 32,13 €, formule 57 % ou 40,4 %+fixe, coefficient 0,75 en conjoncture favorable — chômage < 9 %). Dégressivité : seuil abaissé à 55 ans depuis le 1er avril 2025 (Unédic circ. 2025-03). Revalorisation ARE attendue au 1er juillet 2026. Le montant et la durée réels te seront notifiés par France Travail. Démission et fins de CDD ont des règles spécifiques.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -239,11 +242,11 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Comment lire l'estimation</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">💶</div><div class="tx"><b>Salaire brut mensuel</b>Ton salaire habituel des derniers mois (primes incluses si régulières).</div></div>
     <div class="feat"><div class="ic">📆</div><div class="tx"><b>Mois travaillés</b>Sur les 24 derniers mois (36 si 55 ans et +). Détermine éligibilité et durée.</div></div>
-    <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Formule ARE</b>Le plus élevé entre 57 % du salaire journalier et 40,4 % + 13,18 €/jour. Plancher ≈ 32 €/j, plafond 75 %.</div></div>
+    <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Formule ARE</b>Le plus élevé entre 57 % du salaire journalier et 40,4 % + 13,18 €/jour. Plancher 32,13 €/j (depuis le 1er juillet 2025), plafond 75 %.</div></div>
     <div class="feat"><div class="ic">📉</div><div class="tx"><b>Durée</b>≈ ta durée travaillée, plafonnée (548 j si < 55 ans (= 24 mois × coef 0,75 en conjoncture favorable)). Un coefficient peut la réduire de 25 %.</div></div>
     <div class="legal">Conditions générales (hors démission). L'ARE est versée après d'éventuels différés (congés payés, indemnités supra-légales). Net après CSG/CRDS ≈ -3 à -6,7 %. Le calcul officiel peut différer sensiblement.</div>
     <button class="btn btn-sky" style="margin-top:14px;" data-close="help">Compris</button>
@@ -275,13 +278,13 @@ body.pageBlancheGuard>*{display:block!important;}
   <div class="panel">
     <div class="panel-t">🧾 Ta situation</div>
     <div class="field"><label>Salaire brut mensuel (avant la perte d'emploi)</label>
-      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2200"><span class="unit">€</span></div>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2200" aria-label="Salaire brut mensuel (avant la perte d'emploi)"><span class="unit">€</span></div>
       <div class="hint">Moyenne de tes derniers mois, primes régulières incluses.</div></div>
-    <div class="field"><label>Mois travaillés (24 derniers mois — 30 mois si 53-54 ans, 36 mois si 55 ans et +)</label>
-      <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="36"><span class="unit">mois</span></div>
+    <div class="field"><label>Mois travaillés (24 derniers mois — 36 mois si 55 ans et +)</label>
+      <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="36" aria-label="Mois travaillés (24 derniers mois — 36 mois si 55 ans et +)"><span class="unit">mois</span></div>
       <div class="hint">Il faut au moins 6 mois (130 jours / 910 h) pour ouvrir des droits. Depuis avr. 2026, seuil abaissé à 5 mois pour primo-entrants et saisonniers.</div></div>
     <div class="field"><label>Ton âge à la fin du contrat</label>
-      <select class="ip" id="fAge">
+      <select class="ip" id="fAge" aria-label="Ton âge à la fin du contrat">
         <option value="moins55">Moins de 55 ans</option>
         <option value="55a56">55 à 56 ans</option>
         <option value="57plus">57 ans et plus</option>
@@ -346,7 +349,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   function $(s,r){ return (r||document).querySelector(s); }
@@ -459,7 +462,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

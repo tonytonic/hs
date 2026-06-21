@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>CDI / CDD / Intérim — Le Comparatif</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,12 +23,12 @@
   --cdd:#6a1a3a; --cdd-l:#9a2a5a; --cdd-bg:#fae8f0;
   --int:#1a5a3a; --int-l:#2a8a5a; --int-bg:#e8faf0;
   --dark:#0e1a2e; --dark2:#1a2a40;
-  --ink:#0e1a2e; --ink2:#2a3a55; --faded:#6a7a8a;
+  --ink:#0e1a2e; --ink2:#2a3a55; --faded:#778695;
   --card:#fff; --card-edge:#dde6f5;
   --ok:#1a7a3a; --no:#c03030;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Inter',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(170deg,#0e1a2e 0%,#1a2a40 50%,#0e2238 100%);
@@ -155,6 +156,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -167,7 +170,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">CDI · CDD · Intérim</div>
     <div class="su">LE COMPARATIF · V1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -201,7 +204,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Lire le comparatif</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">👆</div><div class="tx"><b>Onglets CDI / CDD / Intérim</b>Tape pour explorer les droits et caractéristiques de chaque contrat.</div></div>
     <div class="feat"><div class="ic">📊</div><div class="tx"><b>Tableau comparatif</b>En bas, un tableau côte à côte pour comparer les 3 sur les points clés.</div></div>
@@ -286,21 +289,24 @@ body.pageBlancheGuard>*{display:block!important;}
   var DATA={
     cdi:{icon:'💼',title:'CDI',sub:'Contrat à Durée Indéterminée — Le contrat de droit commun',color:'var(--cdi)',rows:[
       {l:'Durée',v:'Sans limite de temps. Pas de date de fin dans le contrat.'},
-      {l:'Période d\'essai légale',v:'2 mois (ouvriers/employés) · 3 mois (techniciens) · 4 mois (cadres). Renouvelable une fois si : (1) prévu par la CCN de branche, (2) mentionné dans le contrat, (3) accord écrit du salarié obtenu pendant la période initiale.'},
+      {l:'Période d\'essai légale',v:'2 mois (ouvriers/employés) · 3 mois (techniciens/agents de maîtrise) · 4 mois (cadres). Renouvelable une fois si : (1) prévu par un accord de branche étendu, (2) mentionné dans le contrat, (3) accord exprès du salarié pendant la période initiale. <span class="ok">Depuis la loi DDADUE</span> (n°2023-171 du 9 mars 2023, en vigueur le 9 sept. 2023), ces durées sont des <b>plafonds impératifs</b> : une convention collective peut les raccourcir mais ne peut plus les allonger (art. L1221-19 & L1221-22 CT).'},
       {l:'Motifs de rupture',v:'<span class="ok">Démission</span> (préavis 1 à 3 mois), <span class="no">licenciement</span> (motif réel et sérieux, procédure), <span class="ok">rupture conventionnelle</span> (amiable avec chômage).'},
-      {l:'Indemnité de rupture',v:'Indemnité légale de licenciement dès 8 mois d\'ancienneté (1/4 mois/an). Rupture conventionnelle : même base, négociable à la hausse.'},
+      {l:'Indemnité de rupture',v:'Indemnité légale de licenciement dès 8 mois d\'ancienneté : <b>1/4 de mois de salaire par an</b> pour les 10 premières années, puis <b>1/3 de mois par an</b> au-delà de 10 ans (art. R1234-2 CT — montant indicatif, le salaire de référence retenu est le plus favorable des deux modes de calcul, art. R1234-4). Rupture conventionnelle : même plancher, négociable à la hausse.'},
       {l:'En fin de contrat',v:'Pas de prime de précarité. Indemnité compensatrice de congés payés non pris.'},
       {l:'Avantages pour le salarié',v:'<span class="ok">✓ Stabilité</span> · <span class="ok">✓ Accès au crédit et logement</span> · <span class="ok">✓ Formation CPF pleine</span> · <span class="ok">✓ Participation/intéressement</span>'},
-      {l:'Attention',v:'La démission ne donne pas droit au chômage (sauf démission légitime ou reconversion validée). Rupture conventionnelle : oui.'}
+      {l:'Attention',v:'La démission ne donne pas droit au chômage (sauf démission légitime ou reconversion validée). Rupture conventionnelle : oui.'},
+      {l:'📚 Sources & mise à jour',v:'Code du travail (art. L1221-19 s., L1234-9, R1234-2, L1237-11 s.). À jour <b>juin 2026</b>. Montants et durées <b>à titre indicatif</b> — ta convention collective peut être plus favorable.'}
     ]},
     cdd:{icon:'📅',title:'CDD',sub:'Contrat à Durée Déterminée — Uniquement pour des motifs précis',color:'var(--cdd)',rows:[
       {l:'Durée maximale',v:'18 mois (renouvellements inclus). 9 mois en attente de l\'arrivée d\'un salarié en CDI (pas pour le remplacement d\'absent). Remplacement d\'absent : sans terme précis si retour incertain. 24 mois pour départ définitif.'},
       {l:'Motifs légaux',v:'Remplacement de salarié absent · Accroissement temporaire d\'activité · Emploi saisonnier · Contrats spécifiques (apprentissage, vendanges…).'},
-      {l:'Rupture avant terme',v:'Très encadrée. Salarié : possible uniquement si embauche en CDI (préavis = 1j/semaine restante, max 2 sem.). Employeur : faute grave, force majeure, ou inaptitude constatée par le médecin du travail. Un accord amiable entre les parties est aussi possible (rupture d'un commun accord).'},
-      {l:'Fin de contrat — prime',v:'<span class="ok">+10 % de prime de précarité</span> du brut total (sauf CDD saisonnier, apprentissage, poursuite en CDI).'},
+      {l:'Rupture avant terme',v:'Très encadrée. Salarié : possible uniquement si embauche en CDI (préavis = 1j/semaine restante, max 2 sem.). Employeur : faute grave, force majeure, ou inaptitude constatée par le médecin du travail. Un accord amiable entre les parties est aussi possible (rupture d\'un commun accord).'},
+      {l:'Fin de contrat — prime',v:'<span class="ok">+10 % de prime de précarité</span> du brut total (art. L1243-8 CT). Taux réductible à <b>6 %</b> par accord de branche étendu si un accès privilégié à la formation est offert (art. L1243-9). Non due en CDD saisonnier, contrat d\'apprentissage, jeune pendant ses vacances scolaires, ou poursuite en CDI. <i>Pourcentages indicatifs.</i>'},
       {l:'Congés payés',v:'<span class="ok">+10 % ICCP</span> (Indemnité Compensatrice de Congés Payés) versée à la fin, sauf si congés pris pendant le contrat.'},
       {l:'Droits au chômage',v:'<span class="ok">✓ Oui</span>, à la fin du CDD (sauf refus d\'un CDI proposé sur le même poste — 2 refus peuvent suspendre les droits).'},
-      {l:'Attention',v:'Un CDD renouvelé plusieurs fois pour le même motif peut faire l\'objet d\'une requalification en CDI. Vérifier le délai de carence entre deux CDD.'}
+      {l:'Délai de carence',v:'Entre deux CDD sur le <b>même poste</b>, un délai de carence s\'applique avant de réembaucher : <b>1/3 de la durée</b> du contrat précédent (renouvellement inclus) s\'il a duré 14 jours ou plus, sinon <b>1/2</b> (art. L1244-3 & L1244-3-1 CT). Un accord de branche peut fixer d\'autres modalités.'},
+      {l:'Attention',v:'Un CDD enchaîné plusieurs fois pour le même motif, ou sans respect du formalisme (écrit, terme, motif), peut être <b>requalifié en CDI</b> par le conseil de prud\'hommes (art. L1245-1 CT).'},
+      {l:'📚 Sources & mise à jour',v:'Code du travail (art. L1242-1 s., L1243-8, L1244-3, L1245-1). À jour <b>juin 2026</b>. Primes <b>indicatives</b> (10 %, réductible à 6 % par accord). Vérifie ta CCN.'}
     ]},
     int:{icon:'🏭',title:'Intérim (contrat de mission)',sub:'Travail temporaire via une agence — Employeur = l\'agence',color:'var(--int)',rows:[
       {l:'Contrat de mission',v:'Chaque mission est un contrat distinct entre l\'agence (employeur), l\'entreprise utilisatrice et toi. Le contrat de mise à disposition est séparé.'},
@@ -308,10 +314,11 @@ body.pageBlancheGuard>*{display:block!important;}
       {l:'Structure',v:'3 parties : l\'agence d\'intérim (ton employeur juridique) · l\'entreprise utilisatrice (lieu de travail) · toi (salarié temporaire).'},
       {l:'Durée',v:'Mission de 18 mois maximum (24 mois dans certains cas, 36 mois pour apprentis). Renouvelable 2 fois dans la limite de la durée max.'},
       {l:'Rémunération',v:'Au moins égale à celle d\'un salarié permanent de l\'entreprise utilisatrice occupant le même poste (règle d\'égalité de traitement).'},
-      {l:'Fin de mission — primes',v:'<span class="ok">+10 % IFM</span> (Indemnité de Fin de Mission = prime de précarité) <span class="ok">+10 % ICCP</span> de congés payés. Soit jusqu\'à +20 % du brut total.'},
+      {l:'Fin de mission — primes',v:'<span class="ok">+10 % IFM</span> (Indemnité de Fin de Mission, art. L1251-32 CT) + <span class="ok">+10 % ICCP</span> de congés payés (art. L1251-19). Soit jusqu\'à +20 % du brut total. Pas d\'IFM si embauche en CDI à l\'issue, mission-formation ou CDI intérimaire. <i>Taux indicatifs.</i>'},
       {l:'Droits au chômage',v:'<span class="ok">✓ Oui</span>, après chaque mission (si conditions d\'affiliation remplies). Attention : 2 refus d\'un CDI proposé par l\'entreprise utilisatrice sur un poste équivalent en 12 mois peuvent suspendre les droits ARE (même règle que pour les CDD).'},
       {l:'Protection sociale',v:'Sécu, retraite : identiques. Mutuelle : via le régime d\'intérim (automatique dès 3 mois ou 414 h sur 12 mois).'},
-      {l:'Avantages spécifiques',v:'Accès au FASTT : aides au logement, crédit auto, garde d\'enfant, formation. CDII (CDI intérimaire) disponible dans certaines agences pour plus de stabilité.'}
+      {l:'Avantages spécifiques',v:'Accès au FASTT : aides au logement, crédit auto, garde d\'enfant, formation. CDII (CDI intérimaire) disponible dans certaines agences pour plus de stabilité.'},
+      {l:'📚 Sources & mise à jour',v:'Code du travail (art. L1251-1 s., L1251-32, L1251-19). À jour <b>juin 2026</b>. IFM/ICCP <b>indicatifs</b> (≈ +20 %). FASTT : aides réelles soumises à conditions.'}
     ]}
   };
 
@@ -372,7 +379,8 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    localStorage.removeItem('CMP_WELCOMED');
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -398,7 +406,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

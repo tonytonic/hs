@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Conservation Documents RH — Les Archives</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,12 +22,12 @@
   --wood:#6b4a1e; --wood-l:#8b6a3e; --wood-ll:#b08a5e;
   --leather:#4a2e0e; --amber:#c8901e; --amber-l:#e8b040;
   --paper:#fdf8f0; --paper2:#f5eede; --paper3:#ede0c8;
-  --ink:#2a1e0e; --ink2:#4a3820; --faded:#8a7a60;
+  --ink:#2a1e0e; --ink2:#4a3820; --faded:#7b6d55;
   --card:#fff; --card-edge:#d8c8a8;
   --d1y:#c03030; --d3y:#c87820; --d5y:#1a6b3a; --d10y:#1a3a6b; --d50y:#6a1a6a;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -59,7 +60,7 @@ header .hbtn{background:var(--wood);color:var(--paper);border:none;border-radius
 .search-wrap{position:relative;margin-bottom:14px;}
 .search-wrap .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;}
 .search-ip{width:100%;background:var(--card);border:2px solid var(--card-edge);border-radius:10px;
-  padding:12px 12px 12px 40px;color:var(--ink);font-size:15px;font-family:'Lato',sans-serif;font-weight:600;}
+  padding:12px 12px 12px 40px;color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:600;}
 .search-ip:focus{outline:none;border-color:var(--wood);}
 
 /* filter tabs */
@@ -166,6 +167,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -178,7 +181,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Les Archives</div>
     <div class="su">Conservation documents RH · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -212,7 +215,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Naviguer dans les archives</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🔍</div><div class="tx"><b>Rechercher</b>Tape un mot-clé pour retrouver un document spécifique.</div></div>
     <div class="feat"><div class="ic">🎨</div><div class="tx"><b>Filtrer par durée</b>Les onglets colorés permettent de filtrer par durée légale (1 an, 3 ans, 5 ans…).</div></div>
@@ -251,7 +254,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
   </div><div class="search-wrap">
     <span class="si">🔍</span>
-    <input class="search-ip" id="searchIp" type="text" placeholder="Rechercher un document…">
+    <input class="search-ip" id="searchIp" type="text" placeholder="Rechercher un document…" aria-label="Rechercher un document…">
   </div>
 
   <div class="ftabs" id="ftabs">
@@ -392,7 +395,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -418,7 +421,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

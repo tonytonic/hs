@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Alternance — Apprentissage & Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,7 +24,7 @@
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5ab0e0;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#060e1a 0%,#0c1828 50%,#040c18 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -55,7 +56,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234a8aca' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -75,11 +76,11 @@ select.ip{appearance:none;-webkit-appearance:none;
 /* tableau barème */
 .sec-t{font-weight:800;font-size:13px;color:var(--acc-l);margin:16px 0 10px;}
 .bareme{background:var(--card);border:1.5px solid var(--card-edge);border-radius:14px;overflow:hidden;}
-.brow{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--card-edge);}
+.brow{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;border-bottom:1px solid var(--card-edge);}
 .brow:last-child{border-bottom:none;}
 .brow.hd{background:rgba(42,106,170,0.2);font-size:10px;font-weight:700;
   text-transform:uppercase;letter-spacing:0.5px;color:var(--acc-l);}
-.brow span{padding:9px 12px;font-size:12px;}
+.brow span{padding:9px 6px;font-size:11.5px;}
 .brow span.hi{color:var(--ok);font-weight:800;}
 
 /* comparatif */
@@ -168,6 +169,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -186,7 +188,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Droits légaux</b>Les règles du Code du travail applicables aux alternants en 2026.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -201,7 +203,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Alternance</div>
     <div class="su">Apprentissage · Contrat Pro · V1.0</div></div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 <div class="wrap">
 
@@ -210,7 +212,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">🧮 Salaire minimum apprentissage 2026</div>
     <div class="field">
       <label>Âge au début du contrat</label>
-      <select class="ip" id="fAge">
+      <select class="ip" id="fAge" aria-label="Âge au début du contrat">
         <option value="m18">Moins de 18 ans</option>
         <option value="18_20">18 à 20 ans</option>
         <option value="21_25" selected>21 à 25 ans</option>
@@ -219,7 +221,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Année dans le contrat</label>
-      <select class="ip" id="fAnnee">
+      <select class="ip" id="fAnnee" aria-label="Année dans le contrat">
         <option value="1">1re année</option>
         <option value="2">2e année</option>
         <option value="3">3e année et +</option>
@@ -235,18 +237,18 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="res info">
       <div class="rl">Exonération de charges</div>
-      <div class="rsub">Les apprentis sont exonérés de cotisations salariales sur la part de rémunération ≤ 79 % du SMIC. La rémunération est également exonérée d'impôt sur le revenu dans la limite de un SMIC annuel (≈ 22 400 €/an en 2026) (2026).</div>
+      <div class="rsub">Les apprentis sont exonérés de cotisations salariales sur la part de rémunération ≤ 50 % du SMIC (seuil abaissé depuis le 1ᵉʳ mars 2025, LFSS 2025 — contre 79 % auparavant). Au-delà, CSG-CRDS et cotisations salariales classiques sont dues sur la fraction excédentaire. La rémunération reste exonérée d'impôt sur le revenu dans la limite d'un SMIC annuel (≈ 22 400 €/an en 2026).</div>
     </div>
   </div>
 
   <!-- Barème complet -->
   <div class="sec-t">📊 Barème complet apprentissage 2026</div>
   <div class="bareme">
-    <div class="brow hd"><span>Âge</span><span>1re année</span><span>2e+ année</span></div>
-    <div class="brow"><span>- de 18 ans</span><span>27 % SMIC</span><span>39 % SMIC</span></div>
-    <div class="brow"><span>18 à 20 ans</span><span>43 % SMIC</span><span>51 % SMIC</span></div>
-    <div class="brow"><span>21 à 25 ans</span><span>53 % SMIC</span><span>61 % SMIC</span></div>
-    <div class="brow"><span>26 ans et +</span><span>100 % SMIC</span><span>100 % SMIC</span></div>
+    <div class="brow hd"><span>Âge</span><span>1re</span><span>2e</span><span>3e+</span></div>
+    <div class="brow"><span>- de 18 ans</span><span>27 % SMIC</span><span>39 % SMIC</span><span>55 % SMIC</span></div>
+    <div class="brow"><span>18 à 20 ans</span><span>43 % SMIC</span><span>51 % SMIC</span><span>67 % SMIC</span></div>
+    <div class="brow"><span>21 à 25 ans</span><span>53 % SMIC</span><span>61 % SMIC</span><span>78 % SMIC</span></div>
+    <div class="brow"><span>26 ans et +</span><span>100 % SMIC</span><span>100 % SMIC</span><span>100 % SMIC</span></div>
   </div>
   <div style="font-size:11px;color:var(--faded);margin-top:6px;line-height:1.4;">SMIC brut juin 2026 : 1 867,02 €/mois. La convention collective peut prévoir des minima plus élevés.</div>
 
@@ -285,7 +287,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <span class="ctag info">alternance.emploi.gouv.fr</span>
   </div></div>
 
-  <div class="note"><span data-art="L6211-1"></span> à <span data-art="L6325-24"></span> CT · Barème apprentissage 2026 (SMIC juin 2026 : 1 867,02 €).<br>
+  <div class="note"><span data-artn="L6211-1"></span> à <span data-artn="L6325-24"></span> CT · Barème apprentissage 2026 (SMIC juin 2026 : 1 867,02 €).<br>
     Convention collective peut prévoir des salaires supérieurs.<br>
     🎓 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
@@ -308,7 +310,7 @@ body.pageBlancheGuard>*{display:block!important;}
 var SMIC = (window.SH && SH.val('smic_mensuel')) || 1867.02;
 // Taux [1ère année, 2e année, 3e année+]
 var TAUX = {
-  m18:  [0.27, 0.39, 0.47],
+  m18:  [0.27, 0.39, 0.55],
   '18_20': [0.43, 0.51, 0.67],
   '21_25': [0.53, 0.61, 0.78],
   p26:  [1.00, 1.00, 1.00]
@@ -354,7 +356,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{age:'21_25',annee:'1'});
@@ -405,7 +407,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

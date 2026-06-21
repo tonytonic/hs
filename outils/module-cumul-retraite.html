@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Cumul Emploi-Retraite</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,7 +24,7 @@
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5ab0e0;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#080e18 0%,#0e1828 50%,#061020 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -66,7 +67,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a9aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -169,6 +170,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -187,7 +189,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Plafond & déclaration</b>En cumul plafonné : pension + salaire ≤ dernier salaire. Déclaration obligatoire.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -205,7 +207,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Cumul Emploi-Retraite</div>
     <div class="su">Travailler & percevoir sa retraite · V1.0</div>
   </div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -230,7 +232,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">🧮 Vérifier ton plafond de cumul</div>
     <div class="field">
       <label>Situation de ta retraite</label>
-      <select class="ip" id="fSit">
+      <select class="ip" id="fSit" aria-label="Situation de ta retraite">
         <option value="plein">Retraite à taux plein (toutes conditions remplies)</option>
         <option value="partiel">Retraite sans taux plein (décote ou âge anticipé)</option>
         <option value="meme">Reprise chez le même employeur (dans les 6 mois)</option>
@@ -239,14 +241,14 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="field">
       <label>Pension de retraite mensuelle brute</label>
       <div class="inline">
-        <input class="ip" id="fPension" type="number" min="0" step="50" placeholder="0">
+        <input class="ip" id="fPension" type="number" min="0" step="50" placeholder="0" aria-label="Pension de retraite mensuelle brute">
         <span class="unit">€/mois</span>
       </div>
     </div>
     <div class="field" id="fieldSal">
       <label>Dernier salaire mensuel brut avant retraite</label>
       <div class="inline">
-        <input class="ip" id="fSalaire" type="number" min="0" step="50" placeholder="0">
+        <input class="ip" id="fSalaire" type="number" min="0" step="50" placeholder="0" aria-label="Dernier salaire mensuel brut avant retraite">
         <span class="unit">€/mois</span>
       </div>
       <div class="hint">Sert à calculer le plafond (160% du SMIC ou dernier salaire, le plus favorable).</div>
@@ -290,7 +292,7 @@ body.pageBlancheGuard>*{display:block!important;}
 
   <div class="rule"><div class="ri">💶</div><div>
     <div class="rt">Plafond du cumul plafonné</div>
-    <div class="rd">Le plafond s'applique sur la somme pension + revenu d'activité. Si pension + revenu > plafond (160 % SMIC ≈ 2 987,30 €/mois ou dernier salaire si plus favorable), la pension est réduite à due concurrence. La marge disponible pour l'activité = plafond − pension.</div>
+    <div class="rd">Le plafond s'applique sur la somme pension + revenu d'activité. Si pension + revenu > plafond (160 % SMIC ≈ 2 987,23 €/mois ou dernier salaire si plus favorable), la pension est réduite à due concurrence. La marge disponible pour l'activité = plafond − pension.</div>
     <span class="ctag info">160% SMIC ou dernier salaire</span>
   </div></div>
 
@@ -312,8 +314,8 @@ body.pageBlancheGuard>*{display:block!important;}
     <span class="ctag info">Toutes pensions liquidées</span>
   </div></div>
 
-  <div class="note">Loi n°2023-270 du 14 avril 2023 · <span data-art="L161-22"></span>.<br>
-    Plafond 2026 : 160% SMIC ≈ 2 987,30 €/mois. Règles info-retraite.fr.<br>
+  <div class="note">Loi n°2023-270 du 14 avril 2023 · <span data-art="L161-22"></span> · à jour juin 2026. <b>À venir</b> : la LFSS 2026 prévoit un durcissement progressif du cumul (écrêtement avant l'âge légal, partiel de 64 à 67 ans), modalités à préciser par décret. Plafond 160 % SMIC indicatif.<br>
+    Plafond 2026 : 160% SMIC ≈ 2 987,23 €/mois. Règles info-retraite.fr.<br>
     🏖️ Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Réforme des retraites 2023 · Outil indicatif & pédagogique · Seule ta caisse de retraite fait foi</div>
@@ -413,7 +415,7 @@ function shConfirm(msg, cb){
   window.resetState = function(){
     shConfirm('Tout remettre à zero ?', function(){
     try{ localStorage.removeItem('CUM_STATE'); localStorage.removeItem('CUM_WELCOMED'); }catch(e){}
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   };
 
@@ -462,7 +464,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

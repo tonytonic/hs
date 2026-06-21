@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1322">
+<title>Pension alimentaire · SimulHeures</title>
+<style>
+:root{
+  --accent:#9aa8d8; --accent2:#7585c0;
+  --bg0:#0e1322; --card:rgba(255,255,255,0.06); --line:rgba(255,255,255,0.12);
+  --text:#f3f1f8; --faded:rgba(255,255,255,0.62);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{overflow-wrap:break-word;word-break:break-word;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);
+  min-height:100vh;padding:0 16px calc(40px + env(safe-area-inset-bottom));line-height:1.5;}
+.back{color:var(--faded);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;}
+.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--text);font-size:15px;font-weight:700;cursor:pointer;}
+.field{margin-bottom:13px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--faded);margin-bottom:6px;}
+.ip{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid var(--line);border-radius:11px;
+  padding:12px;font-size:16px;color:var(--text);color-scheme:dark;}
+.ip:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+.row{display:flex;gap:10px;}.row>.field{flex:1;}
+.hint{max-width:520px;margin:0 auto 14px;text-align:center;color:var(--faded);font-size:13px;padding:14px;
+  border:1px dashed var(--line);border-radius:14px;}
+.reset{display:block;margin:6px auto 0;background:none;border:none;color:var(--faded);font-size:12px;
+  cursor:pointer;text-decoration:underline;}
+.sh-disclaimer{max-width:520px;margin:18px auto 0;padding:13px 15px;background:rgba(0,0,0,0.18);
+  border:1px solid var(--line);border-radius:11px;font-size:11px;line-height:1.6;color:var(--faded);text-align:center;}
+.sh-disclaimer strong{color:rgba(255,255,255,0.8);}
+.sh-disclaimer a{color:var(--faded);text-decoration:underline;}
+.ov{position:fixed;inset:0;background:rgba(8,6,16,0.82);backdrop-filter:blur(6px);z-index:50;
+  display:none;align-items:center;justify-content:center;padding:22px;}
+.ov.show{display:flex;}
+.wz{background:linear-gradient(165deg,#172138,#0e1322);border:1px solid var(--line);border-radius:20px;
+  max-width:380px;width:100%;padding:24px 22px 18px;position:relative;}
+.wz .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--text);font-size:14px;cursor:pointer;}
+.wz .wico{font-size:38px;text-align:center;}
+.wz h2{font-size:17px;font-weight:800;text-align:center;margin:8px 0 4px;}
+.wz .step{font-size:13.5px;color:var(--faded);line-height:1.6;margin:10px 0;}
+.wz .step b{color:var(--text);}
+.wz .ok{width:100%;margin-top:14px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0c0c18;
+  border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+
+body{background:
+    repeating-linear-gradient(180deg, transparent 0px, transparent 27px, rgba(255,255,255,0.035) 28px),
+    linear-gradient(168deg,#0e1322 0%,#172138 55%,#0e1322 100%);}
+header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 0 12px;position:sticky;top:0;
+  background:linear-gradient(180deg,#0e1322 70%,transparent);z-index:10;}
+.brand{flex:1;text-align:center;}
+.brand .ti{font-size:18px;font-weight:800;letter-spacing:-.3px;}
+.brand .su{font-size:11px;color:var(--faded);}
+.hero{text-align:center;margin:6px 0 18px;}
+.hero .badge{width:68px;height:68px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;
+  font-size:32px;background:var(--card);border:3px double var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.hero h1{font-size:21px;font-weight:800;margin-top:10px;color:var(--text);}
+.hero p{font-size:13px;color:var(--faded);margin-top:5px;max-width:440px;margin-left:auto;margin-right:auto;}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:4px 4px 16px 16px;
+  padding:18px 16px;margin-bottom:14px;max-width:520px;margin-left:auto;margin-right:auto;}
+.res{max-width:520px;margin:0 auto 14px;border-radius:4px 4px 16px 16px;padding:18px;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);}
+.res .lbl{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;text-align:center;}
+.res .big{font-size:28px;font-weight:800;letter-spacing:-.4px;text-align:center;display:block;margin-top:2px;}
+.res .sub{font-size:12.5px;margin-top:8px;font-weight:600;opacity:.8;line-height:1.5;text-align:center;}
+.res .line{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;font-weight:600;
+  border-bottom:1px dashed var(--line);}
+.res .line:last-child{border-bottom:none;border-top:1.5px solid var(--accent);margin-top:4px;padding-top:10px;font-size:15px;}
+</style>
+</head>
+<body>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Pension alimentaire</div><div class="su">Barème indicatif (Justice)</div></div>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
+</header>
+<div class="hero">
+  <div class="badge" aria-hidden="true">⚖️</div>
+  <h1>Pension alimentaire</h1>
+  <p>Estimation selon la table de référence du ministère de la Justice — un repère pour les juges, non obligatoire.</p>
+</div>
+<div class="card">
+<div class="field"><label for="revenu">Revenu net mensuel du parent débiteur (€)</label><input class="ip" id="revenu" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="Revenu net mensuel du parent débiteur (€)"></div>
+<div class="row"><div class="field"><label for="enfants">Nombre d'enfants</label><input class="ip" id="enfants" type="number" inputmode="decimal" step="any" placeholder="1" aria-label="Nombre d'enfants"></div></div>
+<div class="field"><label for="garde">Mode de garde</label><select class="ip" id="garde" aria-label="Mode de garde"><option value="classique">Classique (1 week-end/2 + vacances)</option><option value="reduit">Droit de visite réduit (moins fréquent)</option><option value="alternee">Résidence alternée</option></select></div>
+</div>
+<div id="result"></div>
+
+<div class="card" style="margin-top:18px;">
+<div class="field" style="margin-bottom:10px;"><label style="font-size:13px;color:var(--text);">📈 Revalorisation annuelle de la pension</label></div>
+<div class="field"><label for="pensionActuelle">Montant actuel de la pension (€/mois)</label><input class="ip" id="pensionActuelle" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="Montant actuel de la pension"></div>
+<div class="row"><div class="field"><label for="indiceAncien">Indice de référence au jugement</label><input class="ip" id="indiceAncien" type="number" inputmode="decimal" step="any" placeholder="Ex. 119,5" aria-label="Indice de référence au jugement"></div><div class="field"><label for="indiceNouveau">Indice de référence actuel</label><input class="ip" id="indiceNouveau" type="number" inputmode="decimal" step="any" placeholder="Ex. 122,3" aria-label="Indice de référence actuel"></div></div>
+</div>
+<div id="resultIndex"></div>
+<button class="reset" onclick="resetState()">🔄 Réinitialiser</button>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension du droit du travail et de la vie quotidienne. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de décision importante, consultez un professionnel ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>).<br>
+  Barème indicatif du ministère de la Justice (table de référence, non contraignante). Le juge aux affaires familiales fixe le montant définitif selon la situation réelle. Limité à 1-3 enfants dans ce calcul simplifié.<br>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+<div class="ov" id="help" role="dialog" aria-modal="true" aria-label="Aide">
+  <div class="wz">
+    <button class="x" data-close="help" aria-label="Fermer">✕</button>
+    <div class="wico" aria-hidden="true">⚖️</div>
+    <h2>Pension alimentaire</h2>
+    <div class="step">Ce barème est un simple <b>repère indicatif</b> ; le juge aux affaires familiales reste libre de s'en écarter.</div>
+    <div class="step">Saisis le <b>revenu net</b> du parent débiteur, le <b>nombre d'enfants</b> et le <b>mode de garde</b> (classique, réduit ou alterné).</div>
+    <div class="step">Le calcul déduit d'abord un minimum vital (646 €), puis applique un taux par enfant.</div>
+    <div class="step">En bas : calcule la <b>revalorisation annuelle</b> de ta pension à partir des indices de référence.</div>
+    <button class="ok" data-close="help">Compris</button>
+  </div>
+</div>
+
+<script>
+var LS={STATE:'PENSION_ALIMENTAIRE_STATE',WELCOME:'PENSION_ALIMENTAIRE_WELCOMED'};
+function num(id){var e=document.getElementById(id);if(!e)return 0;return parseFloat(String(e.value).replace(/\s/g,'').replace(',','.'))||0;}
+function val(id){var e=document.getElementById(id);return e?e.value:'';}
+function fmt(n,d){d=(d==null?2:d);return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function eur(n){return fmt(n,2)+' €';}
+function show(h){var r=document.getElementById('result');r.innerHTML=h;}
+function hint(t){show('<div class="hint">'+t+'</div>');}
+function box(h){show('<div class="res">'+h+'</div>');}
+
+function saveState(){
+  try{var o={};o['revenu']=val('revenu');o['enfants']=val('enfants');o['garde']=val('garde');o['pensionActuelle']=val('pensionActuelle');o['indiceAncien']=val('indiceAncien');o['indiceNouveau']=val('indiceNouveau');localStorage.setItem(LS.STATE,JSON.stringify(o));}catch(e){}
+}
+function restoreState(){
+  try{var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');
+    if(o['revenu']!=null)document.getElementById('revenu').value=o['revenu'];
+    if(o['enfants']!=null)document.getElementById('enfants').value=o['enfants'];
+    if(o['garde']!=null)document.getElementById('garde').value=o['garde'];
+    if(o['pensionActuelle']!=null)document.getElementById('pensionActuelle').value=o['pensionActuelle'];
+    if(o['indiceAncien']!=null)document.getElementById('indiceAncien').value=o['indiceAncien'];
+    if(o['indiceNouveau']!=null)document.getElementById('indiceNouveau').value=o['indiceNouveau'];
+  }catch(e){}
+}
+function calc(){
+  saveState();
+
+  var r=num('revenu'), n=Math.round(num('enfants')), garde=val('garde');
+  if(!r||!n){hint('Saisis le revenu et le nombre d\'enfants.');return;}
+  var minVital=646, dispo=Math.max(0,r-minVital);
+  var tauxClassique={1:13.5,2:11.5,3:10};
+  var tauxAlternee={1:9,2:7.8,3:6.7};
+  var tauxReduit={1:18,2:15.3,3:13.3}; // extrapolé depuis le taux classique (ratio ~1,33) — pas de table officielle 2-3 enfants pour ce mode
+  var tables={classique:tauxClassique, alternee:tauxAlternee, reduit:tauxReduit};
+  var taux=tables[garde][Math.min(n,3)];
+  if(!taux){hint('Barème disponible pour 1 à 3 enfants avec ce calcul simplifié. Au-delà, vois le simulateur officiel.');return;}
+  var parEnfant=dispo*taux/100, total=parEnfant*n;
+  box('<div class="lbl">Pension totale estimée</div><div class="big">'+eur(total)+'</div>'
+   +'<div class="sub">Soit '+eur(parEnfant)+' par enfant ('+fmt(taux,1)+' % du revenu disponible)</div>'
+   +'<div class="line" style="margin-top:8px;"><span>Revenu disponible (− minimum vital)</span><b>'+eur(dispo)+'</b></div>'
+   + (garde==='reduit' ? '<div class="sub" style="margin-top:6px;color:var(--accent);">⚠️ Taux extrapolé pour 2-3 enfants (pas de table officielle pour ce mode au-delà de 1 enfant) — vérifie sur justice.fr.</div>' : ''));
+
+}
+function calcIndex(){
+  var pension = num('pensionActuelle'), iAncien = num('indiceAncien'), iNouveau = num('indiceNouveau');
+  var rIndex = document.getElementById('resultIndex');
+  if(!pension || !iAncien || !iNouveau){ rIndex.innerHTML=''; return; }
+  var nouveauMontant = pension * (iNouveau/iAncien);
+  var diff = nouveauMontant - pension;
+  rIndex.innerHTML = '<div class="res"><div class="lbl">Nouveau montant indexé</div><div class="big">'+eur(nouveauMontant)+'</div>'
+    +'<div class="sub">Soit '+(diff>=0?'+':'')+eur(diff)+' par mois ('+fmt(diff/pension*100,2)+' %)</div>'
+    +'<div class="sub" style="margin-top:6px;">Formule : pension actuelle × (indice actuel / indice au jugement). Indices disponibles sur insee.fr.</div></div>';
+}
+function resetState(){
+  try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}
+  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
+}
+function openHelp(){document.getElementById('help').classList.add('show');}
+function closeHelp(){document.getElementById('help').classList.remove('show');try{localStorage.setItem(LS.WELCOME,'1');}catch(e){}}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('helpBtn').addEventListener('click',openHelp);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close="help"]'),function(b){b.addEventListener('click',closeHelp);});
+  Array.prototype.forEach.call(document.querySelectorAll('.ip'),function(el){
+    el.addEventListener('input',calc); el.addEventListener('change',calc);
+    el.addEventListener('input',calcIndex); el.addEventListener('change',calcIndex);
+  });
+  restoreState();
+  calc();
+  calcIndex();
+  try{if(!localStorage.getItem(LS.WELCOME))openHelp();}catch(e){openHelp();}
+});
+window.resetState=resetState;
+</script>
+</body>
+</html>

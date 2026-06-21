@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1322">
+<title>Coût d'un appareil · SimulHeures</title>
+<style>
+:root{
+  --accent:#ffd34e; --accent2:#f0a93c;
+  --bg0:#0e1322; --card:rgba(255,255,255,0.06); --line:rgba(255,255,255,0.12);
+  --text:#f3f1f8; --faded:rgba(255,255,255,0.62);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{overflow-wrap:break-word;word-break:break-word;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);
+  min-height:100vh;padding:0 16px calc(40px + env(safe-area-inset-bottom));line-height:1.5;}
+.back{color:var(--faded);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;}
+.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--text);font-size:15px;font-weight:700;cursor:pointer;}
+.field{margin-bottom:13px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--faded);margin-bottom:6px;}
+.ip{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid var(--line);border-radius:11px;
+  padding:12px;font-size:16px;color:var(--text);color-scheme:dark;}
+.ip:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+.row{display:flex;gap:10px;}.row>.field{flex:1;}
+.hint{max-width:520px;margin:0 auto 14px;text-align:center;color:var(--faded);font-size:13px;padding:14px;
+  border:1px dashed var(--line);border-radius:14px;}
+.reset{display:block;margin:6px auto 0;background:none;border:none;color:var(--faded);font-size:12px;
+  cursor:pointer;text-decoration:underline;}
+.sh-disclaimer{max-width:520px;margin:18px auto 0;padding:13px 15px;background:rgba(0,0,0,0.18);
+  border:1px solid var(--line);border-radius:11px;font-size:11px;line-height:1.6;color:var(--faded);text-align:center;}
+.sh-disclaimer strong{color:rgba(255,255,255,0.8);}
+.sh-disclaimer a{color:var(--faded);text-decoration:underline;}
+.ov{position:fixed;inset:0;background:rgba(8,6,16,0.82);backdrop-filter:blur(6px);z-index:50;
+  display:none;align-items:center;justify-content:center;padding:22px;}
+.ov.show{display:flex;}
+.wz{background:linear-gradient(165deg,#172138,#0e1322);border:1px solid var(--line);border-radius:20px;
+  max-width:380px;width:100%;padding:24px 22px 18px;position:relative;}
+.wz .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--text);font-size:14px;cursor:pointer;}
+.wz .wico{font-size:38px;text-align:center;}
+.wz h2{font-size:17px;font-weight:800;text-align:center;margin:8px 0 4px;}
+.wz .step{font-size:13.5px;color:var(--faded);line-height:1.6;margin:10px 0;}
+.wz .step b{color:var(--text);}
+.wz .ok{width:100%;margin-top:14px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0c0c18;
+  border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+
+body{background:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px) 0 0/34px 34px,
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px) 0 0/34px 34px,
+    linear-gradient(168deg,#0e1322 0%,#172138 55%,#0e1322 100%);}
+header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 0 12px;position:sticky;top:0;
+  background:linear-gradient(180deg,#0e1322 70%,transparent);z-index:10;}
+.brand{flex:1;text-align:center;}
+.brand .ti{font-size:18px;font-weight:800;letter-spacing:-.3px;}
+.brand .su{font-size:11px;color:var(--faded);}
+.hero{text-align:center;margin:6px 0 18px;}
+.hero .badge{width:64px;height:64px;border-radius:50% 50% 50% 4px;margin:0 auto;display:flex;align-items:center;justify-content:center;
+  font-size:30px;background:linear-gradient(145deg,var(--accent),var(--accent2));box-shadow:0 6px 16px rgba(0,0,0,.3);
+  transform:rotate(-45deg);}
+.hero .badge span{transform:rotate(45deg);display:block;}
+.hero h1{font-size:21px;font-weight:800;margin-top:12px;color:var(--text);}
+.hero p{font-size:13px;color:var(--faded);margin-top:5px;max-width:440px;margin-left:auto;margin-right:auto;}
+.card{background:var(--card);border:1.5px dashed var(--line);border-radius:16px;padding:16px;margin-bottom:14px;
+  max-width:520px;margin-left:auto;margin-right:auto;}
+.res{max-width:520px;margin:0 auto 14px;border-radius:16px;padding:18px;text-align:center;position:relative;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0c0c18;}
+.res::before{content:'📍';position:absolute;top:-12px;left:18px;font-size:22px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.4));}
+.res .big{font-size:30px;font-weight:800;letter-spacing:-.5px;}
+.res .lbl{font-size:12px;font-weight:700;opacity:.8;text-transform:uppercase;letter-spacing:.5px;}
+.res .sub{font-size:13px;margin-top:8px;font-weight:600;opacity:.85;line-height:1.5;}
+.res .line{display:flex;justify-content:space-between;font-size:13.5px;padding:4px 0;font-weight:600;}
+</style>
+</head>
+<body>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Coût d'un appareil</div><div class="su">Électricité</div></div>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
+</header>
+<div class="hero">
+  <div class="badge" aria-hidden="true"><span>💡</span></div>
+  <h1>Coût d'un appareil</h1>
+  <p>Combien te coûte un appareil selon sa puissance et ton tarif ?</p>
+</div>
+<div class="card">
+<div class="row"><div class="field"><label for="watts">Puissance (W)</label><input class="ip" id="watts" type="number" inputmode="decimal" step="any" placeholder="1000" aria-label="Puissance (W)"></div><div class="field"><label for="heures">Heures par jour</label><input class="ip" id="heures" type="number" inputmode="decimal" step="any" placeholder="2" aria-label="Heures par jour"></div></div>
+<div class="row"><div class="field"><label for="jours">Sur combien de jours</label><input class="ip" id="jours" type="number" inputmode="decimal" step="any" placeholder="30" aria-label="Sur combien de jours"></div><div class="field"><label for="prix">Prix du kWh (€)</label><input class="ip" id="prix" type="number" inputmode="decimal" step="any" placeholder="0,25" aria-label="Prix du kWh (€)"></div></div>
+</div>
+<div id="result"></div>
+<button class="reset" onclick="resetState()">🔄 Réinitialiser</button>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension du droit du travail et de la vie quotidienne. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de décision importante, consultez un professionnel ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>).<br>
+  Outil indicatif et pédagogique.<br>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+<div class="ov" id="help" role="dialog" aria-modal="true" aria-label="Aide">
+  <div class="wz">
+    <button class="x" data-close="help" aria-label="Fermer">✕</button>
+    <div class="wico" aria-hidden="true">💡</div>
+    <h2>Coût d'un appareil</h2>
+    <div class="step">Un appareil de 2000 W allumé 2 h/jour, ça chiffre vite.</div>
+    <div class="step">Saisis la <b>puissance</b> (sur l'étiquette, en watts), la durée et ton <b>prix du kWh</b>.</div>
+    <div class="step">Le prix du kWh figure sur ta facture (souvent autour de 0,20 €).</div>
+    <button class="ok" data-close="help">Compris</button>
+  </div>
+</div>
+
+<script>
+var LS={STATE:'CONSO_ELECTRIQUE_STATE',WELCOME:'CONSO_ELECTRIQUE_WELCOMED'};
+function num(id){var e=document.getElementById(id);if(!e)return 0;return parseFloat(String(e.value).replace(/\s/g,'').replace(',','.'))||0;}
+function val(id){var e=document.getElementById(id);return e?e.value:'';}
+function fmt(n,d){d=(d==null?2:d);return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function eur(n){return fmt(n,2)+' €';}
+function show(h){var r=document.getElementById('result');r.innerHTML=h;}
+function hint(t){show('<div class="hint">'+t+'</div>');}
+function box(h){show('<div class="res">'+h+'</div>');}
+
+function saveState(){
+  try{var o={};o['watts']=val('watts');o['heures']=val('heures');o['jours']=val('jours');o['prix']=val('prix');localStorage.setItem(LS.STATE,JSON.stringify(o));}catch(e){}
+}
+function restoreState(){
+  try{var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');if(o['watts']!=null)document.getElementById('watts').value=o['watts'];if(o['heures']!=null)document.getElementById('heures').value=o['heures'];if(o['jours']!=null)document.getElementById('jours').value=o['jours'];if(o['prix']!=null)document.getElementById('prix').value=o['prix'];}catch(e){}
+}
+function calc(){
+  saveState();
+
+  var w=num('watts'),h=num('heures'),j=num('jours'),p=num('prix');
+  if(!w||!h){hint('Saisis au moins la puissance et les heures par jour.');return;}
+  if(!j)j=1;
+  var kwh=w*h*j/1000, cout=kwh*p;
+  box('<div class="lbl">Coût estimé</div><div class="big">'+eur(cout)+'</div>'
+   +'<div class="sub">Consommation : '+fmt(kwh,2)+' kWh sur '+j+' jour'+(j>1?'s':'')
+   +'<br>soit '+eur(p?cout/j:0)+' / jour'+(p?'':' (ajoute ton prix du kWh)')+'</div>');
+
+}
+function resetState(){
+  try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}
+  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
+}
+function openHelp(){document.getElementById('help').classList.add('show');}
+function closeHelp(){document.getElementById('help').classList.remove('show');try{localStorage.setItem(LS.WELCOME,'1');}catch(e){}}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('helpBtn').addEventListener('click',openHelp);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close="help"]'),function(b){b.addEventListener('click',closeHelp);});
+  Array.prototype.forEach.call(document.querySelectorAll('.ip'),function(el){
+    el.addEventListener('input',calc); el.addEventListener('change',calc);
+  });
+  restoreState();
+  calc();
+  try{if(!localStorage.getItem(LS.WELCOME))openHelp();}catch(e){openHelp();}
+});
+window.resetState=resetState;
+</script>
+</body>
+</html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>AT/MP — Accident du Travail & Maladie Pro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,11 +20,11 @@
   --acc:#b03a3a;--acc-l:#d05a5a;--acc-d:#8a1a1a;
   --dark:#1a0808;--dark2:#280e0e;
   --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
-  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.46);
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#1a0808 0%,#280e0e 50%,#160606 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -62,7 +63,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23d05a5a' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -175,6 +176,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -193,7 +195,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Protections renforcées</b>Licenciement interdit pendant arrêt AT/MP sauf faute grave ou impossibilité maintien.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -211,7 +213,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">AT / MP</div>
     <div class="su">Accident Travail · Maladie Pro · V1.0</div>
   </div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -327,14 +329,14 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="field">
         <label>Salaire journalier de référence</label>
         <div class="inline">
-          <input class="ip" id="fSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <input class="ip" id="fSalJour" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire journalier de référence">
           <span class="unit">€/jour</span>
         </div>
         <div class="hint">Saisis ton salaire mensuel brut (M-1). Le SJR est calculé automatiquement : salaire ÷ 30,42.</div>
       </div>
       <div class="field">
         <label>Période d'arrêt</label>
-        <select class="ip" id="fPeriode">
+        <select class="ip" id="fPeriode" aria-label="Période d'arrêt">
           <option value="j1_28">Du 1er au 28e jour</option>
           <option value="j29">À partir du 29e jour</option>
         </select>
@@ -378,8 +380,8 @@ body.pageBlancheGuard>*{display:block!important;}
     </div></div>
   </div>
 
-  <div class="note"><span data-art="L411-1"></span> à <span data-art="L452-5"></span> · <span data-art="L461-1"></span> à <span data-art="L461-7"></span> — Conforme au Code de la sécurité sociale.<br>
-    IJ AT/MP 2026 : 60% (J1–J28) puis 80% (J29+). Sans délai de carence.<br>
+  <div class="note"><span data-art="L411-1"></span> à <span data-art="L452-5"></span> · <span data-art="L461-1"></span> à <span data-art="L461-7"></span> — Conforme au Code de la sécurité sociale, à jour juin 2026.<br>
+    IJ AT/MP 2026 : 60% (J1–J28, plafond 240,49 €/j) puis 80% (J29+, plafond 320,66 €/j). Sans délai de carence.<br>
     🦺 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Outil indicatif & pédagogique · Seule la CPAM fait foi pour la reconnaissance et l'indemnisation</div>
@@ -420,10 +422,13 @@ function calcIndem(){
   var per = $('fPeriode').value;
   if(sal<=0){$('indemResults').style.display='none';return;}
   var taux = per==='j1_28' ? 0.60 : 0.80;
-  var ij = sal * taux;
+  var plafond = per==='j1_28' ? 240.49 : 320.66; // plafonds IJ AT/MP 2026 (1er janvier 2026)
+  var ijBrute = sal * taux;
+  var ij = Math.min(ijBrute, plafond);
   $('rIJ').textContent = eur(ij)+' / jour';
   $('rIJDetail').textContent = eur(sal)+'/j × '+(taux*100)+'% · '+
-    (per==='j1_28'?'Jours 1 à 28':'À partir du 29e jour');
+    (per==='j1_28'?'Jours 1 à 28':'À partir du 29e jour') +
+    (ijBrute>plafond ? ' · plafond légal '+eur(plafond)+'/j appliqué (calcul théorique : '+eur(ijBrute)+')' : '');
   $('rTaux').textContent = (taux*100)+'%';
   $('indemResults').style.display='block';
 }
@@ -454,7 +459,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{salJour:'',periode:'j1_28'});
@@ -505,7 +510,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

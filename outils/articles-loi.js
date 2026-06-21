@@ -21,7 +21,7 @@
    PAS de fetch / pas de JSON → fonctionne en file://, http(s):// et dans le TWA.
    Aucune dépendance externe.
 
-   DERNIÈRE MISE À JOUR DES VALEURS : 7 juin 2026
+   DERNIÈRE MISE À JOUR DES VALEURS : 30 juin 2026
    ========================================================================== */
 
 (function (global) {
@@ -34,9 +34,10 @@
   var VALEURS = {
 
     /* ----- SMIC (revalorisé au 1er janvier + ajustement inflation en cours d'année) ----- */
-    smic_h:        { v: 12.31,    u: '€/h',    maj: '2026-06-01', src: 'Arrêté 22/05/2026' },
-    smic_h_net:    { v: 10.10,     u: '€/h net',maj: '2026-06-01', src: 'estimation après cotisations' },
+    smic_h:        { v: 12.31,    u: '€/h',    maj: '2026-06-01', src: 'Arrêté 22/05/2026 — ⚠️ 2e revalorisation 2026 (après celle du 1er janvier) ; inflation repartant à la hausse cet été (énergie), re-vérifier en juillet-août si une 3e revalorisation automatique est déclenchée (seuil légal +2% depuis mai 2026, art. L3231-5)' },
+    smic_h_net:    { v: 9.75,     u: '€/h net',maj: '2026-06-01', src: '≈ SMIC net mensuel 1 477,93 € ÷ 151,67 h — info.gouv.fr' },
     smic_mensuel:  { v: 1867.02,  u: '€/mois', maj: '2026-06-01', src: 'JO arrêté 22/05/2026 — base 151,67 h × 12,31 €' },
+    smic_mensuel_net:{ v: 1477.93, u: '€/mois net', maj: '2026-06-01', src: 'SMIC net mensuel — info.gouv.fr (1er juin 2026)' },
     smic_annuel:   { v: 22404.24, u: '€/an',   maj: '2026-06-01', src: '12 × SMIC mensuel' },
 
     /* ----- Plafonds Sécurité sociale (arrêté du 22 décembre 2025) ----- */
@@ -93,8 +94,8 @@
     perco_abondement_max:{ v: 7689.6,u:'€/an',   maj: '2026-01-01', src: '16 % PASS — PERCO/PER collectif' },
 
     /* ----- Invalidité (montants revalorisés — À VÉRIFIER ameli.fr) ----- */
-    invalidite_plancher:{ v: 328,  u: '€/mois',  maj: '2026-04-01', src: 'pension minimale cat. 1 et 2 (à vérifier)' },
-    invalidite_mtp:   { v: 1266,   u: '€/mois',  maj: '2026-04-01', src: 'majoration tierce personne (à vérifier)' },
+    invalidite_plancher:{ v: 338.31, u: '€/mois',  maj: '2026-04-01', src: 'pension minimale cat. 1/2 — 335,62 € (2025) +0,8 % au 1er avr. 2026 = 338,31 €' },
+    invalidite_mtp:   { v: 1298.44, u: '€/mois',  maj: '2026-04-01', src: 'majoration tierce personne (régime général) — +0,8 % au 1er avr. 2026' },
 
     /* ----- Proche aidant / AJPA ----- */
     forfait_hospitalier:  { v: 23,     u: '€/jour', maj: '2026-03-01', src: 'Arrêté du 27/02/2026 (17 € psychiatrie)' },
@@ -205,6 +206,8 @@
       texte:"La durée hebdomadaire moyenne calculée sur 12 semaines consécutives ne peut dépasser 44 heures." },
     'L3121-27': { code:'CT', titre:'Durée légale du travail',
       texte:"La durée légale de travail effectif est fixée à 35 heures par semaine." },
+    'L3121-50': { code:'CT', titre:'Heures perdues récupérables',
+      texte:"Seules les heures perdues en deçà de la durée légale, à la suite d'une interruption collective du travail (cause accidentelle, intempéries, force majeure, inventaire ou pont entre un jour férié et un jour de repos), peuvent être récupérées dans les 12 mois." },
     'L3131-1':  { code:'CT', titre:'Repos quotidien',
       texte:"Tout salarié bénéficie d'un repos quotidien d'au moins 11 heures consécutives." },
     'L3132-1':  { code:'CT', titre:'Repos hebdomadaire — interdiction',
@@ -212,21 +215,29 @@
     'L3132-2':  { code:'CT', titre:'Repos hebdomadaire — durée',
       texte:"Le repos hebdomadaire a une durée minimale de 24 heures consécutives, s'ajoutant aux 11 heures de repos quotidien (soit 35 heures)." },
     'L3133-1':  { code:'CT', titre:'Liste des jours fériés',
+      texte:"Énumère les 11 jours fériés légaux. La loi fixe la liste mais n'impose pas qu'ils soient chômés (sauf le 1er mai)." },
     'L3133-3':  { code:'CT', titre:'Maintien de salaire — jours fériés',
       texte:"Le chômage des jours fériés ne peut entraîner aucune perte de salaire pour les salariés totalisant au moins 3 mois d'ancienneté. Sans cette ancienneté, la convention collective peut prévoir des règles plus favorables." },
-      texte:"Énumère les 11 jours fériés légaux. La loi fixe la liste mais n'impose pas qu'ils soient chômés (sauf 1er mai)." },
     'L3133-4':  { code:'CT', titre:'1er mai chômé et payé',
       texte:"Le 1er mai est le seul jour férié obligatoirement chômé et payé pour tous les salariés." },
+    'L3133-7':  { code:'CT', titre:'Journée de solidarité',
+      texte:"Institue la journée de solidarité destinée au financement de l'autonomie des personnes âgées et handicapées : une journée supplémentaire de travail, en principe non rémunérée, dans la limite de 7 heures (proratisée pour les temps partiels)." },
 
     /* ----- CSE / représentation / délégation ----- */
     'L2143-13': { code:'CT', titre:'Heures de délégation du délégué syndical',
       texte:"Fixe le crédit d'heures du délégué syndical : 12 h/mois (50 à 150 salariés), 18 h/mois (151 à 499), 24 h/mois (500 et plus)." },
     'L2315-7':  { code:'CT', titre:'Heures de délégation des membres du CSE',
       texte:"Détermine le crédit d'heures des élus titulaires du CSE selon l'effectif (à partir de 18 h/mois pour 50-74 salariés)." },
+    'R2314-1':  { code:'CT', titre:'Barème des heures de délégation des titulaires du CSE',
+      texte:"Fixe le crédit d'heures mensuel par titulaire selon l'effectif : 10 h (11-49), 18 h (50-74), 19 h (75-99), 21 h (100-199), 22 h (200-499), 24 h (500-1499), puis 26 h et plus au-delà." },
     'R2315-5':  { code:'CT', titre:'Report et mutualisation des heures',
       texte:"Autorise le report des heures de délégation non utilisées dans la limite de l'année civile (12 mois) et leur mutualisation entre élus, dans la limite de 1,5 fois le crédit mensuel." },
     'L2311-2':  { code:'CT', titre:'Seuil de mise en place du CSE',
       texte:"Le comité social et économique est obligatoire dans les entreprises d'au moins 11 salariés (sur 12 mois consécutifs)." },
+    'L2314-1':  { code:'CT', titre:'Composition du CSE & référent harcèlement',
+      texte:"Le CSE comprend l'employeur et une délégation du personnel élue. Parmi ses membres, le CSE désigne un référent en matière de lutte contre le harcèlement sexuel et les agissements sexistes." },
+    'L2314-33': { code:'CT', titre:'Durée des mandats des élus',
+      texte:"Fixe la durée des mandats des élus du CSE (4 ans, réductible à 2 ou 3 ans par accord). La loi n°2025-989 du 24 octobre 2025 a supprimé la limite de trois mandats successifs, dans toutes les entreprises." },
 
     /* ----- CDD / précarité ----- */
     'L1242-6':  { code:'CT', titre:'Cas de recours au CDD',
@@ -517,6 +528,11 @@
       var a = ARTICLES[key];
       return a ? ('Art. ' + key + ' ' + a.code) : ('Art. ' + key);
     },
+    /* Référence sans code (pour les plages "X à Y CODE") : SH.artn('L1234-1') -> "Art. L1234-1" */
+    artn: function (k) {
+      var key = k.replace(/^Art\.?\s*/i, '');
+      return 'Art. ' + key;
+    },
     /* Titre court de l'article : SH.titre('L1234-1') -> "Préavis de licenciement" */
     titre: function (k) {
       var key = k.replace(/^Art\.?\s*/i, '');
@@ -563,6 +579,7 @@
     root = root || document;
     var map = [
       ['data-art',   function (k) { return SH.art(k); }],
+      ['data-artn',  function (k) { return SH.artn(k); }],
       ['data-loi',   function (k) { return SH.texte(k); }],
       ['data-titre', function (k) { return SH.titre(k); }],
       ['data-val',   function (k) { return SH.show(k); }],

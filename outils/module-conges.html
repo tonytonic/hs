@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Mes Congés Payés</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,12 +22,12 @@
   --orange:#e07a4a;--orange-l:#f0965e;--orange-d:#c25e30;
   --cream:#fff8f0;--cream2:#fff0e0;--cream3:#ffe5cc;
   --card:#fffdf9;--card-edge:#f0c8a0;
-  --ink:#3e1a00;--ink2:#6b3010;--faded:#c08060;
+  --ink:#3e1a00;--ink2:#6b3010;--faded:#98654c;
   --ok:#2e7d50;--warn:#c07820;--red:#c62828;
   --line:rgba(62,26,0,0.10);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;background:linear-gradient(160deg,#ffe8d0,#fff5ea 60%,#fff8f0);}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;background:linear-gradient(160deg,#ffe8d0,#fff5ea 60%,#fff8f0);}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;}
 @media screen and (orientation:landscape) and (max-device-width:1024px){
   body>*:not(#lb){display:none!important;}
@@ -63,7 +64,7 @@ header .hbtn{background:var(--card);border:1.5px solid var(--card-edge);color:va
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:6px;}
 .field .hint{font-size:11px;color:var(--faded);margin-top:4px;line-height:1.4;}
 .ip{width:100%;border:2px solid var(--card-edge);border-radius:12px;padding:13px 14px;
-  font-size:15px;font-weight:700;color:var(--ink);background:var(--cream2);
+  font-size:16px;font-weight:700;color:var(--ink);background:var(--cream2);
   font-family:'Lato',sans-serif;outline:none;-webkit-appearance:none;}
 .ip:focus{border-color:var(--orange);background:#fff;}
 
@@ -107,6 +108,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -140,19 +142,19 @@ body.pageBlancheGuard>*{display:block!important;}
     <h3>📍 Ta situation</h3>
     <div class="field">
       <label>Début de la période de référence</label>
-      <input class="ip" type="date" id="iPeriodeDebut" oninput="calc()">
+      <input class="ip" type="date" id="iPeriodeDebut" oninput="calc()" aria-label="Début de la période de référence">
       <div class="hint">Le 1er juin par défaut. Mets ta date d'embauche si tu es arrivé après, ou la date de début de ta période d'entreprise.</div>
     </div>
     <div class="field">
       <label>Jours de congés déjà posés sur cette période</label>
       <div style="display:flex;align-items:center;gap:10px;">
-        <input class="ip" type="number" id="iPoses" min="0" max="60" step="0.5" placeholder="0" oninput="calc()" style="flex:1;">
+        <input class="ip" type="number" id="iPoses" min="0" max="60" step="0.5" placeholder="0" oninput="calc()" style="flex:1;" aria-label="Jours de congés déjà posés sur cette période">
         <span style="font-size:13px;color:var(--faded);white-space:nowrap;" id="unitPoses">jours ouvrables</span>
       </div>
     </div>
     <div class="field">
       <label>Projection — Combien j'aurai acquis à cette date :</label>
-      <input class="ip" type="date" id="iProjectDate" oninput="calc()">
+      <input class="ip" type="date" id="iProjectDate" oninput="calc()" aria-label="Projection — Combien j'aurai acquis à cette date">
     </div>
   </div>
 
@@ -204,6 +206,11 @@ function setMode(m){
   document.getElementById('unitPoses').textContent=m==='ouvrables'?'jours ouvrables':'jours ouvrés';
   calc();
 }
+function resetState(){
+  try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}
+  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50); // efface l'état + rouvre le wizard d'accueil
+}
+window.resetState=resetState;
 
 function pad(n){return String(n).padStart(2,'0');}
 function toDateInput(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
@@ -319,9 +326,9 @@ if(!get(LS.WELCOME,0)){document.getElementById('helpOv').style.display='flex';se
 })();
 </script>
 <div class="sh-disclaimer">
-  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  <strong>⚠️ À jour juin 2026 · Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span><br><button onclick="resetState()" style="background:none;border:none;color:rgba(255,255,255,0.55);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button>
 </div>
 </body>
 </html>

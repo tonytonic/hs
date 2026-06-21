@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Mutuelle Obligatoire — Le Bouclier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,11 +22,11 @@
   --teal:#0d6e5a; --teal-l:#1a9e82; --teal-ll:#40c8a8; --teal-bg:#e6f7f3;
   --dark:#071e18; --dark2:#0d2e26;
   --card:rgba(255,255,255,0.08); --card-edge:rgba(255,255,255,0.14);
-  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.47);
   --yes:#40c8a8; --no:#f07060; --warn:#f0a840;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'DM Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#071e18 0%,#0d2e26 50%,#071a14 100%);
@@ -146,6 +147,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 <div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#071e18;z-index:9999;"></div>
@@ -153,7 +156,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Mutuelle Obligatoire</div><div class="su">LE BOUCLIER · V1.0</div></div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 <div class="ov" id="wizard">
   <div class="box"><div class="hd"></div><div class="bd">
@@ -165,7 +168,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="feat"><div class="ic">🔄</div><div class="tx"><b>Portabilité 12 mois max</b>Si tu perds ton emploi et es indemnisé, tu gardes ta mutuelle gratuitement jusqu'à 12 mois.</div></div></div>
     <div class="wstep" data-step="2"><div class="wemoji">📋</div><h2>Tu peux refuser ?</h2>
       <p>Oui, dans certains cas. On appelle ça une <span class="accent">dispense d'adhésion</span>. Elle doit être demandée par écrit. Les cas sont listés dans ce module.</p>
-      <div class="legal">Outil indicatif. Loi ANI 2013, généralisée le 1er janv. 2016. Règles stables depuis lors. Ta convention peut prévoir des garanties supérieures. Seul ton employeur et la mutuelle font foi.</div></div>
+      <div class="legal">Outil indicatif. Loi ANI 2013, généralisée le 1er janv. 2016. Règles stables depuis lors. À jour juin 2026. Ta convention peut prévoir des garanties supérieures. Seul ton employeur et la mutuelle font foi.</div></div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
     <button class="btn btn-teal" id="wNext">Continuer</button>
@@ -173,7 +176,7 @@ body.pageBlancheGuard>*{display:block!important;}
   </div></div>
 </div>
 <div class="ov" id="help">
-  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help">✕</button></div>
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🛡️</div><div class="tx"><b>Règles clés</b>Les obligations de l'employeur, tes droits en tant que salarié.</div></div>
     <div class="feat"><div class="ic">🚫</div><div class="tx"><b>Dispenses</b>Les situations où tu peux refuser d'adhérer à la mutuelle collective.</div></div>
@@ -217,7 +220,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin:18px 0 10px;">🏥 Le panier de soins ANI (minimum légal)</div>
   <div class="rule"><div class="ri">👁️</div><div><div class="rt">Optique — 100 % Santé</div><div class="rd">Montures et verres du panier 100 % Santé remboursés intégralement. Pour les montures hors panier, la mutuelle doit couvrir au moins 100 € (montures) + les verres selon les devis.</div><span class="rb yes">Obligatoire</span></div></div>
   <div class="rule"><div class="ri">🦷</div><div><div class="rt">Dentaire — 100 % Santé</div><div class="rd">Soins et prothèses du panier dentaire remboursés à 100 % (pas de reste à charge). Prothèses hors panier : plafonnement des honoraires et prise en charge obligatoire minimum.</div><span class="rb yes">Obligatoire depuis 2020</span></div></div>
-  <div class="rule"><div class="ri">👂</div><div><div class="rt">Audiologie — 100 % Santé</div><div class="rd">Aides auditives du panier 100 % Santé remboursées intégralement depuis 2021. Les appareils hors panier restent à charge selon le contrat. Les appareils hors panier restent à charge selon le contrat.</div><span class="rb yes">Obligatoire depuis 2021</span></div></div>
+  <div class="rule"><div class="ri">👂</div><div><div class="rt">Audiologie — 100 % Santé</div><div class="rd">Aides auditives du panier 100 % Santé remboursées intégralement depuis 2021. Les appareils hors panier restent à charge selon le contrat.</div><span class="rb yes">Obligatoire depuis 2021</span></div></div>
   <div class="rule"><div class="ri">🏥</div><div><div class="rt">Hospitalisation</div><div class="rd">Le forfait journalier (23 €/jour en 2026 (17 €/jour en psychiatrie) — Arrêté du 27/02/2026) doit être remboursé intégralement, sans limitation de durée.</div><span class="rb yes">Inclus panier ANI</span></div></div>
 
   <div style="font-weight:800;font-size:14px;color:var(--teal-ll);margin:18px 0 10px;">💡 Conseils pratiques</div>
@@ -267,7 +270,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -293,7 +296,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

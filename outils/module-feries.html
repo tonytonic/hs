@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Jours Fériés 2026</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,12 +21,12 @@
 :root{
   --blue:#1565C0;--blue-l:#1976D2;--blue-ll:#42A5F5;
   --cream:#f0f4ff;--cream2:#e3eaff;--card:#fff;--card-edge:#c5cae9;
-  --ink:#1a237e;--ink2:#283593;--faded:#7986cb;
+  --ink:#1a237e;--ink2:#283593;--faded:#616ba2;
   --ok:#2e7d50;--warn:#c07820;--red:#c62828;
   --line:rgba(26,35,126,0.10);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;background:var(--cream);}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;background:var(--cream);}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;}
 @media screen and (orientation:landscape) and (max-device-width:1024px){
   body>*:not(#lb){display:none!important;}
@@ -121,6 +122,14 @@ body.pageBlancheGuard>*{display:block!important;}
 .cleg-dot.we{background:rgba(255,255,255,0.2);}
 .combo-empty{font-size:13px;color:rgba(255,255,255,0.4);text-align:center;padding:12px 0;}
 
+/* ── Fonctionnalités interactives (import API + simulateur pose) ── */
+.feat-btn{display:block;width:100%;background:linear-gradient(135deg,#1a237e,#3949ab);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;}
+.feat-btn:disabled{opacity:.6;cursor:default;}
+.feat-status{font-size:12px;line-height:1.5;margin-top:10px;color:rgba(255,255,255,0.65);}
+.feat-input{width:100%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.18);border-radius:10px;padding:11px 12px;font-size:16px;color:#fff;-webkit-text-fill-color:#fff;margin-top:6px;color-scheme:dark;}
+.pose-verdict{margin-top:12px;padding:12px 14px;border-radius:10px;font-size:13.5px;line-height:1.55;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.88);}
+.feat-reset{background:none;border:none;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:12px;}
+
 /* ── SimulHeures disclaimer footer ── */
 .sh-disclaimer{
   margin:24px 0 8px;
@@ -136,6 +145,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -166,6 +176,23 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
   </div>
 
+  <!-- ── IMPORT OFFICIEL data.gouv.fr ── -->
+  <div class="optim-card">
+    <div class="optim-title">🇫🇷 Jours fériés officiels</div>
+    <div class="optim-sub">Vérifie le calendrier de l'année via la source officielle de l'État (data.gouv.fr)</div>
+    <button class="feat-btn" id="btnImport" onclick="importFeriesGouv()">📥 Importer / vérifier les fériés officiels</button>
+    <div class="feat-status" id="importStatus"></div>
+  </div>
+
+  <!-- ── SIMULATEUR DE POSE ── -->
+  <div class="optim-card">
+    <div class="optim-title">🏖️ Je pose ce jour — est-ce rentable ?</div>
+    <div class="optim-sub">Choisis une date : l'outil calcule combien de jours de repos d'affilée tu obtiens (week-ends + fériés voisins inclus)</div>
+    <input type="date" class="feat-input" id="iPoseDate" oninput="simulatePose()" aria-label="Date du jour de congé à tester">
+    <div class="pose-verdict" id="poseResult" style="display:none;"></div>
+    <button class="feat-reset" onclick="resetState()">🔄 Réinitialiser</button>
+  </div>
+
   <div class="info-card">
     <h3>📌 Règles essentielles</h3>
     <ul>
@@ -178,7 +205,31 @@ body.pageBlancheGuard>*{display:block!important;}
   </div>
   <div class="info-card">
     <h3>⚖️ Droit au chômage du jour férié</h3>
-    <p>Pour bénéficier du chômage d'un jour férié sans perte de salaire, la loi prévoit en principe <b>3 mois d'ancienneté</b> requis dans l'entreprise (art. L3133-3 CT — Légifrance). En dessous, l'accord collectif ou la convention collective peut prévoir des règles plus favorables. Les intérimaires bénéficient des mêmes droits que les salariés permanents pour les jours fériés travaillés.</p>
+    <p>Pour bénéficier du chômage d'un jour férié sans perte de salaire, la loi prévoit en principe <b>3 mois d'ancienneté</b> requis dans l'entreprise (<span data-art="L3133-3"></span>). En dessous, l'accord collectif ou la convention collective peut prévoir des règles plus favorables. Les intérimaires bénéficient des mêmes droits que les salariés permanents pour les jours fériés travaillés.</p>
+  </div>
+
+  <div class="info-card">
+    <h3>🤝 Journée de solidarité</h3>
+    <p>C'est une journée de travail supplémentaire (en principe <b>non rémunérée</b>, dans la limite de <b>7 h</b> — proratisée pour un temps partiel) destinée à financer l'autonomie des personnes âgées et handicapées (<span data-art="L3133-7"></span>).</p>
+    <p>Elle est souvent fixée au <b>lundi de Pentecôte</b>, mais l'employeur peut, par accord, retenir un autre jour (sauf le 1er mai). Important : le lundi de Pentecôte <b>reste un jour férié</b> — il n'est donc pas automatiquement travaillé, tout dépend de l'accord applicable dans ton entreprise.</p>
+  </div>
+
+  <div class="info-card">
+    <h3>🏖️ Jour férié pendant tes congés payés</h3>
+    <ul>
+      <li>Un jour férié <b>chômé</b> dans l'entreprise qui tombe pendant tes congés payés <b>n'est pas décompté</b> comme un jour de congé : il « rallonge » d'autant ton repos (ou n'entame pas ton solde).</li>
+      <li>S'il tombe un jour <b>habituellement non travaillé</b> (week-end, repos d'un temps partiel), aucune compensation n'est due — sauf accord plus favorable.</li>
+      <li><b>Pont accordé :</b> l'employeur peut prévoir la récupération des heures perdues dans les 12 mois (<span data-art="L3121-50"></span>), sauf disposition conventionnelle contraire.</li>
+    </ul>
+  </div>
+
+  <div class="info-card">
+    <h3>🗺️ Cas particuliers (Alsace-Moselle & Outre-mer)</h3>
+    <ul>
+      <li><b>Alsace-Moselle</b> (Bas-Rhin, Haut-Rhin, Moselle) : 2 jours fériés en plus — le <b>Vendredi Saint</b> et le <b>26 décembre</b> (Saint-Étienne).</li>
+      <li><b>Outre-mer :</b> jour de l'<b>abolition de l'esclavage</b>, à une date propre à chaque territoire — 22 mai (Martinique), 27 mai (Guadeloupe), 10 juin (Guyane), 20 décembre (La Réunion), 27 avril (Mayotte), entre autres.</li>
+      <li>Ce calendrier liste les <b>11 fériés de France métropolitaine</b> : pense à vérifier ta convention collective et ta région.</li>
+    </ul>
   </div>
   <p style="font-size:11px;color:var(--faded);text-align:center;padding:8px 0 16px;line-height:1.6;">
     <span data-txt="disclaimer_fiscal"></span>.<br><span data-txt="disclaimer_suivi"></span>.<br><span data-txt="ccn_differente"></span>.
@@ -249,6 +300,83 @@ function changeYear(delta){
 function pad(n){return String(n).padStart(2,'0');}
 function dk(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 
+// ── Import / vérification via l'API officielle data.gouv.fr ──
+function importFeriesGouv(){
+  var st=document.getElementById('importStatus');
+  var btn=document.getElementById('btnImport');
+  if(!st||!btn) return;
+  st.textContent='⏳ Connexion à data.gouv.fr…'; st.style.color='';
+  btn.disabled=true;
+  fetch('https://calendrier.api.gouv.fr/jours-feries/metropole/'+curYear+'.json')
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(data){
+      var official=Object.keys(data);
+      var local=getFeries(curYear).map(function(f){return dk(f.date);});
+      var concord=official.filter(function(d){return local.indexOf(d)>=0;}).length;
+      st.innerHTML='✅ <b>'+official.length+' jours fériés officiels</b> pour '+curYear+' (source : data.gouv.fr) · <b>'+concord+'/'+local.length+'</b> concordants avec le calcul local.';
+      st.style.color='#7ddb7d';
+      btn.disabled=false;
+    })
+    .catch(function(e){
+      st.innerHTML='📴 Source officielle indisponible (hors-ligne ?). Le <b>calcul local</b> (algorithme de Pâques) reste exact — les 11 fériés affichés font foi.';
+      st.style.color='#f0c040';
+      btn.disabled=false;
+    });
+}
+
+// ── Simulateur : poser un jour est-il rentable ? ──
+function _isOff(date, holSet){
+  var d=date.getDay();
+  if(d===0||d===6) return true;
+  return holSet.has(dk(date));
+}
+function _fmtJour(d){ return DAYS[d.getDay()]+'. '+d.getDate()+' '+MONTHS_FR[d.getMonth()].toLowerCase(); }
+function simulatePose(){
+  var val=document.getElementById('iPoseDate').value;
+  var box=document.getElementById('poseResult');
+  if(!box) return;
+  if(!val){ box.style.display='none'; box.innerHTML=''; return; }
+  box.style.display='block';
+  var posed=new Date(val+'T12:00:00');
+  var hol=new Set();
+  [posed.getFullYear()-1,posed.getFullYear(),posed.getFullYear()+1].forEach(function(yy){
+    getFeries(yy).forEach(function(f){ hol.add(dk(f.date)); });
+  });
+  var wd=posed.getDay();
+  if(wd===0||wd===6){
+    box.innerHTML='📅 C\'est un <b>week-end</b> — déjà non travaillé, inutile de poser un congé ici.';
+    return;
+  }
+  if(hol.has(dk(posed))){
+    box.innerHTML='🎆 C\'est un <b>jour férié</b> — pas besoin de poser de congé (s\'il est chômé dans ton entreprise).';
+    return;
+  }
+  // étend la plage de jours non travaillés autour du jour posé (le jour posé compte comme repos)
+  var total=1, startD=new Date(posed), endD=new Date(posed);
+  var cur=new Date(posed); cur.setDate(cur.getDate()-1);
+  while(_isOff(cur,hol)){ total++; startD=new Date(cur); cur.setDate(cur.getDate()-1); }
+  cur=new Date(posed); cur.setDate(cur.getDate()+1);
+  while(_isOff(cur,hol)){ total++; endD=new Date(cur); cur.setDate(cur.getDate()+1); }
+  var emoji,verdict,color;
+  if(total>=4){ emoji='🌉'; verdict='Excellent'; color='#7ddb7d'; }
+  else if(total===3){ emoji='👍'; verdict='Bon — week-end prolongé'; color='#7ddb7d'; }
+  else if(total===2){ emoji='🙂'; verdict='Correct'; color='#f0c040'; }
+  else { emoji='😕'; verdict='Peu rentable — journée isolée'; color='#f0c040'; }
+  var plage = total>1 ? (' du <b>'+_fmtJour(startD)+'</b> au <b>'+_fmtJour(endD)+'</b>') : '';
+  box.innerHTML='<span style="color:'+color+';font-weight:800;">'+emoji+' '+verdict+'</span><br>'
+    +'En posant le '+_fmtJour(posed)+', tu obtiens <b>'+total+' jour'+(total>1?'s':'')+'</b> de repos d\'affilée'+plage+'.<br>'
+    +'<span style="opacity:.7;">Ratio repos / jour posé : <b>'+total+' : 1</b></span>';
+}
+
+// ── Réinitialiser ──
+function resetState(){
+  try{localStorage.removeItem('FER_WELCOMED');}catch(e){}
+  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50); // remet à zéro + rouvre le wizard d'accueil
+}
+window.importFeriesGouv=importFeriesGouv;
+window.simulatePose=simulatePose;
+window.resetState=resetState;
+
 function render(){
   document.getElementById('yearLabel').textContent=curYear;
   var feries=getFeries(curYear);
@@ -265,9 +393,9 @@ function render(){
   hero+='<div class="sub">Fériés légaux en France métropolitaine '+curYear+'</div>';
   hero+='<div class="chips">';
   hero+='<div class="chip">'+countFuturs+' à venir</div>';
-  // Compter les lundis/vendredis (ponts potentiels)
-  var ponts=feries.filter(function(f){var d=f.date.getDay();return d===4||d===2;}).length; // jeu→ven, mar→lun
-  hero+='<div class="chip">'+ponts+' pont'+(ponts>1?'s':'')+' potentiel'+(ponts>1?'s':'')+'</div>';
+  // Ponts malins = férié un mardi, mercredi ou jeudi (1 à 2 jours à poser)
+  var ponts=feries.filter(function(f){var dd=f.date.getDay();return dd>=2&&dd<=4;}).length;
+  hero+='<div class="chip">'+ponts+' pont'+(ponts>1?'s':'')+' malin'+(ponts>1?'s':'')+'</div>';
   hero+='</div>';
   document.getElementById('heroBlock').innerHTML=hero;
 
@@ -291,9 +419,12 @@ function render(){
       var cls='ferie-row'+(isToday?' today':'')+(isPast?' past':'');
       // Pont info
       var pontInfo='';
-      if(dw===4) pontInfo=' · vendredi = 🌉 pont probable';
-      if(dw===2) pontInfo=' · lundi = 🌉 pont probable';
-      if(dw===3) pontInfo=' · mercredi = semaine coupée';
+      if(dw===1) pontInfo=' · 🎁 week-end de 3 jours';
+      if(dw===2) pontInfo=' · 🌉 pose le lundi → 4 jours';
+      if(dw===3) pontInfo=' · 🌉 2 ponts possibles (avant / après)';
+      if(dw===4) pontInfo=' · 🌉 pose le vendredi → 4 jours';
+      if(dw===5) pontInfo=' · 🎁 week-end de 3 jours';
+      if(dw===0||dw===6) pontInfo=' · tombe un week-end';
       html+='<div class="'+cls+'">';
       html+='<div class="ferie-date"><div class="d">'+f.date.getDate()+'</div><div class="dw">'+MONTHS_FR[f.date.getMonth()].slice(0,3)+'</div></div>';
       html+='<div class="ferie-info"><div class="nm">'+f.nom+'</div><div class="note">'+f.note+pontInfo+'</div></div>';
@@ -308,198 +439,109 @@ function render(){
 }
 
 
-// ── Optimiseur congés ────────────────────────────────────────────
+// ── Optimiseur congés (v2 : continuité garantie + ponts inter-fériés) ──
 function buildOptim(year){
   var feries = getFeries(year);
-  var ferieKeys = {};
-  feries.forEach(function(f){ ferieKeys[dk(f.date)] = f.nom; });
+  feries.forEach(function(f){ f.date.setHours(0,0,0,0); });
+  var ferieMap = {};
+  feries.forEach(function(f){ ferieMap[dk(f.date)] = f.nom; });
 
   function isWE(d){ var w=d.getDay(); return w===0||w===6; }
-  function isFerie(d){ return !!ferieKeys[dk(d)]; }
-  function isFreeDay(d){ return isWE(d)||isFerie(d); }
+  function isFerie(d){ return !!ferieMap[dk(d)]; }
+  function isFree(d){ return isWE(d)||isFerie(d); }
   function addDays(d,n){ var r=new Date(d); r.setDate(r.getDate()+n); return r; }
   function fmtShort(d){ return ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][d.getDay()]+' '+d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0'); }
-  function dayType(d){
-    if(isFerie(d)) return 'ferie';
-    if(isWE(d)) return 'we';
-    return 'posed';
+  function dayType(d){ if(isFerie(d)) return 'ferie'; if(isWE(d)) return 'we'; return 'posed'; }
+  function span(a,b){ var arr=[]; var d=new Date(a); while(d<=b){ arr.push(new Date(d)); d=addDays(d,1); } return arr; }
+  function len(a,b){ return Math.round((b-a)/86400000)+1; }
+  function ferieDeLAnnee(days){ return days.some(function(x){ return ferieMap[dk(x)] && x.getFullYear()===year; }); }
+
+  // 1) Blocs libres maximaux (week-ends + fériés qui se touchent), de fin N-1 à début N+1
+  var scanStart=new Date(year-1,11,18); scanStart.setHours(0,0,0,0);
+  var scanEnd=new Date(year+1,0,12); scanEnd.setHours(0,0,0,0);
+  var runs=[]; var d=new Date(scanStart);
+  while(d<=scanEnd){
+    if(isFree(d)){
+      var srt=new Date(d), end=new Date(d), nx=addDays(end,1);
+      while(nx<=scanEnd && isFree(nx)){ end=nx; nx=addDays(end,1); }
+      var noms=[]; span(srt,end).forEach(function(x){ if(ferieMap[dk(x)]) noms.push(ferieMap[dk(x)]); });
+      runs.push({start:srt,end:end,feries:noms});
+      d=addDays(end,1);
+    } else d=addDays(d,1);
   }
 
-  var combos = [];
+  var MAXPOSE=4;          // jours ouvrés max à poser pour un "pont"
+  var combos=[];
 
-  // Parcourir tous les fériés — construire des blocs autour de chaque férié
-  feries.forEach(function(f){
-    var fd = new Date(f.date);
-    var dw = fd.getDay(); // 0=dim,1=lun,...,6=sam
-
-    // ── Cas 1 : Jeudi férié → poser vendredi = 4 jours (jeu+ven+sam+dim)
-    if(dw === 4){
-      var posed = [addDays(fd,1)]; // vendredi
-      var total = 4; // jeu ferie + ven posé + sam + dim
-      // Bonus: lundi avant si lundi libre
-      if(isWE(addDays(fd,-3))||isFerie(addDays(fd,-3))){} // lun avant est we ?
-      combos.push({
-        name: f.nom,
-        posed: posed.length,
-        total: total,
-        start: fd,
-        end: addDays(fd,3),
-        days: [fd, posed[0], addDays(fd,2), addDays(fd,3)],
-        tip: '1 congé → <b>4 jours</b> de repos (pont classique)'
-      });
-      // Bonus: poser lundi aussi = 6 jours si mardi pas férié
-      if(!isFerie(addDays(fd,4))){
-        combos.push({
-          name: f.nom + ' (pont long)',
-          posed: 2,
-          total: 6,
-          start: addDays(fd,-3), // lun
-          end: addDays(fd,3),
-          days: [addDays(fd,-3),addDays(fd,-2),addDays(fd,-1),fd,addDays(fd,1),addDays(fd,2),addDays(fd,3)].filter(function(d){ return !isWE(d)||isFerie(d)||[dk(addDays(fd,-3)),dk(addDays(fd,1))].indexOf(dk(d))>=0; }),
-          tip: '2 congés → <b>6 jours</b> de repos (lun+ven posés)'
-        });
-      }
-    }
-
-    // ── Cas 2 : Mardi férié → poser lundi = 4 jours (sam+dim+lun+mar)
-    if(dw === 2){
-      var posed = [addDays(fd,-1)]; // lundi
-      combos.push({
-        name: f.nom,
-        posed: 1,
-        total: 4,
-        start: addDays(fd,-3),
-        end: fd,
-        days: [addDays(fd,-3),addDays(fd,-2),addDays(fd,-1),fd],
-        tip: '1 congé → <b>4 jours</b> de repos (pont classique)'
-      });
-    }
-
-    // ── Cas 3 : Mercredi férié → poser lun+mar = 5j ou jeu+ven = 5j
-    if(dw === 3){
-      if(!isFerie(addDays(fd,-2)) && !isFerie(addDays(fd,-1))){
-        combos.push({
-          name: f.nom + ' (début semaine)',
-          posed: 2,
-          total: 5,
-          start: addDays(fd,-4),
-          end: fd,
-          days: [addDays(fd,-4),addDays(fd,-3),addDays(fd,-2),addDays(fd,-1),fd],
-          tip: '2 congés (lun+mar) → <b>5 jours</b> de repos'
-        });
-      }
-      if(!isFerie(addDays(fd,1)) && !isFerie(addDays(fd,2))){
-        combos.push({
-          name: f.nom + ' (fin semaine)',
-          posed: 2,
-          total: 5,
-          start: fd,
-          end: addDays(fd,4),
-          days: [fd,addDays(fd,1),addDays(fd,2),addDays(fd,3),addDays(fd,4)],
-          tip: '2 congés (jeu+ven) → <b>5 jours</b> de repos'
-        });
-      }
-    }
-
-    // ── Cas 4 : Lundi férié = 3 jours auto (sam+dim+lun) — signaler
-    if(dw === 1){
-      combos.push({
-        name: f.nom,
-        posed: 0,
-        total: 3,
-        start: addDays(fd,-2),
-        end: fd,
-        days: [addDays(fd,-2),addDays(fd,-1),fd],
-        tip: 'Aucun congé à poser → <b>3 jours</b> gratuits 🎁'
-      });
-      // Poser mardi = 4j
-      if(!isFerie(addDays(fd,1))){
-        combos.push({
-          name: f.nom + ' + mardi',
-          posed: 1,
-          total: 4,
-          start: addDays(fd,-2),
-          end: addDays(fd,1),
-          days: [addDays(fd,-2),addDays(fd,-1),fd,addDays(fd,1)],
-          tip: '1 congé (mar) → <b>4 jours</b> de repos'
-        });
-      }
-    }
-
-    // ── Cas 5 : Vendredi férié = 3 jours auto (ven+sam+dim)
-    if(dw === 5){
-      combos.push({
-        name: f.nom,
-        posed: 0,
-        total: 3,
-        start: fd,
-        end: addDays(fd,2),
-        days: [fd,addDays(fd,1),addDays(fd,2)],
-        tip: 'Aucun congé à poser → <b>3 jours</b> gratuits 🎁'
-      });
+  // 2a) Blocs "gratuits" >= 3 jours contenant un férié (week-ends prolongés, 0 congé)
+  runs.forEach(function(r){
+    var L=len(r.start,r.end);
+    if(L>=3 && r.feries.length>0){
+      var days=span(r.start,r.end);
+      if(!ferieDeLAnnee(days)) return;
+      combos.push({ name:r.feries[0], posed:0, total:L, start:new Date(r.start), end:new Date(r.end), days:days,
+        tip:'Aucun congé à poser → <b>'+L+' jours</b> de repos d\'affilée 🎁' });
     }
   });
 
-  // Déduplication & tri par ratio (jours obtenus / congés posés) puis par total
-  var seen = {};
-  var unique = combos.filter(function(c){
-    var k = dk(c.start)+'-'+dk(c.end)+'-'+c.posed;
-    if(seen[k]) return false;
-    seen[k]=1; return true;
-  });
-  // Garder seulement les combos avec un bon ratio (≥3 jours obtenus)
-  unique = unique.filter(function(c){ return c.total >= 3; });
-  // Trier : d'abord les 0 congé, puis meilleur ratio, puis plus long
+  // 2b) Ponts : fusionner des blocs en posant TOUS les jours ouvrés intermédiaires
+  //     (la continuité du repos est ainsi garantie ; capté aussi les ponts inter-fériés)
+  for(var i=0;i<runs.length;i++){
+    var posed=[];
+    for(var j=i+1;j<runs.length;j++){
+      var gap=span(addDays(runs[j-1].end,1), addDays(runs[j].start,-1));
+      posed=posed.concat(gap);
+      if(posed.length>MAXPOSE) break;
+      var days=span(runs[i].start, runs[j].end);
+      var total=days.length, np=posed.length;
+      var fin=[]; days.forEach(function(x){ if(ferieMap[dk(x)]) fin.push(ferieMap[dk(x)]); });
+      // pertinence : au moins un férié de l'année + gain réel (>= 2 jours libres au-delà des posés)
+      if(fin.length>0 && ferieDeLAnnee(days) && total>=np+2 && total>=4){
+        var nm = fin.length>1 ? (fin[0]+' → '+fin[fin.length-1]) : fin[0];
+        combos.push({ name:nm, posed:np, total:total, start:new Date(runs[i].start), end:new Date(runs[j].end), days:days,
+          tip:np+' congé'+(np>1?'s':'')+' → <b>'+total+' jours</b> de repos d\'affilée'+(fin.length>1?' · combo multi-fériés ✨':'') });
+      }
+    }
+  }
+
+  // 3) Dédoublonnage + filtre futur + tri (gratuits d'abord, puis meilleur ratio jours/posé)
+  var seen={};
+  var unique=combos.filter(function(c){ var k=dk(c.start)+'_'+dk(c.end)+'_'+c.posed; if(seen[k])return false; seen[k]=1; return true; });
+  var now=new Date(); now.setHours(0,0,0,0);
+  unique=unique.filter(function(c){ return c.end>=now; });
   unique.sort(function(a,b){
-    if(a.posed===0 && b.posed>0) return -1;
-    if(b.posed===0 && a.posed>0) return 1;
-    var ra = a.total/Math.max(a.posed,1);
-    var rb = b.total/Math.max(b.posed,1);
-    if(rb-ra > 0.01) return 1;
-    if(ra-rb > 0.01) return -1;
+    if(a.posed===0 && b.posed!==0) return -1;
+    if(b.posed===0 && a.posed!==0) return 1;
+    var ra=a.total/Math.max(a.posed,1), rb=b.total/Math.max(b.posed,1);
+    if(Math.abs(rb-ra)>0.01) return rb-ra;
     return b.total-a.total;
   });
 
-  // Filtrer les combos dans le passé
-  var now = new Date(); now.setHours(0,0,0,0);
-  unique = unique.filter(function(c){ return c.end >= now; });
-
-  var scoreClass = function(t){
-    if(t>=11) return 's11';
-    if(t>=9) return 's9';
-    if(t>=7) return 's7';
-    if(t>=5) return 's5';
-    return 's3';
-  };
+  var scoreClass=function(t){ if(t>=11)return 's11'; if(t>=9)return 's9'; if(t>=7)return 's7'; if(t>=5)return 's5'; return 's3'; };
 
   if(!unique.length){
-    document.getElementById('optimList').innerHTML = '<div class="combo-empty">Tous les bons combos sont passés pour '+year+'. Essaie '+( year+1)+' →</div>';
+    document.getElementById('optimList').innerHTML='<div class="combo-empty">Tous les bons combos sont passés pour '+year+'. Essaie '+(year+1)+' →</div>';
     return;
   }
 
-  var html = '';
+  var html='';
   unique.slice(0,10).forEach(function(c){
-    var scoreLabel = c.total+' j';
-    if(c.posed===0) scoreLabel += ' gratuits';
-    else scoreLabel += ' / '+c.posed+' posé'+(c.posed>1?'s':'');
-    html += '<div class="combo">';
-    html += '<div class="combo-head"><div class="combo-name">'+c.name+'</div>';
-    html += '<div class="combo-score '+scoreClass(c.total)+'">'+scoreLabel+'</div></div>';
-    // Mini frise des jours
-    var friseHtml = '<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px;">';
-    c.days.forEach(function(d){
-      var t = dayType(d);
-      var bgMap = {ferie:'rgba(100,200,100,0.3)',we:'rgba(255,255,255,0.1)',posed:'rgba(240,192,64,0.35)'};
-      var clr = {ferie:'#7ddb7d',we:'rgba(255,255,255,0.45)',posed:'#f0c040'};
-      friseHtml += '<div style="background:'+bgMap[t]+';border-radius:6px;padding:3px 6px;text-align:center;font-size:10px;font-weight:700;color:'+clr[t]+';min-width:36px;">';
-      friseHtml += fmtShort(d)+'</div>';
+    var scoreLabel=c.total+' j';
+    if(c.posed===0) scoreLabel+=' gratuits'; else scoreLabel+=' / '+c.posed+' posé'+(c.posed>1?'s':'');
+    html+='<div class="combo">';
+    html+='<div class="combo-head"><div class="combo-name">'+c.name+'</div>';
+    html+='<div class="combo-score '+scoreClass(c.total)+'">'+scoreLabel+'</div></div>';
+    var frise='<div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:6px;">';
+    c.days.forEach(function(dd){
+      var t=dayType(dd);
+      var bg={ferie:'rgba(100,200,100,0.3)',we:'rgba(255,255,255,0.1)',posed:'rgba(240,192,64,0.35)'};
+      var cl={ferie:'#7ddb7d',we:'rgba(255,255,255,0.45)',posed:'#f0c040'};
+      frise+='<div style="background:'+bg[t]+';border-radius:6px;padding:3px 6px;text-align:center;font-size:10px;font-weight:700;color:'+cl[t]+';min-width:36px;">'+fmtShort(dd)+'</div>';
     });
-    friseHtml += '</div>';
-    html += friseHtml;
-    html += '<div class="combo-detail">'+c.tip+'</div>';
-    html += '</div>';
+    frise+='</div>';
+    html+=frise+'<div class="combo-detail">'+c.tip+'</div></div>';
   });
-  document.getElementById('optimList').innerHTML = html;
+  document.getElementById('optimList').innerHTML=html;
 }
 
 document.getElementById('helpBtn').addEventListener('click',function(){
@@ -528,7 +570,7 @@ if(!get(LS.WELCOME,0)){document.getElementById('helpOv').style.display='flex';se
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Période d'Essai — Les Délais</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,12 +23,12 @@
   --indigo:#2a3080; --violet:#7a30a0;
   --dark:#1a1228; --dark2:#241a38;
   --card:rgba(255,255,255,0.08); --card-edge:rgba(255,255,255,0.14);
-  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.46);
   --emp:#e87820; --sal:#2aaa6a; --mut:#5090cc;
   --warn:#e07050;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#1a1228 0%,#241a38 45%,#1a1830 100%);
@@ -61,7 +62,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;letter-spacing:0.3px;}
 .ip{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid var(--card-edge);border-radius:10px;
-  padding:12px;color:#fff;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  padding:12px;color:#fff;font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 input.ip[type="date"]{-webkit-appearance:none;appearance:none;box-sizing:border-box;max-width:100%;min-width:0;}
 input.ip{box-sizing:border-box;max-width:100%;}
 .ip:focus{outline:none;border-color:var(--purple-ll);}
@@ -158,6 +159,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -170,7 +173,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Période d'essai</div>
     <div class="su">DÉLAIS DE PRÉVENANCE · V1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -204,7 +207,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">📅</div><div class="tx"><b>Date de début d'essai</b>Le premier jour du contrat (ou de la nouvelle période d'essai en cas de renouvellement).</div></div>
     <div class="feat"><div class="ic">👤</div><div class="tx"><b>Catégorie</b>Détermine la durée légale maximale de la période d'essai.</div></div>
@@ -220,11 +223,11 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">⚙️ Ta situation</div>
     <div class="field">
       <label>Date de début de la période d'essai</label>
-      <input class="ip" id="fStart" type="date">
+      <input class="ip" id="fStart" type="date" aria-label="Date de début de la période d'essai">
     </div>
     <div class="field">
       <label>Catégorie du salarié</label>
-      <select class="ip" id="fCat">
+      <select class="ip" id="fCat" aria-label="Catégorie du salarié">
         <option value="ouvrier">Ouvrier / Employé</option>
         <option value="technicien">Technicien / Agent de maîtrise</option>
         <option value="cadre">Cadre</option>
@@ -234,7 +237,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="field">
       <label>Durée de la période d'essai prévue au contrat</label>
       <div class="inline">
-        <input class="ip" id="fDur" type="number" inputmode="numeric" min="1" max="8" value="2">
+        <input class="ip" id="fDur" type="number" inputmode="numeric" min="1" max="8" value="2" aria-label="Durée de la période d'essai prévue au contrat">
         <span class="unit">mois</span>
       </div>
       <div class="hint" id="durHint">Max légal : 2 mois (ouvrier/employé).</div>
@@ -262,7 +265,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="rb warn">À connaître</span></div></div>
     <div class="rule-item"><div class="ri">🔄</div><div>
       <div class="rt2">Renouvellement</div>
-      <div class="rd">La période d'essai peut être renouvelée une fois, uniquement si le contrat ou la convention le prévoit expressément, et avec l'accord exprès du salarié.</div>
+      <div class="rd">Renouvelable <b>une seule fois</b>, à 3 conditions cumulatives : (1) un accord de branche étendu le prévoit, (2) c'est inscrit dans le contrat ou la lettre d'engagement, (3) le salarié donne son accord exprès <b>pendant</b> la période initiale. Le renouvellement <b>ne se présume pas</b> (art. L1221-21 & L1221-23 CT).</div>
       <span class="rb mut">Encadré</span></div></div>
     <div class="rule-item"><div class="ri">⏸️</div><div>
       <div class="rt2">Suspension de l'essai</div>
@@ -270,8 +273,8 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="rb mut">Important</span></div></div>
     <div class="rule-item"><div class="ri">📋</div><div>
       <div class="rt2">Durées légales maximales</div>
-      <div class="rd">Ouvrier/Employé : 2 mois · Technicien/Agent de maîtrise : 3 mois · Cadre : 4 mois. Doublables si convention le prévoit.</div>
-      <span class="rb emp">Plafonds légaux</span></div></div>
+      <div class="rd">Ouvrier/Employé : 2 mois · Technicien/Agent de maîtrise : 3 mois · Cadre : 4 mois (art. L1221-19 CT). <b>Depuis la loi DDADUE</b> (n°2023-171 du 9 mars 2023, en vigueur le 9 sept. 2023), ce sont des <b>plafonds impératifs</b> : une convention collective ne peut plus les allonger, seulement les raccourcir (art. L1221-22). Les anciens accords de branche permettant des durées plus longues ne s'appliquent plus.</div>
+      <span class="rb emp">Plafonds légaux · juin 2026</span></div></div>
   </div>
 
   <div class="scard"><div class="si">🔄</div><div>
@@ -389,7 +392,7 @@ body.pageBlancheGuard>*{display:block!important;}
 })();
 
   // ── LocalStorage ──────────────────────────────────────────────
-  var LS={STATE:'ESS_STATE',WELCOME:'ESS_WELCOMED'};
+  var LS={STATE:'PE_STATE',WELCOME:'PE_WELCOMED'};
   function get(k,d){try{var v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}}
   function set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
   
@@ -409,7 +412,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{type:'cdi',date:'',cat:'ouvrier'});
@@ -435,7 +438,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

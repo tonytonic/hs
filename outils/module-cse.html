@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>CSE & Représentation — La Tribune</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,11 +23,11 @@
   --gold:#c8a030; --gold-l:#e8c050;
   --dark:#130a22; --dark2:#1e1038;
   --card:rgba(255,255,255,0.08); --card-edge:rgba(255,255,255,0.13);
-  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.46);
   --s11:#2aaa6a; --s50:#4a90e0;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Outfit',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#130a22 0%,#1e1038 50%,#130a1c 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -147,6 +148,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 <div id="safe-top-bar" style="position:fixed;top:0;left:0;right:0;height:env(safe-area-inset-top);background:#130a22;z-index:9999;"></div>
@@ -154,7 +157,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">CSE & Représentation</div><div class="su">LA TRIBUNE · V1.0</div></div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <div class="ov" id="wizard">
@@ -163,7 +166,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <p>Le Comité Social et Économique est l'<span class="accent">instance de représentation des salariés</span> dans l'entreprise. Il est obligatoire dès 11 salariés. Ses pouvoirs dépendent de la taille de l'entreprise.</p></div>
     <div class="wstep" data-step="1"><div class="wemoji">⚖️</div><h2>2 seuils, 2 niveaux</h2>
       <div class="feat"><div class="ic">🟢</div><div class="tx"><b>11 salariés</b>CSE obligatoire. Réclamations, veille sur les droits, santé-sécurité. Heures de délégation : 10h/mois.</div></div>
-      <div class="feat"><div class="ic">🔵</div><div class="tx"><b>50 salariés</b>Attributions élargies : consultations économiques, budget ASC, droit d'alerte. 16h/mois de délégation.</div></div></div>
+      <div class="feat"><div class="ic">🔵</div><div class="tx"><b>50 salariés</b>Attributions élargies : consultations économiques, budget ASC, droit d'alerte. 18h/mois de délégation (50-74 sal., art. R2314-1).</div></div></div>
     <div class="wstep" data-step="2"><div class="wemoji">📋</div><h2>Nouveauté 2025</h2>
       <p>Depuis la <span class="accent">loi du 24 octobre 2025</span>, la limite de 3 mandats successifs pour les élus CSE a été supprimée. Un élu peut désormais être réélu sans limite.</p>
       <div class="legal">Outil informatif et pédagogique. Ordonnances de 2017, généralisé en 2020. Mise à jour : loi du 24/10/2025. Seul ton accord d'entreprise ou un juriste RH fait foi. Outil neutre.</div></div>
@@ -174,7 +177,7 @@ body.pageBlancheGuard>*{display:block!important;}
   </div></div>
 </div>
 <div class="ov" id="help">
-  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help">✕</button></div>
+  <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🟢🔵</div><div class="tx"><b>Onglets 11 / 50+</b>Les droits diffèrent selon la taille de l'entreprise. Sélectionne ton seuil.</div></div>
     <div class="feat"><div class="ic">📋</div><div class="tx"><b>Droits des salariés</b>Ce que le CSE peut faire pour toi, tes droits d'information et de réclamation.</div></div>
@@ -198,7 +201,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="tc t50">
       <div class="tv">50</div>
       <div class="tl">salariés<br>pendant 12 mois</div>
-      <div class="ts">Attributions élargies<br>16h délégation/mois</div>
+      <div class="ts">Attributions élargies<br>18h délégation/mois</div>
     </div>
   </div>
 
@@ -220,12 +223,19 @@ body.pageBlancheGuard>*{display:block!important;}
   <!-- 50+ -->
   <div class="spanel" id="sp-50">
     <div class="scard"><div class="si">📊</div><div><div class="st2">Consultations économiques obligatoires</div><div class="sd">Le CSE est consulté obligatoirement sur les orientations stratégiques, la situation économique, la politique sociale (emploi, formation, égalité). Au moins 3 consultations annuelles.</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
-    <div class="scard"><div class="si">🎭</div><div><div class="st2">Activités Sociales et Culturelles (ASC)</div><div class="sd">Le CSE gère les ASC : chèques-vacances, billetterie, arbres de Noël, aide aux loisirs... Financé par une contribution employeur (≥ 0,2 % de la masse salariale brute en général).</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
+    <div class="scard"><div class="si">🎭</div><div><div class="st2">Activités Sociales et Culturelles (ASC)</div><div class="sd">Le CSE gère les ASC : chèques-vacances, billetterie, arbres de Noël, aide aux loisirs... Il n'existe <b>aucun minimum légal</b> : le budget ASC est fixé par accord ou par usage, et ne peut pas être inférieur au ratio (contribution / masse salariale) le plus élevé des années précédentes.</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
     <div class="scard"><div class="si">⏰</div><div><div class="st2">Heures de délégation : 18 h/mois (50-74 sal.)</div><div class="sd">Le crédit légal varie selon la taille : 18h (50-74 sal.), 19h (75-99), 21h (100-199), 22h (200-499), plus selon accord. Ce crédit peut être mutualisé entre membres et reporté d'un mois à l'autre dans la limite de l'année civile (12 mois — non 6 mois).</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
     <div class="scard"><div class="si">🚨</div><div><div class="st2">Droit d'alerte économique</div><div class="sd">Si le CSE a connaissance de faits préoccupants pour la situation économique de l'entreprise, il peut activer un droit d'alerte et demander des explications à l'employeur.</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
     <div class="scard"><div class="si">💰</div><div><div class="st2">Budget de fonctionnement</div><div class="sd">L'employeur verse un budget de fonctionnement au CSE (0,20 % de la masse salariale pour les entreprises de 50-1999 salariés, 0,22 % au-delà). Sert à financer les expertises et l'activité du CSE.</div><span class="sbadge s50">≥ 50 salariés</span></div></div>
-  </div>
 
+    <div class="scard"><div class="si">🗂️</div><div>
+      <div class="st2">BDESE — base de données économiques, sociales et environnementales</div>
+      <div class="sd">L'employeur met à disposition du CSE une BDESE actualisée : elle rassemble les informations sur l'investissement, l'égalité professionnelle, la rémunération, les fonds propres, et depuis 2022 les <b>conséquences environnementales</b> de l'activité. C'est le socle des consultations récurrentes.</div>
+      <span class="sbadge s50">≥ 50 salariés</span></div></div>
+    <div class="scard"><div class="si">📆</div><div>
+      <div class="st2">Réunions périodiques</div>
+      <div class="sd">Le CSE se réunit au moins <b>une fois par mois</b> dans les entreprises de 300 salariés et plus, et au moins <b>une fois tous les 2 mois</b> en dessous (sauf accord plus favorable). Au moins 4 réunions par an portent en tout ou partie sur la santé, la sécurité et les conditions de travail.</div>
+      <span class="sbadge s50">≥ 50 salariés</span></div></div>
     <div class="scard"><div class="si">🦺</div><div>
       <div class="st2">CSSCT — Commission Santé, Sécurité, Conditions de Travail</div>
       <div class="sd">Obligatoire dans les entreprises de 300+ salariés (ou sur décision de l'inspection du travail). Reprend les anciennes missions du CHSCT : accidents du travail, prévention des risques, inspections. Composée d'élus CSE désignés.</div>
@@ -236,14 +246,15 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="sbadge s50">Multi-établissements</span></div></div>
     <div class="scard"><div class="si">🔬</div><div>
       <div class="st2">Droit à l'expertise</div>
-      <div class="sd">Le CSE peut faire appel à un expert-comptable (financement employeur) pour analyser les comptes ou lors d'une restructuration. En cas de risque grave, il peut mandater un expert technique. Ces droits sont encadrés par le Code du travail.</div>
+      <div class="sd">Le CSE peut faire appel à un expert-comptable (financé par l'employeur) pour analyser les comptes annuels ou la politique sociale, et lors d'une opération de restructuration / d'un PSE. En cas de risque grave identifié, il peut mandater un expert habilité. Ces droits sont encadrés par le Code du travail (art. L2315-78 et s.).</div>
       <span class="sbadge s50">≥ 50 salariés</span></div></div>
+  </div>
   <!-- Droits salariés -->
   <div class="spanel" id="sp-droits">
     <div class="scard"><div class="si">📋</div><div><div class="st2">Droit à l'information</div><div class="sd">Le CSE est informé et consulté avant toute décision importante : licenciements collectifs, restructurations, modification des conditions de travail. Il peut rendre un avis.</div><span class="sbadge both">Tous seuils</span></div></div>
-    <div class="scard"><div class="si">🗳️</div><div><div class="st2">Elections tous les 4 ans</div><div class="sd">Les élections CSE ont lieu tous les 4 ans. Tout salarié peut voter dès 3 mois d'ancienneté et être candidat dès 1 an d'ancienneté (18 ans minimum).</div><span class="sbadge both">Tous seuils</span></div></div>
-    <div class="scard"><div class="si">🆕</div><div><div class="st2">[règle des 3 mandats toujours en vigueur — art. L2314-33 CT]</div><div class="sd">La loi du 24 octobre 2025 a supprimé la règle qui limitait les élus CSE à 3 mandats successifs. Un élu peut désormais se représenter autant de fois qu'il le souhaite.</div><span class="sbadge new">Loi oct. 2025</span></div></div>
-    <div class="scard"><div class="si">🏛️</div><div><div class="st2">Délit d'entrave</div><div class="sd">L'entrave aux élections (1 an d'emprisonnement + 9 750 € d'amende pour les personnes physiques) CSE reste punie d'1 an d'emprisonnement + 7 500 € d'amende. L'entrave au fonctionnement du CSE (hors élections) : amende de 7 500 € seulement (la peine d'emprisonnement a été supprimée par les ordonnances 2017). Le CSE peut porter le litige devant le tribunal judiciaire.</div><span class="sbadge warn">Protection légale</span></div></div>
+    <div class="scard"><div class="si">🗳️</div><div><div class="st2">Élections : mandat de 4 ans (2 à 4 par accord)</div><div class="sd">Le mandat dure 4 ans par défaut, mais un accord peut le fixer entre 2 et 4 ans. Électeur dès <b>3 mois</b> d'ancienneté, éligible dès <b>1 an</b> (16 ans minimum pour voter, 18 ans pour être élu). Le scrutin et la répartition des sièges sont organisés par le <b>protocole d'accord préélectoral (PAP)</b>, qui doit aussi viser une représentation équilibrée femmes-hommes.</div><span class="sbadge both">Tous seuils</span></div></div>
+    <div class="scard"><div class="si">🆕</div><div><div class="st2">Mandats désormais illimités</div><div class="sd">La loi n° 2025-989 du 24 octobre 2025 (« loi Seniors ») a supprimé, en modifiant l'art. <span data-art="L2314-33"></span>, la limite de 3 mandats successifs qui s'appliquait aux entreprises de 50 salariés et plus. Depuis le 26 octobre 2025, un élu (titulaire ou suppléant) peut être réélu sans limite, quelle que soit la taille de l'entreprise.</div><span class="sbadge new">Loi 24 oct. 2025</span></div></div>
+    <div class="scard"><div class="si">🏛️</div><div><div class="st2">Délit d'entrave</div><div class="sd">Entraver la <b>constitution</b> du CSE ou la <b>libre désignation</b> de ses membres : jusqu'à <b>1 an d'emprisonnement + 7 500 € d'amende</b>. Entraver le <b>fonctionnement</b> d'un CSE déjà en place : <b>7 500 € d'amende</b> (la peine de prison a été supprimée par la loi du 6 août 2015). Pour une personne morale, l'amende est portée à 37 500 €. Le litige se porte devant le tribunal judiciaire.</div><span class="sbadge warn">Protection légale</span></div></div>
     <div class="scard"><div class="si">🤝</div><div>
       <div class="st2">Délégué syndical — distinct du CSE</div>
       <div class="sd">Dans les entreprises de 50+ salariés, les syndicats représentatifs peuvent désigner un délégué syndical (DS). Crédit d'heures DS : 12h (50 à 150 sal.), 18h (151 à 499 sal.), 24h (500 sal. et +) — art. L2143-13 CT (Légifrance) — <span data-art="L2143-13"></span>. Le DS négocie les accords collectifs d'entreprise.</div>
@@ -252,10 +263,13 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="st2">Droit à l'affichage et à la communication</div>
       <div class="sd">Le CSE dispose de panneaux d'affichage et peut distribuer des publications. Dans les entreprises de 50+ salariés, il peut utiliser les outils numériques internes selon les modalités fixées par accord.</div>
       <span class="sbadge both">Tous seuils</span></div></div>
-    <div class="scard"><div class="si">📞</div><div><div class="st2">Comment saisir le CSE ?</div><div class="sd">Contacte directement un élu (liste affichée dans l'entreprise). En l'absence de CSE dans une entreprise de 11+ salariés, l'inspection du travail peut intervenir.</div><span class="sbadge both">Tous seuils</span></div></div>
+    <div class="scard"><div class="si">🛡️</div><div><div class="st2">Élus = salariés protégés</div><div class="sd">Tout élu (titulaire ou suppléant) et tout candidat est un <b>salarié protégé</b> : son licenciement nécessite l'autorisation préalable de l'inspection du travail. La protection dure le temps du mandat et 6 mois après (12 mois pour un candidat non élu, sous conditions). Un licenciement sans autorisation est nul.</div><span class="sbadge both">Tous seuils</span></div></div>
+    <div class="scard"><div class="si">🚫</div><div><div class="st2">Référent harcèlement sexuel</div><div class="sd">Tout CSE, dès 11 salariés, désigne parmi ses membres un <b>référent en matière de lutte contre le harcèlement sexuel et les agissements sexistes</b> (<span data-art="L2314-1"></span>). Dans les entreprises de 250+ salariés, l'employeur désigne en plus son propre référent.</div><span class="sbadge both">Tous seuils</span></div></div>
+    <div class="scard"><div class="si">🎓</div><div><div class="st2">Formation des élus</div><div class="sd">Chaque élu a droit à une <b>formation santé-sécurité (SSCT) de 5 jours</b> au premier mandat (3 jours en cas de renouvellement), financée par l'employeur. Dans les entreprises de 50+ salariés, s'ajoute une <b>formation économique de 5 jours</b> (prise sur le budget de fonctionnement du CSE).</div><span class="sbadge both">Tous seuils</span></div></div>
+    <div class="scard"><div class="si">🚶</div><div><div class="st2">Liberté de déplacement</div><div class="sd">Pendant ses heures de délégation, l'élu circule librement dans et hors de l'entreprise pour exercer son mandat. Ces heures sont <b>présumées utilisées conformément</b> au mandat et payées comme du temps de travail ; l'employeur ne peut les contester qu'après coup, devant le juge.</div><span class="sbadge both">Tous seuils</span></div></div>
   </div>
 
-  <div class="note">Outil indicatif, informatif et pédagogique. CSE créé par ordonnances 2017, généralisé 2020. Loi 24/10/2025 (mandats illimités). Ta convention collective et tes accords d'entreprise peuvent prévoir des droits supplémentaires. Ni avis juridique — consulter un représentant du personnel ou un un.e juriste RH font foi.
+  <div class="note">Outil indicatif, informatif et pédagogique. CSE créé par les ordonnances de 2017, généralisé en 2020. Mise à jour : loi du 24/10/2025 (mandats illimités). Ta convention collective et tes accords d'entreprise peuvent prévoir des droits plus favorables. Ceci n'est pas un avis juridique — en cas de doute, rapproche-toi d'un représentant du personnel ou d'un juriste RH.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">CSE & REPRÉSENTATION · LA TRIBUNE · V1.0<br>🏛️ INFORMATIF — NEUTRE — RÈGLES 2026</div>
 </div>
@@ -309,7 +323,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{effectif:''});
@@ -335,7 +349,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

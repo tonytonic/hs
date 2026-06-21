@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Fin de contrat — Nouveau départ</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,7 +21,7 @@
 :root{
   --dawn1:#fce4c4; --dawn2:#f7b58a; --dawn3:#e88a5a; --dawn4:#c96b8e; --dawn5:#7d6a9c;
   --road:#5a4a3f; --road-d:#3d322b;
-  --ink:#3a2e2a; --ink2:#6e5d56; --faded:#9a877f;
+  --ink:#3a2e2a; --ink2:#6e5d56; --faded:#72645e;
   --card:#fffaf3; --card-edge:#f0dcc4;
   --hill:#b88a6a; --hill2:#a06b8a;
   --gold:#d99a4e; --accent:#d96b4e;
@@ -28,7 +29,7 @@
   --good:#5a9e6f; --warn:#e0913f; --info:#6a7fa8;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Inter',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(180deg,#fce4c4 0%,#f7b58a 24%,#e88a5a 44%,#c96b8e 68%,#7d6a9c 100%);
@@ -188,6 +189,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -200,7 +203,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Nouveau départ</div>
     <div class="su">Fin de contrat · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+  <button class="hbtn" id="helpBtn" title="Aide" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -229,7 +232,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="wemoji">🌅</span>
       <h2>Un mot d'honnêteté</h2>
       <p>Ce sont les <span class="accent">minimums légaux</span> du Code du travail. Ta convention collective peut prévoir bien plus.</p>
-      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni constat. Le calcul suppose un licenciement hors faute grave/lourde et au moins 8 mois d'ancienneté pour l'indemnité. Des situations particulières (CDD, faute, inaptitude, barèmes conventionnels) ne sont pas couvertes. Seul ton solde de tout compte fait foi.</div>
+      <div class="legal">Outil indicatif et pédagogique (à jour juin 2026), ni avis juridique ni constat. Le calcul suppose un licenciement hors faute grave/lourde et au moins 8 mois d'ancienneté pour l'indemnité. Des situations particulières (CDD, faute, inaptitude, barèmes conventionnels) ne sont pas couvertes. Seul ton solde de tout compte fait foi.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -241,7 +244,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Comprendre l'estimation</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🛤️</div><div class="tx"><b>Choisis ton cas</b>Licenciement, rupture conventionnelle ou démission : les droits diffèrent.</div></div>
     <div class="feat"><div class="ic">💶</div><div class="tx"><b>Salaire de référence</b>Le plus avantageux entre la moyenne de tes 12 derniers mois et le 1/3 de tes 3 derniers mois (primes incluses au prorata).</div></div>
@@ -255,12 +258,12 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- SALARY HELPER -->
 <div class="ov" id="salHelp">
   <div class="box"><div class="hd"><div class="t">Salaire de référence</div><div class="s">On prend le plus avantageux</div>
-    <button class="x" data-close="salHelp">✕</button></div>
+    <button class="x" data-close="salHelp" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="field"><label>Moyenne de tes 12 derniers mois (brut)</label>
-      <div class="inline"><input class="ip" id="sh12" type="number" inputmode="decimal" placeholder="ex. 2400"><span class="unit">€ / mois</span></div></div>
+      <div class="inline"><input class="ip" id="sh12" type="number" inputmode="decimal" placeholder="ex. 2400" aria-label="Moyenne de tes 12 derniers mois (brut)"><span class="unit">€ / mois</span></div></div>
     <div class="field"><label>Total de tes 3 derniers mois (brut, primes incluses)</label>
-      <div class="inline"><input class="ip" id="sh3" type="number" inputmode="decimal" placeholder="ex. 7500"><span class="unit">€</span></div>
+      <div class="inline"><input class="ip" id="sh3" type="number" inputmode="decimal" placeholder="ex. 7500" aria-label="Total de tes 3 derniers mois (brut, primes incluses)"><span class="unit">€</span></div>
       <div class="hint">On en prendra le tiers. Inclus les primes/13e mois au prorata.</div></div>
     <button class="btn btn-sun" id="shApply" style="margin-top:4px;">Utiliser le plus avantageux</button>
     <div class="hint" id="shResult" style="text-align:center;margin-top:10px;"></div>
@@ -286,16 +289,16 @@ body.pageBlancheGuard>*{display:block!important;}
   <div class="panel">
     <div class="panel-t">💼 Ta situation</div>
     <div class="field"><label>Salaire de référence (brut mensuel)</label>
-      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2400"><span class="unit">€</span></div>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 2400" aria-label="Salaire de référence (brut mensuel)"><span class="unit">€</span></div>
       <button class="helpbtn" id="openSalHelp">Je ne sais pas le calculer →</button></div>
     <div class="field"><label>Ancienneté dans l'entreprise</label>
       <div class="two">
-        <div class="inline"><input class="ip" id="fYears" type="number" inputmode="numeric" value="0" min="0"><span class="unit">ans</span></div>
-        <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="11"><span class="unit">mois</span></div>
+        <div class="inline"><input class="ip" id="fYears" type="number" inputmode="numeric" value="0" min="0" aria-label="Ancienneté dans l'entreprise"><span class="unit">ans</span></div>
+        <div class="inline"><input class="ip" id="fMonths" type="number" inputmode="numeric" value="0" min="0" max="11" aria-label="Ancienneté dans l'entreprise"><span class="unit">mois</span></div>
       </div>
       <div class="hint">Comptée jusqu'à la fin du préavis.</div></div>
     <div class="field" id="cpField"><label>Congés payés acquis non pris (facultatif)</label>
-      <div class="inline"><input class="ip" id="fCP" type="number" inputmode="decimal" value="0" min="0"><span class="unit">jours ouvrés</span></div>
+      <div class="inline"><input class="ip" id="fCP" type="number" inputmode="decimal" value="0" min="0" aria-label="Congés payés acquis non pris (facultatif)"><span class="unit">jours ouvrés</span></div>
       <div class="hint">Ils sont payés quel que soit le motif de départ.</div></div>
   </div>
 
@@ -416,7 +419,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   function $(s,r){ return (r||document).querySelector(s); }
@@ -577,7 +580,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>
