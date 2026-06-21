@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Forfait Mobilités Durables</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,7 +22,7 @@
   --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#081410 0%,#0e1e12 50%,#081208 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -48,7 +49,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid var(--card-edge);border-radius:10px;
-  padding:12px;color:#fff;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  padding:12px;color:#fff;font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235aba6a' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -143,6 +144,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -153,15 +155,15 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="wiz-step on" data-s="0">
       <span class="wiz-emoji">🚲</span>
       <div class="wiz-h">Forfait Mobilités</div>
-      <div class="wiz-p">L'employeur peut financer les déplacements domicile-travail durables jusqu'à 700 €/an (800 € en cumul avec les transports en commun (LF 2026)).</div>
+      <div class="wiz-p">L'employeur peut financer les déplacements domicile-travail durables jusqu'à 600 €/an (900 € en cumul avec les transports en commun).</div>
       <div class="wiz-p" style="font-size:12px;opacity:.6;">Vélo · Covoiturage · Exo.</div>
     </div>
     <div class="wiz-step" data-s="1">
       <div class="wiz-feat"><div class="wi">🚲</div><div class="wt"><b>Qui est concerné ?</b>Tous les salariés utilisant un vélo, trottinette, covoiturage ou transports partagés.</div></div>
     </div>
     <div class="wiz-step" data-s="2">
-      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Montant & cumul</b>Jusqu'à 700 €/an exonérés (800 € en cumul avec la prise en charge des transports en commun (LF 2026)).</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Montant & cumul</b>Jusqu'à 600 €/an exonérés (900 € en cumul avec la prise en charge des transports en commun).</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -175,7 +177,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Forfait Mobilités</div><div class="su">Vélo · Covoiturage · Exonération · V1.0</div></div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -184,7 +186,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">🚲 Ta situation</div>
     <div class="field">
       <label>Mode de transport utilisé</label>
-      <select class="ip" id="fMode">
+      <select class="ip" id="fMode" aria-label="Mode de transport utilisé">
         <option value="velo">Vélo personnel (ou électrique)</option>
         <option value="trottinette">Trottinette personnelle</option>
         <option value="covoiturage">Covoiturage (passager ou conducteur)</option>
@@ -194,7 +196,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="field">
       <label>Jours de trajet domicile-travail par an</label>
       <div class="inline">
-        <input class="ip" id="fJours" type="number" min="1" max="230" step="1" placeholder="200">
+        <input class="ip" id="fJours" type="number" min="1" max="230" step="1" placeholder="200" aria-label="Jours de trajet domicile-travail par an">
         <span class="unit">jours/an</span>
       </div>
       <div class="hint">Environ 200 jours pour un temps plein (hors congés, fériés, RTT).</div>
@@ -202,7 +204,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="field">
       <label>Montant versé par l'entreprise (si connu)</label>
       <div class="inline">
-        <input class="ip" id="fVerse" type="number" min="0" step="1" placeholder="0">
+        <input class="ip" id="fVerse" type="number" min="0" step="1" placeholder="0" aria-label="Montant versé par l'entreprise (si connu)">
         <span class="unit">€/an</span>
       </div>
       <div class="hint">Laisse vide si l'entreprise ne verse rien encore.</div>
@@ -231,18 +233,18 @@ body.pageBlancheGuard>*{display:block!important;}
 
   <div style="font-weight:800;font-size:13px;color:var(--acc-l);margin-bottom:10px;">📊 Plafonds 2026 par mode</div>
   <div class="modes">
-    <div class="mode"><div><div class="mn">🚲 Vélo / Trottinette</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">700 €/an</div></div>
-    <div class="mode"><div><div class="mn">🚗 Covoiturage</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">700 €/an</div></div>
-    <div class="mode"><div><div class="mn">🔀 Cumul FMD + transports</div><div class="msub">FMD + abonnement transport public</div></div><div class="mp">800 €/an (LF 2026)</div></div>
+    <div class="mode"><div><div class="mn">🚲 Vélo / Trottinette</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">600 €/an</div></div>
+    <div class="mode"><div><div class="mn">🚗 Covoiturage</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">600 €/an</div></div>
+    <div class="mode"><div><div class="mn">🔀 Cumul FMD + transports</div><div class="msub">FMD + abonnement transport public</div></div><div class="mp">900 €/an</div></div>
   </div>
 
   <div style="font-weight:800;font-size:13px;color:var(--acc-l);margin-bottom:10px;">⚖️ Règles essentielles</div>
   <div class="rule"><div class="ri">📋</div><div><div class="rt">Facultatif pour l'entreprise</div><div class="rd">Le Forfait Mobilités Durables est une faculté, pas une obligation légale. L'entreprise peut décider de le mettre en place ou non. Certaines conventions le rendent obligatoire.</div></div></div>
   <div class="rule"><div class="ri">🧾</div><div><div class="rt">Justificatifs requis</div><div class="rd">Le salarié doit attester sur l'honneur de l'utilisation du mode de transport éligible. L'entreprise peut demander des justificatifs (attestation de covoiturage, facture vélo...).</div></div></div>
-  <div class="rule"><div class="ri">🔀</div><div><div class="rt">Cumul possible avec les transports en commun</div><div class="rd">Le FMD est cumulable avec le remboursement obligatoire de 50 % de l'abonnement de transport en commun. En cas de cumul, le plafond global d'exonération est porté à 800 €/an.</div></div></div>
+  <div class="rule"><div class="ri">🔀</div><div><div class="rt">Cumul possible avec les transports en commun</div><div class="rd">Le FMD est cumulable avec le remboursement obligatoire de 50 % de l'abonnement de transport en commun. En cas de cumul, le plafond global d'exonération est porté à 900 €/an.</div></div></div>
   <div class="rule"><div class="ri">🚌</div><div><div class="rt">Modes éligibles</div><div class="rd">Vélo (avec ou sans assistance), trottinette, covoiturage, engins de déplacement personnel motorisés, transports en commun sans abonnement, autopartage à faibles émissions.</div></div></div>
 
-  <div class="note"><span data-art="L3261-3-1"></span> — Décret n°2020-541 · Plafonds 2026 : 700 € (FMD seul) · 800 € (cumul transports en commun) — LF 2026 art. 68, BOFiP 07/04/2026.<br>🚲 Tout reste sur ton appareil.
+  <div class="note"><span data-art="L3261-3-1"></span> — Décret n°2020-541 · Plafonds 2026 : 600 € (FMD seul) · 900 € (cumul transports en commun) · à jour juin 2026. Montants indicatifs.<br>🚲 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Outil indicatif & pédagogique · Consulte ton accord d'entreprise ou de branche</div>
 </div>
@@ -313,7 +315,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{mode:'velo',jours:200,verse:''});
@@ -364,7 +366,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

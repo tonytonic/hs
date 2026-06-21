@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Mise à Pied — Conservatoire & Disciplinaire</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,7 +24,7 @@
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#160e04 0%,#221408 50%,#120c04 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -159,6 +160,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -177,7 +179,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>Disciplinaire</b>Sanction définitive limitée dans le temps. Salaire non versé pendant la période. Inscrite au dossier.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -192,7 +194,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Mise à Pied</div>
     <div class="su">Conservatoire · Disciplinaire · V1.0</div></div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 <div class="wrap">
 
@@ -311,7 +313,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div></div>
   </div>
 
-  <div class="note"><span data-art="L1332-1"></span> à <span data-art="L1332-4"></span> CT · <span data-txt="disclaimer"></span>.<br>
+  <div class="note"><span data-artn="L1332-1"></span> à <span data-artn="L1332-4"></span> CT · à jour <b>juin 2026</b> · <span data-txt="disclaimer"></span>.<br>
     🔄 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Code du travail français · Outil pédagogique · ni avis juridique</div>
@@ -356,7 +358,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -407,7 +409,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Lexique Bulletin — Le Déchiffreur</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,7 +21,7 @@
 :root{
   --parch:#faf6ee; --parch2:#f0e8d8; --parch3:#e4d8c0;
   --leather:#5a3e1e; --leather-l:#7a5530; --leather-ll:#a07848;
-  --ink-d:#1a1208; --ink:#2a1e0e; --ink2:#4a3820; --faded:#8a7860;
+  --ink-d:#1a1208; --ink:#2a1e0e; --ink2:#4a3820; --faded:#7b6b55;
   --gold:#c8a030; --gold-l:#e0bc50; --gold-d:#8a6e18;
   --lamp:#f8d060; --lamp-glow:rgba(248,208,96,0.15);
   --card:#fffdf8; --card-edge:#d8cdb8;
@@ -32,7 +33,7 @@
   --line:rgba(42,30,14,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -81,7 +82,7 @@ header .hbtn{background:var(--leather);color:var(--parch);border:none;border-rad
 .search-wrap{position:relative;margin-bottom:14px;}
 .search-wrap .si{position:absolute;left:13px;top:50%;transform:translateY(-50%);font-size:16px;}
 .search-ip{width:100%;background:var(--card);border:2px solid var(--card-edge);border-radius:12px;
-  padding:12px 12px 12px 40px;color:var(--ink);font-size:15px;font-family:'Lato',sans-serif;font-weight:600;}
+  padding:12px 12px 12px 40px;color:var(--ink);font-size:16px;font-family:'Lato',sans-serif;font-weight:600;}
 .search-ip:focus{outline:none;border-color:var(--leather);background:#fff;}
 
 /* category tabs */
@@ -214,6 +215,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -226,7 +229,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Le Déchiffreur</div>
     <div class="su">Lexique bulletin de paie · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -261,7 +264,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Lire son bulletin</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">👆</div><div class="tx"><b>Taper sur une ligne</b>Ouvre l'explication détaillée juste en dessous. Retapper pour fermer.</div></div>
     <div class="feat"><div class="ic">🔎</div><div class="tx"><b>Rechercher</b>Tape un mot pour filtrer les lignes : "CSG", "retraite", "net"…</div></div>
@@ -282,7 +285,7 @@ body.pageBlancheGuard>*{display:block!important;}
 
   <div class="search-wrap">
     <span class="si">🔍</span>
-    <input class="search-ip" id="searchIp" type="text" placeholder="Rechercher une ligne… ex. CSG, retraite, net">
+    <input class="search-ip" id="searchIp" type="text" placeholder="Rechercher une ligne… ex. CSG, retraite, net" aria-label="Rechercher une ligne… ex. CSG, retraite, net">
   </div>
 
   <div class="cattabs" id="catTabs">
@@ -548,7 +551,8 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    localStorage.removeItem('LBP_WELCOMED');
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -574,7 +578,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

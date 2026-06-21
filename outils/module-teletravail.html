@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Télétravail — Règles & Indemnités</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,7 +24,7 @@
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5ab0e0;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#080e1a 0%,#0e1828 50%,#081220 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -53,7 +54,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%234a8aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -153,6 +154,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -170,8 +172,8 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="wiz-feat"><div class="wi">🏠</div><div class="wt"><b>Accord ou charte</b>L'employeur doit formaliser le télétravail. En cas de refus, il doit motiver sa décision.</div></div>
     </div>
     <div class="wiz-step" data-s="2">
-      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Indemnités</b>Frais professionnels déductibles ou indemnité forfaitaire (URSSAF : jusqu'à 10 €/jour).</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Indemnités</b>Frais professionnels au réel, ou allocation forfaitaire exonérée (URSSAF 2026 : 2,70 €/jour sans accord, 3,30 €/jour avec accord).</div></div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -189,7 +191,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Télétravail</div>
     <div class="su">Règles · Indemnités · Droits · V1.0</div>
   </div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -200,21 +202,21 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="field">
       <label>Jours de télétravail par mois</label>
       <div class="inline">
-        <input class="ip" id="fJours" type="number" min="1" max="23" step="1" placeholder="0">
+        <input class="ip" id="fJours" type="number" min="1" max="23" step="1" placeholder="0" aria-label="Jours de télétravail par mois">
         <span class="unit">jours/mois</span>
       </div>
     </div>
     <div class="field">
       <label>Accord collectif sur le télétravail ?</label>
-      <select class="ip" id="fAccord">
+      <select class="ip" id="fAccord" aria-label="Accord collectif sur le télétravail ?">
         <option value="non">Non — barème de base (2,70 €/jour)</option>
-        <option value="oui">Oui — Accord collectif (3,30 €/j)30 €/jour)</option>
+        <option value="oui">Oui — Accord collectif (3,30 €/jour)</option>
       </select>
     </div>
     <div class="field">
       <label>Indemnité versée par l'entreprise</label>
       <div class="inline">
-        <input class="ip" id="fVerse" type="number" min="0" step="0.01" placeholder="0">
+        <input class="ip" id="fVerse" type="number" min="0" step="0.01" placeholder="0" aria-label="Indemnité versée par l'entreprise">
         <span class="unit">€/jour</span>
       </div>
       <div class="hint">Laisse vide si aucune indemnité n'est versée.</div>
@@ -292,7 +294,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <span class="ctag warn">Vérifier ton accord</span>
   </div></div>
 
-  <div class="note"><span data-art="L1222-9"></span> à <span data-art="L1222-11"></span> CT · ANI Télétravail du 26 nov. 2020 · URSSAF 2026.<br>
+  <div class="note"><span data-artn="L1222-9"></span> à <span data-artn="L1222-11"></span> CT · à jour juin 2026 · ANI Télétravail du 26 nov. 2020 · URSSAF 2026.<br>
     Plafond exonération : 2,70 €/jour (59,40 €/mois) sans accord · 3,30 €/jour (72,60 €/mois) avec accord.<br>
     🏠 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
@@ -383,7 +385,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{jours:'',accord:'non',verse:''});
@@ -434,7 +436,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>
