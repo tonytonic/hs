@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Ancienneté — L'Arbre</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -24,14 +25,14 @@
   --soil:#3a2a1a; --soil-l:#5a4a3a;
   --sun:#f0c040; --sun-l:#f8dc78;
   --cream:#f8f4ec; --cream2:#f0e8dc; --cream3:#e4d8c8;
-  --ink:#2a1e14; --ink2:#5a4a3a; --faded:#9a8a7a;
+  --ink:#2a1e14; --ink2:#5a4a3a; --faded:#786c5f;
   --ring1:#c8783a; --ring2:#a05a28; --ring3:#784020;
   --done:#3a7a3a; --next:#c87820; --future:#9a8a7a;
   --card:#fffdf8; --card-edge:#e0d0b8;
   --line:rgba(42,30,20,0.12);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -213,6 +214,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -225,7 +228,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">L'Arbre</div>
     <div class="su">Ancienneté & jalons · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -260,7 +263,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Lire ton arbre</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">📅</div><div class="tx"><b>Date d'embauche</b>Le premier jour de ton contrat de travail actuel.</div></div>
     <div class="feat"><div class="ic">🟢</div><div class="tx"><b>Jalons verts</b>Déjà atteints — ces droits sont acquis.</div></div>
@@ -292,12 +295,12 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">🌱 Ta situation</div>
     <div class="field">
       <label>Date d'embauche (1er jour de contrat)</label>
-      <input class="ip" id="fDate" type="date">
+      <input class="ip" id="fDate" type="date" aria-label="Date d'embauche (1er jour de contrat)">
       <div class="hint">Le premier jour de ton contrat de travail actuel dans cette entreprise.</div>
     </div>
     <div class="field">
       <label>Type de contrat</label>
-      <select class="ip" id="fType">
+      <select class="ip" id="fType" aria-label="Type de contrat">
         <option value="ouvrier">Ouvrier / Employé (CDI)</option>
         <option value="technicien">Technicien / Agent de maîtrise (CDI)</option>
         <option value="cadre">Cadre (CDI)</option>
@@ -358,7 +361,7 @@ body.pageBlancheGuard>*{display:block!important;}
       </table>
     </div>
   </div>
-  <div class="note">Jalons du Code du travail commun. Ta convention collective peut prévoir d'autres droits.
+  <div class="note">Jalons du Code du travail commun · à jour juin 2026. La prime d'ancienneté n'est pas légale : elle dépend de ta convention collective (taux indicatifs).
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot"><span data-txt="disclaimer"></span>.<br>🌳 Tout reste sur ton appareil.</div>
 </div>
@@ -388,7 +391,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   function $(s,r){ return (r||document).querySelector(s); }
@@ -588,7 +591,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

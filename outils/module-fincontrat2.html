@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Solde de Tout Compte — La Checklist</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,12 +22,12 @@
   --green:#1a6b3a; --green-l:#2a9b55; --green-ll:#4ab870; --green-bg:#e8f5ee;
   --red:#b03030; --orange:#c87820;
   --paper:#f8faf8; --paper2:#edf5ef; --paper3:#dceee2;
-  --ink:#1a2e1a; --ink2:#3a5a3a; --faded:#7a9a7a;
+  --ink:#1a2e1a; --ink2:#3a5a3a; --faded:#5d755d;
   --card:#ffffff; --card-edge:#c8ddc8;
   --stamp:#1a6b3a;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'IBM Plex Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -165,6 +166,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -177,7 +180,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Solde de Tout Compte</div>
     <div class="su">LA CHECKLIST · V1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -211,7 +214,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Utiliser la checklist</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">✅</div><div class="tx"><b>Cocher les items</b>Tape sur chaque document pour le marquer comme reçu. La barre de progression se met à jour.</div></div>
     <div class="feat"><div class="ic">⚠️</div><div class="tx"><b>Ne signe pas sans avoir tout</b>Le reçu pour solde de tout compte a une valeur libératoire. Vérifie chaque ligne avant de signer.</div></div>
@@ -268,7 +271,7 @@ body.pageBlancheGuard>*{display:block!important;}
       {id:'preavis',t:'Indemnité compensatrice de préavis',d:'Si l\'employeur dispense le salarié d\'effectuer son préavis, la loi prévoit en principe le versement d\'une indemnité équivalente.',badge:'obl',bl:'Si applicable'},
   
     {id:'delais',t:'Délais légaux de remise',d:'Tous les documents doivent être remis le dernier jour de travail ou au plus tard avec le dernier bulletin de salaire. Pas de délai légal de grâce — la remise est immédiate à la rupture.',badge:'obl',bl:'Immédiat'},
-    {id:'contestation',t:'Contester le solde de tout compte',d:'Si tu signes : délai de 6 mois pour contester par LRAR. Si tu ne signes pas : le reçu n\'a aucun effet libératoire — tu as 3 ans pour réclamer des rappels de salaire, heures sup ou indemnités devant les Prud\'hommes. Signatureature pour dénoncer le solde par lettre recommandée avec accusé de réception. Après ce délai, le reçu est libératoire pour les sommes qui y figurent.',badge:'warn',bl:'⚠ 6 mois max'},
+      {id:'contestation',t:'Contester le solde de tout compte',d:'Si tu signes : délai de 6 mois pour contester par LRAR. Passé ce délai, le reçu devient libératoire pour les seules sommes qui y figurent. Si tu ne signes pas : le reçu n\'a aucun effet libératoire — tu as 3 ans pour réclamer des rappels de salaire, heures sup ou indemnités devant les Prud\'hommes.',badge:'warn',bl:'⚠ 6 mois max'},
     {id:'cpf',t:'Compte Personnel de Formation',d:'Le CPF n\'est pas lié au contrat de travail : les droits acquis restent disponibles à vie, quel que soit le motif de rupture. Consultables sur moncompteformation.gouv.fr.',badge:'opt',bl:'Droits conservés'},
     {id:'retraite',t:'Portabilité retraite complémentaire',d:'Les points de retraite complémentaire AGIRC-ARRCO acquis sont définitivement acquis. Ils sont reportés sur le compte individuel via la DSN. Aucune démarche à faire.',badge:'obl',bl:'Acquis définitivement'},
     {id:'frais',t:'Remboursement de frais en attente',d:'Notes de frais, frais kilométriques ou avances non encore remboursées.',badge:'opt',bl:'Si applicable'}
@@ -355,7 +358,7 @@ function shConfirm(msg, cb){
   window.resetState = function(){
     shConfirm('Tout remettre à zero ?', function(){
     try{ localStorage.removeItem('STC_DATA'); localStorage.removeItem('STC_WELCOMED'); }catch(e){}
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   };
 </script>
@@ -379,7 +382,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

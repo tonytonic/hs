@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Saisie sur Salaire — Le Coffre</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -22,12 +23,12 @@
   --chrome:#c8d4dc; --chrome-l:#e0eaf0; --chrome-d:#8a9aaa;
   --gold:#c8a84b; --gold-l:#e0c06a; --gold-d:#8a6e2a;
   --safe:#3a7a5a; --safe-l:#4a9a72; --danger:#c84a3a;
-  --ink:#f0f4f8; --ink2:#c0ccd8; --faded:#6a7a88;
+  --ink:#f0f4f8; --ink2:#c0ccd8; --faded:#677684;
   --panel:rgba(255,255,255,0.06); --panel2:rgba(255,255,255,0.10);
   --border:rgba(200,212,220,0.2); --border2:rgba(200,168,75,0.35);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Exo 2',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -225,6 +226,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -237,7 +240,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">SAISIE SALAIRE</div>
     <div class="su">LE COFFRE · V1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+  <button class="hbtn" id="helpBtn" title="Aide" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -276,7 +279,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">MODE D'EMPLOI</div><div class="s">Lire les resultats</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">💶</div><div class="tx"><b>SALAIRE NET</b>Ton salaire net mensuel apres impots (prelevement a la source deduit).</div></div>
     <div class="feat"><div class="ic">👨‍👩‍👧</div><div class="tx"><b>PERSONNES A CHARGE</b>Conjoint/partenaire (revenus &lt; RSA), enfants a charge, ascendants vivant avec toi (revenus &lt; RSA).</div></div>
@@ -307,10 +310,10 @@ body.pageBlancheGuard>*{display:block!important;}
   <div class="panel">
     <div class="panel-t">⚙️ PARAMETRES</div>
     <div class="field"><label>SALAIRE NET MENSUEL</label>
-      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 1800"><span class="unit">€/MOIS</span></div>
+      <div class="inline"><input class="ip" id="fSal" type="number" inputmode="decimal" placeholder="ex. 1800" aria-label="SALAIRE NET MENSUEL"><span class="unit">€/MOIS</span></div>
       <div class="hint">APRES PRELEVEMENT A LA SOURCE</div></div>
     <div class="field"><label>PERSONNES A CHARGE</label>
-      <select class="ip" id="fCharge">
+      <select class="ip" id="fCharge" aria-label="PERSONNES A CHARGE">
         <option value="0">0 — Aucune</option>
         <option value="1">1 personne a charge</option>
         <option value="2">2 personnes a charge</option>
@@ -356,7 +359,7 @@ body.pageBlancheGuard>*{display:block!important;}
       </div>
     </div>
   </div>
-  <div class="note">BAREME 2026 — DECRET N°2025-1299 DU 24/12/2025. Ta convention collective ou un accord d'entreprise peut modifier les modalités applicables. Outil indicatif — ni avis juridique. Seul le commissaire de justice fait foi.<br>ESTIMATION INDICATIVE. SEUL LE COMMISSAIRE DE JUSTICE FAIT FOI.<br>OUTIL PEDAGOGIQUE, NI AVIS JURIDIQUE.
+  <div class="note">BAREME 2026 — DECRET N°2025-1299 DU 24/12/2025. Ta convention collective ou un accord d'entreprise peut modifier les modalités applicables. Outil indicatif — ni avis juridique. Seul le commissaire de justice fait foi.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">OUTIL INDICATIF — NI AVIS JURIDIQUE.<br>LE COFFRE · SAISIE SUR SALAIRE · V1.0<br>🔒 TOUT RESTE SUR TON APPAREIL.</div>
 </div>
@@ -386,7 +389,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   function $(s,r){ return (r||document).querySelector(s); }
@@ -542,7 +545,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

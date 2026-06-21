@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Seuils d'effectif — Le Palier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,12 +22,12 @@
   --blue:#1a5276;--blue-l:#2471a3;--blue-ll:#3498db;
   --navy:#0d2b45;--sky:#d4e6f1;--sky2:#a9cce3;
   --cream:#f4f6f9;--cream2:#eaf0f7;--cream3:#d5e8f5;
-  --ink:#0d1b2a;--ink2:#2c3e50;--faded:#7f8c8d;
+  --ink:#0d1b2a;--ink2:#2c3e50;--faded:#677172;
   --ok:#1a7a4a;--warn:#c07820;--card:#fff;--card-edge:#cde;
   --line:rgba(13,27,42,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:radial-gradient(700px 300px at 50% -5%,rgba(26,82,118,0.15),transparent 55%),
   linear-gradient(180deg,#e8f0fb 0%,#d5e8f5 25%,#f4f6f9 65%,#edf2f7 100%);
@@ -173,6 +174,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 </head>
 <body>
@@ -184,7 +187,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Le Palier</div>
     <div class="su">Seuils d'effectif · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -218,7 +221,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- AIDE -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🔢</div><div class="tx"><b>Sélectionne un seuil</b>Tape sur un bouton pour voir toutes les obligations qui s'ouvrent à partir de cet effectif.</div></div>
     <div class="feat"><div class="ic">📋</div><div class="tx"><b>Cumul ascendant</b>Les obligations des seuils inférieurs restent applicables. À 50 sal., les obligations de 11 s'appliquent aussi.</div></div>
@@ -301,7 +304,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <div style="text-align:center;margin-top:4px;">
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
   </div>
-  <div class="foot"><span data-txt="disclaimer"></span>.<br>🏢 Tout reste sur ton appareil.</div>
+  <div class="foot"><span data-txt="disclaimer"></span>. <span style="opacity:.6">À jour juin 2026 · montants indicatifs.</span><br>🏢 Tout reste sur ton appareil.</div>
 </div>
 
 <div id="toast"></div>
@@ -327,7 +330,7 @@ function shConfirm(msg, cb){
   window._shCb=cb; document.body.appendChild(ov);
 }
 
-  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);}); }
 
 var DATA = {
   11: {
@@ -446,7 +449,7 @@ if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

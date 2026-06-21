@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1322">
+<title>Impôt sur le revenu · SimulHeures</title>
+<style>
+:root{
+  --accent:#e8a8ff; --accent2:#c87cf0;
+  --bg0:#0e1322; --card:rgba(255,255,255,0.06); --line:rgba(255,255,255,0.12);
+  --text:#f3f1f8; --faded:rgba(255,255,255,0.62);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{overflow-wrap:break-word;word-break:break-word;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:var(--text);
+  min-height:100vh;padding:0 16px calc(40px + env(safe-area-inset-bottom));line-height:1.5;}
+.back{color:var(--faded);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;}
+.hbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);
+  color:var(--text);font-size:15px;font-weight:700;cursor:pointer;}
+.field{margin-bottom:13px;}
+.field:last-child{margin-bottom:0;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--faded);margin-bottom:6px;}
+.ip{width:100%;background:rgba(255,255,255,0.07);border:1.5px solid var(--line);border-radius:11px;
+  padding:12px;font-size:16px;color:var(--text);color-scheme:dark;}
+.ip:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:transparent;}
+.row{display:flex;gap:10px;}.row>.field{flex:1;}
+.hint{max-width:520px;margin:0 auto 14px;text-align:center;color:var(--faded);font-size:13px;padding:14px;
+  border:1px dashed var(--line);border-radius:14px;}
+.reset{display:block;margin:6px auto 0;background:none;border:none;color:var(--faded);font-size:12px;
+  cursor:pointer;text-decoration:underline;}
+.sh-disclaimer{max-width:520px;margin:18px auto 0;padding:13px 15px;background:rgba(0,0,0,0.18);
+  border:1px solid var(--line);border-radius:11px;font-size:11px;line-height:1.6;color:var(--faded);text-align:center;}
+.sh-disclaimer strong{color:rgba(255,255,255,0.8);}
+.sh-disclaimer a{color:var(--faded);text-decoration:underline;}
+.ov{position:fixed;inset:0;background:rgba(8,6,16,0.82);backdrop-filter:blur(6px);z-index:50;
+  display:none;align-items:center;justify-content:center;padding:22px;}
+.ov.show{display:flex;}
+.wz{background:linear-gradient(165deg,#172138,#0e1322);border:1px solid var(--line);border-radius:20px;
+  max-width:380px;width:100%;padding:24px 22px 18px;position:relative;}
+.wz .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
+  background:transparent;color:var(--text);font-size:14px;cursor:pointer;}
+.wz .wico{font-size:38px;text-align:center;}
+.wz h2{font-size:17px;font-weight:800;text-align:center;margin:8px 0 4px;}
+.wz .step{font-size:13.5px;color:var(--faded);line-height:1.6;margin:10px 0;}
+.wz .step b{color:var(--text);}
+.wz .ok{width:100%;margin-top:14px;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0c0c18;
+  border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:800;cursor:pointer;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+
+body{background:
+    repeating-linear-gradient(180deg, transparent 0px, transparent 27px, rgba(255,255,255,0.035) 28px),
+    linear-gradient(168deg,#0e1322 0%,#172138 55%,#0e1322 100%);}
+header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 0 12px;position:sticky;top:0;
+  background:linear-gradient(180deg,#0e1322 70%,transparent);z-index:10;}
+.brand{flex:1;text-align:center;}
+.brand .ti{font-size:18px;font-weight:800;letter-spacing:-.3px;}
+.brand .su{font-size:11px;color:var(--faded);}
+.hero{text-align:center;margin:6px 0 18px;}
+.hero .badge{width:68px;height:68px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;
+  font-size:32px;background:var(--card);border:3px double var(--accent);box-shadow:0 4px 14px rgba(0,0,0,.25);}
+.hero h1{font-size:21px;font-weight:800;margin-top:10px;color:var(--text);}
+.hero p{font-size:13px;color:var(--faded);margin-top:5px;max-width:440px;margin-left:auto;margin-right:auto;}
+.card{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);border-radius:4px 4px 16px 16px;
+  padding:18px 16px;margin-bottom:14px;max-width:520px;margin-left:auto;margin-right:auto;}
+.res{max-width:520px;margin:0 auto 14px;border-radius:4px 4px 16px 16px;padding:18px;text-align:left;
+  background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);}
+.res .lbl{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;text-align:center;}
+.res .big{font-size:28px;font-weight:800;letter-spacing:-.4px;text-align:center;display:block;margin-top:2px;}
+.res .sub{font-size:12.5px;margin-top:8px;font-weight:600;opacity:.8;line-height:1.5;text-align:center;}
+.res .line{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;font-weight:600;
+  border-bottom:1px dashed var(--line);}
+.res .line:last-child{border-bottom:none;border-top:1.5px solid var(--accent);margin-top:4px;padding-top:10px;font-size:15px;}
+</style>
+</head>
+<body>
+<header>
+  <a href="../outils.html" class="back">← Trousse</a>
+  <div class="brand"><div class="ti">Impôt sur le revenu</div><div class="su">Estimation par tranches</div></div>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
+</header>
+<div class="hero">
+  <div class="badge" aria-hidden="true">🧮</div>
+  <h1>Impôt sur le revenu</h1>
+  <p>Comprends comment se calcule ton impôt à partir du barème par tranches.</p>
+</div>
+<div class="card">
+<div class="field"><label for="methode">Comment calculer le revenu imposable ?</label><select class="ip" id="methode" aria-label="Méthode"><option value="direct">J'ai déjà mon revenu net imposable</option><option value="brut">Calculer à partir de mon salaire brut</option></select></div>
+<div id="champDirect" class="field"><label for="revenu">Revenu net imposable annuel (€)</label><input class="ip" id="revenu" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="Revenu net imposable annuel (€)"></div>
+<div id="champBrut" style="display:none;">
+  <div class="field"><label for="brut">Salaire brut annuel (€)</label><input class="ip" id="brut" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="Salaire brut annuel"></div>
+  <div class="field"><label for="fraisReels">Frais professionnels réels annuels (€, optionnel)</label><input class="ip" id="fraisReels" type="number" inputmode="decimal" step="any" placeholder="0" aria-label="Frais réels"></div>
+</div>
+<div class="row"><div class="field"><label for="parts">Nombre de parts fiscales</label><input class="ip" id="parts" type="number" inputmode="decimal" step="any" placeholder="1" aria-label="Nombre de parts fiscales"></div></div>
+<div class="field"><label for="situation">Situation</label><select class="ip" id="situation" aria-label="Situation"><option value="seul">Célibataire / seul</option><option value="couple">Couple (imposition commune)</option></select></div>
+</div>
+<div id="result"></div>
+<button class="reset" onclick="resetState()">🔄 Réinitialiser</button>
+<div class="sh-disclaimer">
+  <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
+  SimulHeures est un outil d'information et d'aide à la compréhension du droit du travail et de la vie quotidienne. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de décision importante, consultez un professionnel ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>).<br>
+  Estimation simplifiée (barème 2026 sur revenus 2025 + décote). Abattement 10% plafonné à 14 171 € / plancher 495 € — les sources divergent légèrement sur ce plafond (14 171 à 14 555 € selon les sites), vérifie sur impots.gouv.fr si tu es proche de ce seuil. N'inclut pas le plafonnement du quotient familial, les crédits/réductions d'impôt ni les revenus annexes. Utilise le simulateur officiel impots.gouv.fr pour un calcul exact.<br>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+</div>
+<div class="ov" id="help" role="dialog" aria-modal="true" aria-label="Aide">
+  <div class="wz">
+    <button class="x" data-close="help" aria-label="Fermer">✕</button>
+    <div class="wico" aria-hidden="true">🧮</div>
+    <h2>Impôt sur le revenu</h2>
+    <div class="step">L'impôt est calculé par tranches : seule la part dans chaque tranche est taxée à son taux.</div>
+    <div class="step">Saisis directement ton <b>revenu net imposable</b>, ou calcule-le à partir de ton <b>salaire brut</b> (frais réels vs abattement 10% automatique).</div>
+    <div class="step">Le détail par tranche s'affiche pour comprendre le calcul. Ne tient pas compte des crédits/réductions d'impôt ni du plafonnement du quotient familial.</div>
+    <button class="ok" data-close="help">Compris</button>
+  </div>
+</div>
+
+<script>
+var LS={STATE:'IMPOT_REVENU_STATE',WELCOME:'IMPOT_REVENU_WELCOMED'};
+function num(id){var e=document.getElementById(id);if(!e)return 0;return parseFloat(String(e.value).replace(/\s/g,'').replace(',','.'))||0;}
+function val(id){var e=document.getElementById(id);return e?e.value:'';}
+function fmt(n,d){d=(d==null?2:d);return (Math.round(n*Math.pow(10,d))/Math.pow(10,d)).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d});}
+function eur(n){return fmt(n,2)+' €';}
+function show(h){var r=document.getElementById('result');r.innerHTML=h;}
+function hint(t){show('<div class="hint">'+t+'</div>');}
+function box(h){show('<div class="res">'+h+'</div>');}
+
+var ABATTEMENT_MIN = 495, ABATTEMENT_MAX = 14171; // 2026 (revenus 2025) — à vérifier sur impots.gouv.fr, sources divergentes 14171-14555€
+
+function saveState(){
+  try{var o={};o['methode']=val('methode');o['revenu']=val('revenu');o['brut']=val('brut');o['fraisReels']=val('fraisReels');o['parts']=val('parts');o['situation']=val('situation');localStorage.setItem(LS.STATE,JSON.stringify(o));}catch(e){}
+}
+function restoreState(){
+  try{var o=JSON.parse(localStorage.getItem(LS.STATE)||'{}');
+    if(o['methode']!=null)document.getElementById('methode').value=o['methode'];
+    if(o['revenu']!=null)document.getElementById('revenu').value=o['revenu'];
+    if(o['brut']!=null)document.getElementById('brut').value=o['brut'];
+    if(o['fraisReels']!=null)document.getElementById('fraisReels').value=o['fraisReels'];
+    if(o['parts']!=null)document.getElementById('parts').value=o['parts'];
+    if(o['situation']!=null)document.getElementById('situation').value=o['situation'];
+  }catch(e){}
+}
+function updateMethode(){
+  var m = val('methode');
+  document.getElementById('champDirect').style.display = m==='direct' ? 'block' : 'none';
+  document.getElementById('champBrut').style.display = m==='brut' ? 'block' : 'none';
+}
+function getRevenuImposable(){
+  var m = val('methode');
+  if(m==='brut'){
+    var brut = num('brut'), fr = num('fraisReels');
+    var abattement10 = Math.min(ABATTEMENT_MAX, Math.max(ABATTEMENT_MIN, brut*0.10));
+    var deduction = Math.max(abattement10, fr);
+    return { revenu: Math.max(0, brut-deduction), detail: { brut:brut, abattement10:abattement10, fraisReels:fr, deduction:deduction, optionReel: fr>abattement10 } };
+  }
+  return { revenu: num('revenu'), detail: null };
+}
+var TRANCHES = [[11600,0],[29580,0.11],[84580,0.30],[181920,0.41],[Infinity,0.45]];
+function calc(){
+  saveState();
+
+  var ri = getRevenuImposable();
+  var r = ri.revenu, p=num('parts')||1, sit=val('situation');
+  if(!r){hint('Saisis ton revenu (ou ton salaire brut).');return;}
+  var qf=r/p;
+  function bareme(q){
+    var imp=0, prev=0, parTranche=[];
+    for(var i=0;i<TRANCHES.length;i++){
+      var seuil=TRANCHES[i][0], taux=TRANCHES[i][1];
+      var part=0;
+      if(q>prev){ part=(Math.min(q,seuil)-prev)*taux; imp+=part; prev=seuil; }
+      parTranche.push(part);
+      if(q<=seuil) break;
+    }
+    return {imp:imp, parTranche:parTranche};
+  }
+  var b = bareme(qf), impPart=b.imp, impBrut=impPart*p;
+  var decoteBase = sit==='couple' ? 1483 : 897;
+  var decote=Math.max(0, decoteBase-0.4525*impBrut);
+  var impNet=Math.max(0, impBrut-decote);
+  var tmi=qf<=11600?0:qf<=29580?11:qf<=84580?30:qf<=181920?41:45;
+
+  var detailHtml = '';
+  if(ri.detail){
+    detailHtml += '<div class="line"><span>Salaire brut</span><b>'+eur(ri.detail.brut)+'</b></div>'
+     + '<div class="line"><span>Déduction appliquée</span><b>-'+eur(ri.detail.deduction)+(ri.detail.optionReel?' (frais réels)':' (abattement 10%)')+'</b></div>'
+     + (ri.detail.fraisReels>0 ? '<div class="sub" style="margin-top:4px;">Frais réels '+eur(ri.detail.fraisReels)+' vs abattement 10% '+eur(ri.detail.abattement10)+' → '+(ri.detail.optionReel?'frais réels plus avantageux':'abattement 10% plus avantageux')+'</div>' : '');
+  }
+
+  var labelsT = ['0 %','11 %','30 %','41 %','45 %'];
+  var tranchesHtml = '<div class="sub" style="margin-top:10px;font-weight:700;">Détail par tranche (par part) :</div>';
+  for(var i=0;i<b.parTranche.length;i++){
+    if(b.parTranche[i]>0 || i===0){
+      tranchesHtml += '<div class="line"><span>Tranche à '+labelsT[i]+'</span><b>'+eur(b.parTranche[i])+'</b></div>';
+    }
+  }
+
+  box('<div class="lbl">Impôt net estimé</div><div class="big">'+eur(impNet)+'</div>'
+   + detailHtml
+   +'<div class="line" style="margin-top:8px;"><span>Impôt brut (avant décote)</span><b>'+eur(impBrut)+'</b></div>'
+   +(decote>0?('<div class="line"><span>Décote</span><b>-'+eur(decote)+'</b></div>'):'')
+   +'<div class="line"><span>Taux marginal (TMI)</span><b>'+tmi+' %</b></div>'
+   +'<div class="line"><span>Taux moyen</span><b>'+(r?fmt(impNet/r*100,1):'0')+' %</b></div>'
+   + tranchesHtml
+   +'<div class="sub" style="margin-top:8px;">Soit environ '+eur(impNet/12)+'/mois en prélèvement à la source</div>');
+
+}
+function resetState(){
+  try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}
+  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
+}
+function openHelp(){document.getElementById('help').classList.add('show');}
+function closeHelp(){document.getElementById('help').classList.remove('show');try{localStorage.setItem(LS.WELCOME,'1');}catch(e){}}
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.getElementById('helpBtn').addEventListener('click',openHelp);
+  Array.prototype.forEach.call(document.querySelectorAll('[data-close="help"]'),function(b){b.addEventListener('click',closeHelp);});
+  Array.prototype.forEach.call(document.querySelectorAll('.ip'),function(el){
+    el.addEventListener('input',calc); el.addEventListener('change',calc);
+  });
+  document.getElementById('methode').addEventListener('change',function(){ updateMethode(); calc(); });
+  restoreState();
+  updateMethode();
+  calc();
+  try{if(!localStorage.getItem(LS.WELCOME))openHelp();}catch(e){openHelp();}
+});
+window.resetState=resetState;
+</script>
+</body>
+</html>

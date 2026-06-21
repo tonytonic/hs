@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>C2P Pénibilité — Le Chantier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -31,7 +32,7 @@
   --stripe:repeating-linear-gradient(45deg,rgba(232,120,32,0.12) 0 6px,transparent 6px 12px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Barlow',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(180deg,#1a1e26 0%,#252c38 50%,#1e2530 100%);
@@ -207,6 +208,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -219,7 +222,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">C2P PÉNIBILITÉ</div>
     <div class="su">LE CHANTIER · V1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -253,7 +256,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">MODE D'EMPLOI</div><div class="s">Comprendre le C2P</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🎯</div><div class="tx"><b>QUI EST CONCERNÉ</b>Tout salarié en CDI ou CDD de plus d'un mois exposé à au moins un des 6 facteurs au-delà des seuils.</div></div>
     <div class="feat"><div class="ic">📊</div><div class="tx"><b>COMMENT VOIR SES POINTS</b>Sur compteprofessionnelprevention.fr rubrique C2P, ou en contactant la Carsat de ta région.</div></div>
@@ -390,7 +393,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <a class="link-btn" href="https://www.compteprofessionnelprevention.fr" target="_blank" rel="noopener">📋 Compte Professionnel de Prévention (officiel)</a>
   <a class="link-btn" href="https://www.inrs.fr/demarche/penibilite/ce-qu-il-faut-retenir.html" target="_blank" rel="noopener">🏥 INRS — Pénibilité au travail</a>
 
-  <div class="note">Outil indicatif, informatif et pédagogique. Aucun calcul officiel de points. Seuls l'employeur, la Carsat et la CPAM font foi. Ta convention collective peut prévoir des mesures de prévention supplémentaires. Ni avis médical, ni avis juridique — consulter le médecin du travail pour ta situation.ulte le médecin du travail pour ta situation personnelle.
+  <div class="note">Outil indicatif, informatif et pédagogique — à jour juin 2026 (réforme du 14 avril 2023 intégrée). Aucun calcul officiel de points. 1 point = 500 € (indicatif). Seuls l'employeur, la Carsat et la CPAM font foi. Ta convention collective peut prévoir des mesures de prévention supplémentaires. Ni avis médical, ni avis juridique — consulte le médecin du travail pour ta situation personnelle.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">C2P PÉNIBILITÉ · LE CHANTIER · V1.0<br>🦺 INFORMATIF — NI AVIS MÉDICAL NI JURIDIQUE</div>
 </div>
@@ -441,7 +444,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -467,7 +470,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

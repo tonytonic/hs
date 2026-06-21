@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Avantages en nature — La Cantine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,12 +22,12 @@
   --brown:#6d4c41;--brown-l:#8d6e63;--brown-ll:#a1887f;
   --warm:#3e2723;--amber:#f57f17;--amber-l:#ffb300;
   --cream:#fdf6ee;--cream2:#f5e8d8;--cream3:#ede0cc;
-  --ink:#2c1810;--ink2:#5d4037;--faded:#9e7b6a;
+  --ink:#2c1810;--ink2:#5d4037;--faded:#886a5b;
   --ok:#2e7d50;--warn:#c07820;--card:#fffdf9;--card-edge:#ddd0bb;
   --line:rgba(44,24,16,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:radial-gradient(700px 300px at 50% -5%,rgba(109,76,65,0.15),transparent 55%),
   linear-gradient(180deg,#f9ede0 0%,#f0dfc8 25%,#fdf6ee 65%,#f5eadb 100%);
@@ -161,6 +162,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 </head>
 <body>
@@ -172,7 +175,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">La Cantine</div>
     <div class="su">Avantages en nature · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -206,7 +209,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- AIDE -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">🗂️</div><div class="tx"><b>Sélectionne un avantage</b>Voiture, repas, logement, outils numériques — chaque onglet donne le barème 2026.</div></div>
     <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Simulateur</b>Saisis ta situation pour obtenir la valeur à intégrer dans la base de cotisation.</div></div>
@@ -255,7 +258,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <div style="text-align:center;margin-top:4px;">
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
   </div>
-  <div class="foot">Barème URSSAF 2026 — outil indicatif & pédagogique. Repas : 5,50 € (source : urssaf.fr/avantages-en-nature, mis à jour 2026). Voiture > 5 ans : taux 6 %. Logement : barème PMSS 2026. Ni avis fiscal ni juridique.<br>🎁 Tout reste sur ton appareil.</div>
+  <div class="foot">Barème URSSAF 2026 — outil indicatif & pédagogique. Repas : 5,50 € (source : urssaf.fr/avantages-en-nature, mis à jour 2026). Voiture : barème différent selon la date de mise à disposition (réforme du 1ᵉʳ février 2025). Logement : barème PMSS 2026. Ni avis fiscal ni juridique.<br>🎁 Tout reste sur ton appareil.</div>
 </div>
 <div id="toast"></div>
 
@@ -281,7 +284,7 @@ function shConfirm(msg, cb){
   window._shCb=cb; document.body.appendChild(ov);
 }
 
-  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);}); }
 
 // Barème URSSAF 2026
 // SMIC horaire brut (juin 2026) : 12,31 € → mensuel 35h = 1 867,02 €
@@ -296,24 +299,25 @@ window.setTab = function setTab(tab){
   $all('.an-tab').forEach(function(b){ b.classList.toggle('on', b.textContent.indexOf(tab)>=0 || b.getAttribute('onclick').indexOf(tab)>=0); });
   var html = '';
   if(tab==='voiture'){
-    html = '<div class="field"><label>Mode de mise à disposition</label><select class="ip" id="vMode" onchange="calcVoiture()"><option value="cump">Employeur paie carburant pro + perso</option><option value="cup">Employeur paie carburant perso seulement</option><option value="sans">Salarié paie son carburant</option></select></div>'+
-      '<div class="field"><label>Valeur d\'achat TTC du véhicule (€)</label><input class="ip" type="number" id="vPrix" placeholder="ex: 25000" oninput="calcVoiture()"><div class="hint">Prix catalogue TTC. Si véhicule > 5 ans : le taux forfaitaire passe à 6 % (au lieu de 9 % sans carburant, 12 % avec carburant).</div></div>'+
-      '<div class="field"><label>Âge du véhicule</label><select class="ip" id="vAge" onchange="calcVoiture()"><option value="neuf">Moins de 5 ans</option><option value="ancien">5 ans et plus (taux 6 %)</option></select></div>';
+    html = '<div class="field"><label>Date de mise à disposition</label><select class="ip" id="vDate" onchange="calcVoiture()" aria-label="Date de mise à disposition"><option value="nouveau">À partir du 1ᵉʳ février 2025</option><option value="ancien_regime">Avant le 1ᵉʳ février 2025</option></select></div>'+
+      '<div class="field"><label>Mode de mise à disposition</label><select class="ip" id="vMode" onchange="calcVoiture()" aria-label="Mode de mise à disposition"><option value="cump">Employeur paie carburant pro + perso</option><option value="cup">Employeur paie carburant perso seulement</option><option value="sans">Salarié paie son carburant</option></select></div>'+
+      '<div class="field"><label>Valeur d\'achat TTC du véhicule (€)</label><input class="ip" type="number" id="vPrix" placeholder="ex: 25000" oninput="calcVoiture()" aria-label="Valeur d\'achat TTC du véhicule (€)"><div class="hint">Prix catalogue TTC.</div></div>'+
+      '<div class="field"><label>Âge du véhicule</label><select class="ip" id="vAge" onchange="calcVoiture()" aria-label="Âge du véhicule"><option value="neuf">Moins de 5 ans</option><option value="ancien">5 ans et plus</option></select></div>';
     $('#tabContent').innerHTML = html;
     $('#hBig').textContent='🚗'; $('#hUnit').textContent='Voiture de fonction'; $('#hSub').textContent='Barème forfaitaire URSSAF 2026';
   } else if(tab==='repas'){
     html = '<div class="info-block info" style="margin-bottom:0;"><b>🍽️ Barème repas 2026</b>'+
       '<div class="result-row"><span class="rl">Repas pris à la cantine d\'entreprise</span><span class="rv">5,50 €</span></div>'+
       '<div class="result-row"><span class="rl">Repas fourni par l\'employeur (en nature)</span><span class="rv">5,50 €</span></div>'+
-      '<div class="result-row"><span class="rl">Panier-repas (travail continu ≥ 6h)</span><span class="rv">10,30 €</span></div>'+
-      '<div class="result-row"><span class="rl">Panier travail en équipe</span><span class="rv">10,30 €</span></div>'+
-      '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Valeurs exonérées de cotisations si l\'employeur ne fournit pas de cantine et verse une indemnité de repas dans ces limites. Au-delà : soumis à cotisations.</div></div>';
+      '<div class="result-row"><span class="rl">Restauration sur le lieu de travail (posté, continu, nuit)</span><span class="rv">7,50 €</span></div>'+
+      '<div class="result-row"><span class="rl">Repas hors locaux / sur chantier (sans restaurant)</span><span class="rv">10,40 €</span></div>'+
+      '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Les 2 premières lignes sont des <b>avantages en nature</b> (5,50 €/repas — barème URSSAF 2026). Les 2 suivantes sont des <b>frais professionnels</b> exonérés (limites URSSAF 2026 : 7,50 € sur le lieu de travail, 10,40 € hors locaux, 21,40 € au restaurant). Montants indicatifs ; au-delà : soumis à cotisations.</div></div>';
     $('#tabContent').innerHTML = html;
     $('#resultPanel').style.display='none';
     $('#hBig').textContent='🍽️'; $('#hUnit').textContent='Repas'; $('#hSub').textContent='Barème 2026 — exonération si dans les limites'; $('#hRow').style.display='none';
   } else if(tab==='logement'){
-    html = '<div class="field"><label>Rémunération mensuelle brute (€)</label><input class="ip" type="number" id="lSal" placeholder="ex: 2500" oninput="calcLogement()"><div class="hint">Le barème logement est progressif selon la rémunération (en % du SMIC mensuel).</div></div>'+
-      '<div class="field"><label>Nombre de pièces principales du logement</label><select class="ip" id="lPieces" onchange="calcLogement()"><option value="1">1 pièce</option><option value="2">2 pièces</option><option value="3">3 pièces</option><option value="4">4 pièces</option><option value="5">5 pièces et +</option></select></div>';
+    html = '<div class="field"><label>Rémunération mensuelle brute (€)</label><input class="ip" type="number" id="lSal" placeholder="ex: 2500" oninput="calcLogement()" aria-label="Rémunération mensuelle brute (€)"><div class="hint">Le barème logement est progressif selon la rémunération (8 tranches basées sur le plafond mensuel de la Sécurité sociale).</div></div>'+
+      '<div class="field"><label>Nombre de pièces principales du logement</label><select class="ip" id="lPieces" onchange="calcLogement()" aria-label="Nombre de pièces principales du logement"><option value="1">1 pièce</option><option value="2">2 pièces</option><option value="3">3 pièces</option><option value="4">4 pièces</option><option value="5">5 pièces et +</option></select></div>';
     $('#tabContent').innerHTML = html;
     $('#hBig').textContent='🏠'; $('#hUnit').textContent='Logement de fonction'; $('#hSub').textContent='Barème forfaitaire URSSAF 2026';
   } else if(tab==='numerique'){
@@ -333,17 +337,22 @@ window.calcVoiture = function(){
   var mode = $('#vMode') ? $('#vMode').value : 'sans';
   var prix = parseFloat($('#vPrix') ? $('#vPrix').value : 0) || 0;
   var ancien = $('#vAge') && $('#vAge').value === 'ancien';
+  var nouveauRegime = $('#vDate') ? $('#vDate').value === 'nouveau' : true;
   if(!prix){ $('#resultPanel').style.display='none'; return; }
-  // Barème URSSAF : 9% du prix TTC/an si employeur paye le carburant, 6% sinon
-  // Abattement 15% si > 5 ans
-  var pct = (mode==='cump') ? 0.12 : (mode==='cup') ? 0.09 : 0.09;
-  // Mode sans carburant perso : 9% ; avec carburant perso uniquement : +pct carburant
+  // avec carburant = employeur prend en charge le carburant de l'usage personnel (pro+perso OU perso seul) — l'usage perso payé par l'employeur déclenche le taux majoré dans les deux cas
+  var avecCarburant = (mode === 'cump' || mode === 'cup');
+  // Barème URSSAF véhicule acheté — taux % du prix d'achat TTC, par an
+  // Nouveau régime (véhicules mis à disposition à partir du 1er février 2025) :
+  var TAUX = nouveauRegime
+    ? { neuf: { sans: 0.15, avec: 0.20 }, ancien: { sans: 0.10, avec: 0.15 } }
+    : { neuf: { sans: 0.09, avec: 0.12 }, ancien: { sans: 0.06, avec: 0.09 } };
+  var tranche = ancien ? TAUX.ancien : TAUX.neuf;
+  var pct = avecCarburant ? tranche.avec : tranche.sans;
   var base = prix * pct;
-  if(ancien) base = base * 0.85;
   var html = '<div class="result-row"><span class="rl">Base annuelle de cotisation</span><span class="rv">'+fmt(base)+'</span></div>'+
     '<div class="result-row"><span class="rl">Base mensuelle de cotisation</span><span class="rv">'+fmt(base/12)+'</span></div>'+
-    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Méthode : '+pct*100+' % du prix TTC'+(ancien?' × 0,85 (véhicule ≥ 5 ans)':'')+'. Barème forfaitaire URSSAF 2026.</div>';
-  if(mode==='cup') html += '<div class="info-block warn" style="margin-top:10px;"><b>⚠️ Carburant usage perso</b>Le carburant perso payé par l\'employeur s\'ajoute à l\'évaluation forfaitaire.</div>';
+    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Méthode : '+(pct*100).toFixed(0)+' % du prix TTC ('+(nouveauRegime?'véhicules mis à disposition depuis le 1ᵉʳ février 2025':'véhicules mis à disposition avant le 1ᵉʳ février 2025, régime antérieur conservé')+', véhicule '+(ancien?'≥ 5 ans':'< 5 ans')+', '+(avecCarburant?'avec':'sans')+' carburant perso pris en charge). Barème URSSAF.</div>';
+  if(avecCarburant) html += '<div class="info-block warn" style="margin-top:10px;"><b>⚠️ Carburant usage perso</b>Dès que l\'employeur prend en charge le carburant de l\'usage personnel (même partiellement), le taux majoré « avec carburant » s\'applique.</div>';
   $('#resultContent').innerHTML = html;
   $('#resultPanel').style.display='block';
   $('#hBig').textContent=fmt(base/12); $('#hUnit').textContent='Base cotis./mois'; $('#hSub').textContent='Évaluation forfaitaire voiture';
@@ -354,23 +363,25 @@ window.calcLogement = function(){
   var sal = parseFloat($('#lSal') ? $('#lSal').value : 0) || 0;
   var pieces = parseInt($('#lPieces') ? $('#lPieces').value : 1) || 1;
   if(!sal){ $('#resultPanel').style.display='none'; return; }
-  // Barème URSSAF logement 2026 par tranche de rémunération (en SMIC)
-  // Valeurs par pièce selon tranche
+  // Barème URSSAF logement 2026 (8 tranches, en fonction du PMSS — arrêté du 25/02/2025, à jour janv. 2026)
+  // unePiece = valeur forfaitaire si le logement n'a qu'une seule pièce principale
+  // parPiece = valeur par pièce principale, à multiplier par le nombre de pièces si 2 ou +
   var tranches = [
-    {max:1*SMIC_M, vals:[77.6,41.4,54.8,68.5,82.3]},
-    {max:2*SMIC_M, vals:[90.3,48.3,64.4,80.5,96.6]},
-    {max:3*SMIC_M, vals:[103.1,55.2,73.5,92.0,110.3]},
-    {max:4*SMIC_M, vals:[128.8,69.0,92.0,115.0,138.0]},
-    {max:5*SMIC_M, vals:[154.5,82.8,110.4,138.0,165.6]},
-    {max:Infinity, vals:[180.2,96.6,128.8,161.0,193.2]},
+    {max:2002.50, unePiece:79.70,  parPiece:42.60},
+    {max:2402.99, unePiece:93.00,  parPiece:59.70},
+    {max:2803.49, unePiece:106.20, parPiece:79.70},
+    {max:3604.49, unePiece:119.40, parPiece:99.50},
+    {max:4405.49, unePiece:146.40, parPiece:126.10},
+    {max:5206.49, unePiece:172.60, parPiece:152.40},
+    {max:6007.49, unePiece:199.40, parPiece:185.70},
+    {max:Infinity, unePiece:225.60, parPiece:212.30},
   ];
-  var vpp = tranches[tranches.length-1].vals;
-  for(var t=0;t<tranches.length;t++){if(sal<=tranches[t].max){vpp=tranches[t].vals;break;}}
-  var pIdx = Math.min(pieces-1, 4);
-  var val = vpp[pIdx];
+  var tranche = tranches[tranches.length-1];
+  for(var t=0;t<tranches.length;t++){ if(sal < tranches[t].max){ tranche = tranches[t]; break; } }
+  var val = pieces <= 1 ? tranche.unePiece : tranche.parPiece * pieces;
   var html = '<div class="result-row"><span class="rl">Avantage mensuel à intégrer</span><span class="rv">'+fmt(val)+'</span></div>'+
     '<div class="result-row"><span class="rl">Avantage annuel</span><span class="rv">'+fmt(val*12)+'</span></div>'+
-    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Barème URSSAF 2026 — logement '+pieces+' pièce'+(pieces>1?'s':'')+', tranche de rémunération : '+sal.toLocaleString('fr-FR')+' €/mois.</div>';
+    '<div style="margin-top:8px;font-size:11px;color:var(--faded);">Barème URSSAF 2026 — logement '+pieces+' pièce'+(pieces>1?'s':'')+' ('+(pieces>1?fmt(tranche.parPiece)+'/pièce × '+pieces:'forfait 1 pièce')+'), tranche de rémunération : '+sal.toLocaleString('fr-FR')+' €/mois. Inclut eau, gaz, électricité, chauffage, garage.</div>';
   $('#resultContent').innerHTML = html;
   $('#resultPanel').style.display='block';
   $('#hBig').textContent=fmt(val); $('#hUnit').textContent='Avantage logement/mois'; $('#hSub').textContent='Barème forfaitaire 2026';
@@ -416,7 +427,7 @@ if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Activité Partielle — Le Filet Vert</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,12 +21,12 @@
 :root{
   --green:#1a6b4a;--green-l:#2a8a60;--green-ll:#3aaa78;
   --forest:#0d3d2a;--mint:#d4f0e4;--mint2:#b8e6d0;--mint3:#9adcba;
-  --ink:#0a2018;--ink2:#1e4a34;--faded:#6a8c7a;
+  --ink:#0a2018;--ink2:#1e4a34;--faded:#526c5e;
   --ok:#1a6b4a;--warn:#c07820;--danger:#a03030;
   --card:#f8fdf9;--card-edge:#b8d8c8;--line:rgba(10,32,24,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:radial-gradient(700px 300px at 50% -5%,rgba(26,107,74,0.15),transparent 55%),
   linear-gradient(180deg,#e4f5ec 0%,#d0eede 25%,#f4faf7 65%,#eaf5ef 100%);
@@ -164,6 +165,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 </head>
 <body>
@@ -175,7 +178,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Le Filet Vert</div>
     <div class="su">Activité partielle · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -197,7 +200,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="wemoji">📋</span>
       <h2>Neutre des deux côtés</h2>
       <p>L'outil calcule <span class="accent">l'indemnité due au salarié</span> et le <span class="accent">reste à charge pour l'employeur</span> après remboursement de l'État.</p>
-      <div class="legal">Outil indicatif. Taux 2026 hors crise. Allocation employeur : plancher 8,57 €/h (AP classique) et 9,52 €/h (APLD) — Décret n°2026-35 du 29/01/2026 (JO 30/01/2026), applicable aux heures chômées depuis le 1er janvier 2026. Indemnité salarié : 60 % brut min. Plancher salarié ≈ 9,52 €/h net. En cas de crise, des taux dérogatoires peuvent s'appliquer. <span data-art="L5122-1"></span>. Ni avis juridique.</div>
+      <div class="legal">Outil indicatif. Taux 2026 hors crise. Allocation employeur : plancher 8,57 €/h (AP classique) et 9,52 €/h (APLD) — Décret n°2026-35 du 29/01/2026 (JO 30/01/2026), fixé jusqu'au prochain décret. Indemnité salarié : 60 % brut min. Plancher salarié = SMIC net horaire, qui suit chaque revalorisation du SMIC sans décret séparé — soit 9,75 €/h depuis le 1ᵉʳ juin 2026 (à ne pas confondre avec le plancher employeur APLD de 9,52 €, qui ne bouge qu'avec un nouveau décret). En cas de crise, des taux dérogatoires peuvent s'appliquer. <span data-art="L5122-1"></span>. Ni avis juridique.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -209,7 +212,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- AIDE -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">💶</div><div class="tx"><b>Calcul salarié</b>Entre ton salaire brut et les heures non travaillées pour estimer ton indemnité.</div></div>
     <div class="feat"><div class="ic">🏢</div><div class="tx"><b>Calcul employeur</b>L'État rembourse une partie à l'employeur. Le reste à charge est affiché.</div></div>
@@ -236,7 +239,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">⚙️ Ma situation</div>
     <div class="field">
       <label>Type d'activité partielle</label>
-      <select class="ip" id="fType" onchange="recalc()">
+      <select class="ip" id="fType" onchange="recalc()" aria-label="Type d'activité partielle">
         <option value="ap">Activité partielle classique (AP) — 60 % du brut</option>
         <option value="apld">APLD — Activité Partielle Longue Durée — 70 % du brut</option>
       </select>
@@ -244,11 +247,11 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Salaire brut mensuel (€)</label>
-      <input class="ip" type="number" id="fSal" min="0" step="50" placeholder="ex: 2 400" oninput="recalc()">
+      <input class="ip" type="number" id="fSal" min="0" step="50" placeholder="ex: 2 400" oninput="recalc()" aria-label="Salaire brut mensuel (€)">
     </div>
     <div class="field">
       <label>Heures non travaillées ce mois (en AP)</label>
-      <input class="ip" type="number" id="fHeurs" min="0" max="220" step="1" placeholder="ex: 40" oninput="recalc()">
+      <input class="ip" type="number" id="fHeurs" min="0" max="220" step="1" placeholder="ex: 40" oninput="recalc()" aria-label="Heures non travaillées ce mois (en AP)">
       <div class="hint">Heures habituellement travaillées mais non effectuées du fait de l'AP. Maximum : durée légale (151,67h/mois pour 35h).</div>
     </div>
   </div>
@@ -273,14 +276,14 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="info-block ok"><b class="ok">✅ Contrat maintenu</b>Le contrat de travail est suspendu — pas rompu. Aucun licenciement ne peut intervenir pour ce motif pendant l'AP.</div>
     <div class="info-block ok"><b class="ok">✅ Protection sociale maintenue</b>La Sécu, la mutuelle et la prévoyance continuent de fonctionner normalement. Les cotisations sont calculées sur le salaire maintenu.</div>
     <div class="info-block ok"><b class="ok">✅ Acquisition des congés payés</b>Les heures en AP ouvrent droit à des congés payés comme si elles avaient été travaillées.</div>
-    <div class="info-block warn"><b class="warn">⚠️ Plancher SMIC</b>L'indemnité ne peut pas être inférieure au SMIC net horaire (plancher = 9,52 €/h net (Décret n°2026-35 du 29/01/2026 + SMIC 12,31 €)) pour les heures indemnisées. Si le calcul donne moins, le plancher s'applique.</div>
+    <div class="info-block warn"><b class="warn">⚠️ Plancher SMIC</b>L'indemnité ne peut pas être inférieure au SMIC net horaire (plancher = 9,75 €/h net depuis le 1ᵉʳ juin 2026, SMIC brut 12,31 €) pour les heures indemnisées. Si le calcul donne moins, le plancher s'applique.</div>
     <div class="info-block warn"><b class="warn">⚠️ Plafond</b>L'indemnité est plafonnée à 4,5 fois le SMIC horaire brut par heure indemnisée.</div>
   </div>
 
   <div style="text-align:center;margin-top:4px;">
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;">🔄 Réinitialiser</button>
   </div>
-  <div class="foot"><span data-txt="disclaimer"></span>.<br>Taux AP 2026 — hors mesures dérogatoires. Tout reste sur ton appareil.</div>
+  <div class="foot"><span data-txt="disclaimer"></span>. <span style="opacity:.6">À jour juin 2026 · montants indicatifs.</span><br>Taux AP 2026 — hors mesures dérogatoires. Tout reste sur ton appareil.</div>
 </div>
 <div id="toast"></div>
 
@@ -306,11 +309,11 @@ function shConfirm(msg, cb){
   window._shCb=cb; document.body.appendChild(ov);
 }
 
-  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);}); }
 
 // Constantes 2026
 var SMIC_H_BRUT = (window.SH && SH.val('smic_h')) || 12.31;
-var SMIC_H_NET  = (window.SH && SH.val('smic_h_net')) || 9.52;  // plancher indemnité AP — Décret 2026-35 du 29/01/2026 (JO 30/01/2026)
+var SMIC_H_NET  = (window.SH && SH.val('smic_h_net')) || 9.75;  // plancher indemnité salarié = SMIC net horaire (suit chaque revalorisation du SMIC)
 var HEURES_MOIS = 151.67; // base 35h/sem
 
 window.recalc = function(){
@@ -417,7 +420,7 @@ if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

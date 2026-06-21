@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Congés familiaux — Le nid</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,14 +21,14 @@
 :root{
   --cream1:#fdf6ec; --cream2:#fbeeda; --sky:#cfe8e6; --sky2:#bfdce6;
   --blush:#f4c9c0; --blush-d:#e89b8e; --sage:#bcd4b0; --sage-d:#8fb87e;
-  --ink:#5a4a42; --ink2:#897468; --faded:#b09a8c;
+  --ink:#5a4a42; --ink2:#897468; --faded:#7b6c62;
   --card:#fffdf9; --card-edge:#f0e2cf;
   --stork:#e8956b; --egg:#f5d9a8; --soft:#fbf3e6;
   --line:rgba(90,74,66,0.1);
   --accent:#e8956b; --accent2:#7fb0a8;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Nunito',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(180deg,#fdf6ec 0%,#fbeeda 30%,#f5e6d8 60%,#e8d5e0 100%);
@@ -153,6 +154,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -165,7 +168,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Le Nid</div>
     <div class="su">Congés familiaux · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+  <button class="hbtn" id="helpBtn" title="Aide" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -193,7 +196,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="wemoji">🪺</span>
       <h2>Un mot d'honnêteté</h2>
       <p>Ce sont les <span class="accent">minimums légaux</span> du Code du travail. Beaucoup de conventions collectives accordent davantage de jours.</p>
-      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Les durées de maternité/paternité/adoption sont indemnisées par la Sécurité sociale sous conditions. Des réformes récentes (congé de naissance) peuvent faire évoluer ces droits. Vérifie ta convention collective et auprès de la CPAM / France Travail.</div>
+      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Les durées de maternité/paternité/adoption sont indemnisées par la Sécurité sociale sous conditions. À jour juin 2026. Le congé supplémentaire de naissance entre en vigueur le 1er juillet 2026 (LFSS 2026). Vérifie ta convention collective et auprès de la CPAM / France Travail.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -205,7 +208,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Tes droits familiaux en clair</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">👶</div><div class="tx"><b>Onglet Parentalité</b>Les grands congés liés à l'enfant et leur durée légale.</div></div>
     <div class="feat"><div class="ic">💐</div><div class="tx"><b>Onglet Événements</b>Les jours d'absence pour mariage, naissance, décès, etc.</div></div>
@@ -357,6 +360,7 @@ body.pageBlancheGuard>*{display:block!important;}
     {e:'🤱',t:'Congé maternité',badge:'16 semaines',d:'Pour un 1er ou 2e enfant : 6 sem. avant + 10 sem. après l\'accouchement.',note:'26 semaines à partir du 3e enfant. Allongé en cas de jumeaux (34 sem.) ou triplés+ (46 sem.). Indemnisé par la CPAM sous conditions.'},
     {e:'👨‍🍼',t:'Congé paternité & accueil',badge:'25 jours',d:'Naissance simple : 25 jours calendaires, à prendre dans les 6 mois.',note:'32 jours en cas de naissances multiples. Dont 4 jours obligatoires, qui suivent le congé de naissance de 3 jours. Fractionnable.'},
     {e:'🍼',t:'Congé de naissance',badge:'3 jours',d:'Pour le second parent, au moment de la naissance.',note:'Payé par l\'employeur. Se cumule avec le congé paternité. À prendre le jour de la naissance ou le 1er jour ouvrable suivant.'},
+    {e:'🆕',t:'Congé supplémentaire de naissance',badge:'1 à 2 mois',d:'Nouveau droit (LFSS 2026, loi n°2025-1403) effectif le 1er juillet 2026 : 1 à 2 mois par parent, après le congé maternité/paternité/adoption.',note:'Indemnisé par la CPAM à 70 % du salaire net le 1er mois, 60 % le 2e (plafonné au PASS). Enfants nés/adoptés depuis le 1er janvier 2026. Ne remplace pas le congé parental. Montants indicatifs.'},
     {e:'🧸',t:'Congé d\'adoption',badge:'16 semaines',d:'Pour l\'arrivée d\'un enfant adopté (jusqu\'à 2 enfants au foyer).',note:'18 semaines si le foyer compte 3 enfants ou plus, 22 semaines en adoptions multiples. Partageable entre les deux parents (+25 jours).'},
     {e:'🏡',t:'Congé parental d\'éducation',badge:'jusqu\'aux 3 ans',d:'Après une naissance/adoption, pour s\'occuper de l\'enfant. Total ou partiel.',note:'1 an renouvelable, dans la limite des 3 ans de l\'enfant. Sans solde (mais possible PreParE de la CAF). Aucune condition d\'ancienneté requise.'},
     {e:'🤲',t:'Congé de proche aidant',badge:'3 mois renouvelables',d:'Pour s\'occuper d\'un proche en situation de handicap ou de perte d\'autonomie. Fractionnable. Non rémunéré mais l\'AJPA (Allocation Journalière du Proche Aidant) peut être versée par la CAF dans la limite de 66 jours sur toute la carrière.',note:'Aucune condition d\'ancienneté. AJPA : 66,64 €/jour (33,32 €/demi-journée en 2026 — source : pour-les-personnes-agees.gouv.fr). Indemnisation via CAF sur demande.'},
@@ -431,7 +435,8 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    localStorage.removeItem('CF_WELCOMED');
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{});
@@ -457,7 +462,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>
