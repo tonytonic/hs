@@ -200,6 +200,9 @@ body.pageBlancheGuard>*{display:block!important;}
 
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 .wiz-legal{color:rgba(255,255,255,.55);}
+
+/* Correctif iPhone : le texte long des options de <select> était tronqué sans ellipse (Safari iOS n'applique pas text-overflow sur l'apparence native). On reprend l'apparence à zéro, on redessine un chevron discret assorti au thème, et on tronque proprement avec des points de suspension. */
+select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%2365707c' stroke-opacity='1' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
 </style>
 <body>
 
