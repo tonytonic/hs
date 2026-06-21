@@ -268,6 +268,11 @@ body{ background:#0a1626; }
   background:linear-gradient(180deg, rgba(7,14,26,.62), rgba(7,14,26,0)); pointer-events:none; }
 #vFavoris, #vRecents, #vPlus{ position:relative; }
 
+/* badge "Nouveau" — module récemment passé disponible (déploiement progressif) */
+.new-badge{ display:inline-block; font-size:9.5px; font-weight:800; letter-spacing:.3px;
+  color:#0d1420; background:linear-gradient(135deg,#ffd966,#f0c040); border-radius:6px;
+  padding:2px 6px; vertical-align:middle; margin-left:4px; }
+
 /* étoile favoris : le ☆ (non épinglé) héritait d'une couleur sombre, invisible sur le verre nuit */
 .pin-btn{ color:rgba(247,242,232,.6); }
 .pin-btn.on{ color:#ffd966; }
@@ -341,6 +346,11 @@ body{ background:#0a1626; }
 
   <!-- ACCUEIL -->
   <div class="view on" id="vAccueil">
+    <div id="rolloutBanner" style="display:none;margin:4px 4px 14px;padding:11px 14px;border-radius:13px;
+      background:linear-gradient(135deg,rgba(240,192,64,.16),rgba(240,192,64,.08));
+      border:1px solid rgba(240,192,64,.3);font-size:11.5px;color:rgba(247,242,232,.85);text-align:center;line-height:1.5;">
+      🚧 <b>Déploiement progressif tout l'été</b> — de nouveaux outils arrivent au fil des semaines. Les modules « <span class="new-badge" style="margin:0;">Nouveau</span> » viennent juste d'être activés.
+    </div>
     <div class="sec-sep">Catégories</div>
     <div id="catList"></div>
 
@@ -556,23 +566,23 @@ function openTool(id){
   // Sécurité : si le module a été retiré du serveur depuis la dernière détection
   // (fenêtre du cache 1 h), on re-teste à la volée avant d'ouvrir.
   // Évite d'envoyer l'utilisateur sur une page 404.
-  probe(id).then(function(ok){
-    if(ok){
+  probe(id).then(function(res){
+    if(res.ok){
       var r=getRecent().filter(function(x){return x!==id;});r.unshift(id);r=r.slice(0,12);ls(LS.R,r);
       window.location.href='outils/'+id+'.html';
     }else{
-      // Module supprimé entre-temps : on met à jour la dispo, on purge le cache et on re-render
+      // Module pas encore déployé (ou retiré) : on met à jour la dispo, on purge le cache et on re-render
       if(AVAILABLE)AVAILABLE[id]=false;
       try{localStorage.removeItem(DEPLOY_CHECK_KEY);}catch(e){}
-      toast('Cet outil n\'est plus disponible');
+      toast('Cet outil arrive bientôt — pas encore disponible');
       render();
     }
   });
 }
 
 /* ===== Ligne outil ===== */
-function rowHTML(id){var t=TOOLS[id];if(!t)return'';var on=isPinned(id);
-  return'<div class="tool-row" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( on?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( on?'⭐':'☆')+'</button></div>';}
+function rowHTML(id){var t=TOOLS[id];if(!t)return'';var on=isPinned(id);var nw=isNew(id);
+  return'<div class="tool-row" onclick="openTool(\''+id+'\')">'+makeSvg(SVGP[CATS.find(function(c){return c.ids.indexOf(id)>=0;})?CATS.find(function(c){return c.ids.indexOf(id)>=0;}).icon:'doc'])+'<div class="tool-info"><div class="t">'+t.t+(nw?' <span class="new-badge">Nouveau</span>':'')+'</div><div class="s">'+t.s+'</div></div><button class="pin-btn'+( on?' on':'')+'" onclick="togglePin(\''+id+'\',event)">'+( on?'⭐':'☆')+'</button></div>';}
 
 /* ===== Grille favoris (accueil) ===== */
 function renderFavGrid(){var h=document.getElementById('favGrid');if(!h)return;var p=getPinned().filter(isAvail);
@@ -663,63 +673,99 @@ var AVAILABLE=null;           // null = pas encore testé → on affiche tout
 var DEPLOY_CHECK_KEY='SH_DEPLOYED_CACHE';
 var DEPLOY_CHECK_TTL=3600000; // 1 h de cache pour éviter de re-tester à chaque visite
 
-function isAvail(id){ return AVAILABLE===null || AVAILABLE[id]===true; }
+/* Déploiement progressif : les modules restent visibles dans les listes même avant leur
+   mise en ligne (vitrine de ce qui arrive) — le blocage réel se fait uniquement à l'ouverture,
+   dans openTool(). AVAILABLE reste calculé (badge "Nouveau", anti-404 à l'ouverture). */
+function isAvail(id){ return true; }
 
 /* Filtre une liste d'ids selon la disponibilité */
 function availIds(ids){ return ids.filter(isAvail); }
 
-/* Teste un module : résout true si index.html existe, false sinon */
+/* Teste un module : résout {ok, reached}.
+   reached=true dès qu'on obtient une VRAIE réponse HTTP du serveur (même "pas encore déployé") —
+   ça prouve que le test lui-même fonctionne. reached=false seulement si la requête a échoué au
+   niveau réseau (hors-ligne, CORS, file://) — c'est ÇA qui doit déclencher le garde-fou, pas le
+   nombre de modules réellement disponibles (qui peut légitimement être faible en déploiement progressif). */
 function probe(id){
-  /* Fichier sentinelle ok.txt (1 octet, text/plain) au lieu de index.html :
-     Cloudflare renvoie un 200 custom pour les fichiers manquants, ce qui
-     rend r.ok inutilisable. On vérifie aussi le Content-Type — les pages
-     d erreur Cloudflare sont text/html, notre sentinelle est text/plain. */
   return fetch('outils/'+id+'-ok.txt',{method:'GET',cache:'no-store'})
     .then(function(r){
-      if(!r.ok) return false;
       var ct=(r.headers.get('content-type')||'').toLowerCase();
-      if(ct.indexOf('text/html')>=0) return false;
-      return true;
+      var ok = r.ok && ct.indexOf('text/html')<0;
+      return {ok:ok, reached:true};
     })
-    .catch(function(){return false;});
+    .catch(function(){ return {ok:false, reached:false}; });
 }
 
 /* Lance la détection de tous les modules en parallèle, puis re-render */
 function detectDeployed(){
-  /* Garde-fou : une carte ou presque rien n'est disponible trahit presque
-     toujours un souci de test (file://, hors-ligne, CORS) plutot qu'une
-     vraie indisponibilite de masse -- dans ce cas on l'ignore. */
-  function suspicious(map){
-    var n=Object.keys(map).length, ok=0;
-    for(var k in map){ if(map[k]===true) ok++; }
-    return n>0 && (ok/n)<0.05;
+  /* Garde-fou : si la quasi-totalité des requêtes échoue au niveau réseau (et non simplement
+     "module pas encore en ligne"), c'est le test lui-même qui est cassé (file://, hors-ligne,
+     CORS) — dans ce cas on l'ignore plutôt que de masquer tous les modules par erreur. */
+  function suspicious(results){
+    var n=results.length, reached=0;
+    for(var i=0;i<n;i++){ if(results[i].reached) reached++; }
+    return n>0 && (reached/n)<0.5;
   }
   // Cache court pour ne pas refaire ~100 requêtes à chaque ouverture
   try{
     var c=JSON.parse(localStorage.getItem(DEPLOY_CHECK_KEY)||'null');
-    if(c&&c.t&&(Date.now()-c.t)<DEPLOY_CHECK_TTL&&c.map&&!suspicious(c.map)){
-      AVAILABLE=c.map; render(); return;
+    if(c&&c.t&&(Date.now()-c.t)<DEPLOY_CHECK_TTL&&c.map){
+      AVAILABLE=c.map; flagNew(c.map); render(); return;
     }
   }catch(e){}
 
   var ids=Object.keys(TOOLS);
   Promise.all(ids.map(function(id){
-    return probe(id).then(function(ok){return [id,ok];});
+    return probe(id).then(function(res){return [id,res];});
   })).then(function(results){
-    var map={};
-    results.forEach(function(pair){map[pair[0]]=pair[1];});
-    if(suspicious(map)){
-      try{localStorage.removeItem(DEPLOY_CHECK_KEY);}catch(e){}
+    var raw = results.map(function(p){return p[1];});
+    if(suspicious(raw)){
+      // Test réseau lui-même peu fiable : on n'écrase pas un éventuel cache valide, et on
+      // laisse AVAILABLE=null (tout visible) le temps que la situation se résolve.
       return;
     }
+    var map={};
+    results.forEach(function(pair){map[pair[0]]=pair[1].ok;});
     AVAILABLE=map;
+    flagNew(map);
     try{localStorage.setItem(DEPLOY_CHECK_KEY,JSON.stringify({t:Date.now(),map:map}));}catch(e){}
     render();
   });
 }
 
+/* ===== Badge "Nouveau" : un module qui vient de passer disponible (ok.txt ajouté depuis
+   la dernière visite) garde un petit badge pendant 14 jours. ===== */
+var LS_EVER_SEEN = 'SH_EVER_AVAILABLE';   // { id: timestamp de première détection dispo }
+var NEW_BADGE_DAYS = 14;
+function flagNew(map){
+  try{
+    var seen = JSON.parse(localStorage.getItem(LS_EVER_SEEN)||'{}');
+    var now = Date.now();
+    for(var id in map){
+      if(map[id]===true && seen[id]==null) seen[id]=now;
+    }
+    localStorage.setItem(LS_EVER_SEEN, JSON.stringify(seen));
+  }catch(e){}
+}
+function isNew(id){
+  try{
+    var seen = JSON.parse(localStorage.getItem(LS_EVER_SEEN)||'{}');
+    var t = seen[id];
+    return t!=null && (Date.now()-t) < NEW_BADGE_DAYS*86400000;
+  }catch(e){ return false; }
+}
+
+/* Bannière "déploiement progressif" : visible par défaut, disparaît seulement quand on a une
+   détection FIABLE confirmant que tous les modules sont en ligne. */
+function updateRolloutBanner(){
+  var el = document.getElementById('rolloutBanner');
+  if(!el) return;
+  var allLive = AVAILABLE!==null && Object.keys(TOOLS).every(function(id){ return AVAILABLE[id]===true; });
+  el.style.display = allLive ? 'none' : 'block';
+}
+
 /* ===== RENDU GLOBAL ===== */
-function render(){renderFavGrid();renderCats(document.getElementById('srchIp').value.toLowerCase().trim());if(curTab==='favoris')renderFavFull();if(curTab==='recents')renderRecents();}
+function render(){renderFavGrid();renderCats(document.getElementById('srchIp').value.toLowerCase().trim());if(curTab==='favoris')renderFavFull();if(curTab==='recents')renderRecents();updateRolloutBanner();}
 
 render();              // 1er rendu immédiat (tout visible le temps du test)
 detectDeployed();      // puis détection → masque les modules non déployés

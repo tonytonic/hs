@@ -3424,7 +3424,7 @@ function hasConsent(){
       var em = t ? t.e : '';
       var nm = t ? t.t : id.replace('module-','');
       var sub = t ? t.s : '';
-      return '<a class="fav-drop-item" href="outils/'+id+'.html" onclick="var m=document.getElementById(\'favDropMenu\');if(m)m.style.display=\'none\';_favDropOpen=false;var a=document.getElementById(\'favDropArrow\');if(a)a.textContent=\'▼\';">' +
+      return '<a class="fav-drop-item" href="javascript:void(0)" onclick="openFavTool(event,\''+id+'\')">' +
         (em ? '<span class="fdi-e">'+em+'</span>' : '') +
         '<span style="flex:1;"><span style="display:block;">'+nm+'</span>' +
         (sub ? '<span style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:400;">'+sub+'</span>' : '') +
@@ -3432,6 +3432,29 @@ function hasConsent(){
       '</a>';
     }).join('');
   }
+  // Ouverture d'un favori : on vérifie d'abord que le module est bien déployé (sentinelle -ok.txt),
+  // pour ne pas contourner le blocage "module pas encore en ligne" appliqué dans outils.html.
+  window.openFavTool = function(ev, id){
+    if(ev) ev.preventDefault();
+    var m = document.getElementById('favDropMenu');
+    if(m) m.style.display='none';
+    _favDropOpen = false;
+    var a = document.getElementById('favDropArrow');
+    if(a) a.textContent='▼';
+    fetch('outils/'+id+'-ok.txt', {method:'GET', cache:'no-store'})
+      .then(function(r){
+        var ct = (r.headers.get('content-type')||'').toLowerCase();
+        if(r.ok && ct.indexOf('text/html')<0){
+          window.location.href = 'outils/'+id+'.html';
+        } else {
+          alert("Cet outil arrive bientôt — pas encore disponible.");
+        }
+      })
+      .catch(function(){
+        // Échec réseau (hors-ligne, CORS) : on laisse passer plutôt que de bloquer à tort.
+        window.location.href = 'outils/'+id+'.html';
+      });
+  };
   // Fermer le dropdown si clic en dehors
   document.addEventListener('click', function(e){
     if(_favDropOpen && !document.getElementById('favDropContainer').contains(e.target)){
