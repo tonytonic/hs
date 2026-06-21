@@ -19,14 +19,25 @@
     <a href="mentions-legales.html" class="back-btn">← Retour aux mentions légales</a>
 
     <h1>Politique de Confidentialité</h1>
-    <p><strong>Dernière mise à jour :</strong> 28 février 2026</p>
+    <p><strong>Dernière mise à jour :</strong> 21 juin 2026</p>
 
     <p>Cette Politique de Confidentialité décrit comment l'application <strong>Simulateur Heures Sup</strong> traite vos informations. Votre vie privée est notre priorité absolue.</p>
 
     <h2>1. Absence de Collecte de Données</h2>
     <p>L'Application est conçue pour fonctionner de manière totalement autonome. <strong>Nous ne collectons, ne stockons, ni ne transmettons aucune donnée personnelle</strong> (telle que votre nom, votre adresse e-mail, votre position géographique ou vos calculs) vers des serveurs externes ou vers des tiers.</p>
+    <p>Une exception technique, limitée et strictement optionnelle, existe pour deux fonctions d'import de données publiques (taux de change, jours fériés officiels) : voir le détail au paragraphe 2 ci-dessous.</p>
 
-    <h2>2. Stockage Local (LocalStorage)</h2>
+    <h2>2. Cas particulier : fonctions optionnelles d'import (taux de change, jours fériés)</h2>
+    <p>Deux outils de l'Application proposent un bouton <strong>facultatif</strong> permettant d'importer des données publiques à jour directement depuis des services tiers :</p>
+    <ul>
+        <li>Le module de conversion de devises (bouton « Importer le taux du jour ») interroge <strong>frankfurter.dev</strong> (taux de change officiels de la Banque Centrale Européenne, projet open-source) et <strong>coingecko.com</strong> (cours des cryptomonnaies, Gecko Labs Pte. Ltd.).</li>
+        <li>Le module des jours fériés (bouton « Importer / vérifier les fériés officiels ») interroge <strong>calendrier.api.gouv.fr</strong>, l'API de données ouvertes du gouvernement français (Etalab/DINUM).</li>
+    </ul>
+    <p>Ces requêtes ne partent <strong>que si vous cliquez vous-même</strong> sur le bouton concerné ; sans cette action, rien n'est transmis. Lorsque vous l'utilisez, votre appareil contacte <strong>directement</strong> ces services tiers — l'éditeur de l'Application n'est à aucun moment serveur intermédiaire et ne reçoit donc lui-même aucune information à ce sujet.</p>
+    <p>Comme pour toute requête effectuée sur Internet, ces services reçoivent alors automatiquement votre <strong>adresse IP</strong> ainsi que des informations techniques standard (type de navigateur, etc.), nécessaires à l'acheminement de la réponse — il s'agit d'une contrainte technique inhérente au fonctionnement d'Internet, et non d'une collecte volontaire de notre part. <strong>Aucune autre donnée</strong> — aucune saisie effectuée dans l'Application, aucune information personnelle — ne leur est transmise.</p>
+    <p>Ces services sont indépendants de l'éditeur, qui n'a pas de contrôle sur leurs propres pratiques de traitement des données. Pour en savoir plus : <a href="https://www.coingecko.com/en/privacy" target="_blank" rel="noopener">politique de confidentialité de CoinGecko</a> · <a href="https://www.data.gouv.fr/dataservices/jours-feries" target="_blank" rel="noopener">API jours fériés (data.gouv.fr)</a>. Frankfurter (projet open-source) ne collecte pas de données personnelles ; le service public est servi via Cloudflare, qui peut collecter des informations techniques basiques à des fins de performance.</p>
+
+    <h2>3. Stockage Local (LocalStorage)</h2>
     <p>Toutes les données que vous saisissez dans l'Application sont conservées exclusivement sur votre propre appareil via la technologie <strong>LocalStorage</strong> de votre navigateur. 
     <ul>
         <li><strong>Contrôle total :</strong> Ces données ne nous sont jamais envoyées et restent sous votre contrôle exclusif.</li>
@@ -34,17 +45,17 @@
     </ul>
     </p>
 
-    <h2>3. Pas de Services de Suivi (Analytics)</h2>
+    <h2>4. Pas de Services de Suivi (Analytics)</h2>
     <p>Nous n'utilisons aucun outil de suivi, de cookies publicitaires ou de services d'analyse tiers. Votre utilisation de l'application reste totalement anonyme.</p>
 
-    <h2>4. Sécurité</h2>
-    <p>Puisque aucune donnée n'est transmise sur Internet, les risques liés à la sécurité des serveurs tiers sont inexistants pour cette application. La sécurité de vos données dépend de la sécurité de votre propre appareil mobile.</p>
+    <h2>5. Sécurité</h2>
+    <p>Hors les deux appels optionnels décrits au paragraphe 2 (qui ne transmettent que votre adresse IP, technique et inévitable, jamais vos saisies), aucune donnée n'est transmise sur Internet : les risques liés à la sécurité de serveurs tiers sont donc quasi inexistants pour cette Application. La sécurité de vos données dépend avant tout de la sécurité de votre propre appareil.</p>
 
-    <h2>5. Modifications de cette politique</h2>
+    <h2>6. Modifications de cette politique</h2>
     <p>Nous pouvons mettre à jour notre politique de confidentialité de temps à autre. Toute modification sera publiée sur cette page.</p>
 
     <div class="contact">
-        <h2>6. Contact</h2>
+        <h2>7. Contact</h2>
         <p>Pour toute question concernant cette politique, vous pouvez nous contacter à l'adresse suivante :</p>
         <p><strong>Email :</strong> appareils.treves6g@icloud.com</p>
     </div>
