@@ -158,6 +158,12 @@ body.pageBlancheGuard>*{display:block!important;}
 
 /* Correctif iPhone : le texte long des options de <select> était tronqué sans ellipse (Safari iOS n'applique pas text-overflow sur l'apparence native). On reprend l'apparence à zéro, on redessine un chevron discret assorti au thème, et on tronque proprement avec des points de suspension. */
 select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23ffffff' stroke-opacity='0.46' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+
+/* Correctif iPhone : <input type="date"> s'affichait beaucoup plus haut que les autres champs sur Safari iOS (boîte native interne surdimensionnée ; display:block y ajoute en plus un padding bas parasite propre à iOS). On retire l'apparence native : le champ se dimensionne alors comme un champ texte/nombre, le sélecteur de date s'ouvre toujours au tap. Pseudo-éléments internes remis à plat. */
+input[type="date"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;}
+input[type="date"].ip::-webkit-datetime-edit{padding:0;}
+input[type="date"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="date"].ip::-webkit-date-and-time-value{text-align:left;margin:0;}
 </style>
 </head>
 <body>
@@ -176,7 +182,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>📋 La procédure</b>Entretien(s) → signature → 15 j rétractation → homologation DREETS (15 j ouvrables).</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span> Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -261,7 +267,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
   <div class="rule"><div class="ri">🏖️</div><div><div class="rt">Congés payés non pris</div><div class="rd">Les congés payés acquis et non pris donnent lieu à une indemnité compensatrice distincte, quel que soit le motif de rupture.</div></div></div>
   <div class="rule"><div class="ri">📋</div><div><div class="rt">Documents remis à la rupture</div><div class="rd">Certificat de travail, solde de tout compte, attestation France Travail (ex-Pôle Emploi). La rupture conventionnelle ouvre droit à l'ARE (allocation chômage).</div></div></div>
 
-  <div class="note"><span data-txt="disclaimer"></span>. <span data-artn="L1237-11"></span> à <span data-artn="L1237-19-4"></span> CT.<br>🔄 Tout reste sur ton appareil.
+  <div class="note"><span data-txt="disclaimer"></span> <span data-artn="L1237-11"></span> à <span data-artn="L1237-19-4"></span> CT.<br>🔄 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Barème 2026 — indemnité légale minimale. Ta convention collective peut être plus favorable.</div>
 </div>

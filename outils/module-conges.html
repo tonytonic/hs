@@ -109,6 +109,12 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+
+/* Correctif iPhone : <input type="date"> s'affichait beaucoup plus haut que les autres champs sur Safari iOS (boîte native interne surdimensionnée ; display:block y ajoute en plus un padding bas parasite propre à iOS). On retire l'apparence native : le champ se dimensionne alors comme un champ texte/nombre, le sélecteur de date s'ouvre toujours au tap. Pseudo-éléments internes remis à plat. */
+input[type="date"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;}
+input[type="date"].ip::-webkit-datetime-edit{padding:0;}
+input[type="date"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="date"].ip::-webkit-date-and-time-value{text-align:left;margin:0;}
 </style>
 </head>
 <body>
@@ -175,7 +181,7 @@ body.pageBlancheGuard>*{display:block!important;}
   </div>
 
   <p style="font-size:11px;color:var(--faded);text-align:center;padding:8px 0 16px;line-height:1.6;">
-    <span data-txt="disclaimer_fiscal"></span>.<br><span data-txt="disclaimer_suivi"></span>.<br><span data-txt="ccn_differente"></span>.
+    <span data-txt="disclaimer_fiscal"></span><br><span data-txt="disclaimer_suivi"></span><br><span data-txt="ccn_differente"></span>
   </p>
 </div>
 

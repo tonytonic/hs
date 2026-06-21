@@ -219,6 +219,12 @@ body.pageBlancheGuard>*{display:block!important;}
 
 /* Correctif iPhone : le texte long des options de <select> était tronqué sans ellipse (Safari iOS n'applique pas text-overflow sur l'apparence native). On reprend l'apparence à zéro, on redessine un chevron discret assorti au thème, et on tronque proprement avec des points de suspension. */
 select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23786c5f' stroke-opacity='1' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+
+/* Correctif iPhone : <input type="date"> s'affichait beaucoup plus haut que les autres champs sur Safari iOS (boîte native interne surdimensionnée ; display:block y ajoute en plus un padding bas parasite propre à iOS). On retire l'apparence native : le champ se dimensionne alors comme un champ texte/nombre, le sélecteur de date s'ouvre toujours au tap. Pseudo-éléments internes remis à plat. */
+input[type="date"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;}
+input[type="date"].ip::-webkit-datetime-edit{padding:0;}
+input[type="date"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="date"].ip::-webkit-date-and-time-value{text-align:left;margin:0;}
 </style>
 <body>
 
@@ -366,7 +372,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
   </div>
   <div class="note">Jalons du Code du travail commun · à jour juin 2026. La prime d'ancienneté n'est pas légale : elle dépend de ta convention collective (taux indicatifs).
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
-  <div class="foot"><span data-txt="disclaimer"></span>.<br>🌳 Tout reste sur ton appareil.</div>
+  <div class="foot"><span data-txt="disclaimer"></span><br>🌳 Tout reste sur ton appareil.</div>
 </div>
 
 <div id="toast"></div>
