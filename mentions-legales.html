@@ -132,16 +132,16 @@
     </div>
 
     <script>
-    // Retour intelligent : revient à la page d'où l'utilisateur est venu
-    // (menu.html OU outils.html selon le point d'entrée), au lieu d'un lien fixe.
+    // Retour vers une destination FIXE (jamais history.back()).
+    // history.back() provoquait une boucle : mentions → conditions → mentions →
+    // « retour » renvoyait vers conditions au lieu du menu. On va donc directement
+    // à la trousse si on en vient, sinon au menu — jamais vers la page précédente.
     (function(){
       function smartBack(e){
         e.preventDefault();
         var ref = document.referrer || '';
         if(ref && /outils\.html(\?|#|$)/.test(ref)){
           window.location.href = 'outils.html';
-        } else if(window.history.length > 1 && ref && ref.indexOf(window.location.host) !== -1){
-          window.history.back();
         } else {
           window.location.href = 'menu.html';
         }
