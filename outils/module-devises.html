@@ -103,7 +103,7 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension du droit du travail et de la vie quotidienne. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de décision importante, consultez un professionnel ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>).<br>
-  Conversion à titre indicatif — les taux fluctuent en continu, vérifie auprès de ta banque avant toute opération réelle. Taux saisi manuellement par défaut. Le bouton « Importer le taux du jour » est optionnel : si tu l'utilises, ton appareil contacte frankfurter.app (taux BCE) et/ou coingecko.com (cryptomonnaies) pour récupérer le taux — ces services reçoivent alors ton adresse IP. Sans ce bouton, rien n'est transmis. La source crypto (gratuite, sans compte) peut occasionnellement être indisponible selon ses propres conditions d'accès ; dans ce cas, saisis le taux manuellement.<br>
+  Conversion à titre indicatif — les taux fluctuent en continu, vérifie auprès de ta banque avant toute opération réelle. Taux saisi manuellement par défaut. Le bouton « Importer le taux du jour » est optionnel : si tu l'utilises, ton appareil contacte frankfurter.dev (taux BCE) et/ou coingecko.com (cryptomonnaies) pour récupérer le taux — ces services reçoivent alors ton adresse IP. Sans ce bouton, rien n'est transmis. La source crypto (gratuite, sans compte) peut occasionnellement être indisponible selon ses propres conditions d'accès ; dans ce cas, saisis le taux manuellement.<br>
   <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 <div class="ov" id="help" role="dialog" aria-modal="true" aria-label="Aide">
@@ -137,7 +137,7 @@ var FIAT = {
 };
 var CRYPTO = {
   bitcoin:{n:'Bitcoin', s:'BTC'}, ethereum:{n:'Ethereum', s:'ETH'}, tether:{n:'Tether', s:'USDT'},
-  bnb:{n:'BNB', s:'BNB'}, solana:{n:'Solana', s:'SOL'}, ripple:{n:'XRP', s:'XRP'},
+  binancecoin:{n:'BNB', s:'BNB'}, solana:{n:'Solana', s:'SOL'}, ripple:{n:'XRP', s:'XRP'},
   'usd-coin':{n:'USD Coin', s:'USDC'}, cardano:{n:'Cardano', s:'ADA'}, dogecoin:{n:'Dogecoin', s:'DOGE'},
   tron:{n:'TRON', s:'TRX'}
 };
@@ -190,7 +190,7 @@ function importerTaux(){
   var fiatOk = !needFiat, cryptoOk = !needCrypto; // true par défaut si pas demandé du tout
 
   var pFiat = !needFiat ? Promise.resolve() :
-    fetch('https://api.frankfurter.app/latest?from=EUR')
+    fetch('https://api.frankfurter.dev/v1/latest?base=EUR')
       .then(function(r){ if(!r.ok) throw new Error('frankfurter http '+r.status); return r.json(); })
       .then(function(data){
         Object.keys(data.rates||{}).forEach(function(code){
@@ -198,7 +198,7 @@ function importerTaux(){
         });
         fiatOk = true;
       })
-      .catch(function(e){ console.warn('Import devises (frankfurter.app) :', e); });
+      .catch(function(e){ console.warn('Import devises (frankfurter.dev) :', e); });
 
   var pCrypto = !needCrypto ? Promise.resolve() :
     fetch('https://api.coingecko.com/api/v3/simple/price?ids='+Object.keys(CRYPTO).join(',')+'&vs_currencies=eur')
@@ -218,7 +218,7 @@ function importerTaux(){
     if(fiatOk && cryptoOk){
       lastImportDate = new Date();
       appliquerTauxAuto();
-      status.textContent = '✅ Taux importé à ' + h + ' (frankfurter.app / coingecko.com)';
+      status.textContent = '✅ Taux importé à ' + h + ' (frankfurter.dev / coingecko.com)';
       status.style.color = '#7ddb7d';
     } else if(fiatOk && !cryptoOk){
       appliquerTauxAuto();
