@@ -145,6 +145,12 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+
+/* Correctif iPhone : <input type="date"> s'affichait beaucoup plus haut que les autres champs sur Safari iOS (boîte native interne surdimensionnée ; display:block y ajoute en plus un padding bas parasite propre à iOS). On retire l'apparence native : le champ se dimensionne alors comme un champ texte/nombre, le sélecteur de date s'ouvre toujours au tap. Pseudo-éléments internes remis à plat. */
+input[type="date"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;}
+input[type="date"].ip::-webkit-datetime-edit{padding:0;}
+input[type="date"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="date"].ip::-webkit-date-and-time-value{text-align:left;margin:0;}
 </style>
 </head>
 <body>
@@ -163,7 +169,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Sanction employeur</b>Sans entretien sur 6 ans ni 1 formation : abondement CPF de 3 000 € obligatoire.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. <span style="opacity:.6">À jour juin 2026 · montants indicatifs.</span> Vos saisies restent sur votre appareil.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span> <span style="opacity:.6">À jour juin 2026 · montants indicatifs.</span> Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>

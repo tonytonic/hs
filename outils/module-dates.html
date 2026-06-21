@@ -72,6 +72,12 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 .res .lbl{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;}
 .res .sub{font-size:12.5px;margin-top:8px;font-weight:600;color:rgba(255,255,255,0.6);line-height:1.5;font-family:-apple-system,sans-serif;}
 .res .line{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;font-weight:600;color:rgba(255,255,255,0.75);font-family:-apple-system,sans-serif;}
+
+/* Correctif iPhone : <input type="date"> s'affichait beaucoup plus haut que les autres champs sur Safari iOS (boîte native interne surdimensionnée ; display:block y ajoute en plus un padding bas parasite propre à iOS). On retire l'apparence native : le champ se dimensionne alors comme un champ texte/nombre, le sélecteur de date s'ouvre toujours au tap. Pseudo-éléments internes remis à plat. */
+input[type="date"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;}
+input[type="date"].ip::-webkit-datetime-edit{padding:0;}
+input[type="date"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="date"].ip::-webkit-date-and-time-value{text-align:left;margin:0;}
 </style>
 </head>
 <body>
