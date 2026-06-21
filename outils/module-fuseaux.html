@@ -75,6 +75,14 @@ header{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-are
 
 /* Correctif iPhone : le texte long des options de <select> était tronqué sans ellipse (Safari iOS n'applique pas text-overflow sur l'apparence native). On reprend l'apparence à zéro, on redessine un chevron discret assorti au thème, et on tronque proprement avec des points de suspension. */
 select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:38px;background-repeat:no-repeat;background-position:right 14px center;background-size:11px 7px;background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23ffffff' stroke-opacity='0.62' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+/* Correctif iPhone : <input type="time"> (« Heure ici ») s'affichait plus haut que les
+   autres champs sur Safari iOS — même bug de boîte native surdimensionnée que les champs date.
+   On retire l'apparence native pour qu'il se dimensionne comme un champ texte/nombre ; le
+   sélecteur d'heure s'ouvre toujours au tap. Centrage conservé pour garder l'apparence. */
+input[type="time"].ip{-webkit-appearance:none;appearance:none;width:100%;min-width:0;min-height:0;line-height:1.5;text-align:center;}
+input[type="time"].ip::-webkit-datetime-edit{padding:0;}
+input[type="time"].ip::-webkit-datetime-edit-fields-wrapper{padding:0;}
+input[type="time"].ip::-webkit-date-and-time-value{text-align:center;margin:0;}
 </style>
 </head>
 <body>
@@ -90,21 +98,21 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
 </div>
 <div class="card">
 <div class="field"><label for="ville">Ville visée (optionnel)</label><select class="ip" id="ville" aria-label="Ville visée">
-  <option value="">— Saisie manuelle du décalage —</option>
+  <option value="">— Saisie manuelle —</option>
   <option value="-9">Los Angeles (UTC−7)</option>
-  <option value="-8">Denver, Mexico (UTC−6)</option>
+  <option value="-8">Denver (UTC−6)</option>
   <option value="-7">Chicago (UTC−5)</option>
   <option value="-6">New York (UTC−4)</option>
   <option value="-5">São Paulo (UTC−3)</option>
-  <option value="-1">Londres, Lisbonne (UTC+1)</option>
-  <option value="0">Madrid, Berlin (UTC+2)</option>
+  <option value="-1">Londres (UTC+1)</option>
+  <option value="0">Madrid (UTC+2)</option>
   <option value="0">Le Caire (UTC+2)</option>
-  <option value="1">Moscou, Istanbul (UTC+3)</option>
+  <option value="1">Moscou (UTC+3)</option>
   <option value="2">Dubaï (UTC+4)</option>
   <option value="3.5">New Delhi (UTC+5:30)</option>
   <option value="5">Bangkok (UTC+7)</option>
-  <option value="6">Pékin, Singapour (UTC+8)</option>
-  <option value="7">Tokyo, Séoul (UTC+9)</option>
+  <option value="6">Pékin (UTC+8)</option>
+  <option value="7">Tokyo (UTC+9)</option>
   <option value="8">Sydney (UTC+10)</option>
 </select></div>
 <div class="field"><label for="heure">Heure ici</label><input class="ip" id="heure" type="time" placeholder="" aria-label="Heure ici"></div>
