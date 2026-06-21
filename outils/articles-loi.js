@@ -22,6 +22,14 @@
    Aucune dépendance externe.
 
    DERNIÈRE MISE À JOUR DES VALEURS : 30 juin 2026
+   CONTRÔLE DE CONFORMITÉ (déploiement échelonné, été→septembre 2026) :
+     Valeurs chiffrées re-vérifiées contre sources officielles (Légifrance,
+     URSSAF/BOSS, info.gouv.fr, service-public.fr, instructions DSS).
+     SMIC, PMSS/PASS, titre-restaurant, pension d'invalidité (plancher + MTP)
+     et forfait hospitalier CONFIRMÉS pour septembre 2026 — aucune valeur
+     modifiée. Prochaine échéance connue : revalorisation SMIC au 1er janvier
+     2027 (sauf nouveau dépassement du seuil +2 % d'inflation déclenchant une
+     revalorisation automatique en cours d'année).
    ========================================================================== */
 
 (function (global) {
@@ -34,7 +42,7 @@
   var VALEURS = {
 
     /* ----- SMIC (revalorisé au 1er janvier + ajustement inflation en cours d'année) ----- */
-    smic_h:        { v: 12.31,    u: '€/h',    maj: '2026-06-01', src: 'Arrêté 22/05/2026 — ⚠️ 2e revalorisation 2026 (après celle du 1er janvier) ; inflation repartant à la hausse cet été (énergie), re-vérifier en juillet-août si une 3e revalorisation automatique est déclenchée (seuil légal +2% depuis mai 2026, art. L3231-5)' },
+    smic_h:        { v: 12.31,    u: '€/h',    maj: '2026-06-01', src: 'Arrêté 22/05/2026 (JO 24/05/2026) — 2e revalorisation 2026 (+2,41 %, automatique, seuil +2 % franchi le 13/05/2026), après celle du 1er janvier. Confirmé en vigueur : aucune 3e revalorisation à ce jour ; prochaine au 1er janvier 2027 sauf nouveau dépassement du seuil +2 % (art. L3231-5)' },
     smic_h_net:    { v: 9.75,     u: '€/h net',maj: '2026-06-01', src: '≈ SMIC net mensuel 1 477,93 € ÷ 151,67 h — info.gouv.fr' },
     smic_mensuel:  { v: 1867.02,  u: '€/mois', maj: '2026-06-01', src: 'JO arrêté 22/05/2026 — base 151,67 h × 12,31 €' },
     smic_mensuel_net:{ v: 1477.93, u: '€/mois net', maj: '2026-06-01', src: 'SMIC net mensuel — info.gouv.fr (1er juin 2026)' },
@@ -93,9 +101,9 @@
     pee_abondement_max:{ v: 3844.8,u: '€/an',    maj: '2026-01-01', src: '8 % PASS — PEE' },
     perco_abondement_max:{ v: 7689.6,u:'€/an',   maj: '2026-01-01', src: '16 % PASS — PERCO/PER collectif' },
 
-    /* ----- Invalidité (montants revalorisés — À VÉRIFIER ameli.fr) ----- */
-    invalidite_plancher:{ v: 338.31, u: '€/mois',  maj: '2026-04-01', src: 'pension minimale cat. 1/2 — 335,62 € (2025) +0,8 % au 1er avr. 2026 = 338,31 €' },
-    invalidite_mtp:   { v: 1298.44, u: '€/mois',  maj: '2026-04-01', src: 'majoration tierce personne (régime général) — +0,8 % au 1er avr. 2026' },
+    /* ----- Invalidité (revalorisées +0,8 % au 1er avril 2026 — confirmées) ----- */
+    invalidite_plancher:{ v: 338.31, u: '€/mois',  maj: '2026-04-01', src: 'pension minimale cat. 1/2 : 335,62 € +0,8 % au 1er avr. 2026 = 338,31 € (instruction DSS/2A/2026/36 du 26/03/2026 ; service-public.fr / ameli.fr) — en vigueur jusqu\'au 31 mars 2027' },
+    invalidite_mtp:   { v: 1298.44, u: '€/mois',  maj: '2026-04-01', src: 'majoration tierce personne (MTP) régime général — +0,8 % au 1er avr. 2026 (instruction DSS/2A/2026/36 ; service-public.fr F36489). NB : la MTP des fonctionnaires (CNRACL/SRE) est distincte (1 376 €/mois)' },
 
     /* ----- Proche aidant / AJPA ----- */
     forfait_hospitalier:  { v: 23,     u: '€/jour', maj: '2026-03-01', src: 'Arrêté du 27/02/2026 (17 € psychiatrie)' },
