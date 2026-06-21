@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Modulation — L'Accordéon</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,12 +21,12 @@
 :root{
   --pur:#5c5c8a;--pur-l:#7a7ab0;--pur-ll:#9898c8;
   --deep:#2a2a50;--lilac:#e8e8f8;--lilac2:#d5d5f0;--lilac3:#c0c0e0;
-  --ink:#1a1a30;--ink2:#3a3a60;--faded:#7a7a9a;
+  --ink:#1a1a30;--ink2:#3a3a60;--faded:#64647e;
   --ok:#2a7a50;--warn:#b07020;--danger:#a03030;
   --card:#fdfcff;--card-edge:#d0d0e8;--line:rgba(26,26,48,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:radial-gradient(700px 300px at 50% -5%,rgba(92,92,138,0.15),transparent 55%),
   linear-gradient(180deg,#eeeef8 0%,#e0e0f4 25%,#f8f8fc 65%,#f0f0f8 100%);
@@ -157,6 +158,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 </head>
 <body>
@@ -168,7 +171,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">L'Accordéon</div>
     <div class="su">Modulation · Annualisation · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn">?</button>
+  <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -189,7 +192,7 @@ body.pageBlancheGuard>*{display:block!important;}
       <span class="wemoji">📋</span>
       <h2>Accord obligatoire</h2>
       <p>La modulation <span class="accent">nécessite un accord collectif</span> (branche ou entreprise). Elle ne peut pas être imposée sans accord.</p>
-      <div class="legal">Outil indicatif. Art. L3121-41 à L3121-47 CT. Seuil annuel : 1 607 h (art. L3121-41). Contingent annuel sans accord : 220 h/sal./an (art. D3121-24 CT — confirmé 2026). HS exonérées d'IR jusqu'à 7 500 €/an (LF 2022 — confirmé 2026). Ni avis juridique — consulte ton accord de modulation.</div>
+      <div class="legal">Outil indicatif. Art. L3121-41 à L3121-47 CT. Seuil annuel : 1 607 h (art. L3121-41). Contingent annuel sans accord : 220 h/sal./an (art. D3121-24 CT — confirmé 2026). HS exonérées d'IR jusqu'à 7 500 €/an (LF 2022 — confirmé 2026). Ni avis juridique — consulte ton accord de modulation. À jour juin 2026.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -201,7 +204,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- AIDE -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">⚙️</div><div class="tx"><b>Paramètre ton accord</b>Saisis les limites hautes et basses de ton accord de modulation pour que le simulateur soit précis.</div></div>
     <div class="feat"><div class="ic">📊</div><div class="tx"><b>Simulateur semaine</b>Entre les heures d'une semaine donnée et vois si tu es en zone haute, basse ou normale.</div></div>
@@ -229,7 +232,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">⚙️ Paramètres de l'accord</div>
     <div class="field">
       <label>Durée de référence hebdomadaire</label>
-      <select class="ip" id="fRef" onchange="recalc()">
+      <select class="ip" id="fRef" onchange="recalc()" aria-label="Durée de référence hebdomadaire">
         <option value="35">35h (droit commun)</option>
         <option value="37">37h (avec RTT)</option>
         <option value="39">39h (avec heures sup forfaitisées)</option>
@@ -238,7 +241,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Plafond hebdomadaire (semaines hautes)</label>
-      <select class="ip" id="fPlafond" onchange="recalc()">
+      <select class="ip" id="fPlafond" onchange="recalc()" aria-label="Plafond hebdomadaire (semaines hautes)">
         <option value="44">44h (plafond légal sans accord spécifique)</option>
         <option value="46">46h (accord de branche fréquent)</option>
         <option value="48">48h (maximum légal absolu)</option>
@@ -247,7 +250,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Plancher hebdomadaire (semaines basses)</label>
-      <select class="ip" id="fPlancher" onchange="recalc()">
+      <select class="ip" id="fPlancher" onchange="recalc()" aria-label="Plancher hebdomadaire (semaines basses)">
         <option value="0">0h (semaines de repos possibles)</option>
         <option value="14">14h (mi-temps minimum)</option>
         <option value="21">21h (60% du temps)</option>
@@ -259,7 +262,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">📊 Simulateur semaine</div>
     <div class="field">
       <label>Heures travaillées cette semaine</label>
-      <input class="ip" type="number" id="fHSem" min="0" max="60" step="0.5" placeholder="ex: 42" oninput="recalcSemaine()">
+      <input class="ip" type="number" id="fHSem" min="0" max="60" step="0.5" placeholder="ex: 42" oninput="recalcSemaine()" aria-label="Heures travaillées cette semaine">
     </div>
     <div id="semResult" style="display:none;"></div>
   </div>
@@ -268,12 +271,12 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">🧮 Projection annuelle</div>
     <div class="field">
       <label>Nombre de semaines hautes prévues</label>
-      <input class="ip" type="number" id="fNHautes" min="0" max="52" placeholder="ex: 20" oninput="recalc()">
+      <input class="ip" type="number" id="fNHautes" min="0" max="52" placeholder="ex: 20" oninput="recalc()" aria-label="Nombre de semaines hautes prévues">
       <div class="hint">Semaines où tu travailles au plafond de l'accord.</div>
     </div>
     <div class="field">
       <label>Nombre de semaines basses prévues</label>
-      <input class="ip" type="number" id="fNBasses" min="0" max="52" placeholder="ex: 15" oninput="recalc()">
+      <input class="ip" type="number" id="fNBasses" min="0" max="52" placeholder="ex: 15" oninput="recalc()" aria-label="Nombre de semaines basses prévues">
       <div class="hint">Semaines légères (congés, creux d'activité…). Le reste = semaines normales à la référence.</div>
     </div>
     <div id="annuelResult" style="display:none;"></div>
@@ -316,7 +319,7 @@ function shConfirm(msg, cb){
   window._shCb=cb; document.body.appendChild(ov);
 }
 
-  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);location.reload();}); }
+  window.resetState = function resetState(){ shConfirm('Tout remettre a zero ?', function(){localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);}); }
 
 var SEMAINES_AN = 47; // 52 - 5 CP
 
@@ -428,7 +431,7 @@ if(!get(LS.WELCOME,0)){$('#wizard').classList.add('show');show(0);}
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

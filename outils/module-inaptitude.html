@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Inaptitude & Reclassement</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,7 +24,7 @@
   --ok:#4aaa7a;--warn:#e8a030;--ko:#e06050;--info:#5a9ad8;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#100c1e 0%,#1a122c 50%,#0e0a1a 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -73,7 +74,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%238a6aba' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -175,6 +176,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -193,7 +195,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Si reclassement impossible</b>Licenciement pour inaptitude : indemnité légale doublée si origine professionnelle (AT/MP).</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -211,7 +213,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Inaptitude & Reclassement</div>
     <div class="su">Procédure · Droits · Indemnités · V1.0</div>
   </div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -306,20 +308,20 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="field">
         <label>Salaire brut mensuel de référence</label>
         <div class="inline">
-          <input class="ip" id="fSal" type="number" min="0" step="1" placeholder="0">
+          <input class="ip" id="fSal" type="number" min="0" step="1" placeholder="0" aria-label="Salaire brut mensuel de référence">
           <span class="unit">€/mois</span>
         </div>
       </div>
       <div class="field">
         <label>Ancienneté (années complètes)</label>
         <div class="inline">
-          <input class="ip" id="fAnc" type="number" min="0" max="50" step="1" placeholder="0">
+          <input class="ip" id="fAnc" type="number" min="0" max="50" step="1" placeholder="0" aria-label="Ancienneté (années complètes)">
           <span class="unit">ans</span>
         </div>
       </div>
       <div class="field">
         <label>Origine de l'inaptitude</label>
-        <select class="ip" id="fOrigine">
+        <select class="ip" id="fOrigine" aria-label="Origine de l'inaptitude">
           <option value="pro">Professionnelle (AT/MP) — indemnité doublée</option>
           <option value="nonpro">Non professionnelle (maladie ordinaire)</option>
         </select>
@@ -364,7 +366,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div></div>
   </div>
 
-  <div class="note"><span data-art="L1226-1"></span> à <span data-art="L1226-22"></span> CT · <span data-art="R4624-31"></span>.<br>
+  <div class="note"><span data-artn="L1226-1"></span> à <span data-artn="L1226-22"></span> CT · <span data-art="R4624-31"></span> · à jour juin 2026.<br>
     <span data-txt="disclaimer"></span>.<br>
     En cas d'inaptitude, consulter le médecin du travail et un représentant du personnel.<br>
     🏥 Tout reste sur ton appareil.
@@ -453,7 +455,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{sal:'',anc:'',origine:'pro'});
@@ -504,7 +506,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Rupture Conventionnelle — Indemnité & Procédure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,10 +20,10 @@
   --acc:#e07030; --acc-l:#f09050; --acc-d:#a05020;
   --dark:#1e1208; --dark2:#2a1a0e;
   --card:rgba(255,255,255,0.07); --card-edge:rgba(255,255,255,0.13);
-  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.46);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#1e1208 0%,#2a1a0e 50%,#1a1410 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -49,9 +50,9 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;letter-spacing:0.3px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid var(--card-edge);border-radius:10px;
-  padding:12px;color:#fff;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  padding:12px;color:#fff;font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
-input.ip[type="date"]{-webkit-appearance:none;appearance:none;width:100%;}
+input.ip[type="date"]{-webkit-appearance:none;appearance:none;width:100%;color:#fff;-webkit-text-fill-color:#fff;color-scheme:dark;}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23f09050' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 12px center;padding-right:30px;background-color:rgba(255,255,255,0.07);}
@@ -153,6 +154,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -171,7 +173,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>📋 La procédure</b>Entretien(s) → signature → 15 j rétractation → homologation DREETS (15 j ouvrables).</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -185,7 +187,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Rupture Conv.</div><div class="su">Indemnité · Procédure · V1.0</div></div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -194,24 +196,24 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">⚙️ Ta situation</div>
     <div class="field">
       <label>Date d'entrée dans l'entreprise</label>
-      <input class="ip" id="fStart" type="date">
+      <input class="ip" id="fStart" type="date" aria-label="Date d'entrée dans l'entreprise">
     </div>
     <div class="field">
       <label>Date envisagée de rupture</label>
-      <input class="ip" id="fEnd" type="date">
+      <input class="ip" id="fEnd" type="date" aria-label="Date envisagée de rupture">
       <div class="hint">1er jour après la fin du contrat (après homologation DREETS).</div>
     </div>
     <div class="field">
       <label>Salaire brut mensuel de référence</label>
       <div class="inline">
-        <input class="ip" id="fSalaire" type="number" min="0" step="1" placeholder="0">
+        <input class="ip" id="fSalaire" type="number" min="0" step="1" placeholder="0" aria-label="Salaire brut mensuel de référence">
         <span class="unit">€ brut</span>
       </div>
       <div class="hint">1/12e des 12 derniers mois ou 1/3 des 3 derniers mois (le plus favorable).</div>
     </div>
     <div class="field">
       <label>Base de calcul utilisée</label>
-      <select class="ip" id="fBase">
+      <select class="ip" id="fBase" aria-label="Base de calcul utilisée">
         <option value="12">1/12e des 12 derniers mois</option>
         <option value="3">1/3 des 3 derniers mois</option>
       </select>
@@ -249,11 +251,14 @@ body.pageBlancheGuard>*{display:block!important;}
   <div style="margin-top:4px;font-weight:800;font-size:13px;color:var(--acc-l);margin-bottom:10px;">⚖️ Règles essentielles</div>
   <div class="rule"><div class="ri">📐</div><div><div class="rt">Calcul de l'indemnité légale</div><div class="rd">¼ de mois de salaire par année d'ancienneté pour les 10 premières années, puis ⅓ de mois par année au-delà. <span data-art="L1237-13"></span>.</div></div></div>
   <div class="rule"><div class="ri">📅</div><div><div class="rt">Ancienneté minimale requise</div><div class="rd">Aucune ancienneté minimale n'est requise pour conclure une rupture conventionnelle. L'indemnité est due dès le premier jour.</div></div></div>
-  <div class="rule"><div class="ri">💶</div><div><div class="rt">Fiscalité de l'indemnité</div><div class="rd">Exonérée d'impôt sur le revenu et de cotisations sociales dans la limite du plus élevé entre : 2× la rémunération annuelle brute, 50 % de l'indemnité, ou le montant légal/conventionnel. Plafond : 6× le PASS.</div></div></div>
+  <div class="rule"><div class="ri">💶</div><div><div class="rt">Fiscalité de l'indemnité (à jour juin 2026)</div><div class="rd"><b>Impôt sur le revenu</b> : exonérée dans la limite la plus élevée entre le montant légal/conventionnel, 2× la rémunération annuelle brute (année N-1), ou 50 % de l'indemnité — plafonné à <b>6 PASS (288 360 €)</b>. <b>Cotisations sociales</b> : exonérées dans la limite de <b>2 PASS (96 120 €)</b> ; au-delà de 10 PASS, soumises dès le 1ᵉʳ euro. <b>CSG/CRDS</b> : dues sur la part qui dépasse l'indemnité légale ou conventionnelle. <i>Montants indicatifs — art. 80 duodecies CGI &amp; art. L242-1 CSS (PASS 2026 = 48 060 €).</i></div></div></div>
+  <div class="rule"><div class="ri">🛡️</div><div><div class="rt">Un plancher protecteur</div><div class="rd">L'indemnité spécifique de rupture conventionnelle <b>ne peut jamais être inférieure à l'indemnité légale de licenciement</b> (et à l'indemnité conventionnelle si elle est plus favorable). Au-delà, le montant se négocie librement (art. L1237-13 CT).</div></div></div>
+  <div class="rule"><div class="ri">🏭</div><div><div class="rt">Côté employeur — contribution 40 %</div><div class="rd">Depuis le <b>1ᵉʳ janvier 2026</b>, l'employeur acquitte une <b>contribution patronale de 40 %</b> (contre 30 % auparavant) sur la fraction d'indemnité exonérée de cotisations (LFSS 2026, art. 15). C'est un coût pour l'entreprise, <b>pas une retenue</b> sur ton indemnité — mais ça peut peser dans la négociation.</div></div></div>
+  <div class="rule"><div class="ri">👵</div><div><div class="rt">Cas particulier : retraite</div><div class="rd">Si tu remplis déjà les conditions pour une retraite à taux plein, l'indemnité est <b>soumise à cotisations dès le 1ᵉʳ euro</b> (pas d'exonération). L'intérêt financier de la rupture conventionnelle est alors réduit.</div></div></div>
   <div class="rule"><div class="ri">🏖️</div><div><div class="rt">Congés payés non pris</div><div class="rd">Les congés payés acquis et non pris donnent lieu à une indemnité compensatrice distincte, quel que soit le motif de rupture.</div></div></div>
   <div class="rule"><div class="ri">📋</div><div><div class="rt">Documents remis à la rupture</div><div class="rd">Certificat de travail, solde de tout compte, attestation France Travail (ex-Pôle Emploi). La rupture conventionnelle ouvre droit à l'ARE (allocation chômage).</div></div></div>
 
-  <div class="note"><span data-txt="disclaimer"></span>. <span data-art="L1237-11"></span> à <span data-art="L1237-19-4"></span> CT.<br>🔄 Tout reste sur ton appareil.
+  <div class="note"><span data-txt="disclaimer"></span>. <span data-artn="L1237-11"></span> à <span data-artn="L1237-19-4"></span> CT.<br>🔄 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Barème 2026 — indemnité légale minimale. Ta convention collective peut être plus favorable.</div>
 </div>
@@ -281,9 +286,14 @@ function calcAnc(start, end){
   var y = end.getFullYear() - start.getFullYear();
   var m = end.getMonth() - start.getMonth();
   var d = end.getDate() - start.getDate();
-  if(d < 0){ m--; }
+  if(d < 0){
+    // jours restants dans le mois précédent la date de fin (purement informatif)
+    var prevMonth = new Date(end.getFullYear(), end.getMonth(), 0).getDate();
+    d += prevMonth;
+    m--;
+  }
   if(m < 0){ y--; m += 12; }
-  return { years: y, months: Math.abs(m), totalMonths: y*12 + Math.abs(m) };
+  return { years: y, months: Math.abs(m), days: d, totalMonths: y*12 + Math.abs(m) };
 }
 
 function calcIndem(salRef, totalMonths){
@@ -319,9 +329,11 @@ function recalc(){
 
   var ancTxt = anc.years + ' an' + (anc.years!==1?'s':'');
   if(anc.months > 0) ancTxt += ' et ' + anc.months + ' mois';
+  if(anc.days > 0) ancTxt += ' et ' + anc.days + ' jour' + (anc.days>1?'s':'');
   $('rAnc').textContent = ancTxt;
-  $('rAncDetail').textContent = 'Soit ' + anc.totalMonths + ' mois · ' +
-    (anc.totalMonths >= 120 ? 'Tranche 10+ ans appliquée (⅓/an)' : 'Tranche ≤ 10 ans (¼/an)');
+  $('rAncDetail').textContent = 'Soit ' + anc.totalMonths + ' mois complets' +
+    (anc.days>0 ? ' + ' + anc.days + ' j non comptés (l\'indemnité légale s\'arrête aux mois complets, art. R1234-2)' : '') +
+    ' · ' + (anc.totalMonths >= 120 ? 'Tranche 10+ ans appliquée (⅓/an)' : 'Tranche ≤ 10 ans (¼/an)');
 
   $('results').style.display = 'block';
 }
@@ -357,7 +369,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{start:'',end:'',sal:'',base:'12'});
@@ -408,7 +420,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

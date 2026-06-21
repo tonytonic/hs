@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Titres-Restaurant — Le Bistro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -23,11 +24,11 @@
   --ardoise:#2a2d35; --ardoise-l:#3d4149; --ardoise-ll:#545966;
   --creme:#f8f4ed; --creme2:#f0ebe0; --creme3:#e6dfd0;
   --or:#c8a84b; --or-l:#e0c46a; --or-d:#9a7c2e;
-  --ink:#1a1a1a; --ink2:#3a3a3a; --faded:#7a7a7a;
+  --ink:#1a1a1a; --ink2:#3a3a3a; --faded:#5e5e5e;
   --card:#fff; --line:rgba(26,26,26,0.1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{
   font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:
@@ -183,6 +184,8 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
+.wiz-legal{color:rgba(255,255,255,.55);}
 </style>
 <body>
 
@@ -195,7 +198,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Titres-Restaurant</div>
     <div class="su">Le Bistro · v1.0</div>
   </div>
-  <button class="hbtn" id="helpBtn" title="Aide">?</button>
+  <button class="hbtn" id="helpBtn" title="Aide" aria-label="Aide">?</button>
 </header>
 
 <!-- WIZARD -->
@@ -234,7 +237,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <!-- HELP -->
 <div class="ov" id="help">
   <div class="box"><div class="hd"><div class="t">Mode d'emploi</div><div class="s">Tout sur tes titres-restaurant</div>
-    <button class="x" data-close="help">✕</button></div>
+    <button class="x" data-close="help" aria-label="Fermer">✕</button></div>
   <div class="bd">
     <div class="feat"><div class="ic">💳</div><div class="tx"><b>Valeur du titre</b>Le montant imprimé sur ton chèque ou crédité sur ta carte. Entre 12,20 € et 14,64 € pour maximiser l'exonération.</div></div>
     <div class="feat"><div class="ic">🏛️</div><div class="tx"><b>Part patronale</b>50 à 60 % de la valeur, exonérée jusqu'à 7,32 €/titre en 2026. Au-delà, l'excédent est soumis à charges.</div></div>
@@ -267,7 +270,7 @@ body.pageBlancheGuard>*{display:block!important;}
   <div class="panel">
     <div class="panel-t">🧮 Configure tes titres</div>
     <div class="field"><label>Valeur faciale du titre-restaurant</label>
-      <div class="inline"><input class="ip" id="sVal" type="number" inputmode="decimal" step="0.01" value="13"><span class="unit">€</span></div>
+      <div class="inline"><input class="ip" id="sVal" type="number" inputmode="decimal" step="0.01" value="13" aria-label="Valeur faciale du titre-restaurant"><span class="unit">€</span></div>
       <div class="hint">Optimal entre <b>12,20 €</b> (part patronale 60 %) et <b>14,64 €</b> (part patronale 50 %) pour maximiser l'exonération.</div></div>
     <div class="field"><label>Part patronale</label>
       <div class="slider-row">
@@ -276,7 +279,7 @@ body.pageBlancheGuard>*{display:block!important;}
       </div>
       <div class="hint">Entre 50 % (minimum légal) et 60 % (maximum exonéré).</div></div>
     <div class="field"><label>Jours travaillés dans le mois</label>
-      <div class="inline"><input class="ip" id="fJours" type="number" inputmode="numeric" value="20" min="1" max="31"><span class="unit">jours</span></div>
+      <div class="inline"><input class="ip" id="fJours" type="number" inputmode="numeric" value="20" min="1" max="31" aria-label="Jours travaillés dans le mois"><span class="unit">jours</span></div>
       <div class="hint">1 titre par jour travaillé en principe (pas les weekends ni les jours de télétravail selon accord).</div></div>
   </div>
 
@@ -363,7 +366,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   function $(s,r){ return (r||document).querySelector(s); }
@@ -449,7 +452,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

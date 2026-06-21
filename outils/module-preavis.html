@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Préavis — Durée & Calcul</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,10 +20,10 @@
   --acc:#3a7ab8; --acc-l:#5a9ad8; --acc-d:#1a5a98;
   --dark:#0e1a2a; --dark2:#162233;
   --card:rgba(255,255,255,0.07); --card-edge:rgba(255,255,255,0.13);
-  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.45);
+  --ink:#fff; --ink2:rgba(255,255,255,0.75); --faded:rgba(255,255,255,0.47);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#0e1a2a 0%,#162233 50%,#0e1820 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -49,7 +50,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field{margin-bottom:13px;} .field:last-child{margin-bottom:0;}
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;letter-spacing:0.3px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);border:1.5px solid var(--card-edge);border-radius:10px;
-  padding:12px;color:#fff;font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  padding:12px;color:#fff;font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%235a9ad8' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -145,6 +146,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -163,7 +165,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>⚖️ Dispense & indemnité</b>L'employeur peut dispenser du préavis avec maintien de la rémunération.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -177,7 +179,7 @@ body.pageBlancheGuard>*{display:block!important;}
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
   <div class="brand"><div class="ti">Préavis</div><div class="su">Durée légale · Délais · V1.0</div></div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -186,7 +188,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="panel-t">⚙️ Ta situation</div>
     <div class="field">
       <label>Motif de rupture</label>
-      <select class="ip" id="fMotif">
+      <select class="ip" id="fMotif" aria-label="Motif de rupture">
         <option value="licenciement">Licenciement (sauf faute grave/lourde)</option>
         <option value="demission">Démission</option>
         <option value="retraite_sal">Départ en retraite (salarié)</option>
@@ -195,7 +197,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Catégorie professionnelle</label>
-      <select class="ip" id="fCat">
+      <select class="ip" id="fCat" aria-label="Catégorie professionnelle">
         <option value="ouvrier">Ouvrier / Employé</option>
         <option value="technicien">Technicien / Agent de maîtrise</option>
         <option value="cadre">Cadre</option>
@@ -203,7 +205,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="field">
       <label>Ancienneté (années complètes)</label>
-      <input class="ip" id="fAnc" type="number" min="0" max="50" step="1" placeholder="0">
+      <input class="ip" id="fAnc" type="number" min="0" max="50" step="1" placeholder="0" aria-label="Ancienneté (années complètes)">
       <div class="hint">Années complètes dans l'entreprise à la date de notification.</div>
     </div>
   </div>
@@ -235,9 +237,11 @@ body.pageBlancheGuard>*{display:block!important;}
   <div class="rule"><div class="ri">💶</div><div><div class="rt">Indemnité compensatrice</div><div class="rd">Si le préavis n'est pas effectué (dispense par l'entreprise ou inexécution), une indemnité compensatrice est due, égale au salaire que le salarié aurait perçu pendant cette période.</div></div></div>
   <div class="rule"><div class="ri">📋</div><div><div class="rt">Convention collective prioritaire</div><div class="rd">La convention collective ou le contrat de travail peut prévoir des durées plus longues. Le salarié bénéficie toujours des dispositions les plus favorables.</div></div></div>
   <div class="rule"><div class="ri">🚫</div><div><div class="rt">Pas de préavis en cas de faute grave</div><div class="rd">En cas de licenciement pour faute grave ou lourde, aucun préavis n'est dû. La rupture est immédiate, sans indemnité compensatrice de préavis.</div></div></div>
+  <div class="rule"><div class="ri">🤝</div><div><div class="rt">Dispense de préavis : qui demande ?</div><div class="rd">Si c'est <b>l'employeur</b> qui dispense le salarié d'exécuter le préavis, il doit verser l'<b>indemnité compensatrice</b> (le préavis reste dû). Si c'est <b>le salarié</b> qui demande la dispense et que l'employeur l'accepte, <b>aucune indemnité</b> n'est due de part et d'autre (art. L1234-5 CT).</div></div></div>
+  <div class="rule"><div class="ri">🏖️</div><div><div class="rt">Préavis & congés payés</div><div class="rd">Des congés payés <b>déjà fixés avant</b> la notification <b>suspendent</b> le préavis (sa fin est repoussée d'autant). À l'inverse, le salarié ne peut pas imposer de poser des congés pour écourter son préavis. L'indemnité de congés payés non pris reste due en fin de contrat.</div></div></div>
 
-  <div class="note"><span data-art="L1234-1"></span>, <span data-art="L1237-1"></span> CT — Durées légales minimales. Pour les cadres, les 3 mois et pour la démission, les durées affichées sont les usages conventionnels les plus répandus (non fixés par la loi stricte). Départ volontaire à la retraite : le salarié respecte un préavis de même durée que le licenciement (art. L1237-10 CT — Légifrance). Ta CCN peut prévoir des durées différentes.<br>🔄 Outil indicatif — tout reste sur ton appareil.
-    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
+  <div class="note"><span data-artn="L1234-1"></span>, <span data-artn="L1237-1"></span> CT — Durées légales minimales. Pour les cadres, les 3 mois et pour la démission, les durées affichées sont les usages conventionnels les plus répandus (non fixés par la loi stricte). Départ volontaire à la retraite : le salarié respecte un préavis de même durée que le licenciement (art. L1237-10 CT — Légifrance). Ta CCN peut prévoir des durées différentes.<br>🔄 Outil indicatif — tout reste sur ton appareil.
+    <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button> <b>À jour juin 2026</b> · durées <b>indicatives</b> (réf. art. L1234-1, L1237-1, L1234-5 CT) — ta convention collective prévaut si plus favorable.</div>
   <div class="foot">Préavis légal — Code du travail français · Outil pédagogique</div>
 </div>
 
@@ -297,7 +301,7 @@ function getDuree(motif, cat, ancYears){
 }
 
 function moisStr(m){
-  if(m === 0) return 'Selon convention ou usages (< 6 mois d'ancienneté)';
+  if(m === 0) return 'Selon convention ou usages (< 6 mois d\'ancienneté)';
   return m + ' mois';
 }
 
@@ -355,7 +359,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{motif:'licenciement',cat:'ouvrier',anc:''});
@@ -406,7 +410,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

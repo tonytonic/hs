@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Parentalité — Congés & Droits</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -19,11 +20,11 @@
   --acc:#7a4aaa;--acc-l:#9a6aca;--acc-d:#5a2a8a;
   --dark:#120a1e;--dark2:#1c1030;
   --card:rgba(255,255,255,0.07);--card-edge:rgba(255,255,255,0.13);
-  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.45);
+  --ink:#fff;--ink2:rgba(255,255,255,0.75);--faded:rgba(255,255,255,0.46);
   --ok:#4aaa7a;--warn:#e8a030;--info:#5a9ad8;--pink:#e06090;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;}
 body{font-family:'Plus Jakarta Sans',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;min-height:100vh;
   background:linear-gradient(165deg,#120a1e 0%,#1c1030 50%,#100818 100%);
   background-attachment:fixed;-webkit-text-size-adjust:100%;overflow-x:hidden;}
@@ -78,7 +79,7 @@ header .hbtn{background:var(--card);border:1px solid var(--card-edge);color:#fff
 .field label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:7px;}
 .ip{width:100%;max-width:100%;box-sizing:border-box;background:rgba(255,255,255,0.07);
   border:1.5px solid var(--card-edge);border-radius:10px;padding:12px;color:#fff;
-  font-size:15px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
+  font-size:16px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;}
 .ip:focus{outline:none;border-color:var(--acc-l);}
 select.ip{appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%239a6aca' stroke-width='1.6' fill='none'/%3E%3C/svg%3E");
@@ -181,6 +182,7 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -199,7 +201,7 @@ body.pageBlancheGuard>*{display:block!important;}
     </div>
     <div class="wiz-step" data-s="2">
       <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>👶 Congé paternité</b>28 jours calendaires depuis 2021, dont 7 obligatoires. Indemnisé par la CPAM.</div></div>
-      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Données 100 % locales.</div>
+      <div class="wiz-legal"><span data-txt="disclaimer"></span>. Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="wiz-dots" id="wizDots"></div>
@@ -217,7 +219,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="ti">Parentalité</div>
     <div class="su">Congés · Indemnités · Droits · V1.0</div>
   </div>
-  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'">?</button>
+  <button class="hbtn" onclick="document.getElementById('help').style.display='flex'" aria-label="Aide">?</button>
 </header>
 
 <div class="wrap">
@@ -247,14 +249,14 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="field">
         <label>Salaire brut mensuel de référence</label>
         <div class="inline">
-          <input class="ip" id="mSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <input class="ip" id="mSalJour" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire brut mensuel de référence">
           <span class="unit">€/mois</span>
         </div>
         <div class="hint">Moyenne des 3 derniers mois. Plafonné au PMSS (4 005 €). IJ max : 104,02 €/jour en 2026 (PMSS 4 005 € — source : Légisocial).</div>
       </div>
       <div class="field">
         <label>Rang de naissance</label>
-        <select class="ip" id="mRang">
+        <select class="ip" id="mRang" aria-label="Rang de naissance">
           <option value="16">1er ou 2e enfant (16 semaines)</option>
           <option value="26">3e enfant et + (26 semaines)</option>
           <option value="34">Jumeaux (34 semaines)</option>
@@ -301,14 +303,14 @@ body.pageBlancheGuard>*{display:block!important;}
       <div class="field">
         <label>Salaire brut mensuel de référence</label>
         <div class="inline">
-          <input class="ip" id="pSalJour" type="number" min="0" step="0.01" placeholder="0">
+          <input class="ip" id="pSalJour" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire brut mensuel de référence">
           <span class="unit">€/mois</span>
         </div>
         <div class="hint">Moyenne des 3 derniers mois. Plafonné au PMSS. IJ max : 104,02 €/jour (2026 — Légisocial).</div>
       </div>
       <div class="field">
         <label>Type de naissance</label>
-        <select class="ip" id="pType">
+        <select class="ip" id="pType" aria-label="Type de naissance">
           <option value="22">Naissance simple (22 jours CPAM)</option>
           <option value="29">Naissance multiple (29 jours CPAM)</option>
         </select>
@@ -357,7 +359,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="rule"><div class="ri">📋</div><div><div class="rt">Droit à retrouver son emploi</div><div class="rd">À l'issue du congé parental, le salarié retrouve son emploi précédent ou un emploi similaire avec rémunération équivalente. Un entretien professionnel doit être organisé au retour.</div><span class="ctag ok">Emploi garanti au retour</span></div></div>
   </div>
 
-  <div class="note"><span data-art="L1225-1"></span> à <span data-art="L1225-65"></span> CT · <span data-art="L331-3"></span> · Loi du 16 mars 2012.<br>
+  <div class="note"><span data-artn="L1225-1"></span> à <span data-artn="L1225-65"></span> CT · <span data-art="L331-3"></span> · à jour juin 2026 · Loi du 16 mars 2012.<br>
     Montants CPAM 2026 — PASS 2026 : 48 060 €. PreParE : vérifier sur caf.fr.<br>
     👶 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
@@ -450,7 +452,7 @@ function shConfirm(msg, cb){
     shConfirm('Tout remettre à zero ?', function(){
     localStorage.removeItem(LS.STATE);
     localStorage.removeItem(LS.WELCOME);
-    location.reload();
+    document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
   var state=get(LS.STATE,{mSalJour:'',mRang:'16',pSalJour:'',pType:'22'});
@@ -501,7 +503,7 @@ function shConfirm(msg, cb){
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>

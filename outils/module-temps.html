@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<script src="../articles-loi.js"></script>
+<script>try{history.scrollRestoration='manual';}catch(e){}window.scrollTo(0,0);</script>
+<script src="articles-loi.js"></script>
 <meta charset="UTF-8">
 <title>Temps & Repos — Durées légales</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -20,12 +21,12 @@
 :root{
   --grey:#37474f;--grey-l:#546e7a;--grey-ll:#78909c;
   --cream:#f5f7f8;--card:#fff;--card-edge:#cfd8dc;
-  --ink:#1a2327;--ink2:#37474f;--faded:#90a4ae;
+  --ink:#1a2327;--ink2:#37474f;--faded:#637178;
   --ok:#2e7d50;--warn:#c07820;--red:#c62828;--blue:#1565C0;
   --line:rgba(55,71,79,0.10);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{min-height:100%;background:var(--cream);}
+html,body{overflow-wrap:break-word;word-break:break-word;min-height:100%;background:var(--cream);}
 body{font-family:'Lato',-apple-system,sans-serif;color:var(--ink);padding-bottom:60px;}
 @media screen and (orientation:landscape) and (max-device-width:1024px){
   body>*:not(#lb){display:none!important;}
@@ -89,13 +90,14 @@ body.pageBlancheGuard>*{display:block!important;}
 .sh-disclaimer strong{color:rgba(255,255,255,0.75);}
 .sh-disclaimer a{color:rgba(255,255,255,0.55);text-decoration:underline;}
 
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
 <div id="lb"><div class="i">⚙️</div><div class="t">Passe en portrait pour utiliser cet outil</div></div>
 <header>
   <a href="../outils.html" class="back">← Trousse</a>
-  <div class="brand"><div class="ti">⚙️ Temps & Repos</div><div class="su">Durées légales · Code du travail 2026</div></div>
+  <div class="brand"><div class="ti">⚙️ Temps & Repos</div><div class="su">Durées légales · Code du travail (à jour juin 2026)</div></div>
   <button class="hbtn" id="helpBtn" aria-label="Aide">?</button>
 </header>
 
@@ -250,7 +252,7 @@ if(!get(LS.WELCOME,0)){document.getElementById('helpOv').style.display='flex';se
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
   SimulHeures est un outil d'information et d'aide à la compréhension de la législation du travail. <strong>Tous les résultats, montants et calculs sont fournis à titre indicatif uniquement</strong> et ne constituent pas un avis juridique, fiscal ou comptable. Ils ne sauraient engager la responsabilité de l'auteur. En cas de litige ou de décision importante, consultez un conseiller juridique, votre service RH ou les services officiels (<a href="https://www.service-public.fr" target="_blank">service-public.fr</a>, DREETS).<br>
-  <span style="opacity:.7">Données 100 % locales · Aucune information n'est transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
+  <span style="opacity:.7">Vos données restent sur votre appareil · Aucune saisie transmise · <a href="../mentions-legales.html">Mentions légales</a></span>
 </div>
 </body>
 </html>
