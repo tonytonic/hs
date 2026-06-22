@@ -197,7 +197,7 @@ class Dashboard {
       facteurs_heures: [
         { label:'Heures hebdo vs optimal', key:'_recentWeeklyH', fmt: (v, n) => {
             const src = n('_weeklyHSource');
-            const badge = src === 'live' ? ' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>'
+            const badge = src === 'live' ? ' <span style="font-size:8px;color:#00ccaa;">● LIVE · 7J</span>'
                         : src === 'avg'  ? ' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
                         :                  ' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
             return v.toFixed(0)+'h/sem (optimal : 35h)'+badge;
@@ -235,14 +235,14 @@ class Dashboard {
             // "0h travaillées" était affiché samedi quand le moteur basculait en mode repos
             // alors que lun-ven avaient des HS saisies dans M2
             if (isRest && src !== 'live' && src !== 'avg') return '0h travaillées — potentiel de récupération actif';
-            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE · 7J</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
             // Afficher la base CCN (35h) si semaine repos sans données
             const h = (isRest && v < 10) ? 35 : v;
             return h.toFixed(0)+'h/sem — perf. Pencavel '+(h<=35?'100%':h<=40?'~99%':h<=48?'~82%':h<=50?'~80%':h<=55?'~60%':'~52%')+badge;
         }},
         { label:'Risque cognitif (≥52h)', key:'_recentWeeklyH', fmt: (v, n) => {
             const src = n('_weeklyHSource');
-            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE · 7J</span>':src==='avg'?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>':' <span style="font-size:8px;color:rgba(255,255,255,0.3);">— SEUIL</span>';
             return (v>=52?'Actif : +19% gyrus frontal (OEM 2025)':'Non actif (<52h)')+badge;
           } },
       ],
@@ -303,7 +303,7 @@ class Dashboard {
             // que l'historique récent est à 45h.
             const dispH = (src === 'seuil' && (n('_avgExtraDay28')||0) > 0)
               ? (35 + (n('_avgExtraDay28')||0) * 5) : v;
-            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE</span>'
+            const badge = src==='live'?' <span style="font-size:8px;color:#00ccaa;">● LIVE · 7J</span>'
               : src==='avg' ?' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
               : (n('_avgExtraDay28')||0) > 0
                 ? ' <span style="font-size:8px;color:#c89a18;">◐ MOY. 28J</span>'
@@ -347,7 +347,7 @@ class Dashboard {
                      (semNorm > 0 ? ' ou ' + semNorm + ' sem. normales' : '') +
                      ' pour sortir de surcharge (' + vR + ' sem. cumulées)';
             }
-            return vR > 0 ? 'Réduite : '+vR+' sem. de surcharge' : 'Normale : pas de surcharge';
+            return vR > 0 ? 'Réduite : '+vR+' sem. cumulées' : 'Normale : pas de cumul';
         }},
         { label:'Base de récupération', key:'_recentWeeklyH', fmt: v => v>48?'Faible (>48h/sem)':v>40?'Moyenne (40-48h)':'Bonne (≤40h)' },
       ],
