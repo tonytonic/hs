@@ -4,6 +4,22 @@
 (function(global){
 'use strict';
 
+  // ── Phase physiologique INRS — keyée sur le niveau d'heures SOUTENU + la dose ──────
+  // P1 Adaptation (≤40h) · P2 Fatigue chr. (40-52h) · P3 Surmenage (52-55h) · P4 (>55h).
+  // La dose 12 sem (vR) ne fait que MODULER la durée requise : on n'escalade au-delà de
+  // P1 que si la moyenne hebdo SOUTENUE (avgH, 12 sem — _avgWeeklyH12) est réellement
+  // dans la bande. Évite de classer "fatigue chronique" un rythme léger/intermittent
+  // (ex. 38h/sem avec des semaines de repos) juste parce que la somme fractionnaire
+  // des HS dépasse 4. Source UNIQUE pour les panneaux Fatigue et Stress.
+  function phaseINRS(vR, avgH) {
+    avgH = avgH || 0;
+    if (avgH >= 55 && vR >= 8) return { id: 4, label: 'risque burn-out' };
+    if (avgH >= 52 && vR >= 6) return { id: 3, label: 'surmenage' };
+    if (avgH >= 40 && vR >= 4) return { id: 2, label: 'fatigue chronique' };
+    return { id: 1, label: 'vigilance' };
+  }
+
+
 class Dashboard {
   constructor(){}
 
@@ -152,16 +168,14 @@ class Dashboard {
             return '+'+v.toFixed(1)+'h/jour ('+impact+')'+suffix;
         }},
         // _consecOT : calculé en arrière-plan (bio) mais non affiché — évite confusion utilisateur
-        { label:'Surcharge chronique (12 sem.)', key:'_cumulWeeksLong', fmt: v => {
+        { label:'Surcharge chronique (12 sem.)', key:'_cumulWeeksLong', fmt: (v, get) => {
             const vR = Math.round(v * 10) / 10;
             if (vR <= 0) return 'Aucune surcharge chronique';
-            // Phases alignées sur le panneau Stress (même fenêtre 12 sem, mêmes seuils)
-            let phase;
-            if (vR < 4)        phase = 'phase P1 — vigilance';
-            else if (vR < 8)   phase = 'phase P2 — fatigue chronique';
-            else if (vR < 16)  phase = 'phase P3 — surmenage';
-            else               phase = 'phase P4 — risque burn-out';
-            return vR.toFixed(1)+' sem. en surcharge — '+phase;
+            const avgH = (get && get('_avgWeeklyH12')) || 0;
+            const ph = phaseINRS(vR, avgH); // dose + heures soutenues (helper unique)
+            // "cumulées" et non "en surcharge" : vR est une dose fractionnaire (somme de
+            // semaines partielles), pas un nombre de semaines de surcharge CONTINUE.
+            return vR.toFixed(1)+' sem. cumulées — phase P'+ph.id+' '+ph.label;
         }},
       ],
       facteurs_vie: [
@@ -189,15 +203,13 @@ class Dashboard {
             return v.toFixed(0)+'h/sem (optimal : 35h)'+badge;
           } },
         { label:'Variabilité des horaires', key:'_sigma',         fmt: v => v===0?'Faible — rythme régulier':v>6?'Élevée ('+v.toFixed(1)+'h écart-type — ANACT)':v>3?'Modérée ('+v.toFixed(1)+'h écart-type)':'Faible ('+v.toFixed(1)+'h écart-type)' },
-        { label:'Durée exposition (12 sem.)', key:'_cumulWeeksLong',   fmt: v => {
+        { label:'Durée exposition (12 sem.)', key:'_cumulWeeksLong',   fmt: (v, get) => {
             const vR = Math.round(v * 10) / 10;
             if (vR <= 0) return 'Sous le seuil (12 sem.)';
             if (vR < 1) return 'Effet partiel d\'1 semaine légère';
-            if (vR < 4) return vR.toFixed(1)+' sem. — vigilance';
-            if (vR < 4) return vR.toFixed(1)+' sem. — phase P1 vigilance';
-            if (vR < 8) return vR.toFixed(1)+' sem. — phase P2 fatigue chronique';
-            if (vR < 16) return vR.toFixed(1)+' sem. — phase P3 surmenage';
-            return vR.toFixed(1)+' sem. — phase P4 risque burn-out';
+            const avgH = (get && get('_avgWeeklyH12')) || 0;
+            const ph = phaseINRS(vR, avgH); // source unique : helper phaseINRS()
+            return vR.toFixed(1)+' sem. cumulées — phase P'+ph.id+' '+ph.label;
         }},
       ],
       facteurs_vie: [
