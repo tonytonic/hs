@@ -1316,64 +1316,84 @@ class DTEEngine {
       cumulMonths = Math.round((cumulWeeksR / 4.33) * 10) / 10;
     }
 
-    // ── cumulWeeksLong : fenêtre 12 semaines glissantes ───────────────────────
+    // ── cumulWeeksLong : fenêtre 12 SEM GLISSANTE AU JOUR (semaines civiles alignées) ──
     //
-    // Utilisé UNIQUEMENT pour cvRisk (Kivimäki 2015) et cogRisk (Jang/OEM 2025).
-    // Ces risques sont STRUCTURELS (long terme) : une exposition de 3 mois à 55h/sem
-    // ne s'efface pas en 4 semaines normales (contrairement à la fatigue courante).
+    // ATTENTION : pilote cvRisk (Kivimäki 2015) ET cogRisk (Jang/OEM 2025), MAIS AUSSI
+    // cumulAmp (fatigue) et _chronicFloor (stress) plus bas. Toute erreur ici se
+    // répercute donc sur le SCORE GLOBAL, pas seulement sur les risques structurels.
     //
-    // Règle identique au 28j mais sur 12 semaines (référentiel légal Art. L3121-22).
-    // Fériés = 7h CCN (méthode origine). Pas de séparation isVacWeek/isRestWeek :
-    // seule l'accumulation compte (pas de réduction — le risque structurel ne décroît
-    // pas à -0.12/sem, il requiert des mois de retour à la normale).
+    // FIX RÉSIDU dim→lun (même bug que le 28j, cf. lignes ~1233-1243). Avant : ancré sur
+    // le lundi civil, on comptait les 12 semaines COMPLÈTES (w=1..12) en excluant la
+    // semaine en cours → chaque lundi, la semaine qui venait de se terminer (avec HS)
+    // entrait d'un BLOC dans la fenêtre → saut jusqu'à +1.0 sem. SANS heure travaillée →
+    // fatigue/stress/cvRisk grimpaient le lundi matin après un week-end de repos.
     //
-    // CORRECTIF STABILITÉ (fenêtre chronique). On compte les 12 dernières semaines
-    // COMPLÈTES (w=1 à 12), en EXCLUANT la semaine en cours (w=0, partielle). Raison :
-    // une mesure « chronique 12 sem » ne doit pas sauter selon le jour de la semaine ni
-    // selon que les heures du jour sont déjà saisies. Avant, la semaine en cours ne
-    // passait le seuil que le vendredi (5 jours saisis) → le compteur chutait le lundi
-    // et remontait le vendredi (score instable). Désormais il ne bouge qu'au passage
-    // d'une semaine (lundi→lundi). La réactivité au jour le jour reste portée par les
-    // composantes aiguës (heures de la semaine, fenêtre 7j, ressenti).
-    let cumulWeeksLong = 0;
-    for (let w = 12; w >= 1; w--) {
-      let weekHLong = 0, hasAnyLong = false;
+    // On NE porte PAS la boucle 28j en 12×7j ancrés sur today : des blocs de 7 jours
+    // désalignés des semaines lun-ven recoupent les HS et ~DOUBLENT l'échelle (5.3→~9),
+    // ce qui casserait la calibration de cumulAmp / _chronicFloor / seuils cvRisk.
+    //
+    // SOLUTION : garder le découpage en semaines civiles alignées, mais INTERPOLER entre
+    // la fenêtre ancrée sur le lundi courant ("début de semaine") et celle ancrée sur le
+    // lundi suivant ("fin de semaine"), au prorata des jours écoulés. Le compteur glisse
+    // d'un cran fractionnaire par jour au lieu de sauter le lundi. Échelle strictement
+    // préservée (vérifié sur données réelles : dim 5.14 → lun 5.29, au lieu de +1.0).
+    const _wcLong = (anchorMon) => {
+      let acc = 0;
+      for (let w = 12; w >= 1; w--) {
+        let weekHLong = 0, hasAnyLong = false;
+        for (let dd = 0; dd < workDaysPerWeek; dd++) {
+          const dt = new Date(anchorMon);
+          dt.setDate(anchorMon.getDate() - w * 7 + dd);
+          if (dt > today) continue;
+          const k = localDK(dt);
+          const e = days[k];
+          const isFerie = specialDays[k] === 'ferie';
+          const isVacReal = !!vacances[k] && !isFerie; // vrai congé seulement
+          if (isVacReal) { weekHLong += baseJourCCN; hasAnyLong = true; continue; } // congé = 7h base, 0 HS
+          if (e && e.absent > 0) continue;
+          if (e && e.recup >= baseJourCCN) continue;
+          const hs = e ? (e.extra || 0) : 0;
+          weekHLong += baseJourCCN + hs; // férié = 7h base + HS si travaillé
+          hasAnyLong = true;
+        }
+        if (!hasAnyLong) continue;
+        // Contribution progressive : 1h/sem=0.14, 5h/sem=0.71, ≥7h/sem=1.0. Pas de
+        // réduction (-0.12) : le risque structurel est cumulatif sur la fenêtre.
+        const hs35Long = Math.max(0, weekHLong - _ccnSeuilW);
+        if (hs35Long > 0) acc += Math.min(1.0, hs35Long / (_ccnSeuilW * 0.20));
+      }
+      return acc;
+    };
+    const _nextMonLong = new Date(todayMonday);
+    _nextMonLong.setDate(todayMonday.getDate() + 7);
+    const _fracWLong = ((today.getDay() + 6) % 7) / 7; // lun=0 … dim=6/7
+    let cumulWeeksLong = _wcLong(todayMonday) * (1 - _fracWLong) + _wcLong(_nextMonLong) * _fracWLong;
+    cumulWeeksLong = Math.round(cumulWeeksLong * 1e9) / 1e9;
 
+    // ── avgWeeklyH12 : moyenne hebdo SOUTENUE sur 12 sem (pour la PHASE INRS) ──────────
+    // La phase physiologique INRS dépend du niveau d'heures SOUTENU (bandes 40/52/55h),
+    // pas de la dose cumulée seule. _recentWeeklyH (28j) peut être tiré par UNE grosse
+    // semaine isolée ; cette moyenne 12 sem est robuste à un pic et reflète le rythme réel.
+    let _sumWH12 = 0, _nbWH12 = 0;
+    for (let w = 12; w >= 1; w--) {
+      let wh = 0, has = false;
       for (let dd = 0; dd < workDaysPerWeek; dd++) {
         const dt = new Date(todayMonday);
         dt.setDate(todayMonday.getDate() - w * 7 + dd);
         if (dt > today) continue;
-
         const k = localDK(dt);
         const e = days[k];
         const isFerie = specialDays[k] === 'ferie';
-        const isVacReal = !!vacances[k] && !isFerie; // vrai congé seulement
-
-        if (isVacReal) {
-          weekHLong += baseJourCCN; // congé = base 7h, 0 HS
-          hasAnyLong = true;
-          continue;
-        }
+        const isVacReal = !!vacances[k] && !isFerie;
+        if (isVacReal) { wh += baseJourCCN; has = true; continue; }
         if (e && e.absent > 0) continue;
         if (e && e.recup >= baseJourCCN) continue;
-
-        const hs = e ? (e.extra || 0) : 0;
-        weekHLong += baseJourCCN + hs; // férié = 7h base + HS si travaillé
-        hasAnyLong = true;
+        wh += baseJourCCN + (e ? (e.extra || 0) : 0);
+        has = true;
       }
-
-      if (!hasAnyLong) continue;
-
-      // Contribution progressive (pas de seuil dur). Avant : threshold >= 5h/sem → falaise
-      // à 40h (cumWLong sautait de 0 à 8.6 en 1h). Maintenant : ramp depuis la 1ère heure
-      // supplémentaire. 1h/sem=0.14 contribution, 5h/sem=0.71, ≥7h/sem=1.0.
-      const hs35Long = Math.max(0, weekHLong - _ccnSeuilW);
-      if (hs35Long > 0) {
-        const contrib = Math.min(1.0, hs35Long / (_ccnSeuilW * 0.20));
-        cumulWeeksLong = Math.round((cumulWeeksLong + contrib) * 1e9) / 1e9;
-      }
-      // Pas de réduction (-0.12) : le risque structurel est cumulatif sur la fenêtre
+      if (has) { _sumWH12 += wh; _nbWH12++; }
     }
+    const avgWeeklyH12 = _nbWH12 > 0 ? Math.round((_sumWH12 / _nbWH12) * 10) / 10 : 0;
 
     const cumulWeeksLongR = Math.round(cumulWeeksLong * 10) / 10;
     const cumulMonthsLong = Math.round((cumulWeeksLongR / 4.33) * 10) / 10;
@@ -1783,7 +1803,8 @@ class DTEEngine {
       _consec:        consec,
       _consecOT:      consecOT,
       _cumulWeeks:    cumulWeeksR,      // 28j — fatigue/stress/score
-      _cumulWeeksLong: cumulWeeksLongR,  // 12sem — cvRisk/cogRisk
+      _cumulWeeksLong: cumulWeeksLongR,  // 12sem — cvRisk/cogRisk + cumulAmp/_chronicFloor
+      _avgWeeklyH12:   avgWeeklyH12,     // moyenne hebdo soutenue 12 sem — phase INRS
       _cumulMonthsLong: cumulMonthsLong,
       _cumulMonths:   cumulMonths,
       _consecRestDays: consecRestDays,
