@@ -146,20 +146,20 @@ document.addEventListener('DOMContentLoaded', function () {
       return advice; // vide
     } else if (scores.fatigue >= 85) {
       advice.push({ type:'danger', emoji:'🔴',
-        titre:'Épuisement critique — Phase 4',
+        titre:'Épuisement critique — fatigue très élevée',
         message:'Votre corps envoie des signaux d\'alarme. ' +
           (cumW >= 4 ? 'Après ' + cumW + ' semaines de surcharge, la récupération sera longue.' : 'Réduisez vos heures immédiatement.') +
           ' Le sens que vous donnez à votre travail peut atténuer la perception, mais pas les risques biologiques réels.',
         source:'OMS/OIT 2021 · INRS · HAS 2017 · Art. L4121-1 Code du travail' });
     } else if (scores.fatigue >= 60) {
       advice.push({ type:'warning', emoji:'🟠',
-        titre:'Fatigue chronique — Phase 3',
+        titre:'Fatigue élevée',
         message:'À ' + weekH.toFixed(0) + 'h/sem sur ' + (cumW||1) + ' semaine(s), la fatigue s\'accumule. ' +
           'Votre hygiène de vie (sport, alimentation, sommeil) peut réduire l\'impact de 20 à 30% selon les études INRS.',
         source:'J.Occup.Health 2021 · INRS · Sonnentag 2003' });
     } else if (scores.fatigue >= 35) {
       advice.push({ type:'warning', emoji:'🟡',
-        titre:'Fatigue modérée — Phase 2',
+        titre:'Fatigue modérée',
         message:'Niveau gérable si vous récupérez bien le week-end. Si vous aimez votre travail et dormez ≥7h, ' +
           'vous pouvez maintenir ce rythme à court terme. Surveillez la durée.',
         source:'Thompson 2022 · Nature Hum.Behav. 2025 (Fan et al.)' });
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
         : weekH > 40 ? 'INRS — vigilance dès 40h/sem · J.Occup.Health 2021'
         : 'OMS — Zone optimale ≤40h/sem · INRS';
       advice.push({ type: weekH > 48 ? 'warning' : 'success', emoji: weekH > 40 ? '⚠️' : '🟢',
-        titre: weekH > 48 ? 'Attention : dépassement légal ('+weekH.toFixed(0)+'h/sem)' : 'Bonne forme — Phase 1',
+        titre: weekH > 48 ? 'Attention : dépassement légal ('+weekH.toFixed(0)+'h/sem)' : 'Bonne forme',
         message: p1weekMsg + ' La prévention est le meilleur investissement.',
         source: p1src });
     }
