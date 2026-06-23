@@ -60,10 +60,14 @@ class Dashboard {
     // Maintenant : risks est passé depuis render(), même formule dès le premier affichage.
     const _risks = this._lastRisks || [];
     const sg = hasData ? (() => {
-      const worst = Math.max(scores.fatigue||0, scores.stress||0, scores.cogRisk||0);
+      // Résidus LISSÉS 3 j (helper partagé) — anti-saut journalier du score de tête.
+      const sm = (window.DTE && DTE.smoothResidues) ? DTE.smoothResidues(scores)
+               : { fatigue: scores.fatigue||0, stress: scores.stress||0, cogRisk: scores.cogRisk||0, _n: 1 };
+      this._heroSmoothN = sm._n || 1;
+      const worst = Math.max(sm.fatigue||0, sm.stress||0, sm.cogRisk||0);
       const base  = Math.max(0, 100 - worst);
-      const dangers = _risks.filter(x => x.level === 'CRITIQUE').length;
-      const alertes = _risks.filter(x => x.level !== 'CRITIQUE').length;
+      const dangers = _risks.filter(x => x.level === 'CRITIQUE').length; // instantané
+      const alertes = _risks.filter(x => x.level !== 'CRITIQUE').length; // instantané
       return Math.max(0, Math.min(99, Math.round(base - dangers*5 - alertes*2)));
     })() : null;
     el.textContent = sg !== null ? sg : '--';
@@ -97,6 +101,17 @@ class Dashboard {
       if (_heroPanel) _heroPanel.appendChild(_hint);
     }
 
+    // Repère discret : signaler que le score de tête est lissé (si ≥2 jours d'historique)
+    const _smHintOld = document.getElementById('dte-smooth-hint');
+    if (_smHintOld) _smHintOld.remove();
+    if (hasData && this._heroSmoothN >= 2) {
+      const _smH = document.createElement('div');
+      _smH.id = 'dte-smooth-hint';
+      _smH.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.28);text-align:center;margin-top:2px;display:block;width:100%;clear:both;';
+      _smH.textContent = '📉 score lissé sur ' + this._heroSmoothN + ' j — détails instantanés';
+      const _hp = document.querySelector('.panel--hero');
+      if (_hp) _hp.appendChild(_smH);
+    }
     const mel=document.getElementById('marge-securite');
     if(mel){
       if(!hasData){ mel.textContent='—'; mel.style.color='var(--text-muted)'; }
