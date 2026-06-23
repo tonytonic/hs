@@ -3,6 +3,34 @@
  */
 window.DTE = window.DTE || {};
 
+// ── Lissage 3 jours des résidus physiologiques (anti-nervosité du score de tête) ──
+// Le hero score = 100 − max(fatigue, stress, cerveau). On le calcule sur la MOYENNE
+// glissante des 3 derniers jours au lieu de l'instantané : une seule journée (+2h) ne
+// bascule plus le score de ~16 pts d'un coup. La destination est INCHANGÉE (si la
+// charge dure, la moyenne y arrive) → aucune sous-déclaration.
+// Ne lisse QUE les résidus du hero number. NON lissés : barres + détails (live), marge
+// sécurité (distance à l'alerte fatigue) et pénalités de risque légal (un dépassement
+// doit s'afficher le jour même). Historique : localStorage DTE_SCORE_HIST_V1 (idempotent/j).
+DTE.smoothResidues = function (scores) {
+  var raw = { fatigue: (scores && scores.fatigue) || 0, stress: (scores && scores.stress) || 0, cogRisk: (scores && scores.cogRisk) || 0, _n: 1 };
+  if (!scores || scores._hasData === false) return raw;
+  try {
+    var now = new Date();
+    var dk = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+    var hist = {};
+    try { hist = JSON.parse(localStorage.getItem('DTE_SCORE_HIST_V1') || '{}') || {}; } catch (e) { hist = {}; }
+    hist[dk(now)] = { f: raw.fatigue, s: raw.stress, c: raw.cogRisk };          // upsert du jour
+    var ks = Object.keys(hist).sort();
+    while (ks.length > 7) { delete hist[ks.shift()]; }                           // garder 7 j max
+    try { localStorage.setItem('DTE_SCORE_HIST_V1', JSON.stringify(hist)); } catch (e) {}
+    var win = [];
+    for (var i = 0; i < 3; i++) { var d = new Date(now); d.setDate(now.getDate() - i); var k = dk(d); if (hist[k]) win.push(hist[k]); }
+    if (!win.length) return raw;
+    var avg = function (sel) { return win.reduce(function (a, x) { return a + sel(x); }, 0) / win.length; };
+    return { fatigue: avg(function (x) { return x.f; }), stress: avg(function (x) { return x.s; }), cogRisk: avg(function (x) { return x.c; }), _n: win.length };
+  } catch (e) { return raw; }   // jamais bloquant : retombe sur l'instantané
+};
+
 document.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
@@ -116,9 +144,10 @@ document.addEventListener('DOMContentLoaded', function () {
         DTE.app = { scoreGlobal: null };
       } else {
         const s = state.scores;
-        // Résidus biologiques actifs — le max domine (maillon le plus faible)
-        const worstResidue = Math.max(s.fatigue || 0, s.stress || 0, s.cogRisk || 0);
-        // Pénalité risques détectés
+        // Résidus biologiques actifs — le max domine (maillon le plus faible). LISSÉS 3 j.
+        const sm = DTE.smoothResidues(s);
+        const worstResidue = Math.max(sm.fatigue || 0, sm.stress || 0, sm.cogRisk || 0);
+        // Pénalité risques détectés — INSTANTANÉE (jamais lissée : alerte légale immédiate)
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
