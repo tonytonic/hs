@@ -107,7 +107,7 @@ class Dashboard {
     if (hasData && this._heroSmoothN >= 2) {
       const _smH = document.createElement('div');
       _smH.id = 'dte-smooth-hint';
-      _smH.style.cssText = 'font-size:10px;color:rgba(255,255,255,0.28);text-align:center;margin-top:2px;display:block;width:100%;clear:both;';
+      _smH.style.cssText = 'font-size:11px;color:rgba(120,200,255,0.75);text-align:center;margin-top:6px;display:block;width:100%;clear:both;letter-spacing:.3px;';
       _smH.textContent = '📉 score lissé sur ' + this._heroSmoothN + ' j — détails instantanés';
       const _hp = document.querySelector('.panel--hero');
       if (_hp) _hp.appendChild(_smH);
