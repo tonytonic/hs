@@ -19,7 +19,15 @@ DTE.smoothResidues = function (scores) {
     var dk = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
     var hist = {};
     try { hist = JSON.parse(localStorage.getItem('DTE_SCORE_HIST_V1') || '{}') || {}; } catch (e) { hist = {}; }
-    hist[dk(now)] = { f: raw.fatigue, s: raw.stress, c: raw.cogRisk };          // upsert du jour
+    var wasEmpty = Object.keys(hist).length === 0;                              // tout 1er lancement ?
+    var _tv = { f: raw.fatigue, s: raw.stress, c: raw.cogRisk };
+    hist[dk(now)] = _tv;                                                        // upsert du jour
+    if (wasEmpty) {                                                             // AMORÇAGE : seed J-1 et J-2 = valeur du jour
+      // => lissage + note actifs dès le 1er affichage. Score initial = instantané (3 valeurs
+      //    identiques, on n'invente pas un passé), puis l'amortissement apparaît dès que l'état
+      //    change. Les seeds s'effacent naturellement en 2 vrais jours.
+      for (var j = 1; j <= 2; j++) { var _sd = new Date(now); _sd.setDate(now.getDate() - j); hist[dk(_sd)] = { f: _tv.f, s: _tv.s, c: _tv.c }; }
+    }
     var ks = Object.keys(hist).sort();
     while (ks.length > 7) { delete hist[ks.shift()]; }                           // garder 7 j max
     try { localStorage.setItem('DTE_SCORE_HIST_V1', JSON.stringify(hist)); } catch (e) {}
