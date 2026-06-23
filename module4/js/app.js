@@ -19,14 +19,17 @@ DTE.smoothResidues = function (scores) {
     var dk = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
     var hist = {};
     try { hist = JSON.parse(localStorage.getItem('DTE_SCORE_HIST_V1') || '{}') || {}; } catch (e) { hist = {}; }
-    var wasEmpty = Object.keys(hist).length === 0;                              // tout 1er lancement ?
     var _tv = { f: raw.fatigue, s: raw.stress, c: raw.cogRisk };
-    hist[dk(now)] = _tv;                                                        // upsert du jour
-    if (wasEmpty) {                                                             // AMORÇAGE : seed J-1 et J-2 = valeur du jour
-      // => lissage + note actifs dès le 1er affichage. Score initial = instantané (3 valeurs
-      //    identiques, on n'invente pas un passé), puis l'amortissement apparaît dès que l'état
-      //    change. Les seeds s'effacent naturellement en 2 vrais jours.
-      for (var j = 1; j <= 2; j++) { var _sd = new Date(now); _sd.setDate(now.getDate() - j); hist[dk(_sd)] = { f: _tv.f, s: _tv.s, c: _tv.c }; }
+    hist[dk(now)] = _tv;                                                        // upsert du jour (écrase le slot du jour)
+    // BOOTSTRAP ROBUSTE : combler les jours MANQUANTS de la fenêtre 3 j avec la valeur du
+    // jour (uniquement si absents → figés/persistés). Garantit lissage + note dès le 1er
+    // affichage, que l'historique soit VIDE *ou* PARTIEL (appli déjà installée, vieilles
+    // entrées hors fenêtre). Les jours amorcés sont remplacés par les vrais et sortent de
+    // la fenêtre en 2 j. Score initial = instantané (3 valeurs identiques), puis l'amorti
+    // apparaît dès que l'état change.
+    for (var j = 1; j <= 2; j++) {
+      var _sd = new Date(now); _sd.setDate(now.getDate() - j); var _sk = dk(_sd);
+      if (!hist[_sk]) hist[_sk] = { f: _tv.f, s: _tv.s, c: _tv.c };            // seulement si absent
     }
     var ks = Object.keys(hist).sort();
     while (ks.length > 7) { delete hist[ks.shift()]; }                           // garder 7 j max
