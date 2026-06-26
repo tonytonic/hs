@@ -4334,8 +4334,10 @@ function _injectCurrentWeekContext(s) {
       if (!s.weekly) s.weekly = {};
 
       if (_weekDays_cw > 0 || _weekHS_cw > 0) {
-        // Semaine EN COURS : estimation 'jusqu'ici' = jours ecoules x base + HS
-        const _weekBase_cw = (_dow_cw < 5 ? (_dow_cw + 1) : 5) * _baseJ_cw;
+        // Semaine EN COURS : on projette sur la base hebdo COMPLETE + les HS deja posees.
+        // (Avant : prorata jours ecoules x base, ce qui donnait p.ex. jeudi 4x7+8=36h
+        //  INCOHERENT avec le texte "base 35h + 8h de HS" = 43h. Desormais coherent.)
+        const _weekBase_cw = _baseHebdo_cw;
         const _weekTotal_cw = _weekBase_cw + _weekHS_cw;
         s.weekly.currentWeekTotal = Math.round(_weekTotal_cw * 10) / 10;
         s.weekly.currentWeekHS    = Math.round(_weekHS_cw * 10) / 10;
@@ -5454,7 +5456,7 @@ window.addEventListener('storage', (e) => {
 //    ouverture (restauration de sauvegarde, import, edition), le cache popup/bulle
 //    est purge automatiquement -> recalcul propre, sans rien taper.
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
-const FOX_BUILD = '2026-06-15.13';  // version du moteur Kitsune (affichee par _foxDiag)
+const FOX_BUILD = '2026-06-15.14';  // version du moteur Kitsune (affichee par _foxDiag)
 (function _foxAutoClean(){
   // (0) Changement de VERSION du code -> purge du cache d'affichage.
   // Garantit qu'apres un deploiement, l'ancien message en cache (ex: '35h nickel'
