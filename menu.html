@@ -1343,9 +1343,14 @@
   👁 Modules masqués&nbsp;<span id="hiddenCount"></span>
 </button>
 
-<!-- Trousse à outils du Renard — même style que les autres modules, un cran plus petite -->
-<div class="btn" id="btn-trousse" onclick="location.href='outils.html';" style="max-width:190px;background:linear-gradient(160deg,#0d1420,#1a2030);">
-  <img src="icon-renard.png" loading="eager" alt="Trousse à outils du Renard" style="border-radius:28px;">
+<!-- Trousse à outils du Renard + accès site web — côte à côte, même taille -->
+<div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;width:90%;max-width:402px;margin:0 auto;">
+  <div class="btn" id="btn-trousse" onclick="location.href='outils.html';" style="flex:1 1 150px;width:auto;max-width:190px;margin:0;background:linear-gradient(160deg,#0d1420,#1a2030);">
+    <img src="icon-renard.png" loading="eager" alt="Trousse à outils du Renard" style="border-radius:28px;">
+  </div>
+  <div class="btn" id="btn-site" onclick="window.open('https://www.simulateurheuressupfrance.fr','_blank','noopener')" title="Ouvrir simulateurheuressupfrance.fr" style="flex:1 1 150px;width:auto;max-width:190px;margin:0;background:linear-gradient(160deg,#0d1420,#1a2030);">
+    <img src="site-vignette.jpg" loading="lazy" alt="simulateurheuressupfrance.fr" style="border-radius:28px;">
+  </div>
 </div>
 
 <!-- ══ DROIT À L'ERREUR — BAS DE PAGE ════════════════════════ -->
