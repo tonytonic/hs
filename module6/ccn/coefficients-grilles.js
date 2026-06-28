@@ -256,7 +256,7 @@ const CCN_COEFFICIENTS = [
 
   // ── 2596 RESTAURATION RAPIDE — Cadres ──────────────────────────
   {
-    idcc: 2596, nom: 'Restauration rapide',
+    idcc: 1501, nom: 'Restauration rapide',
     miseAjour: '2024-01',
     categories: {
       Niveau: [
