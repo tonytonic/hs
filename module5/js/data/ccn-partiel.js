@@ -131,14 +131,14 @@ const CCN_PARTIEL_ALIASES = [
   {i:9911,n:"Exploitations agricoles Val-de-Marne",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   {i:9921,n:"Exploitations agricoles Val-d-Oise",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   // ── PAYSAGE ──
-  {i:1686,n:"Entreprises du paysage",s:"Paysage",g:"DC",cap:0.10,fj:false},
+  {i:7018,n:"Entreprises du paysage",s:"Paysage",g:"DC",cap:0.10,fj:false},
   // ── COOPÉRATIVES AGRICOLES ──
   {i:7016,n:"Coopératives agricoles céréales meunerie alimentation bétail",s:"Coopératives agricoles",g:"DC",cap:0.10,fj:false},
   {i:7025,n:"Coopératives fruitières et légumières",s:"Coopératives agricoles",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE VINS ──
   {i:7024,n:"Vins et spiritueux commerce de gros",s:"Commerce vins",g:"DC",cap:0.10,fj:false},
   // ── VITICULTURE ──
-  {i:2075,n:"Caves coopératives vinicoles",s:"Viticulture",g:"DC",cap:0.10,fj:false},
+  {i:7005,n:"Caves coopératives vinicoles",s:"Viticulture",g:"DC",cap:0.10,fj:false},
   // ── HORTICULTURE ──
   {i:7502,n:"Pépinières horticoles nationales",s:"Horticulture",g:"DC",cap:0.10,fj:false},
   // ── JARDINAGE ──
@@ -164,7 +164,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── AGRICULTURE SERRES ──
   {i:7514,n:"Serres horticoles",s:"Agriculture serres",g:"DC",cap:0.10,fj:false},
   // ── IAA SUCRE ──
-  {i:86,n:"Sucre sucreries distilleries raffineries",s:"IAA sucre",g:"DC",cap:0.10,fj:false},
+  {i:2728,n:"Sucre sucreries distilleries raffineries",s:"IAA sucre",g:"DC",cap:0.10,fj:false},
   // ── IAA LAITIER ──
   {i:112,n:"Industrie laitière",s:"IAA laitier",g:"DC",cap:0.10,fj:false},
   // ── ARTISANAT ALIMENTAIRE ──
@@ -176,7 +176,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── IAA VIANDES ──
   {i:211,n:"Industries et commerces en gros des viandes",s:"IAA viandes",g:"DC",cap:0.10,fj:false},
   // ── ARTISANAT CHARCUTERIE ──
-  {i:993,n:"Charcuterie de détail",s:"Artisanat charcuterie",g:"DC",cap:0.33,fj:false},
+  {i:953,n:"Charcuterie de détail",s:"Artisanat charcuterie",g:"DC",cap:0.33,fj:false},
   // ── IAA CONFISERIE ──
   {i:1000,n:"Confiserie chocolaterie biscuiterie",s:"IAA confiserie",g:"DC",cap:0.33,fj:false},
   // ── IAA CONSERVES ──
@@ -184,7 +184,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── IAA MEUNERIE ──
   {i:207,n:"Meunerie",s:"IAA meunerie",g:"DC",cap:0.10,fj:false},
   // ── IAA PÂTES ──
-  {i:1044,n:"Pâtes alimentaires",s:"IAA pâtes",g:"DC",cap:0.10,fj:false},
+  {i:1987,n:"Pâtes alimentaires",s:"IAA pâtes",g:"DC",cap:0.10,fj:false},
   // ── IAA CORPS GRAS ──
   {i:1182,n:"Corps gras huiles margarines",s:"IAA corps gras",g:"DC",cap:0.10,fj:false},
   // ── ARTISANAT POISSONNERIE ──
@@ -208,7 +208,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── BÂTIMENT AM ──
   {i:3326,n:"Bâtiment agents de maîtrise et techniciens",s:"Bâtiment AM",g:"DC",cap:0.10,fj:true},
   // ── ARCHITECTURE ──
-  {i:2609,n:"Architecture cabinets",s:"Architecture",g:"IAA180",cap:0.10,fj:true},
+  {i:2332,n:"Architecture cabinets",s:"Architecture",g:"IAA180",cap:0.10,fj:true},
   // ── BTP MATÉRIAUX ──
   {i:803,n:"Béton et produits du béton",s:"BTP matériaux",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE EXTRACTIVE ──
@@ -222,13 +222,13 @@ const CCN_PARTIEL_ALIASES = [
   // ── INDUSTRIE CHIMIQUE ──
   {i:44,n:"Industries chimiques",s:"Industrie chimique",g:"CHIM130",cap:0.10,fj:true},
   // ── ENERGIE PÉTROLIÈRE ──
-  {i:669,n:"Industrie du pétrole",s:"Energie pétrolière",g:"PETRO",cap:0.10,fj:true},
+  {i:1388,n:"Industrie du pétrole",s:"Energie pétrolière",g:"PETRO",cap:0.10,fj:true},
   // ── INDUSTRIE CAOUTCHOUC ──
   {i:1031,n:"Industrie du caoutchouc",s:"Industrie caoutchouc",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE PLASTIQUE ──
   {i:292,n:"Plasturgie",s:"Industrie plastique",g:"DC",cap:0.10,fj:true},
   // ── INDUSTRIE PHARMACEUTIQUE ──
-  {i:216,n:"Industrie pharmaceutique",s:"Industrie pharmaceutique",g:"PHARMA",cap:0.10,fj:true},
+  {i:176,n:"Industrie pharmaceutique",s:"Industrie pharmaceutique",g:"PHARMA",cap:0.10,fj:true},
   // ── PHARMACIE VÉTÉRINAIRE ──
   {i:1592,n:"Industrie pharmaceutique vétérinaire",s:"Pharmacie vétérinaire",g:"PHARMA",cap:0.10,fj:true},
   // ── INDUSTRIE CHIMIQUE ──
@@ -243,7 +243,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── INDUSTRIE PAPIER ──
   {i:3238,n:"Papiers et cartons industries",s:"Industrie papier",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE CARTONNAGE ──
-  {i:4890,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",cap:0.10,fj:false},
+  {i:489,n:"Cartonnage industries",s:"Industrie cartonnage",g:"DC",cap:0.10,fj:false},
   // ── MÉTALLURGIE ──
   {i:3248,n:"Métallurgie accord national unique 2023",s:"Métallurgie",g:"DC",cap:0.10,fj:true},
   // ── INDUSTRIE MÉCANIQUE ──
@@ -261,7 +261,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── INDUSTRIE CHAUSSURE ──
   {i:176,n:"Chaussure industrie",s:"Industrie chaussure",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE MAROQUINERIE ──
-  {i:1404,n:"Maroquinerie gainerie bracelets cuir",s:"Industrie maroquinerie",g:"DC",cap:0.10,fj:false},
+  {i:2528,n:"Maroquinerie gainerie bracelets cuir",s:"Industrie maroquinerie",g:"DC",cap:0.10,fj:false},
   // ── MODE COUTURE ──
   {i:2070,n:"Couture parisienne haute couture",s:"Mode couture",g:"DC",cap:0.33,fj:true},
   // ── BLANCHISSERIE ──
@@ -320,21 +320,21 @@ const CCN_PARTIEL_ALIASES = [
   {i:1483,n:"Habillement commerce de détail",s:"Commerce textile",g:"DC",cap:0.33,fj:false},
   {i:1870,n:"Habillement textiles commerce de détail",s:"Commerce textile",g:"DC",cap:0.33,fj:false},
   // ── COMMERCE CHAUSSURES ──
-  {i:1383,n:"Chaussure commerce succursaliste",s:"Commerce chaussures",g:"DC",cap:0.33,fj:false},
+  {i:468,n:"Chaussure commerce succursaliste",s:"Commerce chaussures",g:"DC",cap:0.33,fj:false},
   // ── OPTIQUE ──
-  {i:1624,n:"Optique lunetterie de détail",s:"Optique",g:"DC",cap:0.33,fj:false},
+  {i:1431,n:"Optique lunetterie de détail",s:"Optique",g:"DC",cap:0.33,fj:false},
   // ── DISTRIBUTION ÉNERGIE ──
   {i:1985,n:"Combustibles solides liquides gazeux négoce",s:"Distribution énergie",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE CULTUREL ──
   {i:1747,n:"Librairie",s:"Commerce culturel",g:"DC",cap:0.33,fj:false},
   // ── PHARMACIE ──
-  {i:2104,n:"Pharmacies officine",s:"Pharmacie",g:"PHARMO150",cap:0.10,fj:false},
+  {i:1996,n:"Pharmacies officine",s:"Pharmacie",g:"PHARMO150",cap:0.10,fj:false},
   // ── COMMERCE FLORAL ──
   {i:2583,n:"Fleuristes jardineries animaleries",s:"Commerce floral",g:"DC",cap:0.33,fj:false},
   // ── COMMERCE BOIS ──
-  {i:1311,n:"Négoce de bois oeuvre et produits dérivés",s:"Commerce bois",g:"DC",cap:0.10,fj:false},
+  {i:1947,n:"Négoce de bois oeuvre et produits dérivés",s:"Commerce bois",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE BRICOLAGE ──
-  {i:2564,n:"Bricolage commerce de détail",s:"Commerce bricolage",g:"DC",cap:0.33,fj:false},
+  {i:1606,n:"Bricolage commerce de détail",s:"Commerce bricolage",g:"DC",cap:0.33,fj:false},
   // ── COMMERCE JARDINAGE ──
   {i:1862,n:"Jardineries et graineteries commerce de détail",s:"Commerce jardinage",g:"DC",cap:0.33,fj:false},
   // ── COMMERCE AMEUBLEMENT ──
@@ -344,11 +344,11 @@ const CCN_PARTIEL_ALIASES = [
   // ── ARTISANAT BIJOUTERIE ──
   {i:1538,n:"Bijouterie joaillerie orfèvrerie",s:"Artisanat bijouterie",g:"DC",cap:0.10,fj:false},
   // ── SANTÉ DENTAIRE LABO ──
-  {i:2537,n:"Prothèse dentaire laboratoires",s:"Santé dentaire labo",g:"DC",cap:0.10,fj:false},
+  {i:993,n:"Prothèse dentaire laboratoires",s:"Santé dentaire labo",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE ALIM SPÉCIALISÉ ──
   {i:3237,n:"Commerce de détail alimentaire spécialisé",s:"Commerce alim spécialisé",g:"DC",cap:0.33,fj:false},
   // ── COIFFURE ──
-  {i:1040,n:"Coiffure entreprises",s:"Coiffure",g:"COIF200",cap:0.33,fj:false},
+  {i:2596,n:"Coiffure entreprises",s:"Coiffure",g:"COIF200",cap:0.33,fj:false},
   // ── ESTHÉTIQUE BEAUTÉ ──
   {i:2596,n:"Esthétique cosmétique parfumerie enseignement",s:"Esthétique beauté",g:"DC",cap:0.33,fj:false},
   // ── BANQUE ──
@@ -366,19 +366,19 @@ const CCN_PARTIEL_ALIASES = [
   // ── SÉCURITÉ PRIVÉE ──
   {i:1351,n:"Prévention et sécurité privée gardiennage",s:"Sécurité privée",g:"SECU329",cap:0.33,fj:false},
   // ── PROPRETÉ ──
-  {i:3186,n:"Nettoyage entreprises de propreté",s:"Propreté",g:"PROP190",cap:0.33,fj:false},
+  {i:3043,n:"Nettoyage entreprises de propreté",s:"Propreté",g:"PROP190",cap:0.33,fj:false},
   // ── GARDIENNAGE IMMEUBLE ──
   {i:1285,n:"Gardiens concierges employés immeubles",s:"Gardiennage immeuble",g:"DC",cap:0.33,fj:false},
   // ── IMMOBILIER ──
   {i:1527,n:"Immobilier agents gestionnaires syndics",s:"Immobilier",g:"DC",cap:0.10,fj:true},
   // ── PROMOTION IMMOBILIÈRE ──
-  {i:1966,n:"Promotion immobilière",s:"Promotion immobilière",g:"DC",cap:0.10,fj:true},
+  {i:1512,n:"Promotion immobilière",s:"Promotion immobilière",g:"DC",cap:0.10,fj:true},
   // ── AVOCATS ──
   {i:218,n:"Cabinets avocats",s:"Avocats",g:"DC",cap:0.10,fj:true},
   // ── NOTARIAT ──
   {i:1965,n:"Notariat",s:"Notariat",g:"DC",cap:0.10,fj:true},
   // ── JURIDIQUE ──
-  {i:2372,n:"Commissaires de justice ex huissiers",s:"Juridique",g:"DC",cap:0.10,fj:false},
+  {i:1921,n:"Commissaires de justice ex huissiers",s:"Juridique",g:"DC",cap:0.10,fj:false},
   // ── IT INGÉNIERIE CONSEIL ──
   {i:1486,n:"Syntec bureaux études techniques informatique ingénierie conseil",s:"IT ingénierie conseil",g:"SYNTEC130",cap:0.10,fj:true},
   // ── PUBLICITÉ COMMUNICATION ──
@@ -390,7 +390,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── PRESSE RÉGIONALE ──
   {i:1309,n:"Presse quotidienne régionale",s:"Presse régionale",g:"DC",cap:0.10,fj:true},
   // ── AUDIOVISUEL ──
-  {i:1780,n:"Radiodiffusion audiovisuel public et privé",s:"Audiovisuel",g:"DC",cap:0.10,fj:true},
+  {i:1922,n:"Radiodiffusion audiovisuel public et privé",s:"Audiovisuel",g:"DC",cap:0.10,fj:true},
   // ── IMPRIMERIE ──
   {i:405,n:"Imprimerie de labeur et industries graphiques",s:"Imprimerie",g:"IAA180",cap:0.10,fj:false},
   // ── MUSIQUE ÉDITION ──
@@ -402,7 +402,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── SANTÉ LIBÉRALE ──
   {i:776,n:"Cabinets médicaux",s:"Santé libérale",g:"DC",cap:0.10,fj:false},
   // ── SANTÉ DENTAIRE ──
-  {i:2128,n:"Cabinets dentaires",s:"Santé dentaire",g:"DC",cap:0.10,fj:false},
+  {i:1619,n:"Cabinets dentaires",s:"Santé dentaire",g:"DC",cap:0.10,fj:false},
   // ── AIDE À DOMICILE ──
   {i:2941,n:"Aide accompagnement soins à domicile BASS",s:"Aide à domicile",g:"DC",cap:0.33,fj:false},
   // ── MÉDICO-SOCIAL CCNT 66 ──
@@ -414,7 +414,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── BIOLOGIE MÉDICALE ──
   {i:2205,n:"Laboratoires de biologie médicale privés",s:"Biologie médicale",g:"DC",cap:0.10,fj:false},
   // ── SANTÉ VÉTÉRINAIRE ──
-  {i:1996,n:"Vétérinaires praticiens salariés",s:"Santé vétérinaire",g:"DC",cap:0.10,fj:false},
+  {i:2564,n:"Vétérinaires praticiens salariés",s:"Santé vétérinaire",g:"DC",cap:0.10,fj:false},
   // ── SERVICES FUNÉRAIRES ──
   {i:2344,n:"Pompes funèbres et marbrerie funéraire",s:"Services funéraires",g:"DC",cap:0.10,fj:false},
   // ── TRANSPORT ROUTIER MARCHANDISES ──
@@ -438,7 +438,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── SPORT ──
   {i:2511,n:"Sport entreprises du secteur sportif",s:"Sport",g:"DC",cap:0.33,fj:false},
   // ── JEUX CASINOS ──
-  {i:2378,n:"Casinos",s:"Jeux casinos",g:"DC",cap:0.33,fj:false},
+  {i:2257,n:"Casinos",s:"Jeux casinos",g:"DC",cap:0.33,fj:false},
   // ── TOURISME LOISIRS ──
   {i:3139,n:"Parcs de loisirs jardins zoologiques",s:"Tourisme loisirs",g:"DC",cap:0.33,fj:false},
   // ── SERVICES TERTIAIRE ──
@@ -496,7 +496,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── VRP COMMERCIAL ──
   {i:1636,n:"Agents commerciaux VRP multicarte",s:"VRP commercial",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE DISTANCE ──
-  {i:1659,n:"Vente à distance e-commerce",s:"Commerce distance",g:"DC",cap:0.33,fj:true},
+  {i:2198,n:"Vente à distance e-commerce",s:"Commerce distance",g:"DC",cap:0.33,fj:true},
   // ── LOCATION VÉHICULES ──
   {i:1661,n:"Location de véhicules",s:"Location véhicules",g:"DC",cap:0.10,fj:false},
   // ── CONTRÔLE TECHNIQUE ──
@@ -615,7 +615,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── INDUSTRIE BOIS NÉGOCE ──
   {i:158,n:"Bois scieries négoce importation",s:"Industrie bois négoce",g:"DC",cap:0.10,fj:false},
   // ── COOPÉRATIVES ──
-  {i:179,n:"Coopératives de consommation",s:"Coopératives",g:"DC",cap:0.10,fj:false},
+  {i:3205,n:"Coopératives de consommation",s:"Coopératives",g:"DC",cap:0.10,fj:false},
   // ── JURIDIQUE GREFFES ──
   {i:240,n:"Personnel greffes tribunaux de commerce",s:"Juridique greffes",g:"DC",cap:0.10,fj:false},
   // ── TRANSPORT AÉRIEN SOL ──
@@ -631,9 +631,9 @@ const CCN_PARTIEL_ALIASES = [
   // ── CINÉMA ──
   {i:388,n:"Auditoriums cinématographiques",s:"Cinéma",g:"DC",cap:0.10,fj:false},
   // ── NÉGOCE MATÉRIAUX ──
-  {i:398,n:"Ouvriers négoce matériaux construction",s:"Négoce matériaux",g:"DC",cap:0.10,fj:false},
+  {i:3216,n:"Ouvriers négoce matériaux construction",s:"Négoce matériaux",g:"DC",cap:0.10,fj:false},
   // ── CINÉMA PRODUCTION ──
-  {i:435,n:"Production cinématographique acteurs",s:"Cinéma production",g:"DC",cap:0.10,fj:false},
+  {i:3097,n:"Production cinématographique acteurs",s:"Cinéma production",g:"DC",cap:0.10,fj:false},
   // ── ASSURANCE PRODUCTION ──
   {i:438,n:"Echelons intermédiaires assurances production",s:"Assurance production",g:"DC",cap:0.10,fj:false},
   // ── TOURISME SKI ──
@@ -771,7 +771,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── COOPÉRATIVE VIANDE ──
   {i:3203,n:"Structures coopératives agricoles bétail viande",s:"Coopérative viande",g:"DC",cap:0.10,fj:false},
   // ── GÉOMÈTRE EXPERT ──
-  {i:3205,n:"Cabinets géomètres-experts topographes",s:"Géomètre expert",g:"DC",cap:0.10,fj:false},
+  {i:2543,n:"Cabinets géomètres-experts topographes",s:"Géomètre expert",g:"DC",cap:0.10,fj:false},
   // ── TRANSPORT COURSE ──
   {i:3218,n:"Sociétés course par course",s:"Transport course",g:"DC",cap:0.10,fj:false},
   // ── AUDIOVISUEL DOUBLAGE ──
