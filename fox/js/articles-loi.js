@@ -813,7 +813,7 @@ const ARTICLES_LOI = [
     mots: ["preuve heures supplémentaires", "litige", "juge", "éléments de preuve", "doute"]
   },
   {
-    art: "Art. L3211-1", titre: "Salaire minimum interprofessionnel de croissance — SMIC",
+    art: "Art. L3231-2", titre: "Salaire minimum interprofessionnel de croissance — SMIC",
     def: "Tout salarié perçoit une rémunération au moins égale au salaire minimum interprofessionnel de croissance (SMIC). Aucune dérogation n'est possible. Le SMIC est revalorisé au moins une fois par an.",
     ex: "En 2026, le SMIC horaire brut est de 12,31 euros. Aucun salarié ne peut légalement percevoir moins, même à temps partiel. La convention collective peut prévoir plus.",
     mots: ["SMIC", "salaire minimum", "rémunération", "revalorisation", "plancher"]
