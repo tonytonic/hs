@@ -460,7 +460,7 @@ const GLOSSAIRE = {
     simple: "SMIC",
     expert: "salaire minimum",
     def: "Salaire minimum légal en France : le SMIC. Réévalué chaque année.",
-    exemple: "SMIC 2024 = 11,65€/h brut (1766€/mois)"
+    exemple: "SMIC 2026 = 12,31€/h brut (1867,02€/mois)"
   },
   
   "SMIC": {
@@ -641,8 +641,8 @@ const GLOSSAIRE = {
   "plafond sécurité sociale": {
     simple: "limite de cotisation",
     expert: "plafond sécurité sociale",
-    def: "Limite au-delà de laquelle certaines cotisations ne s'appliquent plus. 3666€/mois en 2024.",
-    exemple: "Au-delà de 3666€/mois : certaines cotisations plafonnent"
+    def: "Limite au-delà de laquelle certaines cotisations ne s'appliquent plus. 4005€/mois en 2026.",
+    exemple: "Au-delà de 4005€/mois : certaines cotisations plafonnent"
   },
   
   "proratisation": {
