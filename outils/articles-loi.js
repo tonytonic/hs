@@ -95,7 +95,7 @@
     saisie_solde_insaisissable:{ v: 651.69, u: '€', maj: '2026-04-01', src: 'Décret n°2026-220 du 30/03/2026 — RSA socle 1 pers.' },
 
     /* ----- Avantages en nature ----- */
-    avantage_repas:   { v: 5.45,   u: '€',       maj: '2026-01-01', src: 'avantage nature repas (forfait)' },
+    avantage_repas:   { v: 5.50,   u: '€',       maj: '2026-01-01', src: 'forfait URSSAF avantage nature repas 2026 (était 5,45 € en 2025) — distinct du MG 4,35 € utilisé en HCR' },
 
     /* ----- Épargne salariale (PASS-indexé) ----- */
     pee_abondement_max:{ v: 3844.8,u: '€/an',    maj: '2026-01-01', src: '8 % PASS — PEE' },
