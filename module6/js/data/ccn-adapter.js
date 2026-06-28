@@ -42,10 +42,10 @@ const FALLBACK_FJ = [
 const FALLBACK_HS = [
   // Contingents réels 2024 — sources : Légifrance + avenants de branche
   { idcc: 1486, nom: 'Syntec / Bureaux études',      contingent: 130, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 3248, nom: 'Métallurgie (ANI 2024)',        contingent: 475, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
+  { idcc: 3248, nom: 'Métallurgie (ANI 2024)',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.99.4 : 220h (175h si annualisé) + 80h complémentaire 1 an/2
   { idcc: 1979, nom: 'HCR',                           contingent: 360, seuil: 39, taux1: 10, palier1: 4, taux_inter: 20, palier_inter: 4, taux2: 50 },
   { idcc: 2120, nom: 'Banque AFB',                    contingent: 202, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1672, nom: 'Sociétés assurances',           contingent: 230, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
+  { idcc: 1672, nom: 'Sociétés assurances',           contingent:  70, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.46 CCN 1672 : contingent individuel 70h
   { idcc: 1996, nom: 'Pharmacie officine',            contingent: 180, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc:   16, nom: 'Transport routier',             contingent: 195, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 2511, nom: 'Sport',                         contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
