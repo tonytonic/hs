@@ -101,21 +101,21 @@ const REGLES_HS = {
   },
 
   PETRO: {
-    id:'PETRO', nom:'Pétrole — taux1=30%, contingent 130h',
-    seuil:35, taux1:30, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
+    id:'PETRO', nom:'Pétrole — 25%/50%, contingent 130h',
+    seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
     contingent:130, maxHebdo:48, debutSemaine:1,
     feriesChomes: 11, feriesMajoration: 100,
     feries1erMaiMajoration: 100, feriesAlsaceMoselle: false,
-    notes:'Industrie du pétrole IDCC 669. TAUX1=30% plus favorable. Contingent 130h.'
+    notes:'Industrie du pétrole IDCC 1388 (brochure 3001), art. 413 : 25%/50%, contingent 130h. Le 33% = majoration d\'incommodité nuit/dimanche/férié, distincte des HS.'
   },
 
   PHARMA: {
-    id:'PHARMA', nom:'Pharmaceutique — contingent 145h',
+    id:'PHARMA', nom:'Pharmaceutique — contingent 220h (droit commun)',
     seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
-    contingent:145, maxHebdo:48, debutSemaine:1,
+    contingent:220, maxHebdo:48, debutSemaine:1,
     feriesChomes: 11, feriesMajoration: 0,
     feries1erMaiMajoration: 100, feriesAlsaceMoselle: false,
-    notes:'Industrie pharmaceutique IDCC 216. Contingent 145h.'
+    notes:'Industrie pharmaceutique IDCC 176 (brochure 3104). Contingent 220h droit commun (code.travail.gouv.fr/176), 25%/50%.'
   },
 
   CSS100: {
@@ -400,10 +400,10 @@ const CCN_ALIASES = [
 
   // ── CHIMIE / PHARMA / PÉTROLE ──
   {i:44,b:3108,n:"Industries chimiques",s:"Industrie chimique",g:"CHIM130",fj:true},  // CORRIGÉ: une seule entrée pour IDCC 44
-  {i:669,b:3050,n:"Industrie du pétrole",s:"Energie pétrolière",g:"PETRO",fj:true},
+  {i:1388,b:3001,n:"Industrie du pétrole",s:"Energie pétrolière",g:"PETRO",fj:true},
   {i:1031,b:3078,n:"Industrie du caoutchouc",s:"Industrie caoutchouc",g:"DC",fj:false},
   {i:292,b:3316,n:"Plasturgie",s:"Industrie plastique",g:"DC",fj:true},
-  {i:216,b:3104,n:"Industrie pharmaceutique",s:"Industrie pharmaceutique",g:"PHARMA",fj:true},
+  {i:176,b:3104,n:"Industrie pharmaceutique",s:"Industrie pharmaceutique",g:"PHARMA",fj:true},
   {i:1592,b:null,n:"Industrie pharmaceutique vétérinaire",s:"Pharmacie vétérinaire",g:"PHARMA",fj:true},
   {i:700,b:3054,n:"Détergents et produits entretien",s:"Industrie chimique",g:"DC",fj:false},
 
@@ -421,7 +421,7 @@ const CCN_ALIASES = [
   {i:1370,b:3030,n:"Equipements thermiques installations entretien",s:"Génie climatique",g:"DC",fj:false},
   {i:1489,b:3090,n:"Cordonnerie multiservice",s:"Artisanat cordonnerie",g:"DC",fj:false},
   {i:247,b:3106,n:"Industries textiles",s:"Industrie textile",g:"DC",fj:false},
-  {i:176,b:3098,n:"Chaussure industrie",s:"Industrie chaussure",g:"DC",fj:false},
+  {i:1580,b:3163,n:"Chaussure industrie",s:"Industrie chaussure",g:"DC",fj:false},
   {i:1404,b:3201,n:"Maroquinerie gainerie bracelets cuir",s:"Industrie maroquinerie",g:"DC",fj:false},
   {i:2070,b:3047,n:"Couture parisienne haute couture",s:"Mode couture",g:"DC",fj:true},
   {i:1316,b:3178,n:"Blanchisserie laverie teinturerie nettoyage",s:"Blanchisserie",g:"DC",fj:false},
@@ -460,10 +460,10 @@ const CCN_ALIASES = [
   {i:1624,b:3249,n:"Optique lunetterie de détail",s:"Optique",g:"DC",fj:false},
   {i:1985,b:3261,n:"Combustibles solides liquides gazeux négoce",s:"Distribution énergie",g:"DC",fj:false},
   {i:1747,b:3239,n:"Librairie",s:"Commerce culturel",g:"DC",fj:false},
-  {i:2104,b:3064,n:"Pharmacies officine",s:"Pharmacie",g:"PHARMO150",fj:false},  // CORRIGÉ v5.4: contingent 150h
+  {i:1996,b:3052,n:"Pharmacies officine",s:"Pharmacie",g:"PHARMO150",fj:false},  // CORRIGÉ v5.4: contingent 150h
   {i:2583,b:3100,n:"Fleuristes jardineries animaleries",s:"Commerce floral",g:"DC",fj:false},
   {i:1311,b:3017,n:"Négoce de bois oeuvre et produits dérivés",s:"Commerce bois",g:"DC",fj:false},
-  {i:2564,b:3301,n:"Bricolage commerce de détail",s:"Commerce bricolage",g:"DC",fj:false},
+  {i:1606,b:3232,n:"Bricolage commerce de détail",s:"Commerce bricolage",g:"DC",fj:false},
   {i:1862,b:3240,n:"Jardineries et graineteries commerce de détail",s:"Commerce jardinage",g:"DC",fj:false},
   {i:1177,b:3089,n:"Meubles commerce de détail",s:"Commerce ameublement",g:"DC",fj:false},
   {i:1411,b:3218,n:"Quincaillerie fournitures industrielles",s:"Commerce matériaux",g:"DC",fj:false},
@@ -517,7 +517,7 @@ const CCN_ALIASES = [
   {i:2190,b:3283,n:"Centres de lutte contre le cancer CLCC",s:"Santé oncologie",g:"DC",fj:false},
   {i:3217,b:3406,n:"Transport sanitaire ambulanciers",s:"Transport sanitaire",g:"DC",fj:false},
   {i:2205,b:3274,n:"Laboratoires de biologie médicale privés",s:"Biologie médicale",g:"DC",fj:false},
-  {i:1996,b:3260,n:"Vétérinaires praticiens salariés",s:"Santé vétérinaire",g:"DC",fj:false},
+  {i:2564,b:3332,n:"Vétérinaires praticiens salariés",s:"Santé vétérinaire",g:"DC",fj:false},
   {i:2344,b:3296,n:"Pompes funèbres et marbrerie funéraire",s:"Services funéraires",g:"DC",fj:false},
 
   // ── TRANSPORT / LOGISTIQUE ──
