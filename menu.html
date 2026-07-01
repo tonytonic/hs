@@ -363,6 +363,36 @@
   /* Ordre dynamique des modules selon type de contrat */
   #btn-module5 { transition: order 0s; }
 </style>
+<style>
+  #android-review-banner {
+    display: none;
+    position: fixed;
+    bottom: calc(env(safe-area-inset-bottom) + 16px);
+    left: 16px; right: 16px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    z-index: 9999;
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  #android-review-banner .rev-banner-icon { font-size: 36px; margin-bottom: 8px; }
+  #android-review-banner h3 { margin: 0 0 8px; font-size: 17px; font-weight: 700; color: #1a1a1a; }
+  #android-review-banner p { margin: 0 0 14px; font-size: 14px; color: #444; line-height: 1.5; }
+  #android-review-banner .rev-banner-actions { display: flex; gap: 10px; }
+  #android-review-banner button {
+    border: none; border-radius: 22px; padding: 11px 18px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  #android-review-banner .rev-btn-primary {
+    background: #f0c040; color: #1a1a1a; flex: 2;
+  }
+  #android-review-banner .rev-btn-secondary {
+    background: #f0f0f0; color: #555; flex: 1;
+  }
+</style>
 
 
 <style id="landscape-blocker-style">
@@ -1208,6 +1238,16 @@
     <span><em>3️⃣</em><div>Appuyez sur <strong>« Ajouter »</strong> en haut à droite</div></span>
   </div>
   <button onclick="dismissIOSBanner()">J'ai compris ✓</button>
+</div>
+
+<div id="android-review-banner">
+  <div class="rev-banner-icon">⭐</div>
+  <h3>Un petit avis ?</h3>
+  <p>Si l'app t'a été utile, un avis sur le Play Store aide beaucoup d'autres salariés à la trouver.</p>
+  <div class="rev-banner-actions">
+    <button class="rev-btn-secondary" onclick="dismissAndroidReviewBanner()">Plus tard</button>
+    <button class="rev-btn-primary" onclick="openAndroidReview()">⭐ Laisser un avis</button>
+  </div>
 </div>
 
 <div style="display:flex;gap:8px;align-items:flex-start;">
@@ -2802,6 +2842,62 @@ document.addEventListener('DOMContentLoaded', function(){
     const el = document.getElementById('ios-install-banner');
     if (el) el.style.display = 'none';
     try { localStorage.setItem('ios_banner_dismissed', '1'); } catch(e) {}
+  }
+
+  // ── Bannière avis Play Store (uniquement si lancé depuis l'app installée) ──
+  // Le même dépôt sert la PWA iOS, l'app Android (TWA) et le navigateur classique.
+  // On ne doit demander un avis Play Store que dans le contexte TWA Android :
+  // quand la page est ouverte par l'app installée, Chrome expose un referrer
+  // de la forme "android-app://<package>". Un onglet Chrome/Safari normal
+  // n'a jamais ce referrer, donc ce bandeau ne s'affiche que pour de vrais
+  // utilisateurs de l'app Play Store.
+  function isAndroidTWA() {
+    const isAndroid = /android/i.test(navigator.userAgent);
+    const fromApp = document.referrer.indexOf('android-app://') === 0;
+    return isAndroid && fromApp;
+  }
+
+  (function() {
+    if (!isAndroidTWA()) return;
+    const reviewed = _safeLS.get('android_review_done');
+    const dismissedUntil = parseInt(_safeLS.get('android_review_dismiss_count', '0')) || 0;
+    if (reviewed) return;
+
+    // Compteur de visites (une fois par jour maximum, pour ne pas gonfler
+    // artificiellement le chiffre si l'utilisateur relance l'app plusieurs
+    // fois dans la journée)
+    const today = new Date().toISOString().slice(0, 10);
+    const lastVisit = _safeLS.get('android_last_visit_date');
+    let visitCount = parseInt(_safeLS.get('android_visit_count', '0')) || 0;
+    if (lastVisit !== today) {
+      visitCount += 1;
+      _safeLS.set('android_visit_count', String(visitCount));
+      _safeLS.set('android_last_visit_date', today);
+    }
+
+    // Seuil : à partir de la 3e visite, puis on retente périodiquement
+    // (tous les +4 visites) si l'utilisateur a choisi "Plus tard"
+    const threshold = 3 + (dismissedUntil * 4);
+    if (visitCount < threshold) return;
+
+    setTimeout(function() {
+      const el = document.getElementById('android-review-banner');
+      if (el) el.style.display = 'block';
+    }, 1200);
+  })();
+
+  function openAndroidReview() {
+    _safeLS.set('android_review_done', '1');
+    const el = document.getElementById('android-review-banner');
+    if (el) el.style.display = 'none';
+    window.location.href = 'https://play.google.com/store/apps/details?id=com.tonytonic.heuressup&showAllReviews=true';
+  }
+
+  function dismissAndroidReviewBanner() {
+    const el = document.getElementById('android-review-banner');
+    if (el) el.style.display = 'none';
+    const count = (parseInt(_safeLS.get('android_review_dismiss_count', '0')) || 0) + 1;
+    _safeLS.set('android_review_dismiss_count', String(count));
   }
 
 </script>
