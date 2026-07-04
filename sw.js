@@ -3,7 +3,7 @@
  * Version : 10.9.18 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.9.18"; // partage : deux liens (iOS + Android)
+const CACHE_NAME = "heuressup-cache-v10.9.19"; // partage : deux liens (iOS + Android)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -109,6 +109,7 @@ const FILES_TO_CACHE = [
   "./module7/mimizuku-menu.jpg",
   // ── Trousse à outils (54 modules) + légal ──
   "./outils.html",
+  "./nouveautes.html",   // FIX 2026-07-04b : oubliée du précache => nav avalée par le repli menu
   "./mentions-legales.html",
   "./privacy.html",
   "./outils/articles-loi.js",
@@ -170,7 +171,15 @@ self.addEventListener("activate", (event) => {
 
 // ── FETCH — CACHE FIRST (stale-while-revalidate) ──────────────────────────────
 // FIX 2026-07-04 : page de secours factorisée (utilisée par les 2 chemins offline)
-function _fallbackReconnexion() {
+// FIX 2026-07-04b : le repli menu.html est réservé au SHELL (menu/index/racine).
+// Avant, TOUTE navigation échouée (404, timeout) était remplacée par le menu précaché
+// => sur le TWA Play (pas de barre d'URL), le bouton semblait « sauter » sans rien ouvrir.
+function _isShellUrl(url) {
+  const p = new URL(url).pathname;
+  return p.endsWith("/menu.html") || p.endsWith("/index.html") || p.endsWith("/");
+}
+
+function _fallbackReconnexion(pagePath) {
   return new Response(
     '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -180,6 +189,7 @@ function _fallbackReconnexion() {
     '<div><div style="font-size:44px">\uD83D\uDCE1</div>' +
     '<h1 style="font-size:18px;margin:10px 0 6px">Reconnexion en cours\u2026</h1>' +
     '<p style="font-size:13px;color:#8fb3bd;margin:0 0 14px">Nouvelle tentative automatique dans 2\u00A0secondes.</p>' +
+    (pagePath ? '<p style="font-size:11px;color:#5f8791;margin:0 0 12px">Page demand\u00E9e : ' + pagePath + '</p>' : '') +
     '<button onclick="location.reload()" style="background:#4FB3C2;border:0;color:#04222c;font-weight:700;padding:10px 22px;border-radius:10px;font-size:14px">R\u00E9essayer maintenant</button>' +
     '</div></body></html>',
     { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
@@ -237,12 +247,15 @@ self.addEventListener("fetch", (event) => {
           } catch (e) { /* mise en cache best-effort */ }
           return networkResponse;
         }
-        // Origine en 4xx/5xx (déploiement en cours ?) => on retombe sur le cache
-        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
+        // Origine en 4xx/5xx (déploiement en cours ?) => cache de la page demandée.
+        // Repli menu.html UNIQUEMENT pour le shell — sinon un 404 se déguise en menu.
+        const cached = (await caches.match(event.request)) ||
+          (_isShellUrl(event.request.url) ? await caches.match(OFFLINE_URL) : null);
         return cached || networkResponse;
       } catch (e) {
-        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
-        return cached || _fallbackReconnexion();
+        const cached = (await caches.match(event.request)) ||
+          (_isShellUrl(event.request.url) ? await caches.match(OFFLINE_URL) : null);
+        return cached || _fallbackReconnexion(new URL(event.request.url).pathname);
       }
     })());
     return;
