@@ -1,9 +1,9 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 10.6.2 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
+ * Version : 10.9.18 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.8.16"; // partage : deux liens (iOS + Android)
+const CACHE_NAME = "heuressup-cache-v10.9.18"; // partage : deux liens (iOS + Android)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -99,7 +99,7 @@ const FILES_TO_CACHE = [
   "./images/foxplayer-8.PNG",
   "./images/foxplayer-9.PNG",
   "./images/foxplayer-10.PNG",
-  "./images/foxpredit.jpg",
+  "./foxpredit.jpg",
   // === Lumina — Grilles Salariales CCN 2026 ===
   "./GrillePaye/index.html",
   "./GrillePaye/ccn-data.json",
@@ -169,6 +169,23 @@ self.addEventListener("activate", (event) => {
 });
 
 // ── FETCH — CACHE FIRST (stale-while-revalidate) ──────────────────────────────
+// FIX 2026-07-04 : page de secours factorisée (utilisée par les 2 chemins offline)
+function _fallbackReconnexion() {
+  return new Response(
+    '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<meta http-equiv="refresh" content="2">' +
+    '<title>Reconnexion\u2026</title></head>' +
+    '<body style="margin:0;font-family:system-ui,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0e1a26;color:#e6f2f5;text-align:center">' +
+    '<div><div style="font-size:44px">\uD83D\uDCE1</div>' +
+    '<h1 style="font-size:18px;margin:10px 0 6px">Reconnexion en cours\u2026</h1>' +
+    '<p style="font-size:13px;color:#8fb3bd;margin:0 0 14px">Nouvelle tentative automatique dans 2\u00A0secondes.</p>' +
+    '<button onclick="location.reload()" style="background:#4FB3C2;border:0;color:#04222c;font-weight:700;padding:10px 22px;border-radius:10px;font-size:14px">R\u00E9essayer maintenant</button>' +
+    '</div></body></html>',
+    { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
+  );
+}
+
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
@@ -180,6 +197,56 @@ self.addEventListener("fetch", (event) => {
   // Sinon la réécriture des headers casse le CORS (erreur if-modified-since).
   const reqUrl = new URL(event.request.url);
   if (reqUrl.origin !== self.location.origin) return;
+
+  // ═══ FIX 2026-07-04 : le SHELL (navigations HTML) passe en RÉSEAU D'ABORD ═══
+  // Le cache-first sur le shell rejouait indéfiniment un instantané incohérent
+  // capturé pendant une fenêtre de déploiement (pushs par lots) => menu cassé.
+  // Stratégie : réseau (timeout 4 s) → cache → menu.html précaché → secours.
+  // Hors-ligne : fetch échoue instantanément => démarrage sur cache aussi vite qu'avant.
+  const isNavShell = event.request.mode === "navigate" ||
+    (event.request.headers.get("accept") || "").includes("text/html");
+  if (isNavShell) {
+    event.respondWith((async () => {
+      try {
+        const networkResponse = await Promise.race([
+          fetch(event.request),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("nav-timeout")), 4000))
+        ]);
+        if (networkResponse && networkResponse.status === 200) {
+          // Copie nettoyée pour le cache ; la réponse réseau est renvoyée TELLE
+          // QUELLE au navigateur (zéro manipulation du shell affiché).
+          try {
+            const body = await networkResponse.clone().arrayBuffer();
+            if (body.byteLength < 2000000) {
+              const headers = new Headers();
+              networkResponse.headers.forEach((val, key) => {
+                if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                  headers.append(key, val);
+                }
+              });
+              headers.set('content-length', body.byteLength.toString());
+              headers.delete('content-encoding');
+              headers.delete('transfer-encoding');
+              const cleanCopy = new Response(body, {
+                status: networkResponse.status,
+                statusText: networkResponse.statusText,
+                headers
+              });
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanCopy));
+            }
+          } catch (e) { /* mise en cache best-effort */ }
+          return networkResponse;
+        }
+        // Origine en 4xx/5xx (déploiement en cours ?) => on retombe sur le cache
+        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
+        return cached || networkResponse;
+      } catch (e) {
+        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
+        return cached || _fallbackReconnexion();
+      }
+    })());
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
@@ -202,7 +269,11 @@ self.addEventListener("fetch", (event) => {
               statusText: networkResponse.statusText,
               headers
             });
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+            // FIX 2026-07-03 : ne pas stocker les fichiers > 2 Mo (badges PNG) —
+            // un Cache Storage obèse est évincé par Android => offline cassé.
+            if (body.byteLength < 2000000) {
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
+            }
           }
         }).catch(() => {});
         return cachedResponse;
@@ -226,15 +297,25 @@ self.addEventListener("fetch", (event) => {
             statusText: networkResponse.statusText,
             headers
           });
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanResponse));
-          return new Response(body, { status: networkResponse.status, statusText: networkResponse.statusText, headers: networkResponse.headers });
+          // FIX 2026-07-03 : renvoyer la version aux en-têtes nettoyés (l'ancienne
+          // renvoyait le corps décodé avec content-encoding d'origine) + plafond 2 Mo.
+          if (body.byteLength < 2000000) {
+            const copy = cleanResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return cleanResponse;
         }
         return networkResponse;
       }).catch(() => {
         // Offline + pas en cache → fallback HTML
         const isNav = event.request.mode === "navigate" ||
           event.request.headers.get("accept")?.includes("text/html");
-        if (isNav) return caches.match(OFFLINE_URL);
+        if (isNav) {
+          // FIX 2026-07-03 : caches.match() peut résoudre undefined si le cache a
+          // été évincé par Android => respondWith(undefined) => page d'erreur
+          // Chrome « Actualiser ». On chaîne un fallback HTML auto-retry.
+          return caches.match(OFFLINE_URL).then((r) => r || _fallbackReconnexion());
+        }
         return new Response('', { status: 503 });
       });
     })
