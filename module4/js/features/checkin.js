@@ -104,25 +104,24 @@ class Checkin {
     this._questions = [];
     if(this._close) this._close.addEventListener('click', () => this.close());
     if(this._modal) this._modal.querySelector('.modal-overlay')?.addEventListener('click', () => this.close());
-    this._scheduleMidnightReset();
-  }
-
-  _scheduleMidnightReset(){
-    const now = new Date();
-    const midnight = new Date(now); midnight.setHours(24,0,0,0);
-    setTimeout(() => {
-      _safeLS.del('DTE_CHECKIN_DATE');
-      document.getElementById('checkin-edit-badge')?.remove();
-      this._scheduleMidnightReset();
-    }, midnight - now);
+    // FIX 2026-07-03 : plus de reset minuit — sur Android, le setTimeout gelé en
+    // arrière-plan se déclenchait à la reprise et effaçait DTE_CHECKIN_DATE en
+    // pleine journée => le check-in se rouvrait le soir. La comparaison de date
+    // dans checkIfNeeded() gère déjà le changement de jour.
   }
 
   checkIfNeeded(){
-    const today = new Date().toISOString().slice(0,10);
-    if (_safeLS.get('DTE_CHECKIN_DATE') !== today) {
-      setTimeout(() => this.open(), 800);
+    // FIX 2026-07-03 : date LOCALE (comme _submit) — toISOString() renvoyait la
+    // date UTC, décalée d'un jour entre 0h et 2h en France.
+    const _ldk = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const today = _ldk(new Date());
+    if (_safeLS.get('DTE_CHECKIN_DATE') === today) {
+      setTimeout(() => this._showEditBadge(), 1000);          // déjà fait aujourd'hui
+    } else if (_safeLS.get('DTE_CHECKIN_SNOOZE') === today) {
+      /* fermé sans terminer aujourd'hui → on ne re-sollicite pas,
+         le bouton check-in reste accessible manuellement */
     } else {
-      setTimeout(() => this._showEditBadge(), 1000);
+      setTimeout(() => this.open(), 800);
     }
   }
 
@@ -172,7 +171,13 @@ class Checkin {
     if(this._modal) this._modal.classList.remove('hidden');
   }
 
-  close(){ if(this._modal) this._modal.classList.add('hidden'); }
+  close(){
+    if(this._modal) this._modal.classList.add('hidden');
+    // FIX 2026-07-03 : fermeture sans validation => snooze jusqu'à demain
+    const _ldk = (d) => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const t = _ldk(new Date());
+    if (_safeLS.get('DTE_CHECKIN_DATE') !== t) _safeLS.set('DTE_CHECKIN_SNOOZE', t);
+  }
 
   _buildSequence(){
     const s = this._answers.dayStatus;
