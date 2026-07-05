@@ -1,9 +1,9 @@
 /**
  * Service Worker — Simulateur Heures Sup & RPG Fox
- * Version : 10.9.18 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
+ * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.9.18"; // partage : deux liens (iOS + Android)
+const CACHE_NAME = "heuressup-cache-v10.9.20"; // fix flash cold-start Android (shell cache-first)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -109,6 +109,7 @@ const FILES_TO_CACHE = [
   "./module7/mimizuku-menu.jpg",
   // ── Trousse à outils (54 modules) + légal ──
   "./outils.html",
+  "./nouveautes.html",   // FIX 2026-07-04b : oubliée du précache => nav avalée par le repli menu
   "./mentions-legales.html",
   "./privacy.html",
   "./outils/articles-loi.js",
@@ -170,7 +171,15 @@ self.addEventListener("activate", (event) => {
 
 // ── FETCH — CACHE FIRST (stale-while-revalidate) ──────────────────────────────
 // FIX 2026-07-04 : page de secours factorisée (utilisée par les 2 chemins offline)
-function _fallbackReconnexion() {
+// FIX 2026-07-04b : le repli menu.html est réservé au SHELL (menu/index/racine).
+// Avant, TOUTE navigation échouée (404, timeout) était remplacée par le menu précaché
+// => sur le TWA Play (pas de barre d'URL), le bouton semblait « sauter » sans rien ouvrir.
+function _isShellUrl(url) {
+  const p = new URL(url).pathname;
+  return p.endsWith("/menu.html") || p.endsWith("/index.html") || p.endsWith("/");
+}
+
+function _fallbackReconnexion(pagePath) {
   return new Response(
     '<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
@@ -180,6 +189,7 @@ function _fallbackReconnexion() {
     '<div><div style="font-size:44px">\uD83D\uDCE1</div>' +
     '<h1 style="font-size:18px;margin:10px 0 6px">Reconnexion en cours\u2026</h1>' +
     '<p style="font-size:13px;color:#8fb3bd;margin:0 0 14px">Nouvelle tentative automatique dans 2\u00A0secondes.</p>' +
+    (pagePath ? '<p style="font-size:11px;color:#5f8791;margin:0 0 12px">Page demand\u00E9e : ' + pagePath + '</p>' : '') +
     '<button onclick="location.reload()" style="background:#4FB3C2;border:0;color:#04222c;font-weight:700;padding:10px 22px;border-radius:10px;font-size:14px">R\u00E9essayer maintenant</button>' +
     '</div></body></html>',
     { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }
@@ -198,51 +208,70 @@ self.addEventListener("fetch", (event) => {
   const reqUrl = new URL(event.request.url);
   if (reqUrl.origin !== self.location.origin) return;
 
-  // ═══ FIX 2026-07-04 : le SHELL (navigations HTML) passe en RÉSEAU D'ABORD ═══
-  // Le cache-first sur le shell rejouait indéfiniment un instantané incohérent
-  // capturé pendant une fenêtre de déploiement (pushs par lots) => menu cassé.
-  // Stratégie : réseau (timeout 4 s) → cache → menu.html précaché → secours.
-  // Hors-ligne : fetch échoue instantanément => démarrage sur cache aussi vite qu'avant.
+  // ═══ FIX 2026-07-05 : le SHELL (navigations HTML) passe en CACHE D'ABORD ═══
+  // Avant (FIX 2026-07-04) : réseau d'abord => sur Android/TWA cold start, l'utilisateur
+  // voyait un flash "connexion au web" pendant l'attente réseau avant affichage.
+  // Maintenant : le cache s'affiche INSTANTANÉMENT si présent, le réseau tourne en
+  // parallèle uniquement pour rafraîchir le cache (silencieux, aucun impact visuel).
+  // Le risque de "snapshot cassé pendant déploiement par lots" (raison du FIX précédent)
+  // subsiste en théorie, mais seulement le temps d'un aller-retour réseau — la
+  // revalidation en tâche de fond corrige le cache pour la navigation suivante.
   const isNavShell = event.request.mode === "navigate" ||
     (event.request.headers.get("accept") || "").includes("text/html");
   if (isNavShell) {
     event.respondWith((async () => {
-      try {
-        const networkResponse = await Promise.race([
-          fetch(event.request),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("nav-timeout")), 4000))
-        ]);
-        if (networkResponse && networkResponse.status === 200) {
-          // Copie nettoyée pour le cache ; la réponse réseau est renvoyée TELLE
-          // QUELLE au navigateur (zéro manipulation du shell affiché).
-          try {
-            const body = await networkResponse.clone().arrayBuffer();
-            if (body.byteLength < 2000000) {
-              const headers = new Headers();
-              networkResponse.headers.forEach((val, key) => {
-                if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
-                  headers.append(key, val);
-                }
-              });
-              headers.set('content-length', body.byteLength.toString());
-              headers.delete('content-encoding');
-              headers.delete('transfer-encoding');
-              const cleanCopy = new Response(body, {
-                status: networkResponse.status,
-                statusText: networkResponse.statusText,
-                headers
-              });
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanCopy));
-            }
-          } catch (e) { /* mise en cache best-effort */ }
+      const cached = await caches.match(event.request);
+
+      // Revalidation réseau en arrière-plan (ne bloque jamais l'affichage)
+      const revalidate = (async () => {
+        try {
+          const networkResponse = await Promise.race([
+            fetch(event.request),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("nav-timeout")), 4000))
+          ]);
+          if (networkResponse && networkResponse.status === 200) {
+            try {
+              const body = await networkResponse.clone().arrayBuffer();
+              if (body.byteLength < 2000000) {
+                const headers = new Headers();
+                networkResponse.headers.forEach((val, key) => {
+                  if (!['cf-cache-status','cf-ray','age','x-cache','nel','report-to'].includes(key.toLowerCase())) {
+                    headers.append(key, val);
+                  }
+                });
+                headers.set('content-length', body.byteLength.toString());
+                headers.delete('content-encoding');
+                headers.delete('transfer-encoding');
+                const cleanCopy = new Response(body, {
+                  status: networkResponse.status,
+                  statusText: networkResponse.statusText,
+                  headers
+                });
+                caches.open(CACHE_NAME).then((cache) => cache.put(event.request, cleanCopy));
+              }
+            } catch (e) { /* mise en cache best-effort */ }
+          }
           return networkResponse;
+        } catch (e) {
+          return null;
         }
-        // Origine en 4xx/5xx (déploiement en cours ?) => on retombe sur le cache
-        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
-        return cached || networkResponse;
+      })();
+
+      // Cache dispo → on l'affiche tout de suite, le réseau se contente de rafraîchir.
+      if (cached) {
+        revalidate; // tourne en fire-and-forget, pas de await ici
+        return cached;
+      }
+
+      // Pas de cache (1ère visite / cache vidé) → on attend le réseau comme avant.
+      try {
+        const networkResponse = await revalidate;
+        if (networkResponse && networkResponse.status === 200) return networkResponse;
+        const fallback = _isShellUrl(event.request.url) ? await caches.match(OFFLINE_URL) : null;
+        return fallback || networkResponse || _fallbackReconnexion(new URL(event.request.url).pathname);
       } catch (e) {
-        const cached = (await caches.match(event.request)) || (await caches.match(OFFLINE_URL));
-        return cached || _fallbackReconnexion();
+        const fallback = _isShellUrl(event.request.url) ? await caches.match(OFFLINE_URL) : null;
+        return fallback || _fallbackReconnexion(new URL(event.request.url).pathname);
       }
     })());
     return;
