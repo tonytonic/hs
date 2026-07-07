@@ -152,7 +152,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 200, nom: 'Industrie du verre', secteur: 'Industrie verrière',
+    idcc: 200, nom: 'Industrie du verre (code historique — voir IDCC 669)', secteur: 'Industrie verrière',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -188,7 +188,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 218, nom: 'Cabinets avocats', secteur: 'Avocats',
+    idcc: 218, nom: 'Organismes de Sécurité sociale (UCANSS)', secteur: 'Avocats',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'CCN Avocats L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -314,7 +314,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 413, nom: 'Hospitalisation privée à but lucratif cliniques', secteur: 'Santé privée',
+    idcc: 413, nom: 'Établissements personnes inadaptées et handicapées (CCN 66)', secteur: 'Santé privée',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'CCN Hospitalisation privée L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -368,7 +368,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 493, nom: 'Bois scieries raboteries résinage', secteur: 'Industrie bois',
+    idcc: 493, nom: 'Vins, cidres, jus de fruits, sirops, spiritueux et liqueurs de France', secteur: 'Industrie bois',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -1115,7 +1115,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 1413, nom: 'Gaz naturel distributeurs opérateurs', secteur: 'Energie gaz',
+    idcc: 1413, nom: 'Salariés permanents des entreprises de travail temporaire', secteur: 'Energie gaz',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -1772,7 +1772,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 1747, nom: 'Librairie', secteur: 'Commerce culturel',
+    idcc: 1747, nom: 'Activités industrielles de boulangerie et pâtisserie', secteur: 'Commerce culturel',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -1961,7 +1961,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 1776, nom: 'Foyers de jeunes travailleurs FJT', secteur: 'FJT jeunes',
+    idcc: 1776, nom: 'À vérifier (FJT = IDCC 2336)', secteur: 'FJT jeunes',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2024,7 +2024,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 1850, nom: 'Expertise comptable et commissariat aux comptes', secteur: 'Finance audit',
+    idcc: 1850, nom: 'Avocats salariés (cabinets d\'avocats)', secteur: 'Finance audit',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'CCN Expertise comptable L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2069,7 +2069,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 1921, nom: 'CCNT 66 inadaptés handicapés', secteur: 'Médico-social CCNT 66',
+    idcc: 1921, nom: 'Commissaires de justice (ex-huissiers)', secteur: 'Médico-social CCNT 66',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2132,7 +2132,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2002, nom: 'Transport ferroviaire opérateurs privés', secteur: 'Transport ferroviaire',
+    idcc: 2002, nom: 'Blanchisserie, teinturerie et nettoyage (pressing)', secteur: 'Transport ferroviaire',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2141,7 +2141,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2046, nom: 'Ameublement industrie', secteur: 'Industrie ameublement',
+    idcc: 2046, nom: 'Centres de lutte contre le cancer (CLCC)', secteur: 'Industrie ameublement',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2222,7 +2222,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2190, nom: 'Centres de lutte contre le cancer CLCC', secteur: 'Santé oncologie',
+    idcc: 2190, nom: 'À vérifier (CLCC = IDCC 2046)', secteur: 'Santé oncologie',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2231,7 +2231,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2205, nom: 'Laboratoires de biologie médicale privés', secteur: 'Biologie médicale',
+    idcc: 2205, nom: 'Notariat', secteur: 'Biologie médicale',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2267,7 +2267,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2264, nom: 'Télécommunications', secteur: 'Télécoms',
+    idcc: 2264, nom: 'Hospitalisation privée à but lucratif (cliniques)', secteur: 'Télécoms',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'CCN Télécommunications L3121-65',
     clauseDeconn: true, suiviCharge: 'Art. L3121-65',
@@ -2627,7 +2627,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 3217, nom: 'Transport sanitaire ambulanciers', secteur: 'Transport sanitaire',
+    idcc: 3217, nom: 'Branche ferroviaire (CCN du 31 mai 2016)', secteur: 'Transport sanitaire',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -2789,7 +2789,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 7024, nom: 'Vins et spiritueux commerce de gros', secteur: 'Commerce vins',
+    idcc: 7024, nom: 'Production agricole et CUMA', secteur: 'Commerce vins',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -3635,7 +3635,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 9811, nom: 'Accord national agriculture salariés', secteur: 'Agriculture',
+    idcc: 9811, nom: 'Exploitations agricoles du Tarn (départementale)', secteur: 'Agriculture',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -4821,7 +4821,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 200, nom: 'Industrie du verre — Cadres Dirigeants', secteur: 'Industrie verrière',
+    idcc: 200, nom: 'Industrie du verre (code historique — voir IDCC 669) — Cadres Dirigeants', secteur: 'Industrie verrière',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -4861,7 +4861,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 218, nom: 'Cabinets avocats — Cadres Dirigeants', secteur: 'Avocats',
+    idcc: 218, nom: 'Organismes de Sécurité sociale (UCANSS) — Cadres Dirigeants', secteur: 'Avocats',
     critereCD: 'Gérant de SELARL d\'avocats, managing partner. Attention : les associés libéraux ne sont pas salariés.',
     rmgCD: 'Pas de minimum conventionnel pour les CD — hors barème CBM/CNB',
     entretienCD: 'Non obligatoire légalement pour les CD',
@@ -5001,7 +5001,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 413, nom: 'Hospitalisation privée à but lucratif cliniques — Cadres Dirigeants', secteur: 'Santé privée',
+    idcc: 413, nom: 'Établissements personnes inadaptées et handicapées (CCN 66) — Cadres Dirigeants', secteur: 'Santé privée',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -5061,7 +5061,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 493, nom: 'Bois scieries raboteries résinage — Cadres Dirigeants', secteur: 'Industrie bois',
+    idcc: 493, nom: 'Vins, cidres, jus de fruits, sirops, spiritueux et liqueurs de France — Cadres Dirigeants', secteur: 'Industrie bois',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -5881,7 +5881,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 1413, nom: 'Gaz naturel distributeurs opérateurs — Cadres Dirigeants', secteur: 'Energie gaz',
+    idcc: 1413, nom: 'Salariés permanents des entreprises de travail temporaire — Cadres Dirigeants', secteur: 'Energie gaz',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -6611,7 +6611,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 1747, nom: 'Librairie — Cadres Dirigeants', secteur: 'Commerce culturel',
+    idcc: 1747, nom: 'Activités industrielles de boulangerie et pâtisserie — Cadres Dirigeants', secteur: 'Commerce culturel',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -6821,7 +6821,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 1776, nom: 'Foyers de jeunes travailleurs FJT — Cadres Dirigeants', secteur: 'FJT jeunes',
+    idcc: 1776, nom: 'À vérifier (FJT = IDCC 2336) — Cadres Dirigeants', secteur: 'FJT jeunes',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -6891,7 +6891,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 1850, nom: 'Expertise comptable et commissariat aux comptes — Cadres Dirigeants', secteur: 'Finance audit',
+    idcc: 1850, nom: 'Avocats salariés (cabinets d\'avocats) — Cadres Dirigeants', secteur: 'Finance audit',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -6941,7 +6941,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 1921, nom: 'CCNT 66 inadaptés handicapés — Cadres Dirigeants', secteur: 'Médico-social CCNT 66',
+    idcc: 1921, nom: 'Commissaires de justice (ex-huissiers) — Cadres Dirigeants', secteur: 'Médico-social CCNT 66',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7011,7 +7011,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 2002, nom: 'Transport ferroviaire opérateurs privés — Cadres Dirigeants', secteur: 'Transport ferroviaire',
+    idcc: 2002, nom: 'Blanchisserie, teinturerie et nettoyage (pressing) — Cadres Dirigeants', secteur: 'Transport ferroviaire',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7021,7 +7021,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 2046, nom: 'Ameublement industrie — Cadres Dirigeants', secteur: 'Industrie ameublement',
+    idcc: 2046, nom: 'Centres de lutte contre le cancer (CLCC) — Cadres Dirigeants', secteur: 'Industrie ameublement',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7111,7 +7111,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 2190, nom: 'Centres de lutte contre le cancer CLCC — Cadres Dirigeants', secteur: 'Santé oncologie',
+    idcc: 2190, nom: 'À vérifier (CLCC = IDCC 2046) — Cadres Dirigeants', secteur: 'Santé oncologie',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7121,7 +7121,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 2205, nom: 'Laboratoires de biologie médicale privés — Cadres Dirigeants', secteur: 'Biologie médicale',
+    idcc: 2205, nom: 'Notariat — Cadres Dirigeants', secteur: 'Biologie médicale',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7161,7 +7161,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 2264, nom: 'Télécommunications — Cadres Dirigeants', secteur: 'Télécoms',
+    idcc: 2264, nom: 'Hospitalisation privée à but lucratif (cliniques) — Cadres Dirigeants', secteur: 'Télécoms',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7561,7 +7561,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 3217, nom: 'Transport sanitaire ambulanciers — Cadres Dirigeants', secteur: 'Transport sanitaire',
+    idcc: 3217, nom: 'Branche ferroviaire (CCN du 31 mai 2016) — Cadres Dirigeants', secteur: 'Transport sanitaire',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -7741,7 +7741,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 7024, nom: 'Vins et spiritueux commerce de gros — Cadres Dirigeants', secteur: 'Commerce vins',
+    idcc: 7024, nom: 'Production agricole et CUMA — Cadres Dirigeants', secteur: 'Commerce vins',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -8681,7 +8681,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 9811, nom: 'Accord national agriculture salariés — Cadres Dirigeants', secteur: 'Agriculture',
+    idcc: 9811, nom: 'Exploitations agricoles du Tarn (départementale) — Cadres Dirigeants', secteur: 'Agriculture',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
