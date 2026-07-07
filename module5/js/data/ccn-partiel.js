@@ -32,13 +32,13 @@ const REGLES_HC = {
   HOSPI130:  { cap:0.33, rate1:0.10, rate2:0.25, threshold:0.10, notice:7, note:'Hospitalisation privée FEHAP — accord branche étendu, plafond 1/3' },
   TRANSP:    { cap:0.10, rate1:0.10, rate2:0.25, threshold:0.10, notice:7, note:'Transport routier — plafond 10% pour les temps partiels' },
   ANIM70:    { cap:0.33, rate1:0.10, rate2:0.25, threshold:0.10, notice:7, note:'Animation ÉCLAT — avenant n°201 du 20/09/2023, plafond 1/3' },
-  CSS100:    { cap:0.10, rate1:0.10, rate2:0.25, threshold:0.10, notice:7, note:'Centres sociaux — plafond 10%' },
+  CSS60:    { cap:0.10, rate1:0.10, rate2:0.25, threshold:0.10, notice:7, note:'Centres sociaux — plafond 10%' },
 };
 
 // ── 422 CCN FRANCE ───────────────────────────────────────────────────
 const CCN_PARTIEL_ALIASES = [
   // ── AGRICULTURE ──
-  {i:9811,n:"Accord national agriculture salariés",s:"Agriculture",g:"DC",cap:0.10,fj:false},
+  {i:9811,n:"Exploitations agricoles du Tarn (départementale)",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   {i:9001,n:"Exploitations agricoles national",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   {i:9011,n:"Exploitations agricoles Ain",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   {i:9021,n:"Exploitations agricoles Aisne",s:"Agriculture",g:"DC",cap:0.10,fj:false},
@@ -136,7 +136,7 @@ const CCN_PARTIEL_ALIASES = [
   {i:7016,n:"Coopératives agricoles céréales meunerie alimentation bétail",s:"Coopératives agricoles",g:"DC",cap:0.10,fj:false},
   {i:7025,n:"Coopératives fruitières et légumières",s:"Coopératives agricoles",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE VINS ──
-  {i:7024,n:"Vins et spiritueux commerce de gros",s:"Commerce vins",g:"DC",cap:0.10,fj:false},
+  {i:7024,n:"Production agricole et CUMA",s:"Agriculture",g:"DC",cap:0.10,fj:false},
   // ── VITICULTURE ──
   {i:7005,n:"Caves coopératives vinicoles",s:"Viticulture",g:"DC",cap:0.10,fj:false},
   // ── HORTICULTURE ──
@@ -234,12 +234,12 @@ const CCN_PARTIEL_ALIASES = [
   // ── INDUSTRIE CHIMIQUE ──
   {i:700,n:"Détergents et produits entretien",s:"Industrie chimique",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE VERRIÈRE ──
-  {i:200,n:"Industrie du verre",s:"Industrie verrière",g:"DC",cap:0.10,fj:false},
+  {i:200,n:"Industrie du verre (code historique — voir IDCC 669)",s:"Industrie verrière",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE CÉRAMIQUE ──
   {i:1540,n:"Céramique industries",s:"Industrie céramique",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE BOIS ──
   {i:1561,n:"Fabrication de meubles en bois",s:"Industrie bois",g:"DC",cap:0.10,fj:false},
-  {i:493,n:"Bois scieries raboteries résinage",s:"Industrie bois",g:"DC",cap:0.10,fj:false},
+  {i:493,n:"Vins, cidres, jus de fruits, sirops, spiritueux et liqueurs de France",s:"Vins spiritueux",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE PAPIER ──
   {i:3238,n:"Papiers et cartons industries",s:"Industrie papier",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE CARTONNAGE ──
@@ -251,7 +251,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── HORLOGERIE ──
   {i:1821,n:"Horlogerie",s:"Horlogerie",g:"DC",cap:0.10,fj:false},
   // ── INDUSTRIE AMEUBLEMENT ──
-  {i:2046,n:"Ameublement industrie",s:"Industrie ameublement",g:"DC",cap:0.10,fj:false},
+  {i:2046,n:"Centres de lutte contre le cancer (CLCC)",s:"Santé oncologie",g:"DC",cap:0.10,fj:false},
   // ── GÉNIE CLIMATIQUE ──
   {i:1370,n:"Equipements thermiques installations entretien",s:"Génie climatique",g:"DC",cap:0.10,fj:false},
   // ── ARTISANAT CORDONNERIE ──
@@ -293,7 +293,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── ENERGIE EDF GDF ──
   {i:5001,n:"Industries électriques et gazières IEG",s:"Energie EDF GDF",g:"DC",cap:0.10,fj:false},
   // ── ENERGIE GAZ ──
-  {i:1413,n:"Gaz naturel distributeurs opérateurs",s:"Energie gaz",g:"DC",cap:0.10,fj:false},
+  {i:1413,n:"Salariés permanents des entreprises de travail temporaire",s:"Travail temporaire",g:"DC",cap:0.10,fj:false},
   // ── EAU ENVIRONNEMENT ──
   {i:2230,n:"Eau assainissement propreté urbaine",s:"Eau Environnement",g:"DC",cap:0.10,fj:false},
   // ── RECYCLAGE RÉCUPÉRATION ──
@@ -326,7 +326,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── DISTRIBUTION ÉNERGIE ──
   {i:1985,n:"Combustibles solides liquides gazeux négoce",s:"Distribution énergie",g:"DC",cap:0.10,fj:false},
   // ── COMMERCE CULTUREL ──
-  {i:1747,n:"Librairie",s:"Commerce culturel",g:"DC",cap:0.33,fj:false},
+  {i:1747,n:"Activités industrielles de boulangerie et pâtisserie",s:"Boulangerie industrielle",g:"DC",cap:0.33,fj:false},
   // ── PHARMACIE ──
   {i:1996,n:"Pharmacies officine",s:"Pharmacie",g:"PHARMO150",cap:0.10,fj:false},
   // ── COMMERCE FLORAL ──
@@ -358,7 +358,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── BANQUE MUTUALISTE ──
   {i:2120,n:"Banques populaires",s:"Banque mutualiste",g:"DC",cap:0.10,fj:true},
   // ── FINANCE AUDIT ──
-  {i:1850,n:"Expertise comptable et commissariat aux comptes",s:"Finance audit",g:"DC",cap:0.10,fj:true},
+  {i:1850,n:"Avocats salariés (cabinets d'avocats)",s:"Avocats",g:"DC",cap:0.10,fj:true},
   // ── ASSURANCE COURTAGE ──
   {i:2615,n:"Courtage en assurances et réassurances",s:"Assurance courtage",g:"DC",cap:0.10,fj:true},
   // ── ASSURANCE AGENCES ──
@@ -374,7 +374,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── PROMOTION IMMOBILIÈRE ──
   {i:1512,n:"Promotion immobilière",s:"Promotion immobilière",g:"DC",cap:0.10,fj:true},
   // ── AVOCATS ──
-  {i:218,n:"Cabinets avocats",s:"Avocats",g:"DC",cap:0.10,fj:true},
+  {i:218,n:"Organismes de Sécurité sociale (UCANSS)",s:"Sécurité sociale",g:"DC",cap:0.10,fj:true},
   // ── NOTARIAT ──
   {i:1965,n:"Notariat",s:"Notariat",g:"DC",cap:0.10,fj:true},
   // ── JURIDIQUE ──
@@ -384,7 +384,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── PUBLICITÉ COMMUNICATION ──
   {i:2642,n:"Publicité régies et agences",s:"Publicité communication",g:"DC",cap:0.10,fj:true},
   // ── TÉLÉCOMS ──
-  {i:2264,n:"Télécommunications",s:"Télécoms",g:"DC",cap:0.33,fj:true},
+  {i:2264,n:"Hospitalisation privée à but lucratif (cliniques)",s:"Santé privée",g:"HOSPI130",cap:0.33,fj:true},
   // ── PRESSE NATIONALE ──
   {i:1480,n:"Presse quotidienne nationale",s:"Presse nationale",g:"DC",cap:0.10,fj:true},
   // ── PRESSE RÉGIONALE ──
@@ -398,7 +398,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── EDITION ──
   {i:2121,n:"Edition livres presse multimédia",s:"Edition",g:"DC",cap:0.10,fj:true},
   // ── SANTÉ PRIVÉE ──
-  {i:413,n:"Hospitalisation privée à but lucratif cliniques",s:"Santé privée",g:"HOSPI130",cap:0.33,fj:false},
+  {i:413,n:"Établissements personnes inadaptées et handicapées (CCN 66)",s:"Médico-social CCN 66",g:"DC",cap:0.33,fj:false},
   // ── SANTÉ LIBÉRALE ──
   {i:776,n:"Cabinets médicaux",s:"Santé libérale",g:"DC",cap:0.10,fj:false},
   // ── SANTÉ DENTAIRE ──
@@ -406,13 +406,13 @@ const CCN_PARTIEL_ALIASES = [
   // ── AIDE À DOMICILE ──
   {i:2941,n:"Aide accompagnement soins à domicile BASS",s:"Aide à domicile",g:"DC",cap:0.33,fj:false},
   // ── MÉDICO-SOCIAL CCNT 66 ──
-  {i:1921,n:"CCNT 66 inadaptés handicapés",s:"Médico-social CCNT 66",g:"DC",cap:0.33,fj:false},
+  {i:1921,n:"Commissaires de justice (ex-huissiers)",s:"Juridique",g:"DC",cap:0.33,fj:false},
   // ── SANTÉ ONCOLOGIE ──
-  {i:2190,n:"Centres de lutte contre le cancer CLCC",s:"Santé oncologie",g:"DC",cap:0.33,fj:false},
+  {i:2190,n:"À vérifier (CLCC = IDCC 2046)",s:"À vérifier",g:"DC",cap:0.33,fj:false},
   // ── TRANSPORT SANITAIRE ──
-  {i:3217,n:"Transport sanitaire ambulanciers",s:"Transport sanitaire",g:"DC",cap:0.33,fj:false},
+  {i:3217,n:"Branche ferroviaire (CCN du 31 mai 2016)",s:"Transport ferroviaire",g:"DC",cap:0.33,fj:false},
   // ── BIOLOGIE MÉDICALE ──
-  {i:2205,n:"Laboratoires de biologie médicale privés",s:"Biologie médicale",g:"DC",cap:0.10,fj:false},
+  {i:2205,n:"Notariat",s:"Notariat",g:"DC",cap:0.10,fj:false},
   // ── SANTÉ VÉTÉRINAIRE ──
   {i:2564,n:"Vétérinaires praticiens salariés",s:"Santé vétérinaire",g:"DC",cap:0.10,fj:false},
   // ── SERVICES FUNÉRAIRES ──
@@ -426,7 +426,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── TRANSPORT AÉRIEN SOL ──
   {i:673,n:"Transport aérien personnel au sol",s:"Transport aérien sol",g:"DC",cap:0.10,fj:false},
   // ── TRANSPORT FERROVIAIRE ──
-  {i:2002,n:"Transport ferroviaire opérateurs privés",s:"Transport ferroviaire",g:"DC",cap:0.10,fj:false},
+  {i:2002,n:"Blanchisserie, teinturerie et nettoyage (pressing)",s:"Blanchisserie pressing",g:"DC",cap:0.10,fj:false},
   // ── LOGISTIQUE ──
   {i:3117,n:"Logistique entreposage et manutention",s:"Logistique",g:"DC",cap:0.10,fj:true},
   // ── TRANSPORT FLUVIAL ──
@@ -460,7 +460,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── ANIMATION ESS ──
   {i:1518,n:"Animation ÉCLAT structures employant animateurs",s:"Animation ESS",g:"ANIM70",cap:0.33,fj:false},
   // ── ACTION SOCIALE ──
-  {i:1261,n:"Centres sociaux et socio-culturels",s:"Action sociale",g:"CSS100",cap:0.33,fj:false},
+  {i:1261,n:"Centres sociaux et socio-culturels",s:"Action sociale",g:"CSS60",cap:0.33,fj:false},
   // ── ACTION SOCIALE ESS ──
   {i:3381,n:"Acteurs du lien social et familial ALISFA",s:"Action sociale ESS",g:"DC",cap:0.33,fj:false},
   // ── SPECTACLE VIVANT ──
@@ -580,7 +580,7 @@ const CCN_PARTIEL_ALIASES = [
   // ── OGEC ÉCOLES ──
   {i:1775,n:"Organismes de gestion écoles catholiques OGEC",s:"OGEC écoles",g:"DC",cap:0.33,fj:false},
   // ── FJT JEUNES ──
-  {i:1776,n:"Foyers de jeunes travailleurs FJT",s:"FJT jeunes",g:"DC",cap:0.33,fj:false},
+  {i:1776,n:"À vérifier (FJT = IDCC 2336)",s:"À vérifier",g:"DC",cap:0.33,fj:false},
   // ── SPORT FÉDÉRATIONS ──
   {i:1779,n:"Fédérations sportives nationales",s:"Sport fédérations",g:"DC",cap:0.33,fj:false},
   // ── SPORT CLUBS PRO ──
