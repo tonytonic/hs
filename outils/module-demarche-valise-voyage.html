@@ -6,6 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0e1322">
 <title>Préparer son voyage · SimulHeures</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
 <style>
 :root{
   --accent:#ffd34e; --accent2:#f0a93c;
@@ -18,10 +19,17 @@ body{overflow-wrap:break-word;word-break:break-word;font-family:-apple-system,Bl
 .back{color:var(--faded);text-decoration:none;font-size:13px;font-weight:600;white-space:nowrap;}
 .hbtn{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--card);
   color:var(--text);font-size:15px;font-weight:700;cursor:pointer;}
-.progwrap{max-width:520px;margin:0 auto 18px;}
+.summary-card{max-width:520px;margin:0 auto 18px;background:var(--card);border:1px solid var(--line);
+  border-radius:16px;padding:18px 16px;text-align:center;}
+.summary-num{font-size:30px;font-weight:800;letter-spacing:-.5px;}
+.summary-num span{color:var(--accent);}
+.summary-label{font-size:12px;color:var(--faded);font-weight:600;margin:2px 0 12px;text-transform:uppercase;letter-spacing:.5px;}
 .progbar{height:9px;border-radius:6px;background:rgba(255,255,255,0.09);overflow:hidden;}
 .progfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .25s;}
-.progtxt{text-align:center;font-size:12px;color:var(--faded);margin-top:6px;font-weight:600;}
+.actions{max-width:520px;margin:0 auto 4px;display:flex;gap:10px;}
+.pdfbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));color:#0c0c18;border:none;border-radius:12px;
+  padding:12px;font-size:14px;font-weight:800;cursor:pointer;}
 .reset{display:block;margin:14px auto 0;background:none;border:none;color:var(--faded);font-size:12px;
   cursor:pointer;text-decoration:underline;}
 .sh-disclaimer{max-width:520px;margin:18px auto 0;padding:13px 15px;background:rgba(0,0,0,0.18);
@@ -32,7 +40,7 @@ body{overflow-wrap:break-word;word-break:break-word;font-family:-apple-system,Bl
   display:none;align-items:center;justify-content:center;padding:22px;}
 .ov.show{display:flex;}
 .wz{background:linear-gradient(165deg,#172138,#0e1322);border:1px solid var(--line);border-radius:20px;
-  max-width:380px;width:100%;padding:24px 22px 18px;position:relative;}
+  max-width:380px;width:100%;padding:24px 22px 18px;position:relative;max-height:86vh;overflow-y:auto;}
 .wz .x{position:absolute;top:12px;right:12px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);
   background:transparent;color:var(--text);font-size:14px;cursor:pointer;}
 .wz .wico{font-size:38px;text-align:center;}
@@ -85,13 +93,65 @@ header{display:flex;align-items:center;gap:10px;padding:calc(26px + env(safe-are
   <h1>Préparer son voyage</h1>
   <p>Ce qu'il ne faut pas oublier avant de partir.</p>
 </div>
-<div class="progwrap">
+
+<div class="summary-card">
+  <div class="summary-num"><span id="doneCount">0</span> / <span id="totalCount">0</span></div>
+  <div class="summary-label">éléments cochés</div>
   <div class="progbar"><div class="progfill" id="progfill"></div></div>
-  <div class="progtxt" id="progtxt">0 / 12 étapes faites</div>
 </div>
-<div class="phase"><div class="phase-t">Avant de partir</div><div class="item" data-id="i1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier la validité de sa pièce d'identité ou passeport"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier la validité de sa pièce d'identité ou passeport</div><div class="it-d">6 mois de validité minimum souvent exigés hors UE.</div></div></div><div class="item" data-id="i2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier si un visa est nécessaire pour la destination"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier si un visa est nécessaire pour la destination</div><div class="it-d"></div></div></div><div class="item" data-id="i3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Souscrire une assurance voyage si besoin"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Souscrire une assurance voyage si besoin</div><div class="it-d"></div></div></div><div class="item" data-id="i4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier les vaccins recommandés pour la destination"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier les vaccins recommandés pour la destination</div><div class="it-d"></div></div></div><div class="item" data-id="i5" role="checkbox" aria-checked="false" tabindex="0" aria-label="Prévenir sa banque en cas de paiement à l'étranger"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Prévenir sa banque en cas de paiement à l'étranger</div><div class="it-d"></div></div></div></div>
-<div class="phase"><div class="phase-t">Organisation</div><div class="item" data-id="i6" role="checkbox" aria-checked="false" tabindex="0" aria-label="Faire une copie (photo) de ses papiers importants"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Faire une copie (photo) de ses papiers importants</div><div class="it-d"></div></div></div><div class="item" data-id="i7" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier les franchises bagages de la compagnie"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier les franchises bagages de la compagnie</div><div class="it-d"></div></div></div><div class="item" data-id="i8" role="checkbox" aria-checked="false" tabindex="0" aria-label="Préparer une trousse de pharmacie de base"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Préparer une trousse de pharmacie de base</div><div class="it-d"></div></div></div><div class="item" data-id="i9" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier la météo et adapter les vêtements"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier la météo et adapter les vêtements</div><div class="it-d"></div></div></div></div>
-<div class="phase"><div class="phase-t">Le jour du départ</div><div class="item" data-id="i10" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier les horaires et le terminal/quai"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier les horaires et le terminal/quai</div><div class="it-d"></div></div></div><div class="item" data-id="i11" role="checkbox" aria-checked="false" tabindex="0" aria-label="Arriver avec une marge suffisante (2-3h en avion international)"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Arriver avec une marge suffisante (2-3h en avion international)</div><div class="it-d"></div></div></div><div class="item" data-id="i12" role="checkbox" aria-checked="false" tabindex="0" aria-label="Couper l'eau et le chauffage si absence longue"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Couper l'eau et le chauffage si absence longue</div><div class="it-d"></div></div></div></div>
+<div class="actions">
+  <button class="pdfbtn" id="exportBtn">📄 Exporter PDF</button>
+</div>
+
+<div class="phase"><div class="phase-t">📄 Documents &amp; argent</div>
+<div class="item" data-id="d1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier la validité de sa pièce d'identité ou passeport"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier la validité de sa pièce d'identité ou passeport</div><div class="it-d">6 mois de validité minimum souvent exigés hors UE.</div></div></div>
+<div class="item" data-id="d2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier si un visa est nécessaire pour la destination"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier si un visa est nécessaire pour la destination</div><div class="it-d"></div></div></div>
+<div class="item" data-id="d3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Souscrire une assurance voyage si besoin"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Souscrire une assurance voyage si besoin</div><div class="it-d"></div></div></div>
+<div class="item" data-id="d4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Prévenir sa banque en cas de paiement à l'étranger"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Prévenir sa banque en cas de paiement à l'étranger</div><div class="it-d"></div></div></div>
+<div class="item" data-id="d5" role="checkbox" aria-checked="false" tabindex="0" aria-label="Imprimer ou télécharger ses billets"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Imprimer ou télécharger ses billets</div><div class="it-d">Train, avion, bus — en version papier et sur le téléphone.</div></div></div>
+<div class="item" data-id="d6" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier ses réservations d'hébergement"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier ses réservations d'hébergement</div><div class="it-d"></div></div></div>
+<div class="item" data-id="d7" role="checkbox" aria-checked="false" tabindex="0" aria-label="Carte européenne d'assurance maladie ou assurance santé adaptée"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Carte européenne d'assurance maladie (UE) ou assurance santé adaptée (hors UE)</div><div class="it-d"></div></div></div>
+<div class="item" data-id="d8" role="checkbox" aria-checked="false" tabindex="0" aria-label="Faire une copie de ses papiers importants"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Faire une copie (photo) de ses papiers importants</div><div class="it-d">Pièce d'identité, billets, réservations — dans le cloud ou par email à toi-même.</div></div></div>
+</div>
+
+<div class="phase"><div class="phase-t">🎒 Bagages</div>
+<div class="item" data-id="b1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Choisir le bon bagage et vérifier les franchises"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Choisir le bon bagage (cabine ou soute)</div><div class="it-d">Vérifie les franchises et dimensions autorisées par la compagnie.</div></div></div>
+<div class="item" data-id="b2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vêtements adaptés à la météo et à la durée"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vêtements adaptés à la météo et à la durée du séjour</div><div class="it-d"></div></div></div>
+<div class="item" data-id="b3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Chaussures confortables ou de marche"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Chaussures confortables ou de marche</div><div class="it-d"></div></div></div>
+<div class="item" data-id="b4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Veste légère ou imperméable"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Veste légère ou imperméable</div><div class="it-d"></div></div></div>
+<div class="item" data-id="b5" role="checkbox" aria-checked="false" tabindex="0" aria-label="Serviette microfibre"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Serviette microfibre</div><div class="it-d">Utile en auberge, camping ou à la plage.</div></div></div>
+<div class="item" data-id="b6" role="checkbox" aria-checked="false" tabindex="0" aria-label="Cadenas pour le sac ou la valise"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Cadenas pour le sac ou la valise</div><div class="it-d"></div></div></div>
+</div>
+
+<div class="phase"><div class="phase-t">💊 Santé &amp; hygiène</div>
+<div class="item" data-id="s1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Trousse de pharmacie de base"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Trousse de pharmacie de base</div><div class="it-d"></div></div></div>
+<div class="item" data-id="s2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Médicaments personnels et ordonnance"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Médicaments personnels (+ ordonnance si besoin)</div><div class="it-d"></div></div></div>
+<div class="item" data-id="s3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier les vaccins recommandés"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier les vaccins recommandés pour la destination</div><div class="it-d"></div></div></div>
+<div class="item" data-id="s4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Protection solaire"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Protection solaire adaptée</div><div class="it-d"></div></div></div>
+<div class="item" data-id="s5" role="checkbox" aria-checked="false" tabindex="0" aria-label="Anti-moustique et confort de sommeil"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Anti-moustique, masque et bouchons d'oreilles</div><div class="it-d"></div></div></div>
+</div>
+
+<div class="phase"><div class="phase-t">📱 Tech &amp; divers</div>
+<div class="item" data-id="t1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Charger téléphone et appareils"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Téléphone et appareils chargés</div><div class="it-d"></div></div></div>
+<div class="item" data-id="t2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Chargeur et adaptateur universel"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Chargeur + adaptateur universel si besoin</div><div class="it-d"></div></div></div>
+<div class="item" data-id="t3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Batterie externe"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Batterie externe (powerbank)</div><div class="it-d"></div></div></div>
+<div class="item" data-id="t4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Télécharger les cartes hors-ligne"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Cartes hors-ligne de la destination téléchargées</div><div class="it-d"></div></div></div>
+<div class="item" data-id="t5" role="checkbox" aria-checked="false" tabindex="0" aria-label="Playlist ou podcasts pour la route"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Playlist ou podcasts préparés pour la route</div><div class="it-d"></div></div></div>
+</div>
+
+<div class="phase"><div class="phase-t">🏠 Avant de partir (maison)</div>
+<div class="item" data-id="m1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Suivre ou suspendre le courrier"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Faire suivre ou suspendre le courrier / abonnements</div><div class="it-d"></div></div></div>
+<div class="item" data-id="m2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Garde des animaux ou arrosage des plantes"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Garde des animaux ou arrosage des plantes organisés</div><div class="it-d"></div></div></div>
+<div class="item" data-id="m3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Couper l'eau le gaz et le chauffage"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Couper l'eau, le gaz et le chauffage si absence longue</div><div class="it-d"></div></div></div>
+<div class="item" data-id="m4" role="checkbox" aria-checked="false" tabindex="0" aria-label="Sécuriser le logement"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Sécuriser le logement</div><div class="it-d">Fenêtres fermées, alarme activée, un double des clés chez un proche.</div></div></div>
+</div>
+
+<div class="phase"><div class="phase-t">🚀 Le jour du départ</div>
+<div class="item" data-id="j1" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier les horaires et le terminal/quai"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier les horaires et le terminal/quai</div><div class="it-d"></div></div></div>
+<div class="item" data-id="j2" role="checkbox" aria-checked="false" tabindex="0" aria-label="Arriver avec une marge suffisante"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Arriver avec une marge suffisante</div><div class="it-d">≈ 2-3h en avion international, ≈ 30 min en train.</div></div></div>
+<div class="item" data-id="j3" role="checkbox" aria-checked="false" tabindex="0" aria-label="Vérifier la météo une dernière fois"><div class="chk" aria-hidden="true"></div><div class="it-b"><div class="it-t">Vérifier la météo une dernière fois</div><div class="it-d"></div></div></div>
+</div>
+
 <button class="reset" onclick="resetState()">🔄 Tout réinitialiser</button>
 <div class="sh-disclaimer">
   <strong>⚠️ Outil pédagogique — pas un avis juridique</strong><br>
@@ -105,15 +165,14 @@ header{display:flex;align-items:center;gap:10px;padding:calc(26px + env(safe-are
     <div class="wico" aria-hidden="true">🧳</div>
     <h2>Préparer son voyage</h2>
     <div class="step">Quelques vérifications avant le départ évitent le stress de dernière minute.</div>
-    <div class="step">Coche au fur et à mesure de tes préparatifs.</div>
-    <div class="step">Adapte selon ta destination (international, montagne, plage...).</div>
+    <div class="step">Coche au fur et à mesure de tes préparatifs, réparti en 6 catégories : documents, bagages, santé, tech, maison et jour J.</div>
+    <div class="step">Adapte selon ta destination (international, montagne, plage...) et exporte ta liste en PDF pour l'emmener avec toi.</div>
     <button class="ok" data-close="help">Compris</button>
   </div>
 </div>
 
 <script>
 var LS={STATE:'DEMARCHE_VALISE_VOYAGE_STATE',WELCOME:'DEMARCHE_VALISE_VOYAGE_WELCOMED'};
-var TOTAL=12;
 function getState(){try{return JSON.parse(localStorage.getItem(LS.STATE)||'{}');}catch(e){return {};}}
 function setState(o){try{localStorage.setItem(LS.STATE,JSON.stringify(o));}catch(e){}}
 function toggle(id){
@@ -122,24 +181,62 @@ function toggle(id){
 }
 function render(){
   var o=getState(), n=0;
-  Array.prototype.forEach.call(document.querySelectorAll('.item'),function(el){
+  var items=document.querySelectorAll('.item');
+  var total=items.length;
+  Array.prototype.forEach.call(items,function(el){
     var id=el.getAttribute('data-id'), on=!!o[id];
     el.classList.toggle('done',on);
     el.querySelector('.chk').textContent=on?'✓':'';
     el.setAttribute('aria-checked', on?'true':'false');
     if(on)n++;
   });
-  document.getElementById('progfill').style.width=(TOTAL?Math.round(n/TOTAL*100):0)+'%';
-  document.getElementById('progtxt').textContent=n+' / '+TOTAL+' étapes faites';
+  document.getElementById('progfill').style.width=(total?Math.round(n/total*100):0)+'%';
+  document.getElementById('doneCount').textContent=n;
+  document.getElementById('totalCount').textContent=total;
 }
 function resetState(){
   try{localStorage.removeItem(LS.STATE);localStorage.removeItem(LS.WELCOME);}catch(e){}
-  document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
+  setTimeout(function(){location.reload();},50);
 }
 function openHelp(){document.getElementById('help').classList.add('show');}
 function closeHelp(){document.getElementById('help').classList.remove('show');try{localStorage.setItem(LS.WELCOME,'1');}catch(e){}}
+
+function exportPDF(){
+  if(!window.jspdf){ alert('Le PDF arrive… réessaie dans un instant.'); return; }
+  try{
+    var jsPDF=window.jspdf.jsPDF, doc=new jsPDF({unit:'mm',format:'a4'});
+    var pageH=297, marginX=16, y=20, o=getState();
+    doc.setFont('helvetica','bold'); doc.setFontSize(16);
+    doc.text('Préparer son voyage — Checklist valise', marginX, y); y+=8;
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(120);
+    doc.text('SimulHeures · généré le '+new Date().toLocaleDateString('fr-FR')+' · liste indicative, à adapter selon la destination', marginX, y); y+=9;
+    doc.setTextColor(20);
+    Array.prototype.forEach.call(document.querySelectorAll('.phase'),function(phase){
+      var titleEl=phase.querySelector('.phase-t');
+      var title=titleEl?titleEl.textContent:'';
+      if(y>pageH-20){ doc.addPage(); y=20; }
+      doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(20);
+      doc.text(title, marginX, y); y+=7;
+      Array.prototype.forEach.call(phase.querySelectorAll('.item'),function(el){
+        if(y>pageH-16){ doc.addPage(); y=20; }
+        var id=el.getAttribute('data-id'); var on=!!o[id];
+        var label=el.querySelector('.it-t').textContent;
+        doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+        var mark = on? '[x] ' : '[ ] ';
+        var lines=doc.splitTextToSize(mark+label, 178);
+        doc.text(lines, marginX, y);
+        y+=6*lines.length;
+      });
+      y+=4;
+    });
+    var fname='checklist-valise-'+new Date().toISOString().slice(0,10)+'.pdf';
+    try{ var blob=doc.output('blob'),url=URL.createObjectURL(blob),a=document.createElement('a'); a.href=url;a.download=fname;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},2000); }catch(e2){ doc.save(fname); }
+  }catch(e){ alert('Export PDF impossible pour le moment.'); }
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   document.getElementById('helpBtn').addEventListener('click',openHelp);
+  document.getElementById('exportBtn').addEventListener('click',exportPDF);
   Array.prototype.forEach.call(document.querySelectorAll('[data-close="help"]'),function(b){b.addEventListener('click',closeHelp);});
   Array.prototype.forEach.call(document.querySelectorAll('.item'),function(el){
     el.addEventListener('click',function(){toggle(el.getAttribute('data-id'));});
