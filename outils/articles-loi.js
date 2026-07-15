@@ -30,6 +30,59 @@
      modifiée. Prochaine échéance connue : revalorisation SMIC au 1er janvier
      2027 (sauf nouveau dépassement du seuil +2 % d'inflation déclenchant une
      revalorisation automatique en cours d'année).
+
+   PASSAGE D'AUDIT DU 15/07/2026 (lot 1 — voir tracking-audit-outils.csv) :
+     - ARE (are_min/are_degressif_*) CONFIRMÉS : pas de revalorisation au
+       1er juillet 2026 (Unédic CA du 30/06/2026, communiqué + service-public.fr
+       + unedic.org). Montants du 1er juillet 2025 toujours en vigueur.
+     - Bug corrigé : module-chomage.html utilisait un plancher ARE local
+       (31,97 €) désynchronisé de la valeur confirmée (32,13 €) — corrigé.
+     - Nouveau à surveiller pour la conformité septembre 2026 : loi n° 2026-470
+       du 11/06/2026 (Légifrance : legifrance.gouv.fr/eli/loi/2026/6/11/
+       TRSD2606801L) réduit la durée max. d'indemnisation ARE pour les
+       ruptures conventionnelles homologuées à compter du 1er sept. 2026
+       (18→15 mois si -55 ans, 22,5/27→20,5 mois si 55 ans+). Textes
+       d'application encore attendus à cette date. Note ajoutée dans
+       module-chomage.html et module-rupture.html ; pas encore reflété dans
+       un calcul dédié (le simulateur ne demande pas le motif de rupture).
+     - Chômage BIT : 8,1 % au T1 2026 (Insee, 13/05/2026) — reste sous le
+       seuil de 9 % : le coefficient de contracyclicité 0,75 reste donc
+       d'actualité, mais la tendance est haussière (+0,7 pt sur un an) :
+       à re-vérifier au prochain trimestre Insee.
+     - FMD (forfait mobilités durables) CORRIGÉ : 700€/800€ (limite temporaire
+       2022-2024) remplacés par 600€/900€, en vigueur depuis le 01/01/2025
+       (Art. D3261-15-2 CT ; urssaf.fr ; ecologie.gouv.fr). Bug identique
+       trouvé et corrigé dans module-lexique.html (glossaire, texte figé
+       affichait encore 700/800). Aucun module n'appelait SH.val() pour ces
+       clés — impact live limité à articles-loi.js + module-lexique.html.
+     - avantage_repas (5,50 €) CONFIRMÉ pour 2026 (urssaf.fr).
+     - VALEURS/ARTICLES restant à re-vérifier pour le lot 2 : C2P, saisie sur
+       salaire, PEE/PERCO, AJPA, PreParE — voir tracking-audit-outils.csv
+       pour le détail et le statut des 105 outils (inclusion articles-loi.js,
+       sources vérifiées).
+
+   PASSAGE D'AUDIT DU 16/07/2026 (lot 2) :
+     - c2p_reserve_formation CORRIGÉ : 10 → 20 points. Confirmé par 2 fiches
+       service-public.gouv.fr (F15504, F36326) : "les 20 premiers points du
+       C2P sont obligatoirement affectés à la formation". L'ancienne valeur
+       de 10 semble avoir été une confusion avec un autre seuil du dispositif
+       (plusieurs mécanismes du C2P utilisent aussi le nombre 10). Corrigé
+       aussi dans module-c2p.html (même texte affiché à l'écran).
+     - saisie sur salaire (module-saisie.html) VÉRIFIÉ OK : barème 7 tranches
+       et majoration 145€/mois confirmés identiques à Légifrance (décret
+       n°2025-1299 du 24/12/2025) + service-public.gouv.fr + Éditions Tissot.
+     - jours fériés (module-feries.html) VÉRIFIÉ OK : algorithme de calcul de
+       Pâques (Meeus/Jones/Butcher) contrôlé manuellement pour 2026 (5 avril,
+       donc Ascension 14 mai, Pentecôte 24/25 mai) — correct. Le module
+       s'auto-vérifie déjà en live contre calendrier.api.gouv.fr (officiel),
+       donc risque de dérive très faible pour les années suivantes aussi.
+     - retraite (module-retraite.html) VÉRIFIÉ OK — et bonne nouvelle : la
+       suspension LFSS 2026 de l'âge légal (gel à 62 ans 9 mois pour les
+       générations 1964-1968, dès le 1er septembre 2026, jusqu'en janvier
+       2028 — loi n°2025-1403) y est déjà intégrée avec bascule à la bonne
+       date, y compris le cas particulier des nés au T1 1965. Rien à changer.
+     - Prochain lot : PEE/PERCO, AJPA, PreParE restent à vérifier ; puis
+       attaquer le reste du lot 1 (46 fichiers) — voir tracking-audit-outils.csv.
    ========================================================================== */
 
 (function (global) {
@@ -74,17 +127,17 @@
 
     /* ----- C2P pénibilité (réforme 1er septembre 2023) ----- */
     c2p_valeur_point: { v: 500,    u: '€',       maj: '2023-09-01', src: 'était 375 € (1 pt formation)' },
-    c2p_reserve_formation:{ v: 10, u: 'points',  maj: '2023-09-01', src: 'points réservés formation (était 20)' },
+    c2p_reserve_formation:{ v: 20, u: 'points',  maj: '2023-09-01', src: 'Les 20 premiers points du C2P sont obligatoirement affectés à la formation (au-delà, usage libre : temps partiel, trimestres retraite, reconversion) — confirmé service-public.gouv.fr (fiches F15504 et F36326). Ancienne valeur de 10 corrigée le 16/07/2026 (source non identifiée à l\'origine).' },
     c2p_mitemps_points:{ v: 10,    u: 'points',  maj: '2023-09-01', src: '= 4 mois mi-temps payé plein' },
     c2p_mitemps_duree:{ v: 4,      u: 'mois',    maj: '2023-09-01', src: 'durée mi-temps (était 3 mois)' },
     c2p_seuil_nuit:   { v: 100,    u: 'nuits/an',maj: '2023-09-01', src: 'travail de nuit (était 120)' },
     c2p_seuil_alternance:{ v: 30,  u: 'nuits/an',maj: '2023-09-01', src: 'équipes alternantes (était 50)' },
     c2p_points_par_facteur:{ v: 4, u: 'points',  maj: '2023-09-01', src: 'par facteur/an' },
 
-    /* ----- Transport / mobilités (Loi de finances 2026) ----- */
-    fmd_plafond_seul: { v: 700,    u: '€/an',    maj: '2026-01-01', src: 'FMD seul, secteur privé' },
-    fmd_plafond_cumul:{ v: 800,    u: '€/an',    maj: '2026-01-01', src: 'cumul FMD + transports en commun' },
-    fmd_plafond_public:{ v: 300,   u: '€/an',    maj: '2026-01-01', src: 'fonction publique' },
+    /* ----- Transport / mobilités ----- */
+    fmd_plafond_seul: { v: 600,    u: '€/an',    maj: '2025-01-01', src: 'Forfait mobilités durables seul, secteur privé — Art. D3261-15-2 code du travail. La limite temporaire de 700 € (2022-2024) n\'a pas été reconduite ; 600 € s\'applique depuis le 1er janvier 2025 (urssaf.fr/employeur/beneficier-exonerations/frais-professionnels ; ecologie.gouv.fr/politiques-publiques/soutien-employeurs-aux-mobilites-durables)' },
+    fmd_plafond_cumul:{ v: 900,    u: '€/an',    maj: '2025-01-01', src: 'Cumul FMD + prise en charge transports en commun — 900 € (contre 800 € auparavant), confirmé urssaf.fr' },
+    fmd_plafond_public:{ v: 300,   u: '€/an',    maj: '—',          src: 'Fonction publique — 300 € max (barème progressif 100/200/300 € selon jours d\'usage, inchangé)' },
     tc_prise_charge:  { v: 0.50,   u: '',        maj: '—',          src: '50 % abonnement TC obligatoire' },
 
     /* ----- Titres-restaurant ----- */
@@ -111,7 +164,7 @@
     ajpa_demi:        { v: 33.32,  u: '€/demi-journée', maj: '2026-01-01', src: 'pour-les-personnes-agees.gouv.fr — demi-journée 2026' },
 
     /* ----- Parentalité ----- */
-    prepare_taux_plein:{ v: 455,   u: '€/mois',  maj: '2026-01-01', src: 'PreParE taux plein (enfant né après 2015)' },
+    prepare_taux_plein:{ v: 459.69,u: '€/mois',  maj: '2026-04-01', src: 'Taux plein — barème officiel caf.fr (Barème Prestation partagée d\'éducation de l\'enfant), en vigueur au 1er avril 2026. Ancienne valeur 455 € corrigée le 16/07/2026. Autres montants du barème : PreParE majorée 751,39 € ; activité ≤ 50 % : 297,17 € ; activité > 50-80 % : 171,42 €' },
     affiliation_maternite:{ v: 6,  u: 'mois',    maj: '2023-12-23', src: 'décret 2023-1410 (était 10 mois)' },
 
     /* ----- Anciennetés & délais clés (Code du travail) ----- */

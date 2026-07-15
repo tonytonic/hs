@@ -233,7 +233,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
       <span class="wemoji">⚓</span>
       <h2>À prendre avec des pincettes</h2>
       <p>Les règles changent souvent (revalorisations, réformes, conjoncture). <span class="accent">Seul France Travail fait foi.</span></p>
-      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Estimations basées sur la convention assurance chômage du 15/11/2024 et la à jour juin 2026 · circulaire Unédic 2025-03 d'avril 2025 + convention du 15/11/2024 (partie fixe 13,18 €, plancher 32,13 €, formule 57 % ou 40,4 %+fixe, coefficient 0,75 en conjoncture favorable — chômage < 9 %). Dégressivité : seuil abaissé à 55 ans depuis le 1er avril 2025 (Unédic circ. 2025-03). Revalorisation ARE attendue au 1er juillet 2026. Le montant et la durée réels te seront notifiés par France Travail. Démission et fins de CDD ont des règles spécifiques.</div>
+      <div class="legal">Outil indicatif et pédagogique, ni avis juridique ni officiel. Estimations basées sur la convention assurance chômage du 15/11/2024 · circulaire Unédic 2025-03 d'avril 2025 + convention du 15/11/2024 (partie fixe 13,18 €, plancher 32,13 €, formule 57 % ou 40,4 %+fixe, coefficient 0,75 en conjoncture favorable — chômage &lt; 9 %, taux BIT à 8,1 % au T1 2026 selon l'Insee). Dégressivité : seuil abaissé à 55 ans depuis le 1er avril 2025 (Unédic circ. 2025-03). Le Conseil d'administration de l'Unédic n'a pas voté de revalorisation au 1er juillet 2026 : les montants du 1er juillet 2025 restent donc en vigueur (source : Unédic, communiqué du 30/06/2026). ⚠️ Rupture conventionnelle : à compter du 1er septembre 2026, la durée maximale d'indemnisation sera réduite pour les ruptures conventionnelles homologuées à cette date (15 mois si -55 ans, 20,5 mois si 55 ans et +, contre les durées ci-dessus) — loi n° 2026-470 du 11/06/2026, textes d'application encore attendus. Le montant et la durée réels te seront notifiés par France Travail. Démission et fins de CDD ont des règles spécifiques.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
     <div class="dots" id="wdots"></div>
@@ -251,7 +251,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
     <div class="feat"><div class="ic">📆</div><div class="tx"><b>Mois travaillés</b>Sur les 24 derniers mois (36 si 55 ans et +). Détermine éligibilité et durée.</div></div>
     <div class="feat"><div class="ic">🧮</div><div class="tx"><b>Formule ARE</b>Le plus élevé entre 57 % du salaire journalier et 40,4 % + 13,18 €/jour. Plancher 32,13 €/j (depuis le 1er juillet 2025), plafond 75 %.</div></div>
     <div class="feat"><div class="ic">📉</div><div class="tx"><b>Durée</b>≈ ta durée travaillée, plafonnée (548 j si < 55 ans (= 24 mois × coef 0,75 en conjoncture favorable)). Un coefficient peut la réduire de 25 %.</div></div>
-    <div class="legal">Conditions générales (hors démission). L'ARE est versée après d'éventuels différés (congés payés, indemnités supra-légales). Net après CSG/CRDS ≈ -3 à -6,7 %. Le calcul officiel peut différer sensiblement.</div>
+    <div class="legal">Conditions générales (hors démission). L'ARE est versée après d'éventuels différés (congés payés, indemnités supra-légales). Net après CSG/CRDS ≈ -3 à -6,7 %. Le calcul officiel peut différer sensiblement. <strong>Rupture conventionnelle :</strong> ce simulateur affiche la durée maximale générale ; à partir du 1ᵉʳ septembre 2026 une durée spécifique réduite s'applique aux ruptures conventionnelles homologuées à cette date (loi n° 2026-470 du 11/06/2026).</div>
     <button class="btn btn-sky" style="margin-top:14px;" data-close="help">Compris</button>
   </div></div>
 </div>
@@ -361,7 +361,7 @@ function shConfirm(msg, cb){
   function eur2(n){ n=Math.round((n||0)*100)/100; return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €'; }
 
   // ARE params (connus 2025-2026)
-  var PART_FIXE=13.18, TAUX1=0.404, TAUX2=0.57, PLANCHER=31.97, PLAFOND_PCT=0.75;
+  var PART_FIXE=13.18, TAUX1=0.404, TAUX2=0.57, PLANCHER=32.13, PLAFOND_PCT=0.75;
   var JOURS_MOIS=30.42;
   // durée plafonds (jours) en conjoncture favorable (coef 0.75 déjà appliqué officiellement -> on affiche le plafond effectif)
   var DUR_MAX={ moins55:548, '55a56':685, '57plus':822 };
