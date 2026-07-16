@@ -158,7 +158,7 @@ function getRevenuImposable(){
   }
   return { revenu: num('revenu'), detail: null };
 }
-var TRANCHES = [[11600,0],[29580,0.11],[84580,0.30],[181920,0.41],[Infinity,0.45]];
+var TRANCHES = [[11600,0],[29579,0.11],[84577,0.30],[181917,0.41],[Infinity,0.45]];
 function calc(){
   saveState();
 
@@ -181,7 +181,7 @@ function calc(){
   var decoteBase = sit==='couple' ? 1483 : 897;
   var decote=Math.max(0, decoteBase-0.4525*impBrut);
   var impNet=Math.max(0, impBrut-decote);
-  var tmi=qf<=11600?0:qf<=29580?11:qf<=84580?30:qf<=181920?41:45;
+  var tmi=qf<=11600?0:qf<=29579?11:qf<=84577?30:qf<=181917?41:45;
 
   var detailHtml = '';
   if(ri.detail){
