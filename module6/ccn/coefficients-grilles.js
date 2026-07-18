@@ -70,31 +70,31 @@ const CCN_COEFFICIENTS = [
   // ── 3248 MÉTALLURGIE (accord unique 2023, en vigueur 2024) ─────
   {
     idcc: 3248, nom: 'Métallurgie — Accord national unique',
-    miseAjour: '2024-01',
+    miseAjour: '2026-02',
     categories: {
-      // Nouvelle classification 2024 : 18 niveaux (groupes A à I × 2 sous-groupes)
-      // Remplace les anciennes grilles OETAM (650) et Cadres (653)
-      Niveau: [
-        { position: 'A1', coef: 215, description: 'Postes simples — exécution stricte' },
-        { position: 'A2', coef: 220, description: 'Exécution simple — autonomie ponctuelle' },
-        { position: 'B1', coef: 230, description: 'Exécution variée' },
-        { position: 'B2', coef: 240, description: 'Exécution variée + autonomie' },
-        { position: 'C1', coef: 255, description: 'Exécution complexe' },
-        { position: 'C2', coef: 270, description: 'Exécution complexe + suivi' },
-        { position: 'D1', coef: 285, description: 'Technique — autonomie ' },
-        { position: 'D2', coef: 305, description: 'Technique confirmée' },
-        { position: 'E1', coef: 325, description: 'Maîtrise — coordination' },
-        { position: 'E2', coef: 355, description: 'Maîtrise confirmée' },
-        { position: 'F1', coef: 395, description: 'Cadre débutant' },
-        { position: 'F2', coef: 440, description: 'Cadre confirmé' },
-        { position: 'G',  coef: 510, description: 'Cadre — encadrement' },
-        { position: 'H1', coef: 580, description: 'Cadre direction service' },
-        { position: 'H2', coef: 660, description: 'Cadre direction département' },
-        { position: 'I1', coef: 770, description: 'Cadre direction confirmée' },
-        { position: 'I2', coef: 880, description: 'Cadre dirigeant L3111-2' },
+      // CORRIGÉ 18/07/2026 : l'ancienne version de cette grille utilisait un
+      // système de "coefficients" (215 à 880) qui n'existe plus depuis le
+      // 1er janvier 2024. La vraie classification est 18 CLASSES d'emploi
+      // (1 à 18) regroupées en 9 GROUPES (A à I), déterminées par une
+      // cotation en 6 critères (0-60 points), PAS par un coefficient.
+      // Confirmé par 6 sources concordantes (legisocial.fr, fiche-paie.fr,
+      // bulletinspaie.com, valoxy.org, conventioncollectivemetallurgie.fr,
+      // juritravail.com). Le champ "coef" ci-dessous porte désormais le
+      // numéro de classe (1 à 18, pas un coefficient légal) pour garder un
+      // ordre exploitable par getCoefCadreDirigeant().
+      Classe: [
+        { position: 'A1-A2',   coef: 2, description: 'Groupe A — non-cadre, exécution simple. SMH ≈ 21 700 €/an (portée au SMIC si inférieur)' },
+        { position: 'B3-B4',   coef: 4, description: 'Groupe B — non-cadre, exécution qualifiée' },
+        { position: 'C5-C6',   coef: 6, description: 'Groupe C — non-cadre, technique. Classe 6 ≈ 23 500-25 550 €/an' },
+        { position: 'D7-D8',   coef: 8, description: 'Groupe D — non-cadre confirmé, autonomie (accès possible au forfait jours par accord individuel)' },
+        { position: 'E9-E10',  coef: 10, description: 'Groupe E — maîtrise (accès possible au forfait jours par accord individuel)' },
+        { position: 'F11-F12', coef: 12, description: 'Groupe F — cadre débutant. Classe 11 ≈ 35 200 €/an' },
+        { position: 'G13-G14', coef: 14, description: 'Groupe G — cadre confirmé' },
+        { position: 'H15-H16', coef: 16, description: 'Groupe H — cadre supérieur' },
+        { position: 'I17-I18', coef: 18, description: 'Groupe I — cadre dirigeant L3111-2. Classe 18 ≈ 68 000 €/an, niveau le plus élevé de la grille' },
       ],
     },
-    notes: 'Nouvelle classification fusionnée OETAM + Cadres en vigueur depuis le 1er janvier 2024. Niveaux F à I = cadres. I2 = critère L3111-2 cadre dirigeant.',
+    notes: 'Grille refondue le 1er janvier 2024, remplace 76 conventions territoriales. Cotation sur 6 critères (complexité, connaissances, autonomie, contribution, encadrement, communication), 1 à 10 points chacun. Cadres au forfait jours : majoration de +30% sur le SMH (plafond 218j/an). Groupes A-E = non-cadres, F-I = cadres. Chiffres précis par classe à confirmer sur Légifrance/UIMM — seules les classes 1, 6, 11 et 18 ont pu être recoupées avec certitude cette session.',
     refLegifrance: 'KALICONT000044388197',
   },
 
@@ -173,9 +173,9 @@ const CCN_COEFFICIENTS = [
     refLegifrance: 'KALICONT000005635585',
   },
 
-  // ── 1597 BÂTIMENT ETAM > 10 salariés ──────────────────────────
+  // ── 2609 BÂTIMENT ETAM ──────────────────────────
   {
-    idcc: 1597, nom: 'Bâtiment ETAM > 10 salariés',
+    idcc: 2609, nom: 'Bâtiment ETAM',
     miseAjour: '2024-01',
     categories: {
       Niveau: [
@@ -189,7 +189,7 @@ const CCN_COEFFICIENTS = [
         { position: 'H',  coef: 525, description: 'ETAM H — Position cadre' },
       ],
     },
-    notes: 'Grille ETAM Bâtiment. Pour les cadres BTP, voir CCN 2420 (Cadres) ou IDCC dédié.',
+    notes: 'Grille ETAM Bâtiment (corrigé du 18/07/2026 : cette grille était étiquetée IDCC 1597 par erreur — 1597 désigne en réalité les ouvriers du bâtiment +10 salariés ; le vrai IDCC ETAM est 2609). Pour les cadres BTP, voir CCN 2420 (Cadres).',
     refLegifrance: 'KALICONT000018596160',
   },
 
@@ -254,7 +254,7 @@ const CCN_COEFFICIENTS = [
     refLegifrance: 'KALICONT000005635623',
   },
 
-  // ── 2596 RESTAURATION RAPIDE — Cadres ──────────────────────────
+  // ── 1501 RESTAURATION RAPIDE — Cadres ──────────────────────────
   {
     idcc: 1501, nom: 'Restauration rapide',
     miseAjour: '2024-01',
