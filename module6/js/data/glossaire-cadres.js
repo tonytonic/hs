@@ -70,7 +70,7 @@ const M6_GLOSSAIRE = [
   },
   {
     terme: 'Droit à la déconnexion',
-    art: 'Art. L3121-62 + Accord collectif',
+    art: 'Art. L2242-17 (7°) + L3121-64 II 3° + Accord collectif',
     def: 'Droit du salarié à ne pas être joignable et à ne pas se connecter aux outils numériques professionnels en dehors du temps de travail. Depuis la loi Travail 2017, l\'employeur doit prévoir des modalités concrètes dans l\'accord collectif ou la charte unilatérale.',
     exemple: 'Charte d\'entreprise : pas de mails après 20h ni le week-end, pas de réponse exigée avant 8h.',
     tags: ['déconnexion', 'numérique', 'repos', 'vie personnelle']
@@ -176,18 +176,18 @@ const M6_GLOSSAIRE = [
   //  CCN CADRES PRINCIPALES
   // ══════════════════════════════════════════════════════════════
   {
-    terme: 'Syntec (IDCC 787)',
+    terme: 'Syntec (IDCC 1486)',
     art: 'CCN Syntec — Avenant 1999 + Avenants successifs',
     def: 'Convention collective des ingénieurs et cadres du secteur informatique, ingénierie, conseil et études techniques. Prévoit 3 modalités de durée du travail : Modalité 1 (horaires normaux), Modalité 2 (réalisation de missions — 218j/an), Modalité 3 (autonomie totale). Forfait jours très répandu.',
     exemple: 'Ingénieur logiciel senior → Modalité 2 (forfait jours 218j). Chef de projet → souvent Modalité 3.',
-    tags: ['Syntec', 'IDCC 787', 'informatique', 'ingénierie', 'forfait jours']
+    tags: ['Syntec', 'IDCC 1486', 'informatique', 'ingénierie', 'forfait jours']
   },
   {
-    terme: 'Banque (AFB — IDCC 675)',
-    art: 'CCN AFB — Accord 2000 + Avenants',
-    def: 'Convention collective de la Banque (Association Française des Banques). Forfait jours cadres prévu à 205 jours/an (plus favorable que le légal). Nombreux avantages spécifiques : jours enfant malade, prime d\'ancienneté, 13e mois.',
+    terme: 'Banque (AFB — IDCC 2120)',
+    art: 'CCN Banque — Accord AFB 2000 + Avenants',
+    def: 'Convention collective de la Banque (issue de l\'Association Française des Banques). Forfait jours cadres prévu à 205 jours/an (plus favorable que le légal). Nombreux avantages spécifiques : jours enfant malade, prime d\'ancienneté, 13e mois.',
     exemple: 'Chargé de clientèle cadre : 205 jours forfait + 14 RTT environ + avantages bancaires.',
-    tags: ['banque', 'AFB', 'IDCC 675', '205 jours', 'forfait jours']
+    tags: ['banque', 'AFB', 'IDCC 2120', '205 jours', 'forfait jours']
   },
   {
     terme: 'SYNTEC — Modalités 1/2/3',
@@ -195,6 +195,13 @@ const M6_GLOSSAIRE = [
     def: 'Modalité 1 : durée normale (35h, HS classiques). Modalité 2 : missions (forfait 218j/an, cadres avec autonomie partielle). Modalité 3 : autonomie complète (forfait sans référence horaire — validité jurisprudentielle fragile). La Cass. a plusieurs fois remis en question la Modalité 3.',
     exemple: 'SSII : la quasi-totalité des ingénieurs seniors sont en Modalité 2 (218j). Directeurs en Modalité 3.',
     tags: ['Syntec', 'modalité', '1', '2', '3', 'forfait']
+  },
+  {
+    terme: 'Métallurgie — Accord national unique (IDCC 3248)',
+    art: 'ANU Métallurgie du 7 février 2022, en vigueur 2024',
+    def: 'Convention collective nationale unique de la métallurgie, qui a remplacé au 1er janvier 2024 plus de 70 conventions territoriales et sectorielles distinctes. Période de transition jusqu\'à fin 2024 pour l\'application de certaines clauses. Prévoit un forfait jours à 218j/an pour les cadres, avec clause de déconnexion formalisée.',
+    exemple: 'Un cadre auparavant sous une convention métallurgie régionale (ex: Métallurgie Rhône, Métallurgie Nord) relève désormais de l\'IDCC 3248 unique.',
+    tags: ['métallurgie', 'ANU', 'IDCC 3248', 'unification', '2024', 'forfait jours']
   },
 
   // ══════════════════════════════════════════════════════════════
@@ -365,10 +372,17 @@ const M6_GLOSSAIRE = [
   },
   {
     terme: 'Forfait jours réduit',
-    art: 'Art. L3121-66',
+    art: 'Pratique admise — art. L3121-64 (fixation du nombre de jours par l\'accord)',
     def: 'Il est possible de convenir d\'un forfait jours inférieur au plafond (ex: 150j/an au lieu de 218j). Dans ce cas, le salarié est assimilé à un temps partiel, bénéficie d\'une rémunération proportionnelle, et ne peut pas se voir imposer des jours au-delà du plafond réduit sans son accord.',
     exemple: 'Cadre à 4/5e : forfait 174j/an (218 × 0,8). Salaire proportionnel. RTT recalculés sur 174j.',
     tags: ['forfait réduit', 'temps partiel cadre', 'prorata', '4/5e']
+  },
+  {
+    terme: 'Plafond de 235 jours (renonciation)',
+    art: 'Art. L3121-66',
+    def: 'En cas de renonciation à des jours de repos contre majoration de salaire (rachat), et à défaut de précision différente dans l\'accord collectif, le nombre maximal de jours travaillés dans l\'année ne peut dépasser 235 jours. C\'est le plafond absolu, au-delà du plafond habituel de 218 jours.',
+    exemple: 'Cadre à 218j qui rachète des jours de repos : il peut aller jusqu\'à 235j travaillés dans l\'année, pas au-delà, sauf accord collectif fixant un autre plafond.',
+    tags: ['235 jours', 'plafond', 'rachat', 'renonciation', 'maximum']
   },
   {
     terme: 'Prud\'hommes — cadres',
@@ -537,7 +551,7 @@ const M6_GlossaireAPI = {
       'idcc': 'convention collective IDCC branche',
       'syntec': 'CCN Syntec 1486 ingénieurs cadres',
       'banque': 'CCN Banque AFB 2120',
-      'metallurgie': 'CCN Métallurgie ANU 3109',
+      'metallurgie': 'CCN Métallurgie ANU 3248',
       'cadre': 'forfait jours cadres dirigeants L3111-2',
       'dirigeant': 'cadre dirigeant L3111-2',
     };
