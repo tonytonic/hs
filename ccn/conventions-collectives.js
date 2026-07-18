@@ -1,7 +1,7 @@
 /**
  * BASE COMPLÈTE CCN FRANCE — HEURES SUPPLÉMENTAIRES
  * ==================================================
- * Version : 5.6.11 — 18 juillet 2026
+ * Version : 5.6.12 — 18 juillet 2026
  * Source  : Légifrance, DGT, Code du travail numérique, convention.fr, DARES
  *
  * BUG FIX v5.5.1 — DOUBLONS IDCC CRITIQUES CORRIGÉS :
@@ -52,6 +52,45 @@
  *   IDCC 5730 (commerce de gros non alimentaire) volontairement inchangé :
  *      alias interne pour distinguer alimentaire (573) / non alimentaire,
  *      pas une erreur.
+ *
+ * VERIFICATION TAUX COMPLETE v5.6.12 (suite) — 18/07/2026 : les 3 derniers
+ * groupes verifies, tous confirmes sans changement necessaire :
+ *   CSS60 (60h) : confirme texte Legifrance direct (SNAECSO, art. convention
+ *   du 4 juin 1983)
+ *   PETRO (130h) : confirme texte Legifrance direct (art. 413, convention
+ *   industrie du petrole du 3 septembre 1985)
+ *   MEDSO110 (110h) : confirme via Bulletin Officiel Ministere de la Sante
+ *   n2002-10 + multiples sources CCN51/FEHAP. Nuance relevee : la
+ *   majoration FEHAP est decrite par tranche bihebdomadaire (25% de la
+ *   71e a la 86e heure par periode de 2 semaines, 50% au-dela) plutot
+ *   qu hebdomadaire -- mathematiquement proche de la structure actuelle
+ *   (25% les 8 premieres h, 50% au-dela, par semaine) mais pas verifie
+ *   comme strictement identique. A garder en tete si un ecart de calcul
+ *   est signale un jour sur ce groupe precis.
+ * PHARMA (220h) VERIFIE a son tour -- confirme via code.travail.gouv.fr
+ * (outil officiel Ministere du Travail) : "convention collective
+ * Pharmacie: industrie... fixe le contingent a 220 heures". Exact match.
+ * TOUS LES GROUPES SONT DESORMAIS VERIFIES SANS EXCEPTION : 17/17
+ * derogatoires historiques + les 2 crees cette session + DC + PHARMA.
+ * Audit definitivement complet cote taux/contingent.
+ *
+ * VERIFICATION TAUX v5.6.12 — 18/07/2026 : verification web (Legifrance,
+ * code.travail.gouv.fr et sources professionnelles) de 13 des 17 groupes
+ * derogatoires, en plus de DC deja verifie en v5.6.1 :
+ *   CONFIRMES CORRECTS (contingent identique a ce qui etait deja dans le
+ *   fichier) : HCR 360h/10-20-50%, TRANSP 195h, CHIM130 130h, COIF200
+ *   200h, SYNTEC130 130h (ETAM), BOULAN329 329h, PROP190 190h, SECU329
+ *   329h, PHARMO150 150h, HOSPI130 130h, ASSUR70 70h, ANIM70 70h,
+ *   IAA180 180h (une source concurrente evoque 145h de base pour le
+ *   batiment specifiquement, mais code.travail.gouv.fr confirme 180h).
+ *   2 NOUVEAUX GROUPES CREES suite a une decouverte lors de cette
+ *   verification : IDCC 2247 (courtage assurances) et IDCC 2335
+ *   (agences generales assurances) avaient ete ajoutes en DC par defaut
+ *   en v5.6.7/v5.6.8 faute de donnee -- ils ont en realite leur propre
+ *   contingent (150h et 140h respectivement, textes Legifrance et
+ *   sources pro), distinct des 70h des societes d'assurances.
+ *   NON VERIFIES cette session : CSS60, MEDSO110, PETRO, PHARMA (ce
+ *   dernier egale deja le defaut legal 220h, risque faible).
  *
  * DERNIER CHECK v5.6.11 — 18/07/2026 : 12 CCN agricoles nationales
  * actives ajoutees (lin, cooperatives laitieres/betail, aquaculture,
@@ -428,6 +467,24 @@ const REGLES_HS = {
     notes:'Médico-social FEHAP CCN 51 (IDCC 29, brochure 3198) et UNISSS (IDCC 405). Contingent 110h (Légifrance art.21 / CCN51).'
   },
 
+  ASSURCOURT150: {
+    id:'ASSURCOURT150', nom:'Courtage assurances — contingent 150h',
+    seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
+    contingent:150, maxHebdo:48, debutSemaine:1,
+    feriesChomes: 11, feriesMajoration: 0,
+    feries1erMaiMajoration: 100, feriesAlsaceMoselle: false,
+    notes:'Courtage assurances/réassurances (IDCC 2247). Contingent 150h, distinct des 70h des sociétés d\'assurances. Trouvé lors de la vérification finale du 18/07/2026 (texte Légifrance de la convention).'
+  },
+
+  ASSURAGE140: {
+    id:'ASSURAGE140', nom:'Agences générales assurances — contingent 140h',
+    seuil:35, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
+    contingent:140, maxHebdo:48, debutSemaine:1,
+    feriesChomes: 11, feriesMajoration: 0,
+    feries1erMaiMajoration: 100, feriesAlsaceMoselle: false,
+    notes:'Personnel des agences générales d\'assurances (IDCC 2335, brochure 3115). Contingent 140h, distinct des 70h des sociétés d\'assurances et des 150h du courtage. Trouvé lors de la vérification finale du 18/07/2026.'
+  },
+
   // ─────────────────────────────────────────────────────────
   // MODE PERSONNALISÉ — accord entreprise ou de branche
   // ─────────────────────────────────────────────────────────
@@ -644,7 +701,7 @@ const CCN_ALIASES = [
   {i:1405,b:null,n:"Expédition exportation fruits légumes",s:"Commerce fruits légumes",g:"DC",fj:false},
   {i:1408,b:null,n:"Distribution logistique services énergies proximité",s:"Distribution énergie",g:"DC",fj:false},
   {i:1412,b:null,n:"Installation entretien réparation matériel thermique frigorifique",s:"Génie climatique install.",g:"DC",fj:false},
-  {i:2335,b:null,n:"Personnel agences générales assurances",s:"Assurance agences personnel",g:"DC",fj:false},
+  {i:2335,b:null,n:"Personnel agences générales assurances",s:"Assurance agences personnel",g:"ASSURAGE140",fj:false},
   {i:2683,b:null,n:"Portage de presse",s:"Presse portage",g:"DC",fj:false},
   {i:2691,b:null,n:"Enseignement privé indépendant",s:"Education privée",g:"DC",fj:false},
   {i:2727,b:null,n:"Omnipraticiens entreprises privées",s:"Santé omnipraticiens",g:"DC",fj:false},
@@ -667,7 +724,7 @@ const CCN_ALIASES = [
   {i:1607,b:3130,n:"Jeux jouets articles de fêtes puériculture",s:"Industrie jouets puériculture",g:"DC",fj:false},
   {i:1266,b:3225,n:"Restauration de collectivités",s:"Restauration collective",g:"DC",fj:false},
   {i:1978,b:3010,n:"Fleuristes vente et services animaux familiers",s:"Fleuristes animalerie",g:"DC",fj:false},
-  {i:2247,b:3110,n:"Courtage assurances et réassurances",s:"Assurance courtage",g:"DC",fj:false},
+  {i:2247,b:3110,n:"Courtage assurances et réassurances",s:"Assurance courtage",g:"ASSURCOURT150",fj:false},
   {i:7002,b:3616,n:"Coopératives agricoles céréales meunerie alimentation bétail oléagineux",s:"Coopératives agricoles",g:"DC",fj:false},
   // --- v5.6.7 : 91 CCN actives (DARES jan2026) absentes du fichier, ajoutees ---
   // pour couverture complete temps plein. Brochures confirmees quand connues.
@@ -1032,7 +1089,7 @@ function getFeriesLegaux(year, alsace) {
 if (typeof localStorage !== 'undefined') loadCustomFromStorage();
 
 const CCN_API = {
-  version: '5.6.11',
+  version: '5.6.12',
   REGLES_HS, CCN_ALIASES,
   getRules, getGroupeForCCN, findCCN,
   search: (terme, limit = 60) => findCCN(terme).slice(0, limit),

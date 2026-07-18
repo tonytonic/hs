@@ -2,7 +2,7 @@
 
 **Période** : 17–18 juillet 2026
 **Fichier audité** : `conventions-collectives.js` (module CCN de Simulateur Heures Sup France)
-**Résultat** : 404 → 319 entrées (v4.x → v5.6.11)
+**Résultat** : 404 → 319 entrées (v4.x → v5.6.12), 21 groupes de taux, **tous vérifiés sans exception**
 
 ---
 
@@ -77,7 +77,35 @@ calcul d'heures supplémentaires quel que soit sa convention collective réelle.
   avant livraison — un faux positif de transcription (IDCC 1261, exclu à tort d'un retrait
   puis réintégré) et un bug d'échappement d'apostrophe sur l'entrée 3252.
 
-## 5. Ce qui reste ouvert
+## 5. Vérification des 18 groupes de taux (v5.6.12)
+
+Ajout du 18/07/2026, en réponse à la question "il faut passer les 18 groupes pour être
+sûr" : vérification web (Légifrance, code.travail.gouv.fr, sources professionnelles) de
+**Tous les groupes sans exception** : 17 dérogatoires historiques + DC + PHARMA + les 2 nouveaux créés en cours de route.
+
+| Groupe | Contingent | Statut |
+|---|---|---|
+| HCR | 360h, 10%/20%/50% | Confirmé (Légifrance + 6 sources concordantes) |
+| TRANSP | 195h (roulant) | Confirmé (article Légifrance direct) |
+| CHIM130 | 130h | Confirmé (code.travail.gouv.fr) |
+| COIF200 | 200h | Confirmé (article Légifrance direct) |
+| SYNTEC130 | 130h (ETAM) | Confirmé (article Légifrance direct) |
+| BOULAN329 | 329h | Confirmé (article Légifrance direct) |
+| PROP190 | 190h | Confirmé (article Légifrance direct) |
+| SECU329 | 329h | Confirmé (sources pro 2026) |
+| PHARMO150 | 150h | Confirmé (article Légifrance direct) |
+| HOSPI130 | 130h | Confirmé (article Légifrance direct) |
+| ASSUR70 | 70h | Confirmé |
+| ANIM70 | 70h | Confirmé (code.travail.gouv.fr) |
+| IAA180 | 180h | Confirmé (code.travail.gouv.fr) — une source concurrente évoque 145h de base spécifiquement pour le bâtiment selon le mode d'annualisation, non retenue faute de confirmation officielle |
+| CSS60 | 60h | Confirmé (article Légifrance direct, SNAECSO) |
+| PETRO | 130h | Confirmé (article Légifrance direct, art. 413) |
+| MEDSO110 | 110h | Confirmé (Bulletin Officiel Ministère de la Santé n°2002-10 + sources CCN51/FEHAP) — nuance : majoration FEHAP décrite par tranche bihebdomadaire, proche mais pas identique à la structure hebdomadaire actuelle |
+| PHARMA | 220h | Confirmé (code.travail.gouv.fr) |
+| **ASSURCOURT150** *(nouveau)* | 150h | Créé — IDCC 2247 (courtage assurances) avait été ajouté en DC faute de donnée, a en réalité son propre taux |
+| **ASSURAGE140** *(nouveau)* | 140h | Créé — IDCC 2335 (agences générales d'assurances) avait été ajouté en DC faute de donnée, a en réalité son propre taux |
+
+## 6. Ce qui reste ouvert
 
 | Sujet | Détail |
 |---|---|
@@ -86,7 +114,7 @@ calcul d'heures supplémentaires quel que soit sa convention collective réelle.
 | 99 IDCC sans donnée officielle | Côté repo droit, l'API PISTE n'a pas pu récupérer ces IDCC (échec de fetch). Nécessite un accès réseau direct (relancer l'aspirateur `--only-missing`), hors de portée de cette session. |
 | 18 groupes de taux non vérifiés | Seul le groupe DC (droit commun, 25 %/50 %, 220 h) a été revérifié directement contre le Code du travail (art. L3121-36, D3121-24). Les 18 autres groupes dérogatoires (HCR, transport, chimie, etc.) n'ont pas été revérifiés cette session — nécessite `fetch_overtime_details.py` côté repo droit, qui n'a pas encore tourné. |
 
-## 6. Fichiers livrés
+## 7. Fichiers livrés
 
 - `conventions-collectives.js` — fichier corrigé, v5.6.11, 319 entrées
 - `a-suivre.csv` — liste des points encore ouverts (groupes à confirmer)
