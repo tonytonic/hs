@@ -1,0 +1,10 @@
+categorie,idcc,nom_app_actuel,secteur,groupe,info
+audit_identite,,,,,"TERMINE - toutes verifiees contre le fichier officiel DARES Suivi Historique (juin 2026)"
+couverture_generale,,,,,"TERMINEE - 0 CCN active manquante en regime General (hors annexes/doublons volontairement exclus)"
+couverture_agricole,,,,,"187 CCN agricoles departementales actives identifiees, NON ajoutees (meme granularite que les 92 codes 9xxx retires en v5.6.1, toutes en DC). Disponibles sur demande."
+groupe_a_verifier,1424,Reseaux de transports publics urbains de voyageurs,,DC,"Ajoutee en DC par defaut - taux non confirme"
+groupe_a_verifier,1621,Repartition pharmaceutique,,DC,"Ajoutee en DC - taux non confirme"
+groupe_a_verifier,1679,Inspection d'assurance,,DC,"Ajoutee en DC - taux non confirme"
+groupe_a_verifier,2603,Praticiens-conseils du regime general de securite sociale,,DC,"Ajoutee en DC - taux non confirme"
+groupe_a_verifier,2768,Pharmaciens du regime minier,,DC,"Ajoutee en DC - taux non confirme"
+reste_a_faire_cote_repo_droit,,,,,"99 IDCC sans donnee officielle + 18 groupes de taux/contingent non verifies (hors DC) - necessite un acces reseau direct a l'API"
