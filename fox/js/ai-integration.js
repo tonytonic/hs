@@ -157,8 +157,8 @@ class KitsuneLocal {
       { keys: ['repos','11h','quotidien'], text: `📖 **Repos quotidien minimal** (Art. L3131-1)\n11 heures consécutives minimum entre deux journées de travail.` },
       { keys: ['35h','durée légale'], text: `📖 **Durée légale : 35h/semaine** (Art. L3121-27)\nAu-delà : +25% de la 36e à la 43e heure, +50% à partir de la 44e.` },
       { keys: ['amplitude','13h'], text: `📖 **Amplitude quotidienne** (Conv. collective)\nMaximum 13h entre la première et la dernière heure de travail dans une journée.` },
-      { keys: ['nuit','travailleur'], text: `📖 **Travail de nuit** (Art. L3122-1)\nPériode 21h-6h. 8h max/jour, surveillance médicale si 50+ nuits/an. Majorations obligatoires.` },
-      { keys: ['dimanche','dominical'], text: `📖 **Repos dominical** (Art. L3132-1)\nPrincipe général : repos le dimanche. Dérogations encadrées. Majoration minimale +100%.` },
+      { keys: ['nuit','travailleur'], text: `📖 **Travail de nuit** (Art. L3122-2)\nPériode 21h-7h (au moins 9h consécutives comprenant minuit-5h). 8h max/jour, surveillance médicale si 50+ nuits/an. Majorations obligatoires.` },
+      { keys: ['dimanche','dominical'], text: `📖 **Repos dominical** (Art. L3132-3)\nPrincipe général : repos le dimanche. Dérogations encadrées. Majoration variable selon le régime de dérogation et la convention collective.` },
     ];
     for (const l of limits) {
       if (l.keys.some(k => lower.includes(k))) return { text: l.text, type: 'legal' };
