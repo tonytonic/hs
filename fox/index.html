@@ -146,6 +146,7 @@ window._fox_pre = (function() {
 <!-- HUD -->
 <div id="gaming-hud">
   <div class="hud-logo" id="hud-logo-btn" onclick="demoLogoClick()" style="cursor:pointer;user-select:none;">🦊 FOX</div>
+  <a href="../menu.html" id="hud-menu-return" style="text-decoration:none;color:#FF8C42;font-size:0.8rem;font-weight:900;flex-shrink:0;line-height:1;padding:4px 6px;white-space:nowrap;" title="Retour au menu principal">← Menu</a>
   <div class="hud-xp-section" onclick="openPopup('popup-leagues')" style="cursor:pointer;" title="Voir ma ligue">
     <div class="hud-xp-label">
       <span style="display:flex;align-items:center;gap:5px;">
@@ -166,9 +167,9 @@ window._fox_pre = (function() {
   <div id="hud-buttons">
     <a href="../heures/index.html" class="hud-menu-btn hud-nav-btn" style="text-decoration:none;border-color:rgba(80,180,220,0.4);color:#50B4DC;" title="Module 1 — Suivi annuel">📅 Annuel</a>
     <a href="../paye/index.html"   class="hud-menu-btn hud-nav-btn" style="text-decoration:none;border-color:rgba(80,200,120,0.4);color:#50C878;" title="Module 2 — Paie mensuelle">💰 Mensuel</a>
+    <a href="../module4/index.html" class="hud-menu-btn hud-nav-btn" style="text-decoration:none;border-color:rgba(79,179,194,0.4);color:#4FB3C2;" title="Module 4 — Prédiction santé">📊 Prédiction</a>
     <button class="hud-menu-btn" onclick="openPopup('popup-settings')">⚙️</button>
     <button class="hud-menu-btn" onclick="VuePro.show()" style="border-color:rgba(255,140,66,0.5);color:#FF8C42;font-weight:700;" title="Vue Analyse PRO">📊 PRO</button>
-    <a href="../menu.html" class="hud-menu-btn" style="text-decoration:none;">← Menu</a>
   </div>
 </div>
 
@@ -7300,7 +7301,8 @@ async function sendToKitsune() {
   100% { opacity: 0; transform: var(--dx,translateX(80px)) scale(0); }
 }
 
-/* ── Boutons nav M1/M2 dans le HUD ────────────────────────── */
+/* ── Boutons nav M1/M2/M4 dans le HUD ─────────────────────── */
+#hud-buttons { display: flex !important; flex-wrap: wrap !important; gap: 6px !important; row-gap: 6px !important; }
 @media screen and (max-width: 380px) {
   a.hud-nav-btn { font-size: 0.65rem !important; }
   a.hud-nav-btn::before { content: none !important; }
@@ -15089,7 +15091,8 @@ function _updateContextualShortcuts(situation) {
   // Toujours proposer un accès rapide
   if (!btns.length) {
     btns.push({ label: '📊 M1 Annuel', url: '../heures/index.html' },
-               { label: '💰 M2 Mensuel', url: '../paye/index.html' });
+               { label: '💰 M2 Mensuel', url: '../paye/index.html' },
+               { label: '🩺 M4 Prédiction', url: '../module4/index.html' });
   }
 
   area.innerHTML = btns.map(b =>
@@ -15891,6 +15894,7 @@ function buildBadgeStats() {
     <div style="display:flex;gap:6px;flex:1;">
       <button onclick="document.location.href='../heures/index.html'" style="flex:1;background:rgba(255,140,66,0.15);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:8px;padding:8px;font-size:0.72rem;font-weight:700;cursor:pointer;">📊 Annuel (M1)</button>
       <button onclick="document.location.href='../paye/index.html'" style="flex:1;background:rgba(255,140,66,0.15);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:8px;padding:8px;font-size:0.72rem;font-weight:700;cursor:pointer;">💰 Mensuel (M2)</button>
+      <button onclick="document.location.href='../module4/index.html'" style="flex:1;background:rgba(255,140,66,0.15);border:1px solid rgba(255,140,66,0.3);color:#FF8C42;border-radius:8px;padding:8px;font-size:0.72rem;font-weight:700;cursor:pointer;">📊 Prédiction (M4)</button>
     </div>
     <button onclick="dismissWeeklyNotif()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#555;border-radius:8px;padding:8px 12px;font-size:0.78rem;cursor:pointer;">Plus tard</button>
   </div>
