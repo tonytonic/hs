@@ -1868,11 +1868,16 @@ gap: 4px;
 row-gap: 4px;
 }
 
-/* Ligne 1 : Logo | Stats | Boutons */
+/* Ligne 1 : Logo | Retour menu | Stats | Boutons */
 .hud-logo {
 font-size: 1.1rem;
 flex-shrink: 0;
 order: 1;
+}
+
+#hud-menu-return {
+order: 1;
+flex-shrink: 0;
 }
 
 .hud-stats {
