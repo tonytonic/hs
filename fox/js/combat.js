@@ -68,7 +68,7 @@ class CombatSystem {
                 defense: 12,
                 description: "Travail de nuit sans compensation ni majoration.",
                 legalViolation: "Absence de compensation pour travail de nuit",
-                legalReference: "Article L3122-5 du Code du travail",
+                legalReference: "Article L3122-8 du Code du travail",
                 loot: {
                     xp: 300,
                     wisdom: 15,
