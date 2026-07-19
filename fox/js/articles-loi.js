@@ -123,7 +123,7 @@ const ARTICLES_LOI = [
     ]
   },
   {
-    art: 'Art. L3132-1',
+    art: 'Art. L3132-2',
     titre: 'Repos hebdomadaire — 24h + 11h = 35h',
     def: 'Tout salarié a droit à un repos hebdomadaire d\'une durée minimale de 24h consécutives, auxquelles s\'ajoutent les 11h de repos quotidien, soit 35h au total.',
     ex: 'En pratique : pas de travail le dimanche + au moins 11h de repos après le samedi.',
@@ -231,8 +231,8 @@ const ARTICLES_LOI = [
     mots: ["maladie", "arrêt", "indemnisation", "IJSS", "ancienneté", "maintien salaire"]
   },
   {
-    art: "Art. L1237-1", titre: "Démission",
-    def: "La démission est la rupture du contrat à l'initiative du salarié. Elle doit résulter d'une volonté claire et non équivoque. Elle n'ouvre en principe pas droit à l'allocation chômage, sauf démission légitime reconnue par France Travail.",
+    art: "Jurisprudence constante (Cass. Soc.)", titre: "Démission",
+    def: "La démission est la rupture du contrat à l'initiative du salarié. Elle doit résulter d'une volonté claire et non équivoque (jurisprudence constante — cette définition n'est pas codifiée telle quelle). Elle n'ouvre en principe pas droit à l'allocation chômage, sauf démission légitime reconnue par France Travail. Le préavis de démission est régi par l'Art. L1237-1.",
     ex: "La démission verbale peut être valable mais il est conseillé de la formaliser par écrit pour éviter tout litige sur la date et la volonté.",
     mots: ["démission", "rupture", "préavis", "volontaire", "chômage", "légitime"]
   },
@@ -243,7 +243,7 @@ const ARTICLES_LOI = [
     mots: ["rupture conventionnelle", "commun accord", "chômage", "indemnité", "homologation"]
   },
   {
-    art: "Art. L1243-1", titre: "CDD — terme et renouvellement",
+    art: "Art. L1243-13", titre: "CDD — terme et renouvellement",
     def: "Sauf accord des parties, le terme du CDD ne peut être modifié. Le renouvellement est possible dans les limites fixées par la loi : 2 fois pour les CDD avec terme précis, durée totale ne pouvant excéder la durée maximale légale selon le motif de recours.",
     ex: "Un CDD non rompu à son terme se transforme automatiquement en CDI si le salarié continue à travailler sans nouveau contrat.",
     mots: ["CDD", "terme", "renouvellement", "transformation CDI", "durée maximale"]
@@ -411,13 +411,13 @@ const ARTICLES_LOI = [
     mots: ["congés payés", "acquisition", "2,5 jours", "30 jours", "5 semaines", "ouvrables"]
   },
   {
-    art: "Art. L3141-12", titre: "Prise des congés — droit",
-    def: "L'employeur ne peut pas refuser à un salarié la prise des congés légalement acquis. Les dates sont fixées par l'employeur en concertation. Un report peut être accordé mais ne peut pas conduire à la perte des congés.",
-    ex: "L'employeur peut organiser les départs en congés, mais ne peut pas empêcher un salarié de prendre ses 5 semaines légales sur l'exercice.",
+    art: "Art. L3141-13", titre: "Prise des congés — période et fixation des dates",
+    def: "L'employeur fixe la période de prise des congés (incluant obligatoirement le 1er mai-31 octobre) et peut refuser une date précise demandée par le salarié, sans que ce refus soit abusif. En revanche, il ne peut pas priver le salarié de son droit aux congés acquis : une autre date doit être proposée.",
+    ex: "L'employeur peut organiser les départs en congés et refuser une date précise pour continuité de service, mais ne peut pas empêcher un salarié de prendre ses 5 semaines légales sur l'exercice.",
     mots: ["congés payés", "prise", "refus", "dates", "période de prise", "report"]
   },
   {
-    art: "Art. L3141-26", titre: "Indemnité compensatrice de congés",
+    art: "Art. L3141-28", titre: "Indemnité compensatrice de congés",
     def: "Lors de la rupture du contrat, si le salarié n'a pas pris tout ou partie de ses congés acquis, il perçoit une indemnité compensatrice de congés payés. Elle est due quelle que soit la cause de la rupture, y compris la faute grave.",
     ex: "Même licencié pour faute grave, le salarié conserve le droit à l'indemnité compensatrice pour ses jours de congés non pris.",
     mots: ["indemnité compensatrice", "congés", "rupture", "faute grave", "solde congés"]
@@ -471,7 +471,7 @@ const ARTICLES_LOI = [
     mots: ["droit de retrait", "danger grave", "imminent", "sécurité", "vie", "santé"]
   },
   {
-    art: "Art. L3241-1", titre: "Paiement mensuel du salaire",
+    art: "Art. L3242-1", titre: "Paiement mensuel du salaire",
     def: "Le salaire est payé une fois par mois. Un retard répété dans le paiement constitue un manquement grave de l'employeur, pouvant justifier une prise d'acte de rupture ou une résiliation judiciaire aux torts de l'employeur.",
     ex: "Le salaire doit être versé au plus tard le dernier jour du mois. Un virement daté mais arrivé en compte le mois suivant peut constituer un retard.",
     mots: ["salaire", "paiement", "mensuel", "virement", "retard", "manquement"]
@@ -519,20 +519,20 @@ const ARTICLES_LOI = [
     mots: ["contrat oral", "CDI", "écrit", "preuve", "formalisme"]
   },
   {
-    art: "Art. L1221-23", titre: "Période d'essai — durée CDI",
+    art: "Art. L1221-19", titre: "Période d'essai — durée CDI",
     def: "La période d'essai pour un CDI ne peut pas dépasser : 2 mois pour les ouvriers et employés, 3 mois pour les agents de maîtrise et techniciens, 4 mois pour les cadres. La convention collective peut prévoir des durées inférieures.",
     ex: "Un cadre recruté en CDI peut avoir au maximum 4 mois d'essai, renouvelables une fois si un accord de branche le prévoit, soit 8 mois au total.",
     mots: ["période d'essai", "CDI", "durée", "essai", "cadre", "ouvrier", "employé"]
   },
   {
-    art: "Art. L1221-25", titre: "Période d'essai — renouvellement",
+    art: "Art. L1221-21", titre: "Période d'essai — renouvellement",
     def: "La période d'essai ne peut être renouvelée qu'une seule fois et uniquement si un accord de branche étendu le prévoit expressément. Le renouvellement doit être accepté par le salarié et formalisé avant l'expiration de la période initiale.",
     ex: "Un employeur ne peut pas proposer le renouvellement de l'essai le dernier jour de la période initiale — le salarié doit disposer d'un temps de réflexion suffisant.",
     mots: ["période d'essai", "renouvellement", "accord de branche", "formalisme"]
   },
   {
-    art: "Art. L1226-6", titre: "Maladie — protection contre licenciement",
-    def: "L'employeur ne peut pas rompre le contrat de travail d'un salarié en arrêt maladie, sauf si l'absence prolongée désorganise gravement l'entreprise et nécessite un remplacement définitif, ou en cas de faute grave étrangère à la maladie.",
+    art: "Jurisprudence constante (Cass. Soc.)", titre: "Maladie ordinaire — protection contre licenciement",
+    def: "Pour une maladie non professionnelle, le Code du travail n'offre pas de protection automatique contre le licenciement (contrairement à l'accident du travail/maladie professionnelle, protégé par l'Art. L1226-9). L'employeur ne peut licencier que si l'absence prolongée ou les absences répétées désorganisent gravement l'entreprise et nécessitent un remplacement définitif (jurisprudence constante), ou en cas de faute grave étrangère à la maladie.",
     ex: "Un licenciement motivé uniquement par l'absence pour maladie est nul. L'employeur doit justifier d'une perturbation objective et d'un remplacement effectif.",
     mots: ["maladie", "arrêt", "licenciement", "protection", "absence prolongée"]
   },
@@ -591,7 +591,7 @@ const ARTICLES_LOI = [
     mots: ["rupture conventionnelle", "indemnité", "calcul", "minimum légal", "cotisations"]
   },
   {
-    art: "Art. L1241-1", titre: "CDD — définition et principe",
+    art: "Art. L1242-1", titre: "CDD — définition et principe",
     def: "Le contrat de travail à durée déterminée est l'exception. Il ne peut être conclu que pour l'exécution d'une tâche précise et temporaire. Son recours est strictement limité aux cas énumérés par la loi (remplacement, accroissement temporaire d'activité, emplois saisonniers, etc.).",
     ex: "Embaucher quelqu'un en CDD pour occuper un poste permanent constitue une irrégularité. Le salarié peut demander la requalification en CDI.",
     mots: ["CDD", "contrat durée déterminée", "définition", "exception", "temporaire", "requalification"]
@@ -693,7 +693,7 @@ const ARTICLES_LOI = [
     mots: ["CSE", "seuils", "11 salariés", "50 salariés", "comité social économique"]
   },
   {
-    art: "Art. L2315-1", titre: "Heures de délégation CSE",
+    art: "Art. L2315-7", titre: "Heures de délégation CSE",
     def: "Les membres de la délégation du personnel du CSE disposent du temps nécessaire à l'exercice de leurs fonctions. Ce temps est fixé par décret selon l'effectif. Il est de plein droit considéré comme temps de travail et rémunéré comme tel.",
     ex: "Un élu CSE dans une entreprise de 300 salariés dispose de 22h de délégation par mois. Ces heures sont payées même si l'employeur conteste leur utilisation — la régularisation se fait a posteriori.",
     mots: ["délégation", "heures CSE", "élu", "temps de travail", "rémunération"]
@@ -717,19 +717,19 @@ const ARTICLES_LOI = [
     mots: ["durée du travail", "champ application", "cadres dirigeants", "exceptions", "autonomie"]
   },
   {
-    art: "Art. L3121-8", titre: "Durée maximale quotidienne",
+    art: "Art. L3121-18", titre: "Durée maximale quotidienne",
     def: "La durée quotidienne du travail effectif par salarié ne peut excéder dix heures, sauf en cas de dérogation accordée par convention ou accord collectif ou autorisation de l'inspecteur du travail.",
     ex: "Travailler 11h dans une journée est irrégulier sauf si un accord collectif le permet explicitement et dans les limites autorisées.",
     mots: ["durée maximale", "10 heures", "quotidien", "dérogation", "accord collectif"]
   },
   {
-    art: "Art. L3121-9", titre: "Durée maximale hebdomadaire absolue",
+    art: "Art. L3121-20", titre: "Durée maximale hebdomadaire absolue",
     def: "Au cours d'une même semaine, la durée maximale hebdomadaire du travail est de quarante-huit heures. Aucune dérogation individuelle n'est possible, même avec l'accord du salarié.",
     ex: "Même si un salarié accepte de travailler 50h dans une semaine, c'est illégal. L'employeur engage sa responsabilité et peut être sanctionné par l'inspection du travail.",
     mots: ["48 heures", "durée maximale", "hebdomadaire", "absolu", "dérogation impossible"]
   },
   {
-    art: "Art. L3121-29", titre: "Contingent d'heures supplémentaires",
+    art: "Art. D3121-24", titre: "Contingent d'heures supplémentaires",
     def: "Un accord collectif d'entreprise ou de branche peut fixer le contingent d'heures supplémentaires. A défaut d'accord, le contingent est fixé par décret à 220 heures par an et par salarié.",
     ex: "Si l'entreprise dispose d'un accord collectif, le contingent peut être inférieur ou supérieur à 220h. En l'absence d'accord, la limite légale de 220h s'applique.",
     mots: ["contingent", "220 heures", "accord collectif", "dérogation", "annuel"]
@@ -742,12 +742,12 @@ const ARTICLES_LOI = [
   },
   {
     art: "Art. L3121-37", titre: "Remplacement du paiement par du repos",
-    def: "Une convention ou un accord collectif d'entreprise ou d'établissement peut prévoir le remplacement de tout ou partie du paiement des heures supplémentaires et des majorations par un repos compensateur équivalent.",
+    def: "Dans les entreprises dépourvues de délégué syndical, une convention ou un accord collectif d'entreprise ou d'établissement peut prévoir le remplacement de tout ou partie du paiement des heures supplémentaires et des majorations par un repos compensateur équivalent.",
     ex: "Si un accord d'entreprise le prévoit, les HS peuvent être compensées par des RTT plutôt que payées avec majoration. Le total du repos accordé doit correspondre au montant des heures majorées.",
     mots: ["repos compensateur de remplacement", "RCR", "RTT", "accord", "remplacement paiement"]
   },
   {
-    art: "Art. L3121-39", titre: "Aménagement du temps de travail",
+    art: "Art. L3121-44", titre: "Aménagement du temps de travail",
     def: "Un accord collectif d'entreprise ou, à défaut, un accord de branche peut mettre en place un aménagement du temps de travail sur une période supérieure à la semaine. La durée de la période de référence ne peut dépasser 3 ans si un accord de branche étendu le prévoit.",
     ex: "L'annualisation du temps de travail permet de faire varier les horaires selon les saisons (ex : plus en été, moins en hiver) sans que chaque semaine soit prise isolément.",
     mots: ["aménagement temps de travail", "annualisation", "accord collectif", "période de référence", "modulation"]
@@ -770,12 +770,16 @@ const ARTICLES_LOI = [
     ex: "Un jour férié chômé ne peut pas être déduit du salaire du salarié. L'employeur ne peut pas non plus imposer sa récupération sur d'autres jours.",
     mots: ["jours fériés", "chômage", "rémunération", "perte", "récupération"]
   },
+  /* DÉSACTIVÉ — Audit 19/07/2026 : contenu obsolète, sans rapport avec le texte actuellement en vigueur de L3133-4
+     (qui dit simplement "Le 1er mai est jour férié et chômé", cf. Art. L3133-6 déjà couvert plus haut).
+     Pas de source officielle confirmée pour la règle "enfants/femmes en établissements industriels" — à rechercher avant réintégration.
   {
     art: "Art. L3133-4", titre: "Jours fériés — enfants",
     def: "Dans les établissements industriels, les enfants de moins de 18 ans et les femmes ne peuvent être employés les jours de fêtes légales que dans les établissements dont le personnel bénéficie d'un repos compensateur.",
     ex: "Les mineurs de moins de 18 ans ne peuvent en principe pas travailler les jours fériés légaux.",
     mots: ["jours fériés", "mineurs", "moins de 18 ans", "repos compensateur"]
   },
+  */
   {
     art: "Art. L3141-5", titre: "Congés payés — assimilation à temps de travail",
     def: "Sont notamment assimilés à un mois de travail effectif pour la détermination des droits à congé : les périodes de congé payé précédentes, les périodes de congé maternité, paternité, adoption, les périodes d'arrêt pour accident du travail ou maladie professionnelle.",
@@ -813,7 +817,7 @@ const ARTICLES_LOI = [
     mots: ["preuve heures supplémentaires", "litige", "juge", "éléments de preuve", "doute"]
   },
   {
-    art: "Art. L3231-2", titre: "Salaire minimum interprofessionnel de croissance — SMIC",
+    art: "Art. L3231-1 + L3231-4", titre: "Salaire minimum interprofessionnel de croissance — SMIC",
     def: "Tout salarié perçoit une rémunération au moins égale au salaire minimum interprofessionnel de croissance (SMIC). Aucune dérogation n'est possible. Le SMIC est revalorisé au moins une fois par an.",
     ex: "En 2026, le SMIC horaire brut est de 12,31 euros. Aucun salarié ne peut légalement percevoir moins, même à temps partiel. La convention collective peut prévoir plus.",
     mots: ["SMIC", "salaire minimum", "rémunération", "revalorisation", "plancher"]
@@ -825,7 +829,7 @@ const ARTICLES_LOI = [
     mots: ["égalité salariale", "homme femme", "même travail", "valeur égale", "discrimination salariale"]
   },
   {
-    art: "Art. L3232-1", titre: "Garantie de rémunération mensuelle",
+    art: "Art. L3232-5", titre: "Garantie de rémunération mensuelle",
     def: "Les salariés dont l'horaire de travail est réduit en dessous de 35 heures sans accord collectif perçoivent une allocation complémentaire pour maintenir leur rémunération.",
     ex: "Si un employeur réduit les horaires de ses salariés sans accord de réduction du temps de travail, il doit verser une allocation complémentaire pour éviter toute perte de salaire.",
     mots: ["garantie de rémunération", "réduction horaires", "allocation complémentaire", "35h"]
@@ -879,7 +883,7 @@ const ARTICLES_LOI = [
     mots: ["C2P", "compte professionnel de prévention", "pénibilité", "points", "retraite anticipée", "formation"]
   },
   {
-    art: "Art. L4221-1", titre: "Règlement intérieur — obligation",
+    art: "Art. L1311-2 + L1321-1", titre: "Règlement intérieur — obligation",
     def: "Le règlement intérieur est obligatoire dans les entreprises d'au moins 50 salariés. Il fixe les mesures d'application de la réglementation en matière de santé et de sécurité dans l'entreprise ainsi que les règles générales et permanentes relatives à la discipline.",
     ex: "Le règlement intérieur doit être soumis au CSE, affiché dans l'entreprise et communiqué à l'inspection du travail avant d'entrer en vigueur. Les clauses illégales peuvent être annulées.",
     mots: ["règlement intérieur", "50 salariés", "discipline", "santé sécurité", "CSE", "affichage"]
@@ -897,7 +901,7 @@ const ARTICLES_LOI = [
     mots: ["agents chimiques", "dangereux", "cancérogènes", "exposition", "évaluation des risques"]
   },
   {
-    art: "Art. L4411-1", titre: "Médecin du travail — indépendance",
+    art: "Art. R4623-1", titre: "Médecin du travail — indépendance",
     def: "Le médecin du travail est le conseiller de l'employeur, des travailleurs, des représentants du personnel et des services sociaux, notamment sur les dispositions et mesures nécessaires afin d'éviter ou de diminuer les risques professionnels.",
     ex: "Le médecin du travail est lié par le secret médical et est indépendant de l'employeur pour ses décisions médicales. Ses recommandations s'imposent à l'employeur.",
     mots: ["médecin du travail", "indépendance", "conseiller", "secret médical", "visite médicale"]
@@ -915,7 +919,7 @@ const ARTICLES_LOI = [
     mots: ["aide à l'embauche", "contrats aidés", "État", "emploi", "subvention"]
   },
   {
-    art: "Art. L5211-1", titre: "Service public de l'emploi",
+    art: "Art. L5311-1", titre: "Service public de l'emploi",
     def: "Le service public de l'emploi comprend notamment France Travail (ex-Pôle emploi), l'APEC, les missions locales et Cap emploi. Leur mission est de placer les demandeurs d'emploi et d'accompagner les employeurs dans le recrutement.",
     ex: "France Travail accompagne les demandeurs d'emploi dans leur recherche, verse les allocations chômage et propose des formations. Son accompagnement est obligatoire pour percevoir les allocations.",
     mots: ["service public emploi", "France Travail", "Pôle emploi", "chômage", "APEC", "missions locales"]
@@ -933,9 +937,9 @@ const ARTICLES_LOI = [
     mots: ["ARE", "allocation chômage", "conditions", "6 mois", "calcul", "France Travail"]
   },
   {
-    art: "Art. L5213-1", titre: "Travailleurs handicapés — emploi obligatoire",
-    def: "Tout employeur occupant au moins 20 salariés est assujetti à l'obligation d'emploi de travailleurs handicapés dans la proportion de 6% de l'effectif total de ses salariés. En cas de non-respect, une contribution est versée à l'OETH (ex-Agefiph).",
-    ex: "Une entreprise de 100 salariés doit employer l'équivalent de 6 travailleurs handicapés (en ETP). A défaut, elle verse une contribution financière à l'OETH.",
+    art: "Art. L5212-2", titre: "Travailleurs handicapés — emploi obligatoire",
+    def: "Tout employeur occupant au moins 20 salariés est assujetti à l'obligation d'emploi de travailleurs handicapés (OETH) dans la proportion de 6% de l'effectif total de ses salariés. En cas de non-respect, une contribution est versée à l'Agefiph.",
+    ex: "Une entreprise de 100 salariés doit employer l'équivalent de 6 travailleurs handicapés (en ETP). A défaut, elle verse une contribution financière à l'Agefiph.",
     mots: ["travailleurs handicapés", "OETH", "Agefiph", "6%", "obligation d'emploi", "contribution"]
   },
   {
@@ -951,7 +955,7 @@ const ARTICLES_LOI = [
     mots: ["formation professionnelle", "droit à la formation", "tout au long de la vie", "compétences"]
   },
   {
-    art: "Art. L6323-1", titre: "Compte personnel de formation — CPF (création)",
+    art: "Art. L6323-10", titre: "Compte personnel de formation — CPF (création)",
     def: "Toute personne dispose, dès son entrée sur le marché du travail et jusqu'à son départ à la retraite, d'un compte personnel de formation. Ce compte est alimenté en euros chaque année selon la durée du travail accomplie.",
     ex: "Le CPF est alimenté à hauteur de 500 euros par an pour un salarié à temps plein (800 euros pour les non-qualifiés), dans la limite d'un plafond de 5000 euros (8000 euros pour les non-qualifiés).",
     mots: ["CPF", "compte personnel de formation", "euros", "formation", "financement"]
@@ -963,7 +967,7 @@ const ARTICLES_LOI = [
     mots: ["plan de développement", "compétences", "adaptation", "employabilité", "formation obligatoire"]
   },
   {
-    art: "Art. L6323-1", titre: "CPF — utilisation",
+    art: "Art. L6323-2", titre: "CPF — utilisation",
     def: "Le compte personnel de formation peut être utilisé par son titulaire pour financer des formations certifiantes, notamment pour obtenir une qualification ou acquérir des compétences favorisant son évolution professionnelle.",
     ex: "Un salarié peut utiliser son CPF pour passer le permis B (dans certains cas), obtenir un titre professionnel, ou se reconvertir vers un nouveau métier.",
     mots: ["CPF", "utilisation", "formation certifiante", "qualification", "reconversion"]
@@ -1023,7 +1027,7 @@ const ARTICLES_LOI = [
     mots: ["congé adoption", "durée", "CPAM", "adoptant", "enfant"]
   },
   {
-    art: "Art. L1225-65", titre: "Congé parental d'éducation",
+    art: "Art. L1225-47", titre: "Congé parental d'éducation",
     def: "A l'issue du congé de maternité ou d'adoption, le salarié peut bénéficier d'un congé parental d'éducation. Ce congé est d'une durée initiale d'un an, renouvelable deux fois, soit trois ans maximum.",
     ex: "Un père ou une mère peut prendre jusqu'à 3 ans de congé parental non rémunéré par l'employeur, mais partiellement indemnisé par la CAF via la PreParE.",
     mots: ["congé parental", "éducation", "3 ans", "CAF", "PreParE", "renouvellement"]
@@ -1041,25 +1045,25 @@ const ARTICLES_LOI = [
     mots: ["proche aidant", "congé", "handicap", "dépendance", "aidant familial", "3 mois"]
   },
   {
-    art: "Art. L3142-24-1", titre: "Don de jours de repos",
+    art: "Art. L1225-65-1", titre: "Don de jours de repos",
     def: "Un salarié peut, sur sa demande et en accord avec l'employeur, renoncer anonymement et sans contrepartie à tout ou partie de ses jours de repos non pris au bénéfice d'un autre salarié de l'entreprise qui assume la charge d'un enfant gravement malade.",
     ex: "Un collègue dont l'enfant est gravement malade peut recevoir des jours de congés donnés par d'autres salariés de l'entreprise pour pouvoir rester auprès de lui.",
     mots: ["don de jours", "repos", "enfant malade", "solidarité", "accord", "anonyme"]
   },
   {
-    art: "Art. L2261-22", titre: "Dénonciation d'une convention collective",
+    art: "Art. L2261-9", titre: "Dénonciation d'une convention collective",
     def: "La convention collective ou l'accord collectif à durée indéterminée peut être dénoncé par l'une ou l'autre des parties signataires. La dénonciation est notifiée et doit respecter un préavis de 3 mois minimum.",
     ex: "Si une convention collective est dénoncée, ses dispositions restent applicables pendant 12 mois (délai de survie) puis jusqu'à la conclusion d'un nouvel accord.",
     mots: ["dénonciation", "convention collective", "préavis 3 mois", "survie", "12 mois"]
   },
   {
-    art: "Art. L1237-18", titre: "Rupture conventionnelle collective",
+    art: "Art. L1237-19", titre: "Rupture conventionnelle collective",
     def: "Un accord collectif peut définir les conditions et modalités de ruptures conventionnelles collectives, excluant tout licenciement pour atteindre les objectifs qui lui sont assignés en termes de suppression d'emplois.",
     ex: "La rupture conventionnelle collective (RCC) permet à l'employeur de supprimer des postes avec le consentement des salariés, sans recourir à un plan de sauvegarde de l'emploi (PSE).",
     mots: ["rupture conventionnelle collective", "RCC", "accord collectif", "suppression emplois", "PSE"]
   },
   {
-    art: "Art. L1233-1", titre: "Licenciement économique — définition",
+    art: "Art. L1233-3", titre: "Licenciement économique — définition",
     def: "Constitue un licenciement pour motif économique le licenciement effectué par un employeur pour un ou plusieurs motifs non inhérents à la personne du salarié, résultant d'une suppression ou transformation d'emploi ou d'une modification du contrat de travail refusée par le salarié.",
     ex: "Un licenciement économique peut être justifié par des difficultés économiques, des mutations technologiques, une réorganisation nécessaire à la sauvegarde de la compétitivité, ou la cessation d'activité.",
     mots: ["licenciement économique", "motif économique", "suppression emploi", "difficultés économiques"]
