@@ -83,6 +83,25 @@
        date, y compris le cas particulier des nés au T1 1965. Rien à changer.
      - Prochain lot : PEE/PERCO, AJPA, PreParE restent à vérifier ; puis
        attaquer le reste du lot 1 (46 fichiers) — voir tracking-audit-outils.csv.
+   PASSAGE D'AUDIT DU 19/07/2026 (lot 3 — vérification systématique contre droit repo) :
+     - 131 clés d'articles comparées au texte officiel (117 trouvées directement, 6 fichiers
+       vides côté source, 8 à re-vérifier par le web). 4 erreurs de NUMÉRO D'ARTICLE trouvées
+       (le texte affiché était juste, mais rattaché au mauvais article) :
+       · L1237-9 → contenu préavis déplacé vers L1237-10 (article correct) ; L1237-9 redéfini
+         avec son vrai contenu (indemnité de départ retraite). module-preavis.html corrigé.
+       · L3121-47 → contenu modulation 4/9 semaines déplacé vers L3121-45 (article correct) ;
+         L3121-47 redéfini avec son vrai contenu (délai de prévenance 7 jours).
+       · L3142-27 → contenu congé sabbatique 6-11 mois déplacé vers L3142-28 (article correct) ;
+         L3142-27 redéfini (congé proche aidant/présence parentale, 3 mois renouvelables).
+       · L1225-65 → contenu garantie d'emploi au retour éclaté en 2 entrées correctes :
+         L1225-55 (retour congé parental) et L1225-25 (retour congé maternité) ; L1225-65
+         redéfini avec son vrai contenu (congé présence parentale, ancienneté).
+     - D3243-8 (conservation bulletins) VÉRIFIÉ OK : "50 ans ou jusqu'au 75e anniversaire" sont
+       bien 2 seuils alternatifs officiels, pas une erreur — aucune correction nécessaire.
+     - Prochaine étape : vérifier les 8 clés encore sans source croisée (R351-12, L341-1,
+       L431-1, L441-1, L331-3, L161-22, L225-102-1, L341-16, L411-1, L452-5, L461-7, D242-2,
+       L243-16, R441-3) + reprendre la vérification des 111 articles comparés pour les écarts
+       de contenu au-delà des numéros (formulations, seuils secondaires non encore comparés).
    ========================================================================== */
 
 (function (global) {
@@ -213,16 +232,18 @@
       texte:"Ouvre le droit à l'indemnité légale de licenciement dès 8 mois d'ancienneté ininterrompue (sauf faute grave ou lourde)." },
     'L1237-1':  { code:'CT', titre:'Préavis de démission',
       texte:"Le préavis de démission n'est pas fixé par la loi de manière générale : il résulte de la convention collective, des usages ou du contrat de travail." },
-    'L1237-9':  { code:'CT', titre:'Départ volontaire à la retraite — préavis',
+    'L1237-10': { code:'CT', titre:'Départ volontaire à la retraite — préavis',
       texte:"Le salarié qui part volontairement à la retraite respecte un préavis équivalent à celui du licenciement (1 mois entre 6 mois et 2 ans d'ancienneté, 2 mois au-delà)." },
+    'L1237-9':  { code:'CT', titre:'Départ volontaire à la retraite — indemnité',
+      texte:"Ouvre droit à une indemnité de départ à la retraite dont le taux varie selon l'ancienneté (montant/modalités fixés par voie réglementaire) — distincte du préavis (voir L1237-10)." },
     'L1237-11': { code:'CT', titre:'Rupture conventionnelle — principe',
       texte:"Définit la rupture conventionnelle : rupture d'un commun accord du CDI, exclusive de la démission et du licenciement, soumise à homologation." },
     'L1237-13': { code:'CT', titre:'Rupture conventionnelle — indemnité et délais',
       texte:"Fixe l'indemnité spécifique de rupture conventionnelle (au moins égale à l'indemnité légale de licenciement) et le délai de rétractation de 15 jours calendaires." },
     'L1237-14': { code:'CT', titre:'Rupture conventionnelle — homologation',
       texte:"Organise la procédure d'homologation par la DREETS : délai d'instruction de 15 jours ouvrables, homologation tacite à défaut de réponse." },
-    'L1237-33': { code:'CT', titre:'Rupture conventionnelle collective',
-      texte:"Encadre la rupture conventionnelle collective, négociée par accord collectif majoritaire et validée par la DREETS." },
+    'L1237-6': { code:'CT', titre:'Mise à la retraite — préavis employeur',
+      texte:"L'employeur qui décide une mise à la retraite respecte un préavis dont la durée est déterminée conformément à l'article L1234-1 (comme pour un licenciement)." },
 
     /* ----- Maladie / inaptitude / AT-MP ----- */
     'L1225-1':  { code:'CT', titre:'Protection de la grossesse',
@@ -247,12 +268,18 @@
       texte:"60 jours d'arrêt indemnisés (non nécessairement consécutifs) permettent de valider un trimestre d'assurance vieillesse." },
     'L341-1':   { code:'CSS', titre:'Pension d\'invalidité — ouverture',
       texte:"Ouvre droit à pension d'invalidité pour l'assuré présentant une réduction de capacité de travail ou de gain d'au moins deux tiers." },
-    'L341-3':   { code:'CSS', titre:'Catégories d\'invalidité',
+    'L341-4':   { code:'CSS', titre:'Catégories d\'invalidité',
       texte:"Définit les 3 catégories d'invalidité : cat. 1 (capable d'exercer une activité rémunérée), cat. 2 (incapable), cat. 3 (incapable + besoin d'assistance d'une tierce personne)." },
+    'R341-4':   { code:'CSS', titre:'Pension d\'invalidité — plafonds et salaire de comparaison',
+      texte:"Définit le salaire annuel moyen (SAM) et les plafonds catégoriels de la pension d'invalidité (confirmé par l'instruction interministérielle DSS/2A/2026/36 du 26/03/2026)." },
+    'R341-6':   { code:'CSS', titre:'Majoration pour tierce personne (MTP)',
+      texte:"Fixe le montant de la majoration pour tierce personne (MTP), versée en catégorie 3, revalorisé chaque 1er avril (confirmé par l'instruction DSS/2A/2026/36)." },
+    'L341-3':   { code:'CSS', titre:'Invalidité — moment d\'appréciation',
+      texte:"Précise le moment où l'état d'invalidité est apprécié (consolidation, expiration des IJ, stabilisation, ou constatation médicale selon les cas), en tenant compte de la capacité de travail restante et de la situation de l'assuré." },
     'L431-1':   { code:'CSS', titre:'Prestations AT/MP',
       texte:"Énumère les prestations dues en cas d'accident du travail ou de maladie professionnelle (soins, indemnités journalières, rente)." },
     'L441-1':   { code:'CSS', titre:'Déclaration d\'accident du travail',
-      texte:"La victime informe l'employeur dans les 24 h ; l'employeur déclare l'AT à la CPAM dans les 48 h." },
+      texte:"La victime informe l'employeur (principe posé par L441-1 ; délai précis de 24 h fixé par l'article réglementaire R441-1). L'employeur déclare ensuite l'AT à la CPAM (principe posé par L441-2 ; délai précis de 48 h fixé par R441-3)." },
     'L461-1':   { code:'CSS', titre:'Maladies professionnelles',
       texte:"Définit la maladie professionnelle (présomption d'origine via les tableaux). Délai de déclaration : 2 ans à compter de la cessation d'activité ou du certificat médical." },
 
@@ -364,8 +391,10 @@
       texte:"Fixe les taux légaux de majoration : +25 % pour les 8 premières heures supplémentaires, +50 % au-delà (sauf accord prévoyant des taux différents, minimum 10 %)." },
     'L3121-41': { code:'CT', titre:'Aménagement du temps sur l\'année',
       texte:"Autorise l'aménagement du temps de travail sur une période supérieure à la semaine (annualisation) par accord collectif." },
-    'L3121-47': { code:'CT', titre:'Modulation — défaut d\'accord',
-      texte:"En l'absence d'accord, l'employeur peut organiser la durée du travail sur plusieurs semaines dans la limite de 4 semaines (entreprises de moins de 50 salariés : 9 semaines)." },
+    'L3121-45':{ code:'CT', titre:'Modulation — répartition sur plusieurs semaines à défaut d\'accord',
+      texte:"En l'absence d'accord, l'employeur peut organiser la durée du travail sur plusieurs semaines dans la limite de 9 semaines (entreprises de moins de 50 salariés) ou 4 semaines (50 salariés et plus)." },
+    'L3121-47': { code:'CT', titre:'Modulation — délai de prévenance à défaut d\'accord',
+      texte:"À défaut de stipulations dans l'accord de modulation, le délai de prévenance des salariés en cas de changement de durée ou d'horaires de travail est fixé à 7 jours." },
     'L3122-2':  { code:'CT', titre:'Travail de nuit — définition',
       texte:"Définit le travail de nuit (tout travail entre 21 h et 6 h) et la plage horaire de référence." },
     'L3122-5':  { code:'CT', titre:'Travailleur de nuit — statut',
@@ -386,8 +415,12 @@
       texte:"En cas de circonstances exceptionnelles (épidémie, force majeure), le télétravail peut être imposé comme aménagement du poste, sans accord préalable." },
 
     /* --- Maternité / parentalité --- */
-    'L1225-65': { code:'CT', titre:'Garantie d\'emploi au retour',
-      texte:"Garantit au salarié, à l'issue du congé maternité/parental, de retrouver son précédent emploi ou un emploi similaire à rémunération au moins équivalente." },
+    'L1225-55': { code:'CT', titre:'Garantie d\'emploi au retour — congé parental',
+      texte:"À l'issue du congé parental d'éducation (ou du temps partiel associé), le salarié retrouve son précédent emploi ou un emploi similaire à rémunération au moins équivalente." },
+    'L1225-25': { code:'CT', titre:'Garantie d\'emploi au retour — congé maternité',
+      texte:"À l'issue du congé de maternité, la salariée retrouve son précédent emploi (en priorité) ou, à défaut, un emploi similaire à rémunération au moins équivalente." },
+    'L1225-65': { code:'CT', titre:'Congé de présence parentale — ancienneté',
+      texte:"Pendant le congé de présence parentale, la durée du congé est prise en compte en totalité pour les droits liés à l'ancienneté ; le salarié conserve le bénéfice des avantages acquis avant le congé." },
     'L331-3':   { code:'CSS', titre:'Conditions d\'indemnisation maternité',
       texte:"Fixe les conditions d'ouverture des IJ maternité : affiliation minimale (6 mois), seuil de cotisation ou d'heures travaillées." },
 
@@ -476,18 +509,20 @@
       texte:"Définit l'activité partielle : réduction ou suspension d'activité indemnisée, l'employeur percevant une allocation de l'État. Taux dérogatoires possibles en cas de crise." },
 
     /* --- Sabbatique / congés longs --- */
-    'L3142-27':{ code:'CT', titre:'Congé sabbatique — conditions',
-      texte:"Fixe les conditions du congé sabbatique : ancienneté, durée d'activité, durée du congé (6 à 11 mois)." },
+    'L3142-28':{ code:'CT', titre:'Congé sabbatique — durée',
+      texte:"Fixe la durée du congé sabbatique à défaut d'accord : entre 6 mois minimum et 11 mois maximum." },
+    'L3142-27':{ code:'CT', titre:'Congé (proche aidant/présence parentale) — durée à défaut d\'accord',
+      texte:"À défaut d'accord, fixe la durée maximale du congé à 3 mois, renouvelable dans la limite mentionnée à l'article L3142-19 (durée du congé de proche aidant)." },
     'L3142-28':{ code:'CT', titre:'Congé sabbatique — délai entre deux',
       texte:"Le salarié ne doit pas avoir bénéficié, dans les 6 années précédentes, d'un congé sabbatique, d'un congé pour création d'entreprise ou d'un CPF de transition d'au moins 6 mois." },
     'L3142-40':{ code:'CT', titre:'Congé création d\'entreprise',
       texte:"Encadre le congé pour création ou reprise d'entreprise ; l'obligation de loyauté envers l'employeur demeure pendant le congé." },
 
     /* --- CET (compléments) --- */
-    'L3153-3': { code:'CT', titre:'CET — monétisation et épargne retraite',
-      texte:"Permet d'utiliser les droits du CET pour alimenter un plan d'épargne retraite, dans la limite de 10 jours/an avec avantages fiscaux." },
-    'L3154-3': { code:'CT', titre:'CET — liquidation des droits',
-      texte:"Organise la liquidation des droits acquis sur le CET en cas de rupture du contrat ; les sommes sont soumises aux charges sociales." },
+    'L3152-4':{ code:'CT', titre:'CET — financement retraite et garantie',
+      texte:"Prévoit que les droits du CET peuvent être utilisés pour financer des prestations de retraite collectives, ou (au-delà d'un plafond) donnent lieu à un dispositif d'assurance/garantie ou à une indemnité de conversion monétaire. (Remplace l'ancien L3153-3, abrogé en 2016.)" },
+    'L3152-2':{ code:'CT', titre:'CET — liquidation et transfert des droits',
+      texte:"La convention ou l'accord collectif définit les modalités de gestion du CET et détermine les conditions d'utilisation, de liquidation et de transfert des droits d'un employeur à un autre. (Remplace l'ancien L3154-3, abrogé en 2016.)" },
 
     /* --- Épargne salariale (compléments) --- */
     'L3311-1': { code:'CT', titre:'Intéressement — principe',
@@ -496,25 +531,27 @@
       texte:"Encadre le plan d'épargne interentreprises et les conditions d'abondement (Loi Pacte)." },
 
     /* --- Invalidité (compléments) --- */
-    'L341-5':  { code:'CSS', titre:'Cumul pension d\'invalidité et revenus',
-      texte:"Fixe les règles de cumul de la pension d'invalidité avec des revenus d'activité et les seuils de réduction." },
+    'L341-12':  { code:'CSS', titre:'Cumul pension d\'invalidité et revenus',
+      texte:"Le service de la pension peut être suspendu en tout ou partie en cas de reprise du travail, au-delà d'un seuil fixé par décret (depuis le 1/04/2022 : cumul intégral jusqu'au salaire antérieur, puis pension réduite de moitié du dépassement au-delà)." },
+    'L341-5':   { code:'CSS', titre:'Pension d\'invalidité — montant minimum',
+      texte:"Le montant minimum de la pension d'invalidité, fixé par décret, ne peut être inférieur au montant de l'allocation aux vieux travailleurs salariés." },
     'L341-16': { code:'CSS', titre:'Pension d\'invalidité — révision',
       texte:"Permet la révision, suspension ou suppression de la pension d'invalidité selon l'évolution de l'état de santé ou des revenus." },
 
     /* --- AT/MP (compléments) --- */
     'L411-1':  { code:'CSS', titre:'Définition de l\'accident du travail',
       texte:"Définit l'accident du travail : accident survenu par le fait ou à l'occasion du travail, quelle qu'en soit la cause." },
-    'L452-5':  { code:'CSS', titre:'Faute inexcusable de l\'employeur',
-      texte:"En cas de faute inexcusable de l'employeur, la victime obtient une majoration de rente et l'indemnisation de préjudices complémentaires." },
+    'L452-5':  { code:'CSS', titre:'Faute intentionnelle de l\'employeur',
+      texte:"Si l'accident résulte d'une faute intentionnelle de l'employeur (distincte de la faute inexcusable, art. L452-1 à L452-4), la victime conserve le droit d'agir en réparation de droit commun contre l'auteur, pour la part du préjudice non couverte par les prestations. (La majoration de rente et l'indemnisation des préjudices complémentaires en cas de faute INEXCUSABLE relèvent des art. L452-2 et L452-3.)" },
     'L461-7':  { code:'CSS', titre:'Maladies professionnelles — déclaration',
       texte:"Précise les modalités et délais de déclaration et de reconnaissance des maladies professionnelles." },
 
     /* --- Alternance --- */
-    'L6325-24':{ code:'CT', titre:'Contrat de professionnalisation — rémunération',
-      texte:"Fixe la rémunération minimale du salarié en contrat de professionnalisation selon l'âge et le niveau de qualification." },
+    'L6325-8':{ code:'CT', titre:'Contrat de professionnalisation — rémunération',
+      texte:"Fixe la rémunération minimale du salarié en contrat de professionnalisation selon l'âge et le niveau de qualification (55 à 100% du SMIC selon les cas ; art. L6325-8 à L6325-10)." },
 
     /* --- Conservation des documents / paie --- */
-    'D242-2':  { code:'CT', titre:'Assiette des cotisations vieillesse',
+    'D242-2':  { code:'CSS', titre:'Assiette des cotisations vieillesse',
       texte:"Précise l'assiette de la cotisation d'assurance vieillesse plafonnée (dans la limite du plafond de la Sécurité sociale)." },
     'D3243-8': { code:'CT', titre:'Conservation du double des bulletins',
       texte:"L'employeur conserve un double des bulletins de paie pendant 5 ans (ou sous forme électronique jusqu'aux 75 ans du salarié)." },
@@ -528,9 +565,10 @@
       texte:"Précise les obligations de justification et de conservation relatives au versement des cotisations sociales (3 ans)." },
     'R1221-26':{ code:'CT', titre:'Registre unique du personnel',
       texte:"Le registre unique du personnel mentionne les salariés ; les mentions sont conservées 5 ans à compter du départ du salarié." },
-    'R441-3':  { code:'CSS', titre:'Registre des accidents bénins',
+    'L441-4':  { code:'CSS', titre:'Registre des accidents bénins',
       texte:"Autorise, sous conditions, la tenue d'un registre des accidents du travail bénins, conservé 5 ans." },
-
+    'R441-3':  { code:'CSS', titre:'Délai de déclaration employeur',
+      texte:"La déclaration de l'employeur (art. L441-2) doit être faite dans les 48 heures qui suivent la survenance de l'accident, non compris les dimanches et jours fériés." },
   };
 
   /* ──────────────────────────────────────────────────────────────────────
