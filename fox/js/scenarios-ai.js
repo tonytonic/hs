@@ -92,7 +92,7 @@ class ScenarioSystemAI {
                 title: "Heures non déclarées",
                 char: "Julie", prof: "Assistante",
                 situation: "Julie fait régulièrement 5h sup par semaine mais elles n'apparaissent jamais sur sa fiche de paie.",
-                advice: "Toutes les heures supplémentaires effectuées doivent être rémunérées ou compensées. Julie peut demander la régularisation des 6 derniers mois (délai de prescription réduit) voire 3 ans. Elle doit conserver des preuves : emails, badges, témoignages. En cas de litige, c'est à l'employeur de prouver les heures réellement effectuées.",
+                advice: "Toutes les heures supplémentaires effectuées doivent être rémunérées ou compensées. Julie peut demander la régularisation sur les 3 dernières années (délai de prescription des salaires). Elle doit conserver des preuves : emails, badges, témoignages. En cas de litige, c'est à l'employeur de fournir au juge les éléments justifiant les horaires réellement effectués.",
                 reference: "Article L3171-4 du Code du travail"
             }
         ];
@@ -124,7 +124,7 @@ class ScenarioSystemAI {
                 title: "Première nuit",
                 char: "Ahmed", prof: "Agent de sécurité",
                 situation: "Ahmed vient d'être embauché pour des gardes de nuit (22h-6h). Il se demande quelles sont ses compensations.",
-                advice: "Le travail de nuit (entre 21h et 6h selon définition légale, ou 21h-7h selon accord) donne droit à des contreparties : repos compensateur et/ou prime (selon accord collectif). Ahmed doit aussi bénéficier d'une surveillance médicale renforcée. La durée quotidienne maximale est de 8h (sauf dérogations portant à 12h).",
+                advice: "Le travail de nuit (par défaut légal entre 21h et 7h, soit 9h consécutives incluant l'intervalle minuit-5h ; une convention ou un accord collectif peut fixer une période différente dans ce cadre) donne droit à des contreparties : repos compensateur et/ou prime (selon accord collectif). Ahmed doit aussi bénéficier d'une surveillance médicale renforcée. La durée quotidienne maximale est de 8h (sauf dérogations portant à 12h).",
                 reference: "Articles L3122-1 et suivants du Code du travail"
             },
             {
