@@ -309,7 +309,7 @@ const M6_GlossaireUI = {
       <div class="m6-card" style="margin-bottom:10px">
         <div class="m6-card-body">
           <div style="font-weight:600;font-size:0.92rem;color:var(--charbon);margin-bottom:2px">${e.terme}</div>
-          <div style="font-size:0.68rem;color:var(--champagne-2);margin-bottom:8px">${e.art}</div>
+          <div style="font-size:0.68rem;color:var(--champagne-2);margin-bottom:8px">${(typeof LegiRef !== 'undefined') ? LegiRef.html(e.art) : e.art}</div>
           <div style="font-size:0.8rem;color:var(--charbon-3);line-height:1.5;margin-bottom:8px">${e.def}</div>
           ${e.exemple ? `<div style="font-size:0.75rem;color:var(--pierre);font-style:italic;border-left:2px solid var(--champagne);padding-left:8px">Exemple : ${e.exemple}</div>` : ''}
           <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px">
