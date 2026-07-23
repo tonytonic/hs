@@ -574,7 +574,7 @@ const CCN_ALIASES = [
 
   // ── BANQUE / ASSURANCE / FINANCE ──
   {i:1672,b:3265,n:"Sociétés assurances",s:"Assurance",g:"ASSUR70",fj:true},  // CORRIGÉ: IDCC 1672 (pas 763), contingent 70h
-  {i:2120,b:3281,n:"Banques populaires",s:"Banque mutualiste",g:"DC",fj:true},
+  {i:2120,b:3281,n:"Banque (AFB)",s:"Banque mutualiste",g:"DC",fj:true},
 
   // ── SÉCURITÉ / PROPRETÉ / IMMOBILIER ──
   {i:1351,b:3196,n:"Prévention et sécurité privée gardiennage",s:"Sécurité privée",g:"SECU329",fj:false},  // CORRIGÉ v5.3: contingent 329h
@@ -610,7 +610,7 @@ const CCN_ALIASES = [
   
   {i:2002,b:null,n:"Blanchisserie, teinturerie et nettoyage (pressing)",s:"Blanchisserie pressing",g:"DC",fj:false},
   // BUG FIX v5.5.1: Logistique entreposage déplacée sur i:16110 (alias interne) pour éviter conflit avec IDCC 1611 = alimentaire IAA180
-  {i:5021,b:null,n:"Navigation intérieure bateliers",s:"Transport fluvial",g:"DC",fj:false},
+  {i:5021,b:null,n:"Statut de la Fonction publique territoriale",s:"Fonction publique",g:"DC",fj:false},
 
   // ── TOURISME / LOISIRS / SPORT ──
   {i:1631,b:3186,n:"Organismes de tourisme et hôtellerie de plein air",s:"Tourisme",g:"DC",fj:false},
