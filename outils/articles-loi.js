@@ -529,6 +529,13 @@
       texte:"Définit l'intéressement, dispositif facultatif d'épargne salariale lié aux résultats ou performances, mis en place par accord." },
     'L3333-6': { code:'CT', titre:'PEI — plan d\'épargne interentreprises',
       texte:"Encadre le plan d'épargne interentreprises et les conditions d'abondement (Loi Pacte)." },
+    /* Ajouté le 23/07/2026 : module-cet.html citait 'L3334-8-1', qui n'existe pas
+       au corpus (la section s'arrête à L3334-8, sans sous-numérotation). Le
+       libellé a été corrigé, cet article manquait au référentiel. Titre repris
+       du libellé de la page ; le texte explicatif reste à compléter si tu veux
+       l'exposer via data-loi. */
+    'L3334-8': { code:'CT', titre:'Transfert de droits CET vers un plan d\'épargne retraite',
+      texte:"" },
 
     /* --- Invalidité (compléments) --- */
     'L341-12':  { code:'CSS', titre:'Cumul pension d\'invalidité et revenus',
@@ -559,7 +566,7 @@
       texte:"Rend obligatoire la remise d'un bulletin de paie à chaque versement de la rémunération ; conservation conseillée sans limite par le salarié." },
     'L3171-3': { code:'CT', titre:'Décompte du temps de travail',
       texte:"Impose à l'employeur de tenir un décompte du temps de travail (notamment pour les forfaits jours) et de le tenir à disposition." },
-    'R3171-16':{ code:'CT', titre:'Conservation des relevés d\'heures',
+    'D3171-16':{ code:'CT', titre:'Conservation des relevés d\'heures',
       texte:"Fixe à 1 an la durée de conservation des documents de décompte du temps de travail (relevés, pointages). Conseil : 3 ans (prescription salariale)." },
     'L243-16': { code:'CSS', titre:'Justificatifs de cotisations',
       texte:"Précise les obligations de justification et de conservation relatives au versement des cotisations sociales (3 ans)." },
@@ -626,6 +633,25 @@
       var key = k.replace(/^Art\.?\s*/i, '');
       var a = ARTICLES[key];
       return a ? ('Art. ' + key + ' ' + a.code) : ('Art. ' + key);
+    },
+    /* Même chose, mais cliquable : SH.artLien('L1234-1')
+       -> '<a …>Art. L1234-1 CT</a>' pointant vers le texte officiel.
+
+       À n'utiliser QUE là où le résultat est inséré en HTML (innerHTML,
+       littéral de gabarit…). Pour un usage en textContent, garder SH.art(),
+       sinon le balisage s'afficherait en clair.
+
+       Si l'article est inconnu du référentiel, ou rattaché à un code que le
+       fonds ne couvre pas (transports, commerce), on renvoie le libellé nu :
+       mieux vaut pas de lien qu'un lien mort. */
+    artLien: function (k) {
+      var libelle = SH.art(k);
+      var url = legiUrl(k.replace(/^Art\.?\s*/i, ''));
+      if (!url) return libelle;
+      legiStyle();
+      return '<a class="legi-ref" href="' + url + '" target="_blank"' +
+             ' rel="noopener nofollow" title="Lire le texte officiel de cet article">' +
+             libelle + '</a>';
     },
     /* Référence sans code (pour les plages "X à Y CODE") : SH.artn('L1234-1') -> "Art. L1234-1" */
     artn: function (k) {

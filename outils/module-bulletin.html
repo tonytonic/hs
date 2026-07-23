@@ -249,7 +249,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
 var PASS_MENS = (window.SH && SH.val('pmss')) || 4005; // Plafond SS mensuel 2026
 
 var COTISATIONS = [
-  { nom:'Retraite de base (T1)', taux:6.90, base:'plafond', desc:'6,90 % dans la limite du plafond SS · '+(window.SH?SH.art('D242-2'):'Art. D242-2')+'' },
+  { nom:'Retraite de base (T1)', taux:6.90, base:'plafond', desc:'6,90 % dans la limite du plafond SS · '+(window.SH?SH.artLien('D242-2'):'Art. D242-2')+'' },
   { nom:'Retraite de base (déplafonnée)', taux:0.40, base:'total',   desc:'0,40 % sur la totalité du brut (assurance vieillesse déplafonnée)' },
   { nom:'Retraite complémentaire Agirc-Arrco (T1)', taux:3.15, base:'plafond', desc:'3,15 % part salariale (taux contractuel 7,87 % × 40 %) · T1 (dans limite plafond SS)' },
   { nom:'CEG Agirc-Arrco (T1)', taux:0.86, base:'plafond', desc:'0,86 % part salariale · Contribution d\'Équilibre Général T1 (ne génère pas de points) · Circ. Agirc-Arrco 2025-16' },

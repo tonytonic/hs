@@ -277,10 +277,10 @@ function getFeries(year){
   var pent=new Date(paques); pent.setDate(paques.getDate()+49);
   var lpent=new Date(paques); lpent.setDate(paques.getDate()+50);
   return [
-    {date:new Date(year,0,1),nom:"Jour de l'An",note:(window.SH?SH.art('L3133-1'):"Art. L3133-1 CT")},
+    {date:new Date(year,0,1),nom:"Jour de l'An",note:(window.SH?SH.artLien('L3133-1'):"Art. L3133-1 CT")},
     {date:lp,nom:"Lundi de Pâques",note:"Variable selon l'année · "+MONTHS_FR[lp.getMonth()]+" "+lp.getDate()},
     {date:new Date(year,4,1),nom:"Fête du Travail",note:"Chômé et payé sans condition d'ancienneté · Travail = +100% obligatoire"},
-    {date:new Date(year,4,8),nom:"Victoire 1945",note:(window.SH?SH.art('L3133-1'):"Art. L3133-1 CT")+" · Commémoration armistice 8 mai 1945"},
+    {date:new Date(year,4,8),nom:"Victoire 1945",note:(window.SH?SH.artLien('L3133-1'):"Art. L3133-1 CT")+" · Commémoration armistice 8 mai 1945"},
     {date:av,nom:"Ascension",note:"Variable · "+MONTHS_FR[av.getMonth()]+" "+av.getDate()+" · Souvent source de pont"},
     {date:lpent,nom:"Lundi de Pentecôte",note:"Variable · "+MONTHS_FR[lpent.getMonth()]+" "+lpent.getDate()+" · Journée solidarité (souvent travaillée)"},
     {date:new Date(year,6,14),nom:"Fête Nationale",note:"14 juillet · Commémoration prise de la Bastille"},

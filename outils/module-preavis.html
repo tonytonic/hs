@@ -288,8 +288,8 @@ var LABELS = {
   retraite_sal:'Départ retraite (salarié)', retraite_emp:'Mise à la retraite'
 };
 var REFS = {
-  licenciement:(window.SH?SH.art('L1234-1'):'Art. L1234-1 CT'), demission:(window.SH?SH.art('L1237-1'):'Art. L1237-1 CT'),
-  retraite_sal:(window.SH?SH.art('L1237-10'):'Art. L1237-10 CT'), retraite_emp:(window.SH?SH.art('L1237-6'):'Art. L1237-6 CT')
+  licenciement:(window.SH?SH.artLien('L1234-1'):'Art. L1234-1 CT'), demission:(window.SH?SH.artLien('L1237-1'):'Art. L1237-1 CT'),
+  retraite_sal:(window.SH?SH.artLien('L1237-10'):'Art. L1237-10 CT'), retraite_emp:(window.SH?SH.artLien('L1237-6'):'Art. L1237-6 CT')
 };
 
 function $(id){ return document.getElementById(id); }
