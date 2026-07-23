@@ -1579,7 +1579,7 @@ function renderGlossaire(term) {
     <div class="m5-glos-item" id="glos-${i}">
       <button class="m5-glos-header" onclick="toggleGlos(${i})">
         <span class="m5-glos-term">${g.terme}</span>
-        <span class="m5-glos-art">${g.art}</span>
+        <span class="m5-glos-art">${(typeof LegiRef !== 'undefined') ? LegiRef.html(g.art) : g.art}</span>
         <span class="m5-glos-chevron">›</span>
       </button>
       <div class="m5-glos-body">
