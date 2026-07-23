@@ -908,6 +908,7 @@ body {
 
 <!-- Scripts (ordre inchangé) -->
 <script src="../ccn/conventions-collectives.js"></script>
+<script src="../legi-ref.js"></script>
 <script src="js/articles-loi.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/config.js"></script>
@@ -14838,7 +14839,7 @@ function renderGlossaire(list, query) {
     // Liens externes supprimés (distribution store)
     const liensHtml = '';
     return `<div class="glossaire-card">
-      <div class="gc-art">${_highlight(g.art, query)}</div>
+      <div class="gc-art">${(typeof LegiRef !== 'undefined') ? LegiRef.html(g.art, function (t) { return _highlight(t, query); }) : _highlight(g.art, query)}</div>
       <div class="gc-titre">${_highlight(g.titre, query)}</div>
       <div class="gc-def">${_highlight(g.def, query)}</div>
       <div class="gc-ex">${_highlight(g.ex, query)}</div>
