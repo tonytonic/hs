@@ -454,7 +454,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 2120, nom: 'Banques populaires', secteur: 'Banque mutualiste',
+    idcc: 2120, nom: 'Banque (AFB)', secteur: 'Banque mutualiste',
     plafond: 208, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Accord groupe BPCE',
     clauseDeconn: true, suiviCharge: 'Accord groupe',
@@ -625,7 +625,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 5021, nom: 'Navigation intérieure bateliers', secteur: 'Transport fluvial',
+    idcc: 5021, nom: 'Statut de la Fonction publique territoriale', secteur: 'Transport fluvial',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -3539,7 +3539,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 5021, nom: 'Navigation intérieure bateliers — Cadres Dirigeants', secteur: 'Transport fluvial',
+    idcc: 5021, nom: 'Statut de la Fonction publique territoriale', secteur: 'Transport fluvial',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
