@@ -2336,7 +2336,9 @@ function showGD(idx){
   // Lien vers le texte intégral (repository droit) : uniquement si l'IDCC est fiable
   // (pas une variante départementale/synthétique >7000, ni une entrée notée à vérifier).
   const idccFiable=c[0]<=7000&&!/à vérifier|non confirmée/i.test(c[1]);
-  const lienDroit=idccFiable?`<a class="ccn-src-link" href="https://monlegitexte.heuressupfrance.workers.dev/?idcc=${c[0]}" target="_blank" rel="noopener">📖 Voir le texte officiel de la convention →</a>`:"";
+  // rel="nofollow" volontaire : grillepaye est indexé, monlegitexte ne doit pas
+  // l'être. Sans ça, ce lien servirait de porte d'entrée aux robots.
+  const lienDroit=idccFiable?`<a class="ccn-src-link" href="https://monlegitexte.heuressupfrance.workers.dev/?idcc=${c[0]}" target="_blank" rel="noopener nofollow">📖 Voir le texte officiel de la convention →</a>`:"";
   let h=`<div class="ct"><span class="chip">IDCC ${c[0]>7000?"rég.":c[0]}</span> ${sBadge(st)}${hasPct?' <span class="pct-t">% SMIC auto</span>':""}</div>`;
   h+=`<div style="margin-bottom:10px"><div class="dnom">${c[1]}</div><div class="dmeta">${c[2]} · ${gd.d}</div>${lienDroit}</div>`;
   if(st==="estimated"){
