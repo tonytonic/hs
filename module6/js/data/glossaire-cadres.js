@@ -255,7 +255,7 @@ const M6_GLOSSAIRE = [
   // ══════════════════════════════════════════════════════════════
   {
     terme: 'Congés payés (cadres)',
-    art: 'Art. L3141-1 à L3141-47',
+    art: 'Art. L3141-1 à L3141-33',
     def: '25 jours ouvrables légaux (= 5 semaines) pour tous les salariés. Certaines CCN prévoient des jours supplémentaires (ancienneté, congé de fractionnement, congés "cadres"). Ne pas confondre avec les RTT — les CP ne se perdent pas de la même façon.',
     exemple: 'Banque : 25j CP + 5j ancienneté (après 10 ans) + 2j fractionnement potentiels = jusqu\'à 32j.',
     tags: ['congés payés', '25j', 'CP', 'légal']
