@@ -674,6 +674,68 @@
        <span data-maj="ijss_max"></span>     → date d'effet (1er juillet 2026)
      Ainsi, pour changer un chiffre ou un texte, on ne touche QUE ce fichier.
      ────────────────────────────────────────────────────────────────────── */
+  /* ──────────────────────────────────────────────────────────────────────
+     Lien vers le texte officiel (MonLegiTexte)
+     Les <span data-art="L3121-27"> ne se contentent plus d'afficher
+     "Art. L3121-27 CT" : le libellé devient cliquable et ouvre le texte
+     intégral. On rend cliquable ce qui est DÉJÀ écrit, sans ajouter de bloc
+     "voir le texte" à côté.
+
+     Pourquoi le champ `code` est indispensable : 1442 numéros existent à la
+     fois dans le code du travail et dans celui de la sécurité sociale
+     (L411-1, L461-1, L441-1…). Le numéro seul ne dirait pas où pointer ;
+     c'est `code` ('CT' ou 'CSS'), déjà renseigné article par article dans la
+     table ci-dessus, qui tranche.
+
+     Un article absent de la table, ou rattaché à un autre code (transports,
+     commerce), reste en texte brut : mieux vaut pas de lien qu'un lien qui
+     tombe sur le mauvais texte.
+     ────────────────────────────────────────────────────────────────────── */
+  var LEGI_BASE = 'https://monlegitexte.heuressupfrance.workers.dev/';
+  var LEGI_CORPUS = { CT: '', CSS: '&code=secu' };
+
+  function legiUrl(key) {
+    var a = ARTICLES[key];
+    if (!a) return null;
+    var suffixe = LEGI_CORPUS[a.code];
+    if (suffixe === undefined) return null;   /* code non couvert par le fonds */
+    return LEGI_BASE + '?art=' + encodeURIComponent(key) + suffixe;
+  }
+
+  function legiStyle() {
+    if (typeof document === 'undefined') return;
+    if (document.getElementById('legi-ref-style')) return;
+    var s = document.createElement('style');
+    s.id = 'legi-ref-style';
+    /* Discret : souligné pointillé, couleur héritée. On signale que c'est
+       cliquable sans transformer les pages en sapin de Noël. */
+    s.textContent =
+      '.legi-ref{color:inherit;text-decoration:underline;' +
+      'text-decoration-style:dotted;text-underline-offset:2px;' +
+      'text-decoration-thickness:1px;cursor:pointer}' +
+      '.legi-ref:hover{text-decoration-style:solid}';
+    (document.head || document.documentElement).appendChild(s);
+  }
+
+  /* Remplit un élément avec le libellé, sous forme de lien si l'article est
+     connu du fonds. Idempotent : ré-hydrater ne produit pas de lien imbriqué,
+     puisqu'on réécrit intégralement le contenu de l'élément. */
+  function poserRefArticle(el, key, libelle) {
+    var url = legiUrl((key || '').replace(/^Art\.?\s*/i, ''));
+    if (!url) { el.textContent = libelle; return; }
+    legiStyle();
+    var a = document.createElement('a');
+    a.className = 'legi-ref';
+    a.href = url;
+    a.target = '_blank';
+    /* nofollow : l'application est indexée, MonLegiTexte ne doit pas l'être. */
+    a.rel = 'noopener nofollow';
+    a.title = 'Lire le texte officiel de cet article';
+    a.textContent = libelle;
+    el.textContent = '';
+    el.appendChild(a);
+  }
+
   function hydrate(root) {
     root = root || document;
     var map = [
@@ -693,7 +755,11 @@
       for (var i = 0; i < els.length; i++) {
         var key = els[i].getAttribute(attr);
         var out = fn(key);
-        if (out) els[i].textContent = out;
+        if (!out) continue;
+        /* Seul data-art devient cliquable. data-artn sert aux plages
+           ("Art. X à Y CODE") : un lien sur une borne serait trompeur. */
+        if (attr === 'data-art') poserRefArticle(els[i], key, out);
+        else els[i].textContent = out;
       }
     });
   }
