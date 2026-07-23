@@ -115,6 +115,7 @@ body{font-family:var(--fb);background:var(--iv);color:var(--ch);min-height:100dv
 .arr{color:var(--sa);font-size:.95rem;margin-left:2px;flex-shrink:0}
 .dnom{font-family:var(--fd);font-size:1.2rem;flex:1}
 .dmeta{font-size:.65rem;color:var(--pi);margin-top:2px;font-family:var(--fm)}
+.ccn-src-link{font-size:.68rem;font-weight:600;margin-top:6px;display:inline-block}
 .gt{width:100%;border-collapse:collapse;font-size:.77rem}
 .gt th{padding:7px 10px;text-align:left;font-size:.59rem;text-transform:uppercase;letter-spacing:.07em;color:var(--sa);background:var(--iv);border-bottom:2px solid var(--iv2);font-family:var(--fb)}
 .gt th:last-child,.gt td:last-child,.gt th:nth-child(4),.gt td:nth-child(4){text-align:right}
@@ -2332,8 +2333,12 @@ function showGD(idx){
   const st=gd.status;
   const hasPct=gd.g.some(r=>r.t==="pct");
   const hasCoef=gd.g.some(r=>r.c!==null&&r.c!==undefined);
+  // Lien vers le texte intégral (repository droit) : uniquement si l'IDCC est fiable
+  // (pas une variante départementale/synthétique >7000, ni une entrée notée à vérifier).
+  const idccFiable=c[0]<=7000&&!/à vérifier|non confirmée/i.test(c[1]);
+  const lienDroit=idccFiable?`<a class="ccn-src-link" href="https://monlegitexte.heuressupfrance.workers.dev/?idcc=${c[0]}" target="_blank" rel="noopener">📖 Voir le texte officiel de la convention →</a>`:"";
   let h=`<div class="ct"><span class="chip">IDCC ${c[0]>7000?"rég.":c[0]}</span> ${sBadge(st)}${hasPct?' <span class="pct-t">% SMIC auto</span>':""}</div>`;
-  h+=`<div style="margin-bottom:10px"><div class="dnom">${c[1]}</div><div class="dmeta">${c[2]} · ${gd.d}</div></div>`;
+  h+=`<div style="margin-bottom:10px"><div class="dnom">${c[1]}</div><div class="dmeta">${c[2]} · ${gd.d}</div>${lienDroit}</div>`;
   if(st==="estimated"){
     h+=`<div class="al aw" style="margin-bottom:10px"><span class="aico">🟠</span><div><div class="at">Grille estimée — à compléter</div>Montants calculés en % SMIC. Vérifiez sur <a href="https://www.legifrance.gouv.fr" target="_blank" style="color:inherit">Légifrance.fr</a> puis ⚙️ Admin.</div></div>`;
   } else if(st==="national"){
@@ -4692,7 +4697,7 @@ document.getElementById('tuto-modal').addEventListener('click',function(e){
   Modifiable via ⚙️ Admin → Règles HS (ou directement dans HS_DEF)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  Lumina v2026-07-19 · Développé par Dede
+  Lumina v2026-07-19  · Développé par Dede
   292 CCN · 1269 niveaux
   Données indicatives — Légifrance fait foi
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
