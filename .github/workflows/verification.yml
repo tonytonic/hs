@@ -1,0 +1,101 @@
+name: Vérification
+
+# Déclenchement MANUEL : depuis l'app GitHub sur iPhone,
+#   onglet Actions → « Vérification » → bouton « Run workflow ».
+# Le rapport s'affiche directement dans le résumé du run, lisible sur mobile.
+# Aucun fichier n'est modifié : ces scripts ne font que lire et rapporter.
+on:
+  workflow_dispatch:
+    inputs:
+      depot_droit:
+        description: "Dépôt du fonds (pour détecter les liens morts). Laisser tel quel si tu n'as pas changé de nom."
+        required: false
+        default: "Chauvel1/droit"
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer l'application
+        uses: actions/checkout@v4
+
+      # idcc_list.txt vit dans l'autre dépôt : sans lui, le contrôle des liens
+      # morts est impossible. L'échec n'est pas bloquant — le reste tourne.
+      - name: Récupérer le fonds (pour les liens morts)
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.inputs.depot_droit }}
+          path: _droit
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer openpyxl
+        run: pip install --quiet openpyxl
+
+      - name: 1.1 — Santé des grilles de salaire
+        continue-on-error: true
+        run: |
+          echo "## 1.1 — Santé des grilles" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f _droit/idcc_list.txt ]; then
+            OPT="--idcc-suivis _droit/idcc_list.txt"
+          else
+            OPT=""
+            echo "> Le dépôt du fonds n'a pas pu être lu : le contrôle des liens morts est ignoré." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+          python3 verifier-grilles.py $OPT --out /tmp/g.md
+          cat /tmp/g.md >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 1.2 — Cohérence des fichiers CCN
+        continue-on-error: true
+        run: |
+          echo "## 1.2 — Cohérence des fichiers CCN" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          python3 verifier-ccn.py \
+            --dares ccn/Dares_Suivi_Historique_convention_collective_Juin2026.xlsx \
+            --out /tmp/c.md
+          cat /tmp/c.md >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: 1.3 — Tableau de suivi
+        continue-on-error: true
+        run: |
+          echo "## 1.3 — Tableau de suivi" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cd GrillePaye && python3 tracking-ccn.py >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      # Le test 2.1 du cahier de recette demandait un « curl » depuis un
+      # terminal, impossible sur téléphone. Il est fait ici.
+      - name: 2.1 — MonLegiTexte n'est pas indexable
+        continue-on-error: true
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 2.1 — MonLegiTexte hors index" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          URL="https://monlegitexte.heuressupfrance.workers.dev/"
+          H=$(curl -sI "$URL" | tr -d '\r')
+          if echo "$H" | grep -qi "x-robots-tag:.*noindex"; then
+            echo "- En-tête \`x-robots-tag: noindex\` : **présent** ✓" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- En-tête \`x-robots-tag: noindex\` : **ABSENT** ✗ — le worker n'est pas déployé" >> $GITHUB_STEP_SUMMARY
+          fi
+          R=$(curl -s -o /dev/null -w "%{http_code}" "${URL}robots.txt")
+          if [ "$R" = "200" ]; then
+            echo "- \`/robots.txt\` répond 200 ✓" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- \`/robots.txt\` répond $R ✗" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Rapports téléchargeables
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rapports-verification
+          path: /tmp/*.md
+          if-no-files-found: ignore
