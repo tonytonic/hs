@@ -356,12 +356,12 @@ function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:2,maximu
 
 var MOTIFS = {
   droit:        { due:true,  taux:10, label:'Prime de précarité due', info:null },
-  emploi_usage: { due:false, taux:0,  label:'Prime non due', info:'Les emplois à usage constant ('+(window.SH?SH.art('D1242-1'):'Art. D1242-1 CT')+') sont exclus du dispositif. Vérifie ton secteur et ta convention collective.' },
+  emploi_usage: { due:false, taux:0,  label:'Prime non due', info:'Les emplois à usage constant ('+(window.SH?SH.artLien('D1242-1'):'Art. D1242-1 CT')+') sont exclus du dispositif. Vérifie ton secteur et ta convention collective.' },
   tremplin:     { due:false, taux:0,  label:'Prime non due', info:'Le CDD Tremplin est destiné aux travailleurs handicapés en entreprise adaptée (pas aux jeunes en formation). La prime de précarité n\'est pas due pour ce dispositif spécifique.' },
-  senior:       { due:false, taux:0,  label:'Prime non due', info:'Le CDD senior (57 ans et +) est exclu de la prime de précarité par l\''+(window.SH?SH.art('L1243-10'):'Art. L1243-10 CT')+' 6°.' },
+  senior:       { due:false, taux:0,  label:'Prime non due', info:'Le CDD senior (57 ans et +) est exclu de la prime de précarité par l\''+(window.SH?SH.artLien('L1243-10'):'Art. L1243-10 CT')+' 6°.' },
   rupture_sal:  { due:false, taux:0,  label:'Prime non due', info:'En cas de rupture anticipée à l\'initiative du salarié (sauf pour rejoindre un CDI), la prime de précarité n\'est pas due.' },
   faute:        { due:false, taux:0,  label:'Prime non due', info:'La rupture pour faute grave ou lourde du salarié exclut le versement de la prime de précarité.' },
-  cdi:          { due:false, taux:0,  label:'Prime non due', info:'La prime n\'est légalement pas due si le CDI proposé concerne le même poste (ou équivalent), avec une rémunération au moins égale et un volume horaire similaire ('+(window.SH?SH.art('L1243-10'):'Art. L1243-10 CT')+' 3°). Ce n\'est pas une simple règle jurisprudentielle — c\'est la loi.' },
+  cdi:          { due:false, taux:0,  label:'Prime non due', info:'La prime n\'est légalement pas due si le CDI proposé concerne le même poste (ou équivalent), avec une rémunération au moins égale et un volume horaire similaire ('+(window.SH?SH.artLien('L1243-10'):'Art. L1243-10 CT')+' 3°). Ce n\'est pas une simple règle jurisprudentielle — c\'est la loi.' },
   cdi_accepte:  { due:false, taux:0,  label:'Prime non due', info:'Si le salarié accepte un CDI dans la même entreprise à l\'issue du CDD, la prime de précarité n\'est pas due.' },
 };
 
@@ -389,7 +389,7 @@ function recalc(){
     $('rMontant').textContent = '0 €';
     $('rDetail').textContent = 'Dans ce cas, la prime de précarité n\'est pas due légalement.';
     if(m.info){
-      $('rInfo').textContent = m.info;
+      $('rInfo').innerHTML = m.info;
       infoC.style.display='block';
     } else {
       infoC.style.display='none';
