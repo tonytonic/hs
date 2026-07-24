@@ -1,131 +1,128 @@
-# Lot 2 — onglet « Nos sources » + veille des grilles
+# Lot 2 — onglet « Nos sources », veille hebdomadaire, correctifs
 
 ```
 GrillePaye/index.html               onglet + compteurs recadrés
-GrillePaye/suivi-public.json        données publiques (20 Ko)
+GrillePaye/ccn-data.json            statuts 675 et 993 corrigés
+GrillePaye/suivi-public.json        données publiques régénérées
 GrillePaye/generer-suivi-public.py  générateur
-verifier-fraicheur.py               NOUVEAU — la veille, à la racine
-workflow/.github/workflows/verification.yml   version mise à jour
+verifier-fraicheur.py               la veille, à la racine
+workflow/.github/workflows/verification.yml
 ```
 
-Penser au bump du service worker.
+Bump du service worker après déploiement.
 
 ---
 
-## 1. Onglet « 🔎 Nos sources »
+## ⚠️ Le workflow doit rester sur la branche par défaut
 
-Présent dans les deux rôles. Quatre compteurs, une recherche, la liste des conventions —
-les mieux documentées d'abord — avec pour chacune l'état, la date et **la référence
-juridique** :
+Les fichiers de production sont sur **`Android-cloudfare-production`**, pas sur `main`.
+Deux conséquences, et la seconde est un piège :
 
-```
-IDCC 16    🟢 Vérifiée   Transport routier · 01/02/2026   Source : avenant n°24
-IDCC 1979  🟢 Vérifiée   HCR · 01/06/2026                 Source : avenant n°33 du 19/06
-```
+**Le workflow va chercher les fichiers sur la bonne branche.** Sans le `ref:` ajouté, il
+aurait vérifié ceux de `main` et annoncé des résultats ne correspondant à rien de déployé.
+La branche et le commit vérifiés sont désormais rappelés en tête du rapport.
 
-C'est la référence qui porte la crédibilité : l'utilisateur peut vérifier lui-même.
+**Mais le fichier du workflow, lui, doit rester sur la branche par défaut.** GitHub ne
+déclenche les exécutions planifiées que depuis celle-ci : un `schedule:` posé sur la
+branche de production ne se lancerait **jamais**. Le workflow vit donc sur `main` et lit
+la production.
 
-### Compteurs recadrés
-
-Les libellés officiels (« En cours de sourçage ») étaient tronqués sur téléphone —
-« VÉRI… », « NON … ». Une grille dédiée `.suivi-kpi` remplace `.kpi-grid` : libellés courts,
-casse normale, passage à la ligne autorisé au lieu de la troncature.
+La branche est réglable au lancement, si tu as besoin de vérifier autre chose.
 
 ---
 
-## 2. `verifier-fraicheur.py` — la veille
+## Veille automatique du mercredi
 
-Le fonds récupère les clauses de rémunération de chaque convention et connaît leur date
-(« Avenant salaires du 15 mai 2026 »). GrillePaye connaît la date de la grille affichée.
-Si le fonds a plus récent, la grille est à revoir.
+Planifiée le **mercredi à 7h UTC** — l'aspirateur tourne lundi et jeudi, le mercredi tombe
+après le commit du lundi et avant celui du jeudi.
 
-C'est la veille qui manquait : au lieu de parcourir 292 grilles pour chercher ce qui a
-bougé, tu obtiens la liste de ce qui a changé — et rien d'autre.
+### La notification, sans quoi la veille ne sert à rien
+
+GitHub ne notifie que les échecs. Un run hebdomadaire qui découvre une grille périmée
+serait passé inaperçu.
+
+Quand la veille trouve quelque chose, le workflow **ouvre un ticket** avec le rapport en
+corps de message. Un seul ticket est maintenu : le suivant met à jour le précédent. S'il
+n'y a rien, aucun ticket.
+
+---
+
+## La veille porte maintenant les montants
+
+Le rapport ne se contente plus de signaler qu'un avenant est plus récent : il **recopie
+les montants** relevés dans la clause.
 
 ```
-python3 verifier-fraicheur.py --fonds ../droit/output/ccn
-python3 verifier-fraicheur.py --fonds ../droit/output/ccn --marge 60
+### IDCC 16 — Transport routier de marchandises
+
+Grille affichée : 01/02/2026 · Clause au fonds : 15/05/2026 · écart 103 jours
+
+> Avenant salaires du 15 mai 2026
+
+Montants relevés dans la clause :
+
+- Le coefficient 120 est porté à 1 875,40 € mensuels bruts pour 151,67 heures.
+- Le coefficient 130 est porté à 1 942,10 euros.
+- Le coefficient 150 est fixé à 2 088,55 €.
 ```
 
-Le rapport donne trois sections :
+Seules les phrases contenant un montant sont retenues : les considérants et les demandes
+d'extension sont écartés. Tu ouvres la notification, tu as les chiffres, tu saisis — sans
+rouvrir l'avenant.
 
-| Section | Sens |
+**Le script ne modifie toujours aucun montant.** Il recopie ce qu'il lit ; l'interprétation
+reste la tienne.
+
+---
+
+## Correctif : 675 et 993 n'étaient pas des estimations périmées
+
+Je les avais classées « estimations non réancrées après la revalorisation du SMIC », et
+j'allais les recalculer sur 1 867,02 €. **C'était une erreur qui aurait détruit des données
+vérifiées.**
+
+Tes notes du 18/07 sont formelles :
+
+> **993** — « CONTRÔLE COMPLET 18/07 : montants **RÉELS trouvés** (remplace l'incertitude)
+> — 1837 € (personnel service) / 1857 € (auxiliaire) / 1916-2224 € (TQ1-TQ3) »
+>
+> **675** — « montants **RÉELS trouvés** — plage 1824-3044 € (1er mai 2026, +3,2 % moyenne,
+> accord du 16/04/2026 en attente extension) »
+
+Les montants sont ceux des branches. C'est le champ `st` qui n'avait jamais été mis à jour
+après ton contrôle — encore le même motif : diagnostic fait, propagation oubliée.
+
+**Seules les métadonnées ont été corrigées**, jamais les montants :
+
+| IDCC | `st` avant | `st` après | Date |
+|---|---|---|---|
+| 675 | placeholder | real | 01/05/2026 renseignée |
+| 993 | estimated | real | inchangée |
+
+### Conséquence sur le rapport
+
+Il n'y a plus d'« estimations non réancrées ». À la place : **3 grilles réelles sous le
+SMIC** — 675, 993 et 1286. Ce n'est plus notre erreur mais un fait juridique : ces branches
+n'ont pas renégocié, l'employeur doit verser le SMIC.
+
+### Une règle ajoutée aux scripts
+
+Une note de contrôle peut **annuler** un doute exprimé plus tôt dans la même chaîne :
+« Estimation SMIC-ancrée, À VÉRIFIER | … montants RÉELS trouvés ». Sans cette règle,
+l'ancien doute l'emportait sur la conclusion et une grille vérifiée restait affichée
+« Estimation ».
+
+Nouveaux compteurs : **188 vérifiées** (au lieu de 185), 89 estimations, 12 en cours.
+
+---
+
+## Contrôles passés
+
+| Vérification | Résultat |
 |---|---|
-| **Grilles dépassées** | le fonds a une clause plus récente — à revoir, avec l'écart en jours |
-| **Sans grille mais clause au fonds** | une grille pourrait être créée à partir du texte |
-| **Sans date exploitable** | impossible à comparer ; renseigner le champ `d` les ferait entrer dans la veille |
-
-### Ce qu'il ne fait pas, volontairement
-
-**Il ne touche à aucun montant.** Passer du texte d'un avenant à un barème structuré
-demande une interprétation : chaque branche a sa logique — valeur de point, paliers
-horaires, indice majoré, RAM annuelle. Une erreur d'interprétation produirait un faux
-salaire minimum, ce qui est pire qu'une grille datée. Le script signale, tu décides.
-
-### Deux précautions dans la détection
-
-**Le sujet de la clause est filtré.** Le fonds contient aussi des avenants sur le temps de
-travail ou la prévoyance, sans incidence sur une grille. Seuls les titres parlant de
-salaire, rémunération, minima, barème ou grille sont retenus.
-
-**Une marge de 30 jours** évite le bruit : un avenant signé peu après le relevé de la
-grille est souvent déjà pris en compte. Réglable par `--marge`.
-
-Testé sur des cas reproduisant le réel : avenant plus récent détecté avec l'écart exact,
-avenant plus ancien ignoré, avenant prévoyance écarté, convention sans grille signalée à
-part.
-
----
-
-## 3. Workflow — veille automatique du mercredi
-
-La veille tourne dans le workflow de vérification, **lançable depuis l'iPhone** et
-désormais **planifiée chaque mercredi à 7h UTC**.
-
-Le mercredi n'est pas arbitraire : l'aspirateur tourne lundi et jeudi, le mercredi tombe
-donc après que le run du lundi a été commité, et avant celui du jeudi.
-
-### Le point qui rend la veille utile : la notification
-
-GitHub ne notifie que les échecs, jamais les succès. Un run planifié qui découvre une
-grille périmée passerait donc totalement inaperçu — une veille qu'il faut penser à
-consulter n'est pas une veille.
-
-Quand la veille trouve au moins une grille dépassée, le workflow **ouvre un ticket** dans
-le dépôt, avec le rapport complet en corps de message. Tu reçois la notification sur ton
-téléphone, et le ticket sert d'aide-mémoire jusqu'à ce que tu le fermes.
-
-**Un seul ticket est maintenu à la fois** : le suivant met à jour le précédent au lieu
-d'en accumuler un par semaine. S'il n'y a rien à signaler, aucun ticket n'est créé.
-
-Vérifié dans les deux sens : le marqueur se pose quand une grille est dépassée, et ne se
-pose pas quand tout est à jour.
-
-Cela suppose la permission `issues: write`, déjà déclarée dans le fichier. Aucun secret
-supplémentaire : le jeton fourni par GitHub suffit.
-
-Remplace `.github/workflows/verification.yml` dans le dépôt de l'application.
-
----
-
-## Une fuite trouvée par le contrôle de non-fuite
-
-Le test balaie les 468 lignes rendues à la recherche de huit marqueurs de note interne. Il
-en a trouvé un — pas dans le fichier public, mais dans `CCN_ALL` : l'entrée 1776 s'appelait
-**« À vérifier (FJT = IDCC 2336) »**. Une note de travail affichée comme nom de convention,
-visible aussi dans l'onglet des grilles.
-
-L'IDCC 1776 est inconnu de DARES et sans grille ; la vraie convention des foyers de jeunes
-travailleurs est le **2336**, déjà présent sous « Habitat et logement accompagnés ». Le
-libellé devient **« Foyers de jeunes travailleurs (identité non confirmée) »** : le métier
-reste cherchable, le doute visible, et le lien vers le texte officiel s'éteint
-automatiquement.
-
-Après correction : **0 fuite sur 8 marqueurs**.
-
----
-
-## Non-régression vérifiée
-
-471 entrées dans `CCN_ALL`, 117 bandeaux de fusion intacts, 319 liens MonLegiTexte tous
-couverts, aucune divergence entre les cinq fichiers CCN.
+| Compteurs de l'onglet | 188 / 89 / 12 / 176 |
+| Non-fuite sur les 468 lignes rendues | 0 marqueur sur 8 |
+| Extraction des montants | 3 phrases retenues, considérants écartés |
+| Déclencheur du ticket | posé si anomalie, pas sinon |
+| CCN_ALL | 471 entrées, 117 fusions |
+| Cohérence des 5 fichiers CCN | aucune divergence |

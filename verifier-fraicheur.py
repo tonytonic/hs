@@ -82,6 +82,42 @@ def date_de_grille(txt):
     return datetime(int(m.group(1)), 1, 1) if m else None
 
 
+def texte_du_noeud(noeud):
+    """Concatène le texte des articles d'une clause."""
+    bouts = []
+    for a in (noeud.get("articles") or []):
+        if isinstance(a, dict):
+            t = a.get("content") or a.get("texte") or ""
+            if t:
+                bouts.append(re.sub(r"<[^>]+>", " ", str(t)))
+    return re.sub(r"\s+", " ", " ".join(bouts)).strip()
+
+
+# Un montant en euros, avec ou sans décimales, tel qu'on l'écrit dans un avenant.
+MONTANT = re.compile(r"\b\d{1,2}[  ]?\d{3}(?:[.,]\d{1,2})?\s*(?:€|euros?)", re.I)
+
+
+def extrait_montants(txt, maxi=6):
+    """Phrases du texte qui portent un montant en euros.
+
+    C'est ce qui manque pour agir : savoir qu'un avenant existe ne suffit pas,
+    il faut les chiffres. On ne retient que les phrases qui en contiennent, pour
+    éviter de recopier des pages de considérants.
+    """
+    if not txt:
+        return []
+    trouves = []
+    for phrase in re.split(r"(?<=[.;])\s+", txt):
+        if MONTANT.search(phrase):
+            p = phrase.strip()
+            if len(p) > 240:
+                p = p[:240] + "…"
+            trouves.append(p)
+            if len(trouves) >= maxi:
+                break
+    return trouves
+
+
 def clauses_salaire(noeud, acc=None):
     """Parcourt l'arbre d'une convention et relève les clauses de rémunération
     dont le texte a été récupéré."""
@@ -93,7 +129,7 @@ def clauses_salaire(noeud, acc=None):
     if titre and SUJET_SALAIRE.search(titre):
         d = date_du_titre(titre)
         if d:
-            acc.append((d, titre.strip()))
+            acc.append((d, titre.strip(), texte_du_noeud(noeud)))
     for s in (noeud.get("sections") or []):
         clauses_salaire(s, acc)
     return acc
@@ -139,24 +175,24 @@ def main():
         clauses = clauses_salaire(fonds)
         if not clauses:
             continue
-        clauses.sort(reverse=True)
-        d_fonds, titre = clauses[0]
+        clauses.sort(key=lambda c: c[0], reverse=True)
+        d_fonds, titre, texte = clauses[0]
 
         g = grilles.get(idcc)
         if not g:
             # Le fonds a une clause salaire alors qu'on n'affiche aucune grille :
             # c'est une grille à créer, pas seulement à rafraîchir.
-            non_couvertes.append((idcc, d_fonds, titre))
+            non_couvertes.append((idcc, d_fonds, titre, texte))
             continue
 
         d_grille = date_de_grille(g.get("d"))
         if not d_grille:
-            sans_date.append((idcc, d_fonds, titre))
+            sans_date.append((idcc, d_fonds, titre, texte))
             continue
 
         ecart = (d_fonds - d_grille).days
         if ecart > args.marge:
-            a_revoir.append((idcc, d_grille, d_fonds, ecart, titre, g.get("st")))
+            a_revoir.append((idcc, d_grille, d_fonds, ecart, titre, g.get("st"), texte))
 
     a_revoir.sort(key=lambda x: -x[3])
     non_couvertes.sort(key=lambda x: x[1], reverse=True)
@@ -171,12 +207,26 @@ def main():
         L.append("")
         L.append("Le fonds a une clause de rémunération plus récente que la grille affichée.")
         L.append("")
-        L.append("| IDCC | Convention | Grille | Fonds | Écart | Clause repérée |")
-        L.append("|---|---|---|---|---|---|")
-        for idcc, dg, df, ec, titre, st in a_revoir:
-            L.append(f"| {idcc} | {noms.get(idcc, '?')[:34]} | {dg.strftime('%d/%m/%Y')} | "
-                     f"{df.strftime('%d/%m/%Y')} | {ec} j | {titre[:46]} |")
-        L.append("")
+        for idcc, dg, df, ec, titre, st, texte in a_revoir:
+            L.append(f"### IDCC {idcc} — {noms.get(idcc, '?')[:44]}")
+            L.append("")
+            L.append(f"Grille affichée : **{dg.strftime('%d/%m/%Y')}** · "
+                     f"Clause au fonds : **{df.strftime('%d/%m/%Y')}** · écart **{ec} jours**")
+            L.append("")
+            L.append(f"> {titre}")
+            L.append("")
+            montants = extrait_montants(texte)
+            if montants:
+                # Les montants sont recopiés tels quels depuis le texte officiel.
+                # C'est ce qui permet de mettre la grille à jour sans rouvrir
+                # l'avenant : l'alerte devient un outil de saisie, pas un pense-bête.
+                L.append("Montants relevés dans la clause :")
+                L.append("")
+                for m in montants:
+                    L.append(f"- {m}")
+            else:
+                L.append("_Aucun montant repérable dans le texte : ouvrir la clause pour vérifier._")
+            L.append("")
     else:
         L.append("Aucune grille dépassée : toutes sont au moins aussi récentes que le fonds.")
         L.append("")
@@ -186,7 +236,7 @@ def main():
         L.append("")
         L.append("Une grille pourrait être créée à partir de ces textes.")
         L.append("")
-        for idcc, df, titre in non_couvertes[:30]:
+        for idcc, df, titre, _ in non_couvertes[:30]:
             L.append(f"- **IDCC {idcc}** — {noms.get(idcc, '?')[:38]} : "
                      f"{titre[:52]} ({df.strftime('%d/%m/%Y')})")
         if len(non_couvertes) > 30:
@@ -199,7 +249,7 @@ def main():
         L.append("Impossible de les comparer. Renseigner leur champ `d` les ferait entrer "
                  "dans la veille.")
         L.append("")
-        L.append("- " + ", ".join(f"IDCC {i}" for i, _, _ in sans_date[:40]))
+        L.append("- " + ", ".join(f"IDCC {i}" for i, _, _, _ in sans_date[:40]))
         L.append("")
 
     rapport = "\n".join(L)
