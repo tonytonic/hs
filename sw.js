@@ -3,7 +3,7 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.8.20"; // fix flash cold-start Android (shell cache-first)
+const CACHE_NAME = "heuressup-cache-v10.7.20"; // fix flash cold-start Android (shell cache-first)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
