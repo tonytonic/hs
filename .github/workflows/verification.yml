@@ -12,10 +12,14 @@ on:
     - cron: "0 7 * * 3"
   workflow_dispatch:
     inputs:
-      depot_droit:
-        description: "Dépôt du fonds (pour détecter les liens morts). Laisser tel quel si tu n'as pas changé de nom."
+      branche:
+        description: "Branche contenant les fichiers de production."
         required: false
-        default: "Chauvel1/droit"
+        default: "Android-cloudfare-production"
+      depot_droit:
+        description: "Dépôt du fonds (pour détecter les liens morts)."
+        required: false
+        default: "tonytonic/droit"
 
 # Nécessaire pour ouvrir un ticket quand la veille trouve quelque chose.
 permissions:
@@ -26,8 +30,18 @@ jobs:
   verifier:
     runs-on: ubuntu-latest
     steps:
-      - name: Récupérer l'application
+      # ATTENTION — les fichiers de production ne sont PAS sur la branche par
+      # défaut mais sur « Android-cloudfare-production ». Sans ce « ref », le
+      # workflow vérifierait les fichiers de main et annoncerait des résultats
+      # qui ne correspondent à rien de déployé.
+      #
+      # Le workflow lui-même doit en revanche RESTER sur la branche par défaut :
+      # GitHub ne déclenche les exécutions planifiées que depuis celle-ci. Un
+      # « schedule » posé sur la branche de production ne se lancerait jamais.
+      - name: Récupérer l'application (branche de production)
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branche || 'Android-cloudfare-production' }}
 
       # idcc_list.txt vit dans l'autre dépôt : sans lui, le contrôle des liens
       # morts est impossible. L'échec n'est pas bloquant — le reste tourne.
@@ -35,7 +49,7 @@ jobs:
         continue-on-error: true
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.inputs.depot_droit }}
+          repository: ${{ github.event.inputs.depot_droit || 'tonytonic/droit' }}
           path: _droit
 
       - uses: actions/setup-python@v5
@@ -48,6 +62,8 @@ jobs:
       - name: 1.1 — Santé des grilles de salaire
         continue-on-error: true
         run: |
+          echo "Branche vérifiée : \`$(git rev-parse --abbrev-ref HEAD)\` — commit \`$(git rev-parse --short HEAD)\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 1.1 — Santé des grilles" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -f _droit/idcc_list.txt ]; then
