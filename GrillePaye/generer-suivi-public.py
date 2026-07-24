@@ -67,6 +67,11 @@ LIBELLE_STATUT = {
 TRACE_VERIF = re.compile(
     r"RÉSOLU|CONFIRMÉE|CONTRÔLE COMPLET|identité (réelle )?confirm|vérifi", re.I)
 TRACE_DOUTE = re.compile(r"À VÉRIFIER|estimation", re.I)
+# Une note de contrôle peut ANNULER un doute exprimé plus tôt dans la même
+# chaîne : « Estimation SMIC-ancrée, À VÉRIFIER | … montants RÉELS trouvés
+# (remplace l'incertitude) ». Sans cette règle, l'ancien doute l'emporterait
+# sur la conclusion, et une grille vérifiée resterait affichée « Estimation ».
+TRACE_LEVEE = re.compile(r"montants?\s+RÉELS?\s+trouv|remplace l'incertitude", re.I)
 
 
 def reference_publique(src):
@@ -99,6 +104,8 @@ def statut_public(grille):
     src = str(grille.get("s") or "")
     if st == "placeholder":
         return "encours"
+    if TRACE_LEVEE.search(src):
+        return "verifiee"
     if st == "estimated" or TRACE_DOUTE.search(src):
         return "estimation"
     if TRACE_VERIF.search(src):
