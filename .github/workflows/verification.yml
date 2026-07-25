@@ -17,9 +17,11 @@ on:
         required: false
         default: "Android-cloudfare-production"
       depot_droit:
-        description: "Dépôt du fonds (pour détecter les liens morts)."
+        # Compte DIFFÉRENT de celui de l'application (tonytonic/hs) : le fonds
+        # est hébergé sous un autre compte, anthonychauvel.
+        description: "Dépôt du fonds (pour détecter les liens morts et la veille)."
         required: false
-        default: "tonytonic/droit"
+        default: "anthonychauvel/droit"
 
 # Nécessaire pour ouvrir un ticket quand la veille trouve quelque chose.
 permissions:
@@ -43,14 +45,48 @@ jobs:
         with:
           ref: ${{ github.event.inputs.branche || 'Android-cloudfare-production' }}
 
-      # idcc_list.txt vit dans l'autre dépôt : sans lui, le contrôle des liens
-      # morts est impossible. L'échec n'est pas bloquant — le reste tourne.
-      - name: Récupérer le fonds (pour les liens morts)
+      # idcc_list.txt et output/ccn/ vivent dans l'AUTRE dépôt. Deux choses
+      # peuvent empêcher de le lire, et le message d'erreur de checkout ne
+      # distingue pas les deux :
+      #   · le nom du dépôt est faux ;
+      #   · le dépôt est PRIVÉ — et c'est le cas le plus fréquent. Le jeton
+      #     fourni automatiquement par GitHub (GITHUB_TOKEN) n'a accès QU'AU
+      #     dépôt courant. Lire un second dépôt privé exige un jeton explicite.
+      # Le fonds (anthonychauvel/droit) est public, sur un compte DIFFÉRENT de
+      # celui de l'application (tonytonic/hs) : aucun jeton n'est nécessaire
+      # pour le lire. token/TOKEN_DROIT est conservé en repli seulement — utile
+      # si le dépôt passait un jour en privé, sans effet sur un dépôt public.
+      - name: Récupérer le fonds (pour les liens morts et la veille)
+        id: fonds
         continue-on-error: true
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.inputs.depot_droit || 'tonytonic/droit' }}
+          repository: ${{ github.event.inputs.depot_droit || 'anthonychauvel/droit' }}
           path: _droit
+          token: ${{ secrets.TOKEN_DROIT || github.token }}
+
+      # Sur un dépôt public, un échec ici n'est presque jamais un problème de
+      # permission : c'est le nom du dépôt (mauvais compte, faute de frappe)
+      # ou une panne passagère de GitHub.
+      - name: Diagnostic d'accès au fonds
+        if: steps.fonds.outcome != 'success'
+        run: |
+          echo "## ⚠️ Le dépôt du fonds n'a pas pu être lu" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Dépôt visé : \`${{ github.event.inputs.depot_droit || 'anthonychauvel/droit' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Ce dépôt est public : ce n'est presque jamais un problème de permission." >> $GITHUB_STEP_SUMMARY
+          echo "À vérifier dans l'ordre :" >> $GITHUB_STEP_SUMMARY
+          echo "1. Le nom ci-dessus est-il exact — bon **compte** (\`anthonychauvel\`, pas \`tonytonic\`) et bon dépôt ?" >> $GITHUB_STEP_SUMMARY
+          echo "2. Le dépôt est-il toujours public (pas passé en privé entre-temps) ?" >> $GITHUB_STEP_SUMMARY
+          echo "3. [state.github.com](https://www.githubstatus.com) signale-t-il une panne en cours ?" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ secrets.TOKEN_DROIT }}" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "\`TOKEN_DROIT\` est défini : vérifier qu'il n'a pas expiré." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Conséquence : le contrôle des liens morts **et la veille des grilles** sont ignorés." >> $GITHUB_STEP_SUMMARY
+          echo "Les autres contrôles restent valables." >> $GITHUB_STEP_SUMMARY
 
       - uses: actions/setup-python@v5
         with:
