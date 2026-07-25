@@ -297,8 +297,50 @@ body{ background:#0a1626; }
 
 @media (prefers-reduced-motion: reduce){ .cat-body{ transition:none; } }
 </style>
+<style id="atelier-pro">
+/* ============ MODE SOBRE — même thème bleu nuit, sans l'illustration ============
+   Volontairement minimal : on NE touche à aucune règle d'atelier-skin. On ajoute
+   seulement les quelques overrides nécessaires, sous body.mode-pro, qui gagnent
+   par spécificité (2 classes contre 1) sans "!important". Le reste — cartes en
+   verre, dorures, barre d'onglets — continue de fonctionner tel quel : sans
+   photo derrière, un fond translucide sur un aplat marine donne simplement une
+   carte marine unie. Rien à changer là. */
+
+/* La photo du terrier disparaît ; son dégradé de lisibilité (::after) disparaît
+   avec elle, pas besoin de le cibler séparément. */
+body.mode-pro .atelier-bg{ display:none; }
+
+/* Le hero ne réservait de l'espace que pour laisser respirer le haut de la
+   photo. Sans photo, il n'a plus de raison d'exister. */
+body.mode-pro .atelier-hero{ height:0; }
+
+/* Le header était fixe et transparent pour flotter sur l'image. Sans image
+   derrière, il redevient un bloc normal, avec un fond uni — sinon le contenu
+   défilerait sous un rectangle transparent au lieu de laisser la place. */
+body.mode-pro .hdr{ position:static; background:var(--ink); }
+
+/* "le titre vit sur l'enseigne" peinte dans le décor (cf. atelier-skin) : sans
+   décor, il n'y a plus d'enseigne. Le titre texte doit donc redevenir visible,
+   sous peine d'un bandeau vide. Le texte lui-même n'est pas changé — seule sa
+   visibilité l'était. */
+body.mode-pro .hdr-title{ display:block; }
+
+/* Cette compensation de 86px (juste au-dessus, hors mode sobre) existe pour
+   que Favoris/Récents/Plus ne passent pas SOUS le header fixe — ces trois
+   onglets n'ont pas le hero de 42vh qui fait ce travail sur l'Accueil. En
+   mode sobre le header n'est plus fixe : il pousse déjà le contenu par le
+   flux normal. Sans ce reset, l'espace se cumulait deux fois — un grand vide
+   au-dessus de ces trois onglets. */
+body.mode-pro #vFavoris, body.mode-pro #vRecents, body.mode-pro #vPlus{ padding-top:0; }
+</style>
 </head>
 <body>
+<script>
+/* Synchrone, avant le premier div : si on attendait DOMContentLoaded, la photo
+   s'afficherait une fraction de seconde avant de disparaître — flash visible
+   à chaque ouverture de la page en mode sobre. */
+if(localStorage.getItem('OUTILS_MODE_PRO')==='1') document.body.className='mode-pro';
+</script>
 <div class="atelier-bg" aria-hidden="true"></div>
 
 <!-- WIZARD -->
@@ -552,7 +594,8 @@ const SVGP={
   shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
   growth:'<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>',
   doc:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/>',
-  building:'<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 21V9"/>'
+  building:'<rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 21V9"/>',
+  imgoff:'<path d="M3 3l18 18"/><path d="M21 15V5a2 2 0 0 0-2-2H8"/><path d="M3 8v11a2 2 0 0 0 2 2h11"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M3 16l4.5-4.5a1.5 1.5 0 0 1 2 0L12 14"/>'
 };
 function makeSvg(paths,sz){sz=sz||22;return'<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">'+paths+'</svg>';}
 function catIcon(catId){return SVGP[CATS.find(function(c){return c.id===catId;})||CATS[0]?CATS.find(function(c){return c.id===catId;}).icon:'doc']||SVGP.doc;}
@@ -641,8 +684,16 @@ function renderRecents(){var r=getRecent().filter(isAvail);var h=document.getEle
   h.innerHTML=r.map(rowHTML).join('');}
 
 /* ===== Vue Plus ===== */
-function renderPlus(){document.getElementById('plusContent').innerHTML=
+function isAtelierPro(){return localStorage.getItem('OUTILS_MODE_PRO')==='1';}
+function applyAtelierPro(){document.body.className=isAtelierPro()?'mode-pro':'';}
+function toggleAtelierPro(){
+  localStorage.setItem('OUTILS_MODE_PRO', isAtelierPro()?'0':'1');
+  applyAtelierPro();
+  renderPlus();   // reconstruit la ligne avec son nouveau libellé
+}
+function renderPlus(){var pro=isAtelierPro();document.getElementById('plusContent').innerHTML=
   ['<div class="tool-row" onclick="window.location.href=\'menu.html\'">'+makeSvg(SVGP.briefcase)+'<div class="tool-info"><div class="t">Retour au menu principal</div><div class="s">Les 8 grands modules</div></div></div>',
+   '<div class="tool-row" onclick="toggleAtelierPro()">'+makeSvg(SVGP.imgoff)+'<div class="tool-info"><div class="t">'+(pro?'Revenir à l\'illustration':'Passer en mode sobre')+'</div><div class="s">'+(pro?'Réaffiche le décor du Terrier':'Retire l\'illustration de fond, garde le thème bleu nuit')+'</div></div></div>',
    '<div class="tool-row" onclick="window.location.href=\'mentions-legales.html\'">'+makeSvg(SVGP.doc)+'<div class="tool-info"><div class="t">Mentions légales</div><div class="s">LCEN — éditeur & hébergeurs</div></div></div>',
    '<div class="tool-row" onclick="startWiz()">'+makeSvg(SVGP.growth)+'<div class="tool-info"><div class="t">Revoir le guide</div><div class="s">Comment utiliser la trousse</div></div></div>',
   ].join('');}
