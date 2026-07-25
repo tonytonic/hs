@@ -171,11 +171,12 @@ def main():
 
     if sous_smic:
         bloquant = True
-        L.append(f"## ⚠️ {len(sous_smic)} grille(s) sous le SMIC — à corriger")
+        L.append(f"## ⚠️ {len(sous_smic)} grille(s) réelle(s) sous le SMIC")
         L.append("")
-        L.append("Le minimum conventionnel affiché est inférieur au SMIC : il ne s'applique "
-                 "donc pas, l'employeur doit verser le SMIC. La branche n'a probablement pas "
-                 "renégocié depuis la dernière revalorisation.")
+        L.append("**Rien à corriger ici** : ces montants sont ceux publiés par la branche, sourcés")
+        L.append("et vérifiés. Le SMIC prime automatiquement — l'employeur doit le verser, pas la")
+        L.append("grille conventionnelle. C'est un fait à surveiller, pas une erreur de donnée.")
+        L.append("")
         L.append("")
         for idcc, mini, d in sorted(sous_smic, key=lambda x: x[1]):
             ecart = round(100 * (smic - mini) / smic, 1)
