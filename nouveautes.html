@@ -62,9 +62,100 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">Rentrée 2026</span>
+    <span class="v-num">v10.6</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>MonLégiTexte</b> : un nouvel outil qui regroupe tous les articles du Code du travail, du Code de la sécurité sociale, la jurisprudence et les conventions collectives de branche, à jour via l'API PISTE de Légifrance et Jurilibre. Accessible uniquement aux utilisateurs de l'application, non indexé sur Google. Une veille tourne sur 5 semaines (lundi et jeudi), le volume de textes à traiter étant trop important pour un passage complet chaque semaine. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Refonte du menu principal</b>, pour permettre l'intégration des nouvelles fonctionnalités. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Lumina — onglet « Nos sources »</b> : accède directement à la fraîcheur de chaque convention collective (date de la grille affichée, date du dernier contrôle), avec les compteurs vérifiées / estimations / en cours. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Veille automatique du mercredi</b> : chaque semaine, un contrôle compare la grille affichée à la clause en vigueur pour chaque convention. Quand un avenant plus récent est trouvé, les nouveaux montants (coefficients, salaires minima) sont remontés pour une gestion manuelle des grilles. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Création du module Todolist</b>. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Encart du jour</b> de la Todolist, directement dans le menu général. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Navigation par balayage</b> : glisse à gauche ou à droite sur l'encart pour consulter les jours voisins, de 3 jours en arrière jusqu'au dernier jour publié dans la Todolist. Un jour sans planning affiche « Rien de prévu » plutôt que de disparaître. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Mode sobre</b> : un mode d'affichage sans illustrations, à activer depuis le menu (bouton « Sobre » / « Illustré »). Fond noir métallisé, couleurs du nid d'abeille et de la vignette d'accueil conservées comme seules touches de couleur de l'écran. Les dix tuiles du menu restent lisibles, y compris Trousse à outils et le site des guides. Bascule instantanée entre les deux modes. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Audit légal — 419 conventions collectives (taux de majoration)</b> : tous les groupes de taux de majoration des heures supplémentaires revérifiés sans exception contre le Code du travail et Légifrance (art. L3121-36, D3121-24). 2 conventions qui étaient à tort en droit commun ont récupéré leur propre contingent : courtage d'assurances (IDCC 2247) et agences générales d'assurances (IDCC 2335). <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Temps partiel — 3 articles de loi corrigés</b> : le plafond au tiers du temps de travail par accord de branche, la règle empêchant d'atteindre 35 h, et la requalification en temps plein citaient à tort le même article (celui du plafond de 10 % par défaut). Corrigés vers les bons articles du Code du travail. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Cadres (forfait jours) — base légale du droit à la déconnexion corrigée</b>, IDCC Syntec et Banque corrigés dans le glossaire, et grille Métallurgie reconstruite sur le référentiel en vigueur depuis 2024 (classes d'emploi 1 à 18, en remplacement de l'ancien système de coefficients). <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Fox — citations légales du glossaire et de Kitsune revérifiées</b> : contrôle complet des articles du Code du travail cités dans le glossaire et les messages de la mascotte. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Audit du guide en 5 rounds</b>, croisé avec l'API Légifrance. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Module Prédiction santé — bug de minuit corrigé</b> : un décalage entre le fuseau horaire de l'appareil et le calcul en UTC pouvait fausser le comptage au changement de journée. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
     <span class="v-date">Juin 2026</span>
     <span class="v-num">v10.5</span>
-    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Juin 2026</span>
+    <span class="v-num">v10.5</span>
   </div>
 
   <div class="item">
