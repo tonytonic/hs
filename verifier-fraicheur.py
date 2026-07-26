@@ -159,6 +159,14 @@ def main():
     for c in json.loads(m.group(1)):
         noms.setdefault(str(c[0]), c[1])
 
+    # Une CCN fusionnée redirigée vers une autre qui a déjà une vraie grille
+    # n'est PAS "à créer" -- elle est déjà couverte, via la fusion. Sans ce
+    # contrôle, chaque nouvelle fusion ajoutée à CCN_FUSIONS redéclencherait
+    # une fausse alerte "grille à créer" pour une convention dont personne ne
+    # consulte plus jamais la grille de référence directement.
+    mf = re.search(r"const CCN_FUSIONS=(\{.*?\});", s, re.S)
+    fusions = json.loads(mf.group(1)) if mf else {}
+
     a_revoir, sans_date, non_couvertes = [], [], []
 
     for chemin in sorted(glob.glob(os.path.join(args.fonds, "*.json"))):
@@ -180,6 +188,12 @@ def main():
 
         g = grilles.get(idcc)
         if not g:
+            # Avant de crier "à créer" : cette CCN est-elle redirigée vers une
+            # autre qui a déjà une vraie grille ? Si oui, elle est déjà
+            # couverte -- ce n'est pas un trou, juste une fusion qui marche.
+            cible = fusions.get(idcc)
+            if cible and grilles.get(str(cible[0])):
+                continue
             # Le fonds a une clause salaire alors qu'on n'affiche aucune grille :
             # c'est une grille à créer, pas seulement à rafraîchir.
             non_couvertes.append((idcc, d_fonds, titre, texte))
