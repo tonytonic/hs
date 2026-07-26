@@ -190,7 +190,22 @@ def main():
             sans_date.append((idcc, d_fonds, titre, texte))
             continue
 
-        ecart = (d_fonds - d_grille).days
+        # Une convention à barèmes régionaux (voir mécanisme d'onglets région)
+        # peut avoir une région à jour même quand sa grille de RÉFÉRENCE ne
+        # l'est pas — la référence n'a pas à changer à chaque avenant régional
+        # pour rester utile comme repère rapide. On retient la date la plus
+        # récente parmi la référence et toutes les régions : si UNE SEULE
+        # d'entre elles couvre déjà la clause la plus récente du fonds, cette
+        # convention est à jour dans l'app, même si ce n'est pas via la
+        # référence. Sans ce garde-fou, toute convention régionale enrichie
+        # resterait signalée indéfiniment, peu importe le travail fait.
+        d_plus_recente = d_grille
+        for region in (g.get("regions") or {}).values():
+            d_region = date_de_grille(region.get("d"))
+            if d_region and d_region > d_plus_recente:
+                d_plus_recente = d_region
+
+        ecart = (d_fonds - d_plus_recente).days
         if ecart > args.marge:
             a_revoir.append((idcc, d_grille, d_fonds, ecart, titre, g.get("st"), texte))
 
