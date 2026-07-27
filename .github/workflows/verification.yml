@@ -8,8 +8,16 @@ on:
   # Veille hebdomadaire, le mercredi à 7h UTC. L'aspirateur tourne lundi et
   # jeudi : le mercredi tombe donc après que le run du lundi a été commité,
   # et avant celui du jeudi.
+  #
+  # Minute décalée à :07, pas :00 -- GitHub le documente lui-même : la charge
+  # est la plus forte pile à l'heure ronde, et un run programmé peut être
+  # abandonné en silence si la charge est trop élevée, sans email ni trace.
+  # Même correctif appliqué le 27/07/2026 sur aspirateur.yml (droit) et
+  # regenerer.yml (veille-perso), suite à un run d'aspirateur silencieusement
+  # sauté un lundi. Best-effort côté GitHub, aucune garantie à 100%, mais
+  # évite le pic de contention dans l'écrasante majorité des cas.
   schedule:
-    - cron: "0 7 * * 3"
+    - cron: "7 7 * * 3"
   workflow_dispatch:
     inputs:
       branche:
