@@ -186,14 +186,18 @@ def main():
         clauses.sort(key=lambda c: c[0], reverse=True)
         d_fonds, titre, texte = clauses[0]
 
+        # Une CCN fusionnée ne sera plus jamais mise à jour individuellement --
+        # sa propre entrée peut être vide, cassée, ou périmée, ça n'a plus
+        # d'importance : c'est la CIBLE de la fusion qui compte, pas elle.
+        # Ce contrôle doit passer AVANT de regarder si une grille existe, sinon
+        # une fusion dont la grille est cassée (date vide, format non standard)
+        # continue d'être signalée comme "sans date" ou "périmée" -- seul le
+        # cas "aucune grille du tout" était couvert avant.
+        if idcc in fusions:
+            continue
+
         g = grilles.get(idcc)
         if not g:
-            # Avant de crier "à créer" : cette CCN est-elle redirigée vers une
-            # autre qui a déjà une vraie grille ? Si oui, elle est déjà
-            # couverte -- ce n'est pas un trou, juste une fusion qui marche.
-            cible = fusions.get(idcc)
-            if cible and grilles.get(str(cible[0])):
-                continue
             # Le fonds a une clause salaire alors qu'on n'affiche aucune grille :
             # c'est une grille à créer, pas seulement à rafraîchir.
             non_couvertes.append((idcc, d_fonds, titre, texte))
