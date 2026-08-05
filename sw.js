@@ -3,13 +3,14 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.9.20"; // fix flash cold-start Android (shell cache-first)
+const CACHE_NAME = "heuressup-cache-v10.9.21"; // v10.9.21 : ajout taiko.html + legi-ref.js au précache
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
   "./", "./index.html", "./menu.html", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
   "./glossaire.js", "./ccn/conventions-collectives.js",
+  "./legi-ref.js", // requis par module5/6 + fox (chargé via ../legi-ref.js) — sinon 404 hors-ligne
   "./heures/index.html",
   "./paye/index.html",
   "./fox/index.html", "./fox/css/style.css",
@@ -109,6 +110,7 @@ const FILES_TO_CACHE = [
   "./module7/mimizuku-menu.jpg",
   // ── Trousse à outils (54 modules) + légal ──
   "./outils.html",
+  "./taiko.html",        // FIX 2026-08-05 : module Taiko oublié du précache => nav avalée par le repli menu (même cas que nouveautes.html)
   "./nouveautes.html",   // FIX 2026-07-04b : oubliée du précache => nav avalée par le repli menu
   "./mentions-legales.html",
   "./privacy.html",
