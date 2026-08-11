@@ -250,7 +250,7 @@ body.pageBlancheGuard>*{display:block!important;}
     <div class="feat"><div class="ic">💶</div><div class="tx"><b>Salaire de référence</b>Le plus avantageux entre la moyenne de tes 12 derniers mois et le 1/3 de tes 3 derniers mois (primes incluses au prorata).</div></div>
     <div class="feat"><div class="ic">📐</div><div class="tx"><b>Indemnité légale</b>1/4 de mois par année jusqu'à 10 ans, 1/3 au-delà. Années incomplètes au prorata.</div></div>
     <div class="feat"><div class="ic">⏳</div><div class="tx"><b>Préavis</b>1 mois (6 mois→2 ans d'ancienneté), 2 mois (au-delà). En démission, c'est toi qui le dois (durée selon convention).</div></div>
-    <div class="legal">L'indemnité légale suppose 8 mois d'ancienneté minimum et un licenciement hors faute grave/lourde. La rupture conventionnelle ouvre droit au chômage ; pas la démission (sauf cas particuliers). Ta convention peut être plus favorable.</div>
+    <div class="legal">L'indemnité légale suppose 8 mois d'ancienneté minimum et un licenciement hors faute grave/lourde. La rupture conventionnelle ouvre droit au chômage ; pas la démission (sauf cas particuliers). ⚠️ Pour les ruptures conventionnelles conclues à partir du 1ᵉʳ septembre 2026, la durée d'indemnisation chômage est réduite (15 mois au lieu de 18 avant 55 ans ; loi n° 2026-470). Ta convention peut être plus favorable.</div>
     <button class="btn btn-sun" style="margin-top:14px;" data-close="help">Compris</button>
   </div></div>
 </div>
@@ -513,7 +513,7 @@ function shConfirm(msg, cb){
     // case note
     var note='';
     if(cas==='licenciement') note='Hypothèse : licenciement hors faute grave/lourde. Le préavis n\'est de l\'argent que s\'il est non effectué (sinon il est déjà dans ton salaire).';
-    else if(cas==='rupture') note='La rupture conventionnelle ouvre droit aux allocations chômage. L\'indemnité est négociable au-dessus du minimum.';
+    else if(cas==='rupture') note='La rupture conventionnelle ouvre droit aux allocations chômage (durée réduite pour les ruptures conclues dès le 1er septembre 2026 : 15 mois au lieu de 18 avant 55 ans). L\'indemnité est négociable au-dessus du minimum.';
     else note='La démission n\'ouvre pas droit au chômage (sauf cas particuliers : démission légitime, reconversion…). Tes congés non pris restent dus.';
     $('#caseNote').textContent=note;
 
