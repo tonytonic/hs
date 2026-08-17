@@ -332,13 +332,48 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
       </div>
     </div>
 
+    <div class="panel" style="border-color:rgba(90,154,216,0.5);background:linear-gradient(135deg,rgba(90,154,216,0.16),rgba(90,154,216,0.05));">
+      <div class="panel-t">🆕 Congé supplémentaire de naissance <span style="font-weight:400;opacity:.7;">— nouveau, dès le 1ᵉʳ juillet 2026</span></div>
+      <div class="field">
+        <label>Salaire net mensuel de référence</label>
+        <div class="inline">
+          <input class="ip" id="nSalMois" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire net mensuel de référence">
+          <span class="unit">€ net/mois</span>
+        </div>
+        <div class="hint">Moyenne des 3 derniers mois. Contrairement à la CPAM maternité/paternité (calcul journalier sur le brut), ce congé se calcule directement sur le <b>salaire net mensuel</b>, plafonné au PASS (4 005 €/mois en 2026).</div>
+      </div>
+      <div class="field">
+        <label>Durée prise</label>
+        <select class="ip" id="nDuree" aria-label="Durée du congé de naissance">
+          <option value="2">2 mois (1 par parent... ou les 2 par le même)</option>
+          <option value="1">1 mois</option>
+        </select>
+      </div>
+    </div>
+    <div id="nResults" style="display:none;">
+      <div class="res main">
+        <div class="rl">1ᵉʳ mois — 70 % du salaire net</div>
+        <div class="rbig" id="nM1">—</div>
+      </div>
+      <div class="res info" id="nM2Row">
+        <div class="rl">2ᵉ mois — 60 % du salaire net</div>
+        <div style="font-size:22px;font-weight:800;" id="nM2">—</div>
+      </div>
+      <div class="res info">
+        <div class="rl">Total sur la période choisie</div>
+        <div style="font-size:22px;font-weight:800;" id="nTotal">—</div>
+        <div class="rsub">Versé par l'Assurance maladie (IJSS), pas l'employeur. Estimation — seule ta CPAM fait foi. <span data-art="L331-8-1"></span></div>
+      </div>
+    </div>
+
     <div class="sec-t">⚖️ Règles clés</div>
     <div class="rule"><div class="ri">⚠️</div><div><div class="rt">7 jours d'arrêt obligatoire au total</div><div class="rd">3 jours de congé de naissance (employeur) + 4 jours de congé paternité (CPAM) doivent être pris consécutivement et immédiatement après la naissance. Cette semaine d'arrêt est obligatoire et l'employeur ne peut s'y opposer.</div><span class="ctag ok">3 + 4 = 7 jours obligatoires</span></div></div>
     <div class="rule"><div class="ri">📋</div><div><div class="rt">18 jours facultatifs fractionnables</div><div class="rd">Après les 7 jours obligatoires, les 18 jours restants (25 si naissance multiple) sont facultatifs, fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance.</div><span class="ctag info">2 fractions de 5 jours min.</span></div></div>
     <div class="rule"><div class="ri">💶</div><div><div class="rt">Éligibilité CPAM identique à la maternité</div><div class="rd">Mêmes conditions de cotisation que pour les IJ maternité. Le père ou le second parent (mariage, PACS, concubinage) est éligible.</div></div></div>
     <div class="rule"><div class="ri">👥</div><div><div class="rt">Ouvert au second parent</div><div class="rd">Le congé paternité est ouvert au père, ou au conjoint/partenaire de la mère (marié, pacsé ou en concubinage notoire), quel que soit le sexe.</div><span class="ctag ok">Tous les seconds parents</span></div></div>
-    <div class="rule"><div class="ri">🆕</div><div><div class="rt">Congé supplémentaire de naissance (effectif dès le 1er juillet 2026 — LFSS 2026)</div><div class="rd">LFSS 2026 (loi n°2025-1403 du 30/12/2025), effectif le 1er juillet 2026 : un congé supplémentaire de 1 à 2 mois par parent, cumulable avec le congé paternité, indemnisé à 70 % du salaire net le 1er mois puis 60 % le 2e. Concerne les enfants nés ou adoptés à partir du 1er janvier 2026.</div><span class="ctag info">Jusqu'à ~3 mois de présence au total</span></div></div>
+    <div class="rule"><div class="ri">🆕</div><div><div class="rt">Congé de naissance : à prendre après, pas à la place</div><div class="rd">Ce nouveau congé (LFSS 2026, <span data-art="L1225-46-2"></span>) ne démarre qu'une fois le congé maternité, paternité ou adoption épuisé — il s'ajoute, il ne remplace rien. À poser dans les 9 mois suivant la naissance (<span data-art="D1225-11-3"></span>). Concerne les enfants nés ou adoptés à partir du 1ᵉʳ janvier 2026. Non cumulable avec le CMG ni la PreParE sur la même période.</div><span class="ctag info">Calculateur ci-dessus ↑</span></div></div>
   </div>
+
 
   <!-- PARENTAL -->
   <div class="pane" id="pane-parental">
@@ -432,6 +467,25 @@ function calcPat(){
   $('pResults').style.display='block';
 }
 ['pSalJour','pType'].forEach(function(id){ $(id).addEventListener('input',calcPat); $(id).addEventListener('change',calcPat); });
+
+// Congé supplémentaire de naissance (nouveau, LFSS 2026, dès le 1er juillet 2026).
+// Calcul DIRECT sur le salaire NET mensuel (pas la formule journalière CPAM
+// maternité/paternité) : 70 % le 1er mois, 60 % le 2e, plafonné au PASS.
+function calcNaiss(){
+  var sal = parseFloat($('nSalMois').value)||0;
+  var duree = parseInt($('nDuree').value)||2;
+  if(sal<=0){$('nResults').style.display='none';return;}
+  var base = Math.min(sal, PMSS);
+  var m1 = base * 0.70;
+  var m2 = base * 0.60;
+  var total = duree===2 ? (m1+m2) : m1;
+  $('nM1').textContent = eur(m1);
+  $('nM2').textContent = eur(m2);
+  $('nM2Row').style.display = duree===2 ? 'block' : 'none';
+  $('nTotal').textContent = eur(total);
+  $('nResults').style.display='block';
+}
+['nSalMois','nDuree'].forEach(function(id){ $(id).addEventListener('input',calcNaiss); $(id).addEventListener('change',calcNaiss); });
 })();
 
   // ── LocalStorage ──────────────────────────────────────────────
@@ -458,7 +512,7 @@ function shConfirm(msg, cb){
     document.querySelectorAll('input,select,textarea').forEach(function(el){if(el.type==='checkbox'||el.type==='radio'){el.checked=false;}else{el.value='';}});setTimeout(function(){location.reload();},50);
     });
   }
-  var state=get(LS.STATE,{mSalJour:'',mRang:'16',pSalJour:'',pType:'22'});
+  var state=get(LS.STATE,{mSalJour:'',mRang:'16',pSalJour:'',pType:'22',nSalMois:'',nDuree:'2'});
   // ──────────────────────────────────────────────────────────────
 
   // ── Wizard bienvenue ──────────────────────────────────────────
