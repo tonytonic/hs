@@ -424,6 +424,15 @@
     'L331-3':   { code:'CSS', titre:'Conditions d\'indemnisation maternité',
       texte:"Fixe les conditions d'ouverture des IJ maternité : affiliation minimale (6 mois), seuil de cotisation ou d'heures travaillées." },
 
+    /* --- Congé supplémentaire de naissance (LFSS 2026, effectif 1er juillet 2026) --- */
+    'L1225-46-2': { code:'CT', titre:'Congé supplémentaire de naissance — principe',
+      texte:"Le salarié qui a bénéficié d'un congé de maternité, de paternité et d'accueil de l'enfant ou d'adoption bénéficie, après avoir épuisé ce droit, d'un congé supplémentaire de naissance d'un ou deux mois." },
+    'D1225-11-3': { code:'CT', titre:'Congé supplémentaire de naissance — délai de prise',
+      texte:"La ou les périodes du congé supplémentaire de naissance débutent dans un délai de neuf mois à compter de la naissance de l'enfant ou, pour les parents adoptants, suivant l'arrivée de l'enfant au foyer." },
+    'L331-8-1':   { code:'CSS', titre:'Congé supplémentaire de naissance — indemnisation',
+      texte:"L'assuré en congé supplémentaire de naissance reçoit une indemnité journalière versée par l'Assurance maladie, sous condition d'affiliation, calculée sur son salaire des trois derniers mois : 70 % le premier mois, 60 % le second, plafonnée au PASS." },
+
+
     /* --- Inaptitude --- */
     'L1226-22': { code:'CT', titre:'Reclassement et inaptitude',
       texte:"Encadre l'obligation de reclassement de l'employeur après déclaration d'inaptitude et les conditions de rupture si le reclassement est impossible." },
