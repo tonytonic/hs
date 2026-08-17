@@ -229,8 +229,50 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
 
   <div class="tabs">
     <button class="tab on" onclick="switchTab('maternite')">🤱 Maternité</button>
-    <button class="tab" onclick="switchTab('paternite')">👨 Paternité</button>
+    <button class="tab" onclick="switchTab('paternite')">🧑 2ᵉ parent</button>
     <button class="tab" onclick="switchTab('parental')">🌱 Parental</button>
+  </div>
+
+  <!-- CONGÉ SUPPLÉMENTAIRE DE NAISSANCE : universel, PAS dans un onglet précis.
+       Droit INDIVIDUEL pour CHAQUE parent (la mère ET le 2e parent ont chacun leur
+       propre crédit de 1-2 mois) — donc il ne doit pas être caché dans un seul
+       onglet, sinon l'un des deux parents ne le voit jamais. Visible avec
+       Maternité et 2e parent ; masqué avec Parental (congé différent, non lié). -->
+  <div id="naissanceUniversal">
+    <div class="panel" style="border-color:rgba(90,154,216,0.5);background:linear-gradient(135deg,rgba(90,154,216,0.16),rgba(90,154,216,0.05));">
+      <div class="panel-t">🆕 Congé supplémentaire de naissance <span style="font-weight:400;opacity:.7;">— nouveau, dès le 1ᵉʳ juillet 2026, pour CHAQUE parent</span></div>
+      <div class="field">
+        <label>Salaire net mensuel de référence</label>
+        <div class="inline">
+          <input class="ip" id="nSalMois" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire net mensuel de référence">
+          <span class="unit">€ net/mois</span>
+        </div>
+        <div class="hint">Moyenne des 3 derniers mois. Contrairement à la CPAM maternité/paternité (calcul journalier sur le brut), ce congé se calcule directement sur le <b>salaire net mensuel</b>, plafonné au PASS (4 005 €/mois en 2026).</div>
+      </div>
+      <div class="field">
+        <label>Durée prise</label>
+        <select class="ip" id="nDuree" aria-label="Durée du congé de naissance">
+          <option value="2">2 mois</option>
+          <option value="1">1 mois</option>
+        </select>
+      </div>
+    </div>
+    <div id="nResults" style="display:none;">
+      <div class="res main">
+        <div class="rl">1ᵉʳ mois — 70 % du salaire net</div>
+        <div class="rbig" id="nM1">—</div>
+      </div>
+      <div class="res info" id="nM2Row">
+        <div class="rl">2ᵉ mois — 60 % du salaire net</div>
+        <div style="font-size:22px;font-weight:800;" id="nM2">—</div>
+      </div>
+      <div class="res info">
+        <div class="rl">Total sur la période choisie</div>
+        <div style="font-size:22px;font-weight:800;" id="nTotal">—</div>
+        <div class="rsub">Versé par l'Assurance maladie (IJSS), pas l'employeur. Estimation — seule ta CPAM fait foi. <span data-art="L331-8-1"></span></div>
+      </div>
+    </div>
+    <div class="rule"><div class="ri">🆕</div><div><div class="rt">Un droit à CHAQUE parent, pas un pot commun</div><div class="rd">Ce congé (LFSS 2026, <span data-art="L1225-46-2"></span>) est individuel et non transférable : la mère ET le 2ᵉ parent ont chacun leur propre crédit de 1 à 2 mois, pris ensemble, en alternance, ou séparément. Il ne démarre qu'une fois le congé maternité, paternité ou adoption épuisé — il s'ajoute, il ne remplace rien. À poser dans les 9 mois suivant la naissance (<span data-art="D1225-11-3"></span>). Concerne les enfants nés ou adoptés à partir du 1ᵉʳ janvier 2026. Non cumulable avec le CMG ni la PreParE sur la même période.</div><span class="ctag ok">1 crédit par parent</span></div></div>
   </div>
 
   <!-- MATERNITÉ -->
@@ -332,40 +374,6 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
       </div>
     </div>
 
-    <div class="panel" style="border-color:rgba(90,154,216,0.5);background:linear-gradient(135deg,rgba(90,154,216,0.16),rgba(90,154,216,0.05));">
-      <div class="panel-t">🆕 Congé supplémentaire de naissance <span style="font-weight:400;opacity:.7;">— nouveau, dès le 1ᵉʳ juillet 2026</span></div>
-      <div class="field">
-        <label>Salaire net mensuel de référence</label>
-        <div class="inline">
-          <input class="ip" id="nSalMois" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire net mensuel de référence">
-          <span class="unit">€ net/mois</span>
-        </div>
-        <div class="hint">Moyenne des 3 derniers mois. Contrairement à la CPAM maternité/paternité (calcul journalier sur le brut), ce congé se calcule directement sur le <b>salaire net mensuel</b>, plafonné au PASS (4 005 €/mois en 2026).</div>
-      </div>
-      <div class="field">
-        <label>Durée prise</label>
-        <select class="ip" id="nDuree" aria-label="Durée du congé de naissance">
-          <option value="2">2 mois (1 par parent... ou les 2 par le même)</option>
-          <option value="1">1 mois</option>
-        </select>
-      </div>
-    </div>
-    <div id="nResults" style="display:none;">
-      <div class="res main">
-        <div class="rl">1ᵉʳ mois — 70 % du salaire net</div>
-        <div class="rbig" id="nM1">—</div>
-      </div>
-      <div class="res info" id="nM2Row">
-        <div class="rl">2ᵉ mois — 60 % du salaire net</div>
-        <div style="font-size:22px;font-weight:800;" id="nM2">—</div>
-      </div>
-      <div class="res info">
-        <div class="rl">Total sur la période choisie</div>
-        <div style="font-size:22px;font-weight:800;" id="nTotal">—</div>
-        <div class="rsub">Versé par l'Assurance maladie (IJSS), pas l'employeur. Estimation — seule ta CPAM fait foi. <span data-art="L331-8-1"></span></div>
-      </div>
-    </div>
-
     <div class="sec-t">⚖️ Règles clés</div>
     <div class="rule"><div class="ri">⚠️</div><div><div class="rt">7 jours d'arrêt obligatoire au total</div><div class="rd">3 jours de congé de naissance (employeur) + 4 jours de congé paternité (CPAM) doivent être pris consécutivement et immédiatement après la naissance. Cette semaine d'arrêt est obligatoire et l'employeur ne peut s'y opposer.</div><span class="ctag ok">3 + 4 = 7 jours obligatoires</span></div></div>
     <div class="rule"><div class="ri">📋</div><div><div class="rt">18 jours facultatifs fractionnables</div><div class="rd">Après les 7 jours obligatoires, les 18 jours restants (25 si naissance multiple) sont facultatifs, fractionnables en 2 périodes d'au moins 5 jours, à prendre dans les 6 mois suivant la naissance.</div><span class="ctag info">2 fractions de 5 jours min.</span></div></div>
@@ -436,6 +444,11 @@ function switchTab(t){
   document.querySelectorAll('.pane').forEach(function(el){
     el.classList.toggle('on', el.id==='pane-'+t);
   });
+  // Le calculateur du congé de naissance concerne maternité ET 2e parent (droit
+  // individuel pour chacun) mais pas le congé parental d'éducation (dispositif
+  // différent, sans lien direct) : on ne le masque que sur cet onglet-là.
+  var nu = document.getElementById('naissanceUniversal');
+  if(nu) nu.style.display = (t==='parental') ? 'none' : 'block';
 }
 window.switchTab = switchTab;
 
