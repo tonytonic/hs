@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tout l'écosystème — SimulHeures</title>
+<style>
+  :root{--bg:#0d1220;--card:#18202f;--line:#28344a;--ink:#eef3fa;--mut:#95a4b8;--dim:#68768c;
+    --teal:#37bccb;--gold:#e9c765;--green:#57c98d;--purple:#a184f2;}
+  *{box-sizing:border-box} html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 500px at 50% -8%,#1a2947 0%,var(--bg) 52%);color:var(--ink);min-height:100vh;padding:18px 15px 70px}
+  .wrap{max-width:640px;margin:0 auto}
+  .backbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .backbar a{color:var(--mut);text-decoration:none;font-size:13px;display:flex;align-items:center;gap:6px;
+    background:var(--card);border:1px solid var(--line);padding:8px 13px;border-radius:11px}
+  .hello{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+  .fox{width:56px;height:56px;border-radius:18px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:30px;
+    background:linear-gradient(150deg,#2a1c3f,#1c2f52);border:1px solid #3a4a63;box-shadow:0 8px 22px rgba(0,0,0,.35)}
+  .bubble{background:var(--card);border:1px solid var(--line);border-radius:16px;border-bottom-left-radius:5px;padding:12px 15px;flex:1}
+  .bubble b{font-size:14.5px} .bubble p{margin:3px 0 0;font-size:12.5px;color:var(--mut);line-height:1.5}
+  .searchbar{position:relative;margin:6px 0 12px}
+  .searchbar input{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--card);
+    border:1.5px solid var(--line);border-radius:15px;padding:15px 44px;-webkit-appearance:none}
+  .searchbar input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(55,188,203,.15)}
+  .searchbar .mag{position:absolute;left:15px;top:50%;transform:translateY(-50%);font-size:17px;opacity:.6}
+  .searchbar .clr{position:absolute;right:11px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;
+    background:#2b3852;color:#cdd7e3;border:0;display:none;align-items:center;justify-content:center;font-size:15px;cursor:pointer}
+  .cnt{display:none;font-size:12px;color:var(--teal);font-weight:600;margin:-4px 4px 12px}
+  .lbl{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.06em;margin:16px 4px 9px}
+  .sits{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .sit{border:1px solid var(--line);border-radius:15px;padding:14px 8px;text-align:center;cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,.03),transparent);transition:transform .12s,border-color .15s}
+  .sit:active{transform:scale(.96)} .sit:hover{border-color:#3c4d68}
+  .sit .e{font-size:24px} .sit .t{font-size:11.5px;font-weight:600;margin-top:6px;color:#d6dfea;line-height:1.25}
+  .ribbon{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:18px 0 6px}
+  .chipn{font-size:11.5px;color:#cdd7e3;background:rgba(255,255,255,.05);border:1px solid var(--line);padding:6px 11px;border-radius:20px}
+  .chipn b{color:var(--gold)}
+  .lbl2{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.06em;margin:20px 4px 10px}
+  .pillar{border:1px solid var(--line);border-radius:18px;margin-bottom:13px;overflow:hidden;background:linear-gradient(180deg,rgba(255,255,255,.02),transparent)}
+  .p-head{display:flex;align-items:center;gap:13px;padding:15px 16px;cursor:pointer}
+  .p-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+  .p-tx{flex:1;min-width:0}.p-tx h2{margin:0;font-size:15.5px}.p-tx .sub{font-size:11.5px;color:var(--mut);margin-top:2px;line-height:1.4}
+  .p-ct{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+  .p-ar{color:var(--dim);font-size:13px;flex-shrink:0;transition:transform .25s}.pillar.open .p-ar{transform:rotate(180deg)}
+  .p-body{display:none;padding:0 14px 14px}.pillar.open .p-body{display:block}
+  .grp{margin-top:12px;border-radius:12px;padding:2px;transition:background .4s}
+  .grp.flash{background:rgba(55,188,203,.12)}
+  .grp .gt{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.03em;margin:0 4px 8px;display:flex;justify-content:space-between}
+  .grp .gt em{font-style:normal;color:#4d5a70}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  a.tag{font-size:11.5px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:#cdd7e3;padding:8px 11px;border-radius:10px;
+    line-height:1.2;text-decoration:none;display:inline-block;transition:background .15s,border-color .15s}
+  a.tag:hover{background:rgba(55,188,203,.12);border-color:rgba(55,188,203,.4);color:#eaf3fa}
+  a.tag:active{transform:scale(.97)}
+  .app .p-ic{background:rgba(55,188,203,.14);border:1px solid rgba(55,188,203,.35)}.app .p-ct{background:rgba(55,188,203,.16);color:#93e7f2}
+  .tools .p-ic{background:rgba(233,199,101,.13);border:1px solid rgba(233,199,101,.35)}.tools .p-ct{background:rgba(233,199,101,.15);color:#f2e0a0}
+  .guide .p-ic{background:rgba(87,201,141,.13);border:1px solid rgba(87,201,141,.35)}.guide .p-ct{background:rgba(87,201,141,.15);color:#a6e8c6}
+  .legi .p-ic{background:rgba(161,132,242,.14);border:1px solid rgba(161,132,242,.4)}.legi .p-ct{background:rgba(161,132,242,.16);color:#cbbcf8}
+  .legi .p-ct.soon{background:var(--gold);color:#0d1f38}
+  .foot{text-align:center;color:var(--dim);font-size:12px;margin-top:22px;line-height:1.6}
+  .nores{display:none;text-align:center;color:var(--mut);font-size:13px;padding:26px 10px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body><div class="wrap">
+  <div class="backbar"><a href="menu.html">‹ Retour au menu</a></div>
+  <div class="hello">
+    <div class="fox">🦊</div>
+    <div class="bubble"><b>Salut ! Dis-moi ce que tu cherches.</b>
+      <p>Un mot suffit — « congés », « TVA », « licenciement »… ou choisis une situation.</p></div>
+  </div>
+  <div class="searchbar">
+    <span class="mag">🔎</span>
+    <input id="q" type="text" placeholder="Rechercher un outil, un droit, un calcul…" autocomplete="off">
+    <button class="clr" id="clr" onclick="clearSearch()">✕</button>
+  </div>
+  <div class="cnt" id="cnt"></div>
+
+  <div class="lbl">JE SUIS DANS CETTE SITUATION</div>
+  <div class="sits">
+    <div class="sit" onclick="goTo('g-app-heures')"><div class="e">🕐</div><div class="t">Vérifier mes heures</div></div>
+    <div class="sit" onclick="goTo('g-conditions')"><div class="e">🌴</div><div class="t">Poser des congés</div></div>
+    <div class="sit" onclick="goTo('g-rupture')"><div class="e">👋</div><div class="t">Je quitte mon job</div></div>
+    <div class="sit" onclick="goTo('g-paie')"><div class="e">💰</div><div class="t">Comprendre ma paie</div></div>
+    <div class="sit" onclick="goTo('g-protection')"><div class="e">🛟</div><div class="t">Arrêt, santé, famille</div></div>
+    <div class="sit" onclick="goTo('g-quotidien')"><div class="e">🏠</div><div class="t">Ma vie perso</div></div>
+  </div>
+
+  <div class="ribbon">
+    <span class="chipn"><b>8</b> modules</span><span class="chipn"><b>105</b> outils</span>
+    <span class="chipn"><b>~980</b> fiches</span><span class="chipn"><b>7</b> sources de droit</span>
+  </div>
+
+  <div class="lbl2">TOUT L'ÉCOSYSTÈME</div>
+  <div class="nores" id="nores">🦊 Hmm, rien pour ça… essaie un autre mot.</div>
+
+  <div class="pillar app open" onclick="togglePillar(this,event)">
+    <div class="p-head"><div class="p-ic">📱</div>
+      <div class="p-tx"><h2>Mon suivi d'heures</h2><div class="sub">Ce que tu ouvres au quotidien</div></div>
+      <div class="p-ct">8 modules</div><div class="p-ar">▾</div></div>
+    <div class="p-body"><div class="grp" id="g-app-heures"><div class="gt"><span>Heures &amp; temps de travail</span><em>5</em></div><div class="tags"><a class="tag" href="heures/index.html" data-kw="heures sup supplementaires annuel compteur cumul contingent 220 depassement">Compteur annuel d&#x27;heures</a><a class="tag" href="paye/index.html" data-kw="heures mensuel mensualisees paye salaire mois bulletin">Heures mensualisées</a><a class="tag" href="module7/index.html" data-kw="nuit astreinte prime majoration travail nocturne dimanche">Nuit, astreintes &amp; primes</a><a class="tag" href="module5/index.html" data-kw="temps partiel complementaires mizuki mi-temps 35h contrat">Temps partiel &amp; complémentaires</a><a class="tag" href="module6/index.html" data-kw="cadre forfait jours zenji dirigeant autonome rtt convention">Cadres &amp; forfait jours</a></div></div><div class="grp"><div class="gt"><span>Paie, conformité &amp; bien-être</span><em>3</em></div><div class="tags"><a class="tag" href="GrillePaye/index.html" data-kw="grille salaire minima convention ccn coefficient lumina remuneration idcc">Grilles de salaire par convention</a><a class="tag" href="fox/index.html" data-kw="conformite controle verification legal fox compagnon audit droits">Analyse de conformité</a><a class="tag" href="module4/index.html" data-kw="charge travail recuperation fatigue burn out sante repos surmenage bien-etre">Charge de travail &amp; prédiction santé</a></div></div></div>
+  </div>
+
+  <div class="pillar tools" onclick="togglePillar(this,event)">
+    <div class="p-head"><div class="p-ic">🧰</div>
+      <div class="p-tx"><h2>La Trousse à outils</h2><div class="sub">Du droit du travail à la vie de tous les jours</div></div>
+      <div class="p-ct">105 outils</div><div class="p-ar">▾</div></div>
+    <div class="p-body"><div class="grp" id="g-rupture"><div class="gt"><span>👋 Rupture de contrat</span><em>8</em></div><div class="tags"><a class="tag" href="outils/module-rupture.html" data-kw="licenciement rupture partir quitter demission separation indemnite depart accord amiable homologation">Rupture conventionnelle</a><a class="tag" href="outils/module-preavis.html" data-kw="preavis delai depart demission licenciement duree dispense">Préavis</a><a class="tag" href="outils/module-preavis-comp.html" data-kw="preavis complement indemnite compensatrice">Préavis (complément)</a><a class="tag" href="outils/module-fincontrat.html" data-kw="fin contrat cdd terme echeance solde">Fin de contrat</a><a class="tag" href="outils/module-fincontrat2.html" data-kw="indemnite fin contrat precarite prime solde compte">Indemnités de fin de contrat</a><a class="tag" href="outils/module-archives.html" data-kw="archives conservation documents duree garder bulletins">Archives &amp; conservation</a><a class="tag" href="outils/module-miseapied.html" data-kw="mise a pied sanction disciplinaire conservatoire">Mise à pied</a><a class="tag" href="outils/module-demission-are.html" data-kw="demission demissionner partir chomage are pole emploi france travail legitime">Démission &amp; ARE</a></div></div><div class="grp" id="g-paie"><div class="gt"><span>💰 Paie &amp; cotisations</span><em>6</em></div><div class="tags"><a class="tag" href="outils/module8.html" data-kw="cotisations charges sociales urssaf net brut prelevements retraite">Cotisations sociales</a><a class="tag" href="outils/module-contrats.html" data-kw="contrat cdi cdd interim apprentissage type">Types de contrats</a><a class="tag" href="outils/module-convertisseur.html" data-kw="net brut conversion salaire convertisseur calcul">Convertisseur net ↔ brut</a><a class="tag" href="outils/module-essai.html" data-kw="periode essai duree rupture renouvellement">Période d&#x27;essai</a><a class="tag" href="outils/module-lexique.html" data-kw="lexique definitions bulletin fiche paie termes glossaire">Lexique de la paie</a><a class="tag" href="outils/module-bulletin.html" data-kw="bulletin fiche paie lire comprendre lignes mentions">Bulletin de paie</a></div></div><div class="grp" id="g-conditions"><div class="gt"><span>🌴 Conditions de travail</span><em>9</em></div><div class="tags"><a class="tag" href="outils/module-temps.html" data-kw="temps travail duree 35h 48h amplitude repos">Temps de travail</a><a class="tag" href="outils/module-conges.html" data-kw="conges payes vacances repos cp jours acquisition">Congés payés</a><a class="tag" href="outils/module-feries.html" data-kw="feries ferie pont 1er mai noel paques ascension chome">Jours fériés</a><a class="tag" href="outils/module-tr.html" data-kw="ticket restaurant tr titre repas resto plafond">Titres-restaurant</a><a class="tag" href="outils/module-transport.html" data-kw="transport frais navigo abonnement trajet remboursement">Frais de transport</a><a class="tag" href="outils/module-mutuelle.html" data-kw="mutuelle complementaire sante frais participation employeur">Mutuelle</a><a class="tag" href="outils/module-teletravail.html" data-kw="teletravail domicile indemnite forfait distance">Télétravail</a><a class="tag" href="outils/module-mobilites.html" data-kw="mobilite velo covoiturage forfait durable transport">Forfait mobilités</a><a class="tag" href="outils/module-astreintes.html" data-kw="astreinte permanence disponibilite compensation prime">Astreintes</a></div></div><div class="grp" id="g-protection"><div class="gt"><span>🛟 Protection sociale &amp; santé</span><em>10</em></div><div class="tags"><a class="tag" href="outils/module-arret.html" data-kw="arret maladie malade indemnites journalieres ij subrogation carence">Arrêt maladie</a><a class="tag" href="outils/module-famille.html" data-kw="famille enfant malade evenement mariage deces conges exceptionnels">Congés famille</a><a class="tag" href="outils/module-chomage.html" data-kw="chomage are allocation pole emploi france travail sans emploi indemnisation demandeur">Chômage (ARE)</a><a class="tag" href="outils/module-c2p.html" data-kw="c2p penibilite prevention points compte professionnel">Compte pro prévention (C2P)</a><a class="tag" href="outils/module-saisie.html" data-kw="saisie salaire dette huissier prelevement quotite cessible">Saisie sur salaire</a><a class="tag" href="outils/module-atmp.html" data-kw="accident travail maladie professionnelle atmp at mp taux">Accident du travail / MP</a><a class="tag" href="outils/module-inaptitude.html" data-kw="inaptitude medecin travail reclassement licenciement">Inaptitude</a><a class="tag" href="outils/module-parentalite.html" data-kw="parentalite maternite paternite conge naissance enfant">Parentalité</a><a class="tag" href="outils/module-proche-aidant.html" data-kw="proche aidant conge aider parent handicap dependance">Proche aidant</a><a class="tag" href="outils/module-invalidite.html" data-kw="invalidite pension categorie handicap incapacite">Invalidité</a></div></div><div class="grp" id="g-droits"><div class="gt"><span>📈 Droits &amp; parcours pro</span><em>8</em></div><div class="tags"><a class="tag" href="outils/module-anciennete.html" data-kw="anciennete prime calcul annees date">Ancienneté</a><a class="tag" href="outils/module-cse.html" data-kw="cse comite social economique elu representant delegue">CSE</a><a class="tag" href="outils/module-journal.html" data-kw="journal bord suivi notes evenements">Journal de bord</a><a class="tag" href="outils/module-entretien.html" data-kw="entretien professionnel bilan carriere obligatoire">Entretien professionnel</a><a class="tag" href="outils/module-cet.html" data-kw="cet compte epargne temps jours conges monetiser">Compte épargne-temps (CET)</a><a class="tag" href="outils/module-formation.html" data-kw="formation cpf compte personnel droits euros">Formation (CPF)</a><a class="tag" href="outils/module-epargne.html" data-kw="epargne salariale participation interessement pee perco">Épargne salariale</a><a class="tag" href="outils/module-delegation.html" data-kw="delegation pouvoir signature representant">Délégation</a></div></div><div class="grp" id="g-statuts"><div class="gt"><span>📄 Statuts &amp; clauses spéciales</span><em>9</em></div><div class="tags"><a class="tag" href="outils/module-nonconcurrence.html" data-kw="non concurrence clause contrepartie interdiction">Clause de non-concurrence</a><a class="tag" href="outils/module-precarite.html" data-kw="precarite prime cdd fin contrat 10 pourcent">Prime de précarité</a><a class="tag" href="outils/module-greve.html" data-kw="greve mouvement retenue salaire droit">Grève</a><a class="tag" href="outils/module-sabbatique.html" data-kw="sabbatique conge longue duree pause">Congé sabbatique</a><a class="tag" href="outils/module-retraite.html" data-kw="retraite depart pension age trimestres taux">Retraite</a><a class="tag" href="outils/module-cumul-retraite.html" data-kw="cumul emploi retraite travailler retraite pension">Cumul emploi-retraite</a><a class="tag" href="outils/module-egalite.html" data-kw="egalite hommes femmes salaire index discrimination">Égalité professionnelle</a><a class="tag" href="outils/module-alternance.html" data-kw="alternance apprentissage professionnalisation contrat jeune">Alternance</a><a class="tag" href="outils/module-conge-ss.html" data-kw="conge sans solde non remunere pause absence">Congé sans solde</a></div></div><div class="grp" id="g-orga"><div class="gt"><span>🏢 Organisation &amp; entreprise</span><em>4</em></div><div class="tags"><a class="tag" href="outils/module-effectifs.html" data-kw="effectifs seuils 11 50 salaries obligations">Seuils d&#x27;effectifs</a><a class="tag" href="outils/module-avantages-nature.html" data-kw="avantage nature voiture logement repas telephone">Avantages en nature</a><a class="tag" href="outils/module-modulation.html" data-kw="modulation annualisation temps travail variation">Modulation du temps</a><a class="tag" href="outils/module-activite-partielle.html" data-kw="activite partielle chomage technique partiel indemnisation">Activité partielle</a></div></div><div class="grp" id="g-quotidien"><div class="gt"><span>🧮 Calculs du quotidien</span><em>12</em></div><div class="tags"><a class="tag" href="outils/module-prix-unitaire.html" data-kw="prix unitaire kilo litre comparer courses">Prix unitaire</a><a class="tag" href="outils/module-tva.html" data-kw="tva taxe ht ttc 20 pourcent">TVA</a><a class="tag" href="outils/module-partage-addition.html" data-kw="partage addition restaurant diviser pourboire entre amis">Partage d&#x27;addition</a><a class="tag" href="outils/module-remise.html" data-kw="remise reduction solde pourcentage promo">Remise</a><a class="tag" href="outils/module-pourcentages.html" data-kw="pourcentage calcul augmentation baisse proportion">Pourcentages</a><a class="tag" href="outils/module-interets-composes.html" data-kw="interets composes epargne placement rendement">Intérêts composés</a><a class="tag" href="outils/module-unites.html" data-kw="unites conversion metre kilo litre poids longueur">Conversion d&#x27;unités</a><a class="tag" href="outils/module-fuseaux.html" data-kw="fuseau heure decalage horaire voyage monde">Fuseaux horaires</a><a class="tag" href="outils/module-imc.html" data-kw="imc poids taille corpulence indice masse">IMC</a><a class="tag" href="outils/module-abonnements.html" data-kw="abonnement suivi cout mensuel netflix spotify depenses">Abonnements</a><a class="tag" href="outils/module-devises.html" data-kw="devise change monnaie euro dollar conversion taux">Devises</a><a class="tag" href="outils/module-dates.html" data-kw="date jours calcul difference echeance delai">Calcul de dates</a></div></div><div class="grp" id="g-argent"><div class="gt"><span>🪙 Argent &amp; administratif</span><em>10</em></div><div class="tags"><a class="tag" href="outils/module-credit-cout.html" data-kw="credit cout taux interet mensualite emprunt pret">Coût d&#x27;un crédit</a><a class="tag" href="outils/module-cash-vs-credit.html" data-kw="comptant credit comparer payer cash financement">Comptant vs crédit</a><a class="tag" href="outils/module-salaire-cout-employeur.html" data-kw="cout employeur salaire charges patronales super brut">Coût employeur</a><a class="tag" href="outils/module-budget.html" data-kw="budget depenses revenus gerer mensuel">Budget</a><a class="tag" href="outils/module-livrets-epargne.html" data-kw="livret a ldds epargne taux interet placement">Livrets d&#x27;épargne</a><a class="tag" href="outils/module-remboursement-sante.html" data-kw="remboursement sante secu mutuelle reste a charge">Remboursement santé</a><a class="tag" href="outils/module-impot-revenu.html" data-kw="impot revenu tranche calcul prelevement source foyer">Impôt sur le revenu</a><a class="tag" href="outils/module-allocations-familiales.html" data-kw="allocation familiale caf enfant prestation aide">Allocations familiales</a><a class="tag" href="outils/module-pension-alimentaire.html" data-kw="pension alimentaire enfant divorce montant">Pension alimentaire</a><a class="tag" href="outils/module-comparateur-forfaits.html" data-kw="forfait mobile internet comparer telephone box">Comparateur de forfaits</a></div></div><div class="grp" id="g-logement"><div class="gt"><span>🏠 Logement &amp; transport</span><em>10</em></div><div class="tags"><a class="tag" href="outils/module-loyer-prorata.html" data-kw="loyer prorata jours mois emmenagement partiel">Loyer au prorata</a><a class="tag" href="outils/module-cout-voiture.html" data-kw="voiture cout assurance carburant entretien budget auto">Coût d&#x27;une voiture</a><a class="tag" href="outils/module-conso-electrique.html" data-kw="electricite consommation kwh cout appareil facture">Conso électrique</a><a class="tag" href="outils/module-conso-auto.html" data-kw="consommation carburant essence diesel litres 100km">Conso auto</a><a class="tag" href="outils/module-surface.html" data-kw="surface carrez metre carre logement mesure">Surface (loi Carrez)</a><a class="tag" href="outils/module-dpe-decodeur.html" data-kw="dpe diagnostic energie classe logement passoire">Décodeur DPE</a><a class="tag" href="outils/module-bonus-malus-eco.html" data-kw="bonus malus ecologique voiture co2 prime">Bonus-malus écologique</a><a class="tag" href="outils/module-droits-passagers.html" data-kw="passager train avion retard indemnisation remboursement">Droits des passagers</a><a class="tag" href="outils/module-solde-points-permis.html" data-kw="permis points solde infraction retrait recuperation">Solde de points (permis)</a><a class="tag" href="outils/module-partage-depenses.html" data-kw="partage depenses colocation entre amis diviser">Partage de dépenses</a></div></div><div class="grp" id="g-etapes"><div class="gt"><span>🎉 Étapes de vie</span><em>7</em></div><div class="tags"><a class="tag" href="outils/module-demarche-demenagement.html" data-kw="demenagement demarches adresse changement">Déménagement</a><a class="tag" href="outils/module-demarche-naissance.html" data-kw="naissance bebe demarches declaration conge">Naissance</a><a class="tag" href="outils/module-demarche-pacs-mariage.html" data-kw="pacs mariage union demarches">PACS / mariage</a><a class="tag" href="outils/module-demarche-deces.html" data-kw="deces demarches succession obseques">Décès</a><a class="tag" href="outils/module-demarche-premier-emploi.html" data-kw="premier emploi jeune demarches embauche">Premier emploi</a><a class="tag" href="outils/module-demarche-permis.html" data-kw="permis conduire demarches examen">Permis</a><a class="tag" href="outils/module-demarche-papiers-perdus.html" data-kw="papiers perdus carte identite passeport refaire">Papiers perdus</a></div></div><div class="grp" id="g-demarches"><div class="gt"><span>📝 Démarches pratiques</span><em>8</em></div><div class="tags"><a class="tag" href="outils/module-demarche-depot-garantie.html" data-kw="depot garantie caution location restitution">Dépôt de garantie</a><a class="tag" href="outils/module-demarche-arrivee-france.html" data-kw="arrivee france etranger demarches installation">Arrivée en France</a><a class="tag" href="outils/module-demarche-voiture-occasion.html" data-kw="voiture occasion achat carte grise controle">Voiture d&#x27;occasion</a><a class="tag" href="outils/module-demarche-micro-entreprise.html" data-kw="micro entreprise auto entrepreneur creation">Micro-entreprise</a><a class="tag" href="outils/module-demarche-logement-etudiant.html" data-kw="logement etudiant apl crous bail">Logement étudiant</a><a class="tag" href="outils/module-demarche-valise-voyage.html" data-kw="valise voyage checklist bagage preparer">Valise de voyage</a><a class="tag" href="outils/module-demarche-securite-numerique.html" data-kw="securite numerique mot de passe arnaque phishing">Sécurité numérique</a><a class="tag" href="outils/module-demarche-eco-gestes.html" data-kw="eco gestes economies energie environnement">Éco-gestes</a></div></div><div class="grp" id="g-reperes"><div class="gt"><span>ℹ️ Repères pratiques</span><em>4</em></div><div class="tags"><a class="tag" href="outils/module-decodeur-sigles.html" data-kw="sigles abreviations acronymes signification">Décodeur de sigles</a><a class="tag" href="outils/module-reperes-consommateur.html" data-kw="consommateur droits garantie retractation">Repères consommateur</a><a class="tag" href="outils/module-numeros-urgence.html" data-kw="urgence numero samu pompiers police 15 17 18 112">Numéros d&#x27;urgence</a><a class="tag" href="outils/module-francs-euros.html" data-kw="francs euros conversion ancien">Francs → euros</a></div></div></div>
+  </div>
+
+  <div class="pillar guide" onclick="togglePillar(this,event)">
+    <div class="p-head"><div class="p-ic">📚</div>
+      <div class="p-tx"><h2>Le guide par métier</h2><div class="sub">Tes droits expliqués simplement</div></div>
+      <div class="p-ct">~980 fiches</div><div class="p-ar">▾</div></div>
+    <div class="p-body"><div class="grp"><div class="gt"><span>Par métier / secteur</span></div><div class="tags"><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="btp batiment construction travaux gros oeuvre">BTP &amp; bâtiment</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="hotellerie restauration hcr cafe hotel serveur cuisine">Hôtellerie-restauration</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="commerce vente magasin caissier vendeur gros detail">Commerce</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="industrie metallurgie usine production ouvrier">Industrie &amp; métallurgie</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="transport logistique routier chauffeur livreur entrepot">Transport &amp; logistique</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="sante medico social aide soignant infirmier ehpad">Santé &amp; médico-social</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="proprete nettoyage securite agent gardien">Propreté &amp; sécurité</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="bureau tertiaire services employe administratif">Bureaux &amp; services</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="agriculture agricole exploitation saisonnier">Agriculture</a></div></div><div class="grp"><div class="gt"><span>Par thème</span></div><div class="tags"><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="heures supplementaires majoration">Heures supplémentaires</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="conges rtt vacances repos">Congés &amp; RTT</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="contrat cdi cdd interim embauche">Contrats (CDI, CDD, intérim)</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="licenciement rupture depart">Licenciement &amp; rupture</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="temps travail repos duree">Temps de travail &amp; repos</a><a class="tag" href="https://www.simulateurheuressupfrance.fr" data-kw="salaire prime remuneration paie">Salaire &amp; primes</a></div></div></div>
+  </div>
+
+  <div class="pillar legi" onclick="togglePillar(this,event)">
+    <div class="p-head"><div class="p-ic">⚖️</div>
+      <div class="p-tx"><h2>MonLegiTexte</h2><div class="sub">Tout le droit du travail en poche · 17 sept.</div></div>
+      <div class="p-ct soon">🔒 17 SEPT.</div><div class="p-ar">▾</div></div>
+    <div class="p-body"><div class="grp"><div class="gt"><span>Sources françaises</span></div><div class="tags"><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="code travail loi article legislation">Code du travail</a><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="convention collective ccn idcc branche">Conventions collectives (477 CCN)</a><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="securite sociale code cotisations">Code de la Sécurité sociale</a><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="jurisprudence judilibre arret cour cassation decision">Judilibre</a></div></div><div class="grp"><div class="gt"><span>Europe &amp; international</span></div><div class="tags"><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="eur lex europe union europeenne directive reglement">EUR-Lex</a><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="cjue cour justice union europeenne arret">CJUE</a><a class="tag" href="#" aria-disabled="true" onclick="return false;" style="opacity:.5;cursor:not-allowed" data-kw="cedh cour europeenne droits homme convention">CEDH</a></div></div></div>
+  </div>
+
+  <div class="foot">Je vérifie mes droits → je calcule mon cas → je consulte la loi.<br>Sans inscription · gratuit · tout reste sur ton téléphone.</div>
+</div>
+<script>
+  var q=document.getElementById('q');
+  var pillars=[].slice.call(document.querySelectorAll('.pillar'));
+  function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+  function togglePillar(p,e){ if(e.target.closest('a.tag'))return; p.classList.toggle('open'); }
+  function doSearch(){
+    var term=norm(q.value.trim()), active=term.length>0, total=0;
+    document.getElementById('clr').style.display=active?'flex':'none';
+    pillars.forEach(function(p){
+      var pv=0;
+      [].slice.call(p.querySelectorAll('.grp')).forEach(function(g){
+        var tags=[].slice.call(g.querySelectorAll('a.tag')), gv=0;
+        tags.forEach(function(t){
+          var hay=norm(t.textContent+' '+(t.getAttribute('data-kw')||''));
+          var m=!active||hay.indexOf(term)>=0;
+          t.style.display=m?'':'none'; if(m&&active)gv++;
+        });
+        g.style.display=(active&&gv===0&&tags.length>0)?'none':'';
+        pv+=gv;
+      });
+      if(active){ p.style.display=pv>0?'':'none'; if(pv>0)p.classList.add('open'); total+=pv; }
+      else{ p.style.display=''; }
+    });
+    var c=document.getElementById('cnt');
+    if(active){ c.textContent=total+' résultat'+(total>1?'s':''); c.style.display='block'; }
+    else{ c.style.display='none'; pillars.forEach(function(p){ p.classList.toggle('open',p.classList.contains('app')); }); }
+    document.getElementById('nores').style.display=(active&&total===0)?'block':'none';
+  }
+  function clearSearch(){ q.value=''; doSearch(); }
+  function goTo(id){
+    q.value=''; doSearch();
+    var el=document.getElementById(id); if(!el)return;
+    var p=el.closest('.pillar'); if(p)p.classList.add('open');
+    setTimeout(function(){ el.scrollIntoView({behavior:'smooth',block:'center'}); el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash');},1200); },70);
+  }
+  q.addEventListener('input',doSearch);
+</script>
+</body></html>

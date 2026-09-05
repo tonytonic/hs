@@ -121,7 +121,9 @@
     .overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.65);
+      background: rgba(9,12,18,0.97);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -844,10 +846,10 @@
       <div>
         <h3 style="font-size:14px;margin-bottom:8px;">🔧 Quel profil es-tu ?</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          <button class="wiz-btn" id="wizModeDebutant" onclick="wizChooseMode('debutant')" style="background:rgba(0,200,255,0.1);border:2px solid rgba(0,200,255,0.3);">
+          <button class="wiz-btn" id="wizModeDebutant" onclick="wizChooseMode('debutant')" style="background:#123e50;border:2px solid #2ba7c9;">
             🎓 Débutant<br><span style="font-size:10px;">Termes simplifiés</span>
           </button>
-          <button class="wiz-btn" id="wizModeExpert" onclick="wizChooseMode('expert')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);">
+          <button class="wiz-btn" id="wizModeExpert" onclick="wizChooseMode('expert')" style="background:#232c3a;border:1px solid rgba(255,255,255,0.16);">
             ⚡ Expert<br><span style="font-size:10px;">Termes techniques</span>
           </button>
         </div>
@@ -950,6 +952,7 @@
   };
   window.addEventListener('load', function(){ try{ window.wizVueSync(); }catch(e){} });
 </script>
+
 
 <div class="overlay" id="presentationPopup" style="display:none;" onclick="closePresentation()">
   <div class="presentation-box" onclick="event.stopPropagation()" style="max-width:600px;font-size:13px;">
@@ -1503,6 +1506,7 @@
 
   <!-- Guide de démarrage : sous le favoris (inchangé) -->
   <button class="info-btn" id="guideBtn" onclick="reopenWizard()" style="width:100%;background:linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2));border:1px solid rgba(79,179,194,0.4);">🚀 Guide de démarrage</button>
+  <button class="info-btn" id="sommaireBtn" onclick="window.location.href='sommaire.html'" style="width:100%;margin-top:8px;">🗺️ Tout l'écosystème</button>
 
   <!-- Badge CCN : juste sous le guide de démarrage (pas en bas) -->
   <div id="ccn-badge" onclick="openCCNModal()" title="Changer de convention collective">
@@ -1538,6 +1542,30 @@
      publié : un utilisateur qui n'a jamais ouvert Taiko ne doit voir aucune
      trace de cette fonctionnalité. -->
 <div id="taikoRecap" style="display:none;margin:0 0 14px;"></div>
+  <!-- ══ Zone épinglés + catégories déroulantes (tuiles déplacées par JS) ══ -->
+  <div id="pinnedWrap" style="display:none;">
+    <div id="pinnedHead">📌 Épinglés</div>
+    <div id="pinnedBody" class="mod-grid"></div>
+  </div>
+  <div class="cat-sec">
+    <button class="cat-head" type="button" onclick="toggleCat('heures')">
+      <span>⏱️ Je gère mes heures supplémentaires</span><span class="cat-arw" id="arw-heures">▲</span>
+    </button>
+    <div class="cat-body mod-grid" id="body-heures"></div>
+  </div>
+  <div class="cat-sec">
+    <button class="cat-head" type="button" onclick="toggleCat('paie')">
+      <span>💶 Ma paie &amp; mes droits</span><span class="cat-arw" id="arw-paie">▼</span>
+    </button>
+    <div class="cat-body mod-grid collapsed" id="body-paie"></div>
+  </div>
+  <div class="cat-sec">
+    <button class="cat-head" type="button" onclick="toggleCat('sante')">
+      <span>🩺 Charge de travail &amp; santé</span><span class="cat-arw" id="arw-sante">▼</span>
+    </button>
+    <div class="cat-body mod-grid collapsed" id="body-sante"></div>
+  </div>
+
 <div class="mod-grid" id="modGrid">
 <div class="btn" id="btn-module5" onclick="go('module5')" style="border:2px solid rgba(108,63,197,0.55);background:linear-gradient(160deg,#ede8ff,#f4f0fd);"><button class="perso-badge" onclick="hideModule('btn-module5',event)" title="Masquer Mizuki">✕</button>
   <img src="images/Temps partiel.PNG" loading="eager" alt="Temps partiel — Mizuki" onerror="this.style.display='none'">
@@ -1587,10 +1615,10 @@
   </div>
   <div class="title" style="color:#9ec3ff;">🌙 Nuit, Astreinte &amp; Primes</div>
 </div>
-<div class="btn" id="btn-trousse" onclick="location.href='outils.html';" style="margin:0;order:8;background:linear-gradient(160deg,#0d1420,#1a2030);">
+<div class="btn" id="btn-trousse" onclick="location.href='outils.html';" style="margin:0;order:1;background:linear-gradient(160deg,#0d1420,#1a2030);">
   <img src="icon-renard.png" loading="eager" alt="Trousse à outils du Renard" style="border-radius:28px;">
 </div>
-<div class="btn" id="btn-site" onclick="window.open('https://www.simulateurheuressupfrance.fr','_blank','noopener')" title="Ouvrir simulateurheuressupfrance.fr" style="margin:0;order:9;background:linear-gradient(160deg,#0d1420,#1a2030);">
+<div class="btn" id="btn-site" onclick="window.open('https://www.simulateurheuressupfrance.fr','_blank','noopener')" title="Ouvrir simulateurheuressupfrance.fr" style="margin:0;order:2;background:linear-gradient(160deg,#0d1420,#1a2030);">
   <img src="site-vignette.jpg" loading="lazy" alt="simulateurheuressupfrance.fr" style="border-radius:28px;">
 </div>
 </div><!-- /mod-grid -->
@@ -1616,9 +1644,9 @@
     partiel:'linear-gradient(160deg,#1A0A3E 0%,#2D1467 50%,#3B1F8C 100%)',
     cadre:'linear-gradient(160deg,#1A1714 0%,#2E2A26 60%,#1A1714 100%)'};
   var GUIDE_THEME={
-    plein:{bg:'linear-gradient(135deg,rgba(79,179,194,0.2),rgba(33,150,166,0.2))',bd:'rgba(79,179,194,0.4)'},
-    partiel:{bg:'linear-gradient(135deg,rgba(108,63,197,0.22),rgba(90,50,170,0.22))',bd:'rgba(108,63,197,0.45)'},
-    cadre:{bg:'linear-gradient(135deg,rgba(196,163,90,0.22),rgba(160,130,70,0.22))',bd:'rgba(196,163,90,0.45)'}
+    plein:{bg:'transparent',bd:'rgba(79,179,194,0.55)'},
+    partiel:{bg:'transparent',bd:'rgba(123,79,212,0.60)'},
+    cadre:{bg:'transparent',bd:'rgba(196,163,90,0.60)'}
   };
   window.applyGridOrder=function(){
     var p=curProfile();
@@ -1695,7 +1723,6 @@
      background:linear-gradient(160deg,#0f2d52,#0a1f3a);
      border:1.5px solid rgba(212,175,55,.55);border-radius:22px;
      padding:22px 20px 20px;box-shadow:0 12px 32px rgba(0,0,0,.42);cursor:not-allowed;">
-    <!-- Ruban diagonal daté -->
     <div style="position:absolute;top:20px;right:-56px;transform:rotate(45deg);z-index:4;
       background:linear-gradient(180deg,#e3c15c,#c99b2b);color:#0f2d52;
       font-size:11.5px;font-weight:800;letter-spacing:.06em;padding:5px 62px;
@@ -2667,6 +2694,38 @@ document.addEventListener('DOMContentLoaded', function(){
   };
   applyContractHighlight();
 
+  /* ── OVERRIDE : styling seul, SANS déplacement DOM ──────────────────
+     L'original déplaçait les tuiles (insertBefore relatif à module4, qui est
+     désormais dans la catégorie Santé) → Cadres/Temps partiel sautaient de
+     catégorie au changement de contrat. Le positionnement est géré par
+     applyGridOrder (order, DANS la catégorie). Ici on ne fait plus que le
+     surlignage + badge + fond. */
+  window.applyContractHighlight = function(){
+    var t = _safeLS.get('menuContratType');
+    var b5 = document.getElementById('btn-module5');
+    var b6 = document.getElementById('btn-module6');
+    function badge(btn,color){ if(!btn) return; var o=btn.querySelector('.badge-mon-contrat'); if(o)o.remove();
+      var d=document.createElement('div'); d.className='badge-mon-contrat'; d.textContent='✓ Mon contrat';
+      d.style.cssText='position:absolute;top:8px;right:8px;background:'+color+';color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;letter-spacing:.04em;pointer-events:none;z-index:6;';
+      btn.style.position='relative'; btn.appendChild(d); }
+    function clr(btn){ if(!btn) return; var b=btn.querySelector('.badge-mon-contrat'); if(b)b.remove(); }
+    var meta=document.querySelector('meta[name="theme-color"]');
+    if(t==='partiel'){
+      if(b5){ b5.style.border='3px solid rgba(123,79,212,0.80)'; b5.style.background='linear-gradient(160deg,#e8deff,#ddd0ff)'; b5.style.boxShadow='0 4px 20px rgba(123,79,212,0.25)'; badge(b5,'#7B4FD4'); }
+      if(b6){ b6.style.border='2px solid rgba(196,163,90,0.35)'; b6.style.background='linear-gradient(160deg,#F7F3ED,#EDE8E0)'; b6.style.boxShadow=''; clr(b6); }
+      document.body.style.backgroundColor='#2D1467'; document.body.style.backgroundImage='linear-gradient(160deg,#1A0A3E 0%,#2D1467 50%,#3B1F8C 100%)'; if(meta)meta.setAttribute('content','#2D1467');
+    } else if(t==='cadre'){
+      if(b6){ b6.style.border='3px solid rgba(196,163,90,0.85)'; b6.style.background='linear-gradient(160deg,#2E2A26,#1A1714)'; b6.style.boxShadow='0 4px 20px rgba(196,163,90,0.20)'; var tt=b6.querySelector('.title'); if(tt)tt.style.color='#C4A35A'; badge(b6,'#8B6914'); }
+      if(b5){ b5.style.border='2px solid rgba(108,63,197,0.35)'; b5.style.background='linear-gradient(160deg,#f8f4ff,#fff)'; b5.style.boxShadow=''; clr(b5); }
+      document.body.style.backgroundColor='#2E2A26'; document.body.style.backgroundImage='linear-gradient(160deg,#1A1714 0%,#2E2A26 60%,#1A1714 100%)'; if(meta)meta.setAttribute('content','#1A1714');
+    } else {
+      if(b5){ b5.style.border='2px solid rgba(123,79,212,0.35)'; b5.style.background='linear-gradient(160deg,#f8f4ff,#fff)'; b5.style.boxShadow=''; clr(b5); }
+      if(b6){ b6.style.border='2px solid rgba(196,163,90,0.35)'; b6.style.background='linear-gradient(160deg,#F7F3ED,#EDE8E0)'; b6.style.boxShadow=''; clr(b6); }
+      document.body.style.backgroundColor='#4FB3C2'; document.body.style.backgroundImage='none'; if(meta)meta.setAttribute('content','#4FB3C2');
+    }
+  };
+  applyContractHighlight();
+
   let selectedMode = null;
   let selectedGlossaireMode = 'debutant';
 
@@ -2698,11 +2757,11 @@ document.addEventListener('DOMContentLoaded', function(){
     const btnExpert = document.getElementById('wizModeExpert');
     if (btnDebutant && btnExpert) {
       if (mode === 'debutant') {
-        btnDebutant.style.background = 'rgba(0,200,255,0.2)'; btnDebutant.style.border = '2px solid rgba(0,200,255,0.5)';
-        btnExpert.style.background = 'rgba(255,255,255,0.05)'; btnExpert.style.border = '1px solid rgba(255,255,255,0.1)';
+        btnDebutant.style.background = '#123e50'; btnDebutant.style.border = '2px solid #2ba7c9';
+        btnExpert.style.background = '#232c3a'; btnExpert.style.border = '1px solid rgba(255,255,255,0.16)';
       } else {
-        btnExpert.style.background = 'rgba(0,200,255,0.2)'; btnExpert.style.border = '2px solid rgba(0,200,255,0.5)';
-        btnDebutant.style.background = 'rgba(255,255,255,0.05)'; btnDebutant.style.border = '1px solid rgba(255,255,255,0.1)';
+        btnExpert.style.background = '#123e50'; btnExpert.style.border = '2px solid #2ba7c9';
+        btnDebutant.style.background = '#232c3a'; btnDebutant.style.border = '1px solid rgba(255,255,255,0.16)';
       }
     }
   }
@@ -3487,7 +3546,7 @@ body.mode-pro .mod-grid{
   flex-direction:column;
   gap:7px !important;
 }
-body.mode-pro .mod-grid > *{ width:100% !important; order:0 !important; }
+body.mode-pro .mod-grid > *{ width:100% !important; }
 body.mode-pro #taikoRecap > div{
   background:#161a1f !important;
   border-color:#2b333d !important;
@@ -3561,7 +3620,7 @@ body.mode-pro{
    plutôt que de peinture mate. Purement décoratif, sans interaction. */
 body.mode-pro::before{
   content:'';position:fixed;top:0;left:0;right:0;height:180px;pointer-events:none;
-  background:linear-gradient(180deg, rgba(255,255,255,.055), transparent);
+  background:none;
   z-index:0;
 }
 /* Les tuiles gagnent un très léger relief pour ne pas se fondre dans le fond. */
@@ -3589,10 +3648,10 @@ body.mode-pro #favDropContainer > button{
   box-shadow:0 2px 10px rgba(0,0,0,.45) !important;
 }
 body.mode-pro #guideBtn{
-  background:linear-gradient(160deg,#1B2027,#12161B) !important;
+  background:transparent !important;
   border-color:#3A444F !important;
   color:#E8EDF2 !important;
-  box-shadow:0 2px 10px rgba(0,0,0,.45) !important;
+  box-shadow:none !important;
 }
 body.mode-pro #ccn-badge{
   background:linear-gradient(160deg,#1B2027,#12161B) !important;
@@ -4268,12 +4327,6 @@ function hasConsent(){
   function appliquer(){
     var on=actif();
     document.body.classList.toggle('mode-pro',on);
-    /* La Trousse à outils (outils.html) et le module fox suivent la vue du menu :
-       chacun lit son propre flag à son ouverture — OUTILS_MODE_PRO pour outils,
-       FOX_VUE pour fox. On les aligne ici à chaque application du mode, donc au
-       démarrage comme au basculement. Aucune modif nécessaire dans ces fichiers. */
-    try{ localStorage.setItem('OUTILS_MODE_PRO', on?'1':'0'); }catch(e){}
-    try{ localStorage.setItem('FOX_VUE', on?'pro':'fox'); }catch(e){}
     /* Deux tuiles n'ont aucun élément .title : leur contenu est une image seule
        (trousse à outils, site des guides). En mode sobre, l'image est masquée
        et il ne restait donc rien à lire. On leur fabrique un titre à partir du
@@ -4336,6 +4389,12 @@ function hasConsent(){
        dégradé qu'il ne sait pas interpoler, et l'écran clignote. */
     document.body.classList.add('switch-mode');
     try{ localStorage.setItem(CLE, actif()?'0':'1'); }catch(e){}
+    /* Le fox et la Trousse suivent la bascule — écrit UNIQUEMENT au basculement
+       (jamais au boot), pour qu'un retour en illustré fait DANS l'outil ou le fox
+       persiste même si le menu reste en sobre. */
+    var _pro=(function(){try{return localStorage.getItem(CLE)==='1';}catch(e){return false;}})();
+    try{ localStorage.setItem('OUTILS_MODE_PRO', _pro?'1':'0'); }catch(e){}
+    try{ localStorage.setItem('FOX_VUE', _pro?'pro':'fox'); }catch(e){}
     appliquer();
     /* Deux trames suffisent à laisser le navigateur peindre le nouvel état.
        Repli sur un délai si requestAnimationFrame n'est pas disponible : sans
@@ -4371,5 +4430,208 @@ function hasConsent(){
   /* Pas d'emoji en sobre : le fallback illustré (btn-no-img) reste masqué. */
   body.mode-pro .mod-grid .btn-no-img{ display:none !important; }
 </style>
+<style id="sh-cats">
+  .cat-sec{ width:92%; max-width:420px; margin:14px auto 0; }
+  .cat-head{ width:100%; display:flex; align-items:center; justify-content:center; gap:12px; position:relative;
+    background:transparent; color:#eaf1f6; border:1px solid rgba(255,255,255,.14);
+    border-radius:16px; padding:15px 42px; font-size:14.5px; font-weight:800; cursor:pointer;
+    text-align:center; -webkit-tap-highlight-color:transparent; }
+  .cat-head .cat-arw{ font-size:12px; opacity:.65; flex-shrink:0; position:absolute; right:18px; }
+  .cat-body{ margin-top:10px; }
+  .cat-body.collapsed{ display:none !important; }
+  /* En sobre, body.mode-pro .mod-grid force display:flex !important — on repasse
+     au-dessus avec une spécificité plus haute pour que le repli marche aussi. */
+  body.mode-pro .cat-body.collapsed{ display:none !important; }
+
+  #pinnedWrap{ width:92%; max-width:420px; margin:16px auto 0; }
+  #pinnedHead{ display:flex; align-items:center; justify-content:center; gap:8px; font-size:13px; font-weight:800;
+    color:#e6c257; margin-bottom:9px; letter-spacing:.02em; }
+  #pinnedBody{ width:100% !important; max-width:none !important; margin:0 !important; }
+  .pin-quick{ appearance:none; cursor:pointer; font:inherit; font-weight:700; font-size:12.5px;
+    background:linear-gradient(160deg,#1a2233,#12161f); color:#eaf1f6;
+    border:1px solid rgba(212,175,55,.45); border-radius:12px; padding:11px 15px;
+    -webkit-tap-highlight-color:transparent; }
+  .pin-quick:active{ transform:translateY(1px); }
+
+  /* Badge 📌 (visible en mode perso, coin opposé au ✕) */
+  .pin-badge{ display:none; position:absolute; top:-10px; left:-10px; z-index:50;
+    width:26px; height:26px; border-radius:50%; align-items:center; justify-content:center;
+    background:#2a2f3a; color:#e6c257; border:2px solid rgba(212,175,55,.6);
+    font-size:12px; line-height:1; cursor:pointer; padding:0; }
+  body.perso-mode .pin-badge{ display:flex; }
+  .pin-badge.on{ background:linear-gradient(180deg,#e3c15c,#c99b2b); color:#0f2d52; }
+
+  /* Variantes sobres */
+  body.mode-pro .cat-head{ background:#161a1f; color:#e9edf2; border-color:#2b333d; }
+  /* Tuiles (sous-catégories) en anthracite — distinctes des en-têtes de partie */
+  body.mode-pro .cat-body .btn{ background:#2b3037 !important; border-color:#3a424b !important; }
+  body.mode-pro .cat-body .btn:active{ background:#333a42 !important; }
+  /* Tuiles image-seule (Trousse, site) : hauteur naturelle, plus de vide sombre */
+  #btn-trousse, #btn-site{ align-self:start !important; }
+  /* Tuile seule sur sa ligne (nombre impair) → centrée. 2 colonnes seulement ;
+     en sobre c'est déjà 1 par ligne, donc on ne l'applique pas. */
+  body:not(.mode-pro) .cat-body.mod-grid > .btn.lone-centered{
+    grid-column:1 / -1 !important; justify-self:center !important;
+    width:calc(50% - 6px) !important; max-width:calc(50% - 6px) !important;
+    margin-left:auto !important; margin-right:auto !important;
+  }
+  body.mode-pro .pin-quick{ background:#161a1f; border-color:rgba(212,175,55,.4); color:#e9edf2; }
+  /* En sobre+perso : ✕ est ramené à droite-centre ; on met 📌 à gauche-centre */
+  body.mode-pro.perso-mode .pin-badge{ top:50% !important; left:12px !important; right:auto !important;
+    transform:translateY(-50%); width:24px !important; height:24px !important; }
+  body.mode-pro.perso-mode .mod-grid .title{ padding-left:44px; }
+</style>
+<script>
+(function(){
+  var CATMAP={'btn-heures':'heures','btn-paye':'heures','btn-module7':'heures','btn-module5':'heures','btn-module6':'heures',
+              'btn-lumina':'paie','btn-trousse':'paie','btn-site':'paie','btn-fox':'sante','btn-module4':'sante'};
+  var LABELS={'btn-heures':'Compteur annuel','btn-paye':'Heures mensualisées','btn-module7':'Nuit, astreintes & primes',
+              'btn-module5':'Temps partiel','btn-module6':'Cadres & forfait','btn-lumina':'Grilles de salaire',
+              'btn-fox':'Analyse de conformité','btn-trousse':'Trousse à outils','btn-module4':'Charge & récupération','vignetteLegi':'MonLegiTexte'};
+  var PINNABLE=Object.keys(CATMAP).filter(function(id){return id!=='btn-site';}); /* MLT retiré : verrouillé jusqu'au 17 sept */
+  function pKey(){ return 'menuPinnedV1'; }
+  function getPinned(){ try{ return JSON.parse(localStorage.getItem(pKey())||'[]'); }catch(e){ return []; } }
+  function setPinned(a){ try{ localStorage.setItem(pKey(), JSON.stringify(a)); }catch(e){} }
+  function cKey(){ return 'menuCatStateV1'; }
+  function getCatState(){ try{ var v=JSON.parse(localStorage.getItem(cKey())||'null'); return v||{heures:false,paie:true,sante:true}; }catch(e){ return {heures:false,paie:true,sante:true}; } } // true = replié
+  function setCatState(s){ try{ localStorage.setItem(cKey(), JSON.stringify(s)); }catch(e){} }
+
+  window.toggleCat=function(cat){
+    var body=document.getElementById('body-'+cat), arw=document.getElementById('arw-'+cat);
+    if(!body) return;
+    var willCollapse = !body.classList.contains('collapsed');
+    body.classList.toggle('collapsed', willCollapse);
+    body.style.display = willCollapse ? 'none' : '';   // inline = imparable
+    if(arw) arw.textContent = willCollapse ? '▼' : '▲';
+    var s=getCatState(); s[cat]=willCollapse; setCatState(s);  // mémorisé jusqu'au repli manuel
+  };
+  window.togglePin=function(id,ev){
+    if(ev){ ev.stopPropagation(); ev.preventDefault(); }
+    var p=getPinned(), i=p.indexOf(id);
+    if(i>=0) p.splice(i,1); else p.push(id);
+    setPinned(p);
+    var badge=document.querySelector('#'+id+' .pin-badge');
+    if(badge) badge.classList.toggle('on', p.indexOf(id)>=0);
+    renderPinned();
+  };
+  function renderPinned(){
+    var p=getPinned(), wrap=document.getElementById('pinnedWrap'), body=document.getElementById('pinnedBody');
+    if(!wrap||!body) return;
+    body.innerHTML='';
+    var shown=p.filter(function(id){ return document.getElementById(id) && PINNABLE.indexOf(id)>=0; });
+    if(!shown.length){ wrap.style.display='none'; return; }
+    wrap.style.display='block';
+    shown.forEach(function(id){
+      var orig=document.getElementById(id);
+      if(id==='vignetteLegi'){
+        // Tuile compacte taille module : juste le logo + titre court
+        var oi=orig.querySelector('img');
+        var t=document.createElement('a');
+        t.className='btn'; t.setAttribute('data-pin-id',id);
+        t.setAttribute('href', orig.getAttribute('href')||'#'); t.setAttribute('rel','noopener');
+        t.style.cssText='background:linear-gradient(160deg,#0f2d52,#0a1f3a);border:1.5px solid rgba(212,175,55,.55);text-decoration:none;';
+        var im=document.createElement('img'); if(oi) im.src=oi.src; im.alt='MonLegiTexte'; im.style.borderRadius='18px';
+        var ti=document.createElement('div'); ti.className='title'; ti.style.color='#e6c257'; ti.textContent='⚖️ MonLegiTexte';
+        t.appendChild(im); t.appendChild(ti);
+        body.appendChild(t);
+        return;
+      }
+      var clone=orig.cloneNode(true);          // vraie vignette, dupliquée
+      clone.removeAttribute('id');
+      clone.setAttribute('data-pin-id', id);
+      var junk=clone.querySelectorAll('.perso-badge,.pin-badge,.badge-mon-contrat');
+      for(var k=0;k<junk.length;k++) junk[k].remove();
+      clone.style.order=''; clone.style.margin='';
+      body.appendChild(clone);
+    });
+  }
+  function injectPinBadges(){
+    PINNABLE.forEach(function(id){
+      var el=document.getElementById(id); if(!el||el.querySelector('.pin-badge')) return;
+      try{ if(getComputedStyle(el).position==='static') el.style.position='relative'; }catch(e){ el.style.position='relative'; }
+      var b=document.createElement('button'); b.type='button'; b.className='pin-badge';
+      b.title='Épingler en tête de menu'; b.textContent='📌';
+      b.onclick=function(ev){ window.togglePin(id,ev); };
+      if(getPinned().indexOf(id)>=0) b.classList.add('on');
+      el.appendChild(b);
+    });
+  }
+
+  /* Mode Perso : cliquer une vignette ÉPINGLÉE la retire ; cliquer une vignette
+     MASQUÉE la réactive (sans ouvrir le tiroir). Capture pour bloquer la navigation. */
+  document.addEventListener('click', function(ev){
+    if(!document.body.classList.contains('perso-mode')) return;
+    if(ev.target.closest('.perso-badge,.pin-badge')) return; // laisser les badges agir
+    var pin=ev.target.closest('[data-pin-id]');
+    if(pin){ ev.preventDefault(); ev.stopPropagation(); window.togglePin(pin.getAttribute('data-pin-id')); return; }
+    var tile=ev.target.closest('.cat-body .btn, #vignetteLegi');
+    if(tile){
+      ev.preventDefault(); ev.stopPropagation();
+      if(tile.classList.contains('hidden-module') && tile.id && typeof window.restoreModule==='function'){
+        window.restoreModule(tile.id);
+        var dr=document.getElementById('hiddenDrawer'); if(dr) dr.classList.remove('open');
+        var ov=document.getElementById('drawerOverlay'); if(ov) ov.style.display='none';
+      }
+    }
+  }, true);
+  function visibleTiles(body){
+    return Array.prototype.slice.call(body.children).filter(function(el){
+      if(!el.classList || !el.classList.contains('btn')) return false;
+      if(el.style.display==='none') return false;
+      try{ if(getComputedStyle(el).display==='none') return false; }catch(e){}
+      return true;
+    });
+  }
+  function centerLoneTiles(){
+    var sober=document.body.classList.contains('mode-pro');
+    ['heures','paie','sante'].forEach(function(cat){
+      var body=document.getElementById('body-'+cat); if(!body) return;
+      var vis=visibleTiles(body);
+      vis.forEach(function(el){ el.classList.remove('lone-centered'); });
+      if(!sober && vis.length%2===1){
+        var sorted=vis.slice().sort(function(a,b){ return (parseInt(a.style.order||'0',10)) - (parseInt(b.style.order||'0',10)); });
+        var last=sorted[sorted.length-1];
+        if(last) last.classList.add('lone-centered');
+      }
+    });
+  }
+  function setupCenterObservers(){
+    try{
+      var mo=new MutationObserver(function(){ centerLoneTiles(); });
+      ['heures','paie','sante'].forEach(function(cat){
+        var body=document.getElementById('body-'+cat);
+        if(body) mo.observe(body,{childList:true, subtree:true, attributes:true, attributeFilter:['style']});
+      });
+      // reprise du centrage aussi au basculement sobre/illustré ou perso (classe du body)
+      new MutationObserver(function(){ centerLoneTiles(); }).observe(document.body,{attributes:true, attributeFilter:['class']});
+    }catch(e){}
+  }
+
+  function distribute(){
+    Object.keys(CATMAP).forEach(function(id){
+      var el=document.getElementById(id), body=document.getElementById('body-'+CATMAP[id]);
+      if(el&&body) body.appendChild(el);
+    });
+    var mg=document.getElementById('modGrid'); if(mg) mg.style.display='none';
+    // Restaurer l'état ouvert/replié mémorisé (défaut : Heures ouverte)
+    var st=getCatState();
+    ['heures','paie','sante'].forEach(function(cat){
+      var body=document.getElementById('body-'+cat), arw=document.getElementById('arw-'+cat);
+      if(!body) return;
+      var collapsed = !!st[cat];
+      body.classList.toggle('collapsed', collapsed);
+      body.style.display = collapsed ? 'none' : '';
+      if(arw) arw.textContent = collapsed ? '▼' : '▲';
+    });
+    injectPinBadges();
+    renderPinned();
+    centerLoneTiles();
+    setupCenterObservers();
+    try{ console.log('[SimulHeures] menu chargé — catégories + épingles + centrage'); }catch(e){}
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',distribute);
+  else distribute();
+})();
+</script>
 </body>
 </html>
