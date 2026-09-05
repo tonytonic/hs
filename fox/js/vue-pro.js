@@ -477,7 +477,7 @@
       localStorage.setItem('FOX_VUE', 'fox');
     },
     refresh: function() { if (localStorage.getItem('FOX_VUE') === 'pro') render(); },
-    init: function() { if (localStorage.getItem('FOX_VUE') === 'pro') setTimeout(function(){ window.VuePro.show(); }, 700); }
+    init: function() { if (localStorage.getItem('FOX_VUE') === 'pro') window.VuePro.show(); }
   };
 
 })();
