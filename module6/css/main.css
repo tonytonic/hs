@@ -1096,7 +1096,7 @@ input[type=range] {
    qui masque tout le contenu et invite à tourner le téléphone.
    Vérifie que body a min-width pour éviter les bugs de petits
    écrans en portrait étroit. */
-@media screen and (orientation: landscape) and (max-height: 600px) {
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
   body::before {
     content: '';
     position: fixed;
