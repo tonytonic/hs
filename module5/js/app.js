@@ -2871,6 +2871,11 @@ document.addEventListener('DOMContentLoaded',()=>{
     try{ dA=M5_DataStore.getAll(cy)||{}; }catch(e){}
     try{ dB=(String(y)!==String(cy))?(M5_DataStore.getAll(y)||{}):dA; }catch(e){ dB=dA; }
     function val(dk){ var e=dB[dk]||dA[dk]; return (e&&e.type==='day')?e.worked:null; }
+    // Congés (vacances) : mêmes clés que la vue semaine, pour l'affichage 🌴 en vue mois
+    var vacA={}, vacB={};
+    try{ vacA=M5_DataStore.getVacances(cy)||{}; }catch(e){}
+    try{ vacB=(String(y)!==String(cy))?(M5_DataStore.getVacances(y)||{}):vacA; }catch(e){ vacB=vacA; }
+    function isVacDay(dk){ return !!(vacB[dk]||vacA[dk]); }
     // Semaine saisie en TOTAL (pas jour par jour) : on ne connaît pas la répartition,
     // mais on la signale et elle compte dans les totaux (via _allWeeksRaw).
     function weekTotalFor(dk){ try{ var mon=(window.M5_weekStartOf?window.M5_weekStartOf(dk,sd):null); if(!mon) return null; var e=dB[mon]||dA[mon]; if(e&&e.type==='week') return (e.worked!=null?e.worked:e.total); }catch(err){} return null; }
@@ -2899,13 +2904,16 @@ document.addEventListener('DOMContentLoaded',()=>{
       var _over10=(v!=null && v>10);
       var _wt=(v==null)?weekTotalFor(dk):null;
       var _isWS=(_wt!=null && window.M5_weekStartOf && window.M5_weekStartOf(dk,sd)===dk);
-      var cls='m5-month-day'+(dk===todayDK?' today':'')+(v!=null?' has':'')+(_wt!=null?' m5-wt-day':'')+(_lk?' locked':'')+(_over10?' m5-day-over10':'');
+      var _vac=isVacDay(dk);
+      var cls='m5-month-day'+(dk===todayDK?' today':'')+(v!=null?' has':'')+(_wt!=null?' m5-wt-day':'')+(_lk?' locked':'')+(_over10?' m5-day-over10':'')+(_vac?' m5-month-vac':'');
       if(_pi>=0){ cls+=' m5-mp-'+(_pi%2===0?'a':'b'); if(_pi===_actIdx) cls+=' m5-mp-active'; if(_prevPi!==null && _pi!==_prevPi) cls+=' m5-mp-start'; }
       _prevPi=_pi;
       var _inner=_lk?'<span class="m5-mp-lock">🔒</span>'
+        :(_vac?'<span class="m5-cal-day-vac">🌴</span>'
         :(v!=null?'<span>'+_fmt(v)+(_over10?' ⚠️':'')+'</span>'
-        :(_wt!=null?'<span class="m5-wt-mark">'+(_isWS?('∑'+_fmt(_wt)):'∑')+'</span>':''));
-      h+='<div class="'+cls+'" onclick="openDaySaisie(\''+dk+'\',\''+lab+'\')"><b>'+d+'</b>'+_inner+'</div>';
+        :(_wt!=null?'<span class="m5-wt-mark">'+(_isWS?('∑'+_fmt(_wt)):'∑')+'</span>':'')));
+      var _click=_vac?'window.M5_toast&&M5_toast(\'Semaine en congés 🌴 — décoche les congés pour saisir\',\'info\')':'openDaySaisie(\''+dk+'\',\''+lab+'\')';
+      h+='<div class="'+cls+'" onclick="'+_click+'"><b>'+d+'</b>'+_inner+'</div>';
     }
     h+='</div>';
     el.innerHTML=h;
