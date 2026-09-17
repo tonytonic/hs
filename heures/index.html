@@ -52,6 +52,7 @@ h2{text-align:center}
 .day small{font-size:11px;line-height:1.1;white-space:nowrap}
 .day.in-period{border:2px solid #4FB3C2;background:#e6f6f8}
 .day.today{outline:3px solid #2196a6;box-shadow:0 0 6px rgba(33,150,166,.4)}
+.day.locked{opacity:.4;cursor:not-allowed}
 
 button,input,textarea{width:100%;padding:8px;margin:5px 0}
 
@@ -585,6 +586,9 @@ document.addEventListener("DOMContentLoaded", function(){
   </div>
   <div class="calendar" id="calendar"></div>
 </div>
+<div class="main-zone" style="background:#fff;padding:10px 16px;border-radius:18px;max-width:900px;margin:8px auto 0;box-shadow:0 2px 8px rgba(0,0,0,.07);display:flex;justify-content:flex-end;">
+  <button type="button" id="periodLockBtn" onclick="togglePeriodLock()" style="display:flex;align-items:center;gap:6px;background:#f4f8fb;border:1px solid #dde6ec;border-radius:99px;padding:6px 12px;font-size:12px;font-weight:600;color:#666;cursor:pointer;">🔓 Verrouiller cette période</button>
+</div>
 <div class="totaux main-zone" id="totaux"></div>
 <div class="action-bar">
   <div class="action-btns">
@@ -646,9 +650,10 @@ document.addEventListener("DOMContentLoaded", function(){
     <div id="saisieHS">
       <fieldset class="block plus" style="border:none;padding:0">
         <legend style="font-weight:700;color:#1976d2;margin-bottom:6px">&#10133; Heures suppl&eacute;mentaires</legend>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
           <button onclick="addExtra(0.25)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+15 min</button>
           <button onclick="addExtra(0.5)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+30 min</button>
+          <button onclick="addExtra(0.75)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+45 min</button>
           <button onclick="addExtra(1)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+1 h</button>
           <button onclick="addExtra(2)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+2 h</button>
         </div>
@@ -661,7 +666,9 @@ document.addEventListener("DOMContentLoaded", function(){
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
         <button onclick="addRecup(0.25)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-15 min</button>
         <button onclick="addRecup(0.5)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-30 min</button>
+        <button onclick="addRecup(0.75)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-45 min</button>
         <button onclick="addRecup(1)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-1 h</button>
+        <button onclick="addRecup(2)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-2 h</button>
       </div>
       <input id="manualRecup" type="number" step="0.25" style="border-radius:12px;">
     </fieldset>
@@ -1020,6 +1027,7 @@ function buildPeriods(){
   else if(found===null){if(today<periods[0].start)found=0;else found=closures.length-1;}
   found=Math.max(0,found);
   currentPeriodIndex=found;periodSelect.selectedIndex=found;
+  autoLockPastPeriods();updatePeriodLockUI();
   if(typeof update==="function")update();
 }
 
@@ -1031,6 +1039,61 @@ function getCurrentPeriod(){
   let start=base;
   for(let i=0;i<=closures.length;i++){const end=i<closures.length?new Date(closures[i]):new Date(2099,11,31);if(i===currentPeriodIndex)return{start,end,index:i};start=new Date(end);start.setDate(start.getDate()+1);}
   return null;
+}
+
+/* ── Verrouillage de période (même logique que le module Paye) ──
+   Une période verrouillée protège sa saisie jour par jour contre les
+   modifications accidentelles. L'utilisateur peut toujours déverrouiller
+   manuellement si besoin. */
+function isPeriodLocked(dateStr){
+  const idx=getPeriodIndexForDate(dateStr);
+  return !!(periodMeta[idx]&&periodMeta[idx].locked);
+}
+function savePeriodMeta(){localStorage.setItem(STORAGE.periodMeta,JSON.stringify(periodMeta));}
+function periodHasActivity(period){
+  let d=new Date(period.start);d.setHours(0,0,0,0);
+  const end=new Date(period.end);end.setHours(0,0,0,0);
+  while(d<=end){
+    const key=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+    const day=data[key];
+    if(day&&((Number(day.extra)||0)>0||(Number(day.recup)||0)>0||(Number(day.absent)||0)>0))return true;
+    d.setDate(d.getDate()+1);
+  }
+  return false;
+}
+/* Verrouille automatiquement toutes les périodes antérieures à la période
+   affichée qui ne sont pas encore verrouillées et ont au moins une saisie. */
+function autoLockPastPeriods(){
+  const base=getBaseStartDate();if(!base)return;
+  let start=new Date(base),changed=false;
+  for(let i=0;i<currentPeriodIndex;i++){
+    const end=i<closures.length?new Date(closures[i]):new Date(2099,11,31);
+    if(!(periodMeta[i]&&periodMeta[i].locked)&&periodHasActivity({start:new Date(start),end})){
+      if(!periodMeta[i])periodMeta[i]={};
+      periodMeta[i].locked=true;changed=true;
+    }
+    start=new Date(end);start.setDate(start.getDate()+1);
+  }
+  if(changed)savePeriodMeta();
+}
+function togglePeriodLock(){
+  const idx=currentPeriodIndex;
+  if(!periodMeta[idx])periodMeta[idx]={};
+  const willLock=!periodMeta[idx].locked;
+  periodMeta[idx].locked=willLock;
+  savePeriodMeta();updatePeriodLockUI();generateCalendar();
+  toast(willLock?"🔒 Période verrouillée":"🔓 Période déverrouillée",willLock?"success":"info");
+}
+function updatePeriodLockUI(){
+  const btn=document.getElementById("periodLockBtn");if(!btn)return;
+  const locked=!!(periodMeta[currentPeriodIndex]&&periodMeta[currentPeriodIndex].locked);
+  if(locked){
+    btn.innerHTML="🔒 Période verrouillée — toucher pour déverrouiller";
+    btn.style.background="rgba(243,156,18,.15)";btn.style.borderColor="rgba(243,156,18,.4)";btn.style.color="#f39c12";
+  }else{
+    btn.innerHTML="🔓 Verrouiller cette période";
+    btn.style.background="#f4f8fb";btn.style.borderColor="#dde6ec";btn.style.color="#666";
+  }
 }
 
 function ensureReportsUpTo(index){const sv=currentPeriodIndex;for(let i=0;i<index;i++){currentPeriodIndex=i;calculate();}currentPeriodIndex=sv;}
@@ -1078,6 +1141,8 @@ function generateCalendar(){
     const div=document.createElement("div");div.className="day";
     if(pStartKey&&key>=pStartKey&&key<=pEndKey)div.classList.add("in-period");
     if(closureSet.has(key))div.classList.add("closure-day");
+    const dayLocked=isPeriodLocked(key);
+    if(dayLocked)div.classList.add("locked");
     const day=data[key]||{extra:0,recup:0,absent:0};
     let html=`<strong>${d}</strong>`;
     if(day.extra)html+=`<small style="color:#000;font-weight:600">+${fmtHShort(day.extra)}</small>`;
@@ -1086,7 +1151,7 @@ function generateCalendar(){
     else if(day.absent){html+=`<small style="color:#c62828;font-weight:bold">ABS ${fmtHShort(day.absent)}</small>`;div.style.background="#ffebee";div.style.border="2px solid #c62828";}
     div.innerHTML=html;
     if(key===dateKeyLocal(new Date()))div.classList.add("today");
-    div.onclick=()=>openPopup(key);calendar.appendChild(div);
+    div.onclick=()=>{if(dayLocked){toast("🔒 Période verrouillée","warn");return;}openPopup(key);};calendar.appendChild(div);
   }
 }
 
@@ -1174,6 +1239,7 @@ function calculate(){
 function openNotice(){document.getElementById("popupNotice").style.display="flex";}
 function closeNotice(){document.getElementById("popupNotice").style.display="none";}
 function openPopup(date){
+  if(isPeriodLocked(date)){toast("🔒 Période verrouillée","warn");return;}
   selectedDate=date;
   // NE PAS écrire absent automatiquement — le bloc AUTO_FERIE dans calculate() gère les -7h
   const d=data[date]||{extra:0,recup:0,absent:0};
@@ -1209,9 +1275,9 @@ function createSnapshot(label){const key="SNAPSHOT_"+Date.now();localStorage.set
 function exportJSON(){createSnapshot("before_export");const blob=new Blob([JSON.stringify({version:1,exercise:currentSuffix,data,closures,reports,periodMeta,exerciseStart,annualDate,specialDays,BASE_HEBDO,annualRate},null,2)],{type:"application/json"});const fn=`heures_sup_${currentSuffix}.json`;if(navigator.canShare&&navigator.canShare({files:[new File([blob],fn)]})){
   localStorage.setItem("FILE_SAVE_DATE_"+currentSuffix,new Date().toISOString());updateSaveBadges();
   navigator.share({files:[new File([blob],fn,{type:"application/json"})],title:"Sauvegarde heures supplémentaires"}).catch(e=>{
-    if(e.name!=="AbortError"){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);}
+    if(e.name!=="AbortError"){const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);if(window.hsIsAndroid&&window.hsIsAndroid())window.hsFileSnack(blob,fn,{accent:"#2196a6"});}
   });return;
-}const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);localStorage.setItem("FILE_SAVE_DATE_"+currentSuffix,new Date().toISOString());updateSaveBadges();}
+}const url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=fn;document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);if(window.hsIsAndroid&&window.hsIsAndroid())window.hsFileSnack(blob,fn,{accent:"#2196a6"});localStorage.setItem("FILE_SAVE_DATE_"+currentSuffix,new Date().toISOString());updateSaveBadges();}
 function importJSON(){
   // iOS Safari supporte parfaitement <input type="file"> depuis iOS 13+
   // File picker plus pratique que coller du texte
@@ -1422,7 +1488,7 @@ function update(){
 }
 monthSelect.onchange=()=>{viewMonth=+monthSelect.value;if(typeof update==="function")update();};
 yearSelect.onchange=()=>{viewYear=+yearSelect.value;if(typeof update==="function")update();};
-periodSelect.onchange=()=>{currentPeriodIndex=+periodSelect.value;if(typeof update==="function")update();showToast();};
+periodSelect.onchange=()=>{currentPeriodIndex=+periodSelect.value;autoLockPastPeriods();updatePeriodLockUI();if(typeof update==="function")update();showToast();};
 const annualDateInput=document.getElementById("annualDateInput");
 const exerciseStartInput=document.getElementById("exerciseStartInput");
 const baseHebdoInput=document.getElementById("baseHebdoInput");
@@ -1808,7 +1874,7 @@ function exportPeriodPDF(){
 
   if(inclSign){chk(50);y=pdfSignatureBlock(pdf,y);}
   pdfFooter(pdf);
-  pdf.save(`periode_${period.index+1}_${currentSuffix}.pdf`);
+  window.hsSavePdf(pdf,`periode_${period.index+1}_${currentSuffix}.pdf`,'#2196a6');
   closePdfModal();
 }
 
@@ -1903,7 +1969,7 @@ function exportMonthlyFullPDF(){
 
   if(inclSign){chk(50);y=pdfSignatureBlock(pdf,y);}
   pdfFooter(pdf);
-  pdf.save(`mensuel_${months[viewMonth]}_${viewYear}.pdf`);
+  window.hsSavePdf(pdf,`mensuel_${months[viewMonth]}_${viewYear}.pdf`,'#2196a6');
   closePdfModal();
 }
 
@@ -2053,7 +2119,7 @@ function exportAnnualPDF(){
 
   if(inclSign){chk(50);y=pdfSignatureBlock(pdf,y);}
   pdfFooter(pdf);
-  pdf.save(`annuel_${currentSuffix}.pdf`);
+  window.hsSavePdf(pdf,`annuel_${currentSuffix}.pdf`,'#2196a6');
   closePdfModal();
 }
 
@@ -2381,5 +2447,30 @@ function closeTip(){
 <!-- Glossaire mode débutant/expert -->
 <script src="../glossaire.js"></script>
 
+<!-- Snackbar Android : confirme l'enregistrement des fichiers (PDF / sauvegarde). iOS garde l'ouverture/partage auto. -->
+<script>
+(function(){
+  function isAnd(){return /Android/i.test((navigator&&navigator.userAgent)||'');}
+  window.hsIsAndroid=isAnd;
+  window.hsFileSnack=function(blob,filename,opt){opt=opt||{};
+    var isPdf=(opt.kind==='pdf')||/\.pdf$/i.test(filename||'');
+    var ac=opt.accent||'#2196a6',bg=opt.bg||'#122234',bd=opt.border||'rgba(150,190,220,.45)';
+    var ic=isPdf?'\ud83d\udcc4':'\ud83d\udcbe',noun=isPdf?'PDF enregistr\u00e9':'Sauvegarde enregistr\u00e9e',lbl=isPdf?'Ouvrir':'Partager',mime=isPdf?'application/pdf':'application/json';
+    try{var o=document.getElementById('hs-file-snack');if(o)o.remove();
+      var url=URL.createObjectURL(blob);
+      var s=document.createElement('div');s.id='hs-file-snack';
+      s.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:99999;background:'+bg+';border:1px solid '+bd+';border-radius:13px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,.5);font-family:inherit';
+      var sp=document.createElement('span');sp.textContent=ic+' '+noun+' dans tes fichiers';sp.style.cssText='color:#fff;font-size:13px;font-weight:600;flex:1;line-height:1.3';
+      var b=document.createElement('button');b.textContent=lbl;b.style.cssText='background:'+ac+';color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:800;white-space:nowrap;touch-action:manipulation';
+      b.onclick=function(){try{var f=new File([blob],filename||'document',{type:mime});
+        if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){window.open(url,'_blank');});}
+        else{window.open(url,'_blank');}}catch(e){try{window.open(url,'_blank');}catch(_){}}
+        if(s.parentNode)s.remove();};
+      s.appendChild(sp);s.appendChild(b);document.body.appendChild(s);
+      setTimeout(function(){if(s.parentNode)s.remove();},12000);
+    }catch(e){}};
+  window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
+})();
+</script>
 </body>
 </html>
