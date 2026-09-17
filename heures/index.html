@@ -650,9 +650,10 @@ document.addEventListener("DOMContentLoaded", function(){
     <div id="saisieHS">
       <fieldset class="block plus" style="border:none;padding:0">
         <legend style="font-weight:700;color:#1976d2;margin-bottom:6px">&#10133; Heures suppl&eacute;mentaires</legend>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
           <button onclick="addExtra(0.25)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+15 min</button>
           <button onclick="addExtra(0.5)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+30 min</button>
+          <button onclick="addExtra(0.75)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+45 min</button>
           <button onclick="addExtra(1)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+1 h</button>
           <button onclick="addExtra(2)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+2 h</button>
         </div>
@@ -665,7 +666,9 @@ document.addEventListener("DOMContentLoaded", function(){
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px">
         <button onclick="addRecup(0.25)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-15 min</button>
         <button onclick="addRecup(0.5)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-30 min</button>
+        <button onclick="addRecup(0.75)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-45 min</button>
         <button onclick="addRecup(1)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-1 h</button>
+        <button onclick="addRecup(2)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-2 h</button>
       </div>
       <input id="manualRecup" type="number" step="0.25" style="border-radius:12px;">
     </fieldset>
