@@ -3,7 +3,7 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.10.23"; // v10.10.23 : pré-cache complet (105 outils + sommaire + images tuiles) pour le hors-ligne // v10.9.21 : ajout taiko.html + legi-ref.js au précache
+const CACHE_NAME = "heuressup-cache-v10.10.24"; // v10.10.24 : snackbar Android "enregistré dans tes fichiers" (PDF+sauvegarde M1/M2/M6/M7/menu) + fix congés vue mois M5 // v10.10.23 : pré-cache complet (105 outils + sommaire + images tuiles) pour le hors-ligne // v10.9.21 : ajout taiko.html + legi-ref.js au précache
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
