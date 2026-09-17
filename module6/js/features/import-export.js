@@ -109,6 +109,7 @@ const M6_ImportExport = {
     document.body.appendChild(a); a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    try{if(/Android/i.test((navigator&&navigator.userAgent)||'')&&window.hsFileSnack)window.hsFileSnack(blob,fn,{kind:'backup',accent:'#c4a35a'});}catch(_e){}
   },
 
   // ── Export CSV SIRH (compatible Sage, Cegid, ADP) ─────────────

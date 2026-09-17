@@ -54,8 +54,8 @@ async function _shareOrSave(doc, filename, toastMsg) {
     }
   }
   // Téléchargement / enregistrement direct
-  doc.save(filename);
-  window.M6_toast?.(toastMsg + ' — enregistré');
+  var _b6=doc.output('blob'); doc.save(filename);
+  if(/Android/i.test((navigator&&navigator.userAgent)||'')&&window.hsFileSnack){window.hsFileSnack(_b6,filename,{kind:'pdf',accent:'#c4a35a'});}else{window.M6_toast?.(toastMsg + ' — enregistré');}
 }
 
 function _pdfSanitize(str) {
@@ -653,8 +653,8 @@ const M6_PDF = {
     doc.setFontSize(7); doc.setTextColor(180);
     doc.text(`Bilan ${year} - Genere le ${new Date().toLocaleDateString('fr-FR')}`, M, 290);
 
-    doc.save(`Forfait_Jours_Annuel_${year}.pdf`);
-    M6_toast?.('PDF annuel genere');
+    if(window.hsSavePdf){window.hsSavePdf(doc,`Forfait_Jours_Annuel_${year}.pdf`,'#c4a35a');}else{doc.save(`Forfait_Jours_Annuel_${year}.pdf`);}
+    if(!(/Android/i.test((navigator&&navigator.userAgent)||'')))M6_toast?.('PDF annuel genere');
     if (window.M6_Storage) M6_Storage.markFileSave?.('forfait_jours', year);
   },
 
@@ -819,8 +819,8 @@ const M6_PDF = {
     doc.setFontSize(7); doc.setTextColor(138,132,124); doc.setFont('helvetica','normal');
     doc.text('Ce document ne remplace pas un avis juridique ou medical professionnel.', M, 290);
 
-    doc.save(_pdfSanitize('dirigeant_' + (contract.nom||'cadre').replace(/\s+/g,'_').toLowerCase() + '_' + year + '.pdf'));
-    M6_toast?.('PDF Dirigeant genere');
+    var _fn6=_pdfSanitize('dirigeant_' + (contract.nom||'cadre').replace(/\s+/g,'_').toLowerCase() + '_' + year + '.pdf'); if(window.hsSavePdf){window.hsSavePdf(doc,_fn6,'#c4a35a');}else{doc.save(_fn6);}
+    if(!(/Android/i.test((navigator&&navigator.userAgent)||'')))M6_toast?.('PDF Dirigeant genere');
   },
   // ── PDF Mensuel Forfait Heures ────────────────────────────────
   exportMensuelFH({ regime, year, mois, contract, data, analysis }) {
