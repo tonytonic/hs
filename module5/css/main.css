@@ -1632,6 +1632,11 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 .m5-month-day.m5-mp-a.has{ background:rgba(139,92,246,0.44); border-color:rgba(180,150,255,0.6); }
 .m5-month-day.m5-mp-b.has{ background:rgba(79,179,194,0.44); border-color:rgba(120,220,235,0.65); }
 .m5-month-day.m5-mp-start{ border-left:3px solid #C4A8FF; }
+/* Semaine en congés 🌴 — prioritaire sur les teintes de période */
+.m5-month-day.m5-month-vac,
+.m5-month-day.m5-mp-a.m5-month-vac,
+.m5-month-day.m5-mp-b.m5-month-vac{ background:rgba(52,211,153,0.20); border-color:rgba(52,211,153,0.50); }
+.m5-month-day.m5-month-vac > b{ color:#6EE7B7; }
 /* Période active (celle que ciblent la barre, le verrou et le balayage) */
 .m5-month-day.m5-mp-active{ box-shadow: inset 0 0 0 2px rgba(196,168,255,0.85); }
 .m5-month-day.m5-mp-a.m5-mp-active{ background:rgba(139,92,246,0.30); }
