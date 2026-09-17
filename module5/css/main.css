@@ -570,7 +570,8 @@ body::before {
 .m5-bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--miz-glass);
-  backdrop-filter: blur(16px);
+  /* Ni backdrop-filter (flottement iOS) ni transform (1er tap avalé sur Android) :
+     fond opaque simple → barre fixe stable ET boutons réactifs au 1er tap. */
   border-top: 1px solid var(--miz-border);
   display: flex;
   z-index: 90;
@@ -590,6 +591,8 @@ body::before {
   cursor: pointer; gap: 3px;
   transition: color .15s;
   position: relative;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .m5-bottom-btn .icon { font-size: 22px; line-height: 1; }
 .m5-bottom-btn.active { color: var(--miz-primary); }
@@ -643,7 +646,7 @@ body::before {
 .m5-cal-day.over   { background: rgba(245,158,11,0.12); }
 .m5-cal-day.under  { background: rgba(139,92,246,0.10); }
 .m5-cal-day.weekend{ background: var(--miz-bg2); opacity: 0.78; border: 1.5px dashed rgba(139,92,246,0.25); }
-.m5-cal-day.future { background: var(--miz-bg2); opacity: 0.35; cursor: default; }
+.m5-cal-day.future { background: var(--miz-bg2); opacity: 0.55; cursor: pointer; }
 .m5-cal-day.vac    { background: rgba(20,184,166,0.12); cursor: default; }
 .m5-cal-day.ferie  { background: rgba(245,158,11,0.13); border: 1.5px solid rgba(245,158,11,0.35); }
 .m5-cal-day.ferie.today { border-color: var(--miz-primary); }
@@ -889,6 +892,8 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   gap: 8px;
   margin-bottom: 12px;
   position: relative; z-index: 1;
+  flex-wrap: wrap;      /* les contrôles passent à la ligne au lieu de se chevaucher */
+  row-gap: 8px;
 }
 .acc-nav-btn {
   background: rgba(255,255,255,0.10);
@@ -905,7 +910,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 }
 .acc-nav-btn:active { background: rgba(255,255,255,0.22); }
 .acc-week-label {
-  flex: 1; text-align: center;
+  flex: 1 1 120px; min-width: 0; text-align: center;
   font-size: 13px; font-weight: 700;
   color: rgba(255,255,255,0.92);
   letter-spacing: 0.02em;
@@ -919,6 +924,21 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   color: #C4A8FF; cursor: pointer;
   flex-shrink: 0;
 }
+/* Menu déroulant Semaine / Mois (remplace l'ancien bouton bascule) */
+.acc-view-select {
+  background: rgba(196,168,255,0.22);
+  border: 1px solid rgba(196,168,255,0.35);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 11px; font-weight: 700;
+  color: #C4A8FF; cursor: pointer;
+  flex-shrink: 0;
+  -webkit-appearance: none; appearance: none;
+  text-align: center;
+  touch-action: manipulation;
+}
+.acc-view-select:focus { outline: none; border-color: rgba(196,168,255,0.7); }
+.acc-view-select option { color: #18102E; }
 
 /* Cellules calendrier sur fond sombre */
 #calendar-grid {
@@ -949,7 +969,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 .acc-week-hero .m5-cal-day.over .m5-cal-day-hours { color: #FDE68A; }
 .acc-week-hero .m5-cal-day.under   { background: rgba(167,139,250,0.22); border-color: rgba(167,139,250,0.30); }
 .acc-week-hero .m5-cal-day.weekend { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.07); opacity:0.7; }
-.acc-week-hero .m5-cal-day.future  { background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06); opacity:0.45; }
+.acc-week-hero .m5-cal-day.future  { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.10); opacity:0.6; cursor:pointer; }
 .acc-week-hero .m5-cal-day.vac     { background: rgba(20,184,166,0.25); border-color: rgba(20,184,166,0.40); }
 .acc-week-hero .m5-cal-day.ferie   { background: rgba(251,191,36,0.20); border-color: rgba(251,191,36,0.45); }
 /* Alternance période : différence visible */
@@ -1024,6 +1044,23 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   -webkit-appearance: none;
   cursor: pointer;
   flex-shrink: 0;
+}
+.acc-periode-lock {
+  flex-shrink: 0;
+  width: 38px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(196,168,255,0.25);
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 7px 0;
+  cursor: pointer;
+  color: #fff;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.acc-periode-lock.locked {
+  background: rgba(155,92,248,0.55);
+  border-color: rgba(196,168,255,0.75);
 }
 
 /* ── ALERTES SEMAINE ──────────────────────────────────────────── */
@@ -1277,7 +1314,7 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 
 /* Bottom nav — texte visible sur fond sombre */
 .m5-bottom-nav {
-  background: rgba(18,8,48,0.92);
+  background: rgba(18,8,48,0.98);
   border-top-color: rgba(167,139,250,0.18);
 }
 .m5-bottom-btn { color: rgba(196,168,255,0.45); }
@@ -1547,18 +1584,21 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
 .acc-quick-btns {
   display: flex;
   gap: 6px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 .acc-quick-btn {
+  flex: 1 1 0; min-width: 0;
   background: rgba(255,255,255,0.10);
   border: 1.5px solid rgba(255,255,255,0.15);
   border-radius: 8px;
-  padding: 7px 14px;
+  padding: 7px 4px;
   font-family: var(--miz-font);
   font-size: 13px; font-weight: 700;
   color: rgba(255,255,255,0.75);
   cursor: pointer;
   transition: all .15s;
+  text-align: center; white-space: nowrap;
+  touch-action: manipulation;
 }
 .acc-quick-btn:active { transform: scale(.93); }
 .acc-quick-btn.active {
@@ -1567,8 +1607,52 @@ body { padding-bottom: max(80px, calc(60px + env(safe-area-inset-bottom))); }
   color: #6EE7B7;
 }
 .acc-quick-btn.acc-quick-custom {
+  flex: 0 0 auto;
   background: rgba(255,255,255,0.07);
   border-color: rgba(255,255,255,0.12);
   font-size: 16px;
-  padding: 7px 10px;
+  padding: 7px 12px;
 }
+
+/* AJOUT bac à sable : montant € flouté tant que masqué */
+.m5-blur{filter:blur(7px);-webkit-filter:blur(7px);user-select:none;pointer-events:none;}
+
+/* AJOUT bac à sable : calendrier mensuel façon M2 (mode avancé) */
+.m5-month-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; padding:2px 0; }
+.m5-month-wd{ text-align:center; font-size:10px; font-weight:700; color:rgba(255,255,255,0.55); padding:2px 0; }
+.m5-month-day{ aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:1px; border-radius:9px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.10); cursor:pointer; color:#fff; transition:transform .08s; }
+.m5-month-day b{ font-size:12px; font-weight:600; }
+.m5-month-day span{ font-size:9px; font-weight:800; color:#FFC24B; line-height:1; }
+.m5-month-day.has{ background:rgba(108,63,197,0.38); border-color:rgba(180,150,255,0.5); }
+.m5-month-day.today{ border-color:#9B5CF8; box-shadow:0 0 0 1.5px #9B5CF8; }
+.m5-month-day:active{ transform:scale(0.94); }
+/* Deux teintes pour distinguer les deux périodes de paye du mois */
+.m5-month-day.m5-mp-a{ background:rgba(139,92,246,0.16); }
+.m5-month-day.m5-mp-b{ background:rgba(79,179,194,0.16); }
+.m5-month-day.m5-mp-a.has{ background:rgba(139,92,246,0.44); border-color:rgba(180,150,255,0.6); }
+.m5-month-day.m5-mp-b.has{ background:rgba(79,179,194,0.44); border-color:rgba(120,220,235,0.65); }
+.m5-month-day.m5-mp-start{ border-left:3px solid #C4A8FF; }
+/* Période active (celle que ciblent la barre, le verrou et le balayage) */
+.m5-month-day.m5-mp-active{ box-shadow: inset 0 0 0 2px rgba(196,168,255,0.85); }
+.m5-month-day.m5-mp-a.m5-mp-active{ background:rgba(139,92,246,0.30); }
+.m5-month-day.m5-mp-b.m5-mp-active{ background:rgba(79,179,194,0.30); }
+/* Aujourd'hui : marqueur or, prioritaire sur les teintes de période */
+.m5-month-grid .m5-month-day.today{ border:2px solid #FFC24B; box-shadow:0 0 0 2px rgba(255,194,75,0.40); }
+.m5-month-grid .m5-month-day.today > b{ color:#FFC24B; }
+/* Semaine saisie en TOTAL (répartition inconnue) */
+.m5-month-day.m5-wt-day{ background:rgba(79,179,194,0.13); border-style:dashed; border-color:rgba(120,220,235,0.42); }
+.m5-wt-mark{ font-size:11px; font-weight:800; color:#8FD3E0; }
+/* Journée > 10h — dépassement du max légal (Art. L3121-18) */
+.m5-month-day.m5-day-over10{ box-shadow: inset 0 0 0 2px rgba(255,90,90,0.7); }
+.acc-week-hero .m5-cal-day.m5-day-over10{ box-shadow: inset 0 0 0 2px rgba(255,90,90,0.75); }
+.m5-cal-day-warn{ font-size:11px; margin-left:1px; }
+/* Jours verrouillés : saisie gelée pour cette période */
+.m5-month-day.locked{ opacity:0.55; cursor:not-allowed; background:rgba(255,255,255,0.05); border-style:dashed; }
+.m5-month-day .m5-mp-lock{ font-size:10px; color:rgba(255,255,255,0.75); }
+.acc-week-hero .m5-cal-day.m5-locked{ opacity:0.5; cursor:not-allowed; border-style:dashed; }
+.m5-cal-day-lock{ font-size:12px; }
+.acc-week-hero .m5-cal-week-total-cell.m5-locked{ opacity:0.6; cursor:not-allowed; border-style:dashed; }
+.m5-month-pad{ }
+
+/* AJOUT bac à sable : état actif du bouton vue Mois/Semaine */
+.acc-today-btn#cal-view-btn.active{ background:#9B5CF8 !important; color:#fff !important; border-color:#9B5CF8 !important; }
