@@ -77,6 +77,16 @@ const M5_PdfReport = {
     row('Début exercice',contract.exerciceStart||String(new Date().getFullYear()));
     y+=4;
 
+    // ══ Périodes de paie personnalisées (configurées dans les réglages) ══
+    if(mode==='MENSUEL' && contract.cloturesDates && Object.keys(contract.cloturesDates).length>0){
+      h1('Périodes de paie configurées');
+      const _MOIS=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+      const _fmtD=(iso)=>{ if(!iso) return '—'; const q=String(iso).split('-'); return q.length===3?(q[2]+'/'+q[1]+'/'+q[0]):String(iso); };
+      const _months=Object.keys(contract.cloturesDates).map(Number).sort((a,b)=>a-b);
+      _months.forEach(m=>{ row('Clôture '+(_MOIS[m-1]||('mois '+m)), _fmtD(contract.cloturesDates[m])); });
+      y+=4;
+    }
+
     // ══ SECTION 2 : BILAN ════════════════════════════════════════
     h1('2. Bilan de la période');
     if(mode==='ANNUEL' && analysis && analysis.annuelResult) {
@@ -139,7 +149,7 @@ const M5_PdfReport = {
       y=wy+CELL+6;
       // Légende
       doc.setFontSize(7); doc.setFont('helvetica','normal');
-      [[16,185,129,'Conforme'],[245,158,11,'Heures comp.'],[220,80,80,'≥35h']].forEach(([r,g,b,lbl],i)=>{
+      [[16,185,129,'Conforme'],[245,158,11,'Heures comp.'],[220,80,80,'35h et +']].forEach(([r,g,b,lbl],i)=>{
         const lx=M+i*40;
         doc.setFillColor(r,g,b); doc.rect(lx,y,5,4,'F');
         doc.setTextColor(0,0,0); doc.text(lbl,lx+7,y+3);
@@ -235,7 +245,18 @@ const M5_PdfReport = {
     }
 
     const yr=new Date().getFullYear();
-    doc.save(`heures-complementaires-mizuki-${yr}.pdf`);
+    const filename=`heures-complementaires-mizuki-${yr}.pdf`;
+    const isAndroid=/Android/i.test((navigator&&navigator.userAgent)||'');
+    if(isAndroid){
+      // Android (TWA) : le téléchargement est silencieux → snackbar de confirmation + bouton Ouvrir
+      try{
+        const blob=doc.output('blob');
+        doc.save(filename);
+        if(window.M5_pdfSnackbar) window.M5_pdfSnackbar(blob, filename);
+      }catch(e){ doc.save(filename); }
+    } else {
+      doc.save(filename); // iOS : le PDF s'ouvre automatiquement
+    }
   }
 };
 

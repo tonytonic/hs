@@ -30,6 +30,8 @@ const MSGS_NORMAL = [
   n=>`🦊 ${n}Aucune anomalie détectée. Mizuki surveille pour toi en permanence.`,
   n=>`🦊 ${n}Semaine dans les clous ! Rappel : sans accord collectif, le délai de prévenance est de 7 jours ouvrés (Art. L3123-31).`,
   n=>`🦊 ${n}Aucun dépassement cette semaine. Bon à savoir : tu peux refuser des HC demandées moins de 3 jours avant (Art. L3123-10).`,
+  n=>`🦊 ${n}Rappel santé : entre deux journées de travail, tu as droit à 11h de repos consécutives (Art. L3131-1) — ça limite l'amplitude d'une journée à 13h.`,
+  n=>`🦊 ${n}Pense à ton repos : 11h consécutives minimum entre la fin d'une journée et la reprise (Art. L3131-1), et 10h de travail max par jour (Art. L3121-18).`,
 ];
 
 const MSGS_COMP_LOW = [
@@ -80,6 +82,13 @@ const MSGS_PLAFOND = [
   (n,cap)=>`🦊 ${n}Tes heures dépassent ton contrat de travail (${Math.round(cap*100)}%). Garde une trace de ces semaines — elles peuvent ouvrir des droits.`,
 ];
 
+// Durée quotidienne max 10h (Art. L3121-18) — repéré à partir des saisies par jour
+const MSGS_JOUR_10H = [
+  (n,h)=>`🦊 ${n}⚠️ Journée de ${h}h : au-delà du maximum légal de 10h/jour (Art. L3121-18). Un accord peut le porter à 12h max — vérifie le tien et garde une trace.`,
+  (n,h)=>`🦊 ${n}${h}h sur une même journée — la durée quotidienne ne peut normalement pas dépasser 10h (Art. L3121-18). Pense aussi à tes 11h de repos avant la reprise (Art. L3131-1).`,
+  (n,h)=>`🦊 ${n}Attention à ta santé : ${h}h dans la journée dépasse la limite de 10h/jour (Art. L3121-18). Note bien tes horaires.`,
+];
+
 // ── Rotation intelligente ─────────────────────────────────────────
 function _nextMsg(pool) {
   let idx = parseInt(_get(K.MSG_IDX,'0'));
@@ -99,6 +108,13 @@ const Mizuki = {
 
     if (isVacWeek) return _nextMsg(MSGS_VACANCES)(n);
 
+    const daily = analysis && analysis.dailyFlags;
+    const _al = (weekResult && weekResult.alerts) || [];
+    // Requalification (seuil temps plein) = le plus grave → prioritaire
+    if (_al.some(a=>a.code==='REQUALIFICATION')) return _nextMsg(MSGS_REQUALIF)(n, weekResult.workedH);
+    // Journée > 10h : signal santé/légal (Art. L3121-18)
+    if (daily && daily.count > 0) return _nextMsg(MSGS_JOUR_10H)(n, daily.max);
+
     if (!weekResult || weekResult.workedH <= weekResult.contractH) {
       return _nextMsg(MSGS_NORMAL)(n);
     }
@@ -117,6 +133,7 @@ const Mizuki = {
 
   getPopupContent(analysis) {
     const {weekResult, rule12, isVacWeek} = analysis || {};
+    const daily = analysis && analysis.dailyFlags;
     const name = _get(K.USER_NAME,'');
     // pr = prénom si disponible (3e pers.), sinon 'tu' (2e pers.)
     // v(v3, v2) retourne la bonne conjugaison selon le cas
@@ -125,7 +142,7 @@ const Mizuki = {
 
     const today = new Date().toISOString().slice(0,10);
     const workedKey = weekResult ? Math.round((weekResult.workedH||0)*10) : 0;
-    const cacheKey = `${today}_${workedKey}`;
+    const cacheKey = `${today}_${workedKey}_${(daily&&daily.count)||0}`;
     const cached = _json(K.POPUP_CACHE,{});
     if (cached.key === cacheKey && cached.msg) return cached.msg;
 
@@ -146,6 +163,13 @@ const Mizuki = {
         icon: '🌴', level: 'ok',
         message: `Mizuki détecte que ${pr} ${v('est','es')} en congé cette semaine. Les heures complémentaires ne s'accumulent pas pendant les vacances. Profite du repos — tes données restent intactes.`,
         actions: ['Déconnecte vraiment', 'Reviens reposée !'],
+      };
+    } else if (daily && daily.count > 0 && !(weekResult && (weekResult.alerts||[]).some(a=>a.code==='REQUALIFICATION'))) {
+      msg = {
+        titre: '⚠️ Journée trop longue',
+        icon: '⚠️', level: 'alerte',
+        message: `Une journée de ${daily.max}h dépasse le maximum légal de 10h/jour (Art. L3121-18). Un accord d'entreprise ou de branche peut le porter à 12h maximum — vérifie le tien. Pense aussi à ton repos de 11h consécutives entre deux journées (Art. L3131-1), qui limite l'amplitude d'une journée à 13h. La preuve du respect de ces durées incombe à l'employeur.`,
+        actions: ['Noter tes horaires précis', 'Vérifier ton accord d\'entreprise', 'Voir l\'Art. L3121-18', 'Voir l\'Art. L3131-1'],
       };
     } else if (!weekResult || weekResult.workedH <= weekResult.contractH) {
       msg = {
