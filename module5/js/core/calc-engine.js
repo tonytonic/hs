@@ -58,17 +58,21 @@ function getFeriesYear(year) {
   return getFeriesLocal(year);
 }
 
-function countFeriesInWeek(mondayStr, feriesMap, joursOuvresContrat) {
-  // Compte les fériés tombant sur les jours normalement travaillés.
+function countFeriesInWeek(mondayStr, feriesMap, joursOuvresContrat, workedDaysMap) {
+  // Compte les fériés tombant sur les jours normalement travaillés ET NON TRAVAILLÉS.
+  // Un férié réellement travaillé (heures saisies ce jour-là) n'est PAS "chômé" :
+  // il n'y a pas de perte à compenser, donc on n'abaisse pas le seuil (Art. L3133-3).
   // joursOuvresContrat : nombre de jours/semaine (défaut 5). On compte à partir
-  // du début de semaine (mondayStr représente le 1er jour de la semaine du salarié,
-  // pas forcément lundi — peut être samedi pour HCR, mardi, etc.)
+  // du début de semaine (mondayStr = 1er jour de la semaine du salarié, pas
+  // forcément lundi).
   let count=0;
   const nbJours = Math.max(1, Math.min(7, Math.round(joursOuvresContrat||5)));
   for(let d=0;d<nbJours;d++){
     const dt=new Date(mondayStr+'T12:00:00'); dt.setDate(dt.getDate()+d);
     const key=dk(dt);
-    if(feriesMap&&feriesMap[key]) count++;
+    if(feriesMap&&feriesMap[key]){
+      if(!(workedDaysMap && workedDaysMap[key] > 0)) count++; // chômé uniquement
+    }
   }
   return count;
 }
@@ -95,17 +99,22 @@ const CalcEngine = {
     const joursOuvres = options.joursOuvresContrat || 5;
     const neutralise  = options.neutraliseFeries !== false; // true par défaut
 
-    // Calculer seuil ajusté selon les fériés
+    // Seuil déclencheur des heures complémentaires. Deux traitements du férié
+    // CHÔMÉ coexistent en droit/jurisprudence selon la convention (réglage
+    // "neutraliser les fériés") :
+    //  • neutralise = true  → férié chômé ASSIMILÉ à du temps de travail effectif :
+    //    le seuil est abaissé proportionnellement (Art. L3133-3, CCN assimilantes).
+    //  • neutralise = false → férié chômé EXCLU : le seuil reste la durée
+    //    contractuelle, seules les heures travaillées comptent (Cass. n°10-10.701).
+    // Dans les DEUX cas, un férié TRAVAILLÉ n'est jamais neutralisé : il compte
+    // dans les heures réellement saisies (pas de chômage à neutraliser).
     let contractAjuste = contractH;
     let feriesCount = 0;
     let feriesNote = null;
     if(options.feriesMap && neutralise) {
-      // ✅ Art. L3133-3 + jurisprudence : le chômage d'un jour férié ne peut entraîner
-      // de perte, donc le seuil est abaissé proportionnellement aux fériés tombant
-      // sur des jours normalement travaillés.
       const mondayStr = options.mondayStr;
       if(mondayStr) {
-        feriesCount = countFeriesInWeek(mondayStr, options.feriesMap, joursOuvres);
+        feriesCount = countFeriesInWeek(mondayStr, options.feriesMap, joursOuvres, options.workedDaysMap);
         if(feriesCount > 0) {
           const valJour = contractH / joursOuvres;
           contractAjuste = Math.max(0, contractH - feriesCount * valJour);
@@ -113,7 +122,6 @@ const CalcEngine = {
         }
       }
     }
-    // ⬜ Mode alternatif (jurisprudence) : seuil normal, fériés intégrés dans l'assiette
 
     const maxAllowed  = contractAjuste * (1 + cap);
     const threshold1H = contractAjuste * threshold;
