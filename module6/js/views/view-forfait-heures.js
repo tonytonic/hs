@@ -50,7 +50,7 @@ const VFH = {
     </span>`;
     window.M6_Header?.set({
       title: `Forfait Heures ${this._year}`,
-      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · Contingent ${this._contract.contingent||220}h · ${analysis.totalHS}h HS`,
+      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · Contingent ${this._contract.contingent||220}h · ${this._formatH(analysis.totalHS)} HS`,
       showReset: true,
       showSwitch: true,
       onReset: () => {
@@ -146,11 +146,11 @@ const VFH = {
   _tplBilan(a, bio) {
     return `
     <div class="m6-stats-grid" style="margin-bottom:14px">
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHS}h</div><div class="m6-stat-label">Total HS</div></div>
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHS)}</div><div class="m6-stat-label">Total HS</div></div>
       <div class="m6-stat-box"><div class="m6-stat-val">${a.semaines}</div><div class="m6-stat-label">Semaines saisies</div></div>
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux1}h</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
-      ${a.a3Paliers && a.taux_inter ? `<div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux_inter}h</div><div class="m6-stat-label">HS à +${a.taux_inter}%</div></div>` : ''}
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux2}h</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux1)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
+      ${a.a3Paliers && a.taux_inter ? `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux_inter)}</div><div class="m6-stat-label">HS à +${a.taux_inter}%</div></div>` : ''}
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux2)}</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>
       <div class="m6-stat-box" style="border-color:rgba(196,163,90,0.35)">
         <div class="m6-stat-val" style="color:var(--champagne-2)">${a.tauxHoraire>0?a.montantTotal.toFixed(0)+'€':'—'}</div>
         <div class="m6-stat-label">Montant brut HS</div>
@@ -161,14 +161,14 @@ const VFH = {
     <div class="m6-progress-bar-wrap">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
         <span style="font-size:0.72rem;font-weight:600;color:var(--charbon)">Consommation du contingent <span class="m6-tooltip-wrap" id="fh-cont-tip" style="cursor:pointer;font-size:0.65rem;color:var(--pierre)">ⓘ<span class="m6-tooltip-bubble">Contingent annuel de ${a.contingent||220}h fixé par votre CCN ou accord d'entreprise. Au-delà, une autorisation de l'inspection du travail peut être requise (Art. L3121-30).</span></span></span>
-        <span style="font-size:0.72rem;color:${a.tauxRemplissage>=90?'var(--alerte)':'var(--pierre)'}"><strong>${a.totalHS}h</strong> / ${a.contingent||220}h</span>
+        <span style="font-size:0.72rem;color:${a.tauxRemplissage>=90?'var(--alerte)':'var(--pierre)'}"><strong>${this._formatH(a.totalHS)}</strong> / ${a.contingent||220}h</span>
       </div>
       <div class="m6-progress-track">
         <div class="m6-progress-fill" style="width:${Math.min(100,a.tauxRemplissage)}%;background:${a.tauxRemplissage>=100?'linear-gradient(90deg,#9B2C2C,#E53E3E)':a.tauxRemplissage>=90?'linear-gradient(90deg,var(--champagne-2),var(--champagne))':'linear-gradient(90deg,#2D6A4F,#4A7C6F)'}"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--pierre);margin-top:3px">
         <span>${a.tauxRemplissage}% utilisé</span>
-        <span style="color:${(a.contingent||220)-a.totalHS <= 20?'var(--alerte)':'inherit'}">Reste : <strong>${Math.max(0,(a.contingent||220)-a.totalHS)}h</strong></span>
+        <span style="color:${(a.contingent||220)-a.totalHS <= 20?'var(--alerte)':'inherit'}">Reste : <strong>${this._formatH(Math.max(0,(a.contingent||220)-a.totalHS))}</strong></span>
       </div>
     </div>
 
@@ -317,18 +317,18 @@ const VFH = {
               return `<div class="m6-field" style="margin-bottom:8px;${isWE?'opacity:0.7':''}">
                 <label style="display:flex;justify-content:space-between">
                   <span>${j}${isWE?' <span style="font-size:0.65rem;color:var(--pierre)">(WE)</span>':''}</span>
-                  <span id="fh-j${i}-val" style="color:var(--champagne-2)">${stored}h</span>
+                  <span id="fh-j${i}-val" style="color:var(--champagne-2)">${window._m6fmtH(stored)}</span>
                 </label>
                 <input type="range" id="fh-j${i}" min="0" max="14" step="0.5" value="${stored}"
                   oninput="document.getElementById('fh-j${i}-val').textContent=this.value+'h';
                            const t=[0,1,2,3,4,5,6].reduce((s,x)=>s+(parseFloat(document.getElementById('fh-j'+x)?.value)||0),0);
-                           document.getElementById('fh-total-jours').textContent=t.toFixed(1)+'h';">
+                           document.getElementById('fh-total-jours').textContent=window._m6fmtH(t);">
               </div>`;
             }).join('')}
             <div style="display:flex;justify-content:space-between;font-size:0.82rem;font-weight:600;margin-top:4px;padding:8px;background:var(--ivoire-2);border-radius:var(--radius)">
               <span>Total semaine</span>
               <span id="fh-total-jours" style="color:var(--champagne-2)">
-                ${entry.jours ? entry.jours.reduce((s,v)=>s+(v||0),0).toFixed(1) : (seuil).toFixed(1)}h
+                ${window._m6fmtH(entry.jours ? entry.jours.reduce((s,v)=>s+(v||0),0) : seuil)}
               </span>
             </div>
           </div>
@@ -425,9 +425,9 @@ const VFH = {
           const h = window._hmToDec('fh-hH','fh-hM');
           const hs = Math.max(0, h - seuilC);
           if (rtPanel && h > 0) { rtPanel.style.display = ''; }
-          if (rtHS) rtHS.textContent = hs > 0 ? `+${hs.toFixed(1)}h HS` : '0h HS';
+          if (rtHS) rtHS.textContent = hs > 0 ? `+${window._m6fmtH(hs)} HS` : '0h HS';
           const reste = Math.max(0, contingent - totalHSActuel - hs);
-          if (rtReste) { rtReste.textContent = `${reste.toFixed(0)}h / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
+          if (rtReste) { rtReste.textContent = `${window._m6fmtH(reste)} / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
         };
         hInputH?.addEventListener('input', updateRT); hInputM?.addEventListener('input', updateRT);
         updateRT(); // initial render
@@ -450,7 +450,7 @@ const VFH = {
     <div class="m6-alert info" style="margin-bottom:12px;font-size:0.72rem"><span>⚠️</span><div>Le score de Risque CV est un <strong>indicateur épidémiologique</strong>, pas un diagnostic médical. Il ne remplace pas un avis médical. En cas de doute, consultez votre médecin du travail.</div></div>
     <div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">🩺</div><div><div class="m6-card-label">Phase INRS</div><div class="m6-card-title" style="color:${bio.phase?.color}">${bio.phase?.code} — ${bio.phase?.label}</div></div></div><div class="m6-card-body">${bar('Fatigue',bio.fatigue,true)}${bar('Stress',bio.stress,true)}${bar('Récupération',bio.recovery,false)}${bar('Performance (Pencavel)',bio.performance,false)}</div></div>
     <div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">❤️</div><div><div class="m6-card-label">Long terme</div><div class="m6-card-title">Risques</div></div></div><div class="m6-card-body">${bar('Risque CV (OMS/OIT 2021)',bio.cvRisk,true)}${bar('Charge cognitive',bio.cogRisk,true)}<div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">Pega et al. WHO/ILO 2021 · Kivimäki 2015 · Jang 2025<br>⚠️ Ces indicateurs ne remplacent pas un avis médical.</div></div></div>
-    <div class="m6-card"><div class="m6-card-body"><div class="m6-row"><span class="m6-row-label">Semaines saisies</span><span class="m6-row-val">${bio.details.n}</span></div><div class="m6-row"><span class="m6-row-label">Moyenne hebdo</span><span class="m6-row-val">${bio.details.mean}h</span></div><div class="m6-row"><span class="m6-row-label">Semaines surcharge (>120% seuil)</span><span class="m6-row-val">${bio.details.surcharge}</span></div></div></div>`;
+    <div class="m6-card"><div class="m6-card-body"><div class="m6-row"><span class="m6-row-label">Semaines saisies</span><span class="m6-row-val">${bio.details.n}</span></div><div class="m6-row"><span class="m6-row-label">Moyenne hebdo</span><span class="m6-row-val">${window._m6fmtH(bio.details.mean)}</span></div><div class="m6-row"><span class="m6-row-label">Semaines surcharge (>120% seuil)</span><span class="m6-row-val">${bio.details.surcharge}</span></div></div></div>`;
   },
 
   // ── EXPORT ─────────────────────────────────────────────────,
@@ -566,7 +566,7 @@ const VFH = {
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--pierre);margin-bottom:3px">
-          <span><strong style="color:var(--ivoire)">${a.totalHS}h</strong> HS cumulées</span>
+          <span><strong style="color:var(--ivoire)">${window._m6fmtH(a.totalHS)}</strong> HS cumulées</span>
           <span><strong style="color:${pct>=90?'var(--alerte)':'var(--champagne)'}">${pct}%</strong> du contingent</span>
         </div>
         <div style="height:5px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden">
