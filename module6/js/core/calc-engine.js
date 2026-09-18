@@ -314,7 +314,7 @@ const M6_ForfaitHeures = {
         paliers:taux_inter!==null?`+${taux1}%(${hs1}h)+${taux_inter}%(${hs_inter}h)+${taux2}%(${hs2}h)`:`+${taux1}%(${hs1}h)+${taux2}%(${hs2}h)`});
     }
 
-    const totalHS = Math.round((totalHSTaux1 + totalHSTaux_inter + totalHSTaux2)*10)/10;
+    const totalHS = Math.round((totalHSTaux1 + totalHSTaux_inter + totalHSTaux2)*60)/60;
     const pct=Math.min(100,Math.round(totalHS/contingent*100));
     if(totalHS>contingent) alertes.push({niveau:'danger',icon:'⚠️',titre:`Contingent dépassé (${ccnNom})`,
       texte:`${Math.round(totalHS-contingent)}h au-delà du plafond ${contingent}h. CSE + accord requis (L3121-33).`,loi:'L3121-38'});
@@ -335,9 +335,9 @@ const M6_ForfaitHeures = {
     prediction.statut=prediction.ecart>20?'risque':prediction.ecart<-30?'sous':'ok';
 
     return {totalHeures,semaines,totalHS,
-            totalHSTaux1:Math.round(totalHSTaux1*10)/10,
-            totalHSTaux_inter:Math.round(totalHSTaux_inter*10)/10,
-            totalHSTaux2:Math.round(totalHSTaux2*10)/10,
+            totalHSTaux1:Math.round(totalHSTaux1*60)/60,
+            totalHSTaux_inter:Math.round(totalHSTaux_inter*60)/60,
+            totalHSTaux2:Math.round(totalHSTaux2*60)/60,
             montantHS1:Math.round(montantHS1*100)/100,
             montantHS_inter:Math.round(montantHS_inter*100)/100,
             montantHS2:Math.round(montantHS2*100)/100,
