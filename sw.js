@@ -3,7 +3,7 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.10.34"; // v10.10.34 : M5 tous les affichages d heures en h+min (calendrier, totaux, stats, heatmap, apercus) — reglages contrat inchanges
+const CACHE_NAME = "heuressup-cache-v10.10.36"; // v10.10.36 : M6 totalHS arrondi a la minute (Bilan=carte, fini 6h16 vs 6h18)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
