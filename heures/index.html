@@ -641,7 +641,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <div id="saisieWorked" style="display:none">
       <div class="saisie-worked">
         <label>&#x1F551; Total heures travaill&eacute;es ce jour</label>
-        <input id="workedHours" type="number" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcFromWorked()" style="font-size:16px;border-radius:14px;">
+        <div style="display:flex;gap:8px;align-items:center;"><input id="workedHoursH" type="number" min="0" step="1" inputmode="numeric" placeholder="h" max="24" oninput="calcFromWorked()" style="font-size:16px;border-radius:14px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">h</span><input id="workedHoursM" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="min" oninput="calcFromWorked()" style="font-size:16px;border-radius:14px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">min</span></div>
         <div class="calc-result" id="workedResult"></div>
       </div>
     </div>
@@ -657,7 +657,7 @@ document.addEventListener("DOMContentLoaded", function(){
           <button onclick="addExtra(1)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+1 h</button>
           <button onclick="addExtra(2)" style="border-radius:12px;background:#e8f0fe;border:1.5px solid #b3c8fa;color:#1565c0;font-weight:600;padding:10px 4px;margin:0">+2 h</button>
         </div>
-        <input id="manualExtra" type="number" step="0.25" style="border-radius:12px;">
+        <div style="display:flex;gap:8px;align-items:center;"><input id="manualExtraH" type="number" min="0" step="1" inputmode="numeric" placeholder="h" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">h</span><input id="manualExtraM" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="min" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">min</span></div>
       </fieldset>
     </div>
 
@@ -670,13 +670,13 @@ document.addEventListener("DOMContentLoaded", function(){
         <button onclick="addRecup(1)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-1 h</button>
         <button onclick="addRecup(2)" style="border-radius:12px;background:#fff3e0;border:1.5px solid #ffcc80;color:#e65100;font-weight:600;padding:10px 4px;margin:0">-2 h</button>
       </div>
-      <input id="manualRecup" type="number" step="0.25" style="border-radius:12px;">
+      <div style="display:flex;gap:8px;align-items:center;"><input id="manualRecupH" type="number" min="0" step="1" inputmode="numeric" placeholder="h" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">h</span><input id="manualRecupM" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="min" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">min</span></div>
     </fieldset>
 
     <fieldset class="block absence" style="border:none;padding:0;margin-top:8px">
       <legend style="font-weight:700;color:#c62828;margin-bottom:6px">&#10060; Absence</legend>
       <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:4px"><input type="checkbox" id="isAbsent" style="width:18px;height:18px;margin:0"> Heures d&apos;absence</label>
-      <input id="absentHours" type="number" step="0.25" style="border-radius:12px;">
+      <div style="display:flex;gap:8px;align-items:center;"><input id="absentH" type="number" min="0" step="1" inputmode="numeric" placeholder="h" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">h</span><input id="absentM" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="min" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">min</span></div>
     </fieldset>
 
     <div class="popup-actions">
@@ -816,7 +816,9 @@ function loadExercise(suffix){
   toast("📅 Exercice "+suffix+" chargé","info");
 }
 function openYearsPopup(){const box=document.getElementById("yearsList");if(!box)return;box.innerHTML="";const years=getExistingYears();if(!years.length)box.innerHTML="<i>Aucun exercice existant</i>";else years.forEach(y=>{const btn=document.createElement("button");btn.textContent=y+(String(y)===String(currentSuffix)?" ✓ (actif)":"");btn.style.background=String(y)===String(currentSuffix)?"var(--accent)":"";btn.onclick=()=>{if(String(y)===String(currentSuffix)){closeYearsPopup();return;}loadExercise(y);};box.appendChild(btn);});document.getElementById("popupYears").style.display="flex";}
-function saveManual(){if(!selectedDate)return;if(!data[selectedDate])data[selectedDate]={extra:0,recup:0,absent:0};data[selectedDate].extra=Number(manualExtra.value)||0;data[selectedDate].recup=Number(manualRecup.value)||0;data[selectedDate].absent=isAbsent.checked?(Number(absentHours.value)||DAILY_WORK_HOURS):0;save();const _sd1=selectedDate;closePopup();showSaveFeedback(_sd1);}
+function _hmToDec(hId,mId){var h=Number(document.getElementById(hId).value)||0;var m=Number(document.getElementById(mId).value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;}
+function _decToHM(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;}
+function saveManual(){if(!selectedDate)return;if(!data[selectedDate])data[selectedDate]={extra:0,recup:0,absent:0};data[selectedDate].extra=_hmToDec('manualExtraH','manualExtraM');data[selectedDate].recup=_hmToDec('manualRecupH','manualRecupM');data[selectedDate].absent=isAbsent.checked?(_hmToDec('absentH','absentM')||DAILY_WORK_HOURS):0;save();const _sd1=selectedDate;closePopup();showSaveFeedback(_sd1);}
 function closeYearsPopup(){document.getElementById("popupYears").style.display="none";}
 function confirmSwitchYear(){const val=document.getElementById("newYearInput").value;if(!val)return;if(!localStorage.getItem("DATA_REPORT_"+val)){localStorage.setItem("DATA_REPORT_"+val,JSON.stringify({}));localStorage.setItem("CLOSURES_REPORT_"+val,JSON.stringify([]));localStorage.setItem("REPORTS_REPORT_"+val,JSON.stringify({}));localStorage.setItem("PERIOD_META_REPORT_"+val,JSON.stringify({}));}loadExercise(val);}
 function addRecup(h){if(!data[selectedDate])data[selectedDate]={extra:0,recup:0};const nv=Math.round((data[selectedDate].recup+h)*4)/4;data[selectedDate].recup=ALLOW_RECUP_FREE?nv:Math.min(nv,data[selectedDate].extra);save();closePopup();}
@@ -830,17 +832,17 @@ function setSaisieMode(mode){
   document.getElementById('modeWorked').classList.toggle('active',mode==='worked');
   document.getElementById('saisieHS').style.display=mode==='hs'?'':'none';
   document.getElementById('saisieWorked').style.display=mode==='worked'?'':'none';
-  if(mode==='worked'){document.getElementById('workedHours').value='';document.getElementById('workedResult').textContent='';}
+  if(mode==='worked'){document.getElementById('workedHoursH').value='';document.getElementById('workedHoursM').value='';document.getElementById('workedResult').textContent='';}
 }
 function getBaseJour(){const r=getCCNRules();return r.seuil/5;}
 function calcFromWorked(){
-  const w=Number(document.getElementById('workedHours').value)||0;
+  const w=_hmToDec('workedHoursH','workedHoursM');
   const base=getBaseJour();
-  const extra=Math.max(0,Math.round((w-base)*4)/4);
+  const extra=Math.max(0,Math.round((w-base)*60)/60);
   document.getElementById('workedResult').innerHTML=w>0
     ?'Base journalière : <b>'+base.toFixed(2)+'h</b> ('+getCCNRules().seuil+'h/5j) → <b>HS : '+fmtH(extra)+'</b>'
     :'';
-  document.getElementById('manualExtra').value=extra;
+  _decToHM(extra,'manualExtraH','manualExtraM');
 }
 function getExistingYears(){const s=new Set();for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("DATA_REPORT_"))s.add(k.replace("DATA_REPORT_",""));}return Array.from(s).sort();}
 let STORAGE={data:"DATA_REPORT_"+currentSuffix,closures:"CLOSURES_REPORT_"+currentSuffix,reports:"REPORTS_REPORT_"+currentSuffix,annualDate:"ANNUAL_DATE_"+currentSuffix,specialDays:"SPECIAL_DAYS_"+currentSuffix,exerciseStart:"EXERCISE_START_"+currentSuffix,periodMeta:"PERIOD_META_REPORT_"+currentSuffix};
@@ -938,10 +940,7 @@ const periodInfo=document.getElementById("periodInfo");
 const totaux=document.getElementById("totaux");
 const popup=document.getElementById("popup");
 const popupDate=document.getElementById("popupDate");
-const manualExtra=document.getElementById("manualExtra");
-const manualRecup=document.getElementById("manualRecup");
 const isAbsent=document.getElementById("isAbsent");
-const absentHours=document.getElementById("absentHours");
 const popupJSON=document.getElementById("popupJSON");
 const jsonTitle=document.getElementById("jsonTitle");
 const jsonArea=document.getElementById("jsonArea");
@@ -1255,11 +1254,11 @@ function openPopup(date){
         :'🎌 <b>Jour férié chômé</b> — Mode automatique actif : <b>−7h</b> appliquées sur la semaine. Vous pouvez ajouter des HS si vous avez travaillé ce jour.';
     }
   }
-  popupDate.textContent=date;manualExtra.value=d.extra;manualRecup.value=d.recup;
-  absentHours.value=d.absent||0;isAbsent.checked=(d.absent||0)>0;
+  popupDate.textContent=date;_decToHM(d.extra,'manualExtraH','manualExtraM');_decToHM(d.recup,'manualRecupH','manualRecupM');
+  _decToHM(d.absent||0,'absentH','absentM');isAbsent.checked=(d.absent||0)>0;
   // Restore saisie mode
   setSaisieMode(_saisieMode);
-  if(_saisieMode==='worked'){const base=getBaseJour();const total=d.extra>0?d.extra+base:0;document.getElementById('workedHours').value=total>0?total:'';calcFromWorked();}
+  if(_saisieMode==='worked'){const base=getBaseJour();const total=d.extra>0?d.extra+base:0;_decToHM(total,'workedHoursH','workedHoursM');calcFromWorked();}
   lockBodyScroll();popup.style.display="flex";
 }
 function closePopup(){document.getElementById("popup").style.display="none";const had=selectedDate;selectedDate="";unlockBodyScroll();if(had&&typeof update==="function")update();}
