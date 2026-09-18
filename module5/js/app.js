@@ -255,7 +255,7 @@ function renderCalendar() {
       const base=contract.hoursBase;
       const currentTotal=wk&&wk.total!==null&&wk.total!==undefined?wk.total:null;
       const presets=[
-        {h:base,lbl:`${base}h ✓`},
+        {h:base,lbl:`${window._m5fmtH(base)} ✓`},
         {h:base+1,lbl:`${base+1}h`},
         {h:base+2,lbl:`${base+2}h`},
         {h:base+3,lbl:`${base+3}h`},
@@ -289,7 +289,7 @@ function renderCalendar() {
     el.innerHTML=`
       <div class="m5-cal-weekly-badge">Mode hebdomadaire${_wkLocked?' · 🔒 verrouillé':''}</div>
       <div class="m5-cal-week-total-cell${_wkLocked?' m5-locked':''}" onclick="openWeeklySaisie()">
-        <div class="m5-cal-week-total-val">${wk.total}h</div>
+        <div class="m5-cal-week-total-val">${window._m5fmtH(wk.total)}</div>
         <div class="m5-cal-week-total-sub">${_wkLocked?'période verrouillée 🔒':'total semaine — tap pour modifier'}</div>
       </div>
       <div style="display:flex;gap:8px;margin-top:10px;">
@@ -348,7 +348,7 @@ function renderCalendar() {
     let hoursHtml='<span class="m5-cal-day-empty">—</span>';
     if(isFerie&&!isVac) {
       cellClass+=' ferie';
-      hoursHtml=worked!==null?`<span class="m5-cal-day-hours">${worked}h</span><span class="m5-cal-day-ferie">🎌</span>`:'<span class="m5-cal-day-ferie">🎌</span>';
+      hoursHtml=worked!==null?`<span class="m5-cal-day-hours">${window._m5fmtH(worked)}</span><span class="m5-cal-day-ferie">🎌</span>`:'<span class="m5-cal-day-ferie">🎌</span>';
     }
     if(isVac) {
       cellClass+=' vac';
@@ -361,9 +361,9 @@ function renderCalendar() {
       const diff=worked-contract_daily;
       cellClass+= diff>0?' over': diff<-0.5?' under':' normal';
       if(worked>10) cellClass+=' m5-day-over10';
-      hoursHtml=`<span class="m5-cal-day-hours">${worked}h</span>`;
+      hoursHtml=`<span class="m5-cal-day-hours">${window._m5fmtH(worked)}</span>`;
       if(worked>10) hoursHtml+='<span class="m5-cal-day-warn" title="Plus de 10h — Art. L3121-18">⚠️</span>';
-      if(diff>0) hoursHtml+=`<span class="m5-cal-day-diff">+${diff.toFixed(1)}</span>`;
+      if(diff>0) hoursHtml+=`<span class="m5-cal-day-diff">+${window._m5fmtH(diff)}</span>`;
     }
 
     if(isToday) cellClass+=' today';
@@ -387,7 +387,7 @@ function renderCalendar() {
     html+=`<div class="m5-cal-total">
       <span>Total semaine</span>
       <span style="font-weight:700;color:${diff>0?'var(--miz-warning)':'var(--miz-success)'}">
-        ${total}h ${diff>0?'(+'+diff.toFixed(1)+'h comp.)':''}
+        ${window._m5fmtH(total)} ${diff>0?'(+'+window._m5fmtH(diff)+' comp.)':''}
       </span>
       <span style="font-size:11px;color:var(--miz-text3)">${pct35}% du temps plein</span>
     </div>`;
@@ -479,8 +479,8 @@ Passer en mode journalier va la remplacer. Continuer ?`)) return;
   document.getElementById('day-saisie-title').textContent=`${jourLabel} ${dateStr.slice(8)}/${dateStr.slice(5,7)}`;
   document.getElementById('day-saisie-date').value=dateStr;
 
-  const inp=document.getElementById('day-saisie-hours');
-  inp.value=existing?existing.worked:'';
+  const inp=document.getElementById('day-saisie-hoursH');
+  window._decToHM(existing?existing.worked:0,'day-saisie-hoursH','day-saisie-hoursM');
 
   // Propositions rapides basées sur le contrat
   // Utilise joursOuvresContrat (défini par l'utilisatrice) au lieu de 5 en dur
@@ -515,7 +515,7 @@ Passer en mode journalier va la remplacer. Continuer ?`)) return;
 }
 
 function selectQuickHour(h) {
-  document.getElementById('day-saisie-hours').value=h;
+  window._decToHM(h,'day-saisie-hoursH','day-saisie-hoursM');
   document.querySelectorAll('.m5-quick-btn').forEach(b=>{
     b.classList.toggle('selected', parseFloat(b.getAttribute('data-val'))===h);
   });
@@ -524,18 +524,18 @@ function selectQuickHour(h) {
 
 function updateDayPreview() {
   const contract=M5_Contract.get();
-  const worked=parseFloat(document.getElementById('day-saisie-hours')?.value)||0;
+  const worked=window._hmToDec('day-saisie-hoursH','day-saisie-hoursM');
   const prev=document.getElementById('day-saisie-preview');
   if(!prev||!contract.hoursBase) return;
   const _nb=Math.max(1,Math.min(7,contract.joursOuvresContrat||5));
   const base=Math.round((contract.hoursBase/_nb)*100)/100;
   const _hc=document.getElementById('day-hc-only')&&document.getElementById('day-hc-only').checked;
-  if(_hc){ const _t=Math.round((base+worked)*100)/100; prev.innerHTML='<span style="color:var(--miz-warning);font-size:13px;">+'+worked+'h en plus → journée de <b>'+_t+'h</b> (base '+base+'h)</span>'; return; }
+  if(_hc){ const _t=Math.round((base+worked)*100)/100; prev.innerHTML='<span style="color:var(--miz-warning);font-size:13px;">+'+window._m5fmtH(worked)+' en plus → journée de <b>'+window._m5fmtH(_t)+'</b> (base '+window._m5fmtH(base)+')</span>'; return; }
   const diff=worked-base;
   prev.innerHTML=diff>0.09
-    ?`<span style="color:var(--miz-warning);font-size:13px;">+${diff.toFixed(1)}h au-delà de ta base journalière (${base}h)</span>`
+    ?`<span style="color:var(--miz-warning);font-size:13px;">+${window._m5fmtH(diff)} au-delà de ta base journalière (${window._m5fmtH(base)})</span>`
     :diff<-0.1
-      ?`<span style="color:var(--miz-text3);font-size:13px;">${diff.toFixed(1)}h — en dessous de la base journalière</span>`
+      ?`<span style="color:var(--miz-text3);font-size:13px;">${window._m5fmtH(diff)} — en dessous de la base journalière</span>`
       :`<span style="color:var(--miz-success);font-size:13px;">✓ Dans ta base journalière</span>`;
 }
 
@@ -549,12 +549,12 @@ window.M5dayHCtoggle=function(){
   var props=[]; steps.forEach(function(h){ if(h>=0&&h<=12) props.push(Math.round(h*4)/4); });
   var html=''; [...new Set(props)].sort(function(a,b){return a-b;}).forEach(function(h){ html+='<button class="m5-quick-btn" data-val="'+h+'" onclick="selectQuickHour('+h+')">'+(window._m5fmtH?window._m5fmtH(h):h+'h')+'</button>'; });
   var el=document.getElementById('day-quick-hours'); if(el) el.innerHTML=html;
-  var inp=document.getElementById('day-saisie-hours'); if(inp){ inp.value=''; inp.placeholder = hc ? 'ex: 2 (heures en plus)' : 'ex: 5.75 (= 5h45)'; }
+  var _ih=document.getElementById('day-saisie-hoursH'),_im=document.getElementById('day-saisie-hoursM'); if(_ih)_ih.value=''; if(_im)_im.value='';
   updateDayPreview();
 };
 function saveDaySaisie() {
   const dateStr=document.getElementById('day-saisie-date').value;
-  let worked=parseFloat(document.getElementById('day-saisie-hours').value);
+  let worked=window._hmVal('day-saisie-hoursH','day-saisie-hoursM');
   if(!dateStr||isNaN(worked)||worked<0||worked>24) {
     toast('Saisis un nombre d\'heures valide (0-24).','error'); return;
   }
@@ -601,8 +601,7 @@ function openWeeklySaisie() {
   document.getElementById('week-saisie-title').textContent=label;
   document.getElementById('week-saisie-monday').value=calendarMonday;
 
-  const inp=document.getElementById('week-saisie-hours');
-  inp.value=wk.total!==null?wk.total:contract.hoursBase;
+  window._decToHM(wk.total!==null?wk.total:contract.hoursBase,'week-saisie-hoursH','week-saisie-hoursM');
 
   // Avenant — affichage selon CCN (L3123-22) OU si un avenant existe déjà sauvegardé
   // (on ne peut pas masquer une coche déjà cochée et sauvegardée par l'utilisateur)
@@ -652,7 +651,7 @@ function toggleAvenat() {
 }
 
 function selectWeekQuick(h) {
-  document.getElementById('week-saisie-hours').value=h;
+  window._decToHM(h,'week-saisie-hoursH','week-saisie-hoursM');
   document.querySelectorAll('#week-quick-hours .m5-quick-btn').forEach(b=>{
     b.classList.toggle('selected',parseFloat(b.textContent)===h);
   });
@@ -661,7 +660,7 @@ function selectWeekQuick(h) {
 
 function updateWeekPreview() {
   const contract=M5_Contract.get();
-  const worked=parseFloat(document.getElementById('week-saisie-hours')?.value)||0;
+  const worked=window._hmToDec('week-saisie-hoursH','week-saisie-hoursM');
   const prev=document.getElementById('week-saisie-preview');
   if(!prev||!contract.hoursBase) return;
 
@@ -675,8 +674,8 @@ function updateWeekPreview() {
     result=CalcEngine.calcAvenant(contract.hoursBase,avenatH,worked,contract.hourlyRate||0);
     if(result) {
       html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <span class="m5-preview-tag">${result.avenatPaidH>0?result.avenatPaidH.toFixed(1)+'h avenant (taux normal)':'✓ Dans le contrat'}</span>
-        ${result.compH25>0?`<span class="m5-preview-tag warn">+${result.compH25.toFixed(1)}h à +25%</span>`:''}
+        <span class="m5-preview-tag">${result.avenatPaidH>0?window._m5fmtH(result.avenatPaidH)+' avenant (taux normal)':'✓ Dans le contrat'}</span>
+        ${result.compH25>0?`<span class="m5-preview-tag warn">+${window._m5fmtH(result.compH25)} à +25%</span>`:''}
         <span class="m5-preview-tag ${pct35>=95?'danger':''}">${pct35}% temps plein</span>
       </div>`;
       if(result.avenatPaidH>0&&!result.compH25) {
@@ -685,27 +684,27 @@ function updateWeekPreview() {
       result.alerts.forEach(a=>{
         html+=`<div class="m5-alert ${a.level}" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>${a.level==='critique'?'🚨':'ℹ️'}</span> ${a.msg}</div>`;
       });
-      if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${result.totalCompH}h comp. cette semaine).</div>`;}
+      if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${window._m5fmtH(result.totalCompH)} comp. cette semaine).</div>`;}
     }
   } else {
     const _pfm=(typeof M5_getFeriesYear!=='undefined')?M5_getFeriesYear(parseInt(calendarMonday.slice(0,4))):null;
     result=CalcEngine.calcWeek(contract.hoursBase,worked,contract,contract.hourlyRate||0,
       { feriesMap:_pfm, neutraliseFeries: contract.neutraliseFeries===true||contract.neutraliseFeries===undefined, mondayStr:calendarMonday, joursOuvresContrat:contract.joursOuvresContrat||5, workedDaysMap:_workedDaysMap(calendarMonday,M5_DataStore.getYear()) });
     html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-      <span class="m5-preview-tag ${result.totalCompH>0?'warn':'ok'}">${result.totalCompH>0?'+'+result.totalCompH.toFixed(1)+'h comp.':'✓ Dans le contrat'}</span>
+      <span class="m5-preview-tag ${result.totalCompH>0?'warn':'ok'}">${result.totalCompH>0?'+'+window._m5fmtH(result.totalCompH)+' comp.':'✓ Dans le contrat'}</span>
       <span class="m5-preview-tag ${pct35>=95?'danger':''}">${pct35}% du temps plein</span>
     </div>`;
     result.alerts.forEach(a=>{
       html+=`<div class="m5-alert ${a.level}" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>${a.level==='critique'?'🚨':'⚠️'}</span> ${a.msg}</div>`;
     });
-    if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${result.totalCompH}h comp. cette semaine).</div>`;}
+    if(result.totalCompH>0&&contract.hourlyRate>0){const _c=result.comp1Amount+result.comp2Amount;html+=`<div class="m5-alert info" style="font-size:12px;padding:6px 10px;"><span>💰</span> Estimation semaine : <strong>${_c.toFixed(2)} € brut</strong> de majoration (sur ${window._m5fmtH(result.totalCompH)} comp. cette semaine).</div>`;}
   }
   prev.innerHTML=html;
 }
 
 function saveWeeklySaisie() {
   const monday=document.getElementById('week-saisie-monday').value;
-  const worked=parseFloat(document.getElementById('week-saisie-hours').value);
+  const worked=window._hmVal('week-saisie-hoursH','week-saisie-hoursM');
   if(!monday||isNaN(worked)||worked<0||worked>=35) {
     toast('Saisis un total entre 0 et 34,5h.','error'); return;
   }
@@ -796,7 +795,7 @@ function renderWeekSummary(analysis) {
   });
   if(weekResult.totalCompH>0&&contract.hourlyRate>0&&!prevenanceAlert) {
     const _cw=(weekResult.comp1Amount||0)+(weekResult.comp2Amount||0);
-    html+=`<div class="m5-alert info"><span>💰</span><div>Majoration estimée cette semaine : <strong>${_cw.toFixed(2)} € brut</strong> (${weekResult.totalCompH}h comp. × taux majoré). Estimation brute basée sur votre taux horaire contractuel.</div></div>`;
+    html+=`<div class="m5-alert info"><span>💰</span><div>Majoration estimée cette semaine : <strong>${_cw.toFixed(2)} € brut</strong> (${window._m5fmtH(weekResult.totalCompH)} comp. × taux majoré). Estimation brute basée sur votre taux horaire contractuel.</div></div>`;
   }
   el.innerHTML=html;
 }
@@ -824,12 +823,12 @@ function renderQuickStats(analysis) {
     const cls=solde>1?'ok':solde<-2?'danger':'warn';
     html+=`<div class="m5-stat-grid" style="margin-bottom:10px;">
       <div class="m5-stat"><div class="m5-stat-val">${annuelResult.pctAvancement}%</div><div class="m5-stat-label">Exercice écoulé</div></div>
-      <div class="m5-stat"><div class="m5-stat-val">${annuelResult.reelCumule}h</div><div class="m5-stat-label">Heures réalisées</div></div>
-      <div class="m5-stat"><div class="m5-stat-val ${cls}">${solde>=0?'+':''}${solde}h</div><div class="m5-stat-label">Avance/Retard</div></div>
+      <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(annuelResult.reelCumule)}</div><div class="m5-stat-label">Heures réalisées</div></div>
+      <div class="m5-stat"><div class="m5-stat-val ${cls}">${solde>=0?'+':''}${window._m5fmtH(solde)}</div><div class="m5-stat-label">Avance/Retard</div></div>
     </div>
     <div class="m5-alert ${solde>1?'ok':solde<-2?'warn':'info'}" style="margin-bottom:6px;">
       <span>${solde>1?'🚀':solde<-2?'⏳':'➡️'}</span>
-      <div style="font-size:12px;">Objectif : <strong>${annuelResult.objectifAnnuel}h/an</strong> — Théorique cumulé : ${annuelResult.theoriqueCumule}h</div>
+      <div style="font-size:12px;">Objectif : <strong>${window._m5fmtH(annuelResult.objectifAnnuel)}/an</strong> — Théorique cumulé : ${window._m5fmtH(annuelResult.theoriqueCumule)}</div>
     </div>`;
     // Plafond HC annuel Art. L3123-28 = contractH × cap × 52
     const hcCapAnnuel=Math.round(contract.hoursBase*contract.cap*52*10)/10;
@@ -841,7 +840,7 @@ function renderQuickStats(analysis) {
     html+=`<div style="margin-top:6px;padding:10px 12px;background:rgba(108,63,197,0.06);border:1px solid var(--miz-border);border-radius:10px;">
       <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:5px;">
         <span style="color:var(--miz-text2);">Plafond HC annuel</span>
-        <span style="font-weight:700;color:${hcCol}">${totalHcAnnuel}h / ${hcCapAnnuel}h (${hcPct}%)</span>
+        <span style="font-weight:700;color:${hcCol}">${window._m5fmtH(totalHcAnnuel)} / ${window._m5fmtH(hcCapAnnuel)} (${hcPct}%)</span>
       </div>
       <div style="height:6px;background:var(--miz-bg3);border-radius:3px;overflow:hidden;">
         <div style="height:100%;width:${Math.min(hcPct,100)}%;background:${hcCol};border-radius:3px;transition:width .4s;"></div>
@@ -851,16 +850,16 @@ function renderQuickStats(analysis) {
     </div>`;
   } else if(mode==='MENSUEL'&&mensuelResult) {
     const delta=mensuelResult.delta;
-    const deltaLabel=delta>0?`+${delta.toFixed(1)}h HC`:delta===0?'✓ Équilibré':'Sous le seuil';
+    const deltaLabel=delta>0?`+${window._m5fmtH(delta)} HC`:delta===0?'✓ Équilibré':'Sous le seuil';
     const deltaCls=delta>0?'warn':'ok';
     // Barre de progression vers le seuil
     const pct=Math.min(100,Math.round(mensuelResult.totalWorked/mensuelResult.seuilMensuel*100));
     const reste=Math.max(0,Math.round((mensuelResult.seuilMensuel-mensuelResult.totalWorked)*10)/10);
     const barColor=pct>=100?'var(--miz-warning)':'var(--miz-primary)';
     html+=`<div class="m5-stat-grid" style="margin-bottom:10px;">
-      <div class="m5-stat"><div class="m5-stat-val">${mensuelResult.totalWorked}h</div><div class="m5-stat-label">Réalisées</div></div>
-      <div class="m5-stat"><div class="m5-stat-val" style="color:var(--miz-text3);font-size:16px;">${mensuelResult.seuilMensuel}h</div><div class="m5-stat-label">Seuil période</div></div>
-      <div class="m5-stat"><div class="m5-stat-val ${mensuelResult.totalCompH>0?'warn':'ok'}">${mensuelResult.totalCompH}h</div><div class="m5-stat-label">HC générées</div></div>
+      <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(mensuelResult.totalWorked)}</div><div class="m5-stat-label">Réalisées</div></div>
+      <div class="m5-stat"><div class="m5-stat-val" style="color:var(--miz-text3);font-size:16px;">${window._m5fmtH(mensuelResult.seuilMensuel)}</div><div class="m5-stat-label">Seuil période</div></div>
+      <div class="m5-stat"><div class="m5-stat-val ${mensuelResult.totalCompH>0?'warn':'ok'}">${window._m5fmtH(mensuelResult.totalCompH)}</div><div class="m5-stat-label">HC générées</div></div>
     </div>
     <div style="margin-bottom:8px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -871,7 +870,7 @@ function renderQuickStats(analysis) {
         <div style="height:100%;width:${pct}%;background:${barColor};border-radius:4px;transition:width .3s;"></div>
       </div>
       <div style="font-size:11px;color:var(--miz-text3);margin-top:4px;text-align:right;">
-        ${pct<100?`Il reste <strong>${reste}h</strong> pour atteindre le seuil`:'<span style="color:var(--miz-warning)">⚠️ Seuil dépassé — heures comp. en cours</span>'}
+        ${pct<100?`Il reste <strong>${window._m5fmtH(reste)}</strong> pour atteindre le seuil`:'<span style="color:var(--miz-warning)">⚠️ Seuil dépassé — heures comp. en cours</span>'}
       </div>
     </div>`;
     if(mensuelResult.alerts&&mensuelResult.alerts.length) {
@@ -947,9 +946,9 @@ function renderWellbeing(analysis) {
     html+=`<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.40);border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;">
       <span style="font-size:14px;">⏳</span>
       <div>
-        <strong>Semaine en cours : ${wb.currentWeekH}h${hasHC ? ` (+${diffH}h HC)` : ''}</strong><br>
+        <strong>Semaine en cours : ${window._m5fmtH(wb.currentWeekH)}${hasHC ? ` (+${window._m5fmtH(diffH)} HC)` : ''}</strong><br>
         ${hasHC
-          ? `Ces ${diffH}h d'heures complémentaires seront intégrées au score bio <strong>${joursRestants}</strong> quand la semaine sera complète.`
+          ? `Ces ${window._m5fmtH(diffH)} d'heures complémentaires seront intégrées au score bio <strong>${joursRestants}</strong> quand la semaine sera complète.`
           : `La semaine en cours est exclue des calculs jusqu'à dimanche — seules les semaines complètes alimentent l'analyse.`
         }
       </div>
@@ -1316,10 +1315,10 @@ function renderHistorique() {
     const label=`${d.getDate()}/${d.getMonth()+1} → ${fn.getDate()}/${fn.getMonth()+1}`;
     let cls='normal';
     if(isVac) cls='vacances'; else if(pct35>=95) cls='danger'; else if(diff>0) cls='warn';
-    const compLabel=isVac?'🌴':diff>0?`+${diff.toFixed(1)}h`:'✓';
+    const compLabel=isVac?'🌴':diff>0?`+${window._m5fmtH(diff)}`:'✓';
     return `<div class="m5-week-item" onclick="goToWeek('${w.monday}')">
       <div class="m5-week-date">${label} <span style="font-size:10px;color:var(--miz-text3)">${w.mode==='week'?'hebdo':'journal.'}</span></div>
-      <div class="m5-week-hours">${isVac?'—':worked+'h'}</div>
+      <div class="m5-week-hours">${isVac?'—':window._m5fmtH(worked)}</div>
       <div class="m5-week-comp ${cls}">${compLabel}</div>
     </div>`;
   }).join('');
@@ -1364,16 +1363,16 @@ function renderStats() {
       <div class="m5-card-body">
         <div class="m5-stat-grid" style="margin-bottom:12px;">
           <div class="m5-stat"><div class="m5-stat-val">${ar.pctAvancement}%</div><div class="m5-stat-label">Exercice écoulé</div></div>
-          <div class="m5-stat"><div class="m5-stat-val">${ar.reelCumule}h</div><div class="m5-stat-label">Réalisées</div></div>
-          <div class="m5-stat"><div class="m5-stat-val ${cls}">${solde>=0?'+':''}${solde}h</div><div class="m5-stat-label">Avance/Retard</div></div>
+          <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(ar.reelCumule)}</div><div class="m5-stat-label">Réalisées</div></div>
+          <div class="m5-stat"><div class="m5-stat-val ${cls}">${solde>=0?'+':''}${window._m5fmtH(solde)}</div><div class="m5-stat-label">Avance/Retard</div></div>
         </div>
         <div class="m5-alert info" style="margin-bottom:8px;">
-          <span>🎯</span><div>Objectif : <strong>${ar.objectifAnnuel}h/an</strong><br>
-          <small>Théorique cumulé : ${ar.theoriqueCumule}h — ${ar.joursEcoules} jours écoulés</small></div>
+          <span>🎯</span><div>Objectif : <strong>${window._m5fmtH(ar.objectifAnnuel)}/an</strong><br>
+          <small>Théorique cumulé : ${window._m5fmtH(ar.theoriqueCumule)} — ${ar.joursEcoules} jours écoulés</small></div>
         </div>
         <div class="m5-alert ${solde>1?'ok':solde<-2?'warn':'info'}">
           <span>${solde>1?'🚀':solde<-2?'⏳':'➡️'}</span>
-          <div>${solde>1?`En avance de <strong>${solde}h</strong>.`:solde<-2?`<strong>${Math.abs(solde)}h</strong> de retard.`:"Dans les clous sur l'objectif annuel."}</div>
+          <div>${solde>1?`En avance de <strong>${window._m5fmtH(solde)}</strong>.`:solde<-2?`<strong>${window._m5fmtH(Math.abs(solde))}</strong> de retard.`:"Dans les clous sur l'objectif annuel."}</div>
         </div>
       </div></div>`;
   } else if(mode==='MENSUEL'&&analysis&&analysis.mensuelResult) {
@@ -1383,14 +1382,14 @@ function renderStats() {
       <div class="m5-card-header"><span class="m5-card-title">📊 Bilan mensuel — ${new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</span></div>
       <div class="m5-card-body">
         <div class="m5-stat-grid" style="margin-bottom:12px;">
-          <div class="m5-stat"><div class="m5-stat-val">${mr.totalWorked}h</div><div class="m5-stat-label">Ce mois</div></div>
-          <div class="m5-stat"><div class="m5-stat-val ${delta>0?'warn':'ok'}">${delta>=0?'+':''}${delta.toFixed(1)}h</div><div class="m5-stat-label">vs seuil</div></div>
-          <div class="m5-stat"><div class="m5-stat-val">${mr.totalCompH}h</div><div class="m5-stat-label">Heures comp.</div></div>
+          <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(mr.totalWorked)}</div><div class="m5-stat-label">Ce mois</div></div>
+          <div class="m5-stat"><div class="m5-stat-val ${delta>0?'warn':'ok'}">${delta>=0?'+':''}${window._m5fmtH(delta)}</div><div class="m5-stat-label">vs seuil</div></div>
+          <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(mr.totalCompH)}</div><div class="m5-stat-label">Heures comp.</div></div>
         </div>
         <div class="m5-alert info" style="margin-bottom:8px;">
-          <span>📊</span><div>Seuil mensuel : <strong>${mr.seuilMensuel}h</strong> (${contract.hoursBase}h × 52 / 12)</div>
+          <span>📊</span><div>Seuil mensuel : <strong>${window._m5fmtH(mr.seuilMensuel)}</strong> (${contract.hoursBase}h × 52 / 12)</div>
         </div>
-        ${mr.totalCompH>0?`<div class="m5-alert ok"><span>💰</span><div>${mr.compH1.toFixed(1)}h à +${Math.round((contract.rate1||0.10)*100)}%${mr.compH2>0?' | '+mr.compH2.toFixed(1)+'h à +'+Math.round((contract.rate2||0.25)*100)+'%':''}</div></div>`:''}
+        ${mr.totalCompH>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(mr.compH1)} à +${Math.round((contract.rate1||0.10)*100)}%${mr.compH2>0?' | '+window._m5fmtH(mr.compH2)+' à +'+Math.round((contract.rate2||0.25)*100)+'%':''}</div></div>`:''}
       </div></div>`;
   } else if(stats) {
     html+=`<div class="m5-card" style="margin:12px 0;">
@@ -1398,14 +1397,14 @@ function renderStats() {
       <div class="m5-card-body">
         <div class="m5-stat-grid" style="margin-bottom:14px;">
           <div class="m5-stat"><div class="m5-stat-val">${stats.totalWeeks}</div><div class="m5-stat-label">Semaines</div></div>
-          <div class="m5-stat"><div class="m5-stat-val">${stats.avgWorked}h</div><div class="m5-stat-label">Moy. hebdo</div></div>
+          <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(stats.avgWorked)}</div><div class="m5-stat-label">Moy. hebdo</div></div>
           <div class="m5-stat"><div class="m5-stat-val">${stats.pctOverContract}%</div><div class="m5-stat-label">En dépassement</div></div>
         </div>
         <div class="m5-alert ${stats.totalComp>caps.annual?'warn':'info'}" style="margin-bottom:8px;">
-          <span>⏱️</span><div><strong>${stats.totalComp.toFixed(1)}h</strong> complémentaires<br>
-          <small>Plafond annuel estimé : ${caps.annual.toFixed(1)}h</small></div>
+          <span>⏱️</span><div><strong>${window._m5fmtH(stats.totalComp)}</strong> complémentaires<br>
+          <small>Plafond annuel estimé : ${window._m5fmtH(caps.annual)}</small></div>
         </div>
-        ${stats.totalComp1>0?`<div class="m5-alert ok"><span>💰</span><div>${stats.totalComp1.toFixed(1)}h à +${Math.round((contract.rate1||0.10)*100)}%${stats.totalComp2>0?' | '+stats.totalComp2.toFixed(1)+'h à +'+Math.round((contract.rate2||0.25)*100)+'%':' | Aucune tranche à 25%'}</div></div>`:''}
+        ${stats.totalComp1>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(stats.totalComp1)} à +${Math.round((contract.rate1||0.10)*100)}%${stats.totalComp2>0?' | '+window._m5fmtH(stats.totalComp2)+' à +'+Math.round((contract.rate2||0.25)*100)+'%':' | Aucune tranche à 25%'}</div></div>`:''}
       </div></div>`;
   } else {
     html='<div class="m5-empty"><div class="m5-empty-icon">📊</div><div class="m5-empty-text">Aucune semaine saisie pour '+year+'.</div></div>';
@@ -1430,9 +1429,9 @@ function renderStats() {
       else if(wh>0){ bg=`rgba(16,185,129,${0.25+ratio*0.5})`; border='rgba(16,185,129,0.5)'; txt='#fff'; }
       const d=new Date(w.monday+'T12:00:00');
       const lbl=`${d.getDate()}/${d.getMonth()+1}`;
-      html+=`<div title="${lbl} : ${wh}h" style="width:38px;height:38px;border-radius:6px;background:${bg};border:1px solid ${border};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;transition:transform .1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+      html+=`<div title="${lbl} : ${window._m5fmtH(wh)}" style="width:38px;height:38px;border-radius:6px;background:${bg};border:1px solid ${border};display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:default;transition:transform .1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
         <span style="font-size:9px;color:rgba(255,255,255,0.50);line-height:1;">${lbl}</span>
-        <span style="font-size:12px;font-weight:700;color:${txt};line-height:1.2;">${wh>0?wh+'h':'—'}</span>
+        <span style="font-size:12px;font-weight:700;color:${txt};line-height:1.2;">${wh>0?window._m5fmtH(wh):'—'}</span>
       </div>`;
     });
     html+=`</div></div>
@@ -1728,7 +1727,7 @@ function filterGlossaire(term) {
 
 // ── Auto-save sur fermeture modale ───────────────────────────────
 function saveDaySaisieOrClose() {
-  const worked=parseFloat(document.getElementById('day-saisie-hours')?.value);
+  const worked=window._hmVal('day-saisie-hoursH','day-saisie-hoursM');
   if(!isNaN(worked)&&worked>=0&&worked<=24) {
     saveDaySaisie();  // sauvegarde si une valeur est saisie
   } else {
@@ -1737,7 +1736,7 @@ function saveDaySaisieOrClose() {
 }
 
 function saveWeeklySaisieOrClose() {
-  const worked=parseFloat(document.getElementById('week-saisie-hours')?.value);
+  const worked=window._hmVal('week-saisie-hoursH','week-saisie-hoursM');
   if(!isNaN(worked)&&worked>=0&&worked<35) {
     saveWeeklySaisie();  // sauvegarde si une valeur est saisie
   } else {
@@ -2014,7 +2013,7 @@ function wizUpdateHoursPreview() {
   const el=document.getElementById('wiz-hours-preview'); if(!el) return;
   if(!h||h<=0) { el.textContent=''; return; }
   const mensuel=(h*52/12).toFixed(1);
-  el.textContent=`soit environ ${mensuel}h/mois`;
+  el.textContent=`soit environ ${window._m5fmtH(mensuel)}/mois`;
 }
 
 function wizSearchCCN(term) {
@@ -2260,7 +2259,7 @@ function quickSave(hours) {
     const year=M5_DataStore.getYear();
     M5_DataStore.saveWeekTotal(calendarMonday, hours, year);
     Mizuki.clearCache();
-    toast(`${hours}h sauvegardées ✓`,'success');
+    toast(`${window._m5fmtH(hours)} sauvegardées ✓`,'success');
     refreshUI();
     if(currentSection==='stats') renderStats();
   } catch(e) { toast('Erreur sauvegarde: '+e.message,'error'); }
