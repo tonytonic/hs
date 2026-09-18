@@ -291,8 +291,12 @@ const VFH = {
           <div id="fh-zone-global" style="${saisieMode==='jours'?'display:none':''}">
             <div class="m6-field">
               <label>Heures travaillées cette semaine (ex: 41.5)</label>
-              <input type="number" id="fh-h" min="0" max="80" step="0.25"
-                value="${entry.heures||''}" placeholder="${seuil}" style="font-size:16px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="number" id="fh-hH" min="0" inputmode="numeric" value="${entry.heures?Math.floor(entry.heures):''}" placeholder="${Math.floor(seuil)}" style="font-size:16px;max-width:82px;text-align:center">
+                <span style="font-weight:600;color:var(--pierre)">h</span>
+                <input type="number" id="fh-hM" min="0" max="59" inputmode="numeric" value="${entry.heures?Math.round((entry.heures%1)*60):''}" placeholder="00" style="font-size:16px;max-width:82px;text-align:center">
+                <span style="font-weight:600;color:var(--pierre)">min</span>
+              </div>
               <div style="font-size:0.7rem;color:var(--pierre);margin-top:3px">
                 Seuil contractuel : ${seuil}h · Au-delà = heures supplémentaires
               </div>
@@ -391,7 +395,7 @@ const VFH = {
             joursArr = [0,1,2,3,4,5,6].map(i => parseFloat(sh.querySelector('#fh-j'+i)?.value) || 0);
             heures = Math.round(joursArr.reduce((s,v)=>s+v,0) * 100) / 100;
           } else {
-            heures = parseFloat(sh.querySelector('#fh-h')?.value);
+            heures = window._hmVal('fh-hH','fh-hM');
             if (isNaN(heures)) { M6_toast('Saisissez les heures'); return; }
           }
           const note = sh.querySelector('#fh-note')?.value.trim().replace(/['"]/g, '') || null;
@@ -405,7 +409,7 @@ const VFH = {
       renderSheet();
       // Calcul temps réel — affiche les HS et le reste du contingent
       const bindRealtime = () => {
-        const hInput = sh.querySelector('#fh-h');
+        const hInputH = sh.querySelector('#fh-hH'), hInputM = sh.querySelector('#fh-hM');
         const rtPanel = sh.querySelector('#fh-realtime-calcul');
         const rtHS = sh.querySelector('#fh-rt-hs');
         const rtReste = sh.querySelector('#fh-rt-reste');
@@ -418,14 +422,14 @@ const VFH = {
         const contingent = this._contract?.contingent || ccnRules?.contingent || 220;
         const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, (v.heures||0) - seuilC), 0);
         const updateRT = () => {
-          const h = parseFloat(hInput?.value) || 0;
+          const h = window._hmToDec('fh-hH','fh-hM');
           const hs = Math.max(0, h - seuilC);
           if (rtPanel && h > 0) { rtPanel.style.display = ''; }
           if (rtHS) rtHS.textContent = hs > 0 ? `+${hs.toFixed(1)}h HS` : '0h HS';
           const reste = Math.max(0, contingent - totalHSActuel - hs);
           if (rtReste) { rtReste.textContent = `${reste.toFixed(0)}h / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
         };
-        hInput?.addEventListener('input', updateRT);
+        hInputH?.addEventListener('input', updateRT); hInputM?.addEventListener('input', updateRT);
         updateRT(); // initial render
       };
       bindRealtime();
