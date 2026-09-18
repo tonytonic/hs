@@ -614,10 +614,12 @@
 
     <div class="m5-input-group">
       <label class="m5-label">Heures travaillées ce jour</label>
-      <input type="number" inputmode="decimal" class="m5-input" id="day-saisie-hours"
-        min="0" max="24" step="0.25" placeholder="ex: 5.75 (= 5h45)"
-        oninput="updateDayPreview()"
-        style="font-size:26px;font-weight:700;text-align:center;">
+      <div style="display:flex;gap:10px;align-items:center;justify-content:center;">
+        <input type="number" inputmode="numeric" class="m5-input" id="day-saisie-hoursH" min="0" max="24" placeholder="0" oninput="updateDayPreview()" style="font-size:26px;font-weight:700;text-align:center;max-width:108px;">
+        <span style="font-size:20px;font-weight:700;opacity:.7;">h</span>
+        <input type="number" inputmode="numeric" class="m5-input" id="day-saisie-hoursM" min="0" max="59" placeholder="00" oninput="updateDayPreview()" style="font-size:26px;font-weight:700;text-align:center;max-width:108px;">
+        <span style="font-size:20px;font-weight:700;opacity:.7;">min</span>
+      </div>
     </div>
 
     <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin:2px 0 12px;cursor:pointer;color:var(--miz-text2);">
@@ -648,10 +650,12 @@
 
     <div class="m5-input-group">
       <label class="m5-label">Total heures travaillées cette semaine</label>
-      <input type="number" inputmode="decimal" class="m5-input" id="week-saisie-hours"
-        min="0" max="34.5" step="0.25" placeholder="ex: 28"
-        oninput="updateWeekPreview()"
-        style="font-size:26px;font-weight:700;text-align:center;">
+      <div style="display:flex;gap:10px;align-items:center;justify-content:center;">
+        <input type="number" inputmode="numeric" class="m5-input" id="week-saisie-hoursH" min="0" placeholder="0" oninput="updateWeekPreview()" style="font-size:26px;font-weight:700;text-align:center;max-width:108px;">
+        <span style="font-size:20px;font-weight:700;opacity:.7;">h</span>
+        <input type="number" inputmode="numeric" class="m5-input" id="week-saisie-hoursM" min="0" max="59" placeholder="00" oninput="updateWeekPreview()" style="font-size:26px;font-weight:700;text-align:center;max-width:108px;">
+        <span style="font-size:20px;font-weight:700;opacity:.7;">min</span>
+      </div>
     </div>
 
     <div class="m5-label" style="margin-bottom:8px;">Saisie rapide</div>
@@ -988,5 +992,6 @@ function confirmResetM5() {
 <script src="js/features/wellbeing.js?v=r6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="js/app.js?v=r6"></script>
+<script>window._hmToDec=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var h=Number(he&&he.value)||0,m=Number(me&&me.value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._decToHM=function(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;};window._hmVal=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var hv=he?he.value:'',mv=me?me.value:'';if((hv===''||hv==null)&&(mv===''||mv==null))return NaN;var h=Number(hv)||0,m=Number(mv)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};</script>
 </body>
 </html>
