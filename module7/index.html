@@ -383,7 +383,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       <div class="deHead" data-sec="deNuit"><div class="cb"></div><div class="dt">🌙 Heures de nuit<small id="deNuitSub">Tu as travaillé de nuit</small></div></div>
       <div class="deBody">
         <div class="field"><label>Heures de nuit ce jour</label>
-          <div class="inline"><input class="ip" id="deNHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+          <div class="inline"><input class="ip" id="deNHoursH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deNHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
         <div class="toggle" id="deNMode">
           <div class="t on" data-mode="majo">💶 Majorées</div>
           <div class="t" data-mode="repos">😴 Repos compensateur</div></div>
@@ -407,7 +407,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
           <div class="t" data-mode="forfait">Au forfait</div></div>
         <div id="deAHeure">
           <div class="field"><label>Temps d'astreinte (joignable)</label>
-            <div class="inline"><input class="ip" id="deAHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+            <div class="inline"><input class="ip" id="deAHoursH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deAHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
           <div class="field"><label>Indemnité d'astreinte</label>
             <div class="inline"><input class="ip" id="deARate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div></div>
         </div>
@@ -416,7 +416,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
             <div class="inline"><input class="ip" id="deAForfaitAmt" type="number" inputmode="decimal" value="0"><span class="unit">€</span></div></div>
         </div>
         <div class="field"><label>Intervention réelle ce jour</label>
-          <div class="inline"><input class="ip" id="deAInter" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+          <div class="inline"><input class="ip" id="deAInterH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deAInterM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
         <div class="field"><label>Taux horaire d'intervention</label>
           <div class="inline"><input class="ip" id="deAInterRate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div>
           <div class="check-row" id="deAInterNight"><div class="cb"></div><div>Intervention de nuit (ajoute la majoration nuit)</div></div>
@@ -704,7 +704,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       var dt=new Date(y,mo-1,dnum), wd=dt.getDay(), day=m.days[dnum];
       var row=document.createElement('div'); row.className='dayrow'+(dayHasContent(day)?' has':'')+((wd===0||wd===6)?' we':'');
       var tags='';
-      if(day){ if(day.nuit&&(day.nuit.hours||0)>0)tags+='<span class="dtag nuit">🌙 '+(day.nuit.hours)+'h</span>';
+      if(day){ if(day.nuit&&(day.nuit.hours||0)>0)tags+='<span class="dtag nuit">🌙 '+fmtRepos((day.nuit.hours||0)*60)+'</span>';
         if(day.astr&&((day.astr.hours||0)>0||(day.astr.fAmt||0)>0||(day.astr.inter||0)>0))tags+='<span class="dtag astr">📟</span>';
         var pc=0; if(day.primes){for(var k in day.primes){if(day.primes[k]>0)pc++;}} if(pc)tags+='<span class="dtag prime">🎁 '+pc+'</span>'; }
       if(!tags)tags='<span class="empty">—</span>';
@@ -735,13 +735,13 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     $('#deTitle').textContent=WD[dt.getDay()]+' '+dnum+' '+MONTH_ABBR[monthNum(curKey)-1];
     $('#deCopyPrev').style.display = (dnum>1 && m.days[dnum-1]) ? 'block' : 'none';
     // fill nuit
-    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0;
+    window._decToHM(deDay.nuit.hours||0,'deNHoursH','deNHoursM'); $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0;
     $('#deNBase').value=settings.baseRate||0;
     setDeNMode(deDay.nuit.mode||'majo');
     // fill astr
     setDeAMode(deDay.astr.mode||'heure');
-    $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
-    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    window._decToHM(deDay.astr.hours||0,'deAHoursH','deAHoursM'); $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    window._decToHM(deDay.astr.inter||0,'deAInterH','deAInterM'); $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
     setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun);
     $('#deASunField').style.display=deDay.astr.sun?'block':'none';
     // sections
@@ -766,9 +766,9 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   $('#deAInterSun').addEventListener('click',function(){deDay.astr.sun=!deDay.astr.sun;setDeCheck('#deAInterSun',deDay.astr.sun);$('#deASunField').style.display=deDay.astr.sun?'block':'none';updateDeTotal();});
 
   function readDeInputs(){
-    deDay.nuit.hours=parseFloat($('#deNHours').value)||0; deDay.nuit.rate=parseFloat($('#deNRate').value)||0; deDay.nuit.reposRate=parseFloat($('#deNReposRate').value)||0;
-    deDay.astr.hours=parseFloat($('#deAHours').value)||0; deDay.astr.rate=parseFloat($('#deARate').value)||0; deDay.astr.fAmt=parseFloat($('#deAForfaitAmt').value)||0;
-    deDay.astr.inter=parseFloat($('#deAInter').value)||0; deDay.astr.interRate=parseFloat($('#deAInterRate').value)||0; deDay.astr.sunRate=parseFloat($('#deASunRate').value)||0;
+    deDay.nuit.hours=window._hmToDec('deNHoursH','deNHoursM'); deDay.nuit.rate=parseFloat($('#deNRate').value)||0; deDay.nuit.reposRate=parseFloat($('#deNReposRate').value)||0;
+    deDay.astr.hours=window._hmToDec('deAHoursH','deAHoursM'); deDay.astr.rate=parseFloat($('#deARate').value)||0; deDay.astr.fAmt=parseFloat($('#deAForfaitAmt').value)||0;
+    deDay.astr.inter=window._hmToDec('deAInterH','deAInterM'); deDay.astr.interRate=parseFloat($('#deAInterRate').value)||0; deDay.astr.sunRate=parseFloat($('#deASunRate').value)||0;
     // Report auto : un taux saisi devient le defaut, repris pour les jours suivants (jusqu'a nouveau changement)
     if(deDay.nuit.rate>0) settings.nRate=deDay.nuit.rate;
     if(deDay.astr.rate>0) settings.aRate=deDay.astr.rate;
@@ -778,7 +778,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     var b=parseFloat($('#deNBase').value); if(!isNaN(b)&&b>0) settings.baseRate=b;
     set(LS.SET,settings);
   }
-  ['deNHours','deNRate','deNBase','deNReposRate','deAHours','deARate','deAForfaitAmt','deAInter','deAInterRate','deASunRate'].forEach(function(id){
+  ['deNHoursH','deNHoursM','deNRate','deNBase','deNReposRate','deAHoursH','deAHoursM','deARate','deAForfaitAmt','deAInterH','deAInterM','deAInterRate','deASunRate'].forEach(function(id){
     $('#'+id).addEventListener('input',function(){ readDeInputs(); updateDeTotal(); });
   });
   function updateDeTotal(){ readDeInputs();
@@ -823,10 +823,10 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   });
   function openDayFromObj(){
     if(!deDay.nuit)deDay.nuit=blankDay().nuit; if(!deDay.astr)deDay.astr=blankDay().astr; if(!deDay.primes)deDay.primes={};
-    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0; setDeNMode(deDay.nuit.mode||'majo');
+    window._decToHM(deDay.nuit.hours||0,'deNHoursH','deNHoursM'); $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0; setDeNMode(deDay.nuit.mode||'majo');
     $('#deNBase').value=settings.baseRate||0;
-    setDeAMode(deDay.astr.mode||'heure'); $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
-    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    setDeAMode(deDay.astr.mode||'heure'); window._decToHM(deDay.astr.hours||0,'deAHoursH','deAHoursM'); $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    window._decToHM(deDay.astr.inter||0,'deAInterH','deAInterM'); $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
     setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun); $('#deASunField').style.display=deDay.astr.sun?'block':'none';
     deDay._nuitOn=(deDay.nuit.hours||0)>0; deDay._astrOn=(deDay.astr.hours||0)>0||(deDay.astr.fAmt||0)>0||(deDay.astr.inter||0)>0; var pc=false;for(var k in deDay.primes){if(deDay.primes[k]>0)pc=true;} deDay._primesOn=pc;
     setSection('deNuit',deDay._nuitOn); setSection('deAstr',deDay._astrOn); setSection('dePrimes',deDay._primesOn);
@@ -987,5 +987,6 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
 })();
 </script>
+<script>window._hmToDec=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var h=Number(he&&he.value)||0,m=Number(me&&me.value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._decToHM=function(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;};</script>
 </body>
 </html>
