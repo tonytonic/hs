@@ -395,7 +395,7 @@ document.addEventListener("DOMContentLoaded", function(){
   <div id="m2SaisieWorked" style="display:none">
     <div class="saisie-worked">
       <label>&#x1F551; Total heures travaill&eacute;es ce jour</label>
-      <input id="m2WorkedHours" type="number" inputmode="decimal" step="0.25" min="0" max="24" placeholder="ex: 9.5" oninput="calcM2FromWorked()">
+      <div style="display:flex;gap:8px;align-items:center"><input id="m2WorkedHoursH" type="number" inputmode="numeric" min="0" max="24" placeholder="0" oninput="calcM2FromWorked()" style="flex:1;min-width:0;text-align:center"><span style="font-weight:700;color:#6b7280">h</span><input id="m2WorkedHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" oninput="calcM2FromWorked()" style="flex:1;min-width:0;text-align:center"><span style="font-weight:700;color:#6b7280">min</span></div>
       <div class="calc-result" id="m2WorkedResult"></div>
     </div>
     <button onclick="confirmM2Worked()">Valider</button>
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", function(){
   <div id="m2SaisieHS">
     <div id="hoursChoices"></div>
     <label>Saisie manuelle</label>
-    <input type="number" inputmode="decimal" id="manualHours" step="0.25">
+    <div style="display:flex;gap:8px;align-items:center"><input id="manualHoursH" type="number" inputmode="numeric" min="0" placeholder="0" style="flex:1;min-width:0;text-align:center"><span style="font-weight:700;color:#6b7280">h</span><input id="manualHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" style="flex:1;min-width:0;text-align:center"><span style="font-weight:700;color:#6b7280">min</span></div>
     <button onclick="confirmManual()">Valider</button>
   </div>
 
@@ -1102,7 +1102,7 @@ function applyHours(h){
   save();renderCalendar();recalc();maybeShowReliquatPopup();
   const _sd=currentDay;closeHours();setTimeout(()=>showSaveFeedback(_sd),50)
 }
-function confirmManual(){const inp=document.getElementById("manualHours"),h=parseFloat(inp.value);if(isNaN(h)||h<=0){toast("⛔ Valeur invalide","error");return}applyHours(h);inp.value=""}
+function confirmManual(){const h=window._hmVal("manualHoursH","manualHoursM");if(isNaN(h)||h<=0){toast("⛔ Valeur invalide","error");return}applyHours(h);document.getElementById("manualHoursH").value="";document.getElementById("manualHoursM").value="";}
 function deleteDayHours(){
   const[_y,_m]=currentKey.split("-").map(Number);
   if(currentDay&&isDateLocked(new Date(_y,_m-1,currentDay))){toast("🔒 Période verrouillée","warn");return}
@@ -1126,23 +1126,23 @@ function setM2SaisieMode(mode){
   document.getElementById('m2ModeWorked').classList.toggle('active',mode==='worked');
   document.getElementById('m2SaisieHS').style.display=mode==='hs'?'':'none';
   document.getElementById('m2SaisieWorked').style.display=mode==='worked'?'':'none';
-  if(mode==='worked'){document.getElementById('m2WorkedHours').value='';document.getElementById('m2WorkedResult').textContent='';}
+  if(mode==='worked'){document.getElementById('m2WorkedHoursH').value='';document.getElementById('m2WorkedHoursM').value='';document.getElementById('m2WorkedResult').textContent='';}
 }
 function getM2BaseJour(){const r=getCCNRules();return r.seuil/5;}
 function calcM2FromWorked(){
-  const w=Number(document.getElementById('m2WorkedHours').value)||0;
+  const w=window._hmToDec('m2WorkedHoursH','m2WorkedHoursM');
   const base=getM2BaseJour();
-  const extra=Math.max(0,Math.round((w-base)*4)/4);
+  const extra=Math.max(0,Math.round((w-base)*60)/60);
   document.getElementById('m2WorkedResult').innerHTML=w>0
     ?'Base journalière : <b>'+base.toFixed(2)+'h</b> ('+getCCNRules().seuil+'h/5j) → <b>HS : '+fmtH(extra)+'</b>'
     :'';
 }
 function confirmM2Worked(){
-  const w=Number(document.getElementById('m2WorkedHours').value)||0;
+  const w=window._hmToDec('m2WorkedHoursH','m2WorkedHoursM');
   const base=getM2BaseJour();
-  const extra=Math.max(0,Math.round((w-base)*4)/4);
+  const extra=Math.max(0,Math.round((w-base)*60)/60);
   if(extra<=0){toast("⛔ Pas d'HS calculées","error");return;}
-  applyHours(extra);document.getElementById('m2WorkedHours').value='';
+  applyHours(extra);document.getElementById('m2WorkedHoursH').value='';document.getElementById('m2WorkedHoursM').value='';
 }
 
 /* TUTORIEL */
@@ -1263,8 +1263,8 @@ function recalc(){
   // Affiche ce que la loi dit de chaque heure, indépendamment des paiements.
   // EXCEPTION : si l'utilisateur a manuellement routé les heures via le pop-up
   // (reliquatAlloc), on affiche sa ventilation choisie — elle prime sur les paliers légaux.
-  // Arrondi à 0.25h pour éviter les décimales parasites (ex: mode heures travaillées 39h).
-  const round25sg = v => Math.round(v * 4) / 4;
+  // Arrondi à la minute (précision réelle — pas de snap au quart d'heure).
+  const round25sg = v => Math.round(v * 60) / 60;
   let t25d = round25sg(t25), tInterd = round25sg(tInter), t50d = round25sg(t50);
 
   const mCur = DATA[currentKey];
@@ -1643,29 +1643,32 @@ function renderPaidInputs(rules){
     /* ── MODE LEGACY (avant migration) : TOTAL SIMPLE uniquement ──
        Pas de distinction de taux, pas de FIFO. On fait des heures,
        on paie un total, le reste va en carry. Jusqu'à la mise à zéro. */
-    if(!container.querySelector('#paidHTot')){
+    if(!container.querySelector('#paidHTotH')){
       container.innerHTML = `
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
           <label style="font-size:13px;font-weight:600;color:var(--muted);margin:0">Heures pay\u00e9es</label>
-          <input type="number" inputmode="decimal" id="paidHTot" step="0.25" value="0"
-            style="width:90px;text-align:right;margin:0;padding:6px 10px;border-radius:10px;
-                   font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+          <div style="display:flex;gap:6px;align-items:center;justify-content:flex-end">
+            <input type="number" inputmode="numeric" id="paidHTotH" min="0" placeholder="0" value="" style="width:50px;text-align:center;margin:0;padding:6px 6px;border-radius:10px;font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+            <span style="font-size:12px;color:var(--muted)">h</span>
+            <input type="number" inputmode="numeric" id="paidHTotM" min="0" max="59" placeholder="00" value="" style="width:50px;text-align:center;margin:0;padding:6px 6px;border-radius:10px;font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+            <span style="font-size:12px;color:var(--muted)">min</span>
+          </div>
         </div>
         <div style="font-size:10px;color:var(--muted);line-height:1.4;margin-top:4px">
           Suivi d\u00e9taill\u00e9 par taux d\u00e8s que le solde atteint z\u00e9ro
         </div>`;
-      const inp = document.getElementById('paidHTot');
-      if(inp) inp.oninput = () => {
+      const setPT = () => {
         if(!DATA||!DATA[currentKey]) return;
-        const v = parseFloat(inp.value)||0;
+        const v = window._hmToDec('paidHTotH','paidHTotM');
         DATA[currentKey].paid = v;
         delete DATA[currentKey].paid1; delete DATA[currentKey].paid2; delete DATA[currentKey].paidInter;
         const h = document.getElementById('paidHours'); if(h) h.value = v;
         save(); recalc();
       };
+      const _ih=document.getElementById('paidHTotH'), _im=document.getElementById('paidHTotM');
+      if(_ih) _ih.oninput = setPT; if(_im) _im.oninput = setPT;
     }
-    const inp = document.getElementById('paidHTot');
-    if(inp) inp.value = m.paid||0;
+    window._decToHM(m.paid||0,'paidHTotH','paidHTotM');
     const hid = document.getElementById('paidHours');
     if(hid) hid.value = m.paid||0;
     return;
@@ -1680,16 +1683,19 @@ function renderPaidInputs(rules){
 
   const legacyDetail = isLegacyMode();
   const existingCount = container.querySelectorAll('input[type="number"]').length;
-  const needRebuild = existingCount !== paliers.length || container.querySelector('#paidHTot') ||
+  const needRebuild = existingCount !== paliers.length*2 || container.querySelector('#paidHTotH') ||
                       (legacyDetail && !container.querySelector('#backToTotalBtn')) ||
                       (!legacyDetail && container.querySelector('#backToTotalBtn'));
   if(needRebuild){
     let html = paliers.map(p => `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
         <label style="font-size:13px;font-weight:600;color:${p.color};margin:0">${p.label} pay\u00e9es</label>
-        <input type="number" inputmode="decimal" id="${p.id}" step="0.25" value="0"
-          style="width:90px;text-align:right;margin:0;padding:6px 10px;border-radius:10px;
-                 font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" inputmode="numeric" id="${p.id}H" min="0" placeholder="0" value="" style="width:46px;text-align:center;margin:0;padding:6px 5px;border-radius:10px;font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+          <span style="font-size:11px;color:var(--muted)">h</span>
+          <input type="number" inputmode="numeric" id="${p.id}M" min="0" max="59" placeholder="00" value="" style="width:46px;text-align:center;margin:0;padding:6px 5px;border-radius:10px;font-size:14px;font-weight:600;background:#262a33;color:#fff;border:1px solid #333">
+          <span style="font-size:11px;color:var(--muted)">min</span>
+        </div>
       </div>`).join('');
     // En mode legacy détaillé, proposer un retour au total simple
     if(legacyDetail){
@@ -1698,18 +1704,17 @@ function renderPaidInputs(rules){
     container.innerHTML = html;
 
     paliers.forEach(p => {
-      const inp = document.getElementById(p.id);
-      if(!inp) return;
-      inp.oninput = () => {
+      const _ih = document.getElementById(p.id+'H'), _im = document.getElementById(p.id+'M');
+      if(!_ih && !_im) return;
+      const onp = () => {
         if(!DATA||!DATA[currentKey]) return;
         // Matérialiser TOUS les paliers (passe le mois en per-taux explicite)
         paliers.forEach(pp => {
-          const el = document.getElementById(pp.id);
           if(DATA[currentKey][pp.key] === undefined){
-            DATA[currentKey][pp.key] = parseFloat(el?.value)||0;
+            DATA[currentKey][pp.key] = window._hmToDec(pp.id+'H',pp.id+'M');
           }
         });
-        DATA[currentKey][p.key] = parseFloat(inp.value)||0;
+        DATA[currentKey][p.key] = window._hmToDec(p.id+'H',p.id+'M');
         // Le total payé devient la somme des paliers ventilés
         DATA[currentKey].paid = paliers.reduce((s,t)=>s+(Number(DATA[currentKey][t.key])||0), 0);
         const h = document.getElementById('paidHours');
@@ -1719,6 +1724,7 @@ function renderPaidInputs(rules){
         if(mb) mb.remove();
         save(); recalc();
       };
+      if(_ih) _ih.oninput = onp; if(_im) _im.oninput = onp;
     });
 
     const backBtn = document.getElementById('backToTotalBtn');
@@ -1738,9 +1744,7 @@ function renderPaidInputs(rules){
   const legacyPaidNoDetail = !hasDetailVals && (Number(m.paid)||0) > 0;
 
   paliers.forEach((p) => {
-    const inp = document.getElementById(p.id);
-    if(!inp) return;
-    inp.value = m[p.key] !== undefined ? m[p.key] : 0;
+    window._decToHM(m[p.key] !== undefined ? m[p.key] : 0, p.id+'H', p.id+'M');
   });
 
   // Si un total a été payé sans ventilation par taux (mois saisi avant le détail),
@@ -2056,8 +2060,8 @@ function recalcCascade(){
       }
     }
 
-    // Réconciliation de sécurité (arrondi 0.25h pour éviter les décimales parasites)
-    const round25 = v => Math.round(v * 4) / 4;
+    // Réconciliation de sécurité (arrondi à la minute)
+    const round25 = v => Math.round(v * 60) / 60;
     due1 = round25(Math.max(0, due1));
     dueInter = round25(Math.max(0, dueInter));
     due2 = round25(Math.max(0, due2));
@@ -3085,6 +3089,7 @@ function closeTip(){
   window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
 })();
 </script>
+<script>window._hmToDec=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var h=Number(he&&he.value)||0,m=Number(me&&me.value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._decToHM=function(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;};window._hmVal=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var hv=he?he.value:'',mv=me?me.value:'';if((hv===''||hv==null)&&(mv===''||mv==null))return NaN;var h=Number(hv)||0,m=Number(mv)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};</script>
 </body>
 </html>
 
