@@ -29,6 +29,7 @@ signé quelques jours après le relevé de la grille est souvent déjà pris en
 compte ; 30 jours par défaut évite ce bruit.
 """
 import argparse
+import html
 import glob
 import json
 import os
@@ -51,7 +52,12 @@ SUJET_SALAIRE = re.compile(r"salaire|rémunération|remuneration|minima|barème|
 def date_du_titre(titre):
     """« Avenant salaires du 12 janvier 2026 » -> datetime(2026, 1, 12)."""
     t = (titre or "").lower()
-    m = re.search(r"(\d{1,2})\s+(" + "|".join(MOIS) + r")\s+(\d{4})", t)
+    # (?:er)? -- « Avenant n° 18 du 1er août 2023 ». Sans lui, le titre n'avait
+    # AUCUNE date lisible et la clause était purement ignorée : 925 clauses de
+    # salaires dans 167 conventions, invisibles pour la veille (relevé du
+    # 21/09/2026). Pour 2412, la grille était comparée à l'avenant de 2022
+    # alors que celui du 1er août 2023 était au fonds depuis le début.
+    m = re.search(r"(\d{1,2})(?:er)?\s+(" + "|".join(MOIS) + r")\s+(\d{4})", t)
     if m:
         try:
             return datetime(int(m.group(3)), MOIS[m.group(2)], int(m.group(1)))
@@ -83,14 +89,26 @@ def date_de_grille(txt):
 
 
 def texte_du_noeud(noeud):
-    """Concatène le texte des articles d'une clause."""
+    """Concatène le texte des articles d'une clause, sous-sections comprises.
+
+    Les sous-sections comptent : c'est souvent là qu'est le tableau. Pour
+    l'avenant n° 15 de l'IDCC 2412, on ne lisait que 1 312 caractères de
+    préambule sur 32 092 -- aucun montant de la grille n'était visible.
+    """
     bouts = []
-    for a in (noeud.get("articles") or []):
-        if isinstance(a, dict):
-            t = a.get("content") or a.get("texte") or ""
-            if t:
-                bouts.append(re.sub(r"<[^>]+>", " ", str(t)))
-    return re.sub(r"\s+", " ", " ".join(bouts)).strip()
+
+    def lire(n):
+        for a in (n.get("articles") or []):
+            if isinstance(a, dict):
+                t = a.get("content") or a.get("texte") or ""
+                if t:
+                    bouts.append(re.sub(r"<[^>]+>", " ", str(t)))
+        for s in (n.get("sections") or []):
+            if isinstance(s, dict):
+                lire(s)
+
+    lire(noeud)
+    return html.unescape(re.sub(r"\s+", " ", " ".join(bouts))).strip()
 
 
 # Un montant en euros, avec ou sans décimales, tel qu'on l'écrit dans un avenant.
