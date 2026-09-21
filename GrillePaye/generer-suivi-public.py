@@ -49,7 +49,9 @@ INTERNE = re.compile(
 # Référence juridique exploitable, dans l'ordre de préférence : un accord daté
 # vaut mieux qu'un simple numéro de brochure.
 REFERENCES = [
-    re.compile(r"(?:accord|avenant)\s+(?:national\s+)?(?:n°\s*[\w/-]+\s+)?du\s+\d{1,2}[/ ]\w+[/ ]\d{2,4}", re.I),
+    # « 1er » : sans (?:er)?, « Avenant n° 18 du 1er août 2023 » n'était pas
+    # reconnu et la référence retombait sur l'avenant précédent cité plus loin.
+    re.compile(r"(?:accord|avenant)\s+(?:national\s+)?(?:n°\s*[\w/-]+\s+)?du\s+\d{1,2}(?:er)?[/ ]\w+[/ ]\d{2,4}", re.I),
     re.compile(r"avenant\s*n°\s*[\w/-]+", re.I),
     re.compile(r"arrêté\s+(?:d'extension\s+)?du\s+\d{1,2}[/ ]\w+[/ ]\d{2,4}", re.I),
     re.compile(r"brochure\s*(?:JO\s*)?n?°?\s*\d{4}", re.I),
