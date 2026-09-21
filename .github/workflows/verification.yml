@@ -3,7 +3,11 @@ name: Vérification
 # Déclenchement MANUEL : depuis l'app GitHub sur iPhone,
 #   onglet Actions → « Vérification » → bouton « Run workflow ».
 # Le rapport s'affiche directement dans le résumé du run, lisible sur mobile.
-# Aucun fichier n'est modifié : ces scripts ne font que lire et rapporter.
+# Les contrôles ne font que lire et rapporter. UNE SEULE étape écrit :
+# « 1.5 — Mise à jour des fichiers de suivi », qui régénère
+# GrillePaye/suivi-public.json et GrillePaye/tracking-ccn.csv à partir de
+# ccn-data.json et les committe sur la branche de production, seulement si
+# leur contenu a réellement changé (la date seule ne compte pas).
 on:
   # Veille hebdomadaire, le mercredi à 7h UTC. L'aspirateur tourne lundi et
   # jeudi : le mercredi tombe donc après que le run du lundi a été commité,
@@ -31,9 +35,10 @@ on:
         required: false
         default: "anthonychauvel/droit"
 
-# Nécessaire pour ouvrir un ticket quand la veille trouve quelque chose.
+# issues: write  → ouvrir un ticket quand la veille trouve quelque chose.
+# contents: write → committer les fichiers de suivi régénérés (étape 1.5).
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -140,23 +145,139 @@ jobs:
           cd GrillePaye && python3 tracking-ccn.py >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
+      # P1 (21/09/2026) — Avant, 1.3 ne faisait qu'un aperçu et
+      # generer-suivi-public.py ne tournait nulle part : suivi-public.json,
+      # affiché aux utilisateurs, était resté au 24/07 avec 38 conventions
+      # « Non couverte » alors qu'elles avaient une grille.
+      #
+      # On régénère les deux fichiers, puis on ne committe QUE si leur contenu
+      # a changé. suivi-public.json porte la date du jour dans « _genere » :
+      # sans la comparaison ci-dessous, on committerait chaque mercredi pour
+      # rien (et on redéploierait l'appli pour rien).
+      #
+      # Le commit est poussé avec le jeton du workflow (GITHUB_TOKEN) : il
+      # déclenche le déploiement Cloudflare Pages, mais ne relance aucun autre
+      # workflow (règle GitHub, évite les boucles).
+      - name: 1.5 — Mise à jour des fichiers de suivi
+        continue-on-error: true
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 1.5 — Fichiers de suivi" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          cd GrillePaye
+          cp suivi-public.json /tmp/suivi-avant.json
+          python3 generer-suivi-public.py --ecrire > /tmp/suivi.log
+          python3 tracking-ccn.py --ecrire > /tmp/tracking.log
+          # Seule la date a changé ? On remet l'ancien fichier.
+          python3 - <<'PY'
+          import json, shutil
+          a = json.load(open("/tmp/suivi-avant.json", encoding="utf-8"))
+          b = json.load(open("suivi-public.json", encoding="utf-8"))
+          a.pop("_genere", None); b.pop("_genere", None)
+          if a == b:
+              shutil.copy("/tmp/suivi-avant.json", "suivi-public.json")
+          PY
+          if git diff --quiet -- suivi-public.json tracking-ccn.csv; then
+            echo "Rien à mettre à jour : les fichiers de suivi sont déjà à jour ✓" >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add suivi-public.json tracking-ccn.csv
+          git commit -m "Suivi des grilles régénéré automatiquement ($(date +%d/%m/%Y))"
+          git push origin HEAD:${{ github.event.inputs.branche || 'Android-cloudfare-production' }}
+          echo "Fichiers de suivi **mis à jour et poussés** sur la branche de production :" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -12 /tmp/suivi.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
       # Veille : le fonds a-t-il des avenants plus récents que nos grilles ?
-      # C'est la seule étape qui compare les deux dépôts, elle a donc besoin
-      # que la récupération du fonds ait réussi.
-      - name: 1.4 — Veille des grilles
+      # Rapport indicatif seulement (voir 1.6 pour le ticket).
+      - name: 1.4 — Veille des grilles (rapport indicatif)
         continue-on-error: true
         run: |
           echo "" >> $GITHUB_STEP_SUMMARY
           if [ -d _droit/output/ccn ]; then
             python3 verifier-fraicheur.py --fonds _droit/output/ccn --out /tmp/v.md
             cat /tmp/v.md >> $GITHUB_STEP_SUMMARY
-            # Marqueur pour l'étape suivante : y a-t-il quelque chose à faire ?
-            if grep -q "grille(s) dépassée(s)" /tmp/v.md; then echo "ACTION=1" >> $GITHUB_ENV; fi
+            # P2 (21/09/2026) : ce rapport reste à titre d'information, mais ne
+            # déclenche plus le ticket. Il compare seulement des dates et ne
+            # connaît pas exceptions.json : il signalait chaque semaine des
+            # grilles déjà passées en revue. Le ticket suit désormais le tableau
+            # de bord (étape 1.6).
           else
             echo "## Veille des grilles" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "> Le dossier \`output/ccn\` du fonds n'est pas accessible : veille ignorée." >> $GITHUB_STEP_SUMMARY
           fi
+
+      # P2 (21/09/2026) — Le ticket « veille-grilles » suit le TABLEAU DE BORD.
+      # Le tableau de bord date les grilles par arrivée au fonds, contrôle les
+      # montants et applique exceptions.json : ses alertes « grilles » sont
+      # déjà triées. On ne signale que les alertes JAMAIS VUES par ce ticket :
+      # la liste des alertes déjà signalées est gardée, invisible, dans le
+      # corps du dernier ticket (commentaire HTML « vus »). Premier run (aucun
+      # ticket précédent) : seules les alertes marquées « nouveau » par le
+      # tableau de bord comptent, pour ne pas ressortir tout l'historique.
+      - name: Récupérer le tableau de bord (donnees.json)
+        id: tdb
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          repository: anthonychauvel/tableaudebord
+          path: _tdb
+          sparse-checkout: donnees.json
+          sparse-checkout-cone-mode: false
+
+      - name: 1.6 — Veille des grilles (tableau de bord)
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 1.6 — Veille des grilles (tableau de bord)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ ! -f _tdb/donnees.json ]; then
+            echo "> donnees.json du tableau de bord illisible : veille ignorée cette semaine." >> $GITHUB_STEP_SUMMARY
+            exit 0
+          fi
+          gh issue list --label veille-grilles --state all --limit 1 \
+             --json body --jq '.[0].body // ""' > /tmp/ancien.md 2>/dev/null || : > /tmp/ancien.md
+          python3 - <<'PY'
+          import json, re, os, base64, hashlib
+          d = json.load(open("_tdb/donnees.json", encoding="utf-8"))
+          # Alertes = objets qui ont un « titre » ; on garde celles de la section
+          # grilles (clé « grilles » dans le chemin, ou catégorie qui parle de grille).
+          alertes = []
+          def marche(o, chemin):
+              if isinstance(o, dict):
+                  if "titre" in o and ("grilles" in chemin or "grille" in str(o.get("categorie", "")).lower()):
+                      alertes.append(o); return
+                  for k, v in o.items(): marche(v, chemin + [str(k)])
+              elif isinstance(o, list):
+                  for v in o: marche(v, chemin)
+          marche(d, [])
+          cle = lambda a: hashlib.sha1(str(a.get("titre", "")).encode()).hexdigest()[:12]
+          ancien = open("/tmp/ancien.md", encoding="utf-8").read()
+          m = re.search(r"<!-- vus:([A-Za-z0-9+/=]*) -->", ancien)
+          premier = m is None
+          vus = set(json.loads(base64.b64decode(m.group(1)).decode())) if m and m.group(1) else set()
+          neuves = [a for a in alertes if (a.get("nouveau") if premier else cle(a) not in vus)]
+          tous = sorted(vus | {cle(a) for a in alertes})
+          L = [f"**{len(neuves)}** alerte(s) de grille nouvelle(s) sur {len(alertes)} en cours au tableau de bord.", ""]
+          for a in neuves:
+              g = f" ({a['gravite']})" if a.get("gravite") else ""
+              L.append(f"- [ ] **{a.get('titre','')}**{g}")
+              if a.get("detail"): L.append(f"  {str(a['detail'])[:400]}")
+          L += ["", "Pour fermer une alerte déjà traitée : exceptions.json du tableau de bord.",
+                "", "<!-- vus:" + base64.b64encode(json.dumps(tous).encode()).decode() + " -->"]
+          open("/tmp/tb.md", "w", encoding="utf-8").write("\n".join(L))
+          if neuves:
+              open(os.environ["GITHUB_ENV"], "a").write("ACTION=1\n")
+          print(len(alertes), "alertes grilles,", len(neuves), "nouvelles")
+          PY
+          grep -v "^<!-- vus:" /tmp/tb.md >> $GITHUB_STEP_SUMMARY
 
       # Le test 2.1 du cahier de recette demandait un « curl » depuis un
       # terminal, impossible sur téléphone. Il est fait ici.
@@ -180,6 +301,8 @@ jobs:
             echo "- \`/robots.txt\` répond $R ✗" >> $GITHUB_STEP_SUMMARY
           fi
 
+      # Ne s'ouvre (ou ne se met à jour) que s'il y a des alertes de grille
+      # nouvelles au tableau de bord (étape 1.6).
       # Sans ceci, un run planifié qui trouve une grille périmée passerait
       # inaperçu : GitHub ne notifie que les échecs, pas les succès. Le ticket
       # déclenche une notification sur téléphone, et sert d'aide-mémoire.
@@ -191,7 +314,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TITRE="Veille des grilles — $(date +%d/%m/%Y)"
-          CORPS=$(cat /tmp/v.md)
+          CORPS=$(cat /tmp/tb.md)
           EXISTANT=$(gh issue list --label veille-grilles --state open \
                        --json number --jq '.[0].number' 2>/dev/null || true)
           if [ -n "$EXISTANT" ]; then
