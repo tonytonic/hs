@@ -130,7 +130,11 @@ def statut_de(idcc, grille, statut_dares, smic):
     # Grille sous le SMIC : signalé à part, c'est le défaut le plus grave.
     sous = ""
     montants = [r.get("b") for r in grille.get("g", [])
-                if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"]
+                if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"
+                # P5 : plancher SMIC géré à l'affichage (cv = montant conventionnel
+                # connu, sm = montant non repris) : ces lignes ne sont pas des erreurs
+                # et restent justes après une revalorisation du SMIC.
+                and not r.get("sm") and "cv" not in r]
     if montants and smic:
         mini = min(montants)
         if 500 <= mini < smic:          # sous 500 € : taux horaire ou cachet, hors comparaison
