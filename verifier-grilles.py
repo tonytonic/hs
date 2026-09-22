@@ -131,7 +131,11 @@ def main():
             anciennes.append((idcc, v.get("d"), mois_ecoules(d, ref)))
 
         montants = [r.get("b") for r in v.get("g", [])
-                    if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"]
+                    if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"
+                    # P5 : plancher SMIC géré à l'affichage (cv = montant conventionnel
+                    # connu, sm = montant non repris) : ces lignes ne sont pas des erreurs
+                    # et restent justes après une revalorisation du SMIC.
+                    and not r.get("sm") and "cv" not in r]
         if not montants:
             continue
         mini = min(montants)
