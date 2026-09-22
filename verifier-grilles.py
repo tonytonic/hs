@@ -131,7 +131,11 @@ def main():
             anciennes.append((idcc, v.get("d"), mois_ecoules(d, ref)))
 
         montants = [r.get("b") for r in v.get("g", [])
-                    if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"]
+                    if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"
+                    # P5 : plancher SMIC géré à l'affichage (cv = montant conventionnel
+                    # connu, sm = montant non repris) : ces lignes ne sont pas des erreurs
+                    # et restent justes après une revalorisation du SMIC.
+                    and not r.get("sm") and "cv" not in r]
         if not montants:
             continue
         mini = min(montants)
@@ -171,12 +175,11 @@ def main():
 
     if sous_smic:
         bloquant = True
-        L.append(f"## ⚠️ {len(sous_smic)} grille(s) réelle(s) sous le SMIC")
+        L.append(f"## ⚠️ {len(sous_smic)} grille(s) sous le SMIC — à corriger")
         L.append("")
-        L.append("**Rien à corriger ici** : ces montants sont ceux publiés par la branche, sourcés")
-        L.append("et vérifiés. Le SMIC prime automatiquement — l'employeur doit le verser, pas la")
-        L.append("grille conventionnelle. C'est un fait à surveiller, pas une erreur de donnée.")
-        L.append("")
+        L.append("Le minimum conventionnel affiché est inférieur au SMIC : il ne s'applique "
+                 "donc pas, l'employeur doit verser le SMIC. La branche n'a probablement pas "
+                 "renégocié depuis la dernière revalorisation.")
         L.append("")
         for idcc, mini, d in sorted(sous_smic, key=lambda x: x[1]):
             ecart = round(100 * (smic - mini) / smic, 1)
