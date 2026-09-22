@@ -273,8 +273,13 @@ jobs:
           L += ["", "Pour fermer une alerte déjà traitée : exceptions.json du tableau de bord.",
                 "", "<!-- vus:" + base64.b64encode(json.dumps(tous).encode()).decode() + " -->"]
           open("/tmp/tb.md", "w", encoding="utf-8").write("\n".join(L))
+          env = open(os.environ["GITHUB_ENV"], "a")
           if neuves:
-              open(os.environ["GITHUB_ENV"], "a").write("ACTION=1\n")
+              env.write("ACTION=1\n")
+          elif premier and ancien.strip():
+              # Ancien ticket (d'avant le tableau de bord) sans mémoire : on y
+              # range la liste des alertes vues, puis on le ferme (étape ticket).
+              env.write("MIGRER=1\n")
           print(len(alertes), "alertes grilles,", len(neuves), "nouvelles")
           PY
           grep -v "^<!-- vus:" /tmp/tb.md >> $GITHUB_STEP_SUMMARY
@@ -301,30 +306,35 @@ jobs:
             echo "- \`/robots.txt\` répond $R ✗" >> $GITHUB_STEP_SUMMARY
           fi
 
-      # Ne s'ouvre (ou ne se met à jour) que s'il y a des alertes de grille
-      # nouvelles au tableau de bord (étape 1.6).
+      # Ne s'ouvre que s'il y a des alertes de grille nouvelles au tableau de
+      # bord (étape 1.6). Premier run après le passage au tableau de bord :
+      # l'ancien ticket garde la mémoire des alertes vues et se ferme.
       # Sans ceci, un run planifié qui trouve une grille périmée passerait
       # inaperçu : GitHub ne notifie que les échecs, pas les succès. Le ticket
       # déclenche une notification sur téléphone, et sert d'aide-mémoire.
-      # Un seul ticket est maintenu à la fois : on met à jour le précédent au
-      # lieu d'en accumuler un par semaine.
       - name: Signaler par un ticket si la veille a trouvé quelque chose
-        if: env.ACTION == '1'
+        if: env.ACTION == '1' || env.MIGRER == '1'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TITRE="Veille des grilles — $(date +%d/%m/%Y)"
           CORPS=$(cat /tmp/tb.md)
-          EXISTANT=$(gh issue list --label veille-grilles --state open \
-                       --json number --jq '.[0].number' 2>/dev/null || true)
-          if [ -n "$EXISTANT" ]; then
-            gh issue edit "$EXISTANT" --title "$TITRE" --body "$CORPS"
-            echo "Ticket #$EXISTANT mis à jour." >> $GITHUB_STEP_SUMMARY
-          else
+          if [ "$ACTION" = "1" ]; then
+            # Alertes nouvelles → NOUVEAU ticket : seule la création d'un ticket
+            # envoie une notification (modifier un ticket existant n'en envoie pas).
+            # Les tickets précédents restent ouverts tant qu'ils ne sont pas traités.
             gh label create veille-grilles --description "Grilles à rafraîchir" \
               --color FBCA04 2>/dev/null || true
-            gh issue create --title "$TITRE" --body "$CORPS" --label veille-grilles
-            echo "Ticket ouvert." >> $GITHUB_STEP_SUMMARY
+            gh issue create --title "Veille des grilles — $(date +%d/%m/%Y)" \
+              --body "$CORPS" --label veille-grilles
+            echo "Ticket ouvert (notification envoyée)." >> $GITHUB_STEP_SUMMARY
+          else
+            # Une seule fois : l'ancien ticket (veille par dates) reçoit la mémoire
+            # des alertes déjà vues, puis il est fermé. Plus de bruit ensuite.
+            N=$(gh issue list --label veille-grilles --state all --limit 1 \
+                  --json number --jq '.[0].number')
+            gh issue edit "$N" --title "Veille des grilles — suivie par le tableau de bord" --body "$CORPS"
+            gh issue close "$N" --reason "not planned" 2>/dev/null || gh issue close "$N"
+            echo "Ancien ticket #$N converti au suivi par le tableau de bord, puis fermé." >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Rapports téléchargeables
