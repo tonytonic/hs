@@ -3,11 +3,11 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.10.36"; // v10.10.36 : M6 totalHS arrondi a la minute (Bilan=carte, fini 6h16 vs 6h18)
+const CACHE_NAME = "heuressup-cache-v10.10.54"; // v10.10.54 : P3 IDCC 1558 1605 1679 1938 selectionnables dans GrillePaye. // v10.10.53 : C6 bloc multi-contrat sous Enregistrer. // v10.10.52 : C6 etape 2 vue d ensemble + repere 48 h. // v10.10.51 : C2 Chrome/Firefox iOS -> partage + conseil Safari. // v10.10.50 : C2 retour ouverture directe + bouton Retour au menu en pied de popup. // v10.10.48 : C6 plusieurs contrats Mizuki (etape 1 : cles + choix). // v10.10.47 : C4 saisie rapide en pill noire sous Personnaliser / to-do. // v10.10.46 : C4 barre de saisie rapide affinee (1 ligne). // v10.10.45 : C4 noms des modules + barre masquee sans module configure. // v10.10.44 : C4 saisie rapide (menu + #saisie-aujourdhui M1 M2 M5 M6). // v10.10.43 : C2 textes des rappels (Coucou...). // v10.10.42 : C2 rappels.ics fabrique par le SW (iOS Calendrier). // v10.10.41 : C2 frequence une fois/semaine/mois + ouverture directe iOS. // v10.10.40 : C2 rappels calendrier (.ics) dans le menu. // v10.10.39 : libelles copie de sauvegarde + mode ?test-sauvegarde. // v10.10.38 : C1 rappel sauvegarde commun (js/rappel-sauvegarde.js). v10.10.37 : C1 sauvegarde (date, empreinte, controle import). v10.10.36 : M6 totalHS arrondi a la minute (Bilan=carte, fini 6h16 vs 6h18)
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
-  "./", "./index.html", "./menu.html", "./manifest.json",
+  "./", "./index.html", "./menu.html", "./js/rappel-sauvegarde.js", "./manifest.json",
   "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png",
   "./glossaire.js", "./ccn/conventions-collectives.js",
   "./legi-ref.js", // requis par module5/6 + fox (chargé via ../legi-ref.js) — sinon 404 hors-ligne
@@ -48,6 +48,7 @@ const FILES_TO_CACHE = [
   "./module5/css/main.css",
   "./module5/js/app.js",
   "./module5/js/core/calc-engine.js",
+  "./module5/js/core/contrats.js",
   "./module5/js/data/ccn-partiel.js",
   "./module5/js/features/glossaire.js",
   "./module5/js/features/mizuki.js",
@@ -318,6 +319,27 @@ self.addEventListener("fetch", (event) => {
   // Sinon la réécriture des headers casse le CORS (erreur if-modified-since).
   const reqUrl = new URL(event.request.url);
   if (reqUrl.origin !== self.location.origin) return;
+
+  // ═══ C2 : rappels calendrier. Le fichier .ics est fabriqué ICI, sur le téléphone,
+  // à partir du paramètre c (base64url). Rien ne part sur internet. Une vraie adresse
+  // https servie en text/calendar permet à iOS d'afficher « Ajouter tout ». ═══
+  if (reqUrl.pathname.endsWith('/rappels.ics')) {
+    event.respondWith((async () => {
+      try {
+        const b = (reqUrl.searchParams.get('c') || '').replace(/-/g, '+').replace(/_/g, '/');
+        const bin = atob(b + '==='.slice((b.length + 3) % 4));
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return new Response(bytes, { headers: {
+          'Content-Type': 'text/calendar; charset=utf-8',
+          'Content-Disposition': 'inline; filename="simulheures-rappels.ics"',
+          'Cache-Control': 'no-store' } });
+      } catch (e) {
+        return new Response('Fichier de rappels illisible.', { status: 400, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+      }
+    })());
+    return;
+  }
 
   // ═══ FIX 2026-07-05 : le SHELL (navigations HTML) passe en CACHE D'ABORD ═══
   // Avant (FIX 2026-07-04) : réseau d'abord => sur Android/TWA cold start, l'utilisateur
