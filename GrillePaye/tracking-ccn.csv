@@ -237,7 +237,7 @@
 1554,Fabrication de la bière (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
 1555,Industrie pharmaceutique vétérinaire,0,vérifiée,3,01/06/2026,ACTIF,,juristique.org+convention.fr (extension JORF confirmée),"Fabrication/commerce produits pharmaceutiques, parapharmaceutiques et vétérinaires (brochure 3063) — identité ET contenu cohérents ('employé de vente' plausible pour la distribution). Accord du 28/01/2026, ÉTENDU (arrêté 4/05/2026, JORF n°0108 du 8/05/2026), en vigueur depuis 01/03/2026. +1,46%. OETAM: 1835€-2942,22€/mois. Cadres (à partir niveau III.1): 37 381€-79 171€/an."
 1557,Commerce articles sport équipement loisirs,0,sourcée,20,01/03/2025,ACTIF,oui (1801.8 €),,
-1558,,,absente de CCN_ALL — sourcée,10,26/02/2026,,oui (1831.26 €),,
+1558,Personnel des industries céramiques de France,,sourcée,10,26/02/2026,,oui (1831.26 €),,
 1561,Cordonnerie multiservice,0,vérifiée,3,01/01/2026,HISTORIQUE_PERIME,,,
 1563,Presse hebdomadaire régionale cadres,0,estimation à confirmer,6,01/06/2026,HISTORIQUE_PERIME,,,
 1564,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
@@ -249,7 +249,7 @@
 1600,Ameublement,0,placeholder — contenu à sourcer,1,01/06/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1880",Ancien nom officiel: Convention collective nationale de l'ameublement. Ce numéro est remplacé par le 1880 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 1603,Industrie de l emballage,0,vérifiée,6,01/06/2026,INTROUVABLE_DARES,,,
 1604,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3248",Ancien nom officiel: Convention collective des industries métallurgiques des arrondissements de Rouen et de Dieppe. Ce numéro est remplacé par le 3248 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
-1605,,,absente de CCN_ALL — sourcée,12,17/12/2025,,oui (1837.13 €),,
+1605,"Entreprises de désinfection, désinsectisation, dératisation (3D)",,sourcée,12,17/12/2025,,oui (1837.13 €),,
 1611,Communication écrite directe,0,vérifiée,3,2026,ACTIF,,DARES (ambigu),Logistique de communication (routage/façonnage postal) vs 'employé entreposage' actuel — chevauchement plausible (logistique). Pas tranché.
 1612,Personnel navigant essais et réceptions,0,estimation à confirmer,6,2026,,,,
 1621,Répartition pharmaceutique,,sourcée,37,01/07/2025,,,,
@@ -268,7 +268,7 @@
 1670,Industrie des ascenseurs et escaliers mécaniques,0,sourcée,7,01/06/2026,HISTORIQUE_PERIME,,,
 1673,Quincaillerie commerce Limousin,0,estimation à confirmer,6,01/01/2026,HISTORIQUE_PERIME,,,
 1678,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1909",Ancien nom officiel: Convention collective nationale des organismes de tourisme à caractère non lucratif. Ce numéro est remplacé par le 1909 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
-1679,,,absente de CCN_ALL — sourcée,6,16/06/2025,,,,
+1679,Inspection d'assurance,,sourcée,6,16/06/2025,,,,
 1680,Conseil en gestion entreprise (identité non confirmée),0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1780",Ancien nom officiel: Convention collective départementale des ouvriers du bâtiment et des travaux publics de Vaucluse. Ce numéro est remplacé par le 1780 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 1682,Etudes de marché et sondages (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1683,Traduction et interprétariat (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
@@ -328,7 +328,7 @@
 1880,Négoce de l'ameublement,,sourcée,23,19/03/2026,,oui (1830 €),,
 1891,Entrepôts frigorifiques manutention (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1909,Organismes de tourisme,0,vérifiée,2,26/01/2026,,,,
-1938,,,absente de CCN_ALL — vérifiée,32,01/02/2026,,,"Accord du 28/01/2026 (minima au 1/02/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
+1938,Industries de la transformation des volailles,,vérifiée,32,01/02/2026,,,"Accord du 28/01/2026 (minima au 1/02/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1947,Négoce de bois oeuvre et produits dérivés,0,sourcée,34,30/01/2024,,oui (1800 €),,
 1951,Cabinets ou entreprises d'expertises en automobile,,sourcée,10,19/06/2025,,oui (1842.58 €),,
 1965,Notariat (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
