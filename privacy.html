@@ -19,13 +19,13 @@
     <a href="mentions-legales.html" class="back-btn">← Retour aux mentions légales</a>
 
     <h1>Politique de Confidentialité</h1>
-    <p><strong>Dernière mise à jour :</strong> 21 juin 2026</p>
+    <p><strong>Dernière mise à jour :</strong> 23 septembre 2026</p>
 
     <p>Cette Politique de Confidentialité décrit comment l'application <strong>Simulateur Heures Sup</strong> traite vos informations. Votre vie privée est notre priorité absolue.</p>
 
     <h2>1. Absence de Collecte de Données</h2>
     <p>L'Application est conçue pour fonctionner de manière totalement autonome. <strong>Nous ne collectons, ne stockons, ni ne transmettons aucune donnée personnelle</strong> (telle que votre nom, votre adresse e-mail, votre position géographique ou vos calculs) vers des serveurs externes ou vers des tiers.</p>
-    <p>Une exception technique, limitée et strictement optionnelle, existe pour deux fonctions d'import de données publiques (taux de change, jours fériés officiels) : voir le détail au paragraphe 2 ci-dessous.</p>
+    <p>Deux exceptions techniques existent, sans qu'aucune de vos saisies ne soit jamais transmise : deux fonctions d'import de données publiques, strictement optionnelles (taux de change, jours fériés officiels — paragraphe 2), et le chargement de polices d'écriture et d'une bibliothèque d'export PDF depuis des services tiers (paragraphe 3).</p>
 
     <h2>2. Cas particulier : fonctions optionnelles d'import (taux de change, jours fériés)</h2>
     <p>Deux outils de l'Application proposent un bouton <strong>facultatif</strong> permettant d'importer des données publiques à jour directement depuis des services tiers :</p>
@@ -37,7 +37,12 @@
     <p>Comme pour toute requête effectuée sur Internet, ces services reçoivent alors automatiquement votre <strong>adresse IP</strong> ainsi que des informations techniques standard (type de navigateur, etc.), nécessaires à l'acheminement de la réponse — il s'agit d'une contrainte technique inhérente au fonctionnement d'Internet, et non d'une collecte volontaire de notre part. <strong>Aucune autre donnée</strong> — aucune saisie effectuée dans l'Application, aucune information personnelle — ne leur est transmise.</p>
     <p>Ces services sont indépendants de l'éditeur, qui n'a pas de contrôle sur leurs propres pratiques de traitement des données. Pour en savoir plus : <a href="https://www.coingecko.com/en/privacy" target="_blank" rel="noopener">politique de confidentialité de CoinGecko</a> · <a href="https://www.data.gouv.fr/dataservices/jours-feries" target="_blank" rel="noopener">API jours fériés (data.gouv.fr)</a>. Frankfurter (projet open-source) ne collecte pas de données personnelles ; le service public est servi via Cloudflare, qui peut collecter des informations techniques basiques à des fins de performance.</p>
 
-    <h2>3. Stockage Local (LocalStorage)</h2>
+    <h2>3. Polices d'écriture (Google Fonts) et bibliothèque d'export PDF</h2>
+    <p>Pour afficher ses textes avec les polices prévues, l'Application charge certaines polices d'écriture depuis <strong>Google Fonts</strong> (fonts.googleapis.com et fonts.gstatic.com, service de Google LLC). Une partie des écrans charge également une bibliothèque de génération de PDF (jsPDF) depuis <strong>cdnjs</strong> (cdnjs.cloudflare.com, service de Cloudflare, Inc.).</p>
+    <p>Contrairement aux imports du paragraphe 2, ces chargements se font <strong>automatiquement à l'ouverture des écrans concernés</strong>, lorsque votre appareil est connecté à Internet. Comme pour toute requête sur Internet, ces services reçoivent alors votre <strong>adresse IP</strong> et des informations techniques standard (type de navigateur, langue, page d'origine), nécessaires pour vous envoyer les fichiers. <strong>Aucune de vos saisies</strong> ni aucune information personnelle ne leur est transmise, et l'éditeur de l'Application ne reçoit rien.</p>
+    <p>Hors connexion, ces fichiers ne sont pas chargés : l'Application s'affiche alors avec les polices de votre appareil, et l'export PDF n'est pas disponible. Pour en savoir plus : <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">règles de confidentialité de Google</a> · <a href="https://developers.google.com/fonts/faq/privacy" target="_blank" rel="noopener">Google Fonts et la confidentialité</a> · <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">politique de confidentialité de Cloudflare</a>.</p>
+
+    <h2>4. Stockage Local (LocalStorage)</h2>
     <p>Toutes les données que vous saisissez dans l'Application sont conservées exclusivement sur votre propre appareil via la technologie <strong>LocalStorage</strong> de votre navigateur. 
     <ul>
         <li><strong>Contrôle total :</strong> Ces données ne nous sont jamais envoyées et restent sous votre contrôle exclusif.</li>
@@ -45,17 +50,17 @@
     </ul>
     </p>
 
-    <h2>4. Pas de Services de Suivi (Analytics)</h2>
+    <h2>5. Pas de Services de Suivi (Analytics)</h2>
     <p>Nous n'utilisons aucun outil de suivi, de cookies publicitaires ou de services d'analyse tiers. Votre utilisation de l'application reste totalement anonyme.</p>
 
-    <h2>5. Sécurité</h2>
-    <p>Hors les deux appels optionnels décrits au paragraphe 2 (qui ne transmettent que votre adresse IP, technique et inévitable, jamais vos saisies), aucune donnée n'est transmise sur Internet : les risques liés à la sécurité de serveurs tiers sont donc quasi inexistants pour cette Application. La sécurité de vos données dépend avant tout de la sécurité de votre propre appareil.</p>
+    <h2>6. Sécurité</h2>
+    <p>Hors les appels décrits aux paragraphes 2 et 3 (qui ne transmettent que votre adresse IP et des informations techniques, jamais vos saisies), aucune donnée n'est transmise sur Internet : les risques liés à la sécurité de serveurs tiers sont donc quasi inexistants pour cette Application. La sécurité de vos données dépend avant tout de la sécurité de votre propre appareil.</p>
 
-    <h2>6. Modifications de cette politique</h2>
+    <h2>7. Modifications de cette politique</h2>
     <p>Nous pouvons mettre à jour notre politique de confidentialité de temps à autre. Toute modification sera publiée sur cette page.</p>
 
     <div class="contact">
-        <h2>7. Contact</h2>
+        <h2>8. Contact</h2>
         <p>Pour toute question concernant cette politique, vous pouvez nous contacter à l'adresse suivante :</p>
         <p><strong>Email :</strong> appareils.treves6g@icloud.com</p>
     </div>
