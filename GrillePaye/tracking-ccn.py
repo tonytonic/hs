@@ -130,12 +130,24 @@ def statut_de(idcc, grille, statut_dares, smic):
     # Grille sous le SMIC : signalé à part, c'est le défaut le plus grave.
     sous = ""
     montants = [r.get("b") for r in grille.get("g", [])
-                if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"]
+                if isinstance(r.get("b"), (int, float)) and r.get("t") != "pct"
+                # P5 : plancher SMIC géré à l'affichage (cv = montant conventionnel
+                # connu, sm = montant non repris) : ces lignes ne sont pas des erreurs
+                # et restent justes après une revalorisation du SMIC.
+                and not r.get("sm") and "cv" not in r]
     if montants and smic:
         mini = min(montants)
         if 500 <= mini < smic:          # sous 500 € : taux horaire ou cachet, hors comparaison
             sous = "documenté" if EXPLIQUE_SOUS_SMIC.search(src) else f"oui ({mini} €)"
 
+    if st == "fusion":
+        # Convention fusionnée sans grille historique connue : c'est la grille de
+        # la convention de rattachement qui s'applique (bandeau dans GrillePaye).
+        return "fusionnée — grille de la convention de rattachement", sous
+    if st == "statut":
+        # Statut public (ex. agents des CCI) : rémunération indiciaire fixée par la
+        # commission paritaire nationale, pas de grille de branche à reproduire.
+        return "statut public — rémunération indiciaire", sous
     if st == "placeholder":
         return "placeholder — contenu à sourcer", sous
     if st == "estimated" or TRACE_DOUTE.search(src):

@@ -106,6 +106,8 @@ def statut_public(grille):
     src = str(grille.get("s") or "")
     if st == "placeholder":
         return "encours"
+    if st in ("fusion", "statut"):
+        return "sourcee"
     if TRACE_LEVEE.search(src):
         return "verifiee"
     if st == "estimated" or TRACE_DOUTE.search(src):
