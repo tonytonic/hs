@@ -140,6 +140,14 @@ def statut_de(idcc, grille, statut_dares, smic):
         if 500 <= mini < smic:          # sous 500 € : taux horaire ou cachet, hors comparaison
             sous = "documenté" if EXPLIQUE_SOUS_SMIC.search(src) else f"oui ({mini} €)"
 
+    if st == "fusion":
+        # Convention fusionnée sans grille historique connue : c'est la grille de
+        # la convention de rattachement qui s'applique (bandeau dans GrillePaye).
+        return "fusionnée — grille de la convention de rattachement", sous
+    if st == "statut":
+        # Statut public (ex. agents des CCI) : rémunération indiciaire fixée par la
+        # commission paritaire nationale, pas de grille de branche à reproduire.
+        return "statut public — rémunération indiciaire", sous
     if st == "placeholder":
         return "placeholder — contenu à sourcer", sous
     if st == "estimated" or TRACE_DOUTE.search(src):
