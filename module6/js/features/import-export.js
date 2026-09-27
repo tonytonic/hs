@@ -89,6 +89,8 @@ const M6_ImportExport = {
       imported++;
     }
     if (obj.entretiens) localStorage.setItem(`M6_${regime}_ENTRETIENS`, JSON.stringify(obj.entretiens));
+    // Un ancien export peut ranger janvier-mai sous l'année suivante : re-rangement à la prochaine ouverture
+    try { localStorage.removeItem('M6_MIGR_EXO_V1'); } catch (_) {}
 
     M6_toast(`✅ Import réussi — ${imported} exercice(s) chargé(s)`);
     if (onSuccess) onSuccess();
@@ -116,7 +118,8 @@ const M6_ImportExport = {
   exportCSV(regime, year) {
     const data     = M6_Storage.getData(regime, year);
     const contract = M6_Storage.getContract(regime) || {};
-    const feries   = M6_Feries?.getSet(year) || new Set();
+    const _b       = window.M6_Periode ? M6_Periode.bornes(contract, year) : null;
+    const feries   = _b ? M6_Periode.feries(_b) : (M6_Feries?.getSet(year) || new Set());
 
     const typeLabel = {
       travail:'TRAVAIL', rtt:'RTT', cp:'CONGE', ferie:'FERIE',
@@ -127,7 +130,7 @@ const M6_ImportExport = {
 
     const header = ['Date','Jour','Type','Amplitude_debut','Amplitude_fin','Deplacement','Note','Valeur_jours'];
     const rows = Object.entries(data)
-      .filter(([k]) => k.startsWith(String(year)))
+      .filter(([k]) => _b ? M6_Periode.inclut(k, _b) : k.startsWith(String(year)))
       .sort(([a],[b]) => a.localeCompare(b))
       .map(([dk, v]) => {
         const d = new Date(dk + 'T12:00:00');

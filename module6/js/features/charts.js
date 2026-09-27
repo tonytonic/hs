@@ -67,11 +67,9 @@ const M6_Charts = {
     for (let m = minMois; m <= maxMois; m++) {
       // Données cumulées jusqu'à ce mois (inclut saisies rétroactives)
       const dataCumul = {};
+      const _b = M6_Periode.bornes(contract, year);
       for (const [dk, v] of Object.entries(data)) {
-        if (dk.startsWith(String(year))) {
-          const mois = parseInt(dk.slice(5,7)) - 1;
-          if (mois <= m) dataCumul[dk] = v;
-        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && M6_Periode.jusquAuMois(dk, _b, m)) dataCumul[dk] = v;
       }
       if (Object.keys(dataCumul).length === 0) continue;
 
@@ -181,8 +179,9 @@ const M6_Charts = {
 
     // Compter les jours par mois
     const parMois = Array(12).fill(0);
+    const _b = M6_Periode.bornes(null, year);
     for (const [dk, v] of Object.entries(data)) {
-      if (!dk.startsWith(String(year))) continue;
+      if (!M6_Periode.inclut(dk, _b)) continue;
       const m = parseInt(dk.slice(5,7)) - 1;
       const t = v.type || 'travail';
       if (t === 'travail') parMois[m]++;
@@ -346,14 +345,15 @@ const M6_Charts = {
     const bioParMois = [];
     const moisAvecData = new Set();
     // Filtrer uniquement les clés de type YYYY-MM-DD (jours, pas semaines)
-    const dayKeys = Object.keys(data).filter(dk => /^\d{4}-\d{2}-\d{2}$/.test(dk) && dk.startsWith(String(year)));
+    const _b = M6_Periode.bornes(contract, year);
+    const dayKeys = Object.keys(data).filter(dk => /^\d{4}-\d{2}-\d{2}$/.test(dk) && M6_Periode.inclut(dk, _b));
     for (const dk of dayKeys) {
       moisAvecData.add(parseInt(dk.slice(5,7)) - 1);
     }
     // Si aucune clé journalière (régime FH en semaines), on construit depuis les semaines
     if (!dayKeys.length) {
       // Fallback FH : agrégation par mois depuis les semaines
-      const wkKeys = Object.keys(data).filter(k => /^\d{4}-W\d{2}$/.test(k) && k.startsWith(String(year)));
+      const wkKeys = Object.keys(data).filter(k => /^\d{4}-W\d{2}$/.test(k) && M6_Periode.inclut(k, _b));
       if (!wkKeys.length) {
         return `<div style="padding:24px;text-align:center;color:var(--pierre)">
           <div style="font-size:2rem;margin-bottom:8px">📊</div>
@@ -409,12 +409,22 @@ const M6_Charts = {
         </div>
       </div>`;
     }
-    const minM = moisAvecData.size ? Math.min(...moisAvecData) : 0;
-    const maxM = moisAvecData.size ? Math.max(...moisAvecData) : new Date().getMonth();
+    /* 27/09/2026 : mois rangés dans l'ordre de l'exercice (« Déc 25 » avant « Jan 26 » pour un
+       exercice à cheval), et plus aucun mois après le dernier mois saisi (ni au-delà d'aujourd'hui). */
+    const aCheval = _b.deb.slice(0, 4) !== _b.fin.slice(0, 4);
+    const lib = ym => MOIS[parseInt(ym.slice(5, 7), 10) - 1] + (aCheval ? ' ' + ym.slice(2, 4) : '');
+    const _auj = new Date(), ymAuj = _auj.getFullYear() + '-' + String(_auj.getMonth() + 1).padStart(2, '0');
+    const yms = Array.from(new Set(dayKeys.map(dk => dk.slice(0, 7)))).sort();
+    const listeMois = [];
+    if (yms.length) {
+      let x = new Date(yms[0] + '-01T12:00:00');
+      const der = yms[yms.length - 1] < ymAuj ? yms[yms.length - 1] : (yms.filter(v => v <= ymAuj).pop() || yms[0]);
+      for (let n = 0; n < 24; n++) { const ym = x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0'); if (ym > der) break; listeMois.push(ym); x.setMonth(x.getMonth() + 1); }
+    }
     // Compteur cumulé jours travaillés par mois
     const joursParMois = {};
     for (const dk of dayKeys) {
-      const m = parseInt(dk.slice(5,7)) - 1;
+      const m = dk.slice(0, 7);
       const t = data[dk]?.type || 'travail';
       if (!joursParMois[m]) joursParMois[m] = { travail:0, rtt:0, cp:0, repos:0 };
       if (t === 'travail' || t === 'rachat' || t === 'teletravail') joursParMois[m].travail++;
@@ -423,10 +433,10 @@ const M6_Charts = {
       else if (t === 'cp') joursParMois[m].cp++;
       else if (t === 'repos' || t === 'ferie') joursParMois[m].repos++;
     }
-    for (let m = minM; m <= maxM; m++) {
-      const dataCumul = {};
+    for (const m of listeMois) {
+      const dataCumul = {}, finM = m + '-31';
       for (const [dk,v] of Object.entries(data)) {
-        if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && dk.startsWith(String(year)) && parseInt(dk.slice(5,7))-1 <= m) dataCumul[dk] = v;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dk) && M6_Periode.inclut(dk, _b) && dk <= finM) dataCumul[dk] = v;
       }
       let bio_m = { fatigue:0, stress:0, recovery:50, performance:100 };
       if (window.M6_BioEngine && Object.keys(dataCumul).length) {
@@ -459,10 +469,10 @@ const M6_Charts = {
             <tbody>
               ${(() => {
                 let cumul = 0;
-                return Object.entries(joursParMois).sort(([a],[b])=>a-b).map(([m,d]) => {
+                return Object.entries(joursParMois).sort(([a],[b])=>a<b?-1:1).map(([m,d]) => {
                   cumul += d.travail;
                   return `<tr style="border-top:1px solid var(--ivoire-3)">
-                    <td style="text-align:left;padding:5px 6px;font-weight:600;color:var(--charbon)">${MOIS[m]}</td>
+                    <td style="text-align:left;padding:5px 6px;font-weight:600;color:var(--charbon)">${lib(m)}</td>
                     <td style="padding:5px 4px;font-weight:600;color:#1E3A5F">${d.travail}</td>
                     <td style="padding:5px 4px;color:#4A7C6F">${d.rtt}</td>
                     <td style="padding:5px 4px;color:#2D6A4F">${d.cp}</td>
@@ -479,7 +489,7 @@ const M6_Charts = {
     <!-- Tableau bio chiffres par mois -->
     <div class="m6-card" style="margin-bottom:14px;overflow:hidden">
       <div class="m6-card-header"><div class="m6-card-icon">🧬</div>
-        <div><div class="m6-card-label">Indicateurs biologiques</div><div class="m6-card-title">Scores mensuels cumulés</div></div></div>
+        <div><div class="m6-card-label">Indicateurs biologiques</div><div class="m6-card-title">État en fin de mois</div></div></div>
       <div class="m6-card-body" style="padding:8px 4px">
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse;font-size:0.74rem;text-align:center">
@@ -499,7 +509,7 @@ const M6_Charts = {
                 const recColor = bio.recovery <= 30 ? '#9B2C2C' : bio.recovery <= 50 ? '#C4853A' : '#2D6A4F';
                 const perfColor = bio.performance <= 30 ? '#9B2C2C' : bio.performance <= 60 ? '#C4853A' : '#2D6A4F';
                 return `<tr style="border-top:1px solid var(--ivoire-3)">
-                  <td style="text-align:left;padding:5px 6px;font-weight:600;color:var(--charbon)">${MOIS[m]}</td>
+                  <td style="text-align:left;padding:5px 6px;font-weight:600;color:var(--charbon)">${lib(m)}</td>
                   <td style="padding:5px 4px;font-weight:600;color:${fatColor}">${bio.fatigue}</td>
                   <td style="padding:5px 4px;font-weight:600;color:${stressColor}">${bio.stress}</td>
                   <td style="padding:5px 4px;font-weight:600;color:${recColor}">${bio.recovery}</td>
@@ -510,7 +520,7 @@ const M6_Charts = {
             </tbody>
           </table>
         </div>
-        <div style="font-size:0.65rem;color:var(--pierre);margin-top:6px;text-align:center">Scores calculés cumulativement — 0=optimal · 100=critique</div>
+        <div style="font-size:0.65rem;color:var(--pierre);margin-top:6px;text-align:center">État des 8 dernières semaines à la fin de chaque mois (RTT et CP récupèrent, effet estompé en 3 semaines). Fatigue et stress : 0 = optimal, 100 = critique ; récupération et performance : 100 = optimal.</div>
       </div>
     </div>
     </div>`;

@@ -404,7 +404,7 @@ const M6_ZenjiPopup = {
     _injectStyles();
     this._analysis = analysis;
     this._bio      = bio;
-    this._prenom   = contract?.nomCadre || contract?.nom || '';
+    this._prenom   = contract?.nomCadre || contract?.nom || (function(){try{return localStorage.getItem('SH_PRENOM')||'';}catch(_){return '';}})();
     this._regime   = regime || 'forfait_jours';
     this._onAction = onActionCallback || null;
 

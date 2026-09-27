@@ -264,7 +264,9 @@ const M6_PDF = {
     const d1 = new Date(dateDebut+'T12:00:00'), d2 = new Date(dateFin+'T12:00:00');
     const label1 = d1.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     const label2 = d2.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    const feries = M6_Feries?.getSet(year) || new Set();
+    // Fériés de toutes les années de la période choisie (26/09/2026)
+    const feries = new Set();
+    for (let y=d1.getFullYear(); y<=d2.getFullYear(); y++) (M6_Feries?.getSet(y)||new Set()).forEach(x=>feries.add(x));
 
     // Filtrer les données sur la période
     const entries = Object.entries(data)
