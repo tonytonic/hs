@@ -3,7 +3,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<script src="../js/journal-erreurs.js"></script>
+<!-- Sans flash (01/10/2026) : si le profil (salarié / avancé) est déjà choisi,
+     l'écran de choix est masqué AVANT le premier affichage. Avant, il
+     apparaissait une fraction de seconde à chaque ouverture. -->
+<script>try{if(localStorage.getItem('gp_role'))document.documentElement.classList.add('gp-role-ok');}catch(e){}</script>
+<style>html.gp-role-ok #role-screen{display:none}</style>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
 <meta name="theme-color" content="#12100e">
 <title>Lumina · Conventions Collectives 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -4580,6 +4587,23 @@ function resetRole() {
   }
   // else: role-screen déjà visible par défaut
 })();
+
+/* 26/09/2026 : la CCN choisie dans le menu général (CCN_IDCC) s'ouvre directement,
+   une fois par visite. « ← Retour » ramène à la liste pour chercher une autre CCN.
+   Droit commun ou accord personnalisé : liste habituelle. */
+let _gpMaCCNFaite=false;
+function gpOuvrirMaCCN(){
+  if(_gpMaCCNFaite)return;
+  try{
+    if(!localStorage.getItem('gp_role'))return;              // écran de choix du rôle encore affiché
+    if(!document.getElementById('panel-grilles')?.classList.contains('active'))return;
+    const idcc=parseInt(localStorage.getItem('CCN_IDCC')||'0',10);if(!idcc)return;
+    const idx=CCN_ALL.findIndex(x=>x[0]===idcc);if(idx<0)return;
+    _gpMaCCNFaite=true;showGD(idx);window.scrollTo(0,0);
+  }catch(e){}
+}
+gpOuvrirMaCCN();
+(function(){const f=window.setRole;if(typeof f==='function')window.setRole=function(r){f(r);gpOuvrirMaCCN();};})();
 
 
 // Indicateur de données restaurées dans l'onglet Conformité
