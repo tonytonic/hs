@@ -320,6 +320,62 @@ const M6_CCN_Adapter = {
   },
 };
 
+/* 26/09/2026 : CCN choisie dans le menu général (CCN_IDCC). Accord personnalisé du menu :
+   non repris (il décrit des heures sup de salarié, pas un forfait cadre). */
+M6_CCN_Adapter.duMenu = function(regime) {
+  try {
+    if (localStorage.getItem('CCN_CUSTOM')) return null;
+    const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0', 10); if (!idcc) return null;
+    let ccn = null;
+    if (regime === 'forfait_heures') {
+      if (_hasCommonAPI()) { const e = (global.CCN_API.search(String(idcc), 20) || []).find(x => x.i === idcc); if (e) ccn = this._normalizeHS(e); }
+      if (!ccn) ccn = FALLBACK_HS.find(c => c.idcc === idcc) || null;
+    } else {
+      const r = this.get(idcc, regime); if (r && +r.idcc === idcc) ccn = r;
+    }
+    return ccn && ccn.nom ? ccn : null;
+  } catch (_) { return null; }
+};
+/* Contrat Zenji déjà enregistré sans CCN : reprise une fois (M6_CCN_MENU_<régime> garde
+   l'IDCC déjà proposé). Seules les valeurs restées au défaut légal sont remplacées ;
+   une valeur saisie à la main n'est jamais écrasée. Renvoie le nom repris, sinon ''. */
+M6_CCN_Adapter.appliquerDuMenu = function(regime) {
+  try {
+    if (!regime || !global.M6_Storage) return '';
+    const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0', 10); if (!idcc) return '';
+    const fk = 'M6_CCN_MENU_' + regime;
+    if (localStorage.getItem(fk) === String(idcc)) return '';
+    const c = M6_Storage.getContract(regime);
+    if (!c) return '';                                   // pas encore de contrat : l'assistant s'en charge
+    localStorage.setItem(fk, String(idcc));
+    if (c.ccnIdcc || (c.ccnLabel && c.ccnLabel.trim())) return '';
+    const ccn = this.duMenu(regime); if (!ccn) return '';
+    const n = Object.assign({}, c, { ccnLabel: ccn.nom, ccnIdcc: idcc });
+    const d = this.buildContractDefaults(ccn, regime) || {};
+    const def = (v, x) => v === undefined || v === null || v === '' || v === 0 || v === x;
+    if (regime === 'forfait_jours') {
+      if (d.plafond && def(c.plafond, 218)) n.plafond = d.plafond;
+      if (d.tauxMajorationRachat && def(c.tauxMajorationRachat, 10)) n.tauxMajorationRachat = d.tauxMajorationRachat;
+    } else if (regime === 'forfait_heures') {
+      if (def(c.contingent, 220)) n.contingent = ccn.contingent || 220;
+      if (def(c.taux1, 25)) n.taux1 = ccn.taux1 || 25;
+      if (def(c.taux2, 50)) n.taux2 = ccn.taux2 || 50;
+      if (def(c.palier1, 8)) n.palier1 = ccn.palier1 || 8;
+      if (!c.taux_inter && !c.palier_inter && ccn.taux_inter) { n.taux_inter = ccn.taux_inter; n.palier_inter = ccn.palier_inter || null; }
+    }
+    M6_Storage.setContract(regime, n);
+    return ccn.nom;
+  } catch (_) { return ''; }
+};
+/* Assistant : champ CCN vide → prérempli avec la CCN du menu (toujours modifiable) */
+global.M6_ccnDuMenuWizard = function(inp, regime, cb) {
+  try {
+    if (!inp || inp.value.trim() || parseInt(inp.dataset.idcc || '0', 10)) return;
+    const ccn = M6_CCN_Adapter.duMenu(regime); if (!ccn) return;
+    inp.value = ccn.nom; if (cb) cb(ccn);
+  } catch (_) {}
+};
+
 global.M6_CCN_Adapter      = M6_CCN_Adapter;
 global.M6_CCN_CADRES_TABLE = FALLBACK_FJ;
 
