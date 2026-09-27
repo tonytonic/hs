@@ -7,6 +7,10 @@
 
 let currentSection  = 'accueil';
 let currentAnalysis = null;
+// 26/09/2026 : à chaque ouverture, année et semaine d'aujourd'hui (avant : l'année consultée
+// la dernière fois restait active alors que le calendrier montrait la semaine du jour —
+// une saisie partait dans la mauvaise année)
+try{ M5_DataStore.setYear(String(new Date().getFullYear())); }catch(_){}
 let calendarMonday  = M5_getCurrentMonday(); // semaine affichée dans le calendrier
 
 // ── Toast ─────────────────────────────────────────────────────────
@@ -69,7 +73,8 @@ function runAnalysis() {
   // Mode ANNUEL
   let annuelResult=null;
   if(contract.modeCalcul==='ANNUEL') {
-    annuelResult=CalcEngine.calcAnnuel(contract.hoursBase,contract.exerciceStart||'01/01',allWeeks);
+    // Exercice à cheval sur deux années civiles : semaines des deux côtés (26/09/2026)
+    annuelResult=CalcEngine.calcAnnuel(contract.hoursBase,contract.exerciceStart||'01/01',M5_DataStore.getWeeksAround(year));
   }
   // Mode MENSUEL
   let mensuelResult=null;
@@ -98,7 +103,8 @@ function runAnalysis() {
       };
     }
     // Inclure toute semaine qui chevauche la période (lundi<=fin ET fin_semaine>=debut)
-    const weeksMois=allWeeks.filter(w=>{
+    // Période à cheval sur deux années (ex. 29/12 → 25/01) : semaines des deux côtés (26/09/2026)
+    const weeksMois=M5_DataStore.getWeeksAround(year).filter(w=>{
       const wEnd=new Date(w.monday+'T12:00:00'); wEnd.setDate(wEnd.getDate()+6);
       const wEndStr=wEnd.getFullYear()+'-'+String(wEnd.getMonth()+1).padStart(2,'0')+'-'+String(wEnd.getDate()).padStart(2,'0');
       return w.monday<=pCourante.finStr && wEndStr>=pCourante.debutStr;
@@ -124,8 +130,37 @@ function runAnalysis() {
           const todayStr=M5_localDK(new Date());
           return allWeeks.filter(w=>w.monday<=todayStr).slice(-12);
         })();
-    if(weeksWellbeing.length>=2) {
-      wellbeing=M5_Wellbeing.compute(weeksWellbeing, contract.hoursBase, contract);
+    /* 26/09/2026 : plusieurs contrats → santé calculée sur le cumul de toutes les heures
+       de la semaine, tous employeurs confondus (heures prévues et plafonds additionnés,
+       repos = congé sur tous les contrats). Même résultat quel que soit le contrat affiché. */
+    let wbWeeks=weeksWellbeing, wbContract=contract, cumul=null;
+    try{
+      if(window.M5_Contrats&&M5_Contrats.existing().length>1){
+        const cc=M5_Contrats.contratCumul(), y0=parseInt(year,10), ans=[String(y0-2),String(y0-1),String(y0),String(y0+1)];
+        const sd=contract.weekStartDay||0, todayStr=M5_localDK(new Date());
+        let all=M5_Contrats.semainesCumul(ans,sd).filter(w=>w.monday<=todayStr);
+        // Fenêtre où tous les contrats sont suivis (sinon un contrat pas encore saisi fausse la charge)
+        const ex=M5_Contrats.existing(), premiers=ex.map(n=>{const w=all.find(x=>x.parContrat[n]>0);return w?w.monday:null;});
+        /* 27/09/2026 : dernières semaines pas encore saisies pour tous les contrats (ex. seul le
+           ménage saisi cette semaine) → écartées, au lieu de compter comme des semaines légères
+           (elles faussaient stabilité, récupération et variations soudaines). */
+        try{const vac={};ex.forEach(n=>{vac[n]=M5_Contrats.congesContrat(n,ans,sd);});
+          while(all.length>2){const w=all[all.length-1];if(ex.every(n=>w.parContrat[n]>0||vac[n][w.monday]))break;all.pop();}}catch(e){}
+        if(cc&&premiers.every(Boolean)){
+          const depuis=premiers.sort().pop(), fen=all.filter(w=>w.monday>=depuis);
+          if(fen.length>=2) all=fen;
+          const conges=M5_Contrats.congesCommuns(ans,sd);
+          wbWeeks=all.slice(-16); wbContract=Object.assign({},cc,{_vacLundis:conges});
+          // Repères légaux, tous employeurs : 48 h sur une semaine (L3121-20),
+          // 44 h en moyenne sur 12 semaines consécutives (L3121-22)
+          const d12=all.slice(-12), moy12=d12.length?d12.reduce((a,w)=>a+w.worked,0)/d12.length:0;
+          cumul={n:ex.length, base:cc.hoursBase, sem48:all.slice(-12).filter(w=>w.worked>48), moy12:Math.round(moy12*100)/100, nb12:d12.length};
+        }
+      }
+    }catch(e){}
+    if(wbWeeks.length>=2) {
+      wellbeing=M5_Wellbeing.compute(wbWeeks, wbContract.hoursBase, wbContract);
+      if(wellbeing&&cumul) wellbeing.cumul=cumul;
     }
   }
 
@@ -210,7 +245,8 @@ function refreshUI() {
   // Badge header
   const badge=document.getElementById('header-contract-badge');
   if(badge && contract.hoursBase) {
-    badge.textContent=contract.hoursBase+'h/sem';
+    const _dc=contract.dureeContrat, _uc={M:'mois',A:'an'}[_dc&&_dc.unite];
+    badge.textContent=(_uc&&_dc.valeur>0)?(String(_dc.valeur).replace('.',',')+'h/'+_uc):(contract.hoursBase+'h/sem');
     badge.className='m5-contract-badge ok';
     badge.style.display='inline-flex';
   }
@@ -220,7 +256,7 @@ function refreshUI() {
   // Bulle Mizuki — wellbeing en priorité si signal fort
   let bubbleText=Mizuki.getBubbleText(_analysisForMizuki(analysis));
   if(analysis.wellbeing&&analysis.wellbeing.available&&analysis.wellbeing.niveau==='critique') {
-    const name=localStorage.getItem('M5_USER_NAME')||'';
+    const name=(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
     bubbleText=M5_Wellbeing.getMizukiText(analysis.wellbeing,name)||bubbleText;
   }
   const bubbleEl=document.getElementById('mizuki-bubble-text');
@@ -235,6 +271,7 @@ function refreshUI() {
   renderPeriodeNav();
   renderWeekSummary(analysis);
   renderQuickStats(analysis);
+  try{ if(window.M5_renderOverview) window.M5_renderOverview(); }catch(e){}
 }
 
 // ── CALENDRIER SEMAINE ────────────────────────────────────────────
@@ -296,6 +333,7 @@ function renderCalendar() {
         <button class="m5-btn m5-btn-outline m5-btn-sm" style="flex:1" onclick="openWeeklySaisie()">📊 Total semaine</button>
         <button class="m5-btn m5-btn-sm ${isVacH?'m5-btn-primary':'m5-btn-outline'}" onclick="toggleVacSemaine()">🌴 ${isVacH?'Congés ✓':'Congés'}</button>
       </div>
+      ${_congesTousBtn()}
       <div style="text-align:center;margin-top:8px;">
         <button onclick="switchToDayMode('${calendarMonday}')" style="background:none;border:none;font-size:11px;color:rgba(196,168,255,0.60);cursor:pointer;text-decoration:underline;">
           Passer en saisie journalière →
@@ -403,6 +441,7 @@ function renderCalendar() {
       🌴 ${isVacNow?'Congés ✓':'Congés'}
     </button>
   </div>`;
+  html+=_congesTousBtn();
 
   el.innerHTML=html;
   } catch(renderErr) {
@@ -438,9 +477,21 @@ function calPrev() {
   const d=new Date(calendarMonday+'T12:00:00');
   d.setDate(d.getDate()-7);
   calendarMonday=M5_localDK(d);
+  _m5SuivreExercice();
   // Différer refreshUI au prochain frame → INP nettement réduit (le tap répond instantanément)
   requestAnimationFrame(refreshUI);
 }
+/* 27/09/2026 : la semaine affichée sort de l'exercice → on passe dans l'exercice qui la contient,
+   pour que la saisie soit rangée au bon endroit (avant : rangée dans l'exercice affiché). */
+function _m5SuivreExercice(){try{
+  const y=String(M5_DataStore.getYear()),b=window.M5_exoBornes&&M5_exoBornes(y);
+  if(!b||(calendarMonday>=b.deb&&calendarMonday<=b.fin))return;
+  const a=window.M5_exoDeDate&&M5_exoDeDate(calendarMonday);if(!a||a===y)return;
+  M5_DataStore.setYear(a);if(window.Mizuki&&Mizuki.clearCache)Mizuki.clearCache();
+  if(typeof updateYearBadge==='function')updateYearBadge();
+  toast('📅 Exercice '+a,'info');
+  if(window.M5_verifierExercice)setTimeout(window.M5_verifierExercice,60);
+}catch(e){}}
 function calNext() {
   if(window._m5IsMonthView&&window._m5IsMonthView()){ window.M5monthNext&&window.M5monthNext(); return; }
   const today=M5_getCurrentMonday();
@@ -451,6 +502,7 @@ function calNext() {
   const _max=new Date(); _max.setDate(_max.getDate()+371); const _maxDK=M5_localDK(_max);
   if(next>_maxDK) return;
   calendarMonday=next;
+  _m5SuivreExercice();
   requestAnimationFrame(refreshUI);
 }
 function calToday() {
@@ -832,7 +884,7 @@ function renderQuickStats(analysis) {
     </div>`;
     // Plafond HC annuel Art. L3123-28 = contractH × cap × 52
     const hcCapAnnuel=Math.round(contract.hoursBase*contract.cap*52*10)/10;
-    const allWeeksForCap=M5_DataStore.getWeeksSorted(M5_DataStore.getYear())||[];
+    const allWeeksForCap=M5_DataStore.getWeeksAround(M5_DataStore.getYear())||[];
     const weeksEx=allWeeksForCap.filter(w=>w.monday>=annuelResult.debutEx&&w.monday<=annuelResult.finEx);
     const totalHcAnnuel=Math.round(weeksEx.reduce((s,w)=>s+Math.max(0,(w.worked||0)-contract.hoursBase),0)*10)/10;
     const hcPct=hcCapAnnuel>0?Math.round(totalHcAnnuel/hcCapAnnuel*100):0;
@@ -924,6 +976,22 @@ function renderWellbeing(analysis) {
 
   // Bannière données limitées — affichée seulement si pas de badge multi-année
   let html='';
+  // Plusieurs contrats (26/09/2026) : cumul et repères légaux tous employeurs
+  if(wb.cumul){
+    const cu=wb.cumul, f=window._m5fmtH;
+    html+=`<div style="background:rgba(108,63,197,0.08);border:1px solid rgba(108,63,197,0.25);border-radius:8px;padding:8px 12px;font-size:11.5px;color:#6c3fc5;margin-bottom:10px;">
+      <strong>Cumul de tes ${cu.n} contrats · ${f(cu.base)} prévues par semaine</strong><br>
+      Ta santé dépend de toutes tes heures, tous employeurs confondus. Les heures complémentaires restent calculées contrat par contrat.</div>`;
+    if(cu.sem48.length){
+      html+=`<div style="background:#fdecea;border:1.5px solid #e57373;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#b71c1c;margin-bottom:10px;">
+        <strong>⚠️ Plus de 48 h sur ${cu.sem48.length>1?cu.sem48.length+' semaines':'une semaine'}</strong> (${cu.sem48.map(w=>f(w.worked)).join(', ')}), tous contrats réunis.
+        La durée maximale est de 48 h par semaine, tous employeurs confondus (art. L3121-20) : préviens tes employeurs.</div>`;
+    }
+    if(cu.nb12>=12&&cu.moy12>44){
+      html+=`<div style="background:#fdecea;border:1.5px solid #e57373;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#b71c1c;margin-bottom:10px;">
+        <strong>⚠️ ${f(cu.moy12)} par semaine en moyenne sur 12 semaines</strong>, tous contrats réunis. La moyenne ne doit pas dépasser 44 h sur 12 semaines consécutives (art. L3121-22).</div>`;
+    }
+  }
   if(wb.donneesLimitees && wb.noteMin && !wb.isMultiYear) {
     html+=`<div style="background:#fff3e0;border:2px solid #ff9800;border-radius:10px;padding:10px 12px;font-size:12px;color:#e65100;margin-bottom:12px;display:flex;gap:8px;align-items:flex-start;">
       <span style="font-size:16px;">📊</span>
@@ -936,7 +1004,7 @@ function renderWellbeing(analysis) {
   // → l'utilisateur comprend pourquoi le score ne reflète pas encore cette semaine
   if(wb.currentWeekExcluded && wb.currentWeekH > 0) {
     const contract = analysis && analysis.contract;
-    const contractH = contract ? contract.hoursBase : 0;
+    const contractH = wb.cumul ? wb.cumul.base : (contract ? contract.hoursBase : 0);
     const hasHC = contractH > 0 && wb.currentWeekH > contractH;
     const diffH = contractH > 0 ? (wb.currentWeekH - contractH).toFixed(1) : 0;
     // Calculer combien de jours jusqu'à dimanche
@@ -946,9 +1014,9 @@ function renderWellbeing(analysis) {
     html+=`<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.40);border-radius:8px;padding:8px 12px;font-size:11px;color:#92400e;margin-bottom:10px;display:flex;gap:8px;align-items:flex-start;">
       <span style="font-size:14px;">⏳</span>
       <div>
-        <strong>Semaine en cours : ${window._m5fmtH(wb.currentWeekH)}${hasHC ? ` (+${window._m5fmtH(diffH)} HC)` : ''}</strong><br>
+        <strong>Semaine en cours : ${window._m5fmtH(wb.currentWeekH)}${hasHC ? ` (+${window._m5fmtH(diffH)} ${wb.cumul?'au-delà de tes contrats':'HC'})` : ''}</strong><br>
         ${hasHC
-          ? `Ces ${window._m5fmtH(diffH)} d'heures complémentaires seront intégrées au score bio <strong>${joursRestants}</strong> quand la semaine sera complète.`
+          ? `Ces ${window._m5fmtH(diffH)} ${wb.cumul?'au-delà de tes contrats':'d\'heures complémentaires'} seront intégrées au score bio <strong>${joursRestants}</strong> quand la semaine sera complète.`
           : `La semaine en cours est exclue des calculs jusqu'à dimanche — seules les semaines complètes alimentent l'analyse.`
         }
       </div>
@@ -1069,6 +1137,9 @@ function renderWellbeing(analysis) {
 // ── Navigation période page principale ───────────────────────────
 // Génère les périodes selon les clôtures configurées
 function buildPeriodes(year, contract) {
+  // Exercices précédents (24/09/2026) : pour une année passée, reprendre les
+  // clôtures de l'exercice de cette année-là, pas celles du contrat actuel.
+  if(window.M5_contratPourAnnee) contract=window.M5_contratPourAnnee(year, contract);
   const periodes=[];
   const clotures=contract.cloturesDates||{};
   const hasClotures=Object.keys(clotures).length>0;
@@ -1387,7 +1458,7 @@ function renderStats() {
           <div class="m5-stat"><div class="m5-stat-val">${window._m5fmtH(mr.totalCompH)}</div><div class="m5-stat-label">Heures comp.</div></div>
         </div>
         <div class="m5-alert info" style="margin-bottom:8px;">
-          <span>📊</span><div>Seuil mensuel : <strong>${window._m5fmtH(mr.seuilMensuel)}</strong> (${contract.hoursBase}h × 52 / 12)</div>
+          <span>📊</span><div>Seuil mensuel : <strong>${window._m5fmtH(mr.seuilMensuel)}</strong> (${(contract.dureeContrat&&contract.dureeContrat.unite==='M'&&contract.dureeContrat.valeur>0)?'ton contrat : '+String(contract.dureeContrat.valeur).replace('.',',')+' h/mois':contract.hoursBase+'h × 52 / 12'})</div>
         </div>
         ${mr.totalCompH>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(mr.compH1)} à +${Math.round((contract.rate1||0.10)*100)}%${mr.compH2>0?' | '+window._m5fmtH(mr.compH2)+' à +'+Math.round((contract.rate2||0.25)*100)+'%':''}</div></div>`:''}
       </div></div>`;
@@ -1444,6 +1515,27 @@ function renderStats() {
     </div>`;
   }
 
+  // ── HEATMAP COMMUNE (27/09/2026) : toutes les heures de la semaine, tous contrats ──
+  try{ if(window.M5_Contrats&&M5_Contrats.existing().length>1){
+    const ex=M5_Contrats.existing(), cc=M5_Contrats.contratCumul(), baseT=cc?cc.hoursBase:0;
+    // 27/09/2026 : semaines de l'EXERCICE (la semaine du 29/12/2025 appartient à 2026), pas de l'année civile
+    const _bx=window.M5_exoBornes&&M5_exoBornes(year),_y0=parseInt(year,10);
+    const cw=M5_Contrats.semainesCumul([String(_y0-1),String(year),String(_y0+1)],contract.weekStartDay||0).filter(w=>(_bx?(w.monday>=_bx.deb&&w.monday<=_bx.fin):String(w.monday).slice(0,4)===String(year))&&w.worked>0);
+    if(cw.length){
+      html+=`<div class="m5-card" style="margin:0 0 12px;"><div class="m5-card-header"><span class="m5-card-title">🗓️ Heatmap ${year} · tous mes contrats</span></div><div class="m5-card-body" style="padding:12px;"><div class="m5-heatmap-wrap"><div style="display:flex;flex-wrap:wrap;gap:3px;">`;
+      cw.forEach(w=>{const wh=w.worked;let bg,border,txt='#fff';
+        if(wh>48){bg='rgba(220,38,38,0.92)';border='rgba(185,28,28,1)';}
+        else if(wh>baseT){bg='rgba(251,191,36,0.8)';border='rgba(217,119,6,0.85)';txt='#1f1f1f';}
+        else{bg='rgba(16,185,129,0.55)';border='rgba(16,185,129,0.6)';}
+        const d=new Date(w.monday+'T12:00:00'),lbl=d.getDate()+'/'+(d.getMonth()+1);
+        const det=ex.map(n=>M5_Contrats.nom(n)+' '+window._m5fmtH(w.parContrat[n]||0)).join(' · ');
+        html+=`<div title="${lbl} : ${window._m5fmtH(wh)} (${det})" style="width:38px;height:38px;border-radius:6px;background:${bg};border:1px solid ${border};display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font-size:9px;color:rgba(255,255,255,0.6);line-height:1">${lbl}</span><span style="font-size:12px;font-weight:700;color:${txt};line-height:1.2">${window._m5fmtH(wh)}</span></div>`;});
+      html+=`</div></div><div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--miz-text3);">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:rgba(16,185,129,0.55);border-radius:3px;display:inline-block;"></span>Dans tes contrats (${window._m5fmtH(baseT)})</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:rgba(251,191,36,0.8);border-radius:3px;display:inline-block;"></span>Au-delà</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:12px;height:12px;background:rgba(220,38,38,0.92);border-radius:3px;display:inline-block;"></span>Plus de 48 h</span></div></div></div>`;
+    } } }catch(e){}
+
   html+=`<button class="m5-btn m5-btn-primary m5-btn-full" onclick="exportPDF()" style="margin:0 0 16px;">📄 Exporter en PDF</button>`;
   el.innerHTML=html;
 }
@@ -1467,7 +1559,12 @@ function openMizukiPopup() {
 // ── Contrat ───────────────────────────────────────────────────────
 function openContractModal() {
   const c=M5_Contract.get();
-  document.getElementById('contract-hours').value   =c.hoursBase||'';
+  // Durée affichée dans l'unité du contrat (semaine / mois / an)
+  const _dc=c.dureeContrat, _u=(_dc&&_WIZ_UNITES[_dc.unite])?_dc.unite:'S';
+  setContractUnite(_u, true);
+  document.getElementById('contract-hours').value   =(_u!=='S'&&_dc.valeur>0)?_dc.valeur:(c.hoursBase||'');
+  const _rp=document.getElementById('contract-retraite-prog'); if(_rp) _rp.checked=!!c.retraiteProgressive;
+  updateContractHoursPreview();
   document.getElementById('contract-rate').value    =c.hourlyRate||'';
   document.getElementById('contract-ccn').value     =c.idcc||'0';
   // Cap : priorité à la CCN sélectionnée
@@ -1477,7 +1574,7 @@ function openContractModal() {
     if(ccnR && ccnR.cap) capToShow=ccnR.cap;
   }
   document.getElementById('contract-cap').value = capToShow===0.33?'0.33':'0.10';
-  document.getElementById('contract-name').value    =localStorage.getItem('M5_USER_NAME')||'';
+  document.getElementById('contract-name').value    =(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
   const startDayEl=document.getElementById('contract-start-day');
   if(startDayEl) startDayEl.value=String(c.weekStartDay||0);
   const exEl=document.getElementById('contract-exercice');
@@ -1521,16 +1618,59 @@ function snapExerciceStart(dateStr, weekStartDay) {
 }
 window.snapExerciceStart=snapExerciceStart;
 
+// ── Durée du contrat dans ⚙️ Mon contrat : même logique que l'assistant (26/09/2026) ──
+let _contractUnite='S';
+function _contractValeur(){ return parseFloat(String(document.getElementById('contract-hours')?.value||'0').replace(',','.'))||0; }
+function _contractHebdo(){
+  const v=_contractValeur(); if(v<=0) return 0;
+  return Math.round((_contractUnite==='M'? v*12/52 : _contractUnite==='A'? v/52 : v)*100)/100;
+}
+function setContractUnite(u, silencieux){
+  if(!_WIZ_UNITES[u]) return;
+  const avant=_contractUnite, hebdo=_contractHebdo();
+  _contractUnite=u;
+  ['S','M','A'].forEach(k=>document.getElementById('contract-unite-'+k)?.classList.toggle('selected',k===u));
+  const lb=document.getElementById('contract-hours-label');
+  if(lb) lb.textContent='Durée contractuelle (h/'+_WIZ_UNITES[u].court+') *';
+  const inp=document.getElementById('contract-hours');
+  if(inp){
+    inp.placeholder=_WIZ_UNITES[u].ph;
+    // Changement d'unité à la main : on convertit la valeur déjà saisie
+    if(!silencieux && avant!==u && hebdo>0){
+      const v=u==='M'? hebdo*52/12 : u==='A'? hebdo*52 : hebdo;
+      inp.value=String(Math.round(v*100)/100);
+    }
+  }
+  if(!silencieux){
+    // Le mode de calcul suit l'unité (reste modifiable juste en dessous)
+    const modeEl=document.getElementById('contract-mode'); if(modeEl) modeEl.value=_WIZ_UNITES[u].mode;
+    updateContractHoursPreview();
+  }
+}
+function updateContractHoursPreview(){
+  _rpMaj('contract',_contractUnite,_contractValeur());
+  const el=document.getElementById('contract-hours-preview'); if(!el) return;
+  const v=_contractValeur(), h=_contractHebdo(), f=window._m5fmtH;
+  if(!v||v<=0||!f){ el.textContent=''; return; }
+  el.textContent=_contractUnite==='S'?`soit environ ${f((h*52/12).toFixed(2))}/mois`:`soit en moyenne ${f(h)} par semaine`;
+}
+window.setContractUnite=setContractUnite; window.updateContractHoursPreview=updateContractHoursPreview;
+
 function saveContract() {
-  const hoursBase =parseFloat(document.getElementById('contract-hours').value);
+  const _uC=_WIZ_UNITES[_contractUnite], _vC=_contractValeur();
+  if(!_vC||_vC<=0) { toast('Saisis la durée de ton contrat ('+_uC.ph+').','error'); return; }
+  if(_vC>=_uC.plein) { toast('À partir de '+_uC.pleinTxt+', c\u2019est un temps plein : Mizuki suit les temps partiels.','error'); return; }
+  const hoursBase =_contractHebdo();
   const hourlyRate=parseFloat(document.getElementById('contract-rate').value)||0;
   const idcc      =parseInt(document.getElementById('contract-ccn').value)||0;
   const capManuel =parseFloat(document.getElementById('contract-cap').value)||0.10;
   const name      =document.getElementById('contract-name').value.trim();
   if(!hoursBase||hoursBase<=0||hoursBase>=35) { toast('Saisis une durée entre 1 et 34,5h.','error'); return; }
-  // Art. L3123-7 : contrat <24h/sem = durée minimale légale (sauf dérogations : demande salarié, accord branche, étudiant, CDD court, remplacement)
-  if(hoursBase < 24) {
-    toast("⚠️ Contrat < 24h/sem : vérifie qu'une dérogation légale s'applique (Art. L3123-7)",'warn');
+  // Art. L3123-27 et L3123-7 : 24 h/sem minimum, ou l'équivalent mensuel (104 h) ou sur la période
+  // d'aménagement (24/35 de 1 607 h ≈ 1 102 h/an), sauf dérogations (demande du salarié, accord, étudiant…)
+  const _min24={S:24,M:104,A:1102}[_contractUnite];
+  if(_vC < _min24) {
+    toast("⚠️ Moins de 24 h/sem (ou l'équivalent "+(_contractUnite==='S'?'':'sur ton contrat')+") : vérifie qu'une dérogation légale s'applique (art. L3123-7)",'warn');
   }
   const ccnRules=typeof CCN_PARTIEL_API!=='undefined'?CCN_PARTIEL_API.getRules(idcc):{cap:capManuel,rate1:0.10,rate2:0.25,threshold:0.10};
   // Si une CCN est sélectionnée, son cap fait foi — sinon le sélecteur manuel
@@ -1555,7 +1695,9 @@ function saveContract() {
   M5_Contract.save({hoursBase,hourlyRate,idcc,ccnNom:ccnRules.nom||'Droit commun',cap,
     rate1:ccnRules.rate1||0.10,rate2:ccnRules.rate2||0.25,threshold:ccnRules.threshold||0.10,
     weekStartDay,exerciceStart,cloturesDates,modeCalcul,neutraliseFeries,
-    accordCollectifPrevenance,joursOuvresContrat});
+    accordCollectifPrevenance,joursOuvresContrat,
+    dureeContrat:{unite:_contractUnite,valeur:_vC},
+    retraiteProgressive:!!document.getElementById('contract-retraite-prog')?.checked});
   if(name) localStorage.setItem('M5_USER_NAME',name);
   Mizuki.clearCache();
   // Recalibrer le calendrier avec le nouveau début de semaine
@@ -1596,6 +1738,15 @@ function updatePDFPreview() {
   }
   const weeks=filterWeeksByPeriode(allWeeks, periode, year);
   if(info) info.textContent=`${weeks.length} semaine(s) dans la période sélectionnée`;
+  { const multi=window.M5_Contrats&&M5_Contrats.existing().length>1, box=document.getElementById('pdf-contrat-box'), sel=document.getElementById('pdf-contrat-sel');
+    const bc=document.getElementById('pdf-commun-btn'); if(bc) bc.style.display='none';
+    if(box) box.style.display=multi?'block':'none';
+    if(sel&&multi&&!sel.options.length){
+      M5_Contrats.existing().forEach(n=>{const o=document.createElement('option');o.value=String(n);o.textContent='📄 '+M5_Contrats.nom(n)+(n===M5_Contrats.active?' (affiché)':'');sel.appendChild(o);});
+      const o=document.createElement('option');o.value='tous';o.textContent='📑 Tous mes contrats (PDF commun)';sel.appendChild(o);
+      sel.value=String(M5_Contrats.active);
+    }
+    const bp=document.getElementById('pdf-contrat-lbl'); if(bp) bp.textContent='📄 Générer le PDF'; }
 }
 
 function filterWeeksByPeriode(allWeeks, periode, year) {
@@ -1620,6 +1771,50 @@ function filterWeeksByPeriode(allWeeks, periode, year) {
   return allWeeks; // ANNUEL
 }
 
+/* 27/09/2026 : PDF d'un contrat choisi dans la fenêtre (sans changer de contrat affiché) */
+function _m5StatsSemaines(c,weeks){
+  const base=c.hoursBase||0,thr=base*(c.threshold||0.10);let t=0,tc=0,t1=0,t2=0,wc=0,mx=0;
+  // 27/09/2026 : même moteur que la carte Solde et le paiement (fériés chômés neutralisés).
+  // Chaque semaine reçoit hc10/hc25 : le tableau du PDF affiche exactement ces chiffres.
+  weeks.forEach(w=>{const h=w.worked||0;t+=h;if(h>mx)mx=h;
+    let a1,a2;const R=window.M5_hcSemaine?M5_hcSemaine(c,w.monday,h):null;
+    if(R){a1=R.c1;a2=R.c2;w.hc10=a1;w.hc25=a2;w.hcFerie=R.ferie;}else{const d=Math.max(0,h-base);a1=Math.min(d,thr);a2=Math.max(0,d-thr);}
+    const d=a1+a2;if(d>0.001){wc++;tc+=d;t1+=a1;t2+=a2;}});
+  const n=weeks.length||1,r=x=>Math.round(x*100)/100;
+  return {totalWeeks:weeks.length,weeksWithComp:wc,pctOverContract:Math.round(wc/n*100),totalComp:r(tc),totalComp1:r(t1),totalComp2:r(t2),avgWorked:r(t/n),maxWorked:r(mx),totalWorked:r(t)};
+}
+function launchPDFContrat(n){
+  try{
+    n=parseInt(n,10);
+    if(!window.M5_Contrats||n===M5_Contrats.active){launchPDF();return;}
+    let c={};try{c=JSON.parse(localStorage.getItem(M5_Contrats.keyFor(n,'M5_CONTRACT'))||'{}')||{};}catch(e){}
+    if(!c.hoursBase){toast('Ce contrat n\'est pas configuré','error');return;}
+    try{if(c.idcc>0&&window.CCN_PARTIEL_API)c.cap=CCN_PARTIEL_API.getRules(c.idcc).cap||c.cap;}catch(e){}
+    const year=M5_DataStore.getYear(),y0=parseInt(year,10),periode=document.getElementById('pdf-periode')?.value||'ANNUEL';
+    const cum=M5_Contrats.semainesCumul([String(y0-1),String(y0),String(y0+1)],M5_Contract.get().weekStartDay||0)
+      .filter(w=>w.parContrat[n]>0).map(w=>({monday:w.monday,worked:w.parContrat[n]}));
+    const _bx=window.M5_exoBornes&&M5_exoBornes(year),_inExo=w=>_bx?(w.monday>=_bx.deb&&w.monday<=_bx.fin):String(w.monday).slice(0,4)===String(year);
+    const weeks=filterWeeksByPeriode(periode==='ANNUEL'?cum.filter(_inExo):cum,periode,year);
+    const stats=_m5StatsSemaines(c,weeks);
+    const periodeLabel=periode==='MENSUEL'?['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][parseInt(document.getElementById('pdf-mois')?.value||'1')-1]+' '+year
+      :periode==='CUSTOM'?(document.getElementById('pdf-date-debut')?.value||'')+' → '+(document.getElementById('pdf-date-fin')?.value||'')
+      :periode==='PAIE'?'Période de paie : '+((()=>{const s2=document.getElementById('pdf-paie-select');return (s2&&s2.options[s2.selectedIndex]&&s2.options[s2.selectedIndex].textContent)||'';})()):String(year);
+    const pay=_m5PayePeriode(c,weeks,M5_Contrats.keyFor(n,'M5_HC_PAID'));
+    const userName=(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
+    const cw={...c,userName,periodeLabel,periodeMode:periode,nomContrat:M5_Contrats.nom(n),pay};
+    closeModal('modal-pdf');
+    setTimeout(()=>M5_PdfReport.generate(cw,stats,weeks,null),200);
+  }catch(e){toast('Erreur PDF : '+e.message,'error');console.error(e);}
+}
+window.launchPDFContrat=launchPDFContrat;
+function launchPDFChoisi(){
+  const v=document.getElementById('pdf-contrat-sel')?.value||'';
+  if(v==='tous')return launchPDFCommun();
+  if(v)return launchPDFContrat(v);
+  launchPDF();
+}
+window.launchPDFChoisi=launchPDFChoisi;
+
 function launchPDF() {
   try {
     const contract=M5_Contract.get();
@@ -1627,9 +1822,9 @@ function launchPDF() {
     const periode=document.getElementById('pdf-periode')?.value||'ANNUEL';
     const allWeeks=M5_DataStore.getWeeksSorted(year);
     const weeks=filterWeeksByPeriode(allWeeks, periode, year);
-    const stats=M5_DataStore.getAnnualStats(year,contract.hoursBase,contract);
+    const stats=Object.assign({},M5_DataStore.getAnnualStats(year,contract.hoursBase,contract),_m5StatsSemaines(contract,weeks));
     const analysis=currentAnalysis||runAnalysis();
-    const userName=localStorage.getItem('M5_USER_NAME')||'';
+    const userName=(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
     const periodeLabel=periode==='MENSUEL'
       ? ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][parseInt(document.getElementById('pdf-mois')?.value||'1')-1]+' '+year
       : periode==='CUSTOM'
@@ -1637,7 +1832,12 @@ function launchPDF() {
         : periode==='PAIE'
         ? 'Période de paie : '+(()=>{const s2=document.getElementById('pdf-paie-select');return (s2&&s2.options[s2.selectedIndex]&&s2.options[s2.selectedIndex].textContent)||'';})()
         : String(year);
-    const contractWithName={...contract, userName, periodeLabel, periodeMode:periode};
+    const nomContrat=(window.M5_Contrats&&M5_Contrats.existing().length>1)?M5_Contrats.nom(M5_Contrats.active):'';
+    let pay=_m5PayePeriode(contract, weeks.map(w=>({monday:w.monday,worked:w.worked||0})), M5_key('M5_HC_PAID'));
+    // Contrat affiché : même moteur que la carte « Solde » (fériés, périodes de paie)
+    if(weeks.length&&window.M5_hcExercice){const H=M5_hcExercice(contract,weeks[0].monday,weeks[weeks.length-1].monday);
+      pay={du10:H.d10,du25:H.d25,paye10:H.p10,paye25:H.p25,reste10:H.r10,reste25:H.r25};}
+    const contractWithName={...contract, userName, periodeLabel, periodeMode:periode, nomContrat, pay};
     closeModal('modal-pdf');
     setTimeout(()=>{
       M5_PdfReport.generate(contractWithName, stats, weeks, analysis);
@@ -1646,6 +1846,47 @@ function launchPDF() {
 }
 
 function exportPDF() { openPDFModal(); }
+
+/* 27/09/2026 : heures complémentaires dues / payées / reste sur un ensemble de semaines.
+   Même découpage par taux que le détail du PDF ; paiements saisis (semaine, période ou
+   date) comptés s'ils tombent dans ces semaines. */
+function _m5PayePeriode(c, weeks, paidKey){
+  const r=x=>Math.round(x*100)/100, base=c.hoursBase||0, thr=base*(c.threshold||0.10);
+  let du10=0,du25=0;
+  weeks.forEach(w=>{const d=Math.max(0,(w.worked||0)-base);du10+=Math.min(d,thr);du25+=Math.max(0,d-thr);});
+  let p10=0,p25=0;
+  if(weeks.length){
+    const deb=weeks[0].monday,fx=new Date(weeks[weeks.length-1].monday+'T12:00:00');fx.setDate(fx.getDate()+6);const fin=M5_localDK(fx);
+    let pm={};try{pm=JSON.parse(localStorage.getItem(paidKey)||'{}')||{};}catch(e){}
+    Object.keys(pm).forEach(k=>{const d=k.replace(/^(week|per):/,'');if(/^\d{4}-\d{2}-\d{2}$/.test(d)&&d>=deb&&d<=fin){p10+=+((pm[k]||{}).h10)||0;p25+=+((pm[k]||{}).h25)||0;}});
+  }
+  return {du10:r(du10),du25:r(du25),paye10:r(p10),paye25:r(p25),reste10:r(Math.max(0,du10-p10)),reste25:r(Math.max(0,du25-p25))};
+}
+/* PDF commun : tous les contrats, même période que celle choisie dans la fenêtre PDF */
+function launchPDFCommun(){
+  try{
+    if(!window.M5_Contrats||M5_Contrats.existing().length<2){toast('Un seul contrat : utilise le PDF habituel','info');return;}
+    const year=M5_DataStore.getYear(),y0=parseInt(year,10),periode=document.getElementById('pdf-periode')?.value||'ANNUEL';
+    const sd=M5_Contract.get().weekStartDay||0;
+    const _bx=window.M5_exoBornes&&M5_exoBornes(year);
+    const all=M5_Contrats.semainesCumul([String(y0-1),String(y0),String(y0+1)],sd).filter(w=>periode!=='ANNUEL'||(_bx?(w.monday>=_bx.deb&&w.monday<=_bx.fin):String(w.monday).slice(0,4)===String(year)));
+    const sem=filterWeeksByPeriode(all,periode,year).filter(w=>w.worked>0);
+    const contrats=M5_Contrats.existing().map(n=>{
+      let c={};try{c=JSON.parse(localStorage.getItem(M5_Contrats.keyFor(n,'M5_CONTRACT'))||'{}')||{};}catch(e){}
+      let cap=c.cap||0.10;try{if(c.idcc>0&&window.CCN_PARTIEL_API)cap=CCN_PARTIEL_API.getRules(c.idcc).cap||cap;}catch(e){}
+      const ws=sem.filter(w=>w.parContrat[n]>0).map(w=>({monday:w.monday,worked:w.parContrat[n]}));
+      const pay=_m5PayePeriode(c,ws,M5_Contrats.keyFor(n,'M5_HC_PAID'));
+      return {n,nom:M5_Contrats.nom(n),c,cap,heures:ws.reduce((a,w)=>a+w.worked,0),du10:pay.du10,du25:pay.du25,paye10:pay.paye10,paye25:pay.paye25};
+    });
+    const periodeLabel=periode==='MENSUEL'?['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'][parseInt(document.getElementById('pdf-mois')?.value||'1')-1]+' '+year
+      :periode==='CUSTOM'?(document.getElementById('pdf-date-debut')?.value||'')+' → '+(document.getElementById('pdf-date-fin')?.value||'')
+      :periode==='PAIE'?((()=>{const s2=document.getElementById('pdf-paie-select');return (s2&&s2.options[s2.selectedIndex]&&s2.options[s2.selectedIndex].textContent)||'';})()):String(year);
+    const userName=(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
+    closeModal('modal-pdf');
+    setTimeout(()=>M5_PdfReport.generateCommun({periodeLabel,userName,contrats,semaines:sem}),200);
+  }catch(e){toast('Erreur PDF : '+e.message,'error');console.error(e);}
+}
+window.launchPDFCommun=launchPDFCommun;
 
 function initCCNSelect() {
   // Recherche dynamique — pas de select statique avec 422 entrées
@@ -1743,6 +1984,24 @@ function saveWeeklySaisieOrClose() {
     closeModal('modal-week-saisie');  // ferme si rien de valide
   }
 }
+
+// ── Congés sur tous les contrats en 1 clic (26/09/2026) ──────────────
+function _congesTousBtn(){
+  try{
+    if(!window.M5_Contrats||M5_Contrats.existing().length<2) return '';
+    const on=M5_Contrats.congesTousActif(calendarMonday,M5_DataStore.getYear()), n=M5_Contrats.existing().length;
+    return `<button class="m5-btn m5-btn-sm ${on?'m5-btn-primary':'m5-btn-outline'}" style="width:100%;margin-top:8px" onclick="toggleCongesTous()">🌴 ${on?`En congés sur mes ${n} contrats ✓ — retirer`:`Je suis en congés sur mes ${n} contrats`}</button>`;
+  }catch(e){ return ''; }
+}
+function toggleCongesTous(){
+  if(window.M5_isDayLocked&&window.M5_isDayLocked(calendarMonday)){ toast('Période verrouillée 🔒 — déverrouille-la pour modifier','info'); return; }
+  const year=M5_DataStore.getYear(), n=M5_Contrats.existing().length;
+  const on=M5_Contrats.congesTousActif(calendarMonday,year);
+  M5_Contrats.congesTous(calendarMonday,year,on);
+  toast(on?`Congés retirés sur tes ${n} contrats`:`Semaine en congés sur tes ${n} contrats 🌴`,on?'info':'success');
+  Mizuki.clearCache(); refreshUI();
+}
+window.toggleCongesTous=toggleCongesTous;
 
 // ── Gestion vacances M5 ──────────────────────────────────────────────
 function toggleVacSemaine() {
@@ -1857,22 +2116,49 @@ function openYearsPopup() {
 
 function switchYear(y) {
   M5_DataStore.setYear(y);
-  // Recalibrer le calendrier sur la semaine courante de la nouvelle année
-  calendarMonday=M5_getCurrentMonday();
+  // 26/09/2026 : le calendrier se place dans l'année choisie (avant : semaine d'aujourd'hui,
+  // hors de l'année — une saisie y aurait été rangée dans la mauvaise année)
+  if(String(y)===String(new Date().getFullYear())) calendarMonday=M5_getCurrentMonday();
+  else if(Number(y)>new Date().getFullYear()){
+    // 27/09/2026 : année future → sa première semaine (celle du début d'exercice ou du 1er janvier)
+    let deb=y+'-01-01';
+    try{const c=window.M5_contratPourAnnee?M5_contratPourAnnee(String(y),M5_Contract.get()):M5_Contract.get();
+      if(c&&/^\d{4}-\d{2}-\d{2}$/.test(c.exerciceStart||'')&&c.exerciceStart.slice(0,4)<=String(y))deb=c.exerciceStart;}catch(e){}
+    calendarMonday=M5_weekStartOf(deb,M5_Contract.get().weekStartDay||0);
+  }
+  else {
+    let ws=M5_DataStore.getWeeksSorted(String(y));
+    // Dernière semaine de l'exercice de cette année (la semaine du 29/12 ouvre souvent le suivant)
+    try{const c=window.M5_contratPourAnnee?M5_contratPourAnnee(String(y),M5_Contract.get()):null,cl=c?Object.values(c.cloturesDates||{}).filter(Boolean).sort():[],fin=cl[cl.length-1];
+      if(fin&&fin.slice(0,4)===String(y)){const w2=ws.filter(w=>w.monday<=fin);if(w2.length)ws=w2;}}catch(e){}
+    calendarMonday=ws.length?ws[ws.length-1].monday:M5_weekStartOf(y+'-01-01',M5_Contract.get().weekStartDay||0);
+  }
   Mizuki.clearCache();
   closeModal('modal-years');
   toast('Exercice '+y+' activé','success');
   refreshUI();
   updateYearBadge();
+  // 27/09/2026 : le bandeau d'exercice suit l'année affichée
+  if(window.M5_verifierExercice) setTimeout(window.M5_verifierExercice,60);
 }
 
 function createNewYear() {
+  // 26/09/2026 : exercice en cours terminé → même chemin que le bandeau (choix des clôtures)
+  try{
+    const c=M5_Contract.get(),cl=Object.values(c.cloturesDates||{}).filter(Boolean).sort(),last=cl[cl.length-1];
+    const auj=M5_localDK(new Date());
+    if(last&&auj>last&&typeof window.M5_choisirPuisSuivant==='function'){closeModal('modal-years');window.M5_choisirPuisSuivant();return;}
+  }catch(e){}
   const y=prompt('Saisir l\'année (ex: 2027)');
   if(!y||!/^\d{4}$/.test(y)) return;
   const yr=parseInt(y);
   if(yr<2020||yr>2050) { toast('Année invalide','error'); return; }
+  // 27/09/2026 : année qui suit l'exercice en cours, pas encore terminé → même question
+  // que le bandeau (clôtures automatiques ou manuelles), appliquée le jour du passage
+  try{const c=M5_Contract.get(),cl=Object.values(c.cloturesDates||{}).filter(Boolean).sort(),last=cl[cl.length-1];
+    if(last&&yr===parseInt(last.slice(0,4),10)+1&&typeof window.M5_preparerSuivant==='function'){closeModal('modal-years');if(window.M5_preparerSuivant(y))return;}}catch(e){}
   // Créer un jeu de données vide
-  const key='M5_DATA_'+y;
+  const key=M5_key('M5_DATA_')+y;
   if(!localStorage.getItem(key)) localStorage.setItem(key,JSON.stringify({}));
   switchYear(y);
 }
@@ -1979,11 +2265,46 @@ let _wizMode='HEBDO';
 let _wizNeutraliseFeries=true;
 let _wizCCN=null; // {i, n, s, cap, ...}
 
+/* 26/09/2026 : prénom (SH_PRENOM) et CCN (CCN_IDCC) choisis dans les Paramètres du menu.
+   L'assistant les préremplit ; la CCN seulement pour le contrat 1 (un 2e contrat peut
+   relever d'une autre convention). Tout reste modifiable, « Droit commun » compris. */
+let _wizMenuFait=false;
+function _wizPrefillMenu(){
+  if(_wizMenuFait) return; _wizMenuFait=true;
+  try{ const n=document.getElementById('wiz-name'), p=localStorage.getItem('SH_PRENOM'); if(n&&!n.value&&p) n.value=p; }catch(e){}
+  try{
+    if(_wizCCN||localStorage.getItem('CCN_CUSTOM')) return;
+    if(window.M5_Contrats&&M5_Contrats.active!==1) return;
+    const idcc=parseInt(localStorage.getItem('CCN_IDCC')||'0',10);
+    if(!idcc||typeof CCN_PARTIEL_API==='undefined') return;
+    const x=CCN_PARTIEL_API.getById(idcc); if(!x) return;
+    wizPickCCN(x.i,x.n,x.s,x.cap);
+  }catch(e){}
+}
+/* Contrat 1 déjà enregistré en droit commun : la CCN choisie dans le menu y est reprise
+   une fois (M5_CCN_MENU garde l'IDCC déjà proposé : un retour manuel au droit commun
+   dans Mizuki est respecté). Un contrat qui a déjà sa CCN n'est jamais modifié. */
+function M5_ccnDuMenu(){
+  try{
+    if(window.M5_Contrats&&M5_Contrats.active!==1) return;
+    if(localStorage.getItem('CCN_CUSTOM')) return;
+    const idcc=parseInt(localStorage.getItem('CCN_IDCC')||'0',10); if(!idcc) return;
+    if(localStorage.getItem('M5_CCN_MENU')===String(idcc)) return;
+    if(typeof CCN_PARTIEL_API==='undefined'||!CCN_PARTIEL_API.getById(idcc)) return;
+    const c=M5_Contract.get();
+    localStorage.setItem('M5_CCN_MENU',String(idcc));
+    if(!c.hoursBase||(c.idcc&&c.idcc>0)) return;
+    const r=CCN_PARTIEL_API.getRules(idcc);
+    M5_Contract.save({...c,idcc,ccnNom:r.nom,cap:r.cap,rate1:r.rate1||0.10,rate2:r.rate2||0.25,threshold:r.threshold||0.10});
+    setTimeout(()=>toast('Ta convention collective est reprise du menu : '+r.nom,'success',4000),900);
+  }catch(e){}
+}
+
 function wizNext(step) {
   // Validation avant de passer
   if(step===3) {
-    const h=parseFloat(document.getElementById('wiz-hours')?.value||'0');
-    if(!h||h<=0||h>=35) { toast('Saisis tes heures contractuelles (ex: 25)','error'); return; }
+    const err=_wizHeuresErreur();
+    if(err) { toast(err,'error'); return; }
   }
   _wizGo(step);
 }
@@ -1991,6 +2312,7 @@ function wizPrev(step) { _wizGo(step); }
 function wizSkip() { wizFinish(); }
 
 function _wizGo(step) {
+  _wizPrefillMenu();
   document.querySelectorAll('.wiz-step').forEach(s=>s.classList.remove('active'));
   const target=document.getElementById('wStep'+step);
   if(target) target.classList.add('active');
@@ -2008,12 +2330,56 @@ function _wizGo(step) {
   window.scrollTo(0,0);
 }
 
+// ── Durée du contrat : semaine, mois ou an (26/09/2026) ──────────
+// L'utilisateur saisit la durée telle qu'écrite sur son contrat ; tout le calcul
+// reste en base hebdomadaire (hoursBase) : mois → × 12 / 52, an → ÷ 52.
+// Temps plein de référence : 35 h/sem, 151,67 h/mois, 1 607 h/an (L3121-27, L3123-1).
+let _wizUnite='S';
+const _WIZ_UNITES={
+  S:{label:"Combien d'heures par semaine selon ton contrat ?",ph:'ex : 25',plein:35,  pleinTxt:'35 h par semaine',court:'semaine',mode:'HEBDO'},
+  M:{label:"Combien d'heures par mois selon ton contrat ?",  ph:'ex : 86,67',plein:151.67,pleinTxt:'151,67 h par mois',court:'mois',mode:'MENSUEL'},
+  A:{label:"Combien d'heures par an selon ton contrat ?",    ph:'ex : 1 000',plein:1607,pleinTxt:'1 607 h par an',court:'an',mode:'ANNUEL'}
+};
+function _wizValeurSaisie(){ return parseFloat(String(document.getElementById('wiz-hours')?.value||'0').replace(',','.'))||0; }
+function _wizHeuresHebdo(){
+  const v=_wizValeurSaisie(); if(v<=0) return 0;
+  const h=_wizUnite==='M'? v*12/52 : _wizUnite==='A'? v/52 : v;
+  return Math.round(h*100)/100;
+}
+function _wizHeuresErreur(){
+  const v=_wizValeurSaisie(), u=_WIZ_UNITES[_wizUnite];
+  if(!v||v<=0) return 'Saisis tes heures contractuelles ('+u.ph+')';
+  if(v>=u.plein) return 'À partir de '+u.pleinTxt+', c\u2019est un temps plein : Mizuki suit les temps partiels.';
+  return '';
+}
+function wizSetUnite(u){
+  if(!_WIZ_UNITES[u]) return;
+  _wizUnite=u;
+  ['S','M','A'].forEach(k=>document.getElementById('wiz-unite-'+k)?.classList.toggle('selected',k===u));
+  const lb=document.getElementById('wiz-hours-label'); if(lb) lb.textContent=_WIZ_UNITES[u].label;
+  const inp=document.getElementById('wiz-hours'); if(inp){ inp.placeholder=_WIZ_UNITES[u].ph; inp.value=''; }
+  // Le mode de calcul suit l'unité du contrat (modifiable à l'étape « Comment on compte ? »)
+  wizSelectMode(_WIZ_UNITES[u].mode);
+  wizUpdateHoursPreview();
+}
+window.wizSetUnite=wizSetUnite;
+
+// Retraite progressive : repère « X % d'un temps plein » sous la durée (26/09/2026)
+function _rpMaj(prefixe, unite, valeur){
+  const cb=document.getElementById(prefixe+'-retraite-prog'), info=document.getElementById(prefixe+'-rp-info');
+  if(!cb||!info) return;
+  if(!cb.checked||!(valeur>0)||!window.M5_rpPct){ info.style.display='none'; return; }
+  const c={dureeContrat:{unite:unite,valeur:valeur},hoursBase:unite==='S'?valeur:0};
+  info.innerHTML=M5_rpTexte(M5_rpPct(c),false); info.style.display='block';
+}
 function wizUpdateHoursPreview() {
-  const h=parseFloat(document.getElementById('wiz-hours')?.value||'0');
+  _rpMaj('wiz',_wizUnite,_wizValeurSaisie());
   const el=document.getElementById('wiz-hours-preview'); if(!el) return;
-  if(!h||h<=0) { el.textContent=''; return; }
-  const mensuel=(h*52/12).toFixed(1);
-  el.textContent=`soit environ ${window._m5fmtH(mensuel)}/mois`;
+  const v=_wizValeurSaisie(), h=_wizHeuresHebdo();
+  if(!v||v<=0) { el.textContent=''; return; }
+  const f=window._m5fmtH;
+  if(_wizUnite==='S') el.textContent=`soit environ ${f((h*52/12).toFixed(2))}/mois`;
+  else el.textContent=`soit en moyenne ${f(h)} par semaine`+(_wizUnite==='A'?` (${f((h*52/12).toFixed(2))}/mois)`:'');
 }
 
 function wizSearchCCN(term) {
@@ -2072,11 +2438,13 @@ function wizSelectFeries(val) {
 }
 
 function _wizUpdateSummary() {
-  const h=parseFloat(document.getElementById('wiz-hours')?.value||'0');
+  const h=_wizHeuresHebdo();
   const rate=parseFloat(document.getElementById('wiz-rate')?.value||'0');
   const exercice=document.getElementById('wiz-exercice')?.value||'';
   const modeLbls={HEBDO:'Par semaine',MENSUEL:'Par mois',ANNUEL:"Sur l'année"};
-  _set('wiz-sum-hours', `⏱️ Contrat : <strong>${h}h/semaine</strong>${rate>0?' · '+rate.toFixed(2)+' €/h':''}`);
+  const _u=_WIZ_UNITES[_wizUnite];
+  const _dur=_wizUnite==='S'?`${window._m5fmtH(h)}/semaine`:`${window._m5fmtH(_wizValeurSaisie())}/${_u.court} (≈ ${window._m5fmtH(h)}/semaine)`;
+  _set('wiz-sum-hours', `⏱️ Contrat : <strong>${_dur}</strong>${rate>0?' · '+rate.toFixed(2)+' €/h':''}`);
   _set('wiz-sum-ccn',   `🏢 CCN : <strong>${_wizCCN?_wizCCN.n+' ('+Math.round(_wizCCN.cap*100)+'%)':'Droit commun (10%)'}</strong>`);
   _set('wiz-sum-mode',  `📅 Mode : <strong>${modeLbls[_wizMode]||_wizMode}</strong>`);
   _set('wiz-sum-feries',`🎌 Fériés : <strong>${_wizNeutraliseFeries?"Neutralisés (L3133-3 + jurisprudence)":"Dans l'assiette (accord spécifique)"}</strong>`);
@@ -2127,8 +2495,9 @@ function wizAutofillClotures() {
 }
 
 function wizFinish() {
-  const h=parseFloat(document.getElementById('wiz-hours')?.value||'0');
-  if(!h||h<=0||h>=35) { _wizGo(2); toast('Saisis tes heures contractuelles','error'); return; }
+  const _err=_wizHeuresErreur();
+  if(_err) { _wizGo(2); toast(_err,'error'); return; }
+  const h=_wizHeuresHebdo();
   const exerciceRaw=document.getElementById('wiz-exercice')?.value||'';
   if(!exerciceRaw) {
     toast("La date de début d'exercice est obligatoire",'error');
@@ -2183,6 +2552,8 @@ function wizFinish() {
     cloturesDates,
     modeCalcul:_wizMode,
     neutraliseFeries:_wizNeutraliseFeries,
+    dureeContrat:{unite:_wizUnite,valeur:_wizValeurSaisie()},
+    retraiteProgressive:!!document.getElementById('wiz-retraite-prog')?.checked,
   });
   if(name) localStorage.setItem('M5_USER_NAME', name);
   calendarMonday=M5_getCurrentMonday();
@@ -2195,7 +2566,38 @@ function wizFinish() {
     if (_af && _af.parentNode) _af.parentNode.removeChild(_af);
   } catch(_) {}
   refreshUI();
+  // Multi-contrat : « Oui » à la dernière étape → on crée tout de suite le contrat suivant
+  if(_wizAutreContrat && window.M5_Contrats && M5_Contrats.existing().length<3){
+    _wizAutreContrat=false;
+    setTimeout(function(){ M5_Contrats.add(); }, 600);
+  }
 }
+
+// Multi-contrat (26/09/2026) : question « un autre contrat ? » dans l'assistant
+let _wizAutreContrat=false;
+function wizSetAutreContrat(oui){
+  _wizAutreContrat=!!oui;
+  document.getElementById('wiz-autre-oui')?.classList.toggle('selected',!!oui);
+  document.getElementById('wiz-autre-non')?.classList.toggle('selected',!oui);
+  const info=document.getElementById('wiz-autre-info');
+  if(info) info.textContent=oui
+    ? 'Après « Commencer », tu donneras un nom à ton 2ᵉ contrat et je te poserai les mêmes questions pour lui.'
+    : 'Tu pourras en ajouter un à tout moment : ⚙️ Mon contrat → tout en bas, « 👥 Plusieurs employeurs ? ».';
+}
+window.wizSetAutreContrat=wizSetAutreContrat;
+// Question masquée si le maximum de 3 contrats serait déjà atteint
+(function(){try{
+  const b=document.getElementById('wiz-autre-contrat');
+  if(b && window.M5_Contrats){
+    const ex=M5_Contrats.existing(), act=M5_Contrats.active;
+    const apres=ex.length+(ex.indexOf(act)<0?1:0);
+    if(apres>=3) b.style.display='none';
+    else if(ex.length>0 && ex.indexOf(act)<0){
+      const t=b.querySelector('div[style*="font-weight:700"]'); if(t) t.textContent='👥 As-tu encore un autre contrat à suivre ?';
+      const i=document.getElementById('wiz-autre-info'); if(i&&!_wizAutreContrat) i.textContent='Tu pourras en ajouter un à tout moment : ⚙️ Mon contrat → tout en bas, « 👥 Plusieurs employeurs ? ».';
+    }
+  }
+}catch(_){}})();
 
 
 // ── Export / Import JSON ──────────────────────────────────────────
@@ -2316,7 +2718,7 @@ window.M5_refreshUI=refreshUI;
 window.M5_getCurrentPeriode=function(){ return _currentPeriode; };
 // ── Verrouillage par période : gèle la SAISIE d'une période donnée ──
 // (les autres périodes restent modifiables ; la navigation n'est jamais bloquée)
-function _lockMap(){ try{ return JSON.parse(localStorage.getItem('M5_PERIODE_LOCKS')||'{}'); }catch(e){ return {}; } }
+function _lockMap(){ try{ return JSON.parse(localStorage.getItem(M5_key('M5_PERIODE_LOCKS'))||'{}'); }catch(e){ return {}; } }
 window.M5_isDayLocked=function(dk){ if(!dk) return false; var m=_lockMap(); for(var k in m){ if(dk>=k && dk<=m[k]) return true; } return false; };
 // Période "active" = celle qui contient calendarMonday (= ce qu'affiche la barre)
 function _activePeriode(){
@@ -2332,13 +2734,20 @@ function _activePeriode(){
   }catch(e){}
   return null;
 }
+window.M5_periodeAffichee=function(){
+  // Période contenant la semaine affichée, avec les clôtures de l'exercice affiché (y compris projeté)
+  try{ var cm=calendarMonday, y=M5_DataStore.getYear(), c0=M5_Contract.get();
+    var cp=window.M5_contratPourAnnee?M5_contratPourAnnee(String(y),c0):c0, ys=[String(y),String(parseInt(y,10)-1),String(parseInt(y,10)+1)];
+    for(var k=0;k<ys.length;k++){ var pers=buildPeriodes(ys[k],cp)||[]; for(var i=0;i<pers.length;i++){ if(pers[i].debutStr&&cm>=pers[i].debutStr&&cm<=pers[i].finStr) return pers[i]; } }
+  }catch(e){}
+  return null; };
 window.M5_isActivePeriodeLocked=function(){ var p=_activePeriode(); return !!(p && _lockMap()[p.debutStr]); };
 window.M5togglePeriodeLock=function(){
   var p=_activePeriode();
   if(!p){ toast('Aucune période à verrouiller ici','info'); return; }
   var m=_lockMap(), on=!m[p.debutStr];
   if(on) m[p.debutStr]=p.finStr; else delete m[p.debutStr];
-  try{ localStorage.setItem('M5_PERIODE_LOCKS', JSON.stringify(m)); }catch(e){}
+  try{ localStorage.setItem(M5_key('M5_PERIODE_LOCKS'), JSON.stringify(m)); }catch(e){}
   // Retour visuel IMMÉDIAT (le re-render lourd est différé → 1 seul tap suffit)
   var b=document.getElementById('periode-lock-btn');
   if(b){ b.textContent=on?'🔒':'🔓'; b.classList.toggle('locked', on); b.setAttribute('aria-pressed', on?'true':'false'); }
@@ -2381,7 +2790,9 @@ window.filterGlossaire=filterGlossaire;
 window.toggleGlos=toggleGlos;
 
 document.addEventListener('DOMContentLoaded',()=>{
+  M5_ccnDuMenu();
   initCCNSelect(); showSection('accueil'); updateYearBadge(); refreshUI();
+  document.documentElement.classList.remove('m5-attente'); // premier affichage réel : on montre
   setInterval(()=>{ if(currentSection==='accueil') refreshUI(); },15000);
 });
 
@@ -2413,7 +2824,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     }catch(e){}
     return null;
   }
-  function _getPaidMap(){ try{ return JSON.parse(localStorage.getItem('M5_HC_PAID')||'{}'); }catch(e){ return {}; } }
+  function _getPaidMap(){ try{ return JSON.parse(localStorage.getItem(M5_key('M5_HC_PAID'))||'{}'); }catch(e){ return {}; } }
   function _periodKey(){
     try{
       var m=_mode();
@@ -2426,7 +2837,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   function _savePaid(tranche, v){
     var m=_getPaidMap(), k=_periodKey(); if(!m[k]||typeof m[k]!=='object') m[k]={};
     m[k][tranche]=Math.round(_parseHM(v)*100)/100;
-    try{ localStorage.setItem('M5_HC_PAID', JSON.stringify(m)); }catch(e){}
+    try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(m)); }catch(e){}
   }
   function _fmtH(h){ var s=h<0?'-':''; h=Math.abs(h); var hh=Math.floor(h+1e-9), mm=Math.round((h-hh)*60); if(mm===60){hh++;mm=0;} return s+hh+'h'+(mm?String(mm).padStart(2,'0'):''); }
   window._m5fmtH=_fmtH;
@@ -2482,8 +2893,9 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(typeof buildPeriodes!=='function'||typeof CalcEngine==='undefined'||typeof M5_DataStore==='undefined') return out;
       var bnds=_currentPeriodBounds(); if(!bnds||!bnds.debutStr) return out;
       var year=_year(), periodes=buildPeriodes(year,c)||[], allWeeks=_allWeeksRaw(), pm=_getPaidMap();
-      var cur=bnds.debutStr, b10=0,b25=0;
-      for(var i=0;i<periodes.length;i++){ var per=periodes[i]; if(!per.debutStr||per.debutStr>=cur) break;
+      var cur=bnds.debutStr, b10=0,b25=0, _dep=_exoDebut(); if(_dep&&cur<_dep) _dep=null; var _rp=_repExoPour(_dep);
+      if(_dep&&_rp&&_rp.choix==='report'){ b10=+_rp.h10||0; b25=+_rp.h25||0; }
+      for(var i=0;i<periodes.length;i++){ var per=periodes[i]; if(!per.debutStr||per.debutStr>=cur) break; if(_dep&&per.debutStr<_dep) continue;
         var wks=_weeksInPeriode(allWeeks,per);
         var nbJ=Math.round((new Date(per.finStr+'T12:00:00')-new Date(per.debutStr+'T12:00:00'))/86400000)+1;
         var r=CalcEngine.calcMonth(c.hoursBase,wks,c,(c.hourlyRate||c.rate||0),nbJ);
@@ -2501,9 +2913,24 @@ document.addEventListener('DOMContentLoaded',()=>{
     return { feriesMap:fm, neutraliseFeries: c.neutraliseFeries===true || c.neutraliseFeries===undefined, mondayStr:mondayStr, joursOuvresContrat: c.joursOuvresContrat||5, workedDaysMap:wdm };
   }
   // HEBDO : report = solde non payé cumulé sur les semaines AVANT la semaine affichée
+  /* 27/09/2026 : reste de l'exercice précédent — M5_REPORT_EXO {from, to, h10, h25, choix}.
+     « report » : ces heures ouvrent le report du nouvel exercice ; « garder » : le nouvel
+     exercice repart de zéro (elles restent dans le bilan de l'ancien). Sans choix, rien ne change. */
+  function _repExo(){ try{ var r=JSON.parse(localStorage.getItem(M5_key('M5_REPORT_EXO'))||'null'); return (r&&r.to&&r.choix)?r:null; }catch(e){ return null; } }
+  window.M5_repExo=_repExo;
+  /* 27/09/2026 : choix gardé PAR exercice (M5_REPORT_EXOS {to: {...}}) ; l'ancien
+     enregistrement unique M5_REPORT_EXO reste lu s'il concerne cet exercice. */
+  function _repExoPour(to){ if(!to) return null;
+    try{ var m=JSON.parse(localStorage.getItem(M5_key('M5_REPORT_EXOS'))||'{}')||{}; if(m[to]&&m[to].choix) return m[to]; }catch(e){}
+    var r=_repExo(); return (r&&r.to===to)?r:null; }
+  window.M5_repExoPour=_repExoPour;
+  /* Début de l'exercice affiché : le report repart de zéro à chaque exercice
+     (le reste de l'exercice précédent n'y entre que si l'utilisateur a choisi de le reporter). */
+  function _exoDebut(){ try{ var c0=M5_Contract.get(), cp=window.M5_contratPourAnnee?M5_contratPourAnnee(String(_year()),c0):c0; return (cp&&cp.exerciceStart)||null; }catch(e){ return null; } }
   function _computeHebdoReport(c, curMonday){
     var out={h10:0,h25:0};
     try{ if(!curMonday) return out;
+      var _dep=_exoDebut(); if(_dep&&curMonday<_dep) _dep=null; var _rp=_repExoPour(_dep);
       var wks=_allWeeksRaw(), pm=_getPaidMap();
       // Toutes les semaines à traiter AVANT curMonday : celles qui ont des heures
       // travaillées ET/OU un paiement saisi (sinon un paiement sur une semaine
@@ -2514,6 +2941,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       Object.keys(pm).forEach(function(k){ if(k.indexOf('week:')===0){ var mday=k.slice(5); if(mday && mday<curMonday) set[mday]=1; } });
       var sorted=Object.keys(set).sort();
       var b10=0,b25=0;
+      if(_dep){ sorted=sorted.filter(function(m){return m>=_dep;}); if(_rp&&_rp.choix==='report'){ b10=+_rp.h10||0; b25=+_rp.h25||0; } }
       for(var i=0;i<sorted.length;i++){
         var mday=sorted[i];
         var wk=(workedMap[mday]!=null?workedMap[mday]:0);
@@ -2526,6 +2954,53 @@ document.addEventListener('DOMContentLoaded',()=>{
     }catch(e){}
     return out;
   }
+
+  /* 27/09/2026 : heures complémentaires d'un EXERCICE avec le moteur de la carte Solde
+     (fériés, jours travaillés, périodes de paie en mode mensuel). Dues par taux, payées
+     (cases cochées), reste en fin d'exercice (report semaine après semaine, ou période après
+     période). Le bilan de fin d'exercice et le bandeau « reste dû » utilisent ces chiffres. */
+  /* Semaines d'un exercice quelconque (pas seulement autour de l'année affichée) */
+  function _weeksEntre(deb,fin){ var seen={},all=[];
+    for(var y=parseInt(deb,10)-1;y<=parseInt(fin,10)+1;y++){ try{ (M5_DataStore.getWeeksSorted(String(y))||[]).forEach(function(w){ if(!seen[w.monday]){ seen[w.monday]=1; all.push(w); } }); }catch(e){} }
+    all.sort(function(a,b){ return a.monday<b.monday?-1:1; }); return all; }
+  /* 27/09/2026 : heures complémentaires d'UNE semaine, moteur de la carte Solde (fériés chômés
+     neutralisés, jours travaillés). Utilisé par le PDF pour que bilan, tableau et paiement concordent. */
+  window.M5_hcSemaine=function(c,monday,worked){
+    try{ if(!(worked>0)||!c||!c.hoursBase) return {c1:0,c2:0,ferie:false};
+      const r=CalcEngine.calcWeek(c.hoursBase,worked,c,0,_weekOpts(c,monday));
+      const seuilBase=Math.max(0,worked-c.hoursBase);
+      return {c1:r.compH1||0,c2:r.compH2||0,ferie:((r.compH1||0)+(r.compH2||0))>seuilBase+0.001};
+    }catch(e){ return null; }
+  };
+  window.M5_hcExercice=function(c,deb,fin,paidKey){
+    var o={d10:0,d25:0,p10:0,p25:0,r10:0,r25:0,sem:0};
+    try{
+      var pm={};try{pm=JSON.parse(localStorage.getItem(paidKey||M5_key('M5_HC_PAID'))||'{}')||{};}catch(e){}
+      var rp=_repExoPour(deb),b10=0,b25=0;
+      if(rp&&rp.choix==='report'){b10=+rp.h10||0;b25=+rp.h25||0;}
+      var raw=_weeksEntre(deb,fin),all=raw.filter(function(w){return w.monday>=deb&&w.monday<=fin;}),rate=(c.hourlyRate||c.rate||0);
+      if((c.modeCalcul||'HEBDO')==='MENSUEL'&&typeof buildPeriodes==='function'){
+        var vu={},pers=[];
+        for(var y=parseInt(deb,10);y<=parseInt(fin,10);y++)(buildPeriodes(String(y),c)||[]).forEach(function(p){if(p.debutStr&&p.debutStr>=deb&&p.finStr<=fin&&!vu[p.debutStr]){vu[p.debutStr]=1;pers.push(p);}});
+        pers.sort(function(a,b){return a.debutStr<b.debutStr?-1:1;});
+        pers.forEach(function(per){var wks=_weeksInPeriode(raw,per);if(!wks.length)return;o.sem+=wks.length;
+          var nbJ=Math.round((new Date(per.finStr+'T12:00:00')-new Date(per.debutStr+'T12:00:00'))/86400000)+1;
+          var r=CalcEngine.calcMonth(c.hoursBase,wks,c,rate,nbJ),pd=pm['per:'+per.debutStr]||pm[per.debutStr]||{};
+          var pw={h10:0,h25:0};Object.keys(pm).forEach(function(k){if(k.indexOf('week:')===0){var m=k.slice(5);if(m>=per.debutStr&&m<=per.finStr){pw.h10+=+(pm[k].h10)||0;pw.h25+=+(pm[k].h25)||0;}}});
+          var q10=(+pd.h10||0)+pw.h10,q25=(+pd.h25||0)+pw.h25;
+          o.d10+=r.compH1||0;o.d25+=r.compH2||0;o.p10+=q10;o.p25+=q25;
+          b10=Math.max(0,b10+(r.compH1||0)-q10);b25=Math.max(0,b25+(r.compH2||0)-q25);});
+      }else{
+        all.forEach(function(w){var wk=(w.worked!=null?w.worked:(w.hours||0));if(!(wk>0))return;o.sem++;
+          var r=CalcEngine.calcWeek(c.hoursBase,wk,c,rate,_weekOpts(c,w.monday)),pd=pm['week:'+w.monday]||{};
+          o.d10+=r.compH1||0;o.d25+=r.compH2||0;o.p10+=+pd.h10||0;o.p25+=+pd.h25||0;
+          b10=Math.max(0,b10+(r.compH1||0)-(+pd.h10||0));b25=Math.max(0,b25+(r.compH2||0)-(+pd.h25||0));});
+      }
+      o.r10=b10;o.r25=b25;
+      Object.keys(o).forEach(function(k){o[k]=Math.round(o[k]*100)/100;});
+    }catch(e){}
+    return o;
+  };
 
   window._m5UpdateNet=function(){
     var card=document.getElementById('m5-solde-card'); if(!card) return;
@@ -2547,7 +3022,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if(part==='h') h=Math.max(0,parseInt(String(v),10)||0);
     else min=Math.max(0,Math.min(59,parseInt(String(v),10)||0));
     m[k][tranche]=Math.round((h+min/60)*100)/100;
-    try{ localStorage.setItem('M5_HC_PAID', JSON.stringify(m)); }catch(e){}
+    try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(m)); }catch(e){}
   }
   window.M5setHCPaid10h=function(v){ _savePaidHM('h10','h',v); window._m5UpdateNet(); };
   window.M5setHCPaid10m=function(v){ _savePaidHM('h10','m',v); window._m5UpdateNet(); };
@@ -2566,7 +3041,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     var newDk=Math.max(0, Math.round((newTotal-other)*100)/100);
     var k='week:'+debutStr; if(!pm[k]||typeof pm[k]!=='object') pm[k]={};
     pm[k][tranche]=newDk;
-    try{ localStorage.setItem('M5_HC_PAID', JSON.stringify(pm)); }catch(e){}
+    try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(pm)); }catch(e){}
     if(window.M5_refreshUI) requestAnimationFrame(window.M5_refreshUI);
   };
   window.M5toggleEuro=function(){ var sh=localStorage.getItem('M5_EURO_SHOWN')==='1'; sh=!sh; try{localStorage.setItem('M5_EURO_SHOWN',sh?'1':'0');}catch(e){}
@@ -2891,6 +3366,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     // Période active = celle qui contient la semaine courante (barre + verrou + swipe)
     var _cmA=(window.M5_getCalMonday&&window.M5_getCalMonday())||'';
     var _actIdx=-1; for(var _ai=0;_ai<pers.length;_ai++){ if(_cmA>=pers[_ai].debutStr && _cmA<=pers[_ai].finStr){ _actIdx=_ai; break; } }
+    /* 27/09/2026 : jours hors de l'exercice affiché (ex. début décembre 2026 dans l'exercice 2027
+       qui commence le 28/12) : grisés, et un appui ouvre le bon exercice au lieu d'y saisir. */
+    var _exD='',_exF='';try{var _cpx=window.M5_contratPourAnnee?M5_contratPourAnnee(String(cy),M5_Contract.get()):M5_Contract.get();_exD=_cpx.exerciceStart||'';var _cl=Object.values(_cpx.cloturesDates||{}).filter(Boolean).sort();_exF=_cl.length?_cl[_cl.length-1]:'';}catch(e){}
     var h='<div class="m5-cal-weekly-badge">Mode mensuel — tape un jour · ∑ = semaine saisie en total</div><div class="m5-month-grid">';
     wd.forEach(function(d){ h+='<div class="m5-month-wd">'+d+'</div>'; });
     for(var i=0;i<offset;i++) h+='<div class="m5-month-pad"></div>';
@@ -2912,6 +3390,10 @@ document.addEventListener('DOMContentLoaded',()=>{
         :(v!=null?'<span>'+_fmt(v)+(_over10?' ⚠️':'')+'</span>'
         :(_wt!=null?'<span class="m5-wt-mark">'+(_isWS?('∑'+_fmt(_wt)):'∑')+'</span>':'')));
       var _click=_vac?'window.M5_toast&&M5_toast(\'Semaine en congés 🌴 — décoche les congés pour saisir\',\'info\')':'openDaySaisie(\''+dk+'\',\''+lab+'\')';
+      var _hors=(_exD&&dk<_exD)||(_exF&&dk>_exF);
+      if(_hors){ var _ya=String(parseInt(cy,10)+(dk<_exD?-1:1));
+        _click='if(confirm(\'Ce jour appartient à l\\\'exercice '+_ya+'. L\\\'ouvrir ?\'))switchYear(\''+_ya+'\')';
+        h+='<div class="'+cls+'" style="opacity:.35" title="Hors exercice '+cy+'" onclick="'+_click+'"><b>'+d+'</b>'+_inner+'</div>'; continue; }
       h+='<div class="'+cls+'" onclick="'+_click+'"><b>'+d+'</b>'+_inner+'</div>';
     }
     h+='</div>';
@@ -2948,4 +3430,301 @@ document.addEventListener('DOMContentLoaded',()=>{
       if(dx<0){ if(window.calNext) window.calNext(); } else { if(window.calPrev) window.calPrev(); }
     }, {passive:true});
   });
+})();
+
+
+/* ═══ Passage à l'exercice suivant — Mizuki (24/09/2026) ══════════════════
+   Le contrat ne porte qu'UN exercice (début + 12 clôtures). Une fois la
+   dernière clôture passée, les semaines suivantes ne tombaient dans aucune
+   période. Un bandeau propose maintenant de préparer l'exercice suivant :
+   même rythme de clôtures, un an plus tard. L'exercice terminé est gardé dans
+   M5_EXERCICES pour que ses périodes restent justes quand on le consulte.
+   Rien ne bascule sans l'accord de l'utilisateur. */
+(function(){
+  function jour(s){return new Date(s+'T12:00:00');}
+  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function plus(s,n){var d=jour(s);d.setDate(d.getDate()+n);return iso(d);}
+  function plusUnAn(s){var d=jour(s),m=d.getMonth();d.setFullYear(d.getFullYear()+1);if(d.getMonth()!==m)d.setDate(0);return iso(d);}
+  function finDeMois(s){var d=jour(s);return new Date(d.getFullYear(),d.getMonth()+1,0).getDate()===d.getDate();}
+  function fr(s){return jour(s).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});}
+  function cle(){return (window.M5_key?M5_key('M5_EXERCICES'):'M5_EXERCICES');}
+  function histo(){try{return JSON.parse(localStorage.getItem(cle())||'{}')||{};}catch(e){return {};}}
+  // Décalage d'un an qui garde le rythme : même règle de jour de semaine
+  // (« dernier dimanche », « 3e dimanche ») si toutes les clôtures tombent le
+  // même jour ; fin de mois si ce sont des fins de mois ; sinon même date.
+  function decaleur(dates){
+    var j=dates.map(function(x){return jour(x).getDay();});
+    // Même règle l'an prochain : « dernier dimanche du mois » reste le dernier
+    // dimanche, « 3e dimanche » reste le 3e — aucune dérive (2028, 2029…).
+    if(j.length>1&&j.every(function(v){return v===j[0];}))return function(x){var d=jour(x),wd=d.getDay(),m=d.getMonth(),y=d.getFullYear()+1,nb=new Date(y,m+1,0).getDate(),dernier=d.getDate()+7>new Date(d.getFullYear(),m+1,0).getDate(),r;if(dernier){r=new Date(y,m,nb);while(r.getDay()!==wd)r.setDate(r.getDate()-1);}else{var n=Math.ceil(d.getDate()/7);r=new Date(y,m,1);while(r.getDay()!==wd)r.setDate(r.getDate()+1);r.setDate(r.getDate()+7*(n-1));}return iso(r);};
+    if(dates.length&&dates.every(finDeMois))return function(x){var d=jour(x);return iso(new Date(d.getFullYear()+1,d.getMonth()+1,0));};
+    return plusUnAn;
+  }
+  window.M5_contratPourAnnee=function(year,c){
+    try{
+      var h=histo(),cand=[{exerciceStart:c.exerciceStart,cloturesDates:c.cloturesDates||{}}];
+      Object.keys(h).forEach(function(k){cand.push(h[k]);});
+      function score(x){return Object.values(x.cloturesDates||{}).filter(function(v){return String(v).slice(0,4)===String(year);}).length;}
+      var best=cand[0],bs=score(best);
+      cand.forEach(function(x){var sc=score(x);if(sc>bs){best=x;bs=sc;}});
+      /* 27/09/2026 : année APRÈS l'exercice en cours, sans exercice propre → exercice suivant
+         projeté (clôtures préparées, sinon automatiques), au lieu de l'exercice en cours */
+      var lastC=derniere(c);
+      if(bs===0&&lastC&&parseInt(year,10)>parseInt(lastC.slice(0,4),10)&&window.hsNouvelExercice){
+        var pr=null;try{pr=JSON.parse(localStorage.getItem(window.M5_key?M5_key('M5_EXO_PREPA'):'M5_EXO_PREPA')||'null');}catch(e){}
+        var fs=((c.weekStartDay||0)%7),ms=hsNouvelExercice.moisSuivant(lastC),auto=(pr&&Array.isArray(pr.auto)&&pr.auto.length)?pr.auto:hsNouvelExercice.clotures(ms.mois,ms.annee,fs);
+        var cd={};auto.forEach(function(d){cd[String(parseInt(d.slice(5,7),10))]=d;});
+        var st=plus(lastC,1);if(window.snapExerciceStart)st=snapExerciceStart(st,c.weekStartDay||0);
+        return Object.assign({},c,{exerciceStart:st,cloturesDates:cd,_projete:true,_prepare:!!pr});
+      }
+      return best===cand[0]?c:Object.assign({},c,{exerciceStart:best.exerciceStart,cloturesDates:best.cloturesDates});
+    }catch(e){return c;}
+  };
+  function derniere(c){var v=Object.values(c.cloturesDates||{}).filter(Boolean).sort();return v.length?v[v.length-1]:null;}
+  /* 27/09/2026 — bornes de l'exercice « y » (null si inconnues). L'exercice porte le nom de
+     l'année où il a le plus de jours : 29/12/2025 → 27/12/2026 = 2026. */
+  function majo(d,f){var y1=parseInt(d,10),y2=parseInt(f,10),b=y1,bj=-1;for(var y=y1;y<=y2;y++){var a=Math.max(jour(d).getTime(),jour(y+'-01-01').getTime()),z=Math.min(jour(f).getTime(),jour(y+'-12-31').getTime()),j=Math.round((z-a)/864e5)+1;if(j>bj){bj=j;b=y;}}return b;}
+  window.M5_exoBornes=function(y){try{var cp=window.M5_contratPourAnnee(String(y),M5_Contract.get()),f=derniere(cp),d=cp.exerciceStart;
+    if(!d||!f||f<d||majo(d,f)!==parseInt(y,10))return null;return {deb:d,fin:f};}catch(e){return null;}};
+  window.M5_exoDeDate=function(dk){var yk=parseInt(dk,10),l=[yk,yk+1,yk-1];for(var i=0;i<l.length;i++){var b=M5_exoBornes(l[i]);if(b&&dk>=b.deb&&dk<=b.fin)return String(l[i]);}return null;};
+  /* Saisies rangées dans le mauvais exercice (ex. semaine du 30/11/2026 enregistrée dans 2027
+     depuis la vue 2027) : remises dans l'exercice qui contient leur date. Jamais d'écrasement. */
+  window.M5_rangerSaisies=function(){var n=0;try{
+    ['M5_DATA_','M5_VACANCES_'].forEach(function(pf){
+      var pre=window.M5_key?M5_key(pf):pf,re=new RegExp('^'+pre.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\d{4})$'),tabs={},mod={};
+      for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),m=re.exec(k||'');if(m){try{tabs[m[1]]=JSON.parse(localStorage.getItem(k)||'{}')||{};}catch(e){}}}
+      Object.keys(tabs).forEach(function(y){var b=M5_exoBornes(y);if(!b)return;var t=tabs[y];
+        Object.keys(t).forEach(function(dk){if(!/^\d{4}-\d{2}-\d{2}$/.test(dk)||(dk>=b.deb&&dk<=b.fin))return;
+          var a=M5_exoDeDate(dk);if(!a||a===y)return;if(!tabs[a])tabs[a]={};if(Object.prototype.hasOwnProperty.call(tabs[a],dk))return;
+          tabs[a][dk]=t[dk];delete t[dk];mod[a]=1;mod[y]=1;n++;});});
+      Object.keys(mod).forEach(function(y){try{localStorage.setItem(pre+y,JSON.stringify(tabs[y]));}catch(e){}});
+    });}catch(e){}return n;};
+  // Après chargement complet (l'exercice suivant projeté a besoin de nouvel-exercice.js)
+  window.addEventListener('load',function(){try{if(window.M5_rangerSaisies()>0&&typeof refreshUI==='function')refreshUI();}catch(e){}});
+  window.M5_exerciceSuivant=function(forcees){
+    var c=M5_Contract.get(),last=derniere(c);if(!last)return;
+    var h=histo();h[c.exerciceStart||last]={exerciceStart:c.exerciceStart,cloturesDates:c.cloturesDates};
+    var nc={};
+    if(Array.isArray(forcees)&&forcees.length){
+      // Clôtures choisies à l'ouverture (26/09/2026), rangées par numéro de mois
+      forcees.forEach(function(d){nc[String(parseInt(d.slice(5,7),10))]=d;});
+    }else{
+      var dates=Object.values(c.cloturesDates),dec=decaleur(dates);
+      Object.keys(c.cloturesDates).forEach(function(m){nc[m]=dec(c.cloturesDates[m]);});
+    }
+    var deb=plus(last,1);
+    if(window.snapExerciceStart)deb=snapExerciceStart(deb,c.weekStartDay||0);
+    c.exerciceStart=deb;c.cloturesDates=nc;
+    try{localStorage.setItem(cle(),JSON.stringify(h));M5_Contract.save(c);}
+    catch(e){if(typeof toast==='function')toast('❌ Espace de stockage insuffisant : rien n\'a été modifié.','error');return;}
+    try{if(window.Mizuki&&Mizuki.clearCache)Mizuki.clearCache();}catch(e){}
+    if(typeof refreshUI==='function')refreshUI();
+    if(typeof toast==='function')toast('📅 Nouvel exercice à partir du '+fr(deb),'success');
+    if(window.hsBackupNudge)hsBackupNudge('year');
+    verifier();
+  };
+  /* Bilan de fin d'année (26/09/2026) : l'exercice qui se termine, contrat actif */
+  function bilanLignes(c,last){
+    var deb=c.exerciceStart,fin=last;if(!deb||!fin||!c.hoursBase)return null;
+    var ans={},sem={},f=window._m5fmtH||function(h){return h+'h';};
+    for(var a=parseInt(deb.slice(0,4),10);a<=parseInt(fin.slice(0,4),10)+1;a++)ans[a]=1;
+    Object.keys(ans).forEach(function(a){try{M5_DataStore.getWeeksSorted(String(a)).forEach(function(w){if(w.monday>=deb&&w.monday<=fin&&w.worked>0)sem[w.monday]=w.worked;});}catch(e){}});
+    var ws=Object.keys(sem);if(!ws.length)return null;
+    var base=c.hoursBase,seuil=base*(c.threshold||0.10),tot=0,hc=0,h1=0,h2=0,n35=0;
+    ws.forEach(function(k){var w=sem[k],d=Math.max(0,w-base);tot+=w;hc+=d;h1+=Math.min(d,seuil);h2+=Math.max(0,d-seuil);if(w>=35)n35++;});
+    var r=function(x){return Math.round(x*100)/100;};
+    var l=[['Heures travaillées',f(r(tot))],['Semaines saisies',String(ws.length)]];
+    if(c.modeCalcul==='ANNUEL'){var obj=r(base*52),so=r(tot-obj);l.push(['Objectif annuel du contrat',f(obj)],['Écart avec l\'objectif',(so>0?'+':so<0?'−':'')+f(Math.abs(so))]);}
+    else{var HX=window.M5_hcExercice?M5_hcExercice(c,deb,fin):null;if(HX){h1=HX.d10;h2=HX.d25;hc=h1+h2;}
+      l.push(['Heures complémentaires',f(r(hc))],['Dont à +'+Math.round((c.rate1||0.10)*100)+' %',f(r(h1))],['Dont à +'+Math.round((c.rate2||0.25)*100)+' %',f(r(h2))]);}
+    if(n35>0)l.push(['Semaines à 35 h ou plus',String(n35)]);
+    /* 26/09/2026 : reste à payer en fin d'exercice. Heures complémentaires de l'exercice
+       moins les paiements saisis sur l'exercice (cases « payé » par semaine ou période). */
+    window.__m5Alerte=null;window.__m5Reste=null;
+    if(c.modeCalcul==='ANNUEL'){
+      var so2=r(tot-base*52);
+      if(so2>0.01)window.__m5Alerte={titre:'⚠️ '+f(so2)+' au-delà de l\'objectif annuel du contrat',
+        texte:'En fin de période annuelle, ces heures sont des heures complémentaires à payer (majorées). Si elles ne figurent pas sur ta paie, '+DELAI_MIN()};
+    }else{
+      var HY=window.M5_hcExercice?M5_hcExercice(c,deb,fin):null,p1,p2,n1,n2;
+      if(HY){p1=HY.p10;p2=HY.p25;n1=HY.r10;n2=HY.r25;}
+      else{var pm={};try{pm=JSON.parse(localStorage.getItem(M5_key('M5_HC_PAID'))||'{}')||{};}catch(e){}
+        p1=0;p2=0;Object.keys(pm).forEach(function(k){var d=k.replace(/^(week|per):/,'');if(/^\d{4}-\d{2}-\d{2}$/.test(d)&&d>=deb&&d<=fin){p1+=+((pm[k]||{}).h10)||0;p2+=+((pm[k]||{}).h25)||0;}});
+        n1=r(Math.max(0,h1-p1));n2=r(Math.max(0,h2-p2));}
+      var nT=r(n1+n2);
+      window.__m5Reste={h10:n1,h25:n2,deb:deb,fin:fin};
+      if(p1+p2>0)l.push(['Heures complémentaires payées',f(r(p1+p2))]);
+      if(nT>0.01){l.push(['Reste à payer en fin d\'exercice',f(nT)]);
+        var det=[];if(n1>0.01)det.push(f(n1)+' à +'+Math.round((c.rate1||0.10)*100)+' %');if(n2>0.01)det.push(f(n2)+' à +'+Math.round((c.rate2||0.25)*100)+' %');
+        window.__m5Alerte={titre:'⚠️ Exercice non soldé : '+f(nT)+' d\'heures complémentaires non payées',
+          texte:(det.length>1?'Soit '+det.join(' + ')+'. ':'')+'Même calcul que la carte « Solde » à la fin de l\'exercice : les heures non payées sont reportées de semaine en semaine (un paiement en trop n\'efface pas les semaines suivantes). '+((window.hsBilanAnnee&&hsBilanAnnee.delai)||'')};
+      }
+    }
+    return l.filter(function(x){return !/^Dont /.test(x[0])||/[1-9]/.test(String(x[1]));});
+  }
+  function DELAI_MIN(){return ((window.hsBilanAnnee&&hsBilanAnnee.delai)||'').replace(/^Elles restent/,'elles restent');}
+  /* Question à l'ouverture (26/09/2026) : clôtures automatiques (dernier jour de fin
+     de semaine du contrat, chaque mois) ou saisie manuelle dans ⚙️ Mon contrat */
+  /* 27/09/2026 : reste dû de l'exercice qui se termine → reporter ou non dans le suivant */
+  function kRep(){return window.M5_key?M5_key('M5_REPORT_EXO'):'M5_REPORT_EXO';}
+  function kPrepa(){return window.M5_key?M5_key('M5_EXO_PREPA'):'M5_EXO_PREPA';}
+  function fH(h){return (window._m5fmtH||function(x){return x+'h';})(Math.round(h*100)/100);}
+  /* 27/09/2026 — RESTES DUS SUR 3 ANS (art. L3245-1).
+     Chaque exercice terminé a un reste (heures complémentaires non payées, report entrant compris).
+     • Reporté dans un exercice suivant : il fait partie du reste de celui-ci, on ne le repropose plus.
+     • Gardé (non reporté) : il reste dû dans le bilan de son exercice et il est reproposé à chaque
+       ouverture d'exercice tant que les 3 ans ne sont pas passés.
+     Choix par exercice d'arrivée : M5_REPORT_EXOS { <début>: {to, choix, h10, h25, sources:[{from, fin, h10, h25, depuis, choix}]} }. */
+  function kMap(){return window.M5_key?M5_key('M5_REPORT_EXOS'):'M5_REPORT_EXOS';}
+  function lireMap(){var m={};try{m=JSON.parse(localStorage.getItem(kMap())||'{}')||{};}catch(e){}
+    try{var old=JSON.parse(localStorage.getItem(kRep())||'null');if(old&&old.to&&old.choix&&!m[old.to])m[old.to]={to:old.to,choix:old.choix,h10:old.choix==='report'?(+old.h10||0):0,h25:old.choix==='report'?(+old.h25||0):0,sources:[{from:old.from,fin:old.fin,h10:+old.h10||0,h25:+old.h25||0,depuis:old.from,choix:old.choix}]};}catch(e){}
+    return m;}
+  function sourcesDe(r){return (r&&Array.isArray(r.sources))?r.sources:[];}
+  function exercices(){var c=M5_Contract.get(),h=histo(),vu={},L=[];
+    Object.keys(h).forEach(function(k){var x=h[k],f=derniere(x);if(x&&x.exerciceStart&&f&&!vu[x.exerciceStart]){vu[x.exerciceStart]=1;L.push({deb:x.exerciceStart,fin:f,cd:x.cloturesDates});}});
+    var fc=derniere(c);if(c.exerciceStart&&fc&&!vu[c.exerciceStart])L.push({deb:c.exerciceStart,fin:fc,cd:c.cloturesDates,courant:true});
+    L.sort(function(a,b){return a.deb<b.deb?-1:1;});return L;}
+  function resteDe(x){var c=M5_Contract.get(),cx=Object.assign({},c,{exerciceStart:x.deb,cloturesDates:x.cd||{}});
+    var r=window.M5_hcExercice?M5_hcExercice(cx,x.deb,x.fin):null;return r?{h10:r.r10,h25:r.r25}:{h10:0,h25:0};}
+  function reporteDans(deb,m){m=m||lireMap();var t=null;Object.keys(m).forEach(function(to){sourcesDe(m[to]).forEach(function(s){if(s.from===deb&&s.choix==='report')t=to;});});return t;}
+  function depuisDe(deb,m){m=m||lireMap();var d=deb;sourcesDe(m[deb]).forEach(function(s){if(s.choix==='report'){var x=s.depuis||s.from;if(x&&x<d)d=x;}});return d;}
+  function limite(depuis){return plusUnAn(plusUnAn(plusUnAn(depuis)));}
+  function anLbl(x){var y1=parseInt(x.deb,10),y2=parseInt(x.fin,10),best=y1,bj=-1;  // année où l'exercice a le plus de jours
+    for(var y=y1;y<=y2;y++){var a=Math.max(jour(x.deb).getTime(),jour(y+'-01-01').getTime()),b=Math.min(jour(x.fin).getTime(),jour(y+'-12-31').getTime()),j=Math.round((b-a)/864e5)+1;if(j>bj){bj=j;best=y;}}
+    return String(best);}
+  /* Restes encore dus à la date « a » : exercices terminés avant « to », non reportés, pas prescrits.
+     sansGarde : ignorer les « ne pas reporter » déjà répondus pour « to » (aperçu, passage). */
+  function restesDus(to,a,sansGarde){var m=lireMap(),rec=m[to],out=[];
+    exercices().forEach(function(x){if(!(x.fin<to))return;if(reporteDans(x.deb,m))return;
+      if(!sansGarde&&sourcesDe(rec).some(function(s){return s.from===x.deb;}))return;
+      var dep=depuisDe(x.deb,m),lim=limite(dep);if(lim<=a)return;
+      var r=resteDe(x);if(r.h10+r.h25>0.01)out.push({deb:x.deb,fin:x.fin,h10:r.h10,h25:r.h25,depuis:dep,limite:lim,an:anLbl(x)});});
+    return out.reverse();}
+  window.M5_restesDus=restesDus;
+  function enregistrer(to,items,coches){var m=lireMap(),rec=m[to]||{to:to,sources:[]},src=sourcesDe(rec).slice();
+    items.forEach(function(it,i){src=src.filter(function(s){return s.from!==it.deb;});src.push({from:it.deb,fin:it.fin,h10:it.h10,h25:it.h25,depuis:it.depuis,choix:coches[i]?'report':'garder'});});
+    var h10=0,h25=0;src.forEach(function(s){if(s.choix==='report'){h10+=+s.h10||0;h25+=+s.h25||0;}});
+    m[to]={to:to,choix:(h10+h25>0.001)?'report':'garder',h10:Math.round(h10*100)/100,h25:Math.round(h25*100)/100,sources:src};
+    try{localStorage.setItem(kMap(),JSON.stringify(m));}catch(e){}}
+  /* Fenêtre de choix : une ligne par exercice, cochée par défaut */
+  window.M5_demanderReports=function(items,to,apres){
+    if(!items||!items.length){if(apres)apres();return;}
+    var c=M5_Contract.get(),r1=Math.round((c.rate1||0.10)*100),r2=Math.round((c.rate2||0.25)*100),tot=0;
+    items.forEach(function(it){tot+=it.h10+it.h25;});
+    function fin(coches){enregistrer(to,items,coches);
+      var n=0;coches.forEach(function(x,i){if(x)n+=items[i].h10+items[i].h25;});
+      if(typeof toast==='function')toast(n>0.01?'↪ '+fH(n)+' reportées dans l\'exercice en cours':'Restes gardés dans le bilan de leur exercice','success');
+      if(apres)apres();
+      setTimeout(function(){var mc=document.getElementById('modal-contract');if(!mc||!mc.classList.contains('open'))location.reload();},apres?900:700);}
+    if(!window.hsNouvelExercice||!hsNouvelExercice.restes){fin(items.map(function(){return false;}));return;}
+    hsNouvelExercice.restes({total:fH(tot),vers:'l\'exercice qui commence le '+fr(to),couleur:'#e67e22',
+      items:items.map(function(it){var det=[];if(it.h10>0.01)det.push(fH(it.h10)+' à +'+r1+' %');if(it.h25>0.01)det.push(fH(it.h25)+' à +'+r2+' %');
+        return {titre:'Exercice '+it.an+' : '+fH(it.h10+it.h25),detail:det.join(' + '),limite:fr(it.limite)};}),
+      valider:fin});
+  };
+  /* Compatibilité : ancien appel avec un seul reste */
+  window.M5_demanderReport=function(reste,to,apres){
+    var items=restesDus(to,iso(new Date()),true);
+    if(!items.length&&reste&&reste.h10+reste.h25>0.01)items=[{deb:reste.deb,fin:reste.fin,h10:reste.h10,h25:reste.h25,depuis:reste.deb,limite:limite(reste.deb),an:anLbl({deb:reste.deb,fin:reste.fin})}];
+    window.M5_demanderReports(items,to,apres);
+  };
+  /* Statut du reste d'un exercice terminé, pour son bilan */
+  function statutReste(deb){var m=lireMap(),t=reporteDans(deb,m);
+    if(t)return 'Ce reste a été reporté dans l\'exercice commencé le '+fr(t)+' : il y figure dans le report.';
+    var lim=limite(depuisDe(deb,m));
+    if(lim<=iso(new Date()))return 'Non reporté. Le délai de 3 ans est dépassé pour les plus anciennes heures depuis le '+fr(lim)+' environ.';
+    return 'Non reporté : il reste dû. Les plus anciennes heures sont réclamables jusqu\'au '+fr(lim)+' environ ; il te sera reproposé à l\'ouverture de chaque exercice d\'ici là.';}
+  /* Exercice suivant préparé à l'avance (créé à la main avant la fin) : ses clôtures
+     choisies sont gardées et appliquées au moment du passage. */
+  function suivantAvec(forcees,manuel){
+    var c0=M5_Contract.get(),last0=derniere(c0),reste=null;
+    try{bilanLignes(c0,last0);reste=window.__m5Reste;}catch(e){}
+    window.M5_exerciceSuivant(forcees);
+    var to=M5_Contract.get().exerciceStart;
+    window.M5_demanderReport(reste,to,function(){if(manuel)setTimeout(function(){if(typeof window.openContractModal==='function')window.openContractModal();},400);});
+  }
+  window.M5_choisirPuisSuivant=function(){
+    var c=M5_Contract.get(),last=derniere(c);if(!last)return;
+    var pr=null;try{pr=JSON.parse(localStorage.getItem(kPrepa())||'null');}catch(e){}
+    if(pr&&Array.isArray(pr.auto)&&pr.auto.length&&pr.auto[0]>last){try{localStorage.removeItem(kPrepa());}catch(e){}suivantAvec(pr.auto,!!pr.manuel);return;}
+    if(!window.hsNouvelExercice){suivantAvec(null,false);return;}
+    var fs=((c.weekStartDay||0)%7),ms=hsNouvelExercice.moisSuivant(last),auto=hsNouvelExercice.clotures(ms.mois,ms.annee,fs);
+    var nomC='';try{if(window.M5_Contrats&&M5_Contrats.existing().length>1)nomC=' · '+M5_Contrats.nom(M5_Contrats.active);}catch(e){}
+    hsNouvelExercice.demander({titre:'Exercice suivant'+nomC,couleur:'#6C3FC5',finSemaine:fs,
+      texteManuel:'Tes 12 clôtures sont préremplies ; ⚙️ Mon contrat s\'ouvre pour les corriger.',
+      auto:function(){suivantAvec(auto,false);},
+      manuel:function(){suivantAvec(auto,true);}});
+  };
+  /* Création à la main de l'exercice suivant AVANT la fin de l'exercice en cours :
+     même question que le bandeau ; le choix est gardé pour le jour du passage. */
+  window.M5_preparerSuivant=function(y){
+    var c=M5_Contract.get(),last=derniere(c);if(!last||!window.hsNouvelExercice)return false;
+    var fs=((c.weekStartDay||0)%7),ms=hsNouvelExercice.moisSuivant(last),auto=hsNouvelExercice.clotures(ms.mois,ms.annee,fs);
+    function garder(man){try{localStorage.setItem(kPrepa(),JSON.stringify({auto:auto,manuel:man}));var k=M5_key('M5_DATA_')+y;if(!localStorage.getItem(k))localStorage.setItem(k,'{}');}catch(e){}
+      if(typeof toast==='function')toast('📅 Exercice '+y+' prêt : il s\'ouvrira le '+fr(plus(last,1)),'success');if(typeof window.switchYear==='function')window.switchYear(String(y));}
+    hsNouvelExercice.demander({titre:'Exercice '+y,couleur:'#6C3FC5',finSemaine:fs,
+      texteManuel:'Tes 12 clôtures sont préremplies ; ⚙️ Mon contrat s\'ouvrira pour les corriger le jour du passage.',
+      auto:function(){garder(false);},manuel:function(){garder(true);}});
+    return true;
+  };
+  window.M5_bilanPuisSuivant=function(){
+    var c=M5_Contract.get(),last=derniere(c),l=null;try{l=bilanLignes(c,last);}catch(e){}
+    var nomC='';try{if(window.M5_Contrats&&M5_Contrats.existing().length>1)nomC=' · '+M5_Contrats.nom(M5_Contrats.active);}catch(e){}
+    var an=last?(c.exerciceStart.slice(0,4)===last.slice(0,4)?last.slice(0,4):c.exerciceStart.slice(0,4)+'-'+last.slice(2,4)):'';
+    if(l&&window.hsBilanAnnee)hsBilanAnnee.ouvrir({annee:an,module:'Mizuki · temps partiel'+nomC,couleur:'#6C3FC5',image:'../images/Mizuki.PNG',lignes:l,alerte:window.__m5Alerte,
+      continuer:{libelle:'Ouvrir l\'exercice suivant',action:window.M5_choisirPuisSuivant}});
+    else window.M5_choisirPuisSuivant();
+  };
+  window.M5_voirBilan=function(y){
+    var c=M5_Contract.get(),cp=window.M5_contratPourAnnee?M5_contratPourAnnee(String(y),c):c,lp=derniere(cp),l=null;try{l=bilanLignes(cp,lp);}catch(e){}
+    var an=lp?(cp.exerciceStart.slice(0,4)===lp.slice(0,4)?lp.slice(0,4):cp.exerciceStart.slice(0,4)+'-'+lp.slice(2,4)):String(y);
+    var al=window.__m5Alerte;
+    if(al&&lp&&lp<(c.exerciceStart||'9999')&&window.__m5Reste&&window.__m5Reste.h10+window.__m5Reste.h25>0.01){
+      var st=statutReste(cp.exerciceStart);al=Object.assign({},al,{texte:st+' '+al.texte});
+      if(reporteDans(cp.exerciceStart))al.titre=al.titre.replace('⚠️ Exercice non soldé','↪ Reste reporté');}
+    if(l&&window.hsBilanAnnee)hsBilanAnnee.ouvrir({annee:an,module:'Mizuki · temps partiel',couleur:'#6C3FC5',image:'../images/Mizuki.PNG',lignes:l,alerte:al});
+    else if(typeof toast==='function')toast('Pas encore d\'heures sur cet exercice','info');
+  };
+  window.M5_exercicePlusTard=function(){try{localStorage.setItem('M5_EXO_PLUS_TARD',iso(new Date()));}catch(e){}verifier();};
+  function verifier(){
+    var main=document.getElementById('view-main');if(!main)return;
+    var el=document.getElementById('m5ExoSuivant');
+    if(!el){el=document.createElement('div');el.id='m5ExoSuivant';
+      el.style.cssText='display:none;margin:10px 12px;padding:12px 14px;border-radius:14px;background:#fff8e6;border:1.5px solid #f0c040;font-size:13.5px;line-height:1.45;color:#5a4300';
+      main.insertBefore(el,main.firstChild);}
+    var c=M5_Contract.get(),last=derniere(c),auj=iso(new Date());
+    /* 27/09/2026 : exercice passé consulté (comme le compteur annuel et M2) */
+    try{var yv=String(M5_DataStore.getYear()),cp=window.M5_contratPourAnnee?M5_contratPourAnnee(yv,c):c,lp=derniere(cp);
+      if(c.hoursBase&&cp&&cp._projete){
+        var ap='';try{if(c.modeCalcul!=='ANNUEL'){var pv=restesDus(cp.exerciceStart,cp.exerciceStart,true);
+          if(pv.length)ap='<br>À son ouverture, on te proposera de reporter les heures non payées : '+pv.map(function(x){return '<b>'+x.an+' : '+fH(x.h10+x.h25)+'</b>'+(x.deb===c.exerciceStart?' (à ce jour)':'');}).join(' · ')+'.';}}catch(e){}
+        el.innerHTML='📅 <b>Exercice à venir : il commencera le '+fr(cp.exerciceStart)+'.</b><br>'+(cp._prepare?'Tes clôtures sont déjà choisies ; il s\'ouvrira le moment venu.':'Clôtures automatiques affichées pour l\'instant ; tu peux les choisir dès maintenant.')+ap+
+          '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+(cp._prepare?'':'<button onclick="M5_preparerSuivant(\''+yv+'\')" style="flex:1;padding:10px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:800">Choisir mes clôtures</button>')+
+          '<button onclick="switchYear(\''+String(new Date().getFullYear())+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6C3FC5;color:#fff;font-weight:800">Aller à l\'exercice en cours</button></div>';
+        el.style.display='block';return;}
+      if(c.hoursBase&&cp!==c&&lp&&lp<(c.exerciceStart||'9999')){
+        el.innerHTML='📅 <b>Tu consultes l\'exercice terminé le '+fr(lp)+'.</b><br>Ton exercice en cours a commencé le '+fr(c.exerciceStart)+'.'+
+          '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button onclick="M5_voirBilan(\''+yv+'\')" style="flex:1;padding:10px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:800">📊 Bilan de cet exercice</button>'+
+          '<button onclick="switchYear(\''+String(new Date().getFullYear())+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#6C3FC5;color:#fff;font-weight:800">Aller à l\'exercice en cours</button></div>';
+        el.style.display='block';return;}}catch(e){}
+    /* Restes dus des exercices précédents (3 ans) pas encore traités — sur l'exercice en cours */
+    try{if(cp!==c)throw 0;
+      if(c.hoursBase&&c.modeCalcul!=='ANNUEL'&&localStorage.getItem('M5_REPORT_PLUS_TARD')!==auj){
+        var dus=restesDus(c.exerciceStart,auj,false);
+        if(dus.length){var tt=0;dus.forEach(function(x){tt+=x.h10+x.h25;});
+          window.__m5RestesDus=dus;
+          el.innerHTML='⚠️ <b>'+fH(tt)+' d\'heures complémentaires non payées sur '+(dus.length>1?'tes exercices précédents':'ton exercice précédent')+'</b> ('+dus.map(function(x){return x.an+' : '+fH(x.h10+x.h25);}).join(' · ')+'). Elles restent dues : 3 ans pour les réclamer (art. L3245-1). Tu peux les reporter dans l\'exercice en cours.'+
+            '<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button onclick="M5_demanderReports(window.__m5RestesDus,\''+c.exerciceStart+'\')" style="flex:1;padding:10px;border-radius:10px;border:none;background:#e67e22;color:#fff;font-weight:800">Choisir</button>'+
+            '<button onclick="try{localStorage.setItem(\'M5_REPORT_PLUS_TARD\',\''+auj+'\')}catch(e){};M5_verifierExercice()" style="padding:10px 12px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:700">Plus tard</button></div>';
+          el.style.display='block';return;}}}catch(e){}
+    if(!c.hoursBase||!last||auj<=last||localStorage.getItem('M5_EXO_PLUS_TARD')===auj){el.style.display='none';return;}
+    var deb=plus(last,1);if(window.snapExerciceStart)deb=snapExerciceStart(deb,c.weekStartDay||0);
+    el.innerHTML='📅 <b>Ton exercice s\'est terminé le '+fr(last)+'.</b><br>Le suivant commencera le '+fr(deb)+'. Tu choisiras tes dates de clôture à l\'ouverture.'+
+      '<div style="display:flex;gap:8px;margin-top:10px"><button onclick="M5_bilanPuisSuivant()" style="flex:1;padding:10px;border-radius:10px;border:none;background:#c2185b;color:#fff;font-weight:800">Ouvrir l\'exercice suivant</button>'+
+      '<button onclick="M5_exercicePlusTard()" style="padding:10px 12px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:700">Plus tard</button></div>'+
+      '<div style="font-size:11.5px;margin-top:6px;color:#7a6520">Tes semaines déjà saisies ne bougent pas, et l\'exercice terminé reste consultable.</div>';
+    el.style.display='block';
+  }
+  window.M5_verifierExercice=verifier;
+  if(document.readyState==='complete')setTimeout(verifier,600);else window.addEventListener('load',function(){setTimeout(verifier,600);});
 })();
