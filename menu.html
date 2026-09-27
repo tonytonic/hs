@@ -7,8 +7,15 @@ confirme qu'on arrive bien d'un module (évite tout faux déclenchement au lance
 try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('ecoBack');if(_eco&&document.referrer&&document.referrer.indexOf('sommaire')<0){location.replace('sommaire.html');}}catch(e){}</script>
   <meta charset="UTF-8">
   <title>Simulateur heures supplémentaires</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
   <meta name="color-scheme" content="only light">
+  <!-- 27/09/2026 : menu sans flash au retour d'un module (Android). Le premier rendu attend la fin de la
+       page (#menu-pret) : les styles placés plus bas sont lus avant d'afficher quoi que ce soit ; la page
+       reste ensuite invisible jusqu'à la fin de l'initialisation (DOMContentLoaded). Sécurité : 1,5 s. -->
+  <script>document.documentElement.classList.add('sh-boot');setTimeout(function(){document.documentElement.classList.remove('sh-boot');},1500);</script>
+  <style>html.sh-boot body{visibility:hidden}</style>
+  <link rel="expect" href="#menu-pret" blocking="render">
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#4FB3C2">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -1519,19 +1526,105 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
     <span class="ccn-edit">✎ modifier</span>
   </div>
 
-  <!-- 2 pills noires, côte à côte : Personnaliser (fonction existante) + Ma to-do list (Taiko)
-       flex-wrap:nowrap + min-width:0 sur chaque bouton : même correctif que .row2 dans taiko.html,
-       pour éviter le bug déjà rencontré (rangée qui s'empile sur Android au lieu de rester côte à côte) -->
-  <div style="display:flex;flex-wrap:nowrap;gap:10px;width:100%;">
-    <button id="btnPersoTop" onclick="togglePersoMode()"
-      style="flex:1;min-width:0;background:#0a0a0c;color:#fff;border:1px solid rgba(255,255,255,0.16);
-      border-radius:999px;padding:12px 8px;font-family:inherit;font-weight:700;font-size:12px;
-      cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.45);">✏️ Personnaliser le menu</button>
-    <button onclick="location.href='taiko.html'"
-      style="flex:1;min-width:0;background:#0a0a0c;color:#fff;border:1px solid rgba(255,255,255,0.16);
-      border-radius:999px;padding:12px 8px;font-family:inherit;font-weight:700;font-size:12px;
-      cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,0.45);">✅ Ma to-do list</button>
+  <!-- ══ Mes outils du quotidien (maquette 22/09) : 4 pills noires en 2 × 2 dans une carte ══
+       Personnaliser le menu · Ma to-do list (Taiko) · Saisir aujourd'hui (C4) · Paramètres = choix du
+       module de saisie rapide. grid + min-width:0 : pas d'empilement sur Android. -->
+  <style>
+  .mo-card{width:100%;box-sizing:border-box;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.35);
+    border-radius:26px;padding:14px 12px 16px 16px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);position:relative;z-index:0}
+  .mo-head{display:flex;align-items:center;gap:8px;margin:2px 4px 14px}
+  .mo-title{flex:1;min-width:0;color:#fff;font-weight:800;font-size:15px;line-height:1.2}
+  .mo-quick{color:rgba(255,255,255,0.85);font-size:11.5px;font-weight:700;white-space:nowrap}
+  .mo-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px 10px}
+  .mo-pill{position:relative;min-width:0;display:flex;align-items:center;gap:8px;background:#0a0a0c;color:#fff;
+    border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:6px 12px 6px 6px;min-height:52px;
+    font-family:inherit;cursor:pointer;text-align:left;
+    box-shadow:0 8px 18px rgba(0,0,0,0.35)}
+  /* Reflet coloré : seulement en bas à gauche, il s'efface avant la droite (comme la maquette) */
+  .mo-pill::before{content:"";position:absolute;left:-5px;top:8px;bottom:-6px;width:48%;z-index:-1;
+    border-radius:999px 0 0 999px;background:linear-gradient(90deg,var(--c) 55%,transparent)}
+  .mo-pill:active{transform:translateY(1px)}
+  .mo-ic{flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:var(--c);display:flex;align-items:center;justify-content:center;
+    box-shadow:inset 0 -3px 6px rgba(0,0,0,0.18),inset 0 3px 6px rgba(255,255,255,0.25)}
+  .mo-t{flex:1;min-width:0;font-weight:800;font-size:12px;line-height:1.2;letter-spacing:-0.1px;hyphens:none}
+  .mo-ch{flex:0 0 auto;font-size:17px;font-weight:700;opacity:.9}
+  .qs-opt{padding:11px 14px;border:1px solid rgba(255,255,255,0.16);border-radius:999px;background:rgba(255,255,255,0.06);color:#fff;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;text-align:left}
+  .qs-opt[aria-pressed="true"]{background:#7c4dff;border-color:#7c4dff}
+  </style>
+  <div class="mo-card">
+    <div class="mo-head">
+      <span style="font-size:20px">✨</span>
+      <span class="mo-title">Mes outils du quotidien</span>
+      <span class="mo-quick">Accès rapide ›</span>
+    </div>
+    <div class="mo-grid">
+      <button type="button" id="btnPersoTop" onclick="togglePersoMode()" class="mo-pill" style="--c:#f9b233">
+        <span class="mo-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M14 6l4 4"/></svg></span>
+        <span class="mo-t" id="btnPersoTopLbl">Personnaliser<br>le menu</span>
+      </button>
+      <button type="button" onclick="location.href='taiko.html'" class="mo-pill" style="--c:#2fbf4a">
+        <span class="mo-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg></span>
+        <span class="mo-t">Ma to-do list</span>
+      </button>
+      <button type="button" id="qsGo" onclick="qsGo()" class="mo-pill" style="--c:#7c4dff">
+        <span class="mo-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L5 14h6l-1 8 8-12h-6l1-8z" fill="#fff" stroke="none"/></svg></span>
+        <span class="mo-t">Saisir aujourd’hui</span>
+      </button>
+      <button type="button" id="qsGear" onclick="qsToggleChoice()" class="mo-pill" style="--c:#2f8cff">
+        <span class="mo-ic"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>
+        <span class="mo-t">Paramètres</span>
+      </button>
+    </div>
+    <div id="qsChoice" style="display:none;margin-top:14px;background:#0a0a0c;border:1px solid rgba(255,255,255,0.16);border-radius:18px;padding:12px;box-shadow:0 4px 14px rgba(0,0,0,0.45);">
+      <!-- 26/09/2026 : prénom commun à toute l'appli (SH_PRENOM) et raccourci vers la CCN -->
+      <label for="shPrenom" style="display:block;color:#fff;font-size:13px;font-weight:700;margin-bottom:6px;">Ton prénom <span style="font-weight:500;color:rgba(255,255,255,0.6)">(facultatif)</span></label>
+      <input id="shPrenom" type="text" maxlength="30" autocomplete="given-name" placeholder="Pour que Kitsune, Mizuki et Zenji t'appellent par ton prénom" oninput="shPrenomSet(this.value)" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.06);color:#fff;font-size:16px;font-family:inherit;margin-bottom:12px;">
+      <div style="color:#fff;font-size:13px;font-weight:700;margin-bottom:6px;">Ma convention collective</div>
+      <button type="button" class="qs-opt" onclick="openCCNModal()" style="width:100%;margin-bottom:6px;"><span id="shCcnLbl">Droit commun</span> <span style="color:rgba(255,255,255,0.55);font-weight:600">· changer</span></button>
+      <div style="color:rgba(255,255,255,0.6);font-size:11.5px;line-height:1.4;margin-bottom:14px;">Reprise dans tous les modules. GrillePaye s'ouvre directement dessus.</div>
+      <div id="qsChoiceTitle" style="color:#fff;font-size:13px;font-weight:700;margin-bottom:8px;">Où saisis-tu tes heures ?</div>
+      <div id="qsOpts" style="display:grid;grid-template-columns:1fr;gap:8px;"></div>
+    </div>
   </div>
+  <script>
+  /* C4 — saisie rapide : « Saisir aujourd'hui » ouvre la saisie du jour dans le module choisi
+     (clé SH_SAISIE_RAPIDE) ; « Paramètres » ouvre le choix. Seuls les modules configurés sont proposés. */
+  var QS_KEY='SH_SAISIE_RAPIDE';
+  var QS_MODS=[
+    {id:'heures', nom:'⏱️ Compteur annuel', ok:function(){return qsHasPrefix('EXERCISE_START_');}},
+    {id:'paye',   nom:'📅 Heures mensualisées', ok:function(){return localStorage.getItem('CA_HS_TRACKER_V1_ONBOARDING')==='1';}},
+    {id:'module5',nom:'🦊 Mizuki — Temps partiel', ok:function(){try{var c=JSON.parse(localStorage.getItem('M5_CONTRACT')||'null');return !!(c&&c.hoursBase);}catch(e){return false;}}},
+    {id:'module6',nom:'⚖️ Zenji — Cadres', ok:function(){var r=localStorage.getItem('M6_REGIME');return !!(r&&localStorage.getItem('M6_'+r+'_CONTRACT'));}}
+  ];
+  function qsHasPrefix(p){try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf(p)===0&&localStorage.getItem(k))return true;}}catch(e){}return false;}
+  function qsConfigured(){return QS_MODS.filter(function(m){try{return m.ok();}catch(e){return false;}});}
+  function qsGet(){var c=qsConfigured(),v='';try{v=localStorage.getItem(QS_KEY)||'';}catch(e){}
+    if(c.some(function(m){return m.id===v;}))return v;
+    return c.length===1?c[0].id:'';}
+  function qsRefresh(){
+    var c=qsConfigured(),v=qsGet();
+    var box=document.getElementById('qsOpts'),t=document.getElementById('qsChoiceTitle');box.innerHTML='';
+    if(!c.length){
+      t.textContent='Aucun module de saisie configuré pour l\u2019instant';
+      box.innerHTML='<div style="color:rgba(255,255,255,0.75);font-size:12.5px;line-height:1.45">Ouvre d\u2019abord le module où tu saisis tes heures (Compteur annuel, Heures mensualisées, Mizuki ou Zenji) et termine sa configuration. Il apparaîtra ensuite ici.</div>';
+      return;}
+    t.textContent='Où saisis-tu tes heures ?';
+    c.forEach(function(x){var b=document.createElement('button');b.type='button';b.className='qs-opt';b.textContent=x.nom;
+      b.setAttribute('aria-pressed',x.id===v?'true':'false');b.onclick=function(){qsSet(x.id);};box.appendChild(b);});
+  }
+  function shPrenomSet(v){try{v=String(v||'').trim();if(v)localStorage.setItem('SH_PRENOM',v);else localStorage.removeItem('SH_PRENOM');}catch(e){}}
+  function shParamsRefresh(){
+    try{var p=document.getElementById('shPrenom');if(p&&document.activeElement!==p)p.value=localStorage.getItem('SH_PRENOM')||'';}catch(e){}
+    try{var l=document.getElementById('shCcnLbl'),cu=localStorage.getItem('CCN_CUSTOM'),id=localStorage.getItem('CCN_IDCC'),n=localStorage.getItem('CCN_NOM');
+      if(l)l.textContent=cu?((JSON.parse(cu)||{}).nom||'Accord personnalisé'):(id&&n?n+' · IDCC '+id:'Droit commun (je ne connais pas ma CCN)');}catch(e){}
+  }
+  function qsToggleChoice(){qsRefresh();shParamsRefresh();var c=document.getElementById('qsChoice');c.style.display=c.style.display==='none'?'block':'none';}
+  function qsSet(m){try{localStorage.setItem(QS_KEY,m);}catch(e){}document.getElementById('qsChoice').style.display='none';qsRefresh();qsGo();}
+  function qsGo(){var v=qsGet();if(!v){qsRefresh();document.getElementById('qsChoice').style.display='block';return;}location.href=v+'/index.html#saisie-aujourdhui';}
+  qsRefresh();
+  window.addEventListener('pageshow',qsRefresh);
+  </script>
 </div>
 
 <div style="width:92%;max-width:420px;margin:6px auto 2px;display:flex;flex-wrap:nowrap;align-items:center;justify-content:space-between;gap:8px;">
@@ -1703,10 +1796,21 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
     <span style="font-size:20px;">📱</span> Partager en QR code
   </button>
 
+  <!-- Barre bouton : Rappels calendrier (C2) -->
+  <button onclick="openRappelsPopup()" style="
+    width:100%;padding:13px 16px;border:none;border-radius:16px;cursor:pointer;
+    background:linear-gradient(135deg,#283593,#3949ab);
+    color:#fff;font-size:14px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;gap:9px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.28);letter-spacing:.01em;">
+    <span style="font-size:20px;">📅</span> Rappels dans mon calendrier
+  </button>
+
   <!-- Nid d'abeille : 5 cercles colorés -->
   <div id="nidAbeille" style="position:relative;width:300px;height:196px;margin:0 auto;">
     <button onclick="openBackupPopup()" style="position:absolute;top:0;left:0;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#2196a6,#0d7a8a);">
       <span style="font-size:26px;line-height:1;">💾</span>Sauvegarde
+      <span id="backupAgeBadge" style="display:none;position:absolute;bottom:2px;left:50%;transform:translateX(-50%);color:#fff;border-radius:7px;font-size:9px;padding:1px 6px;font-weight:700;white-space:nowrap;text-shadow:none;"></span>
     </button>
     <button onclick="window.location.href='nouveautes.html'" style="position:absolute;top:0;left:107px;width:86px;height:86px;border-radius:50%;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#fff;font-size:10.5px;font-weight:700;text-shadow:0 1px 3px rgba(0,0,0,.3);box-shadow:0 6px 20px rgba(0,0,0,.28);padding:0;background:linear-gradient(145deg,#e65c00,#f9a825);">
       <span style="font-size:26px;line-height:1;">🆕</span>Nouveautés
@@ -1800,24 +1904,27 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
 <div id="backup-popup-overlay" style="
   display:none;position:fixed;inset:0;z-index:9999;
   background:rgba(0,0,0,0.60);backdrop-filter:blur(6px);
-  align-items:center;justify-content:center;padding:16px;"
+  align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px calc(env(safe-area-inset-bottom,0px) + 12px);"
   onclick="closeBackupPopup()">
   <div onclick="event.stopPropagation()" style="
     background:#fff;border-radius:20px;max-width:440px;width:100%;
-    max-height:90vh;overflow-y:auto;box-shadow:0 16px 56px rgba(0,0,0,0.35);">
+    max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 56px rgba(0,0,0,0.35);">
 
-    <div style="background:linear-gradient(135deg,#4FB3C2,#2196a6);padding:20px;position:relative;">
+    <div style="background:linear-gradient(135deg,#4FB3C2,#2196a6);padding:16px 20px;position:relative;flex-shrink:0;">
       <div style="font-size:20px;font-weight:700;color:#fff;">💾 Sauvegarde générale</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px;">Sauvegardez ou restaurez toutes vos données</div>
-      <button onclick="closeBackupPopup()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;color:#fff;cursor:pointer;">✕</button>
+      <button onclick="closeBackupPopup()" aria-label="Fermer" style="position:absolute;top:50%;transform:translateY(-50%);right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;color:#fff;cursor:pointer;">✕</button>
     </div>
 
-    <div style="padding:20px;">
+    <div style="padding:16px 18px 18px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;">
 
       <!-- Info -->
       <div style="background:#f0f8ff;border-left:3px solid #4FB3C2;border-radius:0 10px 10px 0;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#1a1a2e;line-height:1.5;">
-        Vos données restent <b>100 % sur votre appareil</b>. Cette sauvegarde crée un fichier que vous gardez vous-même — pratique pour changer de téléphone ou éviter toute perte. Aucune donnée n'est envoyée sur internet.
+        Tes données restent <b>sur ton téléphone</b>. La sauvegarde crée un fichier que tu gardes toi-même, pour changer de téléphone ou ne rien perdre. Rien n'est envoyé sur internet.
       </div>
+
+      <!-- Date dernière sauvegarde (C1) -->
+      <div id="backup-last" style="text-align:center;font-size:14px;font-weight:700;padding:10px;border:1px solid #ddd;border-radius:10px;margin-bottom:12px;"></div>
 
       <!-- Stats données -->
       <div id="backup-stats" style="text-align:center;font-size:12px;color:#666;margin-bottom:16px;"></div>
@@ -1829,7 +1936,7 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
         font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">
         📤 Exporter toutes mes données
       </button>
-      <div style="font-size:11px;color:#888;text-align:center;margin-bottom:18px;">Télécharge un fichier <b>.json</b> contenant l'ensemble de vos modules</div>
+      <div style="font-size:11px;color:#888;text-align:center;margin-bottom:18px;">Crée un fichier <b>.json</b> avec tous tes modules, à ranger où tu veux (Fichiers, Drive…)</div>
 
       <hr style="border:0;border-top:1px solid #eee;margin:0 0 18px;">
 
@@ -1839,7 +1946,10 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
         background:#fff;color:#2196a6;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;">
         📥 Restaurer une sauvegarde
       </button>
-      <input type="file" id="backup-import-input" accept=".json,application/json" style="display:none;" onchange="importAllData(event)">
+      <input type="file" id="backup-import-input" style="display:none;" onchange="importAllData(event)">
+      <div id="backup-ou" style="font-size:11.5px;color:#444;background:#f3f8f9;border:1px solid #d6e8eb;border-radius:10px;padding:8px 11px;margin-bottom:8px;line-height:1.4;">
+        🔎 Onglet <b>Récents</b> du sélecteur · fichier <b id="backup-nom" style="word-break:break-all;">simulheures-sauvegarde-AAAA-MM-JJ.json</b>
+      </div>
       <div style="font-size:11px;color:#c0392b;text-align:center;margin-bottom:6px;">⚠️ La restauration remplace vos données actuelles par celles du fichier</div>
 
       <div id="backup-message" style="display:none;margin-top:14px;padding:12px;border-radius:10px;font-size:13px;text-align:center;"></div>
@@ -1857,23 +1967,39 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
 function openBackupPopup() {
   const o = document.getElementById('backup-popup-overlay');
   if (!o) return;
-  // Compter les clés et la taille
+  // Ce que contiendra la copie : toutes les clés de l'appli (tout est dans le
+  // stockage local, rien ailleurs), résumées par module pour que ce soit parlant.
   try {
-    let count = 0, bytes = 0, modCount = 0;
-    // Préfixes connus des 54 modules outils
-    const modPrefixes = /^(STC_|CUM_|M8_|TR_|FAM_|RUP_|ENT_|JI_|TT_|INA_|CP_|PA_|PE_|ESS_|AN_|EFF_|LBP_|LEX_|CSE_|INV_|ALT_|AM_|ANC_|AP_|ARC_|AST_|AT_|BUL_|C2P_|CET_|CF_|CH_|CMP_|CON_|CSS_|CVR_|CV_|DAR_|DEL_|EGA_|EPA_|FC_|FER_|FOR_|GRV_|MAP_|MOB_|MOD_|MUT_|NC_|PAR_|PRC_|PRC2_|PRV_|RET_|SAB_|SS_|TR2_|TRA_|DEL_|TAIKO_)/;
+    let count = 0, bytes = 0;
+    const FAM = [
+      ['Compteur annuel', /^(DATA_REPORT_|CLOSURES_REPORT_|REPORTS_REPORT_|ANNUAL_DATE_|ANNUAL_RATE_|SPECIAL_DAYS_|EXERCISE_START_|ACTIVE_YEAR_SUFFIX|BASE_HEBDO_|AUTO_FERIE_)/],
+      ['Heures mensualisées', /^CA_HS_TRACKER_/],
+      ['Fox', /^FOX_/],
+      ['Jumeau numérique', /^DTE_/],
+      ['Mizuki', /^M5_/],
+      ['Zenji', /^M6_/],
+      ['Grilles', /^gp_/],
+      ['Plannings (Taiko)', /^TAIKO_/]
+    ];
+    const vus = {};
+    let contrats = 0;
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
+      if (BK_SKIP.test(k)) continue;
       count++;
       bytes += (k.length + (localStorage.getItem(k) || '').length);
-      if (modPrefixes.test(k)) modCount++;
+      for (const [nom, re] of FAM) { if (re.test(k)) { vus[nom] = (vus[nom] || 0) + 1; break; } }
+      if (/^M5_(C\d+_)?CONTRACT$/.test(k)) contrats++;
     }
     const kb = (bytes / 1024).toFixed(1);
+    const liste = FAM.filter(([nom]) => vus[nom]).map(([nom]) =>
+      '✓ ' + nom + (nom === 'Mizuki' && contrats > 1 ? ' (' + contrats + ' contrats)' : ''));
     const el = document.getElementById('backup-stats');
     if (el) el.innerHTML = '<b>' + count + '</b> entrées · <b>' + kb + ' Ko</b>' +
-      (modCount > 0 ? ' · <span style="color:#4CAF50"><b>' + modCount + '</b> données modules</span>' : '') +
-      '<br><small style="color:#888">Couvre les 54 modules outils + réglages</small>';
+      '<br><small style="color:#2e7d32">' + (liste.length ? liste.join(' · ') : 'Aucun module rempli pour l\'instant') +
+      '</small><br><small style="color:#888">+ outils, menu et réglages : tout est compris</small>';
   } catch(e) {}
+  bkRefresh();
   const msg = document.getElementById('backup-message');
   if (msg) msg.style.display = 'none';
   o.style.display = 'flex';
@@ -1895,76 +2021,392 @@ function backupShowMessage(text, ok) {
   m.style.color = ok ? '#2e7d32' : '#c0392b';
   m.innerHTML = text;
 }
+/* ══ C1 — Sauvegarde : date, empreinte, contrôle d'intégrité ══ */
+var BK_KEY='SH_LAST_BACKUP';
+/* Clés jamais copiées ni restaurées : état technique propre à l'appareil
+   (plantage, mode secours de la paye, réglages de test de fox, bandeau
+   d'installation iPhone, cache de déploiement, tests de stockage). */
+var BK_SKIP=/^(APP_CRASH_STATE|SH_LAST_BACKUP|SH_LAST_BACKUP_NAME|CA_HS_RECOVERY_MODE|CA_HS_LAST_CRASH|CA_DEBUG|FOX_EMU_MOCK_DATESTR|FOX_BURNOUT_OVERRIDE|FOX_SEASON_OVERRIDE|FOX_SOURCE_OVERRIDE|SH_DEPLOYED_CACHE|SH_CHECK_V1|SH_ERR_LOG|ios_banner_dismissed|__test__|test)$/;
+/* Clés conservées depuis cet appareil (consentement donné ici) */
+var BK_KEEP=/^SH_CONSENT/;
+function bkHash(str){ /* empreinte cyrb53, synchrone (iOS exige le partage dans le geste) */
+  var h1=0xdeadbeef,h2=0x41c6ce57;
+  for(var i=0,ch;i<str.length;i++){ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677);}
+  h1=Math.imul(h1^(h1>>>16),2246822507)^Math.imul(h2^(h2>>>13),3266489909);
+  h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
+  return (4294967296*(2097151&h2)+(h1>>>0)).toString(16);
+}
+function bkCanon(data){var o={};Object.keys(data).sort().forEach(function(k){o[k]=data[k];});return JSON.stringify(o);}
+function bkWeeks(data){ /* semaines distinctes saisies dans le compteur annuel (DATA_REPORT_*) */
+  var s={};
+  Object.keys(data).forEach(function(k){
+    if(k.indexOf('DATA_REPORT_')!==0)return;
+    var d;try{d=JSON.parse(data[k])||{};}catch(e){return;}
+    Object.keys(d).forEach(function(iso){
+      var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);if(!m)return;
+      var t=new Date(Date.UTC(+m[1],+m[2]-1,+m[3]));var dn=(t.getUTCDay()+6)%7;
+      t.setUTCDate(t.getUTCDate()-dn+3);var y=t.getUTCFullYear();
+      var w=1+Math.round((t-Date.UTC(y,0,4))/604800000);s[y+'-'+w]=1;
+    });
+  });
+  return Object.keys(s).length;
+}
+function bkAgeDays(){var v=localStorage.getItem(BK_KEY);if(!v)return null;var t=Date.parse(v);if(isNaN(t))return null;return Math.max(0,Math.floor((Date.now()-t)/86400000));}
+function bkAgeText(n){if(n===null)return 'aucune pour l\'instant';if(n===0)return "aujourd'hui";if(n===1)return 'hier';return 'il y a '+n+' jours';}
+function bkRefresh(){
+  var n=bkAgeDays(),late=(n===null||n>30);
+  var st=document.getElementById('backup-last');
+  if(st){st.textContent='Dernière copie de sauvegarde : '+bkAgeText(n);
+    st.style.background=late?'#fff3e0':'#e8f5e9';st.style.color=late?'#e65100':'#2e7d32';st.style.borderColor=late?'#ffb74d':'#a5d6a7';}
+  var bn=document.getElementById('backup-nom');if(bn){var nm='';try{nm=localStorage.getItem('SH_LAST_BACKUP_NAME')||'';}catch(e){}bn.textContent=nm||'simulheures-sauvegarde-AAAA-MM-JJ.json';}
+  var b=document.getElementById('backupAgeBadge');
+  if(b){b.textContent=n===null?'aucune copie':(n===0?'auj.':n+' j');b.style.background=late?'#ef6c00':'#2e7d32';b.style.display='block';}
+}
+function bkMarkDone(nom){try{localStorage.setItem(BK_KEY,new Date().toISOString());if(nom)localStorage.setItem('SH_LAST_BACKUP_NAME',nom);}catch(e){}bkRefresh();}
 function exportAllData() {
   try {
     const data = {};
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
+      if (BK_SKIP.test(k)) continue;
       data[k] = localStorage.getItem(k);
     }
     const payload = {
       app: 'SimulHeures',
       type: 'backup-complet',
-      version: 1,
+      version: 2,
       date: new Date().toISOString(),
       nbCles: Object.keys(data).length,
+      nbSemaines: bkWeeks(data),
+      empreinte: bkHash(bkCanon(data)),
       data: data
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const txt = JSON.stringify(payload, null, 2);
     const d = new Date();
-    const stamp = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
-    a.href = url;
-    a.download = 'simulheures-sauvegarde-' + stamp + '.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-    if(window.hsIsAndroid&&window.hsIsAndroid())window.hsFileSnack(blob,a.download,{kind:'backup',accent:'#2196a6'});
-    backupShowMessage('✅ Sauvegarde téléchargée (' + payload.nbCles + ' entrées). Conservez ce fichier en lieu sûr.', true);
+    const fn = 'simulheures-sauvegarde-' + d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + '.json';
+    const okMsg = '✅ Sauvegarde créée (' + payload.nbCles + ' entrées, ' + payload.nbSemaines + ' semaines saisies). Range-la dans Fichiers, Drive ou ta messagerie.';
+    const isAnd = window.hsIsAndroid && window.hsIsAndroid();
+    /* iOS / navigateurs compatibles : partage natif, appelé dans le geste */
+    if (!isAnd && navigator.share) {
+      try {
+        const f = new File([txt], fn, { type: 'application/json' });
+        if (navigator.canShare && navigator.canShare({ files: [f] })) {
+          navigator.share({ files: [f], title: 'Sauvegarde SimulHeures' })
+            .then(function(){ bkMarkDone(fn); backupShowMessage(okMsg, true); })
+            .catch(function(err){
+              if (err && err.name === 'AbortError') backupShowMessage('Sauvegarde annulée : aucun fichier enregistré.', false);
+              else bkDownload(txt, fn, okMsg);
+            });
+          return;
+        }
+      } catch(e) {}
+    }
+    bkDownload(txt, fn, okMsg);
   } catch(e) {
     backupShowMessage('❌ Erreur lors de l\'export : ' + e.message, false);
   }
+}
+function bkDownload(txt, fn, okMsg){
+  const blob = new Blob([txt], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = fn;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  if (window.hsIsAndroid && window.hsIsAndroid()) window.hsFileSnack(blob, fn, { kind:'backup', accent:'#2196a6' });
+  bkMarkDone(fn);
+  backupShowMessage(okMsg, true);
+}
+/* Contrôle complet AVANT de toucher au stockage. Renvoie {ok, err, data, info} */
+function bkCheck(parsed){
+  if (!parsed || parsed.app !== 'SimulHeures' || !parsed.data || typeof parsed.data !== 'object')
+    return { ok:false, err:'ce n\'est pas une sauvegarde SimulHeures.' };
+  const v = Number(parsed.version);
+  if (v !== 1 && v !== 2) return { ok:false, err:'version ' + parsed.version + ' inconnue — mets l\'appli à jour.' };
+  const data = parsed.data, keys = Object.keys(data);
+  for (let i = 0; i < keys.length; i++) if (typeof data[keys[i]] !== 'string') return { ok:false, err:'entrée « ' + keys[i] + ' » illisible.' };
+  if (typeof parsed.nbCles === 'number' && parsed.nbCles !== keys.length)
+    return { ok:false, err:'fichier incomplet : ' + keys.length + ' entrées sur ' + parsed.nbCles + ' annoncées.' };
+  if (v === 2) {
+    if (bkHash(bkCanon(data)) !== parsed.empreinte) return { ok:false, err:'le contenu ne correspond pas à son empreinte (fichier modifié ou abîmé).' };
+    const w = bkWeeks(data);
+    if (typeof parsed.nbSemaines === 'number' && w !== parsed.nbSemaines)
+      return { ok:false, err:'fichier incomplet : ' + w + ' semaines saisies sur ' + parsed.nbSemaines + ' annoncées.' };
+  }
+  return { ok:true, data:data, info:{ v:v, nb:keys.length, sem:bkWeeks(data) } };
 }
 function importAllData(event) {
   const file = event.target.files && event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = function(e) {
+    let parsed;
+    try { parsed = JSON.parse(e.target.result); }
+    catch(err) { backupShowMessage('❌ Ce fichier n\'est pas une sauvegarde lisible (il doit s\'appeler simulheures-sauvegarde-….json), ou il est tronqué. Rien n\'a été modifié.', false); event.target.value=''; return; }
+    const chk = bkCheck(parsed);
+    if (!chk.ok) { backupShowMessage('❌ Restauration refusée : ' + chk.err + '<br>Rien n\'a été modifié.', false); event.target.value=''; return; }
+    const dateTxt = parsed.date ? new Date(parsed.date).toLocaleDateString('fr-FR') : 'inconnue';
+    const warnV1 = chk.info.v === 1 ? '\n\nAncien format : pas d\'empreinte, contrôle partiel seulement.' : '';
+    if (!confirm('Restaurer cette sauvegarde ?\n\nDate : ' + dateTxt + '\nEntrées : ' + chk.info.nb + '\nSemaines saisies : ' + chk.info.sem + warnV1 + '\n\n⚠️ Tes données actuelles seront remplacées. L\'application va se recharger.')) { event.target.value=''; return; }
+    /* Copie de l'état actuel, pour revenir en arrière si l'écriture échoue */
+    const before = {};
+    for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); before[k] = localStorage.getItem(k); }
     try {
-      const parsed = JSON.parse(e.target.result);
-      const data = parsed && parsed.data ? parsed.data : null;
-      if (!data || typeof data !== 'object') {
-        backupShowMessage('❌ Fichier invalide : ce n\'est pas une sauvegarde SimulHeures.', false);
-        event.target.value = '';
-        return;
-      }
-      const nb = Object.keys(data).length;
-      const dateTxt = parsed.date ? new Date(parsed.date).toLocaleDateString('fr-FR') : 'inconnue';
-      if (!confirm('Restaurer cette sauvegarde ?\n\nDate : ' + dateTxt + '\nEntrées : ' + nb + '\n\n⚠️ Vos données actuelles seront remplacées. L\'application va se recharger.')) {
-        event.target.value = '';
-        return;
-      }
       localStorage.clear();
-      for (const k in data) {
-        if (Object.prototype.hasOwnProperty.call(data, k)) {
-          localStorage.setItem(k, data[k]);
-        }
-      }
-      backupShowMessage('✅ Sauvegarde restaurée. Rechargement…', true);
-      setTimeout(function(){ location.reload(); }, 1200);
+      Object.keys(chk.data).forEach(function(k){ if (!BK_SKIP.test(k) && !BK_KEEP.test(k)) localStorage.setItem(k, chk.data[k]); });
+      Object.keys(before).forEach(function(k){ if (BK_KEEP.test(k)) localStorage.setItem(k, before[k]); });
+      if (parsed.date) localStorage.setItem(BK_KEY, parsed.date);
     } catch(err) {
-      backupShowMessage('❌ Impossible de lire le fichier : ' + err.message, false);
-      event.target.value = '';
+      try { localStorage.clear(); Object.keys(before).forEach(function(k){ localStorage.setItem(k, before[k]); }); } catch(_) {}
+      backupShowMessage('❌ Écriture impossible (' + err.name + ') : tes données d\'avant ont été remises.', false);
+      event.target.value=''; return;
     }
+    backupShowMessage('✅ Sauvegarde restaurée. Rechargement…', true);
+    setTimeout(function(){ location.reload(); }, 1200);
   };
-  reader.onerror = function() {
-    backupShowMessage('❌ Erreur de lecture du fichier.', false);
-    event.target.value = '';
-  };
+  reader.onerror = function() { backupShowMessage('❌ Erreur de lecture du fichier.', false); event.target.value=''; };
   reader.readAsText(file);
 }
+function bkInit(){bkRefresh();if(location.hash==='#sauvegarde'){try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}openBackupPopup();}}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bkInit); else bkInit();
+</script>
+
+<!-- ══ POPUP RAPPELS CALENDRIER (C2) ═══════════════════════════ -->
+<div id="rappels-popup-overlay" style="
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.60);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px calc(env(safe-area-inset-bottom,0px) + 12px);"
+  onclick="closeRappelsPopup()">
+  <div onclick="event.stopPropagation()" style="
+    background:#fff;border-radius:20px;max-width:440px;width:100%;
+    max-height:calc(100vh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 24px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 16px 56px rgba(0,0,0,0.35);color:#1a1a2e;">
+    <div style="background:linear-gradient(135deg,#283593,#3949ab);padding:16px 56px 16px 20px;position:relative;flex-shrink:0;">
+      <div style="font-size:20px;font-weight:700;color:#fff;">📅 Rappels dans mon calendrier</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px;">Pas de notification : c'est ton calendrier qui te prévient</div>
+      <button onclick="closeRappelsPopup()" aria-label="Fermer" style="position:absolute;top:50%;transform:translateY(-50%);right:14px;background:rgba(255,255,255,0.2);border:none;border-radius:50%;width:32px;height:32px;font-size:18px;color:#fff;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:16px 18px 18px;font-size:13px;line-height:1.5;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;min-height:0;">
+      <div style="background:#eef0fb;border-left:3px solid #3949ab;border-radius:0 10px 10px 0;padding:10px 12px;margin-bottom:16px;font-size:12px;">
+        Chez nous, on trouve qu'il y a déjà trop de notifications sur les téléphones. Alors ici, pas de notification : c'est toi qui gères tes rappels comme tu veux, dans ton calendrier. Tu les modifies ou les supprimes quand tu veux.
+      </div>
+
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;cursor:pointer;">
+        <input type="checkbox" id="rp-hebdo-on" style="margin-top:3px;width:18px;height:18px;">
+        <span><b>Saisir mes heures</b><br><span style="color:#666;font-size:12px;">Une fois, chaque semaine ou chaque mois</span></span>
+      </label>
+      <div style="margin:0 0 16px 28px;">
+        <div id="rp-freq" role="group" aria-label="Fréquence" style="display:flex;border:2px solid #3949ab;border-radius:10px;overflow:hidden;margin-bottom:10px;">
+          <button type="button" data-f="once" style="flex:1;padding:8px 4px;border:none;font-size:13px;font-weight:700;cursor:pointer;">Une fois</button>
+          <button type="button" data-f="week" style="flex:1;padding:8px 4px;border:none;border-left:2px solid #3949ab;border-right:2px solid #3949ab;font-size:13px;font-weight:700;cursor:pointer;">Chaque semaine</button>
+          <button type="button" data-f="month" style="flex:1;padding:8px 4px;border:none;font-size:13px;font-weight:700;cursor:pointer;">Chaque mois</button>
+        </div>
+        <div id="rp-days" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        <label id="rp-once" style="display:none;align-items:center;gap:8px;">Le <input type="date" id="rp-date" style="font-size:15px;padding:6px 8px;border:1px solid #ccc;border-radius:8px;"></label>
+        <label id="rp-month" style="display:none;align-items:center;gap:8px;">Le <select id="rp-mday" style="font-size:15px;padding:6px 8px;border:1px solid #ccc;border-radius:8px;"></select> de chaque mois</label>
+      </div>
+
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;cursor:pointer;">
+        <input type="checkbox" id="rp-periode-on" style="margin-top:3px;width:18px;height:18px;">
+        <span><b>Fin de période</b><br><span id="rp-periode-src" style="color:#666;font-size:12px;"></span></span>
+      </label>
+
+      <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:16px;cursor:pointer;">
+        <input type="checkbox" id="rp-bilan-on" style="margin-top:3px;width:18px;height:18px;">
+        <span><b>Bilan annuel</b><br><span id="rp-bilan-src" style="color:#666;font-size:12px;"></span></span>
+      </label>
+
+      <label style="display:flex;gap:10px;align-items:center;margin-bottom:18px;">
+        <span style="flex:1;"><b>Heure des rappels</b></span>
+        <input type="time" id="rp-heure" value="17:00" style="font-size:15px;padding:6px 8px;border:1px solid #ccc;border-radius:8px;">
+      </label>
+
+      <button onclick="rappelsExport()" style="
+        width:100%;padding:14px;border:none;border-radius:12px;
+        background:linear-gradient(135deg,#283593,#3949ab);color:#fff;
+        font-size:15px;font-weight:700;cursor:pointer;">
+        Ajouter à mon calendrier
+      </button>
+      <button id="rp-direct" onclick="window._rpShare=true;rappelsExport()" style="display:none;width:100%;padding:11px;margin-top:10px;border:2px solid #3949ab;border-radius:12px;background:#fff;color:#283593;font-size:14px;font-weight:700;cursor:pointer;">
+        Rien ne s'ouvre ? Envoyer le fichier (Mail, Fichiers…)
+      </button>
+      <div style="font-size:11px;color:#888;text-align:center;margin-top:8px;">Pour arrêter un rappel, supprime-le dans ton calendrier.</div>
+
+      <div id="rp-message" style="display:none;margin-top:14px;padding:12px;border-radius:10px;font-size:13px;text-align:center;"></div>
+
+      <button onclick="closeRappelsPopup()" style="
+        width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;
+        background:#f5f5f5;color:#555;font-size:14px;font-weight:600;cursor:pointer;margin-top:16px;">
+        ← Retour au menu
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══ C2 — Rappels par le calendrier (.ics), sans notification ni serveur ══ */
+var RP_KEY='SH_RAPPELS';
+var RP_DAYS=[['MO','L'],['TU','M'],['WE','M'],['TH','J'],['FR','V'],['SA','S'],['SU','D']];
+function rpLoad(){var d={hebdo:{on:true,freq:'week',days:['FR'],mday:-1,date:''},periode:{on:true},bilan:{on:true},heure:'17:00',seq:0};
+  try{var s=JSON.parse(localStorage.getItem(RP_KEY)||'null');if(s){for(var k in s)d[k]=s[k];}}catch(e){}
+  if(!d.hebdo.freq)d.hebdo.freq='week';if(d.hebdo.mday===undefined)d.hebdo.mday=-1;if(!d.hebdo.date)d.hebdo.date='';return d;}
+function rpIsIOS(){var u=navigator.userAgent||'';return /iPad|iPhone|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);}
+function rpSetFreq(f){[].slice.call(document.querySelectorAll('#rp-freq button')).forEach(function(b){var on=b.getAttribute('data-f')===f;b.setAttribute('aria-pressed',on?'true':'false');b.style.background=on?'#3949ab':'#fff';b.style.color=on?'#fff':'#3949ab';});
+  document.getElementById('rp-days').style.display=f==='week'?'flex':'none';
+  document.getElementById('rp-once').style.display=f==='once'?'flex':'none';
+  document.getElementById('rp-month').style.display=f==='month'?'flex':'none';}
+function rpGetFreq(){var b=document.querySelector('#rp-freq button[aria-pressed="true"]');return b?b.getAttribute('data-f'):'week';}
+function rpSave(o){try{localStorage.setItem(RP_KEY,JSON.stringify(o));}catch(e){}}
+function rpPad(n){return ('0'+n).slice(-2);}
+function rpISO(d){return d.getFullYear()+'-'+rpPad(d.getMonth()+1)+'-'+rpPad(d.getDate());}
+/* Clôtures futures du compteur annuel (M1), exercice actif */
+function rpClosures(){
+  try{var y=localStorage.getItem('ACTIVE_YEAR_SUFFIX')||String(new Date().getFullYear());
+    var l=JSON.parse(localStorage.getItem('CLOSURES_REPORT_'+y)||'[]')||[],t=rpISO(new Date());
+    return l.filter(function(d){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&d>=t;}).sort();}catch(e){return [];}
+}
+/* Date de bilan du compteur annuel (M1), sinon 31/12 */
+function rpBilanDate(){
+  try{var y=localStorage.getItem('ACTIVE_YEAR_SUFFIX')||String(new Date().getFullYear());
+    var a=localStorage.getItem('ANNUAL_DATE_'+y)||'';if(/^\d{4}-\d{2}-\d{2}$/.test(a))return {iso:a,src:'m1'};}catch(e){}
+  return {iso:new Date().getFullYear()+'-12-31',src:'defaut'};
+}
+function rpFr(iso){return iso.split('-').reverse().join('/');}
+function openRappelsPopup(){
+  var o=document.getElementById('rappels-popup-overlay');if(!o)return;
+  var s=rpLoad();
+  var box=document.getElementById('rp-days');box.innerHTML='';
+  RP_DAYS.forEach(function(p){var b=document.createElement('button');b.type='button';b.textContent=p[1];b.setAttribute('data-d',p[0]);
+    var on=s.hebdo.days.indexOf(p[0])>=0;b.setAttribute('aria-pressed',on?'true':'false');
+    b.style.cssText='width:36px;height:36px;border-radius:50%;font-weight:700;font-size:13px;cursor:pointer;border:2px solid #3949ab;';
+    rpDayStyle(b);b.onclick=function(){b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');rpDayStyle(b);};
+    box.appendChild(b);});
+  var ms=document.getElementById('rp-mday');ms.innerHTML='';
+  for(var j=1;j<=28;j++){var op=document.createElement('option');op.value=j;op.textContent=j===1?'1er':String(j);ms.appendChild(op);}
+  var ol=document.createElement('option');ol.value=-1;ol.textContent='dernier jour';ms.appendChild(ol);
+  ms.value=String(s.hebdo.mday);
+  var dt=document.getElementById('rp-date');var tmr=new Date();tmr.setDate(tmr.getDate()+1);dt.min=rpISO(new Date());dt.value=(s.hebdo.date&&s.hebdo.date>=dt.min)?s.hebdo.date:rpISO(tmr);
+  [].slice.call(document.querySelectorAll('#rp-freq button')).forEach(function(b){b.onclick=function(){rpSetFreq(b.getAttribute('data-f'));};});
+  rpSetFreq(s.hebdo.freq);
+  document.getElementById('rp-direct').style.display='none';
+  document.getElementById('rp-hebdo-on').checked=!!s.hebdo.on;
+  document.getElementById('rp-periode-on').checked=!!s.periode.on;
+  document.getElementById('rp-bilan-on').checked=!!s.bilan.on;
+  document.getElementById('rp-heure').value=s.heure||'17:00';
+  var cl=rpClosures();
+  document.getElementById('rp-periode-src').textContent=cl.length
+    ?'Le jour de chacune des '+cl.length+' prochaines clôtures de ton compteur annuel'
+    :'Le dernier jour de chaque mois (aucune clôture à venir dans ton compteur annuel)';
+  var bd=rpBilanDate();
+  document.getElementById('rp-bilan-src').textContent=(bd.src==='m1'?'Chaque année le ':'Chaque année le 31/12 — ')+(bd.src==='m1'?rpFr(bd.iso).slice(0,5)+' (date de ton compteur annuel)':'pas de date de bilan dans ton compteur annuel');
+  var m=document.getElementById('rp-message');if(m)m.style.display='none';
+  o.style.display='flex';
+  if(typeof lockScroll==='function')lockScroll();else document.body.style.overflow='hidden';
+}
+function rpDayStyle(b){var on=b.getAttribute('aria-pressed')==='true';b.style.background=on?'#3949ab':'#fff';b.style.color=on?'#fff':'#3949ab';}
+function closeRappelsPopup(){var o=document.getElementById('rappels-popup-overlay');if(!o)return;o.style.display='none';
+  if(typeof unlockScroll==='function')unlockScroll();else document.body.style.overflow='';}
+function rpMsgPartage(n){
+  if(window._rpIosAutre){window._rpIosAutre=false;
+    rpMsg('Ce navigateur ne sait pas ouvrir Calendrier sur iPhone. Le plus simple : ouvre SimulHeures dans Safari. Sinon, envoie-toi le fichier par Mail et touche la pièce jointe.',false);return true;}
+  return false;}
+function rpMsg(t,ok){var m=document.getElementById('rp-message');if(!m)return;m.style.display='block';
+  m.style.background=ok?'#e8f5e9':'#fdecea';m.style.color=ok?'#2e7d32':'#c0392b';m.textContent=t;}
+function rpEsc(t){return String(t).replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');}
+function rpStamp(iso,hm){return iso.replace(/-/g,'')+'T'+hm.replace(':','')+'00';}
+function rpUtcNow(){var d=new Date();return d.getUTCFullYear()+rpPad(d.getUTCMonth()+1)+rpPad(d.getUTCDate())+'T'+rpPad(d.getUTCHours())+rpPad(d.getUTCMinutes())+rpPad(d.getUTCSeconds())+'Z';}
+function rpEndHM(hm){var p=hm.split(':'),m=(+p[0])*60+(+p[1])+15;if(m>=1440)m=1439;return rpPad(Math.floor(m/60))+':'+rpPad(m%60);}
+/* Construit le calendrier. Les UID sont stables : réimporter met à jour au lieu de doubler. */
+function rpBuildICS(s){
+  var hm=/^\d{2}:\d{2}$/.test(s.heure)?s.heure:'17:00',end=rpEndHM(hm),now=rpUtcNow(),ev=[],n=0;
+  function add(uid,iso,sum,desc,rrule){n++;
+    ev.push('BEGIN:VEVENT','UID:'+uid+'@simulheures','SEQUENCE:'+s.seq,'DTSTAMP:'+now,
+      'DTSTART:'+rpStamp(iso,hm),'DTEND:'+rpStamp(iso,end),'SUMMARY:'+rpEsc(sum),'DESCRIPTION:'+rpEsc(desc));
+    if(rrule)ev.push('RRULE:'+rrule);
+    ev.push('BEGIN:VALARM','TRIGGER:PT0M','ACTION:DISPLAY','DESCRIPTION:'+rpEsc(sum),'END:VALARM','END:VEVENT');}
+  var today=new Date();today.setHours(0,0,0,0);
+  if(s.hebdo.on&&s.hebdo.freq==='once'&&s.hebdo.date){
+    add('sh-saisie-hebdo',s.hebdo.date,'Coucou, c\'est l\'heure de checker tes heures !','Ouvre SimulHeures pour saisir tes heures.');
+  }
+  else if(s.hebdo.on&&s.hebdo.freq==='month'){
+    var md=Number(s.hebdo.mday)||-1,dm;
+    if(md===-1)dm=new Date(today.getFullYear(),today.getMonth()+1,0);
+    else{dm=new Date(today.getFullYear(),today.getMonth(),md);if(dm<today)dm=new Date(today.getFullYear(),today.getMonth()+1,md);}
+    add('sh-saisie-hebdo',rpISO(dm),'Coucou, c\'est l\'heure de checker tes heures !','Ouvre SimulHeures pour saisir tes heures du mois.','FREQ=MONTHLY;BYMONTHDAY='+md);
+  }
+  else if(s.hebdo.on&&s.hebdo.days.length){
+    /* premier jour choisi à partir d'aujourd'hui */
+    var codes=['SU','MO','TU','WE','TH','FR','SA'],d=new Date(today);
+    for(var i=0;i<7;i++){if(s.hebdo.days.indexOf(codes[d.getDay()])>=0)break;d.setDate(d.getDate()+1);}
+    var order=RP_DAYS.map(function(p){return p[0];}).filter(function(c){return s.hebdo.days.indexOf(c)>=0;});
+    add('sh-saisie-hebdo',rpISO(d),'Coucou, c\'est l\'heure de checker tes heures !','Ouvre SimulHeures pour saisir tes heures de la semaine.','FREQ=WEEKLY;BYDAY='+order.join(','));
+  }
+  if(s.periode.on){
+    var cl=rpClosures();
+    if(cl.length)cl.forEach(function(iso){add('sh-cloture-'+iso,iso,'Coucou, c\'est l\'heure de checker tes heures : fin de période','Dernier jour de la période. Vérifie ta saisie avant la clôture.');});
+    else{var e=new Date(today.getFullYear(),today.getMonth()+1,0);
+      add('sh-fin-mois',rpISO(e),'Coucou, c\'est l\'heure de checker tes heures : fin de période','Dernier jour du mois. Vérifie ta saisie avant la clôture.','FREQ=MONTHLY;BYMONTHDAY=-1');}
+  }
+  if(s.bilan.on){
+    var bd=rpBilanDate(),p=bd.iso.split('-'),b=new Date(today.getFullYear(),+p[1]-1,+p[2]);
+    if(b<today)b.setFullYear(b.getFullYear()+1);
+    add('sh-bilan-annuel',rpISO(b),'Coucou, c\'est l\'heure de checker tes heures : bilan annuel','Fin de ton année de référence : fais ton bilan dans SimulHeures, puis une copie de sauvegarde.','FREQ=YEARLY');
+  }
+  var L=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//SimulHeures//Rappels//FR','CALSCALE:GREGORIAN','METHOD:PUBLISH','X-WR-CALNAME:SimulHeures'].concat(ev,['END:VCALENDAR']);
+  return {txt:L.join('\r\n'),n:n};
+}
+function rappelsExport(){
+  var s=rpLoad();
+  s.hebdo.on=document.getElementById('rp-hebdo-on').checked;
+  s.hebdo.days=[].slice.call(document.querySelectorAll('#rp-days button')).filter(function(b){return b.getAttribute('aria-pressed')==='true';}).map(function(b){return b.getAttribute('data-d');});
+  s.periode.on=document.getElementById('rp-periode-on').checked;
+  s.bilan.on=document.getElementById('rp-bilan-on').checked;
+  s.heure=document.getElementById('rp-heure').value||'17:00';
+  s.hebdo.freq=rpGetFreq();
+  s.hebdo.mday=Number(document.getElementById('rp-mday').value)||-1;
+  s.hebdo.date=document.getElementById('rp-date').value||'';
+  if(s.hebdo.on&&s.hebdo.freq==='week'&&!s.hebdo.days.length){rpMsg('Choisis au moins un jour pour le rappel de saisie.',false);return;}
+  if(s.hebdo.on&&s.hebdo.freq==='once'&&!s.hebdo.date){rpMsg('Choisis la date du rappel de saisie.',false);return;}
+  s.seq=(Number(s.seq)||0)+1;
+  var r=rpBuildICS(s);
+  if(!r.n){rpMsg('Coche au moins un rappel.',false);return;}
+  rpSave(s);
+  window._rpLast=r;
+  /* Chrome, Firefox, Edge… sur iPhone n'ouvrent pas Calendrier (page blanche) : on passe par le partage */
+  var iosAutre=rpIsIOS()&&/CriOS|FxiOS|EdgiOS|OPiOS/.test(navigator.userAgent||'');
+  if(rpIsIOS()&&!iosAutre&&!window._rpShare){rappelsOpenDirect();document.getElementById('rp-direct').style.display='block';return;}
+  if(iosAutre&&!window._rpShare)window._rpIosAutre=true;
+  window._rpShare=false;
+  var fn='simulheures-rappels.ics',shared=false;
+  /* iOS : partage natif dans le geste (même modèle que taiko.html icsExport) */
+  if(navigator.share){
+    try{var f=new File([r.txt],fn,{type:'text/calendar'});
+      if(navigator.canShare&&navigator.canShare({files:[f]})){
+        navigator.share({files:[f],title:'Rappels SimulHeures'})
+          .then(function(){if(!rpMsgPartage())rpMsg(r.n+' rappel(s) prêt(s). Choisis Calendrier ou Agenda pour les ajouter.',true);})
+          .catch(function(err){if(err&&err.name==='AbortError'){if(!rpMsgPartage())rpMsg('Ajout annulé.',false);}else rpFallback(r,fn);});
+        shared=true;}}catch(e){}
+  }
+  if(!shared)rpFallback(r,fn);
+}
+/* iOS : la feuille de partage ne propose pas Calendrier. Ouvrir le .ics
+   directement dans Safari affiche l'aperçu « Ajouter tout ». */
+function rpB64(txt){var b=btoa(unescape(encodeURIComponent(txt)));return b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+/* iOS : ouvre une vraie adresse https (rappels.ics), fabriquée par le service worker
+   sur le téléphone, pour que Calendrier propose « Ajouter tout ». */
+function rappelsOpenDirect(){
+  var r=window._rpLast;if(!r)return;
+  if(!(navigator.serviceWorker&&navigator.serviceWorker.controller)){
+    rpMsg('Ouverture directe indisponible (appli pas encore prête hors ligne). Utilise « Envoyer le fichier » → Mail vers toi, puis touche le fichier.',false);return;}
+  rpMsg('Ouverture de Calendrier… touche « Ajouter tout ».',true);
+  location.href='rappels.ics?c='+rpB64(r.txt);
+}
+function rpFallback(r,fn){
+  try{var a=document.createElement('a');a.href='data:text/calendar;charset=utf-8,'+encodeURIComponent(r.txt);a.download=fn;a.target='_blank';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);}catch(e){}
+  if(!rpMsgPartage())rpMsg(r.n+' rappel(s) prêt(s). Ouvre le fichier simulheures-rappels.ics pour les ajouter à ton calendrier.',true);
+}
+(function(){function go(){if(location.hash==='#rappels'){try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}openRappelsPopup();}}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',go);else go();})();
 </script>
 
 <!-- ══ POPUP PARTAGE ══════════════════════════════════════════ -->
@@ -2300,6 +2742,7 @@ document.addEventListener('keydown', function(e){
         display:inline-flex;align-items:center;gap:8px;letter-spacing:0.2px;">
         ✉️ Nous contacter
       </button>
+      <div style="margin-top:10px;"><a href="etat-appli.html" style="font-size:12px;color:#8fd3dd;font-weight:600;text-decoration:none;">🩺 État de l'appli · mise à jour</a></div>
     </div>
 
     <!-- Application indépendante -->
@@ -2450,6 +2893,20 @@ document.addEventListener('keydown', function(e){
         font-size:14px;background:#fff;color:#222;margin-bottom:6px;
         box-sizing:border-box;font-family:inherit;resize:vertical;min-height:100px;"></textarea>
 
+      <!-- 01/10/2026 : rapport technique (facultatif, visible avant l'envoi) -->
+      <div style="margin:4px 0 12px;padding:10px 12px;border:1px solid rgba(33,150,166,0.3);border-radius:10px;background:rgba(33,150,166,0.05);">
+        <label style="display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#234;cursor:pointer;">
+          <input type="checkbox" id="contact-diag" style="width:18px;height:18px;margin-top:1px;flex:none;">
+          <span><b>Joindre le rapport de plantage</b><br><span style="font-size:11.5px;color:rgba(0,0,0,0.55);">Version de l'appli, type d'appareil et de navigateur, dernières erreurs techniques. Rien sur tes heures ni sur ton travail, aucune donnée personnelle.</span></span>
+        </label>
+        <div style="display:flex;gap:12px;margin-top:6px;padding-left:26px;">
+          <a href="#" onclick="hsVoirDiag();return false" style="font-size:12px;color:#2196a6;font-weight:600;">Voir le rapport</a>
+          <a href="#" onclick="hsCopierDiag();return false" style="font-size:12px;color:#2196a6;font-weight:600;">Copier</a>
+          <a href="etat-appli.html" style="font-size:12px;color:#2196a6;font-weight:600;">État de l'appli</a>
+        </div>
+        <pre id="contact-diag-txt" style="display:none;margin:8px 0 0;padding:8px;max-height:180px;overflow:auto;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:6px;font-size:10.5px;line-height:1.35;white-space:pre-wrap;color:#333;"></pre>
+      </div>
+
       <div style="font-size:10px;color:rgba(0,0,0,0.5);margin-bottom:14px;line-height:1.4;">
         🔒 Aucune donnée n'est stockée sur nos serveurs. Le bouton « Envoyer » ouvre votre application mail avec un message pré-rempli — vous restez maître de l'envoi.
       </div>
@@ -2505,15 +2962,29 @@ function sendContactMail() {
   if (email) body += 'Email : ' + email + '\n';
   body += 'Envoyé depuis : Simulateur Heures Sup France (PWA)\n';
   body += 'Date : ' + new Date().toLocaleString('fr-FR');
-  // User Agent (info debug)
-  body += '\nNavigateur : ' + (navigator.userAgent || '').substring(0, 80);
-  const href = 'mailto:' + to
-    + '?subject=' + encodeURIComponent(mailSubject)
-    + '&body=' + encodeURIComponent(body);
-  window.location.href = href;
-  // Fermer après un petit délai (laisse le temps au mail client de s'ouvrir)
-  setTimeout(closeContactPopup, 600);
+  const envoyer = (diag) => {
+    if (diag) body += '\n\n— — — Rapport de plantage — — —\n' + diag;
+    else body += '\nNavigateur : ' + (navigator.userAgent || '').substring(0, 80);
+    const href = 'mailto:' + to
+      + '?subject=' + encodeURIComponent(mailSubject)
+      + '&body=' + encodeURIComponent(body);
+    window.location.href = href;
+    // Fermer après un petit délai (laisse le temps au mail client de s'ouvrir)
+    setTimeout(closeContactPopup, 600);
+  };
+  const cb = document.getElementById('contact-diag');
+  if (cb && cb.checked && window.hsDiagnostic) hsDiagnostic().then(envoyer, () => envoyer(''));
+  else envoyer('');
 }
+/* 01/10/2026 : rapport de plantage — coché d'office pour un signalement de bug, visible avant l'envoi */
+function hsVoirDiag(){const pre=document.getElementById('contact-diag-txt');if(!pre)return;
+  if(pre.style.display==='block'){pre.style.display='none';return;}
+  pre.textContent='…';pre.style.display='block';if(window.hsDiagnostic)hsDiagnostic().then(t=>{pre.textContent=t;});}
+function hsCopierDiag(){if(!window.hsDiagnostic)return;hsDiagnostic().then(t=>{
+  const ok=()=>{try{alert('Rapport copié : colle-le dans ton message.');}catch(e){}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(ok,()=>{const pre=document.getElementById('contact-diag-txt');if(pre){pre.textContent=t;pre.style.display='block';}});
+  else{const pre=document.getElementById('contact-diag-txt');if(pre){pre.textContent=t;pre.style.display='block';}}});}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='contact-subject'){const cb=document.getElementById('contact-diag');if(cb)cb.checked=/bug/i.test(e.target.value);}});
 // Fermer au clic sur le fond
 document.addEventListener('DOMContentLoaded', function(){
   const ov = document.getElementById('contact-popup-overlay');
@@ -3132,6 +3603,7 @@ document.addEventListener('DOMContentLoaded', function(){
     if (custom) { try { const c = JSON.parse(custom); label = '⚙️ ' + (c.nom || 'Accord personnalisé'); } catch(e){} }
     else if (idcc && nom) { label = nom + ' · IDCC ' + idcc; }
     document.getElementById('ccn-badge-name').textContent = label;
+    if (typeof shParamsRefresh === 'function') shParamsRefresh();
   }
 
   function openCCNModal() {
@@ -3914,7 +4386,8 @@ function hasConsent(){
       btn.classList.toggle('active', persoActive);
     }
     var btnTop = document.getElementById('btnPersoTop');
-    if(btnTop){ btnTop.textContent = persoActive ? '✅ Terminer la personnalisation' : '✏️ Personnaliser le menu'; }
+    var btnTopL = document.getElementById('btnPersoTopLbl');
+    if(btnTopL){ btnTopL.innerHTML = persoActive ? 'Terminer' : 'Personnaliser<br>le menu'; }
     // Réafficher temporairement les modules cachés en mode perso (atténués)
     if(persoActive){
       var h = getHidden();
@@ -4132,10 +4605,12 @@ function hasConsent(){
   function checkNewBadge(){
     try{
       var seen = localStorage.getItem('NV_SEEN');
-      // On stocke la date de la dernière nouveauté dans nouveautes.html (data-latest)
-      // Pour l'instant on affiche toujours si jamais vu
+      // Dernière version publiée dans nouveautes.html : à changer en même temps
+      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026).
+      // Avant, le badge ne s'affichait qu'une seule fois dans la vie de l'appli.
+      var NV_DERNIERE = 'v10.10';
       var badge = document.getElementById('badgeNew');
-      if(badge && !seen){ badge.style.display='inline'; }
+      if(badge && seen !== NV_DERNIERE){ badge.style.display='inline'; }
     }catch(e){}
   }
 
@@ -4219,10 +4694,10 @@ function hasConsent(){
     var h='';
     h+='<div style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);'
       +'border-left:3px solid '+ech(couleur)+';border-radius:12px;padding:12px 14px;'
-      +'touch-action:pan-y;user-select:none;-webkit-user-select:none">';
+      +'touch-action:pan-y;user-select:none;-webkit-user-select:none;overflow:hidden;min-width:0">'; /* 27/09/2026 : un long texte ne déborde plus */
 
     h+='<div style="display:flex;align-items:center;gap:8px;justify-content:space-between">';
-    h+='<div style="font-weight:700;font-size:13px;color:#fff;line-height:1.3">'+ech(titre)+'</div>';
+    h+='<div style="font-weight:700;font-size:13px;color:#fff;line-height:1.3;min-width:0;overflow-wrap:anywhere">'+ech(titre)+'</div>';
     /* Deux chevrons discrets : sans eux, rien n'indiquerait que l'encart se
        balaie. Ils servent aussi de repli quand le geste passe mal. */
     h+='<div style="display:flex;gap:4px;flex-shrink:0">'
@@ -4235,7 +4710,7 @@ function hasConsent(){
     h+='</div>';
 
     if(offset===0 && mode==='full' && data.ctx){
-      h+='<div style="font-size:11.5px;opacity:.72;color:#fff;margin-top:5px;font-style:italic">'
+      h+='<div style="font-size:11.5px;opacity:.72;color:#fff;margin-top:5px;font-style:italic;overflow-wrap:anywhere">'
         +ech(data.ctx)+'</div>';
     }
 
@@ -4244,7 +4719,7 @@ function hasConsent(){
       items.slice(0,4).forEach(function(it){
         h+='<div style="font-size:12px;color:#fff;opacity:.9;display:flex;gap:7px">'
           +(it.h?'<span style="opacity:.6;font-variant-numeric:tabular-nums;flex-shrink:0">'+ech(it.h)+'</span>':'')
-          +'<span>'+ech(it.t)+'</span></div>';
+          +'<span style="min-width:0;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+ech(it.t)+'</span></div>';
       });
       if(items.length>4){
         h+='<div style="font-size:11px;opacity:.6;color:#fff">+ '+(items.length-4)+' autre(s)</div>';
@@ -4672,5 +5147,15 @@ function hasConsent(){
   window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
 })();
 </script>
+<!-- 01/10/2026 : rapport technique pour « Nous contacter » + journal des erreurs -->
+<script src="js/journal-erreurs.js"></script>
+<script>/* 27/09/2026 : fin de l'initialisation du menu → on l'affiche (images visibles décodées, 250 ms max) */
+(function(){function montrer(){var h=document.documentElement;if(!h.classList.contains('sh-boot'))return;
+  var imgs=[].slice.call(document.images).filter(function(i){if(i.complete)return false;var r=i.getBoundingClientRect();return r.bottom>0&&r.top<innerHeight&&r.width>0;});
+  var fini=false,go=function(){if(fini)return;fini=true;h.classList.remove('sh-boot');};
+  if(!imgs.length)return go();setTimeout(go,250);var n=imgs.length;imgs.forEach(function(i){var f=function(){if(--n<=0)go();};i.addEventListener('load',f);i.addEventListener('error',f);});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',montrer);else montrer();})();</script>
+<script src="js/diagnostic.js"></script>
+<div id="menu-pret" hidden></div>
 </body>
 </html>

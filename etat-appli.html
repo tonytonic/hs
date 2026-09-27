@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<script src="js/journal-erreurs.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0f1c22">
+<title>État de l'appli — Simulateur Heures Sup</title>
+<!-- 01/10/2026 : état de l'appli pour l'utilisateur (tiré du diagnostic de test). Tout est vérifié
+     sur le téléphone, rien n'est envoyé. Pas d'adresse de dépôt, pas de donnée personnelle. -->
+<style>
+:root{--bg:#0f1c22;--surface:#16262d;--surface2:#1d3139;--ink:#e4eef1;--muted:#93a9b0;--line:#27404a;
+  --accent:#4fc2d3;--ok:#5fd394;--ok-bg:#15332a;--warn:#f0c35a;--warn-bg:#352c14;--ko:#ff8a7a;--ko-bg:#3b1f1c;--info:#9fb7ff;--info-bg:#1c2540;--na:#8c9ea4;}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 -apple-system,system-ui,"Segoe UI",Roboto,sans-serif;-webkit-text-size-adjust:100%}
+.wrap{max-width:820px;margin:0 auto;padding:16px 16px 80px}
+header h1{margin:0;font-size:22px;font-weight:800;line-height:1.2}
+header p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{font-size:12px;font-weight:700;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 10px}
+.chip.ok{color:var(--ok);border-color:var(--ok)}.chip.ko{color:var(--ko);border-color:var(--ko)}.chip.warn{color:var(--warn);border-color:var(--warn)}
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--bg);display:flex;gap:6px;padding:12px 0 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+nav.tabs button{flex:1;font:inherit;font-size:13.5px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 6px;cursor:pointer}
+nav.tabs button[aria-selected="true"]{color:#06262c;background:var(--accent);border-color:var(--accent)}
+.panel[hidden]{display:none}
+h2{font-size:12.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--accent);margin:18px 0 8px;font-weight:800}
+.row{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:6px}
+.badge{flex-shrink:0;font-size:11px;font-weight:800;border-radius:6px;padding:2px 7px;min-width:44px;text-align:center;margin-top:1px}
+.b-ok{background:var(--ok-bg);color:var(--ok)}.b-warn{background:var(--warn-bg);color:var(--warn)}.b-ko{background:var(--ko-bg);color:var(--ko)}.b-info{background:var(--info-bg);color:var(--info)}.b-run{background:var(--surface2);color:var(--muted)}
+.row .l{font-weight:700;font-size:14px}
+.row .d{color:var(--muted);font-size:12.5px;word-break:break-word;white-space:pre-wrap}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.btn{font:inherit;font-size:13.5px;font-weight:700;border-radius:10px;padding:9px 13px;border:1px solid var(--line);background:var(--surface2);color:var(--ink);cursor:pointer}
+.btn.p{background:var(--accent);border-color:var(--accent);color:#06262c}
+.btn.danger{border-color:var(--ko);color:var(--ko);background:transparent}
+.btn:disabled{opacity:.5}
+.note-box{background:var(--info-bg);border:1px solid #33427a;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--ink);margin:8px 0}
+.sum{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
+.sumc{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px}
+.sumc b{font-size:12.5px;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;display:flex;margin:6px 0}
+.bar i{height:100%}
+.nums{font-size:12px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.filters button{font:inherit;font-size:12.5px;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:5px 11px;cursor:pointer}
+.filters button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#06262c}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:8px}
+.item.ko{border-color:var(--ko)}.item.ok{border-color:#2c5a45}
+.it-top{display:flex;gap:10px;justify-content:space-between;align-items:flex-start}
+.it-t{font-weight:700;font-size:14.5px;line-height:1.35}
+.it-v{font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+.it-h{margin:7px 0 0;font-size:13.5px}
+.it-e{margin:3px 0 0;font-size:13px;color:var(--muted)}
+.it-e b{color:var(--ink)}
+.st{display:flex;gap:6px;flex-shrink:0}
+.st button{font:inherit;font-size:12px;font-weight:800;border-radius:9px;border:1px solid var(--line);padding:6px 8px;min-width:70px;cursor:pointer;line-height:1.15}
+.st button small{display:block;font-size:10px;font-weight:600;opacity:.75}
+.s-todo{background:var(--warn-bg);color:var(--warn)}.s-ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok)!important}
+.s-ko{background:var(--ko-bg);color:var(--ko);border-color:var(--ko)!important}.s-na{background:var(--surface2);color:var(--na)}
+.st button[disabled]{cursor:default;opacity:.8}
+.it-foot{display:flex;gap:8px;align-items:center;margin-top:8px}
+.it-foot input{flex:1;min-width:0;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:9px;padding:7px 9px;background:var(--bg);color:var(--ink)}
+.it-foot a{font-size:12.5px;font-weight:700;color:var(--accent);white-space:nowrap;text-decoration:none;border:1px solid var(--line);border-radius:9px;padding:7px 10px}
+textarea{width:100%;min-height:220px;font:12.5px/1.45 ui-monospace,Menlo,monospace;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px}
+select{font:inherit;font-size:16px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.toast{position:fixed;left:16px;right:16px;bottom:20px;background:#08323a;border:1px solid var(--accent);color:var(--ink);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px;z-index:20;text-align:center}
+#frames{position:fixed;left:-9999px;top:0;width:390px;height:844px;overflow:hidden}
+#frames iframe{width:390px;height:844px;border:0}
+@media (max-width:540px){.it-top{flex-direction:column}.st{align-self:stretch}.st button{flex:1}.sum{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🩺 État de l'appli</h1>
+  <p>Vérifié sur ton téléphone · rien n'est envoyé</p>
+  <div class="chips" id="chips"></div>
+</header>
+<div class="btns">
+  <button type="button" class="btn p" id="runAuto">Relancer la vérification</button>
+  <a class="btn" href="menu.html" style="text-decoration:none">← Menu</a>
+</div>
+<div id="autoOut"></div>
+
+<h2>Outils</h2>
+<div class="btns">
+  <button type="button" class="btn" id="swUpd">Chercher une mise à jour</button>
+  <button type="button" class="btn" id="runMods">Tester l'ouverture des modules</button>
+  <button type="button" class="btn danger" id="swClear">Vider le cache de l'appli et recharger</button>
+</div>
+<p style="font-size:12.5px;color:var(--muted)">« Vider le cache » ne touche pas à tes données (heures, contrats…) : seulement aux fichiers de l'appli, rechargés ensuite depuis internet. À utiliser si l'appli affiche une ancienne version ou un écran bizarre.</p>
+<p style="font-size:12.5px;color:var(--muted)">« Tester l'ouverture des modules » ouvre chaque module en arrière-plan pour repérer une erreur ; tes données sont remises exactement à l'identique à la fin. N'utilise pas l'appli pendant le test.</p>
+<div id="resetConfirm"></div>
+<p style="font-size:12.5px;color:var(--muted)">Un problème persiste ? Menu → <b>Nous contacter</b>, et joins le rapport de plantage.</p>
+</div>
+<div id="frames" aria-hidden="true"></div>
+
+<script>
+(function(){
+'use strict';
+function $(id){return document.getElementById(id);}
+function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function toast(t){var o=document.querySelector('.toast');if(o)o.remove();var d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(function(){d.remove();},2800);}
+function jget(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return undefined;}}
+var UA=navigator.userAgent||'';
+var IS_IOS=/iP(hone|ad|od)/.test(UA)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+var IS_AND=/Android/i.test(UA);
+var STANDALONE=!!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));
+var RES=[];
+function add(sec,st,l,d){RES.push({sec:sec,st:st,l:l,d:d||''});}
+function render(){
+  var h='',sec=null,lab={ok:'OK',warn:'ATTENTION',ko:'PROBLÈME',info:'INFO',run:'…'};
+  RES.forEach(function(r){if(r.sec!==sec){h+='<h2>'+esc(r.sec)+'</h2>';sec=r.sec;}
+    h+='<div class="row"><span class="badge b-'+r.st+'">'+lab[r.st]+'</span><div><div class="l">'+esc(r.l)+'</div>'+(r.d?'<div class="d">'+esc(r.d)+'</div>':'')+'</div></div>';});
+  $('autoOut').innerHTML=h;
+  var c={ok:0,warn:0,ko:0};RES.forEach(function(r){if(c[r.st]!=null)c[r.st]++;});
+  $('chips').innerHTML='<span class="chip">'+(IS_IOS?'iPhone':IS_AND?'Android':'Ordinateur')+' · '+(STANDALONE?'appli':'navigateur')+'</span>'
+    +(window.__ver?'<span class="chip">'+esc(window.__ver)+'</span>':'')
+    +'<span class="chip ok">'+c.ok+' OK</span>'+(c.warn?'<span class="chip warn">'+c.warn+' à surveiller</span>':'')+(c.ko?'<span class="chip ko">'+c.ko+' problème'+(c.ko>1?'s':'')+'</span>':'');
+}
+function swList(txt){var m=txt.match(/FILES_TO_CACHE\s*=\s*\[([\s\S]*?)\]/);if(!m)return [];return (m[1].match(/"([^"]+)"/g)||[]).map(function(s){return s.slice(1,-1);});}
+function num(x){return (String(x).match(/\d+/g)||[]).map(Number);}
+function cmp(a,b){a=num(a);b=num(b);for(var i=0;i<Math.max(a.length,b.length);i++){var d=(a[i]||0)-(b[i]||0);if(d)return d;}return 0;}
+function versionSW(){return new Promise(function(res){var sw=navigator.serviceWorker;if(!sw||!sw.controller||!window.MessageChannel)return res('');
+  var ch=new MessageChannel(),t=setTimeout(function(){res('');},1500);ch.port1.onmessage=function(ev){clearTimeout(t);res((ev.data&&ev.data.version)||'');};
+  try{sw.controller.postMessage({type:'SH_VERSION'},[ch.port2]);}catch(e){res('');}});}
+
+function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function fr(d){return /^\d{4}-\d{2}-\d{2}$/.test(d||'')?d.split('-').reverse().join('/'):'?';}
+function h2(x){return (Math.round(x*100)/100).toString().replace('.',',')+' h';}
+function nomExo(deb,fin){var y1=parseInt(deb,10),y2=parseInt(fin,10),b=y1,bj=-1;for(var y=y1;y<=y2;y++){var a=Math.max(Date.parse(deb+'T12:00:00'),Date.parse(y+'-01-01T12:00:00')),z=Math.min(Date.parse(fin+'T12:00:00'),Date.parse(y+'-12-31T12:00:00')),j=Math.round((z-a)/864e5)+1;if(j>bj){bj=j;b=y;}}return b;}
+function cles(rx){var o=[];for(var i=0;i<localStorage.length;i++){var m=rx.exec(localStorage.key(i)||'');if(m)o.push(m);}return o;}
+function systeme(){var m;
+  if((m=/iPhone OS (\d+)[_.](\d+)/.exec(UA)))return 'iPhone · iOS '+m[1]+'.'+m[2];
+  if((m=/iPad.*OS (\d+)[_.](\d+)/.exec(UA)))return 'iPad · iPadOS '+m[1]+'.'+m[2];
+  if((m=/Android (\d+(\.\d+)?)/.exec(UA)))return 'Android '+m[1];
+  if(/Macintosh/.test(UA))return navigator.maxTouchPoints>1?'iPad':'Mac';
+  if(/Windows/.test(UA))return 'Windows';if(/Linux/.test(UA))return 'Linux';return 'Autre système';}
+function navig(){var m;
+  if((m=/(?:CriOS|Chrome)\/(\d+)/.exec(UA))&&!/Edg\//.test(UA))return 'Chrome '+m[1];
+  if((m=/Edg\/(\d+)/.exec(UA)))return 'Edge '+m[1];
+  if((m=/(?:FxiOS|Firefox)\/(\d+)/.exec(UA)))return 'Firefox '+m[1];
+  if((m=/Version\/(\d+(\.\d+)?).*Safari/.exec(UA)))return 'Safari '+m[1];
+  return 'navigateur inconnu';}
+
+async function run(){
+  RES=[];render();$('runAuto').disabled=true;
+  var S='Appli';
+  var loaded=await versionSW(),online='',files=[];
+  if(!loaded){try{var ks=await caches.keys();loaded=(ks.filter(function(k){return /^heuressup-cache-v/.test(k);}).map(function(k){return k.replace('heuressup-cache-','');}).sort(cmp).pop())||'';}catch(e){}}
+  try{var r=await fetch('sw.js',{cache:'no-store'});var t=await r.text();var m=t.match(/CACHE_NAME\s*=\s*"heuressup-cache-([^"]+)"/);online=m?m[1]:'';files=swList(t);}catch(e){}
+  window.__ver=loaded||online;
+  if(!loaded)add(S,'warn','Version installée inconnue','L\'appli n\'a pas encore été enregistrée sur ce téléphone. Ouvre le menu une fois, puis reviens ici.');
+  else if(online&&loaded!==online)add(S,'warn','Une mise à jour est disponible','Installée : '+loaded+' · disponible : '+online+'. Ferme complètement l\'appli et rouvre-la, ou touche « Chercher une mise à jour » ci-dessous.');
+  else add(S,'ok','À jour · '+loaded,online?'Tu as la dernière version.':'Impossible de vérifier en ligne pour l\'instant (pas de réseau ?).');
+  if(IS_IOS&&!STANDALONE)add(S,'warn','Ouvert dans Safari, pas dans l\'appli','Sur iPhone, Safari et l\'appli installée sur l\'écran d\'accueil n\'ont pas les mêmes données. Ouvre l\'appli depuis son icône pour retrouver tes saisies.');
+  else add(S,'ok',STANDALONE?'Ouverte comme appli installée':'Ouverte dans le navigateur',systeme()+' · '+navig());
+  if(IS_IOS&&!/Safari/.test(UA)||/CriOS|FxiOS/.test(UA))add(S,'warn','Navigateur autre que Safari','Sur iPhone, l\'appli s\'installe et se met à jour correctement depuis Safari (Partager → Sur l\'écran d\'accueil).');
+  add(S,navigator.onLine?'ok':'info',navigator.onLine?'Connecté à internet':'Pas de réseau',navigator.onLine?'Les mises à jour peuvent arriver.':'L\'appli fonctionne hors ligne ; la mise à jour se fera au retour du réseau.');
+  add(S,'info','Écran',screen.width+'×'+screen.height+' · fenêtre '+innerWidth+'×'+innerHeight+' · densité '+(window.devicePixelRatio||1)+' · '+(innerWidth>innerHeight?'paysage':'portrait'));
+  try{if(!('serviceWorker' in navigator))add(S,'warn','Mode hors ligne indisponible','Ce navigateur ne permet pas à l\'appli de fonctionner sans réseau.');
+    else{var reg=await navigator.serviceWorker.getRegistration();
+      if(!reg)add(S,'warn','Mode hors ligne pas encore prêt','Ouvre le menu une fois avec du réseau, puis reviens ici.');
+      else add(S,reg.waiting?'warn':'ok',reg.waiting?'Nouvelle version prête':'Moteur de l\'appli actif',reg.waiting?'Ferme complètement l\'appli et rouvre-la pour l\'utiliser.':'Il gère les mises à jour et le mode hors ligne.');}}catch(e){}
+  // Installation (sans afficher d'adresse)
+  var I='Installation';
+  try{var mr=await fetch('manifest.json',{cache:'no-store'});var mf=await mr.json(),base=new URL('manifest.json',location.href);
+    var su=new URL(mf.start_url||'',base),sc=new URL(mf.scope||'./',base),okO=su.origin===location.origin&&sc.origin===location.origin;
+    /* 27/09/2026 : la prod déclare son adresse officielle en entier ; ouverte depuis une autre adresse, ce n'est pas une panne
+       mais les données ne sont pas partagées entre les deux : simple information */
+    add(I,okO?'ok':(STANDALONE?'warn':'info'),okO?'Fiche d\'installation correcte':'Ouverte depuis une autre adresse que l\'appli installée',okO?'L\'icône de l\'écran d\'accueil ouvre bien cette appli.':'Tes données ne sont pas partagées entre cette adresse et l\'appli installée sur l\'écran d\'accueil : utilise toujours la même pour retrouver tes saisies.');
+    add(I,mf.display==='standalone'?'ok':'warn','Affichage plein écran',mf.display==='standalone'?'L\'appli s\'ouvre sans la barre du navigateur une fois installée.':'Mode : '+(mf.display||'?'));
+    var ic=(mf.icons||[]).length;add(I,ic?'ok':'warn','Icônes de l\'appli',ic+' taille'+(ic>1?'s':'')+' disponible'+(ic>1?'s':''));
+  }catch(e){add(I,navigator.onLine?'warn':'info','Fiche d\'installation non lue',navigator.onLine?'Réessaie dans un instant.':'Pas de réseau.');}
+  render();
+  // Pages
+  var P='Pages de l\'appli',html=files.filter(function(f){return /\.html$/.test(f);}).map(function(f){return f.replace(/^\.\//,'');});
+  if(!html.length)add(P,'info','Contrôle des pages impossible','Pas de réseau pour l\'instant.');
+  else{var bad={http:[],cover:[],zoom:[]},q=html.slice(),wk=[];add(P,'run','Contrôle de '+html.length+' pages…','');render();
+    for(var w=0;w<6;w++)wk.push((async function(){while(q.length){var f=q.shift();try{var rr=await fetch(f,{cache:'no-store'});var tx=await rr.text();
+      if(!rr.ok||/<title>\s*Reconnexion/.test(tx))bad.http.push(f+' ('+rr.status+')');
+      var vp=(tx.match(/<meta[^>]*name=["']viewport["'][^>]*>/i)||[''])[0];if(/viewport-fit\s*=\s*cover/i.test(vp))bad.cover.push(f);
+      if(/v\.content\s*\+=\s*['"],\s*maximum-scale/.test(tx))bad.zoom.push(f);}catch(e){bad.http.push(f);}}})());
+    await Promise.all(wk);RES=RES.filter(function(r){return r.st!=='run';});
+    add(P,bad.http.length?'ko':'ok',(html.length-bad.http.length)+' / '+html.length+' pages répondent',bad.http.length?'Ne répondent pas :\n'+bad.http.join('\n'):'Toutes les pages de l\'appli sont accessibles.');
+    add(P,bad.cover.length?'warn':'ok','Haut des pages sous l\'heure (iPhone)',bad.cover.length?'Pages concernées :\n'+bad.cover.join('\n'):'Aucune page ne passe sous l\'heure ou l\'encoche.');
+    add(P,bad.zoom.length?'warn':'ok','Pas de zoom en touchant un champ',bad.zoom.length?bad.zoom.join('\n'):'');}
+  render();
+  // Hors ligne
+  try{if(loaded&&files.length){var c=await caches.open('heuressup-cache-'+loaded.replace(/ .*$/,''));var keys=(await c.keys()).map(function(q){return new URL(q.url).pathname;});
+    var miss=files.filter(function(f){return keys.indexOf(new URL(f,location.href).pathname)<0;});
+    add('Hors ligne',miss.length?(miss.length>5?'ko':'warn'):'ok',miss.length?(files.length-miss.length)+' / '+files.length+' fichiers disponibles sans réseau':'L\'appli s\'ouvre sans réseau',miss.length?'Manquants :\n'+miss.slice(0,15).map(function(f){return f.replace(/^\.\//,'');}).join('\n')+(miss.length>15?'\n…':'')+'\nOuvre l\'appli avec du réseau, ou touche « Vider le cache de l\'appli et recharger ».':'Tous les fichiers sont enregistrés sur ton téléphone.');}}catch(e){}
+  // Tes données
+  var D='Tes données';
+  var lb=(localStorage.getItem('SH_LAST_BACKUP')||'').slice(0,10);
+  if(!lb)add(D,'warn','Aucune copie de sauvegarde','Menu → 💾 Sauvegarde. Indispensable avant de changer de téléphone ou de réinstaller l\'appli.');
+  else{var age=Math.floor((Date.now()-Date.parse(lb))/86400000);add(D,age>30?'warn':'ok','Dernière copie de sauvegarde : '+lb.split('-').reverse().join('/'),'Il y a '+age+' jour'+(age>1?'s':'')+(age>30?' : pense à en refaire une.':''));}
+  var bads=0;for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i),v=localStorage.getItem(k)||'';if(/^\s*[\[{]/.test(v)){try{JSON.parse(v);}catch(e){bads++;}}}
+  add(D,bads?'ko':'ok',bads?bads+' donnée(s) illisible(s)':'Aucune donnée abîmée',bads?'Restaure ta dernière copie de sauvegarde, ou écris-nous (Menu → Nous contacter, avec le rapport de plantage).':'');
+  var sz=0;try{for(var j=0;j<localStorage.length;j++){var kk=localStorage.key(j);sz+=(kk.length+(localStorage.getItem(kk)||'').length)*2;}}catch(e){}
+  add(D,sz>4.5*1024*1024?'ko':sz>3.5*1024*1024?'warn':'ok','Place utilisée : '+Math.round(sz/1024)+' Ko','Limite pratique : environ 5 Mo sur le téléphone.');
+  try{if(navigator.storage&&navigator.storage.persisted){var pe=await navigator.storage.persisted();add(D,pe?'ok':'info',pe?'Données protégées':'Données non protégées',pe?'Le téléphone ne les effacera pas de lui-même.':'En cas de manque de place, le système peut effacer les données d\'une appli web : garde une copie de sauvegarde récente.');}}catch(e){}
+  modules();
+  // Erreurs
+  var er=jget('SH_ERR_LOG');
+  if(Array.isArray(er)&&er.length){add('Erreurs récentes','warn',er.length+' erreur'+(er.length>1?'s':'')+' technique'+(er.length>1?'s':'')+' enregistrée'+(er.length>1?'s':''),er.slice(-10).reverse().map(function(x){return x.d+' · '+x.p+'\n   '+x.m+(x.f?' ('+x.f+':'+x.l+')':'');}).join('\n')+'\nSi quelque chose ne marche pas : Menu → Nous contacter, avec le rapport de plantage.');}
+  else add('Erreurs récentes','ok','Aucune erreur enregistrée','');
+  render();$('runAuto').disabled=false;
+}
+/* Données par module : uniquement la structure (exercices, nombre de saisies, cohérence), jamais de nom ni de prénom */
+function modules(){
+  var D='Tes données';
+  var cu=jget('CCN_CUSTOM'),idcc=localStorage.getItem('CCN_IDCC');
+  add(D,'info','Convention collective du menu',cu?'Accord personnalisé':idcc?(localStorage.getItem('CCN_NOM')||'?')+' · IDCC '+idcc:'Droit commun (aucune convention choisie)');
+  add(D,'info','Rappel de sauvegarde',localStorage.getItem('SH_BACKUP_NUDGE')?'Dernier rappel : '+localStorage.getItem('SH_BACKUP_NUDGE'):'Pas encore montré ce mois-ci');
+  // M1
+  var S1='Compteur annuel',ex=cles(/^EXERCISE_START_(.+)$/).map(function(m){return m[1];});
+  if(!ex.length)add(S1,'info','Pas encore utilisé','');
+  else{ex.sort().forEach(function(sfx){var d=jget('DATA_REPORT_'+sfx),n=d?Object.keys(d).filter(function(x){return /^\d{4}-\d{2}-\d{2}$/.test(x);}).length:0,cl=jget('CLOSURES_REPORT_'+sfx),off=jget('SH_HS_OFFICIEL_M1_'+sfx);
+      add(S1,d===undefined?'ko':'ok','Exercice '+sfx,d===undefined?'Données illisibles':'Début '+fr(localStorage.getItem('EXERCISE_START_'+sfx))+' · '+n+' jour'+(n>1?'s':'')+' saisi'+(n>1?'s':'')+' · '+(Array.isArray(cl)?cl.length:0)+' clôtures'+(off&&off.total!=null?' · contingent '+h2(off.total):''));});}
+  // M2
+  var S2='Heures mensualisées',ys=cles(/^CA_HS_TRACKER_V1_DATA_(\d{4})$/).map(function(m){return m[1];});
+  if(!ys.length)add(S2,'info','Pas encore utilisé','');
+  else{try{var st=jget('CA_HS_TRACKER_V1_SETTINGS')||{},M=parseInt(st.exoMois,10)||1;add(S2,'info','Début de l\'exercice',M===1?'Janvier (année civile)':['','','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'][M]);}catch(e){}
+    ys.sort().forEach(function(y){var d=jget('CA_HS_TRACKER_V1_DATA_'+y);if(d===undefined){add(S2,'ko','Année '+y,'Données illisibles');return;}
+      var mois=Object.keys(d||{}).filter(function(x){return /^\d{4}-\d{2}$/.test(x);}),j=0;mois.forEach(function(mk){j+=Object.keys((d[mk]||{}).days||{}).length;});
+      var ch=localStorage.getItem('M2_RELIQUAT_CHOIX_'+y),off=jget('SH_HS_OFFICIEL_M2_'+y);
+      add(S2,'ok','Année '+y,mois.length+' mois · '+j+' jours saisis'+(off&&off.total!=null?' · contingent '+h2(off.total):'')+(ch?' · reste de fin d\'exercice '+(ch==='report'?'reporté':localStorage.getItem('M2_RELIQUAT_VERS_'+y)?'reporté dans '+localStorage.getItem('M2_RELIQUAT_VERS_'+y):'non reporté (reproposé pendant 3 ans)'):''));});}
+  // Mizuki
+  var S5='Mizuki (temps partiel)',nb=0;
+  [1,2,3].forEach(function(n){var p=n===1?'M5_':'M5_C'+n+'_',c=jget(p+'CONTRACT');if(c===undefined){add(S5,'ko','Contrat '+n,'Données illisibles');return;}if(!c||!(c.hoursBase>0))return;nb++;
+    var yrs=cles(new RegExp('^'+p+'DATA_(\\d{4})$')).map(function(m){return m[1];}).sort(),sai=0;
+    yrs.forEach(function(y){var d=jget(p+'DATA_'+y);if(d)sai+=Object.keys(d).filter(function(k){return /^\d{4}-(\d{2}-\d{2}|W\d{2})$/.test(k);}).length;});
+    var du=c.dureeContrat?(String(c.dureeContrat.valeur).replace('.',',')+' h / '+({S:'semaine',M:'mois',A:'an'}[c.dureeContrat.unite]||'?')):c.hoursBase+' h / semaine';
+    add(S5,'ok','Contrat '+n,du+' · '+(c.idcc>0?'IDCC '+c.idcc:'droit commun')+' · plafond '+Math.round((c.cap||0.1)*100)+' %'+(c.retraiteProgressive?' · retraite progressive':'')+'\n'+sai+' saisies · exercices '+(yrs.join(', ')||'aucun'));});
+  if(!nb)add(S5,'info','Pas encore utilisé','');
+  else if(nb>1)add(S5,'info',nb+' contrats','Santé et alertes 48 h calculées sur le cumul.');
+  // Zenji
+  var S6='Zenji (cadres)',reg=localStorage.getItem('M6_REGIME'),re=/^\d{4}-\d{2}-\d{2}$/;
+  if(!reg)add(S6,'info','Pas encore utilisé','');
+  else{var mig=localStorage.getItem('M6_EXO_ALIGN_V4');add(S6,mig?'ok':'warn','Exercices recalés et jours rangés',mig?'Fait le '+fr(String(mig).slice(0,10)):'Pas encore : ouvre Zenji une fois.');
+    ['forfait_jours','forfait_heures','cadre_dirigeant'].forEach(function(r){var c=jget('M6_'+r+'_CONTRACT');if(c===undefined){add(S6,'ko',r.replace('_',' '),'Réglages illisibles');return;}if(!c)return;
+      var deb=c.dateDebutExercice,fin=c.dateFinExercice,dat=re.test(deb||'')&&re.test(fin||'');
+      var yrs=cles(new RegExp('^M6_'+r+'_(\\d{4})_DATA$')).map(function(m){return +m[1];}).sort(),mal=0,tot=0,det=[];
+      function bornes(y){var sn=jget('M6_'+r+'_'+y+'_CONTRACT');
+        if(sn&&re.test(sn.dateDebutExercice||'')&&re.test(sn.dateFinExercice||''))return [sn.dateDebutExercice,sn.dateFinExercice];
+        if(sn&&!sn.dateDebutExercice&&!sn.dateFinExercice)return [y+'-01-01',y+'-12-31'];
+        var h=(jget('M6_EXERCICES_'+r)||{})[y];if(h&&h.deb)return [h.deb,h.fin];
+        if(dat){var ec=parseInt(fin,10)-parseInt(deb,10),off=nomExo(deb,fin)-parseInt(deb,10);return [(y-off)+deb.slice(4),(y-off+ec)+fin.slice(4)];}
+        return [y+'-01-01',y+'-12-31'];}
+      yrs.forEach(function(y){var bb=bornes(y),mY=0,n=0,d=jget('M6_'+r+'_'+y+'_DATA')||{};Object.keys(d).forEach(function(k){var dk=k,w=/^(\d{4})-W(\d{2})$/.exec(k);
+          if(w){var j4=new Date(+w[1],0,4,12),l=new Date(j4);l.setDate(j4.getDate()-((j4.getDay()+6)%7)+(+w[2]-1)*7);dk=iso(l);}
+          if(!re.test(dk))return;tot++;n++;if(dk<bb[0]||dk>bb[1]){mal++;mY++;}});
+        det.push(y+' : '+fr(bb[0])+' → '+fr(bb[1])+' · '+n+' saisies'+(mY?' · '+mY+' hors exercice':''));});
+      var perime=dat&&fin<iso(new Date());
+      add(S6,mal?'warn':(r===reg?'ok':'info'),r.replace('_',' ')+(r===reg?' (régime actif)':''),(dat?'Exercice '+fr(deb)+' → '+fr(fin):'Année civile')+' · '+tot+' saisies'+(det.length?'\n'+det.join('\n'):'')+(mal?'\n'+mal+' saisie(s) hors de leur exercice : ouvre Zenji une fois pour les ranger ; sinon vérifie les dates (⚙️ Contrat → « ↺ Effacer les dates »).':'')+(perime?'\nExercice terminé : Zenji doit proposer le nouvel exercice.':''));});}
+  // Autres
+  var tk=jget('TAIKO_V1');add('Autres modules',tk===undefined?'ko':'ok','Taiko',tk===undefined?'Données illisibles':tk?'Données présentes':'Pas encore utilisé');
+  var fx=cles(/^FOX_/).length;add('Autres modules','info','Fox',fx?fx+' réglage'+(fx>1?'s':'')+' enregistré'+(fx>1?'s':''):'Pas encore utilisé');
+  var m7=cles(/^(M7_|NUIT_|ASTREINTE)/).length;if(m7)add('Autres modules','info','Nuit, astreinte, primes',m7+' élément'+(m7>1?'s':'')+' enregistré'+(m7>1?'s':''));
+}
+
+/* Test d'ouverture des modules (données remises à l'identique après) */
+var MODS=[['Menu','menu.html','initCCNBadge'],['Compteur annuel','heures/index.html','hsBilanPuisOuvrir'],['Heures mensualisées','paye/index.html','m2BilanLignes'],
+  ['Fox','fox/index.html','hsOfficiel'],['Jumeau numérique','module4/index.html','DTE'],['Mizuki','module5/index.html','M5_Contract'],['Zenji','module6/index.html','M6_Storage'],
+  ['Nuit, astreinte, primes','module7/index.html',null],['Taiko','taiko.html',null],['GrillePaye','GrillePaye/index.html','gpOuvrirMaCCN'],['Trousse à outils','outils.html',null],
+  ['Outil Préavis','outils/module-preavis.html',null],['Carnet de frais','outils/module8.html',null]];
+var T='Ouverture des modules';
+async function runMods(){
+  var btn=$('runMods');btn.disabled=true;$('runAuto').disabled=true;
+  var snap={};for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);snap[k]=localStorage.getItem(k);}
+  RES=RES.filter(function(r){return r.sec!==T;});add(T,'run','Test en cours…','Chaque module est ouvert en arrière-plan (environ 30 s). N\'utilise pas l\'appli pendant le test.');render();
+  var out=[];for(var m=0;m<MODS.length;m++){out.push(await testMod(MODS[m]));}
+  try{localStorage.clear();Object.keys(snap).forEach(function(k){localStorage.setItem(k,snap[k]);});}catch(e){}
+  RES=RES.filter(function(r){return r.sec!==T;});out.forEach(function(o){add(T,o.st,o.l,o.d);});
+  var same=Object.keys(snap).length===localStorage.length&&Object.keys(snap).every(function(k){return localStorage.getItem(k)===snap[k];});
+  add(T,same?'ok':'ko','Données remises à l\'identique',same?'Rien n\'a changé dans tes données.':'Écart détecté : fais une copie de sauvegarde et écris-nous (Nous contacter).');
+  render();btn.disabled=false;$('runAuto').disabled=false;
+  var fin=document.querySelector('#autoOut h2:last-of-type');if(fin)fin.scrollIntoView({behavior:'smooth'});
+}
+function testMod(md){return new Promise(function(res){
+  var f=document.createElement('iframe'),errs=[],t0=Date.now(),fini=false,hooked=null;
+  function hook(){try{var w=f.contentWindow;if(!w||w===hooked||w.location.href==='about:blank')return;hooked=w;
+    w.addEventListener('error',function(e){errs.push((e.message||'erreur')+(e.filename?' ('+e.filename.split('/').pop()+':'+e.lineno+')':''));});
+    w.addEventListener('unhandledrejection',function(e){errs.push('Promesse rejetée : '+(e.reason&&e.reason.message||e.reason));});}catch(e){}}
+  var poll=setInterval(hook,5);
+  function done(st,d){if(fini)return;fini=true;clearInterval(poll);setTimeout(function(){f.remove();},50);res({st:st,l:md[0],d:d});}
+  f.addEventListener('load',function(){hook();setTimeout(function(){
+    try{var w=f.contentWindow,doc=f.contentDocument,txt=(doc.body&&doc.body.innerText||'').trim(),ms=(Date.now()-t0)+' ms';
+      if(/Reconnexion/.test(doc.title))return done('ko','Page introuvable hors ligne · '+ms);
+      var g=md[2]?!!w[md[2]]:true,st=errs.length?'ko':(!g||txt.length<30)?'warn':'ok';
+      done(st,'Ouvert en '+ms+(g?'':' · moteur du module absent')+(txt.length<30?' · page presque vide':'')+(errs.length?'\n'+errs.slice(0,4).join('\n'):' · aucune erreur'));
+    }catch(e){done('ko',String(e));}},2500);});
+  setTimeout(function(){done('ko','Pas ouvert en 15 s');},15000);
+  f.src=md[1];$('frames').appendChild(f);
+});}
+$('runMods').addEventListener('click',runMods);
+$('swUpd').addEventListener('click',async function(){try{var r=await navigator.serviceWorker.getRegistration();if(!r){toast('Mode hors ligne pas encore prêt');return;}await r.update();
+  setTimeout(function(){toast(r.installing||r.waiting?'Nouvelle version en cours : ferme et rouvre l\'appli':'Tu as déjà la dernière version');run();},800);}catch(e){toast('Vérification impossible (pas de réseau ?)');}});
+$('swClear').addEventListener('click',function(){var box=$('resetConfirm');
+  box.innerHTML='<div class="note-box">Vider le cache de l\'appli ? Tes données restent intactes ; les fichiers seront rechargés depuis internet (réseau nécessaire).<div class="btns"><button type="button" class="btn danger" id="cfYes">Oui, vider</button><button type="button" class="btn" id="cfNo">Annuler</button></div></div>';
+  $('cfNo').onclick=function(){box.innerHTML='';};
+  $('cfYes').onclick=async function(){box.innerHTML='';try{var ks=await caches.keys();await Promise.all(ks.map(function(k){return caches.delete(k);}));var rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(function(x){return x.unregister();}));}catch(e){}
+    location.replace('menu.html');};});
+$('runAuto').addEventListener('click',run);
+run();
+})();
+</script>
+</body>
+</html>
