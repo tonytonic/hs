@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
   <meta name="color-scheme" content="only light">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -77,15 +79,18 @@
   <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
 </div>
 
-<img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<img id="bg-decor" alt="" decoding="async" fetchpriority="high" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
 <script>
 // Appliquer la bonne saison IMMÉDIATEMENT (avant rendu) — évite flash hiver→printemps
+// 01/10/2026 : l'image n'a plus de src dans le HTML. Avant, le navigateur
+// commençait à télécharger le fond d'hiver (PNG de 3 Mo, trop gros pour être
+// gardé hors ligne) même en automne, puis passait à la bonne saison : le fond
+// arrivait tard, d'où un écran noir puis un saut. Hiver = fox-bg.jpg (390 Ko).
 (function(){
-  const _bgs=['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+  const _bgs=['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
   const q=Math.floor(new Date().getMonth()/3);
-  const bg=_bgs[q]||_bgs[0];
   const el=document.getElementById('bg-decor');
-  if(el && bg!==el.src.split('/').pop() && el.src!==new URL(bg,location.href).href) el.src=bg;
+  if(el) el.src=_bgs[q]||_bgs[0];
 })();
 </script>
 
@@ -151,7 +156,7 @@ window._fox_pre = (function() {
     <div class="hud-xp-label">
       <span style="display:flex;align-items:center;gap:5px;">
         <span style="background:linear-gradient(135deg,rgba(255,140,66,0.4),rgba(255,107,53,0.3));border:1px solid rgba(255,140,66,0.7);border-radius:6px;padding:2px 8px;font-weight:900;font-size:0.85rem;text-shadow:0 0 8px rgba(255,140,66,0.6);">NIV <span id="hud-level"><script>document.write(window._fox_pre.lvl)</script></span></span>
-        <span id="hud-league" style="background:rgba(205,127,50,0.2);border:1px solid rgba(205,127,50,0.5);border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.75rem;margin-left:6px;">🥉 Bronze</span>
+        <span id="hud-league" style="background:rgba(205,127,50,0.2);border:1px solid rgba(205,127,50,0.5);border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.75rem;margin-left:6px;">🥉 Bronze</span><script>/* Sans flash (01/10/2026) : la ligue du dernier affichage, tout de suite (avant : « Bronze » puis la vraie ligue) */try{var _L=JSON.parse(localStorage.getItem('FOX_HUD_LEAGUE')||'null'),_e=document.getElementById('hud-league');if(_L&&_e){_e.innerHTML=_L.h;_e.style.color=_L.c;_e.style.background=_L.c+'33';_e.style.borderColor=_L.c+'99';}}catch(e){}</script>
       </span>
       <span style="color:#FF8C42;font-weight:900;font-size:0.82rem;"><span id="hud-xp"><script>document.write(window._fox_pre.xp)</script></span><span style="color:#444;font-size:0.65em;"> / <span id="hud-xp-max"><script>document.write(window._fox_pre.xpMax)</script></span></span> <span style="color:#888;font-size:0.65em;">XP</span></span>
     </div>
@@ -909,9 +914,11 @@ body {
 <!-- Scripts (ordre inchangé) -->
 <script src="../ccn/conventions-collectives.js"></script>
 <script src="../legi-ref.js"></script>
+<script src="../js/rappel-sauvegarde.js"></script>
 <script src="js/articles-loi.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/config.js"></script>
+<script src="../js/hs-officiel.js"></script>
 <script src="js/module-reader.js"></script>
 <script src="js/xp-system.js"></script>
 <script src="js/leagues.js"></script>
@@ -1283,7 +1290,7 @@ function _getContextualGreeting() {
   const hour  = now.getHours();
   const date  = now.getDate();
   const month = now.getMonth() + 1;
-  const name  = localStorage.getItem('FOX_USER_NAME') || '';
+  const name  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr    = name ? name + ', ' : '';
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 
@@ -1533,7 +1540,7 @@ function _getTodayOT() {
 function _getHourlyBubble(hour, day, todayOT) {
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const jr    = JOURS[day];
-  const name  = localStorage.getItem('FOX_USER_NAME') || '';
+  const name  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr    = name ? name + ' ' : '';
 
   // Seed : varie par heure + jour + HS → message change à chaque tranche horaire
@@ -1735,7 +1742,7 @@ function _getHourlyBubble(hour, day, todayOT) {
 function _getExtendedBubble(hour, day, todayOT, _seed) {
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const jr  = JOURS[day];
-  const nm  = localStorage.getItem('FOX_USER_NAME') || '';
+  const nm  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr  = nm ? nm + ' ' : '';
   const xh  = todayOT ? todayOT.extra : 0;
   const th  = todayOT ? todayOT.total : 0;
@@ -2656,7 +2663,9 @@ function _analyzeLegalSituation() {
     Object.values(rawM2).forEach(mv => {
       if (mv && mv.days) Object.values(mv.days).forEach(v => { m2annual += parseFloat(v) || 0; });
     });
-    const bestAnnual = Math.max(annualOT, m2annual);
+    // 26/09/2026 : chiffre officiel du module (contingent) quand il existe
+    const _off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(year) : null;
+    const bestAnnual = _off ? _off.total : Math.max(annualOT, m2annual);
     const pct = Math.round(bestAnnual / contingentMax * 100);
     const annual = {
       annualOT: Math.round(bestAnnual * 10) / 10,
@@ -2852,7 +2861,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     const now_pr  = new Date();
     const jours   = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
     const jourNow = jours[now_pr.getDay()];
-    const name_pr = localStorage.getItem('FOX_USER_NAME') || '';
+    const name_pr = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
     const pr_pr   = name_pr ? name_pr + ', ' : '';
     const _isPrevW = !!(s.weekly && s.weekly.isPrevWeek);
     const _semLbl  = _isPrevW ? 'La semaine passée' : 'Ta semaine';
@@ -2921,7 +2930,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     const now = new Date();
     const hr  = now.getHours();
     const jr  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][now.getDay()];
-    const name = localStorage.getItem('FOX_USER_NAME') || '';
+    const name = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
     const pr   = name ? name + ', ' : '';
 
     const pool = [
@@ -3869,7 +3878,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const _dowNow_g = (new Date().getDay() + 6) % 7; // 0=lun … 5=sam, 6=dim
       const _semBouclee_g = _dowNow_g >= 5; // sam/dim : la PRIORITÉ -1 gère déjà le total réel
       if (_cwHS_g > 0 && _cwDay_g > 0 && !_semBouclee_g) {
-        const _nm_g  = localStorage.getItem('FOX_USER_NAME') || '';
+        const _nm_g  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
         const _prn_g = _nm_g ? _nm_g + ', ' : '';
         const _jr_g  = ['lundi','mardi','mercredi','jeudi','vendredi'][_dowNow_g] || 'cette semaine';
         const _hsf_g = _fmtH(_cwHS_g);
@@ -4374,7 +4383,7 @@ function _buildDailyLoop5(s, h, todayOT) {
   const th   = todayOT ? todayOT.total : 0;
   const now  = new Date();
   const jr   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][now.getDay()];
-  const name = localStorage.getItem('FOX_USER_NAME') || '';
+  const name = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr   = name ? name + '\u00a0: ' : '';
   const bo   = (typeof gameState !== 'undefined' ? (gameState.burnout || 0) : 0);
 
@@ -4930,6 +4939,7 @@ function _checkAndResetXpCapYear() {
     localStorage.removeItem('FOX_NIGHT_WEEKEND_COUNT');
     console.log('🦊 XP cap reset : exercice ' + (prevYear||'?') + ' → ' + activeYear
       + ' (précédent: ' + prevUsed + 'h utilisées, clôture: ' + resetDate + ')');
+    if (prevYear && window.hsBackupNudge) hsBackupNudge('year');
     return newState;
   }
   return capState;
@@ -5989,6 +5999,7 @@ function refreshHUD() {
           if (!lgEl.dataset.leagueId || lgEl.dataset.leagueId !== String(leagueData.id)) {
             lgEl.dataset.leagueId = String(leagueData.id);
             lgEl.innerHTML = _lgNewHtml;
+            try { localStorage.setItem('FOX_HUD_LEAGUE', JSON.stringify({h:_lgNewHtml, c:_lc})); } catch(_) {}
             // Charger l'image une seule fois par ligue
             if (leagueData.img && !lgEl.dataset.imgLoaded) {
               const _tImg = new Image();
@@ -6378,12 +6389,14 @@ function refreshModulesPopup() {
       ${(() => {
         const ccn = _kitsuneGetCCN();
         const contingent = ccn.contingent || 220;
-        const totalHS = cum?.totalNetOvertime || 0;
+        // 26/09/2026 : le contingent est annuel — année en cours seulement, pas le cumul de toutes les années
+        const _yc = String(moduleReader.year || new Date().getFullYear());
+        const totalHS = (cum?.perYear?.[_yc]?.net) || 0;
         const pct = Math.round((totalHS / contingent) * 100);
         const color = pct >= 100 ? '#E53935' : pct >= 75 ? '#FF8C42' : '#4CAF50';
         return `
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-top:8px;text-align:center;">
-          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Contingent annuel</div>
+          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Contingent annuel ${_yc}</div>
           <div style="font-weight:900;font-size:1.2rem;color:${color};">${_fmtH(totalHS)} / ${contingent}h</div>
           <div style="font-size:0.7rem;color:${color};margin-top:2px;">${pct}% consomm\u00E9</div>
         </div>`;
@@ -7848,7 +7861,7 @@ function devSetSeason(q) {
   if (bgEl) {
     const idx = q >= 0 ? q : Math.floor(new Date().getMonth() / 3);
     const bgs = typeof _SEASONAL_BG !== 'undefined' ? _SEASONAL_BG :
-      ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+      ['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
     const target = bgs[idx] || bgs[0];
     bgEl.style.opacity = '0';
     bgEl.style.transition = 'opacity 1.2s ease';
@@ -8081,7 +8094,7 @@ function emuSimDays(nDays, withViolation) {
 
 // \u2500\u2500 D\u00E9cor saisonnier (4 backgrounds par trimestre) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const _SEASONAL_BG = [
-  '../images/fox-bg.PNG',     // Q1 : hiver (jan-mar)
+  '../images/fox-bg.jpg',     // Q1 : hiver (jan-mar)
   '../images/fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
   '../images/fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
   '../images/fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
@@ -8094,7 +8107,7 @@ function updateSeasonalBg() {
   // Défaut fallback si _SEASONAL_BG non défini globalement
   const _bgs = (typeof _SEASONAL_BG !== 'undefined' && Array.isArray(_SEASONAL_BG))
     ? _SEASONAL_BG
-    : ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+    : ['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
   const bg   = _bgs[q] || _bgs[0];
   const bgEl = document.getElementById('bg-decor');
   if (!bgEl) return;
@@ -14903,8 +14916,10 @@ function _getYearData(year) {
   const monthVals = Object.values(months);
   const peakMonth = monthVals.length ? Math.max(...monthVals) : 0;
   const peakMonthKey = Object.keys(months).find(k => months[k] === peakMonth) || null;
+  // 26/09/2026 : total officiel du module (contingent) quand il existe
+  try { const _off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(y) : null; if (_off) totalHS = _off.total; } catch (_) {}
   const avgPerMonth  = monthVals.length ? totalHS / monthVals.length : 0;
-  const pctContingent = Math.round(totalHS / 220 * 100);
+  const pctContingent = Math.round(totalHS / ((_kitsuneGetCCN().contingent) || 220) * 100);
 
   return { year, totalHS: Math.round(totalHS * 100) / 100, pctContingent, peakMonth, peakMonthKey, avgPerMonth: Math.round(avgPerMonth * 100) / 100, violationsDay, hasData: totalHS > 0 };
 }
@@ -15019,8 +15034,11 @@ function renderAnnualComparison() {
 const _PROFILE_KEY = 'FOX_KITSUNE_PROFILE';
 
 function loadKitsuneProfile() {
-  try { return JSON.parse(localStorage.getItem(_PROFILE_KEY) || '{}'); }
-  catch(e) { return {}; }
+  // 26/09/2026 : sans prénom propre à Kitsune, celui des Paramètres du menu (SH_PRENOM)
+  let p = {};
+  try { p = JSON.parse(localStorage.getItem(_PROFILE_KEY) || '{}') || {}; } catch(e) { p = {}; }
+  if (!p.prenom) { try { const g = localStorage.getItem('SH_PRENOM'); if (g) p.prenom = g; } catch(e) {} }
+  return p;
 }
 
 function saveKitsuneProfile() {
@@ -15343,7 +15361,7 @@ function renderRapport() {
     <div class="rapport-section">
       <div class="rapport-title">⚖️ Situation légale — ${year}</div>
       <div class="rapport-row"><span class="rr-label">Heures sup cumulées</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${_fmtH(dN.totalHS)}</span></div>
-      <div class="rapport-row"><span class="rr-label">% du contingent ({contingent}h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>
+      <div class="rapport-row"><span class="rr-label">% du contingent (${(s.annual&&s.annual.contingentMax)||(_kitsuneGetCCN().contingent||220)}h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>
       <div class="rapport-row"><span class="rr-label">Journée max détectée</span><span class="rr-val ${s.daily?.hasDailyCrit ? 'rr-danger' : s.daily?.hasDailyRisk ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.daily?.maxDayTotal || 0)}</span></div>
       <div class="rapport-row"><span class="rr-label">Semaine max détectée</span><span class="rr-val ${s.weekly?.hasWeekViol ? 'rr-danger' : s.weekly?.hasWeekAlert ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.weekly?.maxWeekTotal || 35)}</span></div>
       <div class="rapport-row"><span class="rr-label">Niveau global</span><span class="rr-val" style="color:${levelColor(s.globalLevel || 'ok')};text-transform:uppercase;">${s.globalLevel || 'ok'}</span></div>
@@ -15361,7 +15379,7 @@ function renderRapport() {
       <div class="rapport-title">📆 Comparaison annuelle</div>
       <div class="rapport-row"><span class="rr-label">${year}</span><span class="rr-val">${dN.totalHS}h</span></div>
       <div class="rapport-row"><span class="rr-label">${year-1}</span><span class="rr-val" style="color:#666;">${dP.totalHS}h</span></div>
-      <div class="rapport-row"><span class="rr-label">Évolution</span><span class="rr-val ${dN.totalHS > dP.totalHS ? 'rr-danger' : 'rr-ok'}">${dN.totalHS > dP.totalHS ? '+' : ''}${_fmtH(Math.abs(dN.totalHS - dP.totalHS))}</span></div>
+      <div class="rapport-row"><span class="rr-label">Évolution</span><span class="rr-val ${dN.totalHS > dP.totalHS ? 'rr-danger' : 'rr-ok'}">${dN.totalHS > dP.totalHS ? '+' : dN.totalHS < dP.totalHS ? '−' : ''}${_fmtH(Math.abs(dN.totalHS - dP.totalHS))}</span></div>
     </div>` : ''}
 
     <!-- Patterns -->
