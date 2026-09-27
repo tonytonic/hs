@@ -39,20 +39,111 @@ const M6_Feries = {
 };
 
 // ══════════════════════════════════════════════════════════════════
+//  BORNES DE L'EXERCICE (26/09/2026)
+//  Un exercice à cheval (ex. juin → mai) est rangé sous l'année de son début :
+//  ses jours de janvier à mai portent l'année suivante. Avant, tout filtrait sur
+//  « la date commence par l'année » et ces jours étaient ignorés.
+//  Exercice du 1er janvier au 31 décembre : filtre strictement identique à avant.
+// ══════════════════════════════════════════════════════════════════
+/* 27/09/2026 : nom (année) d'un exercice = l'année où il a le plus de jours ; égalité →
+   année de début. 29/12/2025 → 27/12/2026 : 2026 ; 01/06/2025 → 31/05/2026 : 2025.
+   Même règle que le compteur annuel. */
+function M6_exoAnnee(deb, fin) {
+  const re = /^\d{4}-\d{2}-\d{2}$/;
+  if (!re.test(deb || '')) return null;
+  const y1 = parseInt(deb, 10);
+  if (!re.test(fin || '') || fin < deb) return y1;
+  const y2 = parseInt(fin, 10);
+  let best = y1, bj = -1;
+  for (let y = y1; y <= y2; y++) {
+    const a = new Date(Math.max(Date.parse(deb + 'T12:00:00'), Date.parse(y + '-01-01T12:00:00')));
+    const b = new Date(Math.min(Date.parse(fin + 'T12:00:00'), Date.parse(y + '-12-31T12:00:00')));
+    const j = Math.round((b - a) / 864e5) + 1;
+    if (j > bj) { bj = j; best = y; }
+  }
+  return best;
+}
+global.M6_exoAnnee = M6_exoAnnee;
+
+const M6_Periode = {
+  _iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); },
+  bornes(contract, year, regime) {
+    year = parseInt(year, 10);
+    let c = contract;
+    const RG = regime || localStorage.getItem('M6_REGIME') || '';
+    if (!c) { try { c = global.M6_Storage && M6_Storage.getContract(RG); } catch (_) {} }
+    c = c || {};
+    // Réglages propres à cet exercice (27/09/2026) : leurs dates priment
+    try {
+      const rg = RG;
+      const sn = JSON.parse(localStorage.getItem('M6_' + rg + '_' + year + '_CONTRACT') || 'null');
+      const re0 = /^\d{4}-\d{2}-\d{2}$/;
+      if (sn) {
+        if (re0.test(sn.dateDebutExercice || '') && re0.test(sn.dateFinExercice || '') && sn.dateFinExercice >= sn.dateDebutExercice && M6_exoAnnee(sn.dateDebutExercice, sn.dateFinExercice) === year)
+          return { year, deb: sn.dateDebutExercice, fin: sn.dateFinExercice, calendaire: sn.dateDebutExercice === year + '-01-01' && sn.dateFinExercice === year + '-12-31' };
+        if (!sn.dateDebutExercice && !sn.dateFinExercice) return { year, deb: year + '-01-01', fin: year + '-12-31', calendaire: true };
+      }
+    } catch (_) {}
+    // Exercices déjà clos : leurs vraies dates, gardées à l'ouverture du suivant (26/09/2026)
+    try {
+      const h = JSON.parse(localStorage.getItem('M6_EXERCICES_' + RG) || '{}') || {};
+      const e = h[String(year)];
+      if (e && e.deb && e.fin && e.fin >= e.deb) return { year, deb: e.deb, fin: e.fin, calendaire: e.deb === year + '-01-01' && e.fin === year + '-12-31' };
+    } catch (_) {}
+    const deb = c.dateDebutExercice, fin = c.dateFinExercice, re = /^\d{4}-\d{2}-\d{2}$/;
+    if (deb && re.test(deb) && !(deb.slice(5) === '01-01' && (!fin || fin.slice(5) === '12-31'))) {
+      // L'exercice nommé « year » commence l'année (year - décalage) : 17/11 → 16/11 est nommé
+      // d'après l'année de sa fin, 01/06 → 31/05 d'après celle de son début
+      const off = (fin && re.test(fin)) ? (M6_exoAnnee(deb, fin) - parseInt(deb, 10)) : 0;
+      const d = (year - off) + '-' + deb.slice(5);
+      let f;
+      if (fin && re.test(fin)) f = (year - off + parseInt(fin.slice(0, 4), 10) - parseInt(deb.slice(0, 4), 10)) + '-' + fin.slice(5);
+      else { const x = new Date(d + 'T12:00:00'); x.setFullYear(x.getFullYear() + 1); x.setDate(x.getDate() - 1); f = this._iso(x); }
+      if (f >= d) return { year, deb: d, fin: f, calendaire: false };
+    }
+    return { year, deb: year + '-01-01', fin: year + '-12-31', calendaire: true };
+  },
+  inclut(k, b) {
+    k = String(k);
+    if (b.calendaire) return k.startsWith(String(b.year));
+    if (/^\d{4}-\d{2}-\d{2}$/.test(k)) return k >= b.deb && k <= b.fin;
+    const w = /^(\d{4})-W(\d{2})$/.exec(k);
+    if (w) { const j4 = new Date(+w[1], 0, 4, 12), lun = new Date(j4); lun.setDate(j4.getDate() - ((j4.getDay() + 6) % 7) + (+w[2] - 1) * 7); const m = this._iso(lun); return m >= b.deb && m <= b.fin; }
+    return false;
+  },
+  feries(b) {
+    const s = new Set();
+    for (let y = +b.deb.slice(0, 4); y <= +b.fin.slice(0, 4); y++) M6_Feries.getSet(y).forEach(x => s.add(x));
+    return s;
+  },
+  // Jour compris dans l'exercice et au plus tard à la fin du mois m (0-11) de cet exercice
+  jusquAuMois(dk, b, m) {
+    if (!this.inclut(dk, b)) return false;
+    if (b.calendaire) return parseInt(dk.slice(5, 7), 10) - 1 <= m;
+    const dm = parseInt(b.deb.slice(5, 7), 10) - 1, y = parseInt(b.deb.slice(0, 4), 10) + (m < dm ? 1 : 0);
+    return dk <= this._iso(new Date(y, m + 1, 0));
+  }
+};
+
+// ══════════════════════════════════════════════════════════════════
 //  MOTEUR FORFAIT JOURS
 // ══════════════════════════════════════════════════════════════════
 const M6_ForfaitJours = {
 
   calcRTT(year, plafond=218, cpContrat=25, dateArrivee=null, dateDepart=null, exDebut=null, exFin=null) {
     const isLeap = y => (y%4===0&&y%100!==0)||y%400===0;
-    const feries = M6_Feries.getSet(year);
-    const debut  = dateArrivee ? new Date(dateArrivee+'T12:00:00') : new Date(year,0,1);
-    const fin    = dateDepart  ? new Date(dateDepart+'T12:00:00')  : new Date(year,11,31);
+    // Fériés de toutes les années couvertes (exercice à cheval, 26/09/2026)
+    const feries = (function(){ const s=new Set(),a=dateArrivee?parseInt(dateArrivee,10):year,z=dateDepart?parseInt(dateDepart,10):year;
+      for(let y=Math.min(a,z);y<=Math.max(a,z);y++) M6_Feries.getSet(y).forEach(x=>s.add(x)); return s; })();
+    // 27/09/2026 : midi heure locale + date locale. Avant, minuit + toISOString décalait
+    // chaque jour d'un cran en France (UTC+1/+2) : fériés mal repérés, RTT faussés en année civile.
+    const debut  = dateArrivee ? new Date(dateArrivee+'T12:00:00') : new Date(year,0,1,12);
+    const fin    = dateDepart  ? new Date(dateDepart+'T12:00:00')  : new Date(year,11,31,12);
     const joursCalendaires = isLeap(year)?366:365;
     let WE=0,feriesOuvres=0,joursEffPeriode=0;
     const cur=new Date(debut);
     while(cur<=fin){
-      const dk=cur.toISOString().slice(0,10),dow=cur.getDay();
+      const dk=cur.getFullYear()+'-'+String(cur.getMonth()+1).padStart(2,'0')+'-'+String(cur.getDate()).padStart(2,'0'),dow=cur.getDay();
       joursEffPeriode++;
       if(dow===0||dow===6) WE++;
       else if(feries.has(dk)) feriesOuvres++;
@@ -109,10 +200,11 @@ const M6_ForfaitJours = {
         recap.rttManuel = true;
       }
     }
-    const feries=M6_Feries.getSet(year);
+    const _b=M6_Periode.bornes(contract,year);
+    const feries=M6_Periode.feries(_b);
     let travailles=0,rachetes=0,rttPris=0,cpPris=0,reposPris=0,demis=0,deplacements=0,demis_matin=0,demis_am=0;
     const alertes=[],entrees=[];
-    const entries=Object.entries(data).filter(([k])=>k.startsWith(String(year))).sort(([a],[b])=>a.localeCompare(b));
+    const entries=Object.entries(data).filter(([k])=>M6_Periode.inclut(k,_b)).sort(([a],[b])=>a.localeCompare(b));
     for(const [dk,v] of entries){
       const t=v.type||'travail';
       const dow=new Date(dk+'T12:00:00').getDay();
@@ -126,7 +218,7 @@ const M6_ForfaitJours = {
         else demis_am++;
         demis++;
       }
-      else if(t==='travail') travailles++;
+      else if(t==='travail'||t==='teletravail') travailles++; // 27/09/2026 : le télétravail est un jour travaillé
       else if(t==='rachat'){travailles++;rachetes++;}
       else if(t==='rtt')   rttPris++;
       else if(t==='cp')    cpPris++;
@@ -136,7 +228,7 @@ const M6_ForfaitJours = {
       entrees.push({dk,...v});
     }
     // Amplitude + repos quotidien
-    const joursTrack=entrees.filter(e=>['travail','rachat'].includes(e.type||'travail'));
+    const joursTrack=entrees.filter(e=>['travail','rachat','teletravail'].includes(e.type||'travail'));
     const amplitudeViolations=[];
     for(let i=1;i<joursTrack.length;i++){
       const prev=joursTrack[i-1],curr=joursTrack[i];
@@ -174,7 +266,7 @@ const M6_ForfaitJours = {
     if(!_entretienOk) alertes.push({niveau:'info',icon:'🗓️',
       titre:'Entretien annuel non enregistré',
       texte:'Obligatoire — risque de nullité du forfait (L3121-65).',loi:'L3121-65'});
-    const fractionnement=this._calcFractionnement(data,year);
+    const fractionnement=this._calcFractionnement(data,year,contract);
     const simulRachat=this._simuleRachat(contract,travailles,recap.joursTravailMax);
     const prediction=this._predictFinAnnee(travailles,recap.joursTravailMax,year);
     return {
@@ -195,10 +287,11 @@ const M6_ForfaitJours = {
     };
   },
 
-  _calcFractionnement(data,year) {
+  _calcFractionnement(data,year,contract) {
+    const _b=M6_Periode.bornes(contract,year);
     let cpHorsPeriode=0,totalCP=0;
     for(const [dk,v] of Object.entries(data)){
-      if(!dk.startsWith(String(year))||v.type!=='cp') continue;
+      if(!M6_Periode.inclut(dk,_b)||v.type!=='cp') continue;
       totalCP++;
       const mois=parseInt(dk.slice(5,7));
       if(mois<5||mois>10) cpHorsPeriode++;
@@ -286,7 +379,8 @@ const M6_ForfaitHeures = {
     const tauxH=contract.tauxHoraire||0;
     let totalHSTaux1=0,totalHSTaux_inter=0,totalHSTaux2=0,totalHeures=0,semaines=0;
     const detailSemaines=[],alertes=[];
-    const entries=Object.entries(data).filter(([k])=>k.startsWith(String(year))).sort(([a],[b])=>a.localeCompare(b));
+    const _b=M6_Periode.bornes(contract,year);
+    const entries=Object.entries(data).filter(([k])=>M6_Periode.inclut(k,_b)).sort(([a],[b])=>a.localeCompare(b));
 
     for(const [wk,v] of entries){
       const h=parseFloat(v.heures)||0; totalHeures+=h; semaines++;
@@ -358,6 +452,7 @@ const M6_ForfaitHeures = {
 };
 
 global.M6_Feries=M6_Feries;
+global.M6_Periode=M6_Periode;
 global.M6_ForfaitJours=M6_ForfaitJours;
 global.M6_ForfaitHeures=M6_ForfaitHeures;
 

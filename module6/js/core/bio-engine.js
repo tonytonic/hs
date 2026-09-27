@@ -320,7 +320,7 @@ const M6_BioEngine = {
       semaines[wk].push({ dk, ...v });
 
       const t = v.type || 'travail';
-      if (t === 'travail')    joursTotal++;
+      if (t === 'travail' || t === 'teletravail') joursTotal++;
       if (t === 'rachat')     { joursTotal++; rachetes++; }
       if (t === 'rtt')        { rttPris++; cumulSurcharge = Math.max(0, cumulSurcharge - 0.25); }
       if (t === 'cp')         { cpPris++;  cumulSurcharge = Math.max(0, cumulSurcharge - 0.35); }
@@ -349,7 +349,7 @@ const M6_BioEngine = {
     const nbSemaines = wkKeys.length || 1;
 
     for (const wk of wkKeys) {
-      const jT = semaines[wk].filter(j => ['travail','rachat','demi'].includes(j.type||'travail')).length;
+      const jT = semaines[wk].filter(j => ['travail','rachat','demi','teletravail'].includes(j.type||'travail')).length;
       if (jT >= 5) {
         semSurcharge++;
         cumulSurcharge += Math.min(2, jT - 4); // max 2 unités/semaine
@@ -372,50 +372,68 @@ const M6_BioEngine = {
     const baselineFat    = baseline?.fatigue || 0;
     const baselineStress = baseline?.stress  || 0;
 
-    // ── Équivalent heures hebdomadaires (pour les modèles horaires) ──
-    // Pour FJ : on estime l'heq à partir du taux de forfait + amplitude réelle si saisie
-    const tauxForfait = Math.min(1.3, joursTotal / Math.max(1, plafond * (nbSemaines / 52)));
-    // Base : 35h + surcharge proportionnelle au taux de remplissage
-    let hEquivMoyen = Math.min(60, 35 + (tauxForfait - 1) * 50 + rachetes * 0.9);
-    // Affinage : si des amplitudes ont été saisies, on les intègre directement
-    // amplitudeViola ⊂ amplitudeLongue → ne comptabiliser qu'une fois chaque jour
-    const nAmplitudeTotal = amplitudeLongue; // amplitudeViola est déjà inclus dans amplitudeLongue
-    if (nAmplitudeTotal > 0 && joursTotal > 0) {
-      // Amplitude moyenne estimée pondérée sur les journées saisies :
-      //   jours >13h → 14h moy.  |  jours 11-13h → 12h moy.  |  autres → 8.5h std
-      const nViola     = amplitudeViola;
-      const nLong      = amplitudeLongue - amplitudeViola; // 11-13h sans viola
-      const nStd       = Math.max(0, joursTotal - amplitudeLongue); // jours normaux
-      const hMoyTotal  = (nViola * 14 + nLong * 12 + nStd * 8.5) / Math.max(1, joursTotal);
-      const hEqAmplitude = Math.min(65, hMoyTotal * 5); // × 5 jours/sem
-      // Pondération : amplitude pondérée à 60%, estimation forfait 40%
-      hEquivMoyen = Math.round((hEqAmplitude * 0.60 + hEquivMoyen * 0.40) * 10) / 10;
+    /* 27/09/2026 — ÉTAT RÉCENT (8 dernières semaines saisies).
+       Avant : fatigue et stress cumulaient tout l'exercice. Chaque RTT ou CP pris depuis
+       janvier baissait la fatigue pour toujours (bloquée au minimum dès février) pendant
+       que le stress ne faisait que monter. Désormais :
+       • charge = rythme des 8 dernières semaines (jours travaillés, semaines pleines,
+         week-ends travaillés, amplitudes) ;
+       • RTT et CP récupèrent, avec un effet qui s'estompe en 3 semaines (BIO.CP_FADE_WEEKS) ;
+       • les jours rachetés et l'entretien annuel restent comptés sur l'exercice (structurels). */
+    const _ref = entries[entries.length - 1][0];
+    const _refT = new Date(_ref + 'T12:00:00').getTime();
+    const _age = dk => Math.round((_refT - new Date(dk + 'T12:00:00').getTime()) / 864e5);
+    const FEN = 56, FADE = (BIO.CP_FADE_WEEKS || 3) * 7;
+    let joursR = 0, amplLongR = 0, amplViolaR = 0, rttEff = 0, cpEff = 0;
+    const semR = {};
+    for (const [dk, v] of entries) {
+      const a = _age(dk); if (a < 0 || a >= FEN) continue;
+      const t = v.type || 'travail', wk = this._isoWeek(new Date(dk + 'T12:00:00'));
+      if (!semR[wk]) semR[wk] = 0;
+      if (t === 'travail' || t === 'rachat' || t === 'teletravail') { joursR++; semR[wk]++; }
+      else if (t === 'demi') { joursR += 0.5; semR[wk] += 0.5; }
+      else if (t === 'rtt') rttEff += Math.max(0, 1 - a / FADE);
+      else if (t === 'cp')  cpEff  += Math.max(0, 1 - a / FADE);
+      let amp = null;
+      if (v.debut && v.fin) { const [dh, dm] = v.debut.split(':').map(Number), [fh, fm] = v.fin.split(':').map(Number); amp = ((fh * 60 + fm) - (dh * 60 + dm)) / 60; }
+      else if (v.amplitude) amp = parseFloat(v.amplitude);
+      if (amp !== null && !isNaN(amp)) { if (amp >= BIO.FJ_AMPLITUDE_LONG) amplLongR++; if (amp >= BIO.AMPLITUDE_STRESS_SEUIL) amplViolaR++; }
+    }
+    const nbSemR = Math.max(1, Object.keys(semR).length);
+    let denseR = 0, weR = 0;
+    Object.values(semR).forEach(n => { if (n >= 6) weR++; else if (n >= 5) denseR++; });
+    const joursParSem = plafond / 52;                       // rythme du forfait (218 j → 4,2 j/sem)
+    const tauxForfait = Math.min(1.3, joursR / Math.max(1, joursParSem * nbSemR));
+
+    // ── Équivalent heures hebdomadaires (modèles horaires) : rythme récent ──
+    let hEquivMoyen = Math.min(60, 35 + Math.max(0, tauxForfait - 1) * 50 + weR * 1.5 + rachetes * 0.3);
+    if (amplLongR > 0 && joursR > 0) {
+      const nStd = Math.max(0, joursR - amplLongR);
+      const hMoyTotal = (amplViolaR * 14 + (amplLongR - amplViolaR) * 12 + nStd * 8.5) / Math.max(1, joursR);
+      hEquivMoyen = Math.round((Math.min(65, hMoyTotal * 5) * 0.60 + hEquivMoyen * 0.40) * 10) / 10;
     }
 
-    // ── FATIGUE (INRS 4 phases) ───────────────────────────────
-    // Calibrée sur les phases INRS et la charge de travail effective
+    // ── FATIGUE (INRS 4 phases) : charge récente − récupération récente ──
     let fatigue = Math.min(100, Math.round(
-      18                                                 // baseline cadre
-      + (tauxForfait - 1) * 35                           // charge > forfait
-      + (rachetes / Math.max(1, plafond)) * 65           // rachat = surcharge forte
-      + amplitudeLongue * 2.5                            // amplitudes longues (Hakola)
-      + amplitudeViola  * 3.5                            // violation repos légal
-      + semSurcharge    * 1.8                            // semaines denses [ERV-1]
-      - rttPris         * BIO.RTT_RECUP_FACTOR  * 100   // RTT pris (récupération partielle)
-      - cpPris          * BIO.CP_SEMAINE_RECUP  * 100 / 5 // CP = récupération réelle
+      18                                                   // baseline cadre
+      + Math.max(0, tauxForfait - 1) * 40                  // rythme > forfait
+      + denseR * 2                                         // semaines pleines (5 j)
+      + weR    * 8                                         // week-ends travaillés (6 j et +)
+      + (rachetes / Math.max(1, plafond)) * 65             // rachat = surcharge forte (exercice)
+      + amplLongR  * 2.5                                   // amplitudes longues (Hakola)
+      + amplViolaR * 3.5                                   // violation repos légal
+      - rttEff * BIO.RTT_RECUP_FACTOR * 100                // RTT récents (s'estompent en 3 sem.)
+      - cpEff  * BIO.CP_SEMAINE_RECUP * 100 / 5            // CP récents (s'estompent en 3 sem.)
     ));
     fatigue = Math.max(5, fatigue);
 
-    // ── B2 CONTINUITÉ : pondérer avec la baseline si on est en début d'exercice ──
-    // Si peu de saisies (<10 jours), la fatigue récente compte peu — on garde la mémoire
+    // ── B2 CONTINUITÉ : en début d'exercice, la baseline garde la mémoire ──
     if (joursTotal < 10 && baselineFat > 0) {
-      const w = joursTotal / 10;  // poids progressif des nouvelles données
+      const w = joursTotal / 10;
       fatigue = Math.round(fatigue * w + baselineFat * (1 - w));
     }
 
     // ── STRESS (HPA + épigénétique) ──────────────────────────
-    // Basé sur : cortisol chronique [EPI], entretien [L3121-65], rachat [INF]
-    // Entretien considéré "fait" si : date saisie OU case auto-attestée dans Validité.
     const _attestKey = `M6_VALID_CHECK_forfait_jours_${year}_entretien_annuel`;
     let _entretienAutoOk = false;
     try { _entretienAutoOk = (localStorage.getItem(_attestKey) === '1'); } catch(_) {}
@@ -425,9 +443,11 @@ const M6_BioEngine = {
       8
       + (rachetes > 0 ? rachetes * BIO.RACHAT_STRESS_PAR_JOUR : 0)
       + (!entretienDone ? BIO.ENTRETIEN_MANQUANT_STRESS : 0)  // absence entretien L3121-65
-      + semSurcharge   * 2.2
-      + amplitudeLongue * 1.8                            // Hakola : perturbation circadienne
-      + amplitudeViola  * 3.0                            // violation repos = cortisol spike
+      + denseR * 1.5
+      + weR    * 4
+      + amplLongR  * 1.8                                   // Hakola : perturbation circadienne
+      + amplViolaR * 3.0                                   // violation repos = cortisol spike
+      - cpEff * 1.5                                        // vacances récentes
     ));
     stress = Math.max(3, stress);
     if (joursTotal < 10 && baselineStress > 0) {
@@ -440,7 +460,7 @@ const M6_BioEngine = {
     const perfFinal = Math.max(25, perfBase - Math.round(fatigue * 0.18));
 
     // ── RÉCUPÉRATION (Sonnentag 2022) ─────────────────────────
-    const recovery = _recoveryScore(fatigue, rttPris, cpPris, nbSemaines, semSurcharge);
+    const recovery = _recoveryScore(fatigue, Math.round(rttEff), Math.round(cpEff), nbSemR, denseR + weR);
 
     // ── RISQUE CV (Kivimäki 2015 + dose-réponse asymétrique) ──
     const cumulMonths  = cumulSurcharge / 4;
@@ -557,17 +577,26 @@ const M6_BioEngine = {
     // Semaines de récupération réelle (<seuil) — Sonnentag 2022
     const semainesRecup = heuresArr.filter(h => h <= seuil * 0.95).length;
 
+    /* 27/09/2026 : fatigue et stress sur les 8 dernières semaines saisies (état récent),
+       comme le forfait jours. Avant, surcharges et semaines légères se cumulaient sur tout
+       l'exercice : les scores ne redescendaient jamais, ou restaient bloqués au minimum. */
+    const arrR = heuresArr.slice(-8), nR = arrR.length;
+    const meanR = arrR.reduce((s,h) => s+h, 0) / Math.max(1, nR);
+    const surchargeR = arrR.filter(h => h > seuil * 1.15).length;
+    let cumulR = 0; arrR.forEach(h => { cumulR += Math.max(0, h - seuil) / seuil; });
+    const recupR = arrR.filter(h => h <= seuil * 0.95).length;
+
     // ── Scores ────────────────────────────────────────────────
     let fatigue = Math.min(100, Math.round(
       12
-      + (mean > seuil ? (mean - seuil) * 2.5 : 0)
-      + surcharge * 2.8
-      + cumul * 6
-      - semainesRecup * 2.5                // récupération effective
+      + (meanR > seuil ? (meanR - seuil) * 2.5 : 0)
+      + surchargeR * 2.8
+      + cumulR * 6
+      - recupR * 2.5                       // récupération effective (récente)
     ));
     fatigue = Math.max(5, fatigue);
 
-    let stress    = Math.min(100, Math.round(8 + surcharge * 4.5 + Math.max(0, mean - BIO.H_LEGAL) * 2.8));
+    let stress    = Math.min(100, Math.round(8 + surchargeR * 4.5 + Math.max(0, meanR - BIO.H_LEGAL) * 2.8));
 
     // ── ÉCHANTILLON FAIBLE : tempérer pour les premières semaines ──
     // Avec 1 ou 2 semaines, le mean est très volatil ; une seule semaine à 45h
@@ -582,8 +611,8 @@ const M6_BioEngine = {
       stress  = Math.round(baseStress + (stress  - baseStress) * warmup);
     }
 
-    const perfFinal = Math.max(25, Math.round(_pencavelPerf(mean) * 100 - fatigue * 0.12));
-    const recovery  = _recoveryScore(fatigue, semainesRecup, 0, n, surcharge);
+    const perfFinal = Math.max(25, Math.round(_pencavelPerf(meanR) * 100 - fatigue * 0.12));
+    const recovery  = _recoveryScore(fatigue, recupR, 0, nR, surchargeR);
     const cvRiskScore = Math.round(_cvRiskModel(mean, cumul / 4, surcharge) * 100);
     const cogRisk   = _cogRisk(mean, fatigue, stress, 0);
     const agingRisk = _agingRisk(fatigue, stress, cumul / 4);
