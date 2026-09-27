@@ -7,8 +7,15 @@
 <meta name="apple-mobile-web-app-title" content="Compteur Heures & Paie">
 <meta name="theme-color" content="#4FB3C2">
 <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
 <title>Simulateur de compteur annuel</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
+<!-- Sans flash (01/10/2026) : quand un exercice existe, le calendrier et les
+     totaux restent invisibles le temps d'être remplis, puis apparaissent d'un
+     coup (avant : cases vides, puis chiffres, puis décalage). Sécurité 2 s. -->
+<script>(function(){try{var s=localStorage.getItem('ACTIVE_YEAR_SUFFIX')||String(new Date().getFullYear());if(localStorage.getItem('EXERCISE_START_'+s)){var h=document.documentElement;h.classList.add('hs-attente');var f=function(){requestAnimationFrame(function(){h.classList.remove('hs-attente');});};window.addEventListener('load',f);setTimeout(f,2000);}}catch(e){}})();</script>
+<style>.main-zone{transition:opacity .15s ease}html.hs-attente .main-zone{opacity:0}</style>
 <style>
 .popup-content input[type=number]{box-sizing:border-box;width:100%;}
 .saisie-toggle{display:flex;gap:0;margin-bottom:12px;border-radius:14px;overflow:hidden;border:1px solid #ddd}
@@ -394,6 +401,7 @@ document.addEventListener("DOMContentLoaded", function(){
   <button onclick="switchYear()" style="width:auto;padding:6px 14px;border-radius:99px;border:1.5px solid #b0dde5;background:#e8f6f8;color:#2196a6;font-weight:700;font-size:13px;cursor:pointer;margin:0"><b id="activeYearLabel"></b> ⇄</button>
 </div>
 
+<div id="hsExoSuivant" style="display:none;max-width:900px;margin:8px auto;padding:12px 14px;border-radius:14px;background:#fff8e6;border:1.5px solid #f0c040;font-size:13.5px;line-height:1.45;color:#5a4300"></div>
 <div id="contingentBar" style="max-width:900px;margin:8px auto">
   <div class="contingent-wrap">
     <div class="contingent-label">
@@ -694,7 +702,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <button onclick="closeJSONPopup()">Fermer</button>
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+<script src="../js/vendor/jspdf.umd.min.js">
 /* TOAST SYSTEM */
 function toast(msg,type="info",duration=2800){
   const c=document.getElementById("toastContainer");
@@ -765,6 +773,38 @@ window.addEventListener("unhandledrejection",e=>{
 });
 function goMenu(){try{unlockBodyScroll();}catch(_){}localStorage.removeItem("lastApp");window.location.href="../menu.html";}
 function autoSwitchPeriodAtMidnight(){const now=new Date();const next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,0,0);if(midnightTimer)clearTimeout(midnightTimer);midnightTimer=setTimeout(()=>{if(typeof buildPeriods==="function")buildPeriods();if(typeof update==="function")update();showToast();autoSwitchPeriodAtMidnight();},next-now);}
+/* 26/09/2026 : l'année mémorisée (lue aussi par Fox et le jumeau numérique) revient
+   toujours sur l'exercice en cours — le plus récent déjà commencé — à l'ouverture de M1
+   et quand on le quitte. Consulter une année passée reste possible, le temps de la visite. */
+function hsExerciceEnCours(){
+  const t=new Date(),auj=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+  let best=null,bestDeb='';
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const m=/^EXERCISE_START_(\d{4})$/.exec(k||'');if(!m)continue;
+    const d=String(localStorage.getItem(k)||'').slice(0,10);if(/^\d{4}-\d{2}-\d{2}$/.test(d)&&d<=auj&&d>bestDeb){bestDeb=d;best=m[1];}}
+  return best;
+}
+/* 27/09/2026 — un jour appartient à l'exercice qui contient sa date. Avant : saisi depuis un autre
+   exercice (ex. 29/12/2025 tapé dans 2025 qui finit le 28/12), il restait rangé là et n'était compté
+   nulle part. hsBornesExo(y) = [début, fin] ; hsExoDeDate(d) = exercice qui contient d. */
+function hsBornesExo(y){const d=String(localStorage.getItem('EXERCISE_START_'+y)||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return null;
+  let f=String(localStorage.getItem('ANNUAL_DATE_'+y)||'').slice(0,10);if(!/^\d{4}-\d{2}-\d{2}$/.test(f)){try{const c=JSON.parse(localStorage.getItem('CLOSURES_REPORT_'+y)||'[]').filter(Boolean).sort();f=c[c.length-1]||'';}catch(e){f='';}}
+  return /^\d{4}-\d{2}-\d{2}$/.test(f)&&f>=d?{deb:d,fin:f}:null;}
+function hsExoDeDate(dk){for(let i=0;i<localStorage.length;i++){const m=/^EXERCISE_START_(\d{4})$/.exec(localStorage.key(i)||'');if(!m)continue;const b=hsBornesExo(m[1]);if(b&&dk>=b.deb&&dk<=b.fin)return m[1];}return null;}
+(function hsRangerJours(){try{
+  const ys=[];for(let i=0;i<localStorage.length;i++){const m=/^DATA_REPORT_(\d{4})$/.exec(localStorage.key(i)||'');if(m)ys.push(m[1]);}
+  const tabs={},mod={};ys.forEach(y=>{try{tabs[y]=JSON.parse(localStorage.getItem('DATA_REPORT_'+y)||'{}')||{};}catch(e){tabs[y]=null;}});
+  ys.forEach(y=>{const b=hsBornesExo(y),t=tabs[y];if(!b||!t)return;
+    Object.keys(t).forEach(dk=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(dk)||(dk>=b.deb&&dk<=b.fin))return;
+      const a=hsExoDeDate(dk);if(!a||a===y)return;if(!tabs[a])tabs[a]=JSON.parse(localStorage.getItem('DATA_REPORT_'+a)||'{}')||{};
+      if(Object.prototype.hasOwnProperty.call(tabs[a],dk))return;   // jamais d'écrasement
+      tabs[a][dk]=t[dk];delete t[dk];mod[a]=1;mod[y]=1;});});
+  Object.keys(mod).forEach(y=>{localStorage.setItem('DATA_REPORT_'+y,JSON.stringify(tabs[y]));localStorage.setItem('REPORTS_REPORT_'+y,'{}');});
+}catch(e){}})();
+(function(){try{const y=hsExerciceEnCours();if(y)localStorage.setItem("ACTIVE_YEAR_SUFFIX",y);
+  const remettre=function(){try{const y2=hsExerciceEnCours();if(y2)localStorage.setItem("ACTIVE_YEAR_SUFFIX",y2);}catch(e){}};
+  window.addEventListener('pagehide',remettre);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')remettre();});
+}catch(e){}})();
 let currentSuffix=localStorage.getItem("ACTIVE_YEAR_SUFFIX")||new Date().getFullYear();
 document.getElementById("activeYearLabel").textContent=currentSuffix;
 function resetCurrentExercise(){
@@ -820,7 +860,13 @@ function _hmToDec(hId,mId){var h=Number(document.getElementById(hId).value)||0;v
 function _decToHM(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;}
 function saveManual(){if(!selectedDate)return;if(!data[selectedDate])data[selectedDate]={extra:0,recup:0,absent:0};data[selectedDate].extra=_hmToDec('manualExtraH','manualExtraM');data[selectedDate].recup=_hmToDec('manualRecupH','manualRecupM');data[selectedDate].absent=isAbsent.checked?(_hmToDec('absentH','absentM')||DAILY_WORK_HOURS):0;save();const _sd1=selectedDate;closePopup();showSaveFeedback(_sd1);}
 function closeYearsPopup(){document.getElementById("popupYears").style.display="none";}
-function confirmSwitchYear(){const val=document.getElementById("newYearInput").value;if(!val)return;if(!localStorage.getItem("DATA_REPORT_"+val)){localStorage.setItem("DATA_REPORT_"+val,JSON.stringify({}));localStorage.setItem("CLOSURES_REPORT_"+val,JSON.stringify([]));localStorage.setItem("REPORTS_REPORT_"+val,JSON.stringify({}));localStorage.setItem("PERIOD_META_REPORT_"+val,JSON.stringify({}));}loadExercise(val);}
+function confirmSwitchYear(){const val=document.getElementById("newYearInput").value;if(!val)return;
+  /* 26/09/2026 : nouvelle année qui suit un exercice existant → même chemin que le bandeau
+     (clôtures automatiques ou manuelles, début au lendemain de la clôture annuelle, jours
+     déjà saisis après la clôture rangés dans la nouvelle année) */
+  {const prev=String(Number(val)-1);
+   if(/^\d{4}$/.test(String(val))&&!localStorage.getItem("DATA_REPORT_"+val)&&localStorage.getItem("ANNUAL_DATE_"+prev)&&typeof window.hsChoisirPuisOuvrir==="function"){
+     closeYearsPopup();if(String(currentSuffix)!==prev)loadExercise(prev);window.hsChoisirPuisOuvrir();return;}}if(!localStorage.getItem("DATA_REPORT_"+val)){localStorage.setItem("DATA_REPORT_"+val,JSON.stringify({}));localStorage.setItem("CLOSURES_REPORT_"+val,JSON.stringify([]));localStorage.setItem("REPORTS_REPORT_"+val,JSON.stringify({}));localStorage.setItem("PERIOD_META_REPORT_"+val,JSON.stringify({}));}loadExercise(val);if(window.hsBackupNudge)hsBackupNudge("year");}
 function addRecup(h){if(!data[selectedDate])data[selectedDate]={extra:0,recup:0};const nv=Math.round((data[selectedDate].recup+h)*4)/4;data[selectedDate].recup=ALLOW_RECUP_FREE?nv:Math.min(nv,data[selectedDate].extra);save();closePopup();}
 function addExtra(h){if(!data[selectedDate])data[selectedDate]={extra:0,recup:0};data[selectedDate].extra=Math.round((data[selectedDate].extra+h)*4)/4;save();const _sd2=selectedDate;closePopup();showSaveFeedback(_sd2);}
 
@@ -1026,6 +1072,9 @@ function buildPeriods(){
   else if(found===null){if(today<periods[0].start)found=0;else found=closures.length-1;}
   found=Math.max(0,found);
   currentPeriodIndex=found;periodSelect.selectedIndex=found;
+  // 26/09/2026 : le calendrier se place sur la période choisie (avant : il restait sur le
+  // mois d'aujourd'hui, hors exercice quand on consulte une année passée)
+  {const P=periods[found];if(P){if(today>=P.start&&today<=P.end)hsVoirMois(today);else hsVoirMois(P.end<today?P.end:P.start);}}
   autoLockPastPeriods();updatePeriodLockUI();
   if(typeof update==="function")update();
 }
@@ -1238,6 +1287,9 @@ function calculate(){
 function openNotice(){document.getElementById("popupNotice").style.display="flex";}
 function closeNotice(){document.getElementById("popupNotice").style.display="none";}
 function openPopup(date){
+  /* 27/09/2026 : jour d'un autre exercice → on ouvre cet exercice (la saisie y sera rangée) */
+  try{const b=hsBornesExo(currentSuffix);if(b&&(date<b.deb||date>b.fin)){const a=hsExoDeDate(date);
+    if(a&&a!==String(currentSuffix)){confirmModal("Le "+date.split('-').reverse().join('/')+" appartient à l'exercice "+a+".\nL'ouvrir pour saisir ce jour ?",()=>{loadExercise(a);setTimeout(()=>openPopup(date),300);},"Ouvrir "+a);return;}}}catch(e){}
   if(isPeriodLocked(date)){toast("🔒 Période verrouillée","warn");return;}
   selectedDate=date;
   // NE PAS écrire absent automatiquement — le bloc AUTO_FERIE dans calculate() gère les -7h
@@ -1303,6 +1355,27 @@ function closeJSONPopup(){popupJSON.style.display="none";}
 async function importFeries(){const by=Number(currentSuffix),years=[by-1,by,by+1];try{for(const y of years){const res=await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`);const f=await res.json();Object.keys(f).forEach(d=>{if(!specialDays[d])specialDays[d]="ferie";});}localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));localStorage.setItem(STORAGE.data,JSON.stringify(data));if(typeof update==="function")update();toast("✅ Jours fériés importés (N-1/N/N+1)","success");}catch(e){toast("❌ Import fériés impossible","error");}}
 
 /* SWIPE CALENDRIER */
+function hsPeriodeN(i){const b=getBaseStartDate();if(!b||i<0||i>=closures.length)return null;let st=new Date(b);st.setHours(0,0,0,0);
+  for(let k=0;k<i;k++){st=new Date(closures[k]);st.setHours(0,0,0,0);st.setDate(st.getDate()+1);}const en=new Date(closures[i]);en.setHours(0,0,0,0);return{start:st,end:en,index:i};}
+function hsVoirMois(d){viewMonth=d.getMonth();viewYear=d.getFullYear();}
+function hsSwipePeriode(dir){
+  const p=hsPeriodeN(currentPeriodIndex)||getCurrentPeriod();if(!p)return;
+  const debM=new Date(viewYear,viewMonth,1),finM=new Date(viewYear,viewMonth+1,0);
+  // Mois affiché hors de la période : on se replace d'abord dessus
+  if(finM<p.start||debM>p.end){hsVoirMois(dir>0?p.start:(p.end.getFullYear()<2099?p.end:p.start));return;}
+  if(dir>0){
+    if(p.end>finM&&p.end.getFullYear()<2099){hsVoirMois(new Date(viewYear,viewMonth+1,1));return;}
+    const n=hsPeriodeN(currentPeriodIndex+1);
+    if(!n){toast("Fin de l'exercice "+currentSuffix,"info");return;}
+    currentPeriodIndex=n.index;if(n.start>finM)hsVoirMois(n.start);
+  }else{
+    if(p.start<debM){hsVoirMois(new Date(viewYear,viewMonth-1,1));return;}
+    const n=hsPeriodeN(currentPeriodIndex-1);
+    if(!n){toast("Début de l'exercice "+currentSuffix,"info");return;}
+    currentPeriodIndex=n.index;if(n.end<debM)hsVoirMois(n.end);
+  }
+  autoLockPastPeriods();updatePeriodLockUI();
+}
 (function(){
   let _sx=null,_sy=null;
   function initSwipe(){
@@ -1315,54 +1388,9 @@ async function importFeries(){const by=Number(currentSuffix),years=[by-1,by,by+1
       const dy=e.changedTouches[0].clientY-_sy;
       if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>50){
         const dir=dx<0?1:-1;
-        const p=getCurrentPeriod();
-        if(dir>0){
-          // Swipe avant : si la période en cours déborde sur le mois suivant → avancer le mois
-          // Sinon → passer à la période suivante
-          const curMonthEnd=new Date(viewYear,viewMonth+1,0);// dernier jour du mois affiché
-          if(p&&p.end>curMonthEnd&&p.end.getFullYear()<2099){
-            // La période continue après ce mois → avancer d'un mois
-            viewMonth++;if(viewMonth>11){viewMonth=0;viewYear++;}
-          } else {
-            // Fin de période dans ce mois (ou période infinie) → passer à la période suivante
-            const newIdx=Math.min(closures.length,currentPeriodIndex+1);
-            if(newIdx!==currentPeriodIndex){
-              currentPeriodIndex=newIdx;
-              // Si le mois actuel n'est pas dans la nouvelle période → aller au début
-              let s2=exerciseStart?new Date(exerciseStart):new Date(viewYear,0,1);
-              for(let i=0;i<newIdx;i++){const e=new Date(closures[i]);s2=new Date(e);s2.setDate(s2.getDate()+1);}
-              const curMonthStart=new Date(viewYear,viewMonth,1);
-              if(curMonthStart<s2){viewMonth=s2.getMonth();viewYear=s2.getFullYear();}
-            }
-          }
-        } else {
-          // Swipe arrière : si le mois précédent est encore dans la période → reculer d'un mois
-          const prevMonthEnd=new Date(viewYear,viewMonth,0);// dernier jour du mois précédent
-          if(p&&p.start<=prevMonthEnd&&viewMonth>0||(viewYear>2000&&viewMonth===0)){
-            const ps=new Date(p?p.start:new Date(viewYear,viewMonth,1));
-            const prevMonth=viewMonth===0?11:viewMonth-1;
-            const prevYear=viewMonth===0?viewYear-1:viewYear;
-            const prevMonthStart=new Date(prevYear,prevMonth,1);
-            if(ps<=new Date(prevYear,prevMonth+1,0)){
-              viewMonth=prevMonth;viewYear=prevYear;
-            } else {
-              // Revenir à la période précédente
-              const newIdx=Math.max(0,currentPeriodIndex-1);
-              if(newIdx!==currentPeriodIndex){
-                currentPeriodIndex=newIdx;
-                const pPrev=getCurrentPeriod();
-                if(pPrev){viewMonth=pPrev.end.getMonth();viewYear=pPrev.end.getFullYear();}
-              }
-            }
-          } else {
-            const newIdx=Math.max(0,currentPeriodIndex-1);
-            if(newIdx!==currentPeriodIndex){
-              currentPeriodIndex=newIdx;
-              const pPrev=getCurrentPeriod();
-              if(pPrev){viewMonth=pPrev.end.getMonth();viewYear=pPrev.end.getFullYear();}
-            }
-          }
-        }
+        /* 26/09/2026 : mois par mois dans la période, puis période voisine ; arrêt au
+           début et à la fin de l'exercice. La liste des périodes suit (update). */
+        hsSwipePeriode(dir);
         update();
       }
       _sx=null;_sy=null;
@@ -1376,42 +1404,47 @@ async function importFeries(){const by=Number(currentSuffix),years=[by-1,by,by+1
    Droit français Art. L3121-30 : le contingent est constitué par les HS effectivement
    réalisées, indépendamment de leur mode de compensation (paiement ou récupération).
    La récupération ne réduit PAS le contingent. */
+/* 26/09/2026 : total officiel du contingent d'un exercice (calcul pur, réutilisable).
+   Enregistré dans SH_HS_OFFICIEL_M1_<année> pour que Fox et le jumeau numérique
+   affichent exactement le même chiffre que le compteur. */
+function hsContingentExercice(d,sd,auto,deb,fin){
+  const _dansExo=x=>(!deb||x>=String(deb).slice(0,10))&&(!fin||x<=String(fin).slice(0,10));
+  const rules=getCCNRules(),seuil=rules.seuil;
+  const weeks={},absences={};
+  if(auto){
+    Object.entries(sd||{}).forEach(([date,type])=>{
+      if(type!=="ferie"||!_dansExo(date))return;
+      const dt=new Date(date);if(_isCCNRestDay(dt.getDay()))return;
+      if(!(d[date]&&(d[date].absent||0)>0)){const wk=getWeekKey(dt);absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;}
+    });
+  }
+  Object.entries(d||{}).forEach(([date,v])=>{
+    if(!v||typeof v!=="object"||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!_dansExo(date))return;
+    const[y,m,dd]=date.split("-").map(Number);const dt=new Date(y,m-1,dd);const wk=getWeekKey(dt);
+    weeks[wk]=(weeks[wk]||0)+(v.extra||0);
+    if(!_isCCNRestDay(dt.getDay()))absences[wk]=(absences[wk]||0)+(v.absent||0);
+  });
+  let total=0;
+  Object.entries(weeks).forEach(([wk,extra])=>{const tw=Math.max(0,seuil-(absences[wk]||0))+extra;if(tw>seuil)total+=tw-seuil;});
+  return Math.round(total*100)/100;
+}
+function hsEnregistrerOfficiel(suffix,total){try{localStorage.setItem('SH_HS_OFFICIEL_M1_'+suffix,JSON.stringify({total:total,maj:new Date().toISOString()}));}catch(e){}}
+/* Tous les exercices, au chargement : Fox a le bon chiffre même pour une année non consultée */
+function hsEnregistrerTousOfficiels(){
+  try{getExistingYears().forEach(y=>{
+    const lire=(k,def)=>{try{const v=localStorage.getItem(k);return v===null?def:JSON.parse(v);}catch(e){return def;}};
+    const d=lire('DATA_REPORT_'+y,{});if(!Object.keys(d).length)return;
+    hsEnregistrerOfficiel(y,hsContingentExercice(d,lire('SPECIAL_DAYS_'+y,{}),localStorage.getItem('AUTO_FERIE_'+y)==='true',localStorage.getItem('EXERCISE_START_'+y)||'',localStorage.getItem('ANNUAL_DATE_'+y)||''));
+  });}catch(e){}
+}
 function updateContingent(){
   const rules=getCCNRules();
   BASE_HEBDO = rules.seuil;
   const LIMIT=rules.contingent;
-  // Reconstruire via la même logique semaine que calculate()
-  // sur l'ensemble de l'exercice (toutes les périodes)
-  const weeks={},absences={};
-  if(AUTO_FERIE){
-    const _fr2=typeof window.CCN_API!=='undefined'?window.CCN_API.getCCNFeriesRules(parseInt(localStorage.getItem('CCN_IDCC')||'0')):{feriesChomes:11,seul1erMaiChome:false};
-    Object.entries(specialDays).forEach(([date,type])=>{
-      if(type!=="ferie")return;
-      // CCN restreintes : seul 1er mai chômé — override par AUTO_FERIE actif
-      const d=new Date(date);const dow=d.getDay();
-      if(_isCCNRestDay(dow))return;
-      const _hmA4 = data[date] && (data[date].absent||0) > 0;
-      if(!_hmA4){ const wk=getWeekKey(d);
-        absences[wk]=(absences[wk]||0)+DAILY_WORK_HOURS;
-      }
-    });
-  }
-  Object.entries(data).forEach(([date,v])=>{
-    if(!v||typeof v!=="object")return;
-    const[y,m,d]=date.split("-").map(Number);
-    const dd=new Date(y,m-1,d);const dow=dd.getDay();
-    const wk=getWeekKey(dd);
-    weeks[wk]=(weeks[wk]||0)+(v.extra||0);
-    if(!_isCCNRestDay(dow))absences[wk]=(absences[wk]||0)+(v.absent||0);
-  });
-  let total=0;
-  Object.entries(weeks).forEach(([wk,extra])=>{
-    const absent=absences[wk]||0;
-    const base=Math.max(0,BASE_HEBDO-absent);
-    const totalW=base+extra;
-    // BASE_HEBDO suit le seuil CCN — semaine civile indivisible (pas de récup au contingent, cf. L3121-30)
-    if(totalW>BASE_HEBDO)total+=totalW-BASE_HEBDO;
-  });
+  const total=hsContingentExercice(data,specialDays,AUTO_FERIE,exerciseStart,annualDate);
+  // Enregistré seulement si l'exercice a des saisies (un M1 ouvert mais vide ne doit pas masquer M2)
+  if(Object.keys(data||{}).some(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)))hsEnregistrerOfficiel(currentSuffix,total);
+  else{try{localStorage.removeItem('SH_HS_OFFICIEL_M1_'+currentSuffix);}catch(e){}}
   const pct=Math.min(100,total/LIMIT*100);
   const fill=document.getElementById("contingentFill");
   const txt=document.getElementById("contingentText");
@@ -1461,6 +1494,7 @@ function showSaveFeedback(dateKey){
 }
 
 function update(){
+  try{if(periodSelect&&periodSelect.options.length)periodSelect.selectedIndex=Math.min(currentPeriodIndex,periodSelect.options.length-1);}catch(e){}
   checkExerciseStartAlert();initSelectors();generateCalendar();calculate();applyConfigLock();updateSaveBadges();updateContingent();
   const _esi=document.getElementById("exerciseStartInput");if(_esi)_esi.value=exerciseStart;
   const _bhi=document.getElementById("baseHebdoInput");if(_bhi)_bhi.value=BASE_HEBDO;
@@ -1740,10 +1774,11 @@ function calcPeriodWeeks(pStart,pEnd){
     const dd=new Date(y,m-1,d);if(dd<pS||dd>pE)return;
     const dow=dd.getDay();
     const wk=getWeekKey(dd);
-    if(getWeekStart(dd)<pS||getWeekStart(dd)>pE)return;
+    // 26/09/2026 : même règle que l'écran (calculate) — tout jour de la période compte,
+    // même si sa semaine a commencé dans la période précédente (clôtures en milieu de semaine).
     wks[wk]=(wks[wk]||0)+(v.extra||0);
     rec[wk]=(rec[wk]||0)+(v.recup||0);
-    if(dow!==0&&dow!==6)abs[wk]=(abs[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dow))abs[wk]=(abs[wk]||0)+(v.absent||0);
   });
   let t1=0,tInter=0,t2=0,tR=0,tExtra=0,tAbs=0;
   const rules=getCCNRules();
@@ -2130,7 +2165,7 @@ localStorage.removeItem("APP_CRASH_STATE");
 let _scrollY=0;
 function lockBodyScroll(){_scrollY=window.scrollY;document.body.style.overflow="hidden";document.body.style.position="fixed";document.body.style.top="-"+_scrollY+"px";document.body.style.width="100%";}
 function unlockBodyScroll(){document.body.style.overflow="";document.body.style.position="";document.body.style.top="";document.body.style.width="";window.scrollTo(0,_scrollY);}
-document.addEventListener("DOMContentLoaded",()=>{protectFunctions();syncBaseHebdoWithCCN();initSelectors();applyConfigLock();buildPeriods();autoSwitchPeriodAtMidnight();if(!exerciseStart)setTimeout(openWizardModal,300);});
+document.addEventListener("DOMContentLoaded",()=>{setTimeout(hsEnregistrerTousOfficiels,300);protectFunctions();syncBaseHebdoWithCCN();initSelectors();applyConfigLock();buildPeriods();autoSwitchPeriodAtMidnight();if(!exerciseStart)setTimeout(openWizardModal,300);});
 function openLegalPopup(){document.getElementById("popupLegal").style.display="flex";}
 function closeLegalPopup(){document.getElementById("popupLegal").style.display="none";}
 function protectFunctions(){
@@ -2356,7 +2391,22 @@ const _skipFirst=_startDay>1;let _i=_skipFirst?1:0,_count=0;while(_count<12&&_i<
   annualRate=Number(document.getElementById("wizHourlyRate").value)||10;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);
   AUTO_FERIE=document.getElementById("wizAutoFerie").checked;localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);
   if(document.getElementById("wizImportFeries").checked){try{const years=[by-1,by,by+1];for(const y of years){const res=await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`);const f=await res.json();Object.keys(f).forEach(d=>{if(!specialDays[d])specialDays[d]="ferie";});}localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));}catch(e){console.warn("Import jours fériés échoué:",e);}}
+  /* 27/09/2026 : un nouvel exercice (sans saisie) prend le nom de l'année où il a le plus de jours,
+     comme les autres modules (octobre 2026 → septembre 2027 = 2027 ; juin → mai = année de début). */
+  try{const fin=annualDate||closures[closures.length-1],L=hsNomExercice(exerciseStart,fin),cur=String(currentSuffix);
+    const vide=!Object.keys(JSON.parse(localStorage.getItem("DATA_REPORT_"+cur)||"{}")).some(k=>/^\d{4}-\d{2}-\d{2}$/.test(k));
+    if(L&&String(L)!==cur&&vide&&!localStorage.getItem("EXERCISE_START_"+L)&&!localStorage.getItem("DATA_REPORT_"+L)){
+      ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CONFIG_LOCK_","AUTO_SAVE_DATE_"].forEach(function(pf){const v=localStorage.getItem(pf+cur);if(v!==null){localStorage.setItem(pf+L,v);localStorage.removeItem(pf+cur);}});
+      closeWizardModal();loadExercise(String(L));showToast();return;}
+  }catch(e){}
   closeWizardModal();if(typeof buildPeriods==="function")buildPeriods();if(typeof update==="function")update();showToast();
+}
+/* Année où l'exercice a le plus de jours (égalité → année de début) */
+function hsNomExercice(deb,fin){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(deb||"")||!/^\d{4}-\d{2}-\d{2}$/.test(fin||"")||fin<deb)return null;
+  let best=parseInt(deb,10),bj=-1;
+  for(let y=parseInt(deb,10);y<=parseInt(fin,10);y++){const a=Math.max(Date.parse(deb+"T12:00:00"),Date.parse(y+"-01-01T12:00:00")),b=Math.min(Date.parse(fin+"T12:00:00"),Date.parse(y+"-12-31T12:00:00")),j=Math.round((b-a)/864e5)+1;if(j>bj){bj=j;best=y;}}
+  return best;
 }
 function openWizardModal(){wizReset();document.getElementById("wizardModal").style.display="flex";lockBodyScroll();}
 function closeWizardModal(){document.getElementById("wizardModal").style.display="none";unlockBodyScroll();}
@@ -2469,6 +2519,160 @@ function closeTip(){
       setTimeout(function(){if(s.parentNode)s.remove();},12000);
     }catch(e){}};
   window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
+})();
+</script>
+<script src="../js/rappel-sauvegarde.js"></script>
+<script src="../js/bilan-annee.js"></script>
+<script src="../js/nouvel-exercice.js"></script>
+<script>try{hsBackupCheckDates(JSON.parse(localStorage.getItem("CLOSURES_REPORT_"+(localStorage.getItem("ACTIVE_YEAR_SUFFIX")||new Date().getFullYear()))||"[]"));}catch(e){}</script>
+<!-- C4 saisie rapide : #saisie-aujourdhui ouvre la saisie du jour (lien depuis le menu) -->
+<script>
+(function(){
+  if(location.hash!=='#saisie-aujourdhui')return;
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  function go(){try{
+    var w=document.getElementById('wizardModal');if(w&&w.style.display&&w.style.display!=='none')return;
+    /* 26/09/2026 : saisie rapide = toujours l'exercice et la période d'aujourd'hui,
+       même si on consultait une autre année juste avant */
+    var auj=dateKeyLocal(new Date());
+    try{getExistingYears().forEach(function(y){var d=localStorage.getItem('EXERCISE_START_'+y),f=localStorage.getItem('ANNUAL_DATE_'+y);
+      if(d&&f&&auj>=d.slice(0,10)&&auj<=f.slice(0,10)&&String(y)!==String(currentSuffix))loadExercise(y);});}catch(e){}
+    if(typeof buildPeriods==='function')buildPeriods();
+    if(typeof openPopup==='function')openPopup(auj);}catch(e){}}
+  if(document.readyState==='complete')setTimeout(go,400);else window.addEventListener('load',function(){setTimeout(go,400);});
+})();
+</script>
+<script>
+/* ═══ Passage à l'exercice suivant (24/09/2026) ═══════════════════════════
+   Avant : une fois la date de clôture annuelle passée, plus aucune période
+   n'existait et rien ne proposait d'ouvrir l'exercice suivant — les heures
+   saisies ensuite ne tombaient dans aucune période, donc n'étaient comptées
+   nulle part (Fox, qui suit l'exercice actif, restait aussi sur l'ancien).
+   Maintenant : un bandeau le propose, et l'exercice suivant est préparé
+   d'un geste avec les mêmes réglages et le même rythme de clôtures.
+   Rien ne bascule sans l'accord de l'utilisateur. */
+(function(){
+  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function jour(s){return new Date(s+'T12:00:00');}
+  function plus(s,n){var d=jour(s);d.setDate(d.getDate()+n);return iso(d);}
+  function plusUnAn(s){var d=jour(s),m=d.getMonth();d.setFullYear(d.getFullYear()+1);if(d.getMonth()!==m)d.setDate(0);return iso(d);}
+  function fr(s){var d=jour(s);return d.toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});}
+  function lire(k,def){try{var v=localStorage.getItem(k);return v===null?def:JSON.parse(v);}catch(e){return def;}}
+  function suivant(){ return /^\d{4}$/.test(String(currentSuffix)) ? String(Number(currentSuffix)+1) : null; }
+  // Si toutes les clôtures tombent le même jour de la semaine (ex. le
+  // dimanche) : même règle l'année suivante (« dernier dimanche », « 3e
+  // dimanche »). Sinon : même date l'année suivante (fins de mois, dates fixes).
+  function decaleur(dates){
+    var j=dates.map(function(x){return jour(x).getDay();});
+    var memeJour=j.length>1&&j.every(function(v){return v===j[0];});
+    // Même règle l'an prochain : « dernier dimanche du mois » reste le dernier
+    // dimanche, « 3e dimanche » reste le 3e. Aucune dérive d'une année sur
+    // l'autre (2028, 2029…), contrairement à un simple « +52 semaines ».
+    return memeJour?function(x){var d=jour(x),wd=d.getDay(),m=d.getMonth(),y=d.getFullYear()+1,nb=new Date(y,m+1,0).getDate(),dernier=d.getDate()+7>new Date(d.getFullYear(),m+1,0).getDate(),r;if(dernier){r=new Date(y,m,nb);while(r.getDay()!==wd)r.setDate(r.getDate()-1);}else{var n=Math.ceil(d.getDate()/7);r=new Date(y,m,1);while(r.getDay()!==wd)r.setDate(r.getDate()+1);r.setDate(r.getDate()+7*(n-1));}return iso(r);}:plusUnAn;
+  }
+  window.hsOuvrirExerciceSuivant=function(forcees){
+    var nx=suivant();if(!nx||!annualDate)return;
+    var fin=annualDate, deb=plus(fin,1);
+    if(!localStorage.getItem('EXERCISE_START_'+nx)){
+      var nClos,nFin;
+      if(Array.isArray(forcees)&&forcees.length){
+        // Clôtures choisies à l'ouverture (26/09/2026) : la dernière est la clôture annuelle
+        nClos=forcees.slice().sort();nFin=nClos[nClos.length-1];
+      }else{
+        var clos=(closures||[]).slice().sort();
+        var dec=decaleur(clos.length?clos:[fin]);
+        nClos=clos.map(dec);nFin=dec(fin);
+        if(nClos.indexOf(nFin)<0)nClos.push(nFin);
+        nClos.sort();
+      }
+      // Les jours déjà saisis après la clôture partent dans le nouvel exercice.
+      var ancien=lire('DATA_REPORT_'+currentSuffix,{}), neuf=lire('DATA_REPORT_'+nx,{}), n=0;
+      Object.keys(ancien).forEach(function(k){ if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&k>fin){ if(!(k in neuf))neuf[k]=ancien[k]; delete ancien[k]; n++; } });
+      try{
+        if(typeof createSnapshot==='function')createSnapshot('avant_exercice_'+nx);
+        localStorage.setItem('DATA_REPORT_'+currentSuffix,JSON.stringify(ancien));
+        localStorage.setItem('DATA_REPORT_'+nx,JSON.stringify(neuf));
+        localStorage.setItem('EXERCISE_START_'+nx,deb);
+        localStorage.setItem('ANNUAL_DATE_'+nx,nFin);
+        localStorage.setItem('CLOSURES_REPORT_'+nx,JSON.stringify(nClos));
+        if(!localStorage.getItem('REPORTS_REPORT_'+nx))localStorage.setItem('REPORTS_REPORT_'+nx,'{}');
+        if(!localStorage.getItem('PERIOD_META_REPORT_'+nx))localStorage.setItem('PERIOD_META_REPORT_'+nx,'{}');
+        ['BASE_HEBDO_','ANNUAL_RATE_','AUTO_FERIE_'].forEach(function(p){var v=localStorage.getItem(p+currentSuffix);if(v!==null&&localStorage.getItem(p+nx)===null)localStorage.setItem(p+nx,v);});
+      }catch(e){ toast('❌ Espace de stockage insuffisant : rien n\'a été modifié.','error'); return; }
+      if(n)setTimeout(function(){toast('📅 '+n+' jour(s) saisi(s) après le '+fr(fin)+' rangé(s) dans '+nx,'info');},1600);
+    }
+    loadExercise(nx);
+    if(window.hsBackupNudge)hsBackupNudge('year');
+    verifier();
+  };
+  /* Bilan de fin d'année (26/09/2026) : mêmes calculs que le bilan annuel PDF */
+  function bilanLignes(){
+    var r=getCCNRules(),annualNet=0,h1=0,h2=0,hI=0,rec=0,ext=0,nb=0;
+    var c1=1+r.taux1/100,c2=1+r.taux2/100,cI=r.taux_inter?(1+r.taux_inter/100):0;
+    (closures||[]).forEach(function(_,idx){
+      if(periodMeta[idx]&&periodMeta[idx].status==='deleted')return;
+      var start=getBaseStartDate();
+      for(var i=0;i<idx;i++){var e=new Date(closures[i]);start=new Date(e);start.setDate(start.getDate()+1);}
+      var p=calcPeriodWeeks(start,new Date(closures[idx]));
+      annualNet+=p.t25*c1+(p.tInter||0)*cI+p.t50*c2-p.tR;h1+=p.t25;h2+=p.t50;hI+=(p.tInter||0);rec+=p.tR;ext+=p.tExtra;nb++;
+    });
+    if(!nb||ext<=0&&rec<=0)return null;
+    /* 26/09/2026 : intitulés explicites — saisies, comptées (après fériés et absences),
+       récupérées, solde à payer majorations comprises, valeur */
+    var cpt=h1+hI+h2,ecart=Math.round((ext-cpt)*100)/100;
+    var l=[['Heures sup saisies',fmtH(ext)]];
+    if(ecart>0.01)l.push(['Heures sup comptées',fmtH(cpt)]);
+    l.push(['Dont majorées à '+r.taux1+' %',fmtH(h1)]);
+    if(r.taux_inter)l.push(['Dont majorées à '+r.taux_inter+' %',fmtH(hI)]);
+    l.push(['Dont majorées à '+r.taux2+' %',fmtH(h2)]);
+    if(rec>0)l.push(['Heures récupérées',fmtH(rec)]);
+    if(annualNet>0)l.push(['Solde à payer (majoré)',fmtH(annualNet)]);
+    if(localStorage.getItem('ANNUAL_RATE_'+currentSuffix)!==null&&annualRate>0&&annualNet>0)
+      l.push(['Valeur estimée (brut)',(Math.round(annualNet*annualRate)).toLocaleString('fr-FR')+' €']);
+    var ct=document.getElementById('contingentText');
+    if(ct&&ct.textContent)l.push(['Contingent annuel utilisé',ct.textContent.trim()]);
+    /* 26/09/2026 : solde non nul en fin d'exercice. Ce compteur ne suit pas les paiements :
+       l'encadré le dit, avec le délai pour réclamer. */
+    window.__hsBilanAlerte=annualNet>0.01?{titre:'⚠️ Solde à payer en fin d\'exercice : '+fmtH(annualNet)+' (majorations comprises)',
+      texte:'Ce compteur ne suit pas les paiements : si ces heures n\'ont été ni payées ni récupérées, '+((window.hsBilanAnnee&&hsBilanAnnee.delai)||'').replace(/^Elles restent/,'elles restent')}:null;
+    window.__hsBilanNote=ecart>0.01?(fmtH(ecart)+' saisies tombent dans des semaines avec un férié ou une absence : elles complètent d\'abord la semaine jusqu\'à '+(r.seuil||35)+' h et ne sont pas des heures sup. Solde à payer = heures comptées × majoration − heures récupérées.'):'Solde à payer = heures comptées × majoration − heures récupérées.';
+    return l.filter(function(x){return !/^Dont /.test(x[0])||/[1-9]/.test(String(x[1]));});
+  }
+  /* Question à l'ouverture (26/09/2026) : clôtures automatiques (dernier jour de fin
+     de semaine de chaque mois) ou saisie manuelle dans l'écran Clôtures existant */
+  function finSemaineJS(){var ds=(getCCNRules().debutSemaine||1),dsJS=ds===7?0:ds;return (dsJS+6)%7;}
+  window.hsChoisirPuisOuvrir=function(){
+    var nx=suivant();if(!nx||!annualDate)return;
+    if(localStorage.getItem('EXERCISE_START_'+nx)||!window.hsNouvelExercice){window.hsOuvrirExerciceSuivant();return;}
+    var ms=hsNouvelExercice.moisSuivant(annualDate),fs=finSemaineJS(),auto=hsNouvelExercice.clotures(ms.mois,ms.annee,fs);
+    hsNouvelExercice.demander({titre:'Exercice '+nx,couleur:'#2196a6',finSemaine:fs,
+      texteManuel:'Tes 12 clôtures et ta clôture annuelle sont préremplies ; l\'écran Clôtures s\'ouvre pour les corriger.',
+      auto:function(){window.hsOuvrirExerciceSuivant(auto);},
+      manuel:function(){window.hsOuvrirExerciceSuivant(auto);setTimeout(function(){if(typeof openClosures==='function')openClosures();},500);}});
+  };
+  window.hsBilanPuisOuvrir=function(){
+    var nx=suivant(),l=null;try{l=bilanLignes();}catch(e){}
+    if(l&&window.hsBilanAnnee)hsBilanAnnee.ouvrir({annee:String(currentSuffix),module:'Compteur annuel · heures sup',couleur:'#2196a6',lignes:l,note:window.__hsBilanNote,alerte:window.__hsBilanAlerte,
+      continuer:{libelle:'Ouvrir '+nx,action:window.hsChoisirPuisOuvrir}});
+    else window.hsChoisirPuisOuvrir();
+  };
+  window.hsPlusTardExercice=function(){try{localStorage.setItem('HS_EXO_PLUS_TARD',iso(new Date()));}catch(e){}verifier();};
+  function verifier(){
+    var el=document.getElementById('hsExoSuivant');if(!el)return;
+    var nx=suivant(), auj=iso(new Date());
+    if(!nx||!annualDate||auj<=annualDate||localStorage.getItem('HS_EXO_PLUS_TARD')===auj){el.style.display='none';return;}
+    var pret=!!localStorage.getItem('EXERCISE_START_'+nx);
+    el.innerHTML='📅 <b>Ton exercice '+currentSuffix+' est terminé</b> (clôture le '+fr(annualDate)+').<br>'+
+      (pret?'L\'exercice '+nx+' est déjà prêt.':'L\'exercice '+nx+' commencera le '+fr(plus(annualDate,1))+', avec les mêmes réglages. Tu choisiras tes dates de clôture à l\'ouverture.')+
+      '<div style="display:flex;gap:8px;margin-top:10px"><button onclick="hsBilanPuisOuvrir()" style="flex:1;margin:0;padding:10px;border-radius:10px;border:none;background:#2196a6;color:#fff;font-weight:800">Ouvrir '+nx+'</button>'+
+      '<button onclick="hsPlusTardExercice()" style="width:auto;margin:0;padding:10px 12px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:700">Plus tard</button></div>'+
+      '<div style="font-size:11.5px;margin-top:6px;color:#7a6520">Ton exercice '+currentSuffix+' reste consultable avec le bouton '+currentSuffix+' ⇄.</div>';
+    el.style.display='block';
+  }
+  window.hsVerifierExercice=verifier;
+  if(document.readyState==='complete')setTimeout(verifier,500);else window.addEventListener('load',function(){setTimeout(verifier,500);});
+  var _load=window.loadExercise;
+  if(typeof _load==='function'){window.loadExercise=function(x){_load(x);setTimeout(verifier,50);};}
 })();
 </script>
 </body>
