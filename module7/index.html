@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
 <title>Nuit, Astreinte &amp; Primes</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0a1228">
 <meta name="screen-orientation" content="portrait">
@@ -16,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Outfit:wght@300;400;500;600;700;800&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="../js/vendor/jspdf.umd.min.js" defer></script>
 <style>
 :root{
   --night:#0a1228; --night2:#0d1838; --ink:#070d1c;
@@ -430,7 +432,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     <div class="deSection" id="dePrimes">
       <div class="deHead" data-sec="dePrimes"><div class="cb"></div><div class="dt">🎁 Primes du jour<small>Panier, dimanche, férié…</small></div></div>
       <div class="deBody">
-        <div class="deMini">Coche et indique la quantité pour ce jour.</div>
+        <div class="deMini">Indique le montant en € du jour. Si tu as réglé un montant par unité (appui sur le nom de la prime), indique plutôt la quantité.</div>
         <div id="dePrimeList"></div>
         <div class="addprime" style="margin-top:8px;"><button id="deAddPrime">＋ Ajouter une prime jour</button></div>
       </div>
@@ -616,7 +618,9 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     if(a.night) extra+=interH*(settings.baseRate||0)*((day.nuit&&day.nuit.rate)||settings.nRate||0)/100;
     if(a.sun) extra+=interBase*(a.sunRate||0)/100;
     return indem+interBase+extra; }
-  function dayPrimesVal(day){ if(!day||!day.primes)return 0; var v=0; dayPrimes.forEach(function(p){ var q=day.primes[p.id]||0; v+=(p.amount||0)*q; }); return v; }
+  /* 27/09/2026 : prime avec un montant unitaire → la case est une quantité (× montant) ; sans montant
+     unitaire → la case est directement le montant en euros (avant : 10 × 0 € = 0 €). */
+  function dayPrimesVal(day){ if(!day||!day.primes)return 0; var v=0; dayPrimes.forEach(function(p){ var q=day.primes[p.id]||0; v+=(p.amount>0)?p.amount*q:q; }); return v; }
   function dayTotal(day){ return dayNuit(day)+dayAstr(day)+dayPrimesVal(day); }
   function dayHasContent(day){ if(!day)return false;
     if(day.nuit&&(day.nuit.hours||0)>0)return true;
@@ -797,11 +801,11 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       var row=document.createElement('div'); row.className='dprime'+(on?' on':'');
       var custom=DEFAULT_DAYPRIMES.findIndex(function(d){return d.id===p.id;})===-1;
       row.innerHTML='<div class="pc">'+(on?'✓':'')+'</div><div class="pn">'+p.name+'<small>'+(p.amount?eur(p.amount).replace('+','')+' · '+p.desc:p.desc)+'</small></div>'+
-        '<div class="pq"><input type="number" inputmode="numeric" value="'+(q||'')+'" placeholder="0"></div>'+
+        '<div class="pq"><input type="number" inputmode="decimal" step="any" value="'+(q||'')+'" placeholder="'+(p.amount>0?'Qté':'€')+'"><small style="display:block;font-size:10px;color:var(--mut);text-align:center;margin-top:2px">'+(p.amount>0?'× '+eur(p.amount).replace('+',''):'montant €')+'</small></div>'+
         (custom?'<button class="del" style="background:none;border:none;color:var(--soft);font-size:15px;cursor:pointer;">🗑</button>':'');
       var inp=row.querySelector('input');
       inp.addEventListener('input',function(){ deDay.primes[p.id]=parseFloat(inp.value)||0; row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
-      row.querySelector('.pc').addEventListener('click',function(){ if((deDay.primes[p.id]||0)>0){deDay.primes[p.id]=0;inp.value='';}else{ if(!p.amount){ editDayPrimeAmount(p); return;} deDay.primes[p.id]=1;inp.value=1;} row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
+      row.querySelector('.pc').addEventListener('click',function(){ if((deDay.primes[p.id]||0)>0){deDay.primes[p.id]=0;inp.value='';}else{ if(!p.amount){ inp.focus(); return;} deDay.primes[p.id]=1;inp.value=1;} row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
       row.querySelector('.pn').addEventListener('click',function(){ editDayPrimeAmount(p); });
       var del=row.querySelector('.del'); if(del)del.addEventListener('click',function(){ if(confirm('Supprimer « '+p.name+' » ?')){ var ix=dayPrimes.findIndex(function(x){return x.id===p.id;}); if(ix>=0)dayPrimes.splice(ix,1); saveAll(); renderDayPrimes(); } });
       c.appendChild(row);
