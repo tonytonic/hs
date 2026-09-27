@@ -5,7 +5,19 @@
    Mood : compagnon de confiance, douceur professionnelle
 ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&display=swap');
+/* 27/09/2026 : changement de contrat sans flash (iPhone iOS 18.2+, Chrome/Android) : l'ancien écran reste jusqu'au nouveau */
+@view-transition{navigation:auto}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.12s}
+/* 27/09/2026 : polices embarquées dans l'appli (dossier /fonts, licence SIL OFL), servies par le cache hors ligne :
+   plus de téléchargement Google à chaque ouverture, donc plus de « flash » au premier rechargement. */
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:block;src:url('../../fonts/dm-sans-latin-300-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:block;src:url('../../fonts/dm-sans-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:500;font-display:block;src:url('../../fonts/dm-sans-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:600;font-display:block;src:url('../../fonts/dm-sans-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:700;font-display:block;src:url('../../fonts/dm-sans-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:800;font-display:block;src:url('../../fonts/dm-sans-latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:900;font-display:block;src:url('../../fonts/dm-sans-latin-900-normal.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:italic;font-weight:400;font-display:block;src:url('../../fonts/dm-sans-latin-400-italic.woff2') format('woff2')}
 
 :root {
   /* Couleurs */
