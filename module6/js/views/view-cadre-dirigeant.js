@@ -63,7 +63,7 @@ const VCD = {
       if(t==='rtt')    { rttPris++; continue; }
       if(t==='repos')  continue;
       if(t==='demi')   { jTravailles+=0.5; demis++; }
-      else if(t==='travail') jTravailles++;
+      else if(t==='travail'||t==='teletravail') jTravailles++;
       if(v.deplacement) deplacements++;
       if(v.debut&&v.fin) {
         const amp=(new Date(`${dk}T${v.fin}:00`)-new Date(`${dk}T${v.debut}:00`))/3600000;
@@ -244,7 +244,7 @@ const VCD = {
     if(yp) yp.addEventListener('change',()=>{this._year=parseInt(yp.value);M6_Storage.setActiveYear(REGIME, this._year);this._load();this.render();});
     const _goYear = (yr) => {
       const exist = M6_Storage.getAllYears(REGIME);
-      if (!exist.includes(yr)) M6_Storage.createYear(REGIME, yr);
+      if (!exist.includes(yr)) { if (yr > Math.max(...exist) && window.M6_nouvelExercice) { M6_nouvelExercice(); } else { M6_toast('Pas d\'exercice '+yr); } return; } /* 27/09/2026 : plus de création silencieuse */
       this._year = yr; M6_Storage.setActiveYear(REGIME, yr); this._load(); this.render();
     };
     this._c.querySelector('#cd-yr-prev')?.addEventListener('click',()=>_goYear(this._year-1));
@@ -355,7 +355,7 @@ const VCD = {
     });
     this._c.querySelector('#cd-saisir')?.addEventListener('click',()=>{this._section='calendrier';this.render();});
     this._c.querySelector('#cd-bio-card')?.addEventListener('click',()=>{this._section='sante';this.render();});
-    this._c.querySelector('#cd-newyr')?.addEventListener('click',()=>{const y=prompt(`Exercice (ex: ${this._year+1})`,this._year+1);if(!y||isNaN(y))return;const yr=parseInt(y);M6_Storage.createYear(REGIME,yr);this._year=yr;M6_Storage.setActiveYear(REGIME, yr);this._load();this.render();M6_toast(`Exercice ${yr} créé`);});
+    this._c.querySelector('#cd-newyr')?.addEventListener('click',()=>{ if(window.M6_nouvelExercice) return M6_nouvelExercice(); });
     this._c.querySelector('#cd-reset')?.addEventListener('click',()=>{
       // Ouvre le wizard pré-rempli — l'utilisateur modifie ce qu'il veut et enregistre, ou annule.
       this._c.innerHTML=this._tplSetup();
@@ -815,6 +815,7 @@ const VCD = {
         </div>
         <div class="m6-field"><label>Début de l'exercice <small style="color:var(--pierre);font-weight:400">(laisser vide = 1er janvier)</small></label><input type="date" id="s-ex-debut" value="${c.dateDebutExercice||''}" placeholder="${this._year}-01-01" style="font-size:16px"></div>
         <div class="m6-field"><label>Fin de l'exercice <small style="color:var(--pierre);font-weight:400">(laisser vide = 31 décembre)</small></label><input type="date" id="s-ex-fin" value="${c.dateFinExercice||''}" placeholder="${this._year}-12-31" style="font-size:16px"></div>
+        <button type="button" class="m6-btn m6-btn-ghost" style="width:100%;font-size:0.78rem;margin:-4px 0 12px" onclick="document.getElementById('s-ex-debut').value='';document.getElementById('s-ex-fin').value='';if(window.M6_toast)M6_toast('Dates effacées : année civile. Pense à enregistrer.')">↺ Effacer les dates (année civile) — le bouton Réinitialiser de l'iPhone remet l'ancienne date</button>
         <div class="m6-field"><label>Date d'arrivée si en cours d'année <small style="color:var(--pierre);font-weight:400">(prorata uniquement si renseignée)</small></label><input type="date" id="s-debut" value="${c.dateArrivee||''}" style="font-size:16px"></div>
         <div class="m6-field"><label>Nom du manager / Président du CA</label><input type="text" id="s-mgr" value="${(c.nomManager||'').replace(/"/g,'&quot;')}" placeholder="Pour les PDF" style="font-size:16px"></div>
         <button class="m6-btn m6-btn-gold" id="s-save">${isEdit?'💾 Enregistrer les modifications':'Commencer le suivi →'}</button>
