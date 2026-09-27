@@ -2,8 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
+<style id="sh-fond">/* 27/09/2026 : fond posé dès le début (plus d'écran blanc au rechargement, Android) */html,body{background:#F7F3ED}</style>
   <title>M6 Cadres — Forfait Jours & Heures</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
   <!-- M6 FORCÉ EN MODE CLAIR — pas de prise en compte des préférences système sombres -->
   <meta name="color-scheme" content="light">
   <meta name="theme-color" content="#1A1714">
@@ -24,7 +27,7 @@
   <script src="ccn/conventions-cadres.js"></script>
   <script src="ccn/coefficients-grilles.js"></script>
   <link rel="stylesheet" href="css/main.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script src="../js/vendor/jspdf.umd.min.js" defer></script>
 </head>
 <body>
 
@@ -59,6 +62,9 @@
 <script src="js/core/storage.js"></script>
 <script src="js/data/ccn-adapter.js"></script>
 <script src="../legi-ref.js"></script>
+<script src="../js/rappel-sauvegarde.js"></script>
+<script src="../js/bilan-annee.js"></script>
+<script src="../js/nouvel-exercice.js"></script>
 <script src="js/data/glossaire-cadres.js"></script>
 <script src="js/features/zenji.js"></script>
 <script src="js/features/zenji-popup.js"></script>
@@ -76,6 +82,181 @@
 <script src="js/views/view-forfait-heures.js"></script>
 <script src="js/views/view-cadre-dirigeant.js"></script>
 <script src="js/app.js"></script>
+<script>
+/* ═══ Nouvel exercice — Zenji (26/09/2026) ════════════════════════════════
+   Le lendemain de la fin de l'exercice (date de fin du contrat, ou 31 décembre
+   sans dates), un bandeau propose d'ouvrir l'exercice suivant : bilan de
+   l'année écoulée, puis « même période un an plus tard » ou « je saisis mes
+   dates ». Avant, la bascule était silencieuse et les dates du contrat ne
+   changeaient jamais. Forfait jours et forfait heures. */
+(function(){
+  function fH(h){h=Math.round((h||0)*60);var s=h<0?'-':'';h=Math.abs(h);return s+Math.floor(h/60)+'h'+(h%60?String(h%60).padStart(2,'0'):'');}
+  function j(n){n=Math.round((n||0)*10)/10;return String(n).replace('.',',')+' j';}
+  function iso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function plus(s,n){var d=new Date(s+'T12:00:00');d.setDate(d.getDate()+n);return iso(d);}
+  function unAn(s){var d=new Date(s+'T12:00:00'),m=d.getMonth();d.setFullYear(d.getFullYear()+1);if(d.getMonth()!==m)d.setDate(0);return iso(d);}
+  function fr(s){return new Date(s+'T12:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});}
+  var re=/^\d{4}-\d{2}-\d{2}$/;
+  function contexte(){
+    var regime=localStorage.getItem('M6_REGIME');
+    if(regime!=='forfait_jours'&&regime!=='forfait_heures')return null;
+    if(!window.M6_Storage)return null;
+    var c=(M6_Storage.getContractGlobal?M6_Storage.getContractGlobal(regime):M6_Storage.getContract(regime))||{},auj=iso(new Date()),x;
+    if(re.test(c.dateDebutExercice||'')&&re.test(c.dateFinExercice||'')){
+      // Exercice daté (ex. juin → mai) : fini quand la date de fin est passée
+      x={regime:regime,c:c,prec:M6_exoAnnee(c.dateDebutExercice,c.dateFinExercice),deb:c.dateDebutExercice,fin:c.dateFinExercice,date:true};
+    }else{
+      // Sans dates : année civile, déjà passée seule au 1er janvier
+      var cur=M6_Storage.getActiveYear(regime),prec=cur-1,data=M6_Storage.getData(regime,prec)||{};
+      if(!Object.keys(data).some(function(k){return re.test(k)||/^\d{4}-W\d{2}$/.test(k);}))return null;
+      if(localStorage.getItem('M6_EXO_OUVERT_'+regime)===String(prec))return null;
+      x={regime:regime,c:c,prec:prec,deb:prec+'-01-01',fin:prec+'-12-31',date:false};
+    }
+    if(auj<=x.fin)return null;
+    x.ndeb=plus(x.fin,1);x.nfin=x.date?unAn(x.fin):(x.prec+1)+'-12-31';
+    return x;
+  }
+  /* 26/09/2026 : ce qui peut rester dû en fin d'exercice (Zenji ne suit pas les paiements) */
+  var alerte=null;
+  function delaiMin(){return ((window.hsBilanAnnee&&hsBilanAnnee.delai)||'').replace(/^Elles restent/,'elles restent');}
+  function lignes(x){
+    var data=M6_Storage.getData(x.regime,x.prec)||{};alerte=null;
+    // 27/09/2026 : réglages propres à l'exercice analysé
+    if(M6_Storage.hasYearContract&&M6_Storage.hasYearContract(x.regime,x.prec))x=Object.assign({},x,{c:M6_Storage.getContract(x.regime,x.prec)});
+    if(x.regime==='forfait_jours'){
+      var a=M6_ForfaitJours.analyze(x.c,data,x.prec);if(!a.joursEffectifs&&!a.rttPris&&!a.cpPris)return null;
+      var dep=Math.max(0,(a.joursEffectifs||0)-(a.plafond||218)),nr=Math.max(0,dep-(a.rachetes||0));
+      if(nr>0.01)alerte={titre:'⚠️ '+j(nr)+' au-delà de ton plafond de '+j(a.plafond)+' sans rachat',
+        texte:'Travailler au-delà du plafond suppose un rachat de jours de repos : accord écrit et majoration d\'au moins 10 % (art. L3121-59). Si ces jours n\'ont été ni payés ni récupérés, '+delaiMin()};
+      var l=[['Jours travaillés',j(a.joursEffectifs)+' / '+j(a.plafond)],['Jours de RTT pris',j(a.rttPris)+' sur '+j(a.rttTheoriques)],['Congés payés pris',j(a.cpPris)]];
+      if(a.rachetes>0)l.push(['Jours de repos rachetés',j(a.rachetes)]);
+      if(a.deplacements>0)l.push(['Jours en déplacement',j(a.deplacements)]);
+      return l;
+    }
+    var b=M6_ForfaitHeures.analyze(x.c,data,x.prec);if(!b.totalHeures)return null;
+    if(b.totalHS>0.01)alerte={titre:'⚠️ '+fH(b.totalHS)+' d\'heures sup sur l\'exercice',
+      texte:'Zenji ne suit pas les paiements : si elles n\'ont été ni payées ni récupérées en repos, '+delaiMin()};
+    var l2=[['Heures travaillées',fH(b.totalHeures)],['Semaines saisies',String(b.semaines)],['Heures supplémentaires',fH(b.totalHS)],['Dont majorées à '+b.taux1+' %',fH(b.totalHSTaux1)]];
+    if(b.a3Paliers)l2.push(['Dont majorées à '+b.taux_inter+' %',fH(b.totalHSTaux_inter)]);
+    l2.push(['Dont majorées à '+b.taux2+' %',fH(b.totalHSTaux2)],['Contingent annuel utilisé',fH(b.totalHS)+' / '+b.contingent+'h']);
+    if(b.montantTotal>0)l2.push(['Valeur estimée (brut)',Math.round(b.montantTotal).toLocaleString('fr-FR')+' €']);
+    return l2.filter(function(r){return !/^Dont /.test(r[0])||/[1-9]/.test(String(r[1]));});
+  }
+  function appliquer(x,deb,fin){
+    try{
+      // Garder les vraies dates de l'exercice qui se termine (utile si la période change)
+      var hk='M6_EXERCICES_'+x.regime,h={};try{h=JSON.parse(localStorage.getItem(hk)||'{}')||{};}catch(e){}
+      h[String(x.prec)]={deb:x.deb,fin:x.fin};localStorage.setItem(hk,JSON.stringify(h));
+      // 27/09/2026 : l'exercice qui se termine garde SES réglages ; le suivant part d'une
+      // copie (ou de ceux préparés à l'avance), puis chacun vit sa vie
+      var ny=M6_exoAnnee(deb,fin),old=Object.assign({},x.c||{});
+      if(M6_Storage.hasYearContract&&!M6_Storage.hasYearContract(x.regime,x.prec)){old.dateDebutExercice=x.date?x.deb:(old.dateDebutExercice||null);old.dateFinExercice=x.date?x.fin:(old.dateFinExercice||null);localStorage.setItem('M6_'+x.regime+'_'+x.prec+'_CONTRACT',JSON.stringify(old));}
+      var base=(M6_Storage.hasYearContract&&M6_Storage.hasYearContract(x.regime,ny))?M6_Storage.getContract(x.regime,ny):Object.assign({},x.c||{});
+      var c=Object.assign({},base);
+      if(x.date||deb!==x.ndeb||fin!==x.nfin){c.dateDebutExercice=deb;c.dateFinExercice=fin;}
+      localStorage.setItem('M6_'+x.regime+'_'+ny+'_CONTRACT',JSON.stringify(c));
+      if(M6_Storage.setContractGlobal)M6_Storage.setContractGlobal(x.regime,c);else M6_Storage.setContract(x.regime,c);
+      localStorage.setItem('M6_EXO_OUVERT_'+x.regime,String(x.prec));
+      M6_Storage.setActiveYear(x.regime,ny);
+      M6_Storage.createYear(x.regime,ny);
+    }catch(e){if(window.M6_toast)M6_toast('Espace de stockage insuffisant : rien n\'a été modifié.');return;}
+    location.reload();
+  }
+  function saisirDates(x){
+    var d=document.createElement('div');d.id='m6DatesExo';
+    d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(8,14,22,.72);display:flex;align-items:flex-end;justify-content:center;padding:16px 12px calc(16px + env(safe-area-inset-bottom,0px))';
+    d.innerHTML='<div style="width:100%;max-width:460px;background:#fff;border-radius:20px;padding:18px;font-family:inherit;color:#10202f">'
+      +'<div style="font-size:18px;font-weight:800;margin-bottom:12px">Dates du nouvel exercice</div>'
+      +'<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px">Début</label><input type="date" id="m6ExoDeb" value="'+x.ndeb+'" style="width:100%;box-sizing:border-box;font-size:16px;padding:10px;border:1px solid #cfd6de;border-radius:10px;margin-bottom:12px">'
+      +'<label style="display:block;font-size:13px;font-weight:600;margin-bottom:4px">Fin</label><input type="date" id="m6ExoFin" value="'+x.nfin+'" style="width:100%;box-sizing:border-box;font-size:16px;padding:10px;border:1px solid #cfd6de;border-radius:10px">'
+      +'<div id="m6ExoErr" style="color:#c0392b;font-size:12.5px;min-height:18px;margin:8px 0"></div>'
+      +'<button type="button" data-a="ok" style="width:100%;padding:12px;border:none;border-radius:12px;background:#8a6d2f;color:#fff;font-weight:800;font-size:15px;margin:0 0 6px">Ouvrir l\'exercice</button>'
+      +'<button type="button" data-a="x" style="width:100%;padding:8px;border:none;background:none;color:#7a8594;font-weight:600;margin:0">Annuler</button></div>';
+    d.addEventListener('click',function(e){var a=e.target&&e.target.getAttribute&&e.target.getAttribute('data-a');
+      if(a==='x'||e.target===d){d.remove();return;}
+      if(a==='ok'){var db=document.getElementById('m6ExoDeb').value,fn=document.getElementById('m6ExoFin').value,er=document.getElementById('m6ExoErr');
+        if(!re.test(db)||!re.test(fn)){er.textContent='Indique les deux dates.';return;}
+        if(fn<=db){er.textContent='La fin doit être après le début.';return;}
+        if(db<=x.fin){er.textContent='Le nouvel exercice doit commencer après le '+fr(x.fin)+'.';return;}
+        d.remove();if(x._creer)x._creer(db,fn);else appliquer(x,db,fn);}});
+    document.body.appendChild(d);
+  }
+  function choisir(x){
+    if(!window.hsNouvelExercice){appliquer(x,x.ndeb,x.nfin);return;}
+    hsNouvelExercice.demander({titre:'Exercice '+fr(x.ndeb).replace(/^\d+ /,'')+' → '+fr(x.nfin).replace(/^\d+ /,''),couleur:'#8a6d2f',
+      question:'Les dates de ton exercice :',titreAuto:'Même période, un an plus tard',texteAuto:'Du '+fr(x.ndeb)+' au '+fr(x.nfin)+'.',
+      texteManuel:'Ton employeur change la période : tu indiques le début et la fin.',
+      auto:function(){appliquer(x,x.ndeb,x.nfin);},manuel:function(){saisirDates(x);}});
+  }
+  window.M6_ouvrirExercice=function(){
+    var x=contexte();if(!x)return;var l=null;try{l=lignes(x);}catch(e){}
+    var el=document.getElementById('m6ExoSuivant');if(el)el.remove();
+    var an=x.deb.slice(0,4)===x.fin.slice(0,4)?x.deb.slice(0,4):x.deb.slice(0,4)+'-'+x.fin.slice(2,4);
+    if(l&&window.hsBilanAnnee)hsBilanAnnee.ouvrir({annee:an,module:'Zenji · '+(x.regime==='forfait_jours'?'forfait jours':'forfait heures'),couleur:'#8a6d2f',image:'images/Cadremenu.PNG',lignes:l,alerte:alerte,
+      continuer:{libelle:'Ouvrir l\'exercice suivant',action:function(){choisir(x);}}});
+    else choisir(x);
+  };
+  window.M6_exercicePlusTard=function(){var x=contexte();if(x)try{localStorage.setItem('M6_EXO_PLUS_TARD_'+x.regime,iso(new Date()));}catch(e){}var el=document.getElementById('m6ExoSuivant');if(el)el.remove();};
+  /* 27/09/2026 : exercice passé consulté → bandeau (comme les autres modules) */
+  window.M6_allerExerciceEnCours=function(){var r=localStorage.getItem('M6_REGIME');try{M6_Storage.setActiveYear(r,M6_Storage.currentExoYear(r));}catch(e){}location.reload();};
+  window.M6_bilanExercice=function(y){
+    var r=localStorage.getItem('M6_REGIME'),c=M6_Storage.getContract(r,y),b=M6_Periode.bornes(c,y);
+    var x={regime:r,c:c,prec:y,deb:b.deb,fin:b.fin,date:!b.calendaire};var l=null;try{l=lignes(x);}catch(e){}
+    var an=b.deb.slice(0,4)===b.fin.slice(0,4)?b.deb.slice(0,4):b.deb.slice(0,4)+'-'+b.fin.slice(2,4);
+    if(l&&window.hsBilanAnnee)hsBilanAnnee.ouvrir({annee:an,module:'Zenji · '+(r==='forfait_jours'?'forfait jours':'forfait heures'),couleur:'#8a6d2f',image:'images/Cadremenu.PNG',lignes:l,alerte:alerte});
+    else if(window.M6_toast)M6_toast('Pas encore de saisies sur cet exercice');
+  };
+  function bandeauPasse(){
+    var r=localStorage.getItem('M6_REGIME');if(r!=='forfait_jours'&&r!=='forfait_heures')return false;
+    var y=M6_Storage.getActiveYear(r),cur=M6_Storage.currentExoYear?M6_Storage.currentExoYear(r):y;if(y===cur)return false;
+    var b=M6_Periode.bornes(M6_Storage.getContract(r,y),y),passe=y<cur;
+    var d=document.createElement('div');d.id='m6ExoSuivant';
+    d.style.cssText='margin:10px 12px;padding:12px 14px;border-radius:14px;background:#fff8e6;border:1.5px solid #f0c040;font-size:13.5px;line-height:1.45;color:#5a4300';
+    d.innerHTML='📅 <b>Tu consultes l\'exercice '+(passe?'terminé':'à venir')+' du '+fr(b.deb)+' au '+fr(b.fin)+'.</b><br>Ses réglages lui sont propres : les modifier ne change pas les autres exercices.'
+      +'<div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">'+(passe?'<button onclick="M6_bilanExercice('+y+')" style="flex:1;padding:10px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:800">📊 Bilan de cet exercice</button>':'')
+      +'<button onclick="M6_allerExerciceEnCours()" style="flex:1;padding:10px;border-radius:10px;border:none;background:#8a6d2f;color:#fff;font-weight:800">Aller à l\'exercice en cours</button></div>';
+    var root=document.getElementById('m6-app-root');if(root&&root.parentNode)root.parentNode.insertBefore(d,root);return true;
+  }
+  /* Exercice suivant créé à la main (avant la fin du précédent) : mêmes choix de dates,
+     ses propres réglages (copie du dernier exercice). Le passage se fera le moment venu. */
+  window.M6_nouvelExercice=function(){
+    var r=localStorage.getItem('M6_REGIME');if(!r)return;
+    var ys=M6_Storage.getAllYears(r),L=Math.max.apply(null,ys.concat([M6_Storage.currentExoYear?M6_Storage.currentExoYear(r):new Date().getFullYear()]));
+    var cL=M6_Storage.getContract(r,L),bL=M6_Periode.bornes(cL,L),ndeb=plus(bL.fin,1),nfin=bL.calendaire?(L+1)+'-12-31':unAn(bL.fin);
+    var ny=parseInt(ndeb,10);
+    function creer(deb,fin){
+      var c=Object.assign({},cL);if(!bL.calendaire||deb!==(ny+'-01-01')||fin!==(ny+'-12-31')){c.dateDebutExercice=deb;c.dateFinExercice=fin;}else{c.dateDebutExercice=null;c.dateFinExercice=null;}
+      var yN=M6_exoAnnee(deb,fin);try{localStorage.setItem('M6_'+r+'_'+yN+'_CONTRACT',JSON.stringify(c));M6_Storage.createYear(r,yN);
+        var auj=iso(new Date());if(auj>=deb&&auj<=fin&&M6_Storage.setContractGlobal)M6_Storage.setContractGlobal(r,c);
+        M6_Storage.setActiveYear(r,yN);try{sessionStorage.setItem('M6_VOIR_ANNEE',String(yN));}catch(e){}}catch(e){if(window.M6_toast)M6_toast('Espace de stockage insuffisant');return;}
+      location.reload();
+    }
+    var x={regime:r,c:cL,prec:L,deb:bL.deb,fin:bL.fin,ndeb:ndeb,nfin:nfin,date:!bL.calendaire};
+    if(!window.hsNouvelExercice){creer(ndeb,nfin);return;}
+    hsNouvelExercice.demander({titre:'Exercice '+fr(ndeb).replace(/^\d+ /,'')+' → '+fr(nfin).replace(/^\d+ /,''),couleur:'#8a6d2f',
+      question:'Les dates du nouvel exercice :',titreAuto:'Même période, un an plus tard',texteAuto:'Du '+fr(ndeb)+' au '+fr(nfin)+'. Réglages copiés de l\'exercice précédent, modifiables sans le toucher.',
+      texteManuel:'Ton employeur change la période : tu indiques le début et la fin.',
+      auto:function(){creer(ndeb,nfin);},manuel:function(){saisirDates(Object.assign({},x,{_creer:creer}));}});
+  };
+  function verifier(){
+    if(document.getElementById('m6ExoSuivant'))return;
+    if(bandeauPasse())return;
+    var x=contexte();if(!x)return;
+    if(localStorage.getItem('M6_EXO_PLUS_TARD_'+x.regime)===iso(new Date()))return;
+    if(document.getElementById('m6ExoSuivant'))return;
+    var d=document.createElement('div');d.id='m6ExoSuivant';
+    d.style.cssText='margin:10px 12px;padding:12px 14px;border-radius:14px;background:#fff8e6;border:1.5px solid #f0c040;font-size:13.5px;line-height:1.45;color:#5a4300';
+    d.innerHTML='📅 <b>Ton exercice s\'est terminé le '+fr(x.fin)+'.</b><br>Le suivant commence le '+fr(x.ndeb)+'. Tu verras ton bilan, puis tu choisiras les dates.'
+      +'<div style="display:flex;gap:8px;margin-top:10px"><button onclick="M6_ouvrirExercice()" style="flex:1;padding:10px;border-radius:10px;border:none;background:#8a6d2f;color:#fff;font-weight:800">Ouvrir l\'exercice suivant</button>'
+      +'<button onclick="M6_exercicePlusTard()" style="padding:10px 12px;border-radius:10px;border:1px solid #d8c48a;background:#fff;color:#5a4300;font-weight:700">Plus tard</button></div>'
+      +'<div style="font-size:11.5px;margin-top:6px;color:#7a6520">Tes jours déjà saisis ne bougent pas, et l\'exercice terminé reste consultable.</div>';
+    var root=document.getElementById('m6-app-root');if(root&&root.parentNode)root.parentNode.insertBefore(d,root);
+  }
+  window.M6_verifierExercice=verifier;
+  window.M6_rafraichirBandeau=function(){var e=document.getElementById('m6ExoSuivant');if(e)e.remove();verifier();};
+  if(document.readyState==='complete')setTimeout(verifier,700);else window.addEventListener('load',function(){setTimeout(verifier,700);});
+})();
+</script>
 <script>
 // Enregistrement Service Worker PWA
 if ('serviceWorker' in navigator) {
@@ -128,5 +309,42 @@ if ('serviceWorker' in navigator) {
 })();
 </script>
 <script>window._hmToDec=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var h=Number(he&&he.value)||0,m=Number(me&&me.value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._decToHM=function(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;};window._hmVal=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var hv=he?he.value:'',mv=me?me.value:'';if((hv===''||hv==null)&&(mv===''||mv==null))return NaN;var h=Number(hv)||0,m=Number(mv)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._m6fmtH=function(h){h=Number(h);if(!h||isNaN(h))return '0h';var s=h<0?'-':'';h=Math.abs(h);var e=Math.floor(h),m=Math.round((h-e)*60);if(m===60){e++;m=0;}return s+e+'h'+(m>0?String(m).padStart(2,'0'):'');};</script>
+<!-- C4 saisie rapide : #saisie-aujourdhui ouvre la saisie du jour (lien depuis le menu) -->
+<script>
+(function(){
+  /* 26/09/2026 : à chaque ouverture (et pour la saisie rapide), exercice qui contient
+     aujourd'hui. Ce script passe avant l'affichage de la vue : il suffit de changer
+     l'année active ici. Consulter une autre année reste possible pendant la visite. */
+  try{
+    var reg=localStorage.getItem('M6_REGIME');
+    if(reg&&window.M6_Storage&&window.M6_Periode){
+      var t=new Date(),auj=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+      var c=(M6_Storage.getContractGlobal?M6_Storage.getContractGlobal(reg):M6_Storage.getContract(reg))||{},bon=t.getFullYear();
+      [t.getFullYear()-1,t.getFullYear(),t.getFullYear()+1].forEach(function(y){var b=M6_Periode.bornes(c,y);if(auj>=b.deb&&auj<=b.fin)bon=y;});
+      // 27/09/2026 : exercice qu'on vient de créer → on l'ouvre (une fois)
+      var voir=null;try{voir=sessionStorage.getItem('M6_VOIR_ANNEE');sessionStorage.removeItem('M6_VOIR_ANNEE');}catch(e){}
+      if(voir&&/^\d{4}$/.test(voir))bon=parseInt(voir,10);
+      if(M6_Storage.getActiveYear(reg)!==bon)M6_Storage.setActiveYear(reg,bon);
+    }
+  }catch(e){}
+  /* 26/09/2026 : CCN choisie dans le menu, reprise dans un contrat encore sans CCN */
+  try{
+    var regC=localStorage.getItem('M6_REGIME');
+    var nomC=regC&&window.M6_CCN_Adapter&&M6_CCN_Adapter.appliquerDuMenu?M6_CCN_Adapter.appliquerDuMenu(regC):'';
+    if(nomC)window.addEventListener('load',function(){setTimeout(function(){if(window.M6_toast)M6_toast('Ta convention collective est reprise du menu : '+nomC);},900);});
+  }catch(e){}
+  if(location.hash!=='#saisie-aujourdhui')return;
+  try{history.replaceState(null,'',location.pathname+location.search);}catch(e){}
+  function go(){try{
+    /* M6 : les vues se construisent après coup ; on attend le bouton de saisie du régime */
+    var n=0,t=setInterval(function(){
+      var b=document.querySelector('#vfj-saisir,#fh-saisir,#fh-add,#cd-saisir');
+      if(b){clearInterval(t);b.click();
+        if(b.id==='cd-saisir')setTimeout(function(){try{var d=new Date();M6_Calendar._openPopup(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));}catch(e){}},400);}
+      else if(++n>30)clearInterval(t);
+    },200);}catch(e){}}
+  if(document.readyState==='complete')setTimeout(go,400);else window.addEventListener('load',function(){setTimeout(go,400);});
+})();
+</script>
 </body>
 </html>
