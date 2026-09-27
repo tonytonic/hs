@@ -773,6 +773,17 @@ class ModuleReaderPro extends ModuleReader {
 
       if (Object.keys(monthBreakdown).length === 0) return;
 
+      // 26/09/2026 : total officiel du module (contingent M1/M2) quand il existe ;
+      // les paliers sont remis à l'échelle pour rester cohérents avec ce total.
+      try {
+        const off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(y) : null;
+        if (off && yearOT > 0 && Math.abs(off.total - yearOT) > 0.01) {
+          const k = off.total / yearOT;
+          yearHs25 *= k; yearHs10 *= k; yearHs50 *= k;
+          yearOT = off.total;
+        } else if (off && yearOT <= 0) { yearOT = off.total; yearHs25 = off.total; }
+      } catch (_) {}
+
       monthCount  += Object.keys(monthBreakdown).length;
       totalExtra  += yearOT;
       totalPlus25 += yearHs25;

@@ -59,6 +59,9 @@
       });
     });
 
+    // 26/09/2026 : total officiel du module (contingent M1/M2) quand il existe
+    try { var off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(yr) : null;
+      if (off) return { total: off.total, src: off.source }; } catch (e) {}
     return { total: totalMin / 60, src: src };
   }
 
