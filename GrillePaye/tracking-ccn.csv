@@ -89,7 +89,7 @@
 3245,Opérateurs de voyages et des guides,3,estimation à confirmer,3,2026,,,,
 3250,Commissaires de justice et sociétés de ventes volontaires,3,estimation à confirmer,33,01/01/2026,,,,
 5001,Industries électriques et gazières IEG,3,vérifiée,6,01/06/2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
-158,Bois scieries négoce importation,2,estimation à confirmer,14,2026,ACTIF,,,
+158,Bois scieries négoce importation,2,sourcée,9,01/04/2026,ACTIF,,,
 218,Organismes de Sécurité sociale (UCANSS),2,vérifiée,3,01/2026,ACTIF,,convention.fr+jooble (offres réelles),"Identité CORRECTE : organismes de sécurité sociale (CPAM/CAF/URSSAF), coefficient/points UCANSS, secrétariat plausible. Pas de tableau officiel unique trouvé (grosse réforme classification 2024-2026 en cours), mais points réels récents via offres d'emploi UCANSS: coef 252->2161€, coef 277->2351€, coef 305->2527€, coef 320->2678€, coef 360->3036€ (Ségur inclus). À affiner avec le texte de l'accord du 22/11/2024 si besoin de précision totale."
 412,Agences de voyages-guides accompagnateurs,2,fusionnée — grille de la convention de rattachement,1,,HISTORIQUE_PERIME,,,
 489,Industries du cartonnage,2,vérifiée,6,01/05/2025,ACTIF,,,
@@ -114,7 +114,7 @@
 200,Exploitations frigorifiques,1,vérifiée,3,01/03/2026,ACTIF,,,
 211,Industries de carrières et de matériaux cadres,1,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 350,Industries de la mode et chapellerie,1,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
-478,Sociétés financières établissements financiers,1,vérifiée,7,01/03/2025,ACTIF,,,
+478,Sociétés financières établissements financiers,1,sourcée,20,01/06/2026,ACTIF,,,
 538,Manutention ferroviaire travaux connexes,1,sourcée,41,01/01/2026,ACTIF,,,
 637,Récupération industrie et commerces,1,vérifiée,21,2026,ACTIF,,,
 707,Cadres transformation papiers cartons,1,vérifiée,3,01/06/2026,HISTORIQUE_PERIME,,,
