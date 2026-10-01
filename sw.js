@@ -3,7 +3,7 @@
  * Version : 10.9.19 — Cloudflare Pages (Google Play compliance : disclaimers non-gouv + sources)
  */
 
-const CACHE_NAME = "heuressup-cache-v10.11.23"; // v10.10.23 : pré-cache complet (105 outils + sommaire + images tuiles) pour le hors-ligne // v10.9.21 : ajout taiko.html + legi-ref.js au précache
+const CACHE_NAME = "heuressup-cache-v10.11.26"; // v10.11.26 : pré-cache sans cache navigateur (cache:reload) // v10.10.23 : pré-cache complet (105 outils + sommaire + images tuiles) pour le hors-ligne // v10.9.21 : ajout taiko.html + legi-ref.js au précache
 const OFFLINE_URL = "./menu.html";
 
 const FILES_TO_CACHE = [
@@ -237,7 +237,10 @@ self.addEventListener("install", (event) => {
       let ok = 0, fail = 0;
       for (const url of FILES_TO_CACHE) {
         try {
-          const res = await fetch(url);
+          // 01/10/2026 : cache:'reload' = toujours le fichier du serveur, jamais une
+          // copie gardée par le navigateur (GitHub Pages la garde 10 min) : sinon une
+          // nouvelle version pouvait remettre en cache l'ancienne page.
+          const res = await fetch(url, { cache: 'reload' });
           if (res.ok) {
             const body = await res.arrayBuffer();
             const headers = new Headers();
