@@ -97,7 +97,7 @@
 669,Fabrication mécanique du verre,2,estimation à confirmer,8,2026,ACTIF,,,
 800,,2,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1388,Industrie du pétrole,2,estimation à confirmer,6,01/06/2026,ACTIF,,,
-1483,Habillement commerce de détail,2,vérifiée,8,01/06/2026,ACTIF,,,
+1483,Habillement commerce de détail,2,sourcée,13,2026,ACTIF,,,
 1619,Cabinets dentaires,2,sourcée,4,01/01/2025,,,,
 1922,Radiodiffusion audiovisuel public et privé,2,vérifiée,2,01/10/2025,,,,
 1930,Transformation des grains (meunerie),2,vérifiée,6,09/02/2026,,,,
@@ -386,7 +386,7 @@
 3228,Personnel navigant maritime (Officier/Appui),,sourcée,8,01/01/2022,,,,
 3229,Personnel sédentaire du transport de marchandises en navigation intérieure,,sourcée,12,01/01/2026,,,,
 3230,Presse quotidienne et hebdomadaire,0,vérifiée,7,01/12/2025,ACTIF,,,
-3236,Industrie et des services nautiques,0,vérifiée,3,01/04/2025,ACTIF,,DARES,Industrie et services nautiques (bateaux) vs 'menuisier/facteur d'orgue' actuel. Aucun rapport.
+3236,Industrie et des services nautiques,0,sourcée,18,01/06/2026,ACTIF,,DARES,Industrie et services nautiques (bateaux) vs 'menuisier/facteur d'orgue' actuel. Aucun rapport.
 3241,Télédiffusion (CDDU),,sourcée,12,01/07/2024,,,,
 3243,Quincaillerie fournitures industrielles (grandes chaînes),0,vérifiée,3,01/06/2026,,,,
 3244,Professions réglementées auprès des juridictions,0,vérifiée,5,01/06/2026,,,,
@@ -407,7 +407,7 @@
 7012,Centres équestres (personnel),,sourcée,11,01/01/2023,,,,
 7016,Coopératives agricoles céréales meunerie alimentation bétail (identité non confirmée),0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 99999",Ancien nom officiel: Convention collective nationale de travail concernant les jardiniers et jardiniers-gardiens de propriétés privées. Ce numéro est remplacé par le 99999 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 7017,Parcs et jardins zoologiques,,sourcée,11,01/04/2017,,,,
-7019,Conchyliculture,,sourcée,6,01/03/2023,,,,
+7019,Conchyliculture,,sourcée,6,01/08/2026,,,,
 7020,Centres de gestion agréés agricoles,0,estimation à confirmer,2,2026,,,,
 7021,Sélection et reproduction animale,0,estimation à confirmer,2,2026,,,,
 7027,Conseil et service en élevage,,sourcée,10,01/01/2026,,,,
