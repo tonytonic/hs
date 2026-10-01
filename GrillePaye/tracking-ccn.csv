@@ -55,9 +55,9 @@
 843,Boulangerie-pâtisserie artisanale,4,vérifiée,10,01/01/2026,ACTIF,,,
 959,Laboratoires analyses médicales extra-hospitaliers,4,vérifiée,6,01/06/2026,ACTIF,,,
 1266,Restauration de collectivités,4,vérifiée,7,01/06/2026,ACTIF,,,
-1285,Entreprises artistiques et culturelles,4,sourcée,9,01/01/2024,ACTIF,,,
+1285,Entreprises artistiques et culturelles,4,sourcée,9,01/08/2026,ACTIF,,,
 1411,Fabrication de l'ameublement,4,vérifiée,3,01/06/2026,ACTIF,,,"IDCC 1411 réel = Fabrication de l'ameublement (brochure 3155). Contenu actuel = labels commerciaux (employé commercial, technico-commercial, chef de rayon) qui collent mal à un secteur manufacturier. Pas confirmé mismatch mais suspect - à vérifier par l'autre agent avant de chercher une grille."
-1413,Salariés permanents des entreprises de travail temporaire,4,vérifiée,7,01/06/2026,ACTIF,,,
+1413,Salariés permanents des entreprises de travail temporaire,4,sourcée,13,01/09/2026,ACTIF,,,
 1431,Optique lunetterie de détail,4,vérifiée,3,01/01/2026,,,,
 1702,Travaux publics ouvriers,4,vérifiée,5,01/01/2026,ACTIF,,salairebtp.fr+juristique.org (plusieurs régions croisées),"Travaux publics OUVRIERS - identité confirmée DARES. IMPORTANT: grille RÉGIONALE, pas nationale unique (chaque région FRTP négocie son propre barème, 1,2%-2,9% de hausse 2026 selon régions). Repère Bretagne (accord 9/12/2025 étendu, maj FNTP 24/02/2026): Niveau I coef.100 = 23 863€/an, Niveau IV coef.180 = 34 529€/an. Autres régions 2026: Grand Est 23 294-33 525€, Nouvelle-Aquitaine 23 242-34 040€, IDF 23 709-34 569€ (certaines encore non étendues). Un seul chiffre 'national' serait trompeur — si le schéma doit rester simple, Bretagne est une base raisonnable mais à annoter clairement comme variable selon région."
 2002,"Blanchisserie, teinturerie et nettoyage (pressing)",4,estimation à confirmer,13,01/01/2026,ACTIF,,,Contenu actuel = 'conduite ferroviaire' mais IDCC 2002 réel = teinturerie/pressing (confirmé par l'audit du guide). A signaler.
@@ -104,7 +104,7 @@
 2128,Mutualité,2,vérifiée,8,01/06/2026,ACTIF,,,
 2198,Vente à distance e-commerce,2,vérifiée,4,01/04/2026,,,,
 2543,Cabinets géomètres-experts topographes,2,vérifiée,5,2026,,,,
-3222,Menuiseries charpentes constructions industrialisées,2,vérifiée,8,01/06/2026,,,,
+3222,Menuiseries charpentes constructions industrialisées,2,vérifiée,11,01/05/2026,,,,
 3238,Papiers et cartons industries,2,vérifiée,2,01/06/2026,ACTIF,,juristique.org (page complète),"Papiers-cartons. Table complète: OETAM 15 échelons (1843€ à 3258€) + Cadres 6 niveaux (RAM annuelle 32000€ à 66307€, soit ~2133€ à 4420€/mois à 80%). Avenants n°21/22/23 du 30/01/2026, en attente d'extension au moment de l'article."
 3249,Industries de carrières et matériaux de construction,2,sourcée,20,01/01/2026,,,,
 7005,Caves coopératives vinicoles,2,sourcée,9,01/01/2018,,,,
@@ -224,7 +224,7 @@
 1383,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3243","Ancien nom officiel: Convention collective nationale des commerces de quincaillerie, fournitures industrielles, fers, métaux et équipement de la maison, employés et personnels de maîtrise. Ce numéro est remplacé par le 3243 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
 1396,Industries des produits alimentaires élaborés,0,vérifiée,6,01/06/2026,ACTIF,,,
 1404,Commerce rép tracteurs matériel agricole bât TP,0,vérifiée,8,01/06/2026,ACTIF,,,
-1412,Installation entretien réparation matériel thermique frigorifique,0,vérifiée,6,01/06/2026,ACTIF,,,
+1412,Installation entretien réparation matériel thermique frigorifique,0,sourcée,24,01/07/2026,ACTIF,,,
 1424,Réseaux de transports publics urbains de voyageurs,,sourcée,6,01/01/2026,,,,
 1489,Cordonnerie multiservice (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1499,Miroiterie transformation négoce du verre,0,sourcée,17,01/05/2026,ACTIF,oui (1823.35 €),,
