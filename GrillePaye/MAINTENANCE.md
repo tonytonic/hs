@@ -4,8 +4,8 @@
 
 ```
 GrillePaye/
-├── index.html        Module standalone (données embarquées en base64)
-├── ccn-data.json     Source des données CCN (350 KB)
+├── index.html        Module (lit ccn-data.json au démarrage — depuis le 01/10/2026)
+├── ccn-data.json     Source UNIQUE des grilles CCN : c'est le seul fichier à modifier
 └── MAINTENANCE.md    Ce guide
 ```
 
@@ -26,7 +26,7 @@ Chercher en haut du fichier :
   "_smic_date": "01/01/2026",
   "_smic_src": "Décret n°2025-1228 du 17 décembre 2025",
 ```
-Modifier ces 3 valeurs. Le prochain rebuild embarquera le nouveau SMIC.
+Modifier ces 3 valeurs (et SMIC_DEF dans index.html, ci-dessous : les deux doivent rester identiques).
 
 ### Dans le code source (`index.html`)
 Chercher `const SMIC_DEF=` → modifier la valeur :
@@ -120,29 +120,24 @@ const SMIC_DEF=1823.03,SDATE_DEF="01/01/2026",SSRC_DEF="Décret n°2025-1228";
 
 ---
 
-## 6. Reconstruire index.html après mise à jour JSON
+## 6. Après une mise à jour de ccn-data.json
 
-### Prérequis : Node.js ≥ 18
+**Plus rien à reconstruire (01/10/2026).** `index.html` lit `ccn-data.json` à
+chaque ouverture : modifier `ccn-data.json` sur GitHub suffit.
 
-```bash
-# Cloner le repo (si sur GitHub)
-git clone https://github.com/SODISE/GrillePaye
-cd GrillePaye
-
-# Modifier ccn-data.json (voir §2 et §3)
-# Puis rebuild :
-node gen_clean.js
-
-# Résultat : index.html mis à jour avec les nouvelles données embarquées
-```
-
-### Sans rebuild (via Admin UI)
-Pour des corrections ponctuelles **sans toucher au code** :
-1. Ouvrir `index.html`
-2. Aller dans **⚙️ Admin → Grilles CCN**
-3. Rechercher la CCN, modifier les niveaux
-4. **💾 Enregistrer** → stocké localement
-5. **Export JSON** → sauvegarder les modifs pour le prochain rebuild
+- Pour que les téléphones voient la nouvelle grille **dès l'ouverture
+  suivante** : augmenter `CACHE_NAME` dans `sw.js` (à la racine de l'appli).
+  Sans ça, ils la voient à l'ouverture d'après (le cache se rafraîchit en
+  arrière-plan).
+- `gen_clean.js` ne doit **plus** être utilisé : il remettrait l'ancienne
+  copie figée (`_B64`) dans index.html.
+- Si `ccn-data.json` est introuvable ou mal formé, la page s'ouvre quand même
+  avec un bandeau rouge « Grilles indisponibles » (montants estimés). Vérifier
+  le JSON (virgule oubliée, montant entre guillemets…).
+- Contrôle rapide : en bas de la liste des grilles, la ligne
+  `📄 N grilles lues dans ccn-data.json · fichier du … · en ligne` (élément
+  `#gp-pied-donnees`, créé par le chargeur en fin de fichier). Elle signale
+  aussi un écart entre `_smic` de ccn-data.json et `SMIC_DEF`.
 
 ---
 
@@ -155,8 +150,8 @@ const SMIC_DEF=1823.03           // ← SMIC par défaut embarqué
 const SDATE_DEF="01/01/2026"     // ← Date du SMIC
 const SSRC_DEF="Décret n°2025-1228" // ← Source décret
 
-const _B64="..."                 // ← Données CCN encodées base64 (NE PAS MODIFIER MANUELLEMENT)
-                                 //   Générées automatiquement par gen_clean.js
+const GR_REMOTE=window.__GR_GRILLES // ← grilles lues dans ccn-data.json par le chargeur
+                                 //   en bas de page (plus de copie _B64 depuis le 01/10/2026)
 
 const HS_DEF={                   // ← Règles heures supplémentaires par groupe CCN
   DC:{n:"Droit commun",cg:220,mh:48,t1:25,p1:8,t2:50,...},
@@ -188,7 +183,7 @@ const HS_DEF={                   // ← Règles heures supplémentaires par grou
 
 ## 9. Checklist mise à jour annuelle (janvier)
 
-- [ ] Nouveau SMIC ? → Décret paru en décembre → mettre à jour `_smic` dans JSON + rebuild
+- [ ] Nouveau SMIC ? → Décret paru en décembre → mettre à jour `_smic` dans JSON + `SMIC_DEF` dans index.html
 - [ ] CCN transport routier (IDCC 16) → NAO octobre/novembre → montants M (marchandises) et V (voyageurs)
 - [ ] CCN sécurité privée (IDCC 1351) → accord triennal → taux HS à vérifier
 - [ ] CCN propreté (IDCC 3043/3186) → avenant mars/avril
@@ -198,7 +193,7 @@ const HS_DEF={                   // ← Règles heures supplémentaires par grou
 - [ ] CCN bâtiment ouvriers (IDCC 1596/1597) → avenant régional IDF
 - [ ] CCN pharmacie officine (IDCC 2104) → avenant mai/juin
 - [ ] Mise à jour `_version` et `_date` dans JSON
-- [ ] Rebuild index.html → `node gen_clean.js`
+- [ ] Augmenter `CACHE_NAME` dans `sw.js` (plus de rebuild : index.html lit ccn-data.json)
 - [ ] Commit + push GitHub → déploiement automatique Vercel/GitHub Pages
 
 ---
