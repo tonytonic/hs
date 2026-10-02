@@ -378,6 +378,7 @@ document.addEventListener("DOMContentLoaded", function(){
     <p>La base hebdomadaire (ex&nbsp;: 35h) repr&eacute;sente une semaine compl&egrave;te th&eacute;orique. Les heures suppl&eacute;mentaires sont d&eacute;clench&eacute;es uniquement apr&egrave;s d&eacute;passement de cette base, d&eacute;duction faite des absences.</p>
     <hr><h4>&#10060; Absences</h4>
     <p>Les absences correspondent &agrave; du temps non travaill&eacute;. Elles <b>r&eacute;duisent le volume d&apos;heures attendues</b> dans la semaine, ce qui diminue le solde brut de la p&eacute;riode. Elles ne g&eacute;n&egrave;rent pas d&apos;heures suppl&eacute;mentaires.</p>
+    <p>&#x1F334; <b>Cong&eacute;s pay&eacute;s</b>&nbsp;: depuis l&apos;arr&ecirc;t de la Cour de cassation du 10 septembre 2025 (n&deg;&nbsp;23-14.455, confirm&eacute; le 7 janvier 2026 pour un d&eacute;compte sur deux semaines), les jours de cong&eacute;s pay&eacute;s comptent comme du temps de travail pour savoir si le seuil de la semaine est d&eacute;pass&eacute;. Coche &laquo;&nbsp;C&apos;est un cong&eacute; pay&eacute;&nbsp;&raquo; en saisissant l&apos;absence&nbsp;: ces heures ne r&eacute;duisent alors plus le seuil (r&eacute;glage activ&eacute; par d&eacute;faut, d&eacute;sactivable dans les R&eacute;glages).</p>
     <hr><h4>&#x1F501; R&eacute;cup&eacute;rations</h4>
     <p>Les r&eacute;cup&eacute;rations sont des heures pr&eacute;c&eacute;demment travaill&eacute;es, reprises ult&eacute;rieurement sous forme de repos.</p>
     <p><b>Dans cet outil, les r&eacute;cup&eacute;rations ne r&eacute;duisent pas la base hebdomadaire.</b> Elles sont uniquement soustraites du <b>solde brut</b> pour obtenir le <b>solde net</b>, afin d&apos;&eacute;viter un double comptage.</p>
@@ -483,6 +484,10 @@ document.addEventListener("DOMContentLoaded", function(){
       <label class="sett-check-row">
         <input type="checkbox" id="autoFerieToggle" style="width:18px;height:18px;flex-shrink:0;margin:0;accent-color:#4FB3C2;">
         <span style="font-size:14px;">Mode f&eacute;ri&eacute; automatique (−7h en semaine)</span>
+      </label>
+      <label class="sett-check-row">
+        <input type="checkbox" id="cpJurisToggle" style="width:18px;height:18px;flex-shrink:0;margin:0;accent-color:#2e7d32;">
+        <span style="font-size:14px;">Les cong&eacute;s pay&eacute;s comptent pour le seuil des heures sup<span style="display:block;font-size:11px;color:#888;margin-top:2px;">Cass. soc. 10 sept. 2025 (n&deg; 23-14.455) et 7 janv. 2026 (n&deg; 24-19.410)&nbsp;: pour un d&eacute;compte &agrave; la semaine ou sur deux semaines, les jours de CP comptent pour atteindre le seuil (sans devenir des heures sup). Coche &laquo;&nbsp;C&apos;est un cong&eacute; pay&eacute;&nbsp;&raquo; en saisissant l&apos;absence. En cas d&apos;annualisation ou de modulation, v&eacute;rifie ton accord.</span></span>
       </label>
     </div>
 
@@ -639,6 +644,9 @@ document.addEventListener("DOMContentLoaded", function(){
     <h3 id="popupDate"></h3>
     <div id="popup-ferie-info" style="display:none;background:#e3f2fd;border:1px solid #1976d2;border-radius:12px;padding:10px;font-size:13px;color:#1565c0;margin-bottom:10px;line-height:1.5;"></div>
 
+    <!-- CONGÉ PAYÉ EN UN GESTE -->
+    <button type="button" id="btnCPJournee" onclick="cpJourneeRapide()" style="width:100%;margin:0 0 10px;padding:10px 12px;border-radius:12px;border:1.5px solid #81c784;background:#e8f5e9;color:#2e7d32;font-weight:700;font-size:14px;">&#x1F334; Journ&eacute;e de cong&eacute; pay&eacute;</button>
+
     <!-- MODE TOGGLE -->
     <div class="saisie-toggle">
       <button id="modeHS" class="active" onclick="setSaisieMode('hs')">&#10133; HS directes</button>
@@ -685,6 +693,8 @@ document.addEventListener("DOMContentLoaded", function(){
       <legend style="font-weight:700;color:#c62828;margin-bottom:6px">&#10060; Absence</legend>
       <label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:4px"><input type="checkbox" id="isAbsent" style="width:18px;height:18px;margin:0"> Heures d&apos;absence</label>
       <div style="display:flex;gap:8px;align-items:center;"><input id="absentH" type="number" min="0" step="1" inputmode="numeric" placeholder="h" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">h</span><input id="absentM" type="number" min="0" max="59" step="1" inputmode="numeric" placeholder="min" style="border-radius:12px;flex:1;min-width:0;text-align:center;"><span style="font-weight:700;color:#6b7280;font-size:14px;">min</span></div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px;color:#2e7d32"><input type="checkbox" id="absentCP" onchange="cpCaseChange(this)" style="width:18px;height:18px;margin:0;accent-color:#2e7d32"> &#x1F334; C&apos;est un cong&eacute; pay&eacute;</label>
+      <div id="absentCPHint" style="font-size:11px;color:#6b7280;margin-top:3px;line-height:1.35">Si la r&egrave;gle des cong&eacute;s pay&eacute;s est active (R&eacute;glages), ces heures comptent comme du temps de travail pour le seuil des heures sup (Cass. soc., 10 sept. 2025, n&deg; 23-14.455).</div>
     </fieldset>
 
     <div class="popup-actions">
@@ -813,7 +823,7 @@ function resetCurrentExercise(){
     var msg="Reinitialiser exercice "+currentSuffix+" ? Toutes les donnees seront supprimees.";
     confirmModal(msg,function(){
       createSnapshot("before_reset_exercise");
-      ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CONFIG_LOCK_"].forEach(function(p){localStorage.removeItem(p+currentSuffix);});
+      ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CP_JURIS_","CONFIG_LOCK_"].forEach(function(p){localStorage.removeItem(p+currentSuffix);});
       localStorage.setItem("DATA_REPORT_"+currentSuffix,JSON.stringify({}));
       localStorage.setItem("CLOSURES_REPORT_"+currentSuffix,JSON.stringify([]));
       localStorage.setItem("REPORTS_REPORT_"+currentSuffix,JSON.stringify({}));
@@ -848,6 +858,7 @@ function loadExercise(suffix){
   periodMeta=JSON.parse(localStorage.getItem(STORAGE.periodMeta))||{};
   BASE_HEBDO=Number(localStorage.getItem("BASE_HEBDO_"+suffix))||35;
   AUTO_FERIE=localStorage.getItem("AUTO_FERIE_"+suffix)==="true";
+  CP_JURIS=localStorage.getItem("CP_JURIS_"+suffix)!=="false";
   currentPeriodIndex=0;
   document.getElementById("activeYearLabel").textContent=suffix;
   closeYearsPopup();
@@ -858,7 +869,10 @@ function loadExercise(suffix){
 function openYearsPopup(){const box=document.getElementById("yearsList");if(!box)return;box.innerHTML="";const years=getExistingYears();if(!years.length)box.innerHTML="<i>Aucun exercice existant</i>";else years.forEach(y=>{const btn=document.createElement("button");btn.textContent=y+(String(y)===String(currentSuffix)?" ✓ (actif)":"");btn.style.background=String(y)===String(currentSuffix)?"var(--accent)":"";btn.onclick=()=>{if(String(y)===String(currentSuffix)){closeYearsPopup();return;}loadExercise(y);};box.appendChild(btn);});document.getElementById("popupYears").style.display="flex";}
 function _hmToDec(hId,mId){var h=Number(document.getElementById(hId).value)||0;var m=Number(document.getElementById(mId).value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;}
 function _decToHM(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;}
-function saveManual(){if(!selectedDate)return;if(!data[selectedDate])data[selectedDate]={extra:0,recup:0,absent:0};data[selectedDate].extra=_hmToDec('manualExtraH','manualExtraM');data[selectedDate].recup=_hmToDec('manualRecupH','manualRecupM');data[selectedDate].absent=isAbsent.checked?(_hmToDec('absentH','absentM')||DAILY_WORK_HOURS):0;save();const _sd1=selectedDate;closePopup();showSaveFeedback(_sd1);}
+/* Congé payé en un geste : la journée entière (DAILY_WORK_HOURS) est enregistrée comme congé payé. */
+function cpJourneeRapide(){if(!selectedDate)return;const d=data[selectedDate]||{extra:0,recup:0,absent:0};d.extra=_hmToDec('manualExtraH','manualExtraM')||0;d.recup=_hmToDec('manualRecupH','manualRecupM')||0;d.absent=DAILY_WORK_HOURS;d.cp=1;data[selectedDate]=d;save();const _sd=selectedDate;closePopup();showSaveFeedback(_sd);}
+function cpCaseChange(el){if(!el.checked)return;const a=document.getElementById('isAbsent');if(a)a.checked=true;if(!_hmToDec('absentH','absentM'))_decToHM(DAILY_WORK_HOURS,'absentH','absentM');}
+function saveManual(){if(!selectedDate)return;if(!data[selectedDate])data[selectedDate]={extra:0,recup:0,absent:0};data[selectedDate].extra=_hmToDec('manualExtraH','manualExtraM');data[selectedDate].recup=_hmToDec('manualRecupH','manualRecupM');{const _cpEl=document.getElementById('absentCP');const _cp=!!(_cpEl&&_cpEl.checked);data[selectedDate].absent=(isAbsent.checked||_cp)?(_hmToDec('absentH','absentM')||DAILY_WORK_HOURS):0;if(_cp&&data[selectedDate].absent>0)data[selectedDate].cp=1;else delete data[selectedDate].cp;}save();const _sd1=selectedDate;closePopup();showSaveFeedback(_sd1);}
 function closeYearsPopup(){document.getElementById("popupYears").style.display="none";}
 function confirmSwitchYear(){const val=document.getElementById("newYearInput").value;if(!val)return;
   /* 26/09/2026 : nouvelle année qui suit un exercice existant → même chemin que le bandeau
@@ -902,6 +916,10 @@ let exerciseStart=localStorage.getItem(STORAGE.exerciseStart)||"";
 let periodMeta=JSON.parse(localStorage.getItem(STORAGE.periodMeta))||{};
 let BASE_HEBDO=Number(localStorage.getItem("BASE_HEBDO_"+currentSuffix))||35;
 let AUTO_FERIE=localStorage.getItem("AUTO_FERIE_"+currentSuffix)==="true";
+/* Congés payés et seuil des heures sup (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026) :
+   si CP_JURIS, les heures d'absence marquées « congé payé » (cp:1) ne réduisent pas le seuil hebdomadaire. Activé par défaut. */
+let CP_JURIS=localStorage.getItem("CP_JURIS_"+currentSuffix)!=="false";
+function _absRetenue(v){if(!v)return 0;if(CP_JURIS&&v.cp)return 0;return v.absent||0;}
 // Auto-import fériés au démarrage si l'option est activée
 if(localStorage.getItem('AUTO_IMPORT_FERIES')==='true'){
   setTimeout(()=>{ if(typeof importFeries==='function') importFeries(); }, 2000);
@@ -1196,6 +1214,7 @@ function generateCalendar(){
     if(day.extra)html+=`<small style="color:#000;font-weight:600">+${fmtHShort(day.extra)}</small>`;
     if(day.recup)html+=`<small style="color:#ef6c00">-${fmtHShort(day.recup)}</small>`;
     if(specialDays[key]==="ferie"){html+=`<small style="color:#0d47a1;font-weight:bold">🎌 Férié</small>`;div.style.background="#e3f2fd";div.style.border="2px dashed #1976d2";}
+    else if(day.absent&&day.cp){html+=`<small style="color:#2e7d32;font-weight:bold">CP ${fmtHShort(day.absent)}</small>`;div.style.background="#e8f5e9";div.style.border="2px solid #2e7d32";}
     else if(day.absent){html+=`<small style="color:#c62828;font-weight:bold">ABS ${fmtHShort(day.absent)}</small>`;div.style.background="#ffebee";div.style.border="2px solid #c62828";}
     div.innerHTML=html;
     if(key===dateKeyLocal(new Date()))div.classList.add("today");
@@ -1250,7 +1269,7 @@ function calculate(){
     const iso=dow===0?7:dow;
     const wk=getWeekKey(dd);
     weeks[wk]=(weeks[wk]||0)+(v.extra||0);
-    if(!_isCCNRestDay(dow))absences[wk]=(absences[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dow))absences[wk]=(absences[wk]||0)+_absRetenue(v);
     recups[wk]=(recups[wk]||0)+(v.recup||0);
     totalRecup+=v.recup||0;
   });
@@ -1307,7 +1326,7 @@ function openPopup(date){
     }
   }
   popupDate.textContent=date;_decToHM(d.extra,'manualExtraH','manualExtraM');_decToHM(d.recup,'manualRecupH','manualRecupM');
-  _decToHM(d.absent||0,'absentH','absentM');isAbsent.checked=(d.absent||0)>0;
+  _decToHM(d.absent||0,'absentH','absentM');isAbsent.checked=(d.absent||0)>0;{const _cpEl=document.getElementById('absentCP');if(_cpEl)_cpEl.checked=!!d.cp;}
   // Restore saisie mode
   setSaisieMode(_saisieMode);
   if(_saisieMode==='worked'){const base=getBaseJour();const total=d.extra>0?d.extra+base:0;_decToHM(total,'workedHoursH','workedHoursM');calcFromWorked();}
@@ -1422,7 +1441,7 @@ function hsContingentExercice(d,sd,auto,deb,fin){
     if(!v||typeof v!=="object"||!/^\d{4}-\d{2}-\d{2}$/.test(date)||!_dansExo(date))return;
     const[y,m,dd]=date.split("-").map(Number);const dt=new Date(y,m-1,dd);const wk=getWeekKey(dt);
     weeks[wk]=(weeks[wk]||0)+(v.extra||0);
-    if(!_isCCNRestDay(dt.getDay()))absences[wk]=(absences[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dt.getDay()))absences[wk]=(absences[wk]||0)+_absRetenue(v);
   });
   let total=0;
   Object.entries(weeks).forEach(([wk,extra])=>{const tw=Math.max(0,seuil-(absences[wk]||0))+extra;if(tw>seuil)total+=tw-seuil;});
@@ -1501,6 +1520,8 @@ function update(){
   const _adi=document.getElementById("annualDateInput");if(_adi)_adi.value=annualDate;
   const aft=document.getElementById("autoFerieToggle");
   if(aft){aft.checked=AUTO_FERIE;aft.onchange=()=>{AUTO_FERIE=aft.checked;localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);update();};}
+  const cpj=document.getElementById("cpJurisToggle");
+  if(cpj){cpj.checked=CP_JURIS;cpj.onchange=()=>{CP_JURIS=cpj.checked;localStorage.setItem("CP_JURIS_"+currentSuffix,CP_JURIS);update();};}
   // Toggle auto-import fériés
   const _aitEl=document.getElementById('autoImportFeriesToggle');
   const _ailEl=document.getElementById('autoImportFeriesLabel');
@@ -1778,7 +1799,7 @@ function calcPeriodWeeks(pStart,pEnd){
     // même si sa semaine a commencé dans la période précédente (clôtures en milieu de semaine).
     wks[wk]=(wks[wk]||0)+(v.extra||0);
     rec[wk]=(rec[wk]||0)+(v.recup||0);
-    if(!_isCCNRestDay(dow))abs[wk]=(abs[wk]||0)+(v.absent||0);
+    if(!_isCCNRestDay(dow))abs[wk]=(abs[wk]||0)+_absRetenue(v);
   });
   let t1=0,tInter=0,t2=0,tR=0,tExtra=0,tAbs=0;
   const rules=getCCNRules();
@@ -2206,6 +2227,7 @@ function protectFunctions(){
     <p>Les récupérations correspondent à des heures précédemment travaillées et ultérieurement non travaillées.<br><br>Elles <b>ne réduisent pas la base hebdomadaire</b> de calcul des heures supplémentaires. Elles sont uniquement soustraites du solde brut pour obtenir le <b>solde net</b>.</p>
     <hr><h4>➕ Heures supplémentaires</h4>
     <p>Le seuil de déclenchement correspond à l'équivalent de 35 heures hebdomadaires, ajusté selon les absences uniquement.</p>
+    <p>🌴 Exception : les congés payés marqués comme tels ne réduisent pas le seuil (Cass. soc. 10 sept. 2025, n° 23-14.455 ; 7 janv. 2026), sauf si tu désactives cette règle dans les Réglages.</p>
     <ul><li>Heures de la 36ᵉ à la 43ᵉ heure : majoration de 25 %</li><li>Heures au-delà de la 43ᵉ heure : majoration de 50 %</li></ul>
     <hr><h4>📚 Sources officielles</h4>
     <ul><li><a href="https://www.legifrance.gouv.fr/codes/id/LEGITEXT000006072050/" target="_blank" rel="noopener">Code du travail – Légifrance</a></li></ul>
@@ -2276,6 +2298,18 @@ function protectFunctions(){
         </label>
         <div style="padding:10px 14px;font-size:12px;color:#aaa;background:#f0f0f0;">
           <b style="color:#555;">Si décoché :</b> La semaine est considérée comme complète même les jours fériés — selon la jurisprudence Cass. Soc. 2012 : certains accords d'entreprise peuvent intégrer les jours fériés chômés dans l'assiette de calcul des HS.
+        </div>
+      </div>
+      <div style="background:#f1f8e9;border-radius:12px;border:1px solid #c5e1a5;overflow:hidden;margin-top:10px;">
+        <label class="wiz-check-row" style="margin:0;padding:12px 14px;cursor:pointer;">
+          <input type="checkbox" id="wizCpJuris" checked>
+          <span>
+            <b>🌴 Les congés payés comptent pour le seuil des heures sup</b>
+            <span style="display:block;font-size:12px;color:#888;margin-top:3px;">👉 Cour de cassation, 10 septembre 2025 (n° 23-14.455) et 7 janvier 2026 : dans une semaine avec des jours de congés payés, ces jours comptent comme travaillés pour savoir si les 35 h sont dépassées. Tu marques le congé en saisissant l'absence.</span>
+          </span>
+        </label>
+        <div style="padding:10px 14px;font-size:12px;color:#888;background:#f7fbf2;">
+          <b style="color:#555;">Si décoché :</b> ancienne règle — un congé payé réduit le seuil de la semaine comme une autre absence. Ne décoche que si ton temps de travail n'est pas décompté à la semaine (annualisation ou modulation prévue par un accord) : pour un décompte à la semaine ou sur deux semaines, la règle s'impose même si un accord dit le contraire.
         </div>
       </div>
       <div class="wiz-nav">
@@ -2390,13 +2424,14 @@ const _skipFirst=_startDay>1;let _i=_skipFirst?1:0,_count=0;while(_count<12&&_i<
   localStorage.setItem(STORAGE.closures,JSON.stringify(closures));
   annualRate=Number(document.getElementById("wizHourlyRate").value)||10;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);
   AUTO_FERIE=document.getElementById("wizAutoFerie").checked;localStorage.setItem("AUTO_FERIE_"+currentSuffix,AUTO_FERIE);
+  {const _wc=document.getElementById("wizCpJuris");CP_JURIS=_wc?_wc.checked:true;localStorage.setItem("CP_JURIS_"+currentSuffix,CP_JURIS);}
   if(document.getElementById("wizImportFeries").checked){try{const years=[by-1,by,by+1];for(const y of years){const res=await fetch(`https://calendrier.api.gouv.fr/jours-feries/metropole/${y}.json`);const f=await res.json();Object.keys(f).forEach(d=>{if(!specialDays[d])specialDays[d]="ferie";});}localStorage.setItem(STORAGE.specialDays,JSON.stringify(specialDays));}catch(e){console.warn("Import jours fériés échoué:",e);}}
   /* 27/09/2026 : un nouvel exercice (sans saisie) prend le nom de l'année où il a le plus de jours,
      comme les autres modules (octobre 2026 → septembre 2027 = 2027 ; juin → mai = année de début). */
   try{const fin=annualDate||closures[closures.length-1],L=hsNomExercice(exerciseStart,fin),cur=String(currentSuffix);
     const vide=!Object.keys(JSON.parse(localStorage.getItem("DATA_REPORT_"+cur)||"{}")).some(k=>/^\d{4}-\d{2}-\d{2}$/.test(k));
     if(L&&String(L)!==cur&&vide&&!localStorage.getItem("EXERCISE_START_"+L)&&!localStorage.getItem("DATA_REPORT_"+L)){
-      ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CONFIG_LOCK_","AUTO_SAVE_DATE_"].forEach(function(pf){const v=localStorage.getItem(pf+cur);if(v!==null){localStorage.setItem(pf+L,v);localStorage.removeItem(pf+cur);}});
+      ["DATA_REPORT_","CLOSURES_REPORT_","REPORTS_REPORT_","PERIOD_META_REPORT_","ANNUAL_DATE_","SPECIAL_DAYS_","EXERCISE_START_","BASE_HEBDO_","ANNUAL_RATE_","AUTO_FERIE_","CP_JURIS_","CONFIG_LOCK_","AUTO_SAVE_DATE_"].forEach(function(pf){const v=localStorage.getItem(pf+cur);if(v!==null){localStorage.setItem(pf+L,v);localStorage.removeItem(pf+cur);}});
       closeWizardModal();loadExercise(String(L));showToast();return;}
   }catch(e){}
   closeWizardModal();if(typeof buildPeriods==="function")buildPeriods();if(typeof update==="function")update();showToast();
@@ -2597,7 +2632,7 @@ function closeTip(){
         localStorage.setItem('CLOSURES_REPORT_'+nx,JSON.stringify(nClos));
         if(!localStorage.getItem('REPORTS_REPORT_'+nx))localStorage.setItem('REPORTS_REPORT_'+nx,'{}');
         if(!localStorage.getItem('PERIOD_META_REPORT_'+nx))localStorage.setItem('PERIOD_META_REPORT_'+nx,'{}');
-        ['BASE_HEBDO_','ANNUAL_RATE_','AUTO_FERIE_'].forEach(function(p){var v=localStorage.getItem(p+currentSuffix);if(v!==null&&localStorage.getItem(p+nx)===null)localStorage.setItem(p+nx,v);});
+        ['BASE_HEBDO_','ANNUAL_RATE_','AUTO_FERIE_','CP_JURIS_'].forEach(function(p){var v=localStorage.getItem(p+currentSuffix);if(v!==null&&localStorage.getItem(p+nx)===null)localStorage.setItem(p+nx,v);});
       }catch(e){ toast('❌ Espace de stockage insuffisant : rien n\'a été modifié.','error'); return; }
       if(n)setTimeout(function(){toast('📅 '+n+' jour(s) saisi(s) après le '+fr(fin)+' rangé(s) dans '+nx,'info');},1600);
     }
