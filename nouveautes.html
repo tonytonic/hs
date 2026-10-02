@@ -62,9 +62,33 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">2 octobre 2026</span>
+    <span class="v-num">v10.11</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Congés payés et heures sup</b> : depuis l'arrêt de la Cour de cassation du 10 septembre 2025 (n° 23-14.455), confirmé le 7 janvier 2026, les jours de <b>congés payés comptent comme du temps de travail</b> pour savoir si tu dépasses le seuil des heures sup de la semaine. Dans le compteur annuel, le bouton 🌴 <b>Journée de congé payé</b> marque le jour en un geste ; dans le forfait heures, indique les jours de CP de la semaine. La règle est active par défaut ; tu peux la désactiver dans les Réglages si ton temps de travail est annualisé par un accord. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Les congés payés apparaissent dans tes PDF</b> : les relevés du compteur annuel (période, mois, bilan annuel) ont une colonne <b>CP</b>, et ceux du forfait heures affichent les jours de CP à côté des heures de la semaine. Une mention rappelle la règle appliquée, pour que ton employeur comprenne d'où viennent tes heures sup. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Relevé de période</b> : le PDF ne plante plus quand le tableau des semaines continue sur une deuxième page. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
     <span class="v-date">1er octobre 2026</span>
     <span class="v-num">v10.10</span>
-    <span class="v-new-badge">NOUVEAU</span>
   </div>
 
   <div class="item">
@@ -744,7 +768,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <script>
 // Marquer comme vu quand l'utilisateur ouvre la page
 /* La version lue (et plus seulement « déjà vu ») : le badge du menu revient à chaque nouvelle version. */
-try{ localStorage.setItem('NV_SEEN','v10.10'); }catch(e){}
+try{ localStorage.setItem('NV_SEEN','v10.11'); }catch(e){}
 </script>
 </body>
 </html>
