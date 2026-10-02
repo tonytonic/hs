@@ -291,6 +291,13 @@ const M6_Router = {
                   <label for="wiz-prorata-cont" style="font-size:0.78rem;color:var(--pierre);cursor:pointer">Appliquer un prorata si j'arrive en cours d'année</label>
                 </div>
               </div>
+              <div class="m6-field">
+                <div style="display:flex;align-items:flex-start;gap:8px">
+                  <input type="checkbox" id="wiz-fh-cpjuris" ${existing.cpJuris===false?'':'checked'} style="width:16px;height:16px;margin-top:2px">
+                  <label for="wiz-fh-cpjuris" style="font-size:0.8rem;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:400;color:var(--encre,#2b2620)"><b>🌴 Les congés payés comptent pour le seuil des heures sup</b>
+                    <span style="display:block;font-size:0.72rem;color:var(--pierre);margin-top:2px">Cour de cassation, 10 septembre 2025 (n° 23-14.455, forfait hebdomadaire) et 7 janvier 2026 (n° 24-19.410) : dans une semaine avec des jours de congés payés, ces jours comptent comme travaillés. La règle s'impose même si un accord dit le contraire ; ne décoche que si ton temps de travail n'est pas décompté à la semaine (annualisation ou modulation).</span></label>
+                </div>
+              </div>
               <div class="m6-field"><label>Taux horaire brut (€, optionnel)</label><input type="number" id="wiz-tauxH" step="0.01" value="${existing.tauxHoraire||''}" placeholder="25.50" style="font-size:16px"></div>
             `:`
               <div class="m6-field"><label>Fonction</label><input type="text" id="wiz-cd-fnc" value="${(existing.fonction||'').replace(/"/g,'&quot;')}" placeholder="Directeur Général, DAF, DRH…" style="font-size:16px"></div>
@@ -436,6 +443,7 @@ const M6_Router = {
             seuilHebdo:        parseFloat(this._root.querySelector('#wiz-seuil')?.value) || existing.seuilHebdo || rules?.seuil || 39,
             contingent:        parseInt(this._root.querySelector('#wiz-cont')?.value) || existing.contingent || rules?.contingent || 220,
             prorataContingent: !!(this._root.querySelector('#wiz-prorata-cont')?.checked),
+            cpJuris:           this._root.querySelector('#wiz-fh-cpjuris') ? !!this._root.querySelector('#wiz-fh-cpjuris').checked : (existing.cpJuris !== false),
             tauxHoraire:       parseFloat(this._root.querySelector('#wiz-tauxH')?.value) || existing.tauxHoraire || 0,
             ccnLabel:          this._root.querySelector('#wiz-ccn-fh')?.value.trim() || existing.ccnLabel || '',
             ccnIdcc:           idccFH || existing.ccnIdcc || 0,
