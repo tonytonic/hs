@@ -897,7 +897,7 @@ const M6_PDF = {
         chk();
         const h  = parseFloat(v.heures)||0;
         const seuil = contract.seuilHebdo||35;
-        const extra = Math.max(0,h-seuil);
+        const extra = Math.max(0,(window.M6_hRetenues?window.M6_hRetenues(v,contract):h)-seuil);
         const t1    = analysis?.taux1||25, pal=analysis?.palier||8;
         const t2    = analysis?.taux2||50;
         const tauxH = contract.tauxHoraire||0;
@@ -1087,7 +1087,7 @@ const M6_PDF = {
     semaines.forEach(([wk,v],i) => {
       chk();
       const h = parseFloat(v.heures)||0;
-      const extra = Math.max(0, h-seuil);
+      const extra = Math.max(0, (window.M6_hRetenues?window.M6_hRetenues(v,contract):h)-seuil);
       const conforme = h<=48;
       if (i%2===0) { doc.setFillColor(248,245,241); doc.rect(M,y-1.5,PW,5.5,'F'); }
       txt(wk, M+2, y+2.5, 7.5, [70,65,60]);
