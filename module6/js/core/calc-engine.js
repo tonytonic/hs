@@ -4,6 +4,17 @@
  * Prorata arrivée/départ · Fractionnement · Amplitude 11h/35h · Prédictif
  * Sources : Code du travail L3121-41→L3121-65, ANI 2001, Cass.Soc.
  */
+/* Congés payés et seuil des heures sup (Cass. soc. 10/09/2025, n° 23-14.455 — affaire Altran, forfait hebdomadaire Syntec ;
+   Cass. soc. 07/01/2026 pour un décompte sur deux semaines) : les jours de congés payés de la semaine comptent comme travaillés
+   (seuil contractuel / 5 par jour) pour déterminer les heures sup. Désactivable : contrat.cpJuris === false. */
+window.M6_hRetenues = function(v, contract){
+  const h = parseFloat(v && v.heures) || 0;
+  const cp = parseFloat(v && v.cpJours) || 0;
+  if (!cp || (contract && contract.cpJuris === false)) return h;
+  const s = (contract && contract.seuilHebdo) || 35;
+  return Math.round((h + cp * s / 5) * 100) / 100;
+};
+
 'use strict';
 
 (function(global) {
@@ -384,7 +395,7 @@ const M6_ForfaitHeures = {
 
     for(const [wk,v] of entries){
       const h=parseFloat(v.heures)||0; totalHeures+=h; semaines++;
-      const extra=Math.max(0,h-seuil);
+      const extra=Math.max(0,window.M6_hRetenues(v,contract)-seuil);
 
       let hs1=0, hs_inter=0, hs2=0;
       if (taux_inter !== null) {
