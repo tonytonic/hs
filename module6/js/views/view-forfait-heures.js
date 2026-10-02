@@ -208,7 +208,7 @@ const VFH = {
     ${!entries.length?`<div class="m6-alert info"><span>📋</span><div>Aucune semaine saisie pour ${this._year}.</div></div>`:''}
 
     ${entries.map(([wk,v])=>{
-      const h=parseFloat(v.heures)||0, extra=Math.max(0,h-a.seuil);
+      const h=parseFloat(v.heures)||0, extra=Math.max(0,window.M6_hRetenues(v,this._contract)-a.seuil);
       // 3 paliers si CCN HCR/Restauration : palier1 + palier_inter + reste
       let hs1, hs_inter, hs2;
       if (a.taux_inter && a.palier_inter) {
@@ -334,6 +334,14 @@ const VFH = {
           </div>
 
           <div class="m6-field" style="margin-top:12px">
+            <label>🌴 Jours de congés payés cette semaine</label>
+            <input type="number" id="fh-cp" min="0" max="6" step="0.5" inputmode="decimal" value="${entry.cpJours||''}" placeholder="0" style="font-size:16px;max-width:100px;text-align:center">
+            <div style="font-size:0.7rem;color:var(--pierre);margin-top:3px">${this._contract?.cpJuris===false
+              ? 'Règle des congés payés désactivée dans le contrat : ces jours ne comptent pas pour le seuil.'
+              : 'Chaque jour de CP compte pour ' + window._m6fmtH((this._contract?.seuilHebdo||35)/5) + ' dans le seuil des heures sup (Cass. soc. 10 sept. 2025, n° 23-14.455).'}</div>
+          </div>
+
+          <div class="m6-field" style="margin-top:12px">
             <label>Note (déplacement, astreinte, télétravail…)</label>
             <input type="text" id="fh-note" value="${(entry.note||'').substring(0,200)}"
               placeholder="ex : 2j déplacement Lyon" style="font-size:16px" maxlength="200">
@@ -401,6 +409,8 @@ const VFH = {
           const note = sh.querySelector('#fh-note')?.value.trim().replace(/['"]/g, '') || null;
           const payload = { heures, note };
           if (joursArr) payload.jours = joursArr;
+          const cpJours = parseFloat(sh.querySelector('#fh-cp')?.value) || 0;
+          if (cpJours > 0) payload.cpJours = cpJours;
           this._save(wk, payload);
           ov.classList.remove('open');
         });
@@ -420,10 +430,11 @@ const VFH = {
         }
         const seuilC     = this._contract?.seuilHebdo || ccnRules?.seuil || 35;
         const contingent = this._contract?.contingent || ccnRules?.contingent || 220;
-        const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, (v.heures||0) - seuilC), 0);
+        const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, window.M6_hRetenues(v,this._contract) - seuilC), 0);
         const updateRT = () => {
           const h = window._hmToDec('fh-hH','fh-hM');
-          const hs = Math.max(0, h - seuilC);
+          const _cpJ = parseFloat(sh.querySelector('#fh-cp')?.value) || 0;
+          const hs = Math.max(0, window.M6_hRetenues({heures:h, cpJours:_cpJ}, this._contract) - seuilC);
           if (rtPanel && h > 0) { rtPanel.style.display = ''; }
           if (rtHS) rtHS.textContent = hs > 0 ? `+${window._m6fmtH(hs)} HS` : '0h HS';
           const reste = Math.max(0, contingent - totalHSActuel - hs);
