@@ -38,7 +38,7 @@
     var m1 = readM1(yr);
     Object.keys(m1).forEach(function(k) {
       if (/^\d{4}-\d{2}-\d{2}$/.test(k) && (m1[k].extra||0) > 0) {
-        var ot = Math.max(0, parseFloat(m1[k].extra||0) - parseFloat(m1[k].recup||0) - parseFloat(m1[k].absent||0));
+        var ot = Math.max(0, parseFloat(m1[k].extra||0) - parseFloat(m1[k].recup||0) - (window.FOX_m1AbsHS ? window.FOX_m1AbsHS(m1[k], k.slice(0,4)) : parseFloat(m1[k].absent||0)));
         totalMin += Math.round(ot * 60);
         seen[k] = true;
         src = 'M1+M2';
