@@ -1769,11 +1769,32 @@ function pdfSignatureBlock(pdf,y){
   return y+24;
 }
 
+/* Mention de la règle des congés payés (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026 n° 24-19.410) en bas des PDF M1. */
+function pdfCpNote(pdf,y,tCp){
+  if(!(tCp>0)){
+    // Pas de CP comptés sur la période : mention seulement si la règle est désactivée et que des jours sont marqués congé payé
+    if(CP_JURIS)return y;
+    const anyCp=Object.values(data||{}).some(v=>v&&v.cp&&(v.absent||0)>0);
+    if(!anyCp)return y;
+  }
+  const t=CP_JURIS
+    ?"Conges payes : les heures de conges payes (colonne CP) comptent comme du temps de travail pour le seuil des heures supplementaires et ne reduisent pas le seuil de la semaine (Cass. soc. 10 sept. 2025, n. 23-14.455 ; 7 janv. 2026, n. 24-19.410). La colonne Absences ne reprend que les autres absences."
+    :"Conges payes : regle de la Cour de cassation (Cass. soc. 10 sept. 2025, n. 23-14.455) desactivee pour cet exercice. Les conges payes sont comptes dans les absences et reduisent le seuil de la semaine.";
+  const lines=pdf.splitTextToSize(pdfStr(t),PDF_W-PDF_M*2-4);
+  const h=lines.length*3.6+4;
+  if(y+h>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;}
+  pdf.setFillColor(232,245,233);pdf.rect(PDF_M,y-3,PDF_W-PDF_M*2,h,"F");
+  pdf.setFontSize(7.5);pdf.setFont(undefined,"normal");pdf.setTextColor(27,94,32);
+  pdf.text(lines,PDF_M+2,y+1);
+  pdf.setTextColor(0,0,0);
+  return y+h+3;
+}
+
 /* calcul semaines pour une période */
 function calcPeriodWeeks(pStart,pEnd){
   const pS=new Date(pStart);pS.setHours(0,0,0,0);
   const pE=new Date(pEnd);pE.setHours(0,0,0,0);
-  let wks={},abs={},rec={};
+  let wks={},abs={},rec={},cpw={};
   // Auto-férié — selon règles fériés CCN
   if(AUTO_FERIE){
     const _fr3=typeof window.CCN_API!=='undefined'?window.CCN_API.getCCNFeriesRules(parseInt(localStorage.getItem('CCN_IDCC')||'0')):{feriesChomes:11,seul1erMaiChome:false};
@@ -1800,18 +1821,20 @@ function calcPeriodWeeks(pStart,pEnd){
     wks[wk]=(wks[wk]||0)+(v.extra||0);
     rec[wk]=(rec[wk]||0)+(v.recup||0);
     if(!_isCCNRestDay(dow))abs[wk]=(abs[wk]||0)+_absRetenue(v);
+    // Congés payés comptés comme travaillés (règle CP_JURIS) : affichés à part dans les PDF
+    if(!_isCCNRestDay(dow)&&CP_JURIS&&v.cp)cpw[wk]=(cpw[wk]||0)+(v.absent||0);
   });
-  let t1=0,tInter=0,t2=0,tR=0,tExtra=0,tAbs=0;
+  let t1=0,tInter=0,t2=0,tR=0,tExtra=0,tAbs=0,tCp=0;
   const rules=getCCNRules();
   const weekRows=Object.keys(wks).sort().map(wk=>{
-    const extra=wks[wk]||0,absent=abs[wk]||0,recup=rec[wk]||0;
+    const extra=wks[wk]||0,absent=abs[wk]||0,recup=rec[wk]||0,cp=cpw[wk]||0;
     const base=Math.max(0,BASE_HEBDO-absent);
     const total=base+extra;
     const p=calcHsPaliers(total,rules);
-    t1+=p.h1;tInter+=p.hInter;t2+=p.h2;tR+=recup;tExtra+=extra;tAbs+=absent;
-    return{wk,extra,absent,recup,h25:p.h1,h50:p.h2,hInter:p.hInter};
+    t1+=p.h1;tInter+=p.hInter;t2+=p.h2;tR+=recup;tExtra+=extra;tAbs+=absent;tCp+=cp;
+    return{wk,extra,absent,cp,recup,h25:p.h1,h50:p.h2,hInter:p.hInter};
   });
-  return{weekRows,t25:t1,t50:t2,tInter,tR,tExtra,tAbs,rules};
+  return{weekRows,t25:t1,t50:t2,tInter,tR,tExtra,tAbs,tCp,rules};
 }
 
 /* =====================================================
@@ -1832,7 +1855,7 @@ function exportPeriodPDF(){
   const inclSign=document.getElementById("pOptSignature")?.checked!==false;
 
   const pEndStr=period.end.getFullYear()===2099?"en cours":period.end.toLocaleDateString();
-  const{weekRows,t25,t50,tInter,tR,tExtra,tAbs,rules:pRules}=calcPeriodWeeks(period.start,period.end);
+  const{weekRows,t25,t50,tInter,tR,tExtra,tAbs,tCp,rules:pRules}=calcPeriodWeeks(period.start,period.end);
   const rp=getLastValidReport(period.index);
   const coef1=1+pRules.taux1/100,coef2=1+pRules.taux2/100,coefI=pRules.taux_inter?(1+pRules.taux_inter/100):0;
   const brut=t25*coef1+(tInter||0)*coefI+t50*coef2+rp;
@@ -1852,31 +1875,32 @@ function exportPeriodPDF(){
     ...(pRules.taux_inter?[["Total à "+pRules.taux_inter+"%",fmtH(tInter||0)]]:[]),
     ["Total à "+pRules.taux2+"%",fmtH(t50)],
     ["Absences période",fmtH(tAbs)],
+    ...(tCp>0?[["CP comptés travaillés",fmtH(tCp)]]:[]),
     ["Récupérations",fmtH(tR)],
     ["Solde brut",fmtH(brut)],
     ["Solde net",fmtH(net)],
   ]);
 
   // Tableau semaines
-  const C={WK:PDF_M+1,EXTRA:PDF_M+42,ABS:PDF_M+62,REC:PDF_M+80,H25:PDF_M+98,H50:PDF_M+118,COEF:PDF_M+136,BRUT:PDF_M+156};
-  function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;y=pdfTableHeader(pdf,y,[["Semaine",C.WK],["Extras",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],[mRules.taux1+"%",C.H25],[mRules.taux2+"%",C.H50]]);;}}
+  const C={WK:PDF_M+1,EXTRA:PDF_M+42,ABS:PDF_M+62,CP:PDF_M+82,REC:PDF_M+100,H25:PDF_M+118,H50:PDF_M+138};
+  const _hdrP=[["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["CP",C.CP],["Récup.",C.REC],["H. "+pRules.taux1+"%",C.H25],["H. "+pRules.taux2+"%",C.H50]];
+  function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;y=pdfTableHeader(pdf,y,_hdrP);}}
 
   y=pdfSectionTitle(pdf,y,"Détail par semaine");
-  y=pdfTableHeader(pdf,y,[
-    ["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absence",C.ABS],["Récup.",C.REC],["H. 25%",C.H25],["H. 50%",C.H50]
-  ]);
+  y=pdfTableHeader(pdf,y,_hdrP);
 
-  weekRows.forEach(({wk,extra,absent,recup,h25,h50},idx)=>{
+  weekRows.forEach(({wk,extra,absent,cp,recup,h25,h50},idx)=>{
     chk();
     if(idx%2===0){pdf.setFillColor(240,248,250);pdf.rect(PDF_M,y-4,PDF_W-PDF_M*2,PDF_LINE-0.5,"F");}
     pdf.setFontSize(8);
     const label=new Date(wk+"T12:00:00").toLocaleDateString("fr-FR");
-    const hasData=extra>0||absent>0||recup>0;
+    const hasData=extra>0||absent>0||cp>0||recup>0;
     pdf.setFont(undefined,hasData?"bold":"normal");
     pdf.setTextColor(hasData?0:60,hasData?0:60,hasData?0:60);
     pdf.text(pdfStr(label),C.WK,y);
     pdf.text(pdfStr(extra>0?fmtH(extra):"—"),C.EXTRA,y);
     pdf.text(pdfStr(absent>0?fmtH(absent):"—"),C.ABS,y);
+    pdf.text(pdfStr(cp>0?fmtH(cp):"—"),C.CP,y);
     pdf.text(pdfStr(recup>0?fmtH(recup):"—"),C.REC,y);
     pdf.text(pdfStr(h25>0?fmtH(h25):"—"),C.H25,y);
     pdf.text(pdfStr(h50>0?fmtH(h50):"—"),C.H50,y);
@@ -1891,10 +1915,12 @@ function exportPeriodPDF(){
     ["TOTAL",C.WK],
     [fmtH(tExtra),C.EXTRA],
     [fmtH(tAbs),C.ABS],
+    [fmtH(tCp),C.CP],
     [fmtH(tR),C.REC],
     [fmtH(t25),C.H25],
     [fmtH(t50),C.H50],
   ]);
+  y=pdfCpNote(pdf,y,tCp);
 
   // Bloc solde final
   chk(30);
@@ -1942,7 +1968,7 @@ function exportMonthlyFullPDF(){
   const inclRec=document.getElementById("mOptRecup")?.checked!==false;
   const inclSign=document.getElementById("mOptSignature")?.checked!==false;
 
-  const{weekRows,t25,t50,tInter:tInter2,tR,tExtra,tAbs,rules:mRules}=calcPeriodWeeks(
+  const{weekRows,t25,t50,tInter:tInter2,tR,tExtra,tAbs,tCp,rules:mRules}=calcPeriodWeeks(
     new Date(viewYear,viewMonth,1),
     new Date(viewYear,viewMonth+1,0)
   );
@@ -1968,31 +1994,32 @@ function exportMonthlyFullPDF(){
   }
   _recap.push(["Total à "+mRules.taux2+"%",fmtH(t50)]);
   if(inclAbs)_recap.push(["Absences du mois",fmtH(tAbs)]);
+  if(inclAbs&&tCp>0)_recap.push(["CP comptés travaillés",fmtH(tCp)]);
   if(inclRec)_recap.push(["Récupérations",fmtH(tR)]);
   _recap.push(["Solde brut pondéré",fmtH(brut25+brutI2+brut50)]);
   _recap.push(["Solde net",fmtH(net)]);
   y=pdfRecapBox(pdf,y,_recap);
 
-  const C={WK:PDF_M+1,EXTRA:PDF_M+44,ABS:PDF_M+64,REC:PDF_M+84,H25:PDF_M+104,H50:PDF_M+124};
+  const C={WK:PDF_M+1,EXTRA:PDF_M+42,ABS:PDF_M+62,CP:PDF_M+82,REC:PDF_M+100,H25:PDF_M+118,H50:PDF_M+138};
+  const _hdrM=[["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["CP",C.CP],["Récup.",C.REC],["H. "+mRules.taux1+"%",C.H25],["H. "+mRules.taux2+"%",C.H50]];
   function chk(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;
-    y=pdfTableHeader(pdf,y,[["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],["H. "+mRules.taux1+"%",C.H25],["H. "+mRules.taux2+"%",C.H50]]);
+    y=pdfTableHeader(pdf,y,_hdrM);
   }}
 
   y=pdfSectionTitle(pdf,y,"Détail semaine par semaine – "+months[viewMonth]+" "+viewYear);
-  y=pdfTableHeader(pdf,y,[
-    ["Semaine du",C.WK],["H.Sup.",C.EXTRA],["Absences",C.ABS],["Récup.",C.REC],["H. 25%",C.H25],["H. 50%",C.H50]
-  ]);
+  y=pdfTableHeader(pdf,y,_hdrM);
 
-  weekRows.forEach(({wk,extra,absent,recup,h25,h50},idx)=>{
+  weekRows.forEach(({wk,extra,absent,cp,recup,h25,h50},idx)=>{
     chk();
     if(idx%2===0){pdf.setFillColor(240,248,250);pdf.rect(PDF_M,y-4,PDF_W-PDF_M*2,PDF_LINE-0.5,"F");}
     pdf.setFontSize(8);
-    const hasData=extra>0||(inclAbs&&absent>0)||(inclRec&&recup>0);
+    const hasData=extra>0||(inclAbs&&(absent>0||cp>0))||(inclRec&&recup>0);
     pdf.setFont(undefined,hasData?"bold":"normal");
     pdf.setTextColor(hasData?0:60,hasData?0:60,hasData?0:60);
     pdf.text(pdfStr(new Date(wk+"T12:00:00").toLocaleDateString("fr-FR")),C.WK,y);
     pdf.text(pdfStr(extra>0?fmtH(extra):"—"),C.EXTRA,y);
     pdf.text(pdfStr(inclAbs&&absent>0?fmtH(absent):"—"),C.ABS,y);
+    pdf.text(pdfStr(inclAbs&&cp>0?fmtH(cp):"—"),C.CP,y);
     pdf.text(pdfStr(inclRec&&recup>0?fmtH(recup):"—"),C.REC,y);
     pdf.text(pdfStr(h25>0?fmtH(h25):"—"),C.H25,y);
     pdf.text(pdfStr(h50>0?fmtH(h50):"—"),C.H50,y);
@@ -2007,11 +2034,13 @@ function exportMonthlyFullPDF(){
   y=pdfTotalRow(pdf,y,[
     ["TOTAL",C.WK],
     [fmtH(tExtra),C.EXTRA],
-    [fmtH(tAbs),C.ABS],
+    [inclAbs?fmtH(tAbs):"—",C.ABS],
+    [inclAbs?fmtH(tCp):"—",C.CP],
     [fmtH(tR),C.REC],
     [fmtH(t25),C.H25],
     [fmtH(t50),C.H50],
   ]);
+  y=pdfCpNote(pdf,y,tCp);
 
   chk(26);
   y=pdfRecapBox(pdf,y,[
@@ -2044,7 +2073,7 @@ function exportAnnualPDF(){
   );
 
   // Précalcul toutes périodes
-  let annualNet=0,annualH25=0,annualH50=0,annualR=0,annualExtra=0;
+  let annualNet=0,annualH25=0,annualH50=0,annualR=0,annualExtra=0,annualCp=0;
   const aRules=getCCNRules();
   const aCoef1=1+aRules.taux1/100,aCoef2=1+aRules.taux2/100,aCoefI=aRules.taux_inter?(1+aRules.taux_inter/100):0;
   const periodResults=[];
@@ -2053,12 +2082,12 @@ function exportAnnualPDF(){
     let start=getBaseStartDate();
     for(let i=0;i<idx;i++){const e=new Date(closures[i]);start=new Date(e);start.setDate(start.getDate()+1);}
     const end=new Date(closures[idx]);
-    const{weekRows,t25,t50,tInter:tInterA,tR,tExtra,tAbs}=calcPeriodWeeks(start,end);
+    const{weekRows,t25,t50,tInter:tInterA,tR,tExtra,tAbs,tCp}=calcPeriodWeeks(start,end);
     const rp=getLastValidReport(idx);
     const net=t25*aCoef1+(tInterA||0)*aCoefI+t50*aCoef2+rp-tR;
     const contrib=t25*aCoef1+(tInterA||0)*aCoefI+t50*aCoef2-tR;
-    annualNet+=contrib;annualH25+=t25;annualH50+=t50;annualR+=tR;annualExtra+=tExtra;
-    periodResults.push({idx,start,end,weekRows,t25,t50,tInter:tInterA||0,tR,tExtra,tAbs,rp,net});
+    annualNet+=contrib;annualH25+=t25;annualH50+=t50;annualR+=tR;annualExtra+=tExtra;annualCp+=tCp||0;
+    periodResults.push({idx,start,end,weekRows,t25,t50,tInter:tInterA||0,tR,tExtra,tAbs,tCp:tCp||0,rp,net});
   });
 
   // Récap global - tableau dynamique selon paliers
@@ -2079,6 +2108,7 @@ function exportAnnualPDF(){
     recapLines.push([`Total à ${aRules.taux2}%`, fmtH(annualH50)]);
   }
   
+  if (annualCp > 0) recapLines.push(["CP comptés travaillés", fmtH(annualCp)]);
   recapLines.push(
     ["Total récupérations", fmtH(annualR)],
     ["Solde annuel net", fmtH(annualNet)],
@@ -2125,11 +2155,12 @@ function exportAnnualPDF(){
     [fmtH(annualR),CP.REC],
     [fmtH(annualNet),CP.NET],
   ]);
+  y=pdfCpNote(pdf,y,annualCp);
   y+=4;
 
   // Détail par période si option activée
   if(inclDetail){
-    periodResults.forEach(({idx,start,end,weekRows,t25,t50,tR,tExtra,rp,net})=>{
+    periodResults.forEach(({idx,start,end,weekRows,t25,t50,tR,tExtra,tAbs,tCp,rp,net})=>{
       if(!weekRows.length)return;
       pdfFooter(pdf);pdf.addPage();y=15;
       const endStr=end.getFullYear()===2099?"en cours":end.toLocaleDateString("fr-FR");
@@ -2145,21 +2176,24 @@ function exportAnnualPDF(){
         ["50%",fmtH(t50)],
         ["Récupérations",fmtH(tR)],
         ["Solde net",fmtH(net)],
+        ...(tCp>0?[["CP comptés travaillés",fmtH(tCp)]]:[]),
       ]);
-      const DW={WK:PDF_M+1,EXTRA:PDF_M+44,ABS:PDF_M+64,REC:PDF_M+84,H25:PDF_M+104,H50:PDF_M+124};
+      const DW={WK:PDF_M+1,EXTRA:PDF_M+42,ABS:PDF_M+62,CP:PDF_M+82,REC:PDF_M+100,H25:PDF_M+118,H50:PDF_M+138};
+      const _hdrD=[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absences",DW.ABS],["CP",DW.CP],["Récup.",DW.REC],["H. "+(aRules.taux1||25)+"%",DW.H25],["H. "+(aRules.taux2||50)+"%",DW.H50]];
       function chkD(n=PDF_LINE){if(y+n>PDF_H-12){pdfFooter(pdf);pdf.addPage();y=15;
-        y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],[(aRules.taux1||25)+"%",DW.H25],[(aRules.taux2||50)+"%",DW.H50]]);
+        y=pdfTableHeader(pdf,y,_hdrD);
       }}
-      y=pdfTableHeader(pdf,y,[["Semaine du",DW.WK],["H.Sup.",DW.EXTRA],["Absence",DW.ABS],["Récup.",DW.REC],["H. "+(aRules.taux1||25)+"%",DW.H25],["H. "+(aRules.taux2||50)+"%",DW.H50]]);
-      weekRows.forEach(({wk,extra,absent,recup,h25,h50},i)=>{
+      y=pdfTableHeader(pdf,y,_hdrD);
+      weekRows.forEach(({wk,extra,absent,cp,recup,h25,h50},i)=>{
         chkD();
         if(i%2===0){pdf.setFillColor(240,248,250);pdf.rect(PDF_M,y-4,PDF_W-PDF_M*2,PDF_LINE-0.5,"F");}
-        const hasData=extra>0||absent>0||recup>0;
+        const hasData=extra>0||absent>0||cp>0||recup>0;
         pdf.setFontSize(8);pdf.setFont(undefined,hasData?"bold":"normal");
         pdf.setTextColor(hasData?0:60,hasData?0:60,hasData?0:60);
         pdf.text(pdfStr(new Date(wk+"T12:00:00").toLocaleDateString("fr-FR")),DW.WK,y);
         pdf.text(pdfStr(extra>0?fmtH(extra):"—"),DW.EXTRA,y);
         pdf.text(pdfStr(absent>0?fmtH(absent):"—"),DW.ABS,y);
+        pdf.text(pdfStr(cp>0?fmtH(cp):"—"),DW.CP,y);
         pdf.text(pdfStr(recup>0?fmtH(recup):"—"),DW.REC,y);
         pdf.text(pdfStr(h25>0?fmtH(h25):"—"),DW.H25,y);
         pdf.text(pdfStr(h50>0?fmtH(h50):"—"),DW.H50,y);
@@ -2168,7 +2202,7 @@ function exportAnnualPDF(){
         y+=PDF_LINE;
       });
       chkD(PDF_LINE+4);
-      y=pdfTotalRow(pdf,y,[["TOTAL",DW.WK],[fmtH(tExtra),DW.EXTRA],["-",DW.ABS],[fmtH(tR),DW.REC],[fmtH(t25),DW.H25],[fmtH(t50),DW.H50]]);
+      y=pdfTotalRow(pdf,y,[["TOTAL",DW.WK],[fmtH(tExtra),DW.EXTRA],[fmtH(tAbs||0),DW.ABS],[fmtH(tCp||0),DW.CP],[fmtH(tR),DW.REC],[fmtH(t25),DW.H25],[fmtH(t50),DW.H50]]);
     });
   }
 
