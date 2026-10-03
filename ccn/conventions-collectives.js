@@ -485,15 +485,6 @@ const REGLES_HS = {
     notes:'Personnel des agences générales d\'assurances (IDCC 2335, brochure 3115). Contingent 140h, distinct des 70h des sociétés d\'assurances et des 150h du courtage. Trouvé lors de la vérification finale du 18/07/2026.'
   },
 
-  PEMP40: {
-    id:'PEMP40', nom:'Particuliers employeurs — seuil 40h',
-    seuil:40, taux1:25, palier1:8, taux_inter:null, palier_inter:null, taux2:50,
-    contingent:220, maxHebdo:50, debutSemaine:1,
-    feriesChomes: 11, feriesMajoration: 0,
-    feries1erMaiMajoration: 100, feriesAlsaceMoselle: false,
-    notes:'Particuliers employeurs et emploi à domicile (IDCC 3239). Heures sup au-delà de 40h de travail effectif (moyenne sur 8 semaines, art. 136) : +25 % de la 41e à la 48e h, +50 % de la 49e à la 50e h (art. 147), 50h max. Majoration payée ou repos compensateur majoré. Les règles du Code sur le temps partiel ne s\'appliquent pas (L7221-2). Ajouté le 03/10/2026 (fonds droit, texte de la convention).'
-  },
-
   // ─────────────────────────────────────────────────────────
   // MODE PERSONNALISÉ — accord entreprise ou de branche
   // ─────────────────────────────────────────────────────────
@@ -727,7 +718,7 @@ const CCN_ALIASES = [
   {i:2543,b:null,n:"Cabinets géomètres-experts topographes",s:"Géomètre expert",g:"DC",fj:false},
   {i:3230,b:null,n:"Presse quotidienne et hebdomadaire",s:"Presse",g:"DC",fj:false},
   
-  {i:3239,b:null,n:"Particuliers employeurs emploi à domicile",s:"Emploi domicile",g:"PEMP40",fj:false},  // 03/10/2026 : seuil 40h (art. 136-147)
+  {i:3239,b:null,n:"Particuliers employeurs emploi à domicile",s:"Emploi domicile",g:"DC",fj:false},
   // --- v5.6.6 : contenus reconstitues sous leur VRAI numero IDCC (verifie DARES jan2026 + Predictice) ---
   // le mauvais numero qui portait ce contenu par erreur a ete retire en v5.6.3
   {i:1607,b:3130,n:"Jeux jouets articles de fêtes puériculture",s:"Industrie jouets puériculture",g:"DC",fj:false},
