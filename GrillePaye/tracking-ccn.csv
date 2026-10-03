@@ -15,7 +15,7 @@
 1518,Animation ÉCLAT structures employant animateurs,16,vérifiée,11,01/01/2026,ACTIF,,,
 1351,Prévention et sécurité privée gardiennage,14,vérifiée,10,01/06/2026,ACTIF,,,
 7024,Production agricole et CUMA,14,vérifiée,7,01/05/2026,ACTIF,,juristique.org (page complète),"Production agricole/CUMA. Table complète 12 paliers horaires: 12,02€ à 24,16€. Avenant n°10 du 20/01/2026 — statut extension: en attente au moment de l'article (à reconfirmer, l'avenant n°9 précédent lui était déjà étendu 01/07/2025)."
-3239,Particuliers employeurs emploi à domicile,12,vérifiée,5,01/06/2026,ACTIF,,,
+3239,Particuliers employeurs emploi à domicile,12,sourcée,12,01/11/2026,ACTIF,,,
 2098,Prestataires de services secteur tertiaire,11,sourcée,23,01/11/2025,ACTIF,,,
 1090,Commerce réparation automobile cycle motocycle,10,vérifiée,12,01/06/2026,ACTIF,,,
 1480,Journalistes,10,sourcée,8,01/01/2026,ACTIF,,,
@@ -49,7 +49,7 @@
 2332,Architecture cabinets,5,vérifiée,6,01/01/2026,,,,
 2420,Bâtiment cadres,5,vérifiée,5,01/01/2026,ACTIF,,,
 3219,Branche des salariés en portage salarial,5,vérifiée,2,2026,ACTIF,,,"Contenu actuel = 'doublage' mais le tout premier README de session identifiait déjà 3219=portage salarial / 10=doublage comme inversés. Bug connu, pas corrigé ici."
-3255,Boulangerie-pâtisserie industrielle et professionnels de l'œuf,5,vérifiée,16,01/06/2026,ACTIF,,,
+3255,Boulangerie-pâtisserie industrielle et professionnels de l'œuf,5,sourcée,33,01/08/2026,ACTIF,,,
 44,Industries chimiques,4,estimation à confirmer,16,01/01/2026,ACTIF,,,
 184,Imprimerie de labeur et industries graphiques,4,estimation à confirmer,9,2026,ACTIF,,,
 843,Boulangerie-pâtisserie artisanale,4,vérifiée,10,01/01/2026,ACTIF,,,
@@ -252,7 +252,7 @@
 1605,"Entreprises de désinfection, désinsectisation, dératisation (3D)",,sourcée,12,17/12/2025,,oui (1837.13 €),,
 1611,Communication écrite directe,0,vérifiée,3,2026,ACTIF,,DARES (ambigu),Logistique de communication (routage/façonnage postal) vs 'employé entreposage' actuel — chevauchement plausible (logistique). Pas tranché.
 1612,Personnel navigant essais et réceptions,0,estimation à confirmer,6,2026,,,,
-1621,Répartition pharmaceutique,,sourcée,37,01/07/2025,,,,
+1621,Répartition pharmaceutique,,sourcée,37,01/01/2026,,,,
 1624,Confiserie chocolaterie — commerce de gros,0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 573","Ancien nom officiel: Convention collective nationale des commerces de gros de Confiserie, chocolaterie, biscuiterie et alimentation fine et des négociants distributeurs de levure. Ce numéro est remplacé par le 573 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
 1636,Agents commerciaux VRP multicarte (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1637,Industrie des ardoises,0,vérifiée,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
@@ -355,7 +355,7 @@
 2408,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 2409,Travaux publics cadres,0,vérifiée,5,01/01/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3212",Ancien nom officiel: Convention collective nationale des cadres des travaux publics. Ce numéro est remplacé par le 3212 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2412,Production de films d'animation,,vérifiée,147,01/10/2023,,,"Avenant n° 18 du 1/08/2023, annexe CDD d'usage (au 1/10/2023), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026 — avenant n° 19 (NAO 2024) présent au fonds sans texte",
-2494,Coopération maritime,,sourcée,15,31/03/2026,,oui (1823.03 €),,
+2494,Coopération maritime,,sourcée,15,01/06/2026,,,,
 2537,,0,absente de CCN_ALL — hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 2564,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1875",Ancien nom officiel: Convention collective nationale des vétérinaires praticiens salariés. Ce numéro est remplacé par le 1875 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2582,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1702",Ancien nom officiel: Convention collective des ouvriers des travaux public de la Savoie. Ce numéro est remplacé par le 1702 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
