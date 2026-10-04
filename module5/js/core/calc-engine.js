@@ -93,9 +93,10 @@ const CalcEngine = {
    */
   calcWeek(contractH, workedH, ccnRules, hourlyRate=0, options={}) {
     const cap       = ccnRules.cap       || 0.10;
-    const rate1     = ccnRules.rate1     || 0.10;
-    const rate2     = ccnRules.rate2     || 0.25;
+    const rate1     = ccnRules.rate1     ?? 0.10;   // 03/10/2026 : 0 % possible (IDCC 3239)
+    const rate2     = ccnRules.rate2     ?? 0.25;
     const threshold = ccnRules.threshold || 0.10;
+    const FULL      = ccnRules.tempsPlein || LEGAL_FULL_TIME; // 40 h pour l'IDCC 3239
     const joursOuvres = options.joursOuvresContrat || 5;
     const neutralise  = options.neutraliseFeries !== false; // true par défaut
 
@@ -135,19 +136,22 @@ const CalcEngine = {
     if(workedH > contractAjuste) {
       let diff = workedH - contractAjuste;
 
-      if(workedH >= LEGAL_FULL_TIME) {
+      if(workedH > FULL && ccnRules.sansMajoration) {   // 04/10/2026 : 40 h pile = temps plein, pas encore des heures sup
+        alerts.push({ level:'alerte', code:'REQUALIFICATION',
+          msg:`${workedH}h cette semaine : au-delà de ${FULL} h, ce sont des heures ${FULL===45?'majorées, au taux de ton contrat (au moins +10 %)':'supplémentaires (+25 % jusqu\'à 48 h, puis +50 %)'}. Mizuki ne les majore pas : vérifie-les sur ta fiche de paie.` });
+      } else if(workedH >= FULL && !ccnRules.sansMajoration) {
         alerts.push({ level:'critique', code:'REQUALIFICATION',
           msg:`Tu as atteint ${workedH}h cette semaine — le seuil légal du temps plein. La loi prévoit des droits dans ce cas. Conserve cet historique.` });
         isLegal = false;
       }
-      if(workedH > maxAllowed && workedH < LEGAL_FULL_TIME) {
+      if(workedH > maxAllowed && workedH < FULL && !ccnRules.sansPlafond && cap < 0.99) {
         alerts.push({ level:'alerte', code:'PLAFOND_CCN',
           msg:`Tes heures dépassent le plafond conventionnel (${Math.round(cap*100)}% du contrat = max ${maxAllowed.toFixed(1)}h). Garde une trace de ces semaines.` });
         isLegal = false;
       }
-      if(workedH >= LEGAL_FULL_TIME - 1 && workedH < LEGAL_FULL_TIME) {
+      if(workedH >= FULL - 1 && workedH < FULL) {
         alerts.push({ level:'vigilance', code:'PROCHE_TEMPS_PLEIN',
-          msg:`Tu es à ${(LEGAL_FULL_TIME - workedH).toFixed(1)}h du temps plein. Sois vigilante.` });
+          msg:`Tu es à ${(FULL - workedH).toFixed(1)}h du temps plein. Sois vigilante.` });
       }
       if(diff <= threshold1H) {
         compH1 = diff;
@@ -171,7 +175,7 @@ const CalcEngine = {
       comp1Amount: Math.round(comp1Amount*100)/100,
       comp2Amount: Math.round(comp2Amount*100)/100,
       totalAmount: Math.round(totalAmount*100)/100,
-      rate1, rate2, cap, maxAllowed: Math.round(maxAllowed*100)/100,
+      rate1, rate2, cap, maxAllowed: Math.round(maxAllowed*100)/100, tempsPlein: FULL,
       feriesCount, feriesNote, alerts, isLegal,
     };
   },
@@ -189,16 +193,17 @@ const CalcEngine = {
     const totalWorked  = weeks.reduce((s,w) => s + (w.worked||0), 0);
     const diff         = totalWorked - seuilMensuel;
     const cap          = ccnRules.cap || 0.10;
-    const rate1        = ccnRules.rate1 || 0.10;
-    const rate2        = ccnRules.rate2 || 0.25;
+    const rate1        = ccnRules.rate1 ?? 0.10;
+    const rate2        = ccnRules.rate2 ?? 0.25;
+    const FULL         = ccnRules.tempsPlein || LEGAL_FULL_TIME;
     const threshold    = ccnRules.threshold || 0.10;
     const maxAllowed   = Math.round(seuilMensuel * (1 + cap) * 100) / 100;
 
     // ⚠️ La limite 35h est HEBDOMADAIRE — elle s'applique même en mode mensuel
-    const semainesRequalif = weeks.filter(w => (w.worked||0) >= LEGAL_FULL_TIME);
+    const semainesRequalif = weeks.filter(w => (w.worked||0) >= FULL);
     const alerts = semainesRequalif.length > 0 ? [{
       level:'critique', code:'REQUALIFICATION',
-      msg:`${semainesRequalif.length} semaine(s) à 35h ou plus détectée(s) (${semainesRequalif.map(w=>w.monday).join(', ')}). La durée légale ne peut jamais être atteinte sur un contrat temps partiel — risque de requalification (Art. L3123-28). Conserve cet historique.`
+      msg:`${semainesRequalif.length} semaine(s) à ${FULL}h ou plus détectée(s) (${semainesRequalif.map(w=>w.monday).join(', ')}). La durée légale ne peut jamais être atteinte sur un contrat temps partiel — risque de requalification (Art. L3123-28). Conserve cet historique.`
     }] : [];
 
     let compH1 = 0, compH2 = 0;
@@ -207,7 +212,7 @@ const CalcEngine = {
       compH1 = Math.min(diff, th1);
       compH2 = Math.max(0, diff - th1);
       // Alerte si dépassement du plafond conventionnel
-      if(totalWorked > maxAllowed) {
+      if(totalWorked > maxAllowed && cap < 0.99) {
         alerts.push({ level:'alerte', code:'PLAFOND_CCN',
           msg:`Tes heures ce mois (${totalWorked}h) dépassent le plafond conventionnel de ${Math.round(cap*100)}% du seuil mensuel (max ${maxAllowed}h). Conserve ces relevés — Art. L3123-28.`
         });
@@ -361,13 +366,25 @@ const CalcEngine = {
         if(cnt>=12){ triggered15=true; break; }
       }
     }
-    const triggered=maxConsec>=12||triggered15;
+    // 04/10/2026 : L3123-13 raisonne sur l'HORAIRE MOYEN (dépassement d'au moins 2 h par semaine
+    // en moyenne), pas sur chaque semaine. Avant, une semaine à +1 h bloquait la règle même si la
+    // moyenne dépassait +2 h (au détriment du salarié). Fenêtre de 12 semaines consécutives, ou
+    // 12 semaines au cours de 15 (on retient les 12 plus chargées de la fenêtre).
+    const avg=a=>a.reduce((x,w)=>x+(w.worked||0),0)/a.length;
+    let triggeredMoy=false, triggeredMoy15=false;
+    for(let i=0;i+12<=weeklyData.length;i++){ if(avg(weeklyData.slice(i,i+12))>=contractH+2){ triggeredMoy=true; if(!triggerStart&&triggerStart!==0) triggerStart=i; break; } }
+    if(!triggeredMoy) for(let i=0;i+15<=weeklyData.length;i++){
+      const top=weeklyData.slice(i,i+15).slice().sort((a,b)=>(b.worked||0)-(a.worked||0)).slice(0,12);
+      if(avg(top)>=contractH+2){ triggeredMoy15=true; break; }
+    }
+    triggered15 = triggered15 || (triggeredMoy15 && maxConsec<12 && !triggeredMoy);
+    const triggered=maxConsec>=12||triggered15||triggeredMoy;
     return {
       triggered, maxConsec, triggerStart, triggered15,
       msg: triggered
         ? (triggered15&&maxConsec<12)
-          ? `12 semaines sur une période de 15 ont dépassé ton contrat de +2h/sem. L'Art. L3123-13 s'applique — tu peux demander par écrit la modification de ton contrat à la hausse (préavis 7j, sauf opposition de ta part).`
-          : `Depuis ${maxConsec} semaines consécutives, tes heures dépassent le contrat de +2h/sem. L'Art. L3123-13 prévoit la modification du contrat — tu peux en faire la demande écrite, ou t'y opposer pour conserver ton horaire actuel.`
+          ? `Sur 12 semaines d'une période de 15, tes heures ont dépassé ton contrat de 2 h ou plus par semaine en moyenne. L'Art. L3123-13 s'applique — tu peux demander par écrit la modification de ton contrat à la hausse (préavis 7j, sauf opposition de ta part).`
+          : `${maxConsec>=12?'Depuis '+maxConsec+' semaines consécutives':'Sur 12 semaines consécutives'}, tes heures dépassent le contrat de 2 h ou plus par semaine en moyenne. L'Art. L3123-13 prévoit la modification du contrat — tu peux en faire la demande écrite, ou t'y opposer pour conserver ton horaire actuel.`
         : maxConsec>=8
           ? `${maxConsec} semaines consécutives au-dessus du contrat. Encore ${12-maxConsec} semaines avant que la règle des 12 semaines s'applique.`
           : null

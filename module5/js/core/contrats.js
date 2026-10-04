@@ -165,7 +165,18 @@ function hcContrat(c,d,wa,pa,pb){
   if(o.w!=null)o.w=Math.round(o.w*100)/100;if(o.p!=null)o.p=Math.round(o.p*100)/100;
   return o;
 }
-function hcTxt(h){return h==null?'':'<div style="font-size:11px;font-weight:600;color:'+(h>0?'#d35400':'#9a8fb5')+'">'+(h>0?'dont '+fmtH(h)+' HC':'0 h HC')+'</div>';}
+/* 04/10/2026 : contrat chez un particulier employeur (IDCC 3239) : heures en plus du contrat
+   payées au taux normal (pas des « HC » majorées), et durées maximales du Code non applicables
+   (L7221-2) : ses heures sortent des repères 48 h / 10 h « tous employeurs ». */
+function est3239(n){var c=contrat(n);return !!(c&&(c.sansMajoration||parseInt(c.idcc,10)===3239));}
+function hcTxt(h,tn){if(h==null)return '';
+  /* 04/10/2026 : libellé court et retour à la ligne permis (la colonne débordait de l'écran) */
+  var lib=tn?(h>0?'dont '+fmtH(h)+' taux normal':'0 h en plus'):(h>0?'dont '+fmtH(h)+' HC':'0 h HC');
+  return '<div style="font-size:11px;font-weight:600;white-space:normal;line-height:1.25;color:'+(h>0?'#d35400':'#9a8fb5')+'">'+lib+'</div>';}
+/* Total : heures complémentaires (majorées) et heures 3239 au taux normal, séparées */
+function hcTotTxt(hc,tn,a){if(!a)return '';
+  if(!(hc>0)&&!(tn>0))return hcTxt(0,false);
+  return (hc>0?hcTxt(hc,false):'')+(tn>0?hcTxt(tn,true):'');}
 function renderOverview(){
   var old=document.getElementById('m5-ensemble');if(old&&old.parentNode)old.parentNode.removeChild(old);
   var ex=existing();if(ex.length<2)return;
@@ -178,30 +189,37 @@ function renderOverview(){
   var wa=dk(mon),wb=dk(sun),ma=dk(new Date(t.getFullYear(),t.getMonth(),1)),mb=dk(new Date(t.getFullYear(),t.getMonth()+1,0)),libM='Ce mois';
   try{var per=global.M5_periodeAffichee&&M5_periodeAffichee();if(per&&per.debutStr&&per.finStr){ma=per.debutStr;mb=per.finStr;libM='Période '+ma.slice(8)+'/'+ma.slice(5,7)+' → '+mb.slice(8)+'/'+mb.slice(5,7);}}catch(e){}
   var libS=estAuj?'Cette semaine':'Semaine du '+wa.slice(8)+'/'+wa.slice(5,7);
-  var rows='',tw=0,tm=0,hw=0,hm=0,aHw=false,aHm=false;
-  ex.forEach(function(n){var d=allData(n),w=sumRange(d,wa,wb),m=sumRange(d,ma,mb),b=base(n),hc=hcContrat(contrat(n),d,wa,ma,mb);tw+=w;tm+=m;
-    if(hc.w!=null){hw+=hc.w;aHw=true;}if(hc.p!=null){hm+=hc.p;aHm=true;}
-    rows+='<tr'+(n===ACTIVE?' style="font-weight:700"':'')+'><td style="padding:5px 4px;vertical-align:top">'+esc(nom(n))+'</td>'
-      +'<td style="padding:5px 4px;text-align:right;white-space:nowrap;vertical-align:top">'+fmtH(w)+(b?' <span style="opacity:.55;font-weight:400">/ '+fmtH(b)+'</span>':'')+hcTxt(hc.w)+'</td>'
-      +'<td style="padding:5px 4px;text-align:right;white-space:nowrap;vertical-align:top">'+fmtH(m)+hcTxt(hc.p)+'</td></tr>';});
-  tw=Math.round(tw*100)/100;tm=Math.round(tm*100)/100;hw=Math.round(hw*100)/100;hm=Math.round(hm*100)/100;
-  var over=tw>48;
+  var rows='',tw=0,tm=0,hw=0,hm=0,aHw=false,aHm=false,tw2=0,n3239=0,hwT=0,hmT=0;
+  ex.forEach(function(n){var d=allData(n),w=sumRange(d,wa,wb),m=sumRange(d,ma,mb),b=base(n),hc=hcContrat(contrat(n),d,wa,ma,mb),tn=est3239(n);tw+=w;tm+=m;
+    if(tn)n3239++;else tw2+=w;
+    if(hc.w!=null){if(tn)hwT+=hc.w;else hw+=hc.w;aHw=true;}if(hc.p!=null){if(tn)hmT+=hc.p;else hm+=hc.p;aHm=true;}
+    rows+='<tr'+(n===ACTIVE?' style="font-weight:700"':'')+'><td style="padding:5px 4px;vertical-align:top;overflow-wrap:anywhere">'+esc(nom(n))+'</td>'
+      +'<td style="padding:5px 4px;text-align:right;white-space:nowrap;vertical-align:top">'+fmtH(w)+(b?' <span style="opacity:.55;font-weight:400">/ '+fmtH(b)+'</span>':'')+hcTxt(hc.w,tn)+'</td>'
+      +'<td style="padding:5px 4px;text-align:right;white-space:nowrap;vertical-align:top">'+fmtH(m)+hcTxt(hc.p,tn)+'</td></tr>';});
+  tw=Math.round(tw*100)/100;tm=Math.round(tm*100)/100;hw=Math.round(hw*100)/100;hm=Math.round(hm*100)/100;hwT=Math.round(hwT*100)/100;hmT=Math.round(hmT*100)/100;tw2=Math.round(tw2*100)/100;
+  var ex2=ex.filter(function(n){return !est3239(n);}); // contrats soumis aux durées maximales du Code
+  var over=ex2.length>0&&tw2>48;
+  var art20=(global.LegiRef&&LegiRef.html?LegiRef.html('L3121-20'):'L3121-20');
+  var bloc48=!ex2.length
+    ? '<div style="margin-top:10px;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.45;background:rgba(108,63,197,0.06);color:#4a3f66">Tes contrats sont chez des particuliers employeurs (IDCC 3239) : les durées maximales du Code du travail ne s’appliquent pas (art. L7221-2), ce sont celles de ta convention, employeur par employeur. Total saisi '+(estAuj?'cette semaine':'la semaine du '+wa.slice(8)+'/'+wa.slice(5,7))+' : <b>'+fmtH(tw)+'</b>.</div>'
+    : '<div style="margin-top:10px;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.45;'
+      +(over?'background:#fff3e0;color:#b34700;border:1px solid #ffb74d':'background:rgba(108,63,197,0.06);color:#4a3f66')+'">'
+      +'Tous employeurs confondus, la durée maximale de travail est de 48 h par semaine '
+      +'(art. '+art20+' et L8261-1 du Code du travail). '
+      +'Total saisi '+(estAuj?'cette semaine':'la semaine du '+wa.slice(8)+'/'+wa.slice(5,7))+(n3239?' hors contrat'+(n3239>1?'s':'')+' de particulier employeur (IDCC 3239, non concerné'+(n3239>1?'s':'')+')':'')+' : <b>'+fmtH(n3239?tw2:tw)+'</b>.'+(over?' Ce total dépasse 48 h.':'')+'</div>';
   var c=document.createElement('div');c.id='m5-ensemble';
   c.style.cssText='margin:10px 12px 0;padding:12px 14px;border-radius:14px;background:#fff;border:1px solid rgba(108,63,197,0.22);font-size:13px;color:#2a2340';
   c.innerHTML='<div style="font-weight:800;margin-bottom:6px">Vue d\u2019ensemble de tes contrats</div>'
-    +'<table style="width:100%;border-collapse:collapse"><thead><tr style="font-size:11.5px;opacity:.65">'
+    +'<table style="width:100%;max-width:100%;table-layout:fixed;border-collapse:collapse"><colgroup><col style="width:34%"><col style="width:33%"><col style="width:33%"></colgroup><thead><tr style="font-size:11.5px;opacity:.65">'
     +'<th style="text-align:left;padding:2px 4px;font-weight:600">Contrat</th>'
     +'<th style="text-align:right;padding:2px 4px;font-weight:600">'+libS+' / base</th>'
     +'<th style="text-align:right;padding:2px 4px;font-weight:600">'+libM+'</th></tr></thead><tbody>'+rows
     +'<tr style="border-top:1px solid rgba(108,63,197,0.25);font-weight:800"><td style="padding:6px 4px">Total</td>'
-    +'<td style="padding:6px 4px;text-align:right;vertical-align:top">'+fmtH(tw)+(aHw?hcTxt(hw):'')+'</td><td style="padding:6px 4px;text-align:right;vertical-align:top">'+fmtH(tm)+(aHm?hcTxt(hm):'')+'</td></tr></tbody></table>'
-    +'<div style="margin-top:4px;font-size:11px;opacity:.65">Heures travaillées ; en orange, les heures complémentaires (HC) calculées contrat par contrat.</div>'
-    +'<div style="margin-top:10px;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.45;'
-    +(over?'background:#fff3e0;color:#b34700;border:1px solid #ffb74d':'background:rgba(108,63,197,0.06);color:#4a3f66')+'">'
-    +'Tous employeurs confondus, la durée maximale de travail est de 48 h par semaine '
-    +'(art. '+(global.LegiRef&&LegiRef.html?LegiRef.html('L3121-20'):'L3121-20')+' et L8261-1 du Code du travail). '
-    +'Total saisi '+(estAuj?'cette semaine':'la semaine du '+wa.slice(8)+'/'+wa.slice(5,7))+' : <b>'+fmtH(tw)+'</b>.'+(over?' Ce total dépasse 48 h.':'')+'</div>'
-    +jours10h(ex,sun)
+    +'<td style="padding:6px 4px;text-align:right;vertical-align:top">'+fmtH(tw)+hcTotTxt(hw,hwT,aHw)+'</td><td style="padding:6px 4px;text-align:right;vertical-align:top">'+fmtH(tm)+hcTotTxt(hm,hmT,aHm)+'</td></tr></tbody></table>'
+    +'<div style="margin-top:4px;font-size:11px;opacity:.65">Heures travaillées ; en orange, les heures complémentaires (HC) calculées contrat par contrat'
+    +(n3239?' ; chez un particulier employeur (IDCC 3239), les heures en plus du contrat sont payées au taux normal':'')+'.</div>'
+    +bloc48
+    +(ex2.length>=2?jours10h(ex2,sun):'')
     +(function(){var rp=ex.some(function(n){var c=contrat(n);return c&&c.retraiteProgressive;});if(!rp)return '';
       var tot=0;ex.forEach(function(n){tot+=rpPct(contrat(n));});tot=Math.round(tot*10)/10;
       return '<div style="margin-top:8px;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.45;background:rgba(108,63,197,0.06);color:#4a3f66">🧓 '+rpTexte(tot,true)+'</div>';})()
@@ -248,7 +266,7 @@ function congesCommuns(annees,sd){
   return Object.keys(cpt).filter(function(m){return cpt[m]===ex.length;}).sort();
 }
 /* Plafond d'heures complémentaires de chaque contrat (CCN prioritaire, comme Mizuki) */
-function capDe(c){var cap=c.cap||0.10;try{if(c.idcc>0&&global.CCN_PARTIEL_API)cap=CCN_PARTIEL_API.getRules(c.idcc).cap||cap;}catch(e){}return cap;}
+function capDe(c){var cap=c.cap||0.10;try{if(c.idcc>0&&global.CCN_PARTIEL_API)cap=CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom).cap||cap;}catch(e){}return cap;}
 /* Contrat « cumulé » pour le calcul santé : heures = somme, plafond = somme des plafonds */
 function contratCumul(){
   var ex=existing(),base=0,capH=0,noms={},c1=contrat(ACTIVE)||{};
@@ -282,5 +300,5 @@ function congesTousActif(debut,annee){
 global.M5_key=key;
 global.M5_rpPct=rpPct;global.M5_rpTexte=rpTexte;
 global.M5_Contrats={active:ACTIVE,key:key,keyFor:keyFor,exists:exists,nom:nom,list:list,existing:existing,switchTo:switchTo,add:add,
-  semainesCumul:semainesCumul,congesCommuns:congesCommuns,congesContrat:congesContrat,contratCumul:contratCumul,congesTous:congesTous,congesTousActif:congesTousActif};
+  semainesCumul:semainesCumul,est3239:est3239,congesCommuns:congesCommuns,congesContrat:congesContrat,contratCumul:contratCumul,congesTous:congesTous,congesTousActif:congesTousActif};
 })(window);
