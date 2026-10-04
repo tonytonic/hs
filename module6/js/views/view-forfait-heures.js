@@ -50,7 +50,7 @@ const VFH = {
     </span>`;
     window.M6_Header?.set({
       title: `Forfait Heures ${this._year}`,
-      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · Contingent ${this._contract.contingent||220}h · ${this._formatH(analysis.totalHS)} HS`,
+      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · ${analysis.sansContingent ? 'Pas de contingent' : 'Contingent '+(this._contract.contingent||220)+'h'} · ${this._formatH(analysis.totalHS)} HS`,
       showReset: true,
       showSwitch: true,
       onReset: () => {
@@ -126,6 +126,7 @@ const VFH = {
           totalHS:        analysis.totalHS,
           contingent:     analysis.contingent,
           tauxRemplissage:analysis.tauxRemplissage,
+          sansContingent: !!analysis.sansContingent,
           rttPris:0, rttSolde:0, rachetes:0, cpPris:0,
           alertes: analysis.alertes,
           rttTheoriques:0, joursRestants: analysis.contingent - analysis.totalHS },
@@ -148,15 +149,18 @@ const VFH = {
     <div class="m6-stats-grid" style="margin-bottom:14px">
       <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHS)}</div><div class="m6-stat-label">Total HS</div></div>
       <div class="m6-stat-box"><div class="m6-stat-val">${a.semaines}</div><div class="m6-stat-label">Semaines saisies</div></div>
-      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux1)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
+      ${a.tauxUnique
+        ? `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHS)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>`
+        : `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux1)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
       ${a.a3Paliers && a.taux_inter ? `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux_inter)}</div><div class="m6-stat-label">HS à +${a.taux_inter}%</div></div>` : ''}
-      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux2)}</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux2)}</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>`}
       <div class="m6-stat-box" style="border-color:rgba(196,163,90,0.35)">
-        <div class="m6-stat-val" style="color:var(--champagne-2)">${a.tauxHoraire>0?a.montantTotal.toFixed(0)+'€':'—'}</div>
+        <div class="m6-stat-val" style="color:var(--champagne-2)">${a.tauxHoraire>0?(Math.round(a.montantTotal*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €':'—'}</div>
         <div class="m6-stat-label">Montant brut HS</div>
       </div>
     </div>
 
+    ${a.sansContingent ? `<div class="m6-alert info" style="margin-bottom:14px"><span class="m6-alert-icon">ℹ️</span><div><strong>Pas de contingent annuel</strong> pour cette convention : ni plafond annuel d'heures sup ni repos obligatoire lié au contingent (la convention n'en fixe pas, L7221-2). Les heures sup restent dues et majorées${a.tauxUnique?' (+'+a.taux1+' %)':''}, dans la limite de la durée maximale.</div></div>` : `
     <!-- Barre de progression forfait heures -->
     <div class="m6-progress-bar-wrap">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
@@ -171,19 +175,24 @@ const VFH = {
         <span style="color:${(a.contingent||220)-a.totalHS <= 20?'var(--alerte)':'inherit'}">Reste : <strong>${this._formatH(Math.max(0,(a.contingent||220)-a.totalHS))}</strong></span>
       </div>
     </div>
+    `}
 
     ${a.tauxHoraire>0||this._contract.tauxHoraire>0?`<div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">💶</div><div><div class="m6-card-label">Loi TEPA 2007 ${a.ccnNom?'· '+a.ccnNom:''}</div><div class="m6-card-title">Réduction de cotisations salariales et exonération fiscale</div></div></div><div class="m6-card-body">
-      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux1||25}% (${a.palier||8}h/sem)</span><span class="m6-row-val">${(a.montantHS1||0).toFixed(2)} €</span></div>
+      ${a.tauxUnique
+        ? `<div class="m6-row"><span class="m6-row-label">HS à +${a.taux1}% (${this._formatH(a.totalHS)})</span><span class="m6-row-val">${(a.montantTotal||0).toFixed(2)} €</span></div>`
+        : `<div class="m6-row"><span class="m6-row-label">HS à +${a.taux1||25}% (${a.palier||8}h/sem)</span><span class="m6-row-val">${(a.montantHS1||0).toFixed(2)} €</span></div>
       ${a.a3Paliers&&a.taux_inter?`<div class="m6-row"><span class="m6-row-label">HS à +${a.taux_inter}% (${a.palier_inter}h/sem)</span><span class="m6-row-val">${(a.montantHS_inter||0).toFixed(2)} €</span></div>`:''}
-      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux2||50}%</span><span class="m6-row-val">${(a.montantHS2||0).toFixed(2)} €</span></div>
+      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux2||50}%</span><span class="m6-row-val">${(a.montantHS2||0).toFixed(2)} €</span></div>`}
       <div class="m6-row"><span style="font-weight:600">Total brut</span><span class="m6-row-val gold" style="font-family:var(--font-display);font-size:1.2rem">${(a.montantTotal||0).toFixed(2)} €</span></div>
       <div class="m6-row"><span class="m6-row-label">Exo IR (plaf. 7 500€/an)</span><span class="m6-row-val ok">${(a.exoFiscale||0).toFixed(2)} €</span></div>
       <div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">Art. L241-17 CSS · Loi TEPA 2007 · Loi 2022-1158</div>
     </div></div>`:''}
 
+    ${this._tplPaiement(a)}
+
     ${bio.hasData?`<div class="m6-card" style="margin-bottom:14px;cursor:pointer" id="fh-bio-card"><div class="m6-card-body" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="m6-card-label">Santé — Phase ${bio.phase?.code}</div><span class="m6-badge" style="background:${bio.phase?.color}20;color:${bio.phase?.color};border-radius:99px;font-size:0.65rem;padding:2px 8px">${bio.phase?.label}</span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">${[['Fatigue',bio.fatigue,true],['Stress',bio.stress,true],['Récup.',bio.recovery,false],['Perf.',bio.performance,false]].map(([l,v,inv])=>{const c=inv?(v>60?'#B85C50':v>35?'#C4853A':'#4A7C6F'):(v<40?'#B85C50':v<65?'#C4853A':'#4A7C6F');return `<div style="background:var(--ivoire);border-radius:8px;padding:8px 4px"><div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:${c}">${v}</div><div style="font-size:0.6rem;color:var(--pierre);text-transform:uppercase">${l}</div></div>`;}).join('')}</div><div style="font-size:0.68rem;color:var(--pierre);margin-top:6px;text-align:right">→ onglet Santé</div></div></div>`:''}
 
-    ${a.alertes.length?a.alertes.map(al=>`<div class="m6-alert ${al.niveau}" style="margin-bottom:10px"><span class="m6-alert-icon">${al.icon}</span><div><strong>${al.titre}</strong><br><span style="font-size:0.77rem">${al.texte}</span><br><span style="font-size:0.65rem;color:var(--pierre)">Art. ${al.loi}</span></div></div>`).join('') : `<div class="m6-alert success" style="margin-bottom:14px"><span class="m6-alert-icon">✅</span><div><strong>Contingent conforme</strong> — Aucune alerte pour ${this._year}.</div></div>`}
+    ${a.alertes.length?a.alertes.map(al=>`<div class="m6-alert ${al.niveau}" style="margin-bottom:10px"><span class="m6-alert-icon">${al.icon}</span><div><strong>${al.titre}</strong><br><span style="font-size:0.77rem">${al.texte}</span><br><span style="font-size:0.65rem;color:var(--pierre)">Art. ${al.loi}</span></div></div>`).join('') : `<div class="m6-alert success" style="margin-bottom:14px"><span class="m6-alert-icon">✅</span><div><strong>${a.sansContingent?'Aucune alerte':'Contingent conforme'}</strong> — ${a.sansContingent?'durée maximale respectée pour '+this._year+'.':'Aucune alerte pour '+this._year+'.'}</div></div>`}
 
     <button class="m6-btn m6-btn-primary" id="fh-saisir" style="margin-bottom:8px">＋ Saisir une semaine</button>
     <div style="display:flex;gap:8px">
@@ -196,6 +205,83 @@ const VFH = {
     this._c.querySelector('#fh-saisir')?.addEventListener('click', () => { this._section='semaines'; this.render(); setTimeout(()=>this._c.querySelector('#fh-add')?.click(),200); });
     this._c.querySelector('#fh-bio-card')?.addEventListener('click', () => { this._section='bio'; this.render(); });
     this._c.querySelector('#fh-newyr')?.addEventListener('click',()=>{ if(window.M6_nouvelExercice) return M6_nouvelExercice(); });
+    this._c.querySelectorAll('[data-paie-mois]').forEach(inp => inp.addEventListener('change', () => {
+      const mois = inp.dataset.paieMois, k = inp.dataset.paieK;
+      const hEl = this._c.querySelector(`[data-paie-mois="${mois}"][data-paie-k="${k}"][data-paie-part="h"]`);
+      const mEl = this._c.querySelector(`[data-paie-mois="${mois}"][data-paie-k="${k}"][data-paie-part="m"]`);
+      const h = Math.max(0, parseInt(hEl?.value, 10) || 0), mn = Math.max(0, Math.min(59, parseInt(mEl?.value, 10) || 0));
+      const p = this._getPaie();
+      if (!p[mois] || typeof p[mois] !== 'object') p[mois] = {};
+      p[mois][k] = Math.round((h + mn / 60) * 100) / 100;
+      this._setPaie(p);
+      this.render(); M6_toast('✓ Paiement enregistré');
+    }));
+  },
+
+  // ── PAIEMENT DES HEURES SUP, MOIS PAR MOIS (04/10/2026) ────────
+  // Forfait en heures hebdomadaire ou mensuel : ni report ni modulation. Les heures
+  // au-delà du forfait se paient sur la paie du mois, majorées. Ce qui n'est pas payé
+  // reste dû et passe au mois suivant (même taux).
+  _paieKey() { return `M6_${this._regime}_${this._year}_PAIE`; },
+  _getPaie() { try { return JSON.parse(localStorage.getItem(this._paieKey()) || '{}') || {}; } catch (_) { return {}; } },
+  _setPaie(p) { try { localStorage.setItem(this._paieKey(), JSON.stringify(p)); } catch (_) {} },
+
+  _paieCalcul(a) {
+    const paie = this._getPaie();
+    const tr = a.tauxUnique
+      ? [{ k:'p1', taux:a.taux1, gen:m => m.hs1 + m.hs_inter + m.hs2 }]
+      : [{ k:'p1', taux:a.taux1, gen:m => m.hs1 },
+         ...(a.a3Paliers && a.taux_inter ? [{ k:'pi', taux:a.taux_inter, gen:m => m.hs_inter }] : []),
+         { k:'p2', taux:a.taux2, gen:m => m.hs2 }];
+    const rep = {}; tr.forEach(t => rep[t.k] = 0);
+    const r60 = v => Math.round(v * 60) / 60;
+    const mois = (a.parMois || []).map(m => {
+      const lignes = tr.map(t => {
+        const report = rep[t.k], gen = t.gen(m), du = r60(report + gen);
+        const paye = Math.min(du, Math.max(0, Number((paie[m.mois] || {})[t.k]) || 0));
+        const reste = r60(Math.max(0, du - paye));
+        rep[t.k] = reste;
+        return { k:t.k, taux:t.taux, report:r60(report), gen:r60(gen), du, paye, reste };
+      });
+      return { mois:m.mois, lignes };
+    });
+    const resteTotal = r60(tr.reduce((s, t) => s + rep[t.k], 0));
+    const resteEur = a.tauxHoraire > 0 ? tr.reduce((s, t) => s + rep[t.k] * a.tauxHoraire * (1 + t.taux / 100), 0) : 0;
+    return { mois, resteTotal, resteEur };
+  },
+
+  _tplPaiement(a) {
+    if (!a.parMois || !a.parMois.length || !a.totalHS) return '';
+    const calc = this._paieCalcul(a);
+    const NOMS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const lib = mk => { const [y, m] = mk.split('-'); return NOMS[parseInt(m, 10) - 1] + ' ' + y; };
+    const eur = (h, t) => a.tauxHoraire > 0 ? ' · ' + (h * a.tauxHoraire * (1 + t / 100)).toFixed(2) + ' €' : '';
+    const inp = (mk, k, part, val) => `<input type="number" inputmode="numeric" min="0" ${part==='m'?'max="59"':''} data-paie-mois="${mk}" data-paie-k="${k}" data-paie-part="${part}" value="${val}" placeholder="${part==='h'?'0':'00'}" style="font-size:16px;width:58px;text-align:center;padding:5px 4px">`;
+    const blocs = calc.mois.filter(m => m.lignes.some(l => l.du > 0)).reverse().map(m => {
+      const rows = m.lignes.filter(l => l.du > 0 || l.paye > 0).map(l => {
+        const ph = Math.floor(l.paye + 1e-9); let pm = Math.round((l.paye - ph) * 60); let phh = ph; if (pm === 60) { phh++; pm = 0; }
+        return `<div style="padding:8px 0;border-bottom:1px solid rgba(26,23,20,0.06)">
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem"><span style="font-weight:600">HS à +${l.taux}%</span><span>${this._formatH(l.du)} dues${eur(l.du, l.taux)}</span></div>
+          <div style="font-size:0.66rem;color:var(--pierre);margin-top:2px">${this._formatH(l.gen)} ce mois${l.report > 0 ? ' + ' + this._formatH(l.report) + ' reportées' : ''}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;font-size:0.74rem;color:var(--pierre)">
+            <span>Payées sur la paie :</span>
+            <span style="display:flex;align-items:center;gap:4px">${inp(m.mois, l.k, 'h', l.paye ? phh : '')}h ${inp(m.mois, l.k, 'm', l.paye ? String(pm).padStart(2, '0') : '')}min</span>
+          </div>
+          ${l.reste > 0 ? `<div style="font-size:0.7rem;color:var(--alerte);margin-top:4px;text-align:right">Reste dû : ${this._formatH(l.reste)}${eur(l.reste, l.taux)}</div>` : `<div style="font-size:0.7rem;color:var(--succes);margin-top:4px;text-align:right">✓ Payées</div>`}
+        </div>`;
+      }).join('');
+      return `<div style="margin-top:10px"><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--champagne-2);font-weight:600">${lib(m.mois)}</div>${rows}</div>`;
+    }).join('');
+    const total = calc.resteTotal > 0
+      ? `<div class="m6-row" style="margin-top:8px"><span style="font-weight:600;color:var(--alerte)">⚠️ Restant dû à ce jour</span><span class="m6-row-val" style="color:var(--alerte)">${this._formatH(calc.resteTotal)}${a.tauxHoraire > 0 ? ' · ' + calc.resteEur.toFixed(2) + ' €' : ''}</span></div>`
+      : `<div class="m6-row" style="margin-top:8px"><span style="font-weight:600;color:var(--succes)">✅ Toutes les heures sup saisies sont payées</span><span></span></div>`;
+    return `<div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">🧾</div><div><div class="m6-card-label">Paiement des heures sup</div><div class="m6-card-title">Mois par mois</div></div></div><div class="m6-card-body">
+      <div style="font-size:0.7rem;color:var(--pierre);line-height:1.5">Forfait hebdomadaire ou mensuel : ni report ni modulation. Les heures au-delà du forfait se paient sur la paie du mois, avec leur majoration. Le remplacement par du repos n'est possible que si un accord d'entreprise ou de branche le prévoit. Une semaine compte dans le mois de son dimanche.</div>
+      ${a.tauxHoraire > 0 ? '' : '<div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">💡 Renseigne ton taux horaire (⚙️ Contrat ou Export) pour voir les montants.</div>'}
+      ${blocs}
+      ${total}
+      <div style="font-size:0.66rem;color:var(--pierre);margin-top:6px">Heures non payées : 3 ans pour les réclamer (Art. L3245-1).</div>
+    </div></div>`;
   },
 
   // ── SEMAINES ───────────────────────────────────────────────,
@@ -230,7 +316,7 @@ const VFH = {
               <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:600">${this._formatH(h)}</div>
             </div>
             <div style="text-align:right">
-              ${extra>0?`<div style="font-size:0.78rem;color:var(--champagne-2);font-weight:500">+${this._formatH(extra)} HS</div><div style="font-size:0.68rem;color:var(--pierre)">${hs1>0?this._formatH(hs1)+' à +'+a.taux1+'%':''}${hs_inter>0?' · '+this._formatH(hs_inter)+' à +'+a.taux_inter+'%':''}${hs2>0?' · '+this._formatH(hs2)+' à +'+a.taux2+'%':''}</div>`:`<div style="font-size:0.78rem;color:var(--succes)">Conforme</div>`}
+              ${extra>0?`<div style="font-size:0.78rem;color:var(--champagne-2);font-weight:500">+${this._formatH(extra)} HS</div><div style="font-size:0.68rem;color:var(--pierre)">${a.tauxUnique ? this._formatH(extra)+' à +'+a.taux1+'%' : `${hs1>0?this._formatH(hs1)+' à +'+a.taux1+'%':''}${hs_inter>0?' · '+this._formatH(hs_inter)+' à +'+a.taux_inter+'%':''}${hs2>0?' · '+this._formatH(hs2)+' à +'+a.taux2+'%':''}`}</div>`:`<div style="font-size:0.78rem;color:var(--succes)">Conforme</div>`}
             </div>
             <button data-del="${wk}" style="background:none;border:none;color:var(--pierre);font-size:1rem;cursor:pointer;padding:4px 8px;margin-left:4px">✕</button>
           </div>
@@ -426,8 +512,9 @@ const VFH = {
         // PRIORITÉ : saisie manuelle (contract) > CCN > droit commun
         let ccnRules = null;
         if (window.CCN_API && this._contract?.ccnIdcc && this._contract.ccnIdcc > 0) {
-          try { ccnRules = CCN_API.getGroupeForCCN(this._contract.ccnIdcc); } catch(_) {}
+          try { ccnRules = (window.M6_CCN_Adapter && M6_CCN_Adapter.reglesContrat) ? M6_CCN_Adapter.reglesContrat(this._contract) : CCN_API.getGroupeForCCN(this._contract.ccnIdcc); } catch(_) {}
         }
+        const sansCont   = !!(ccnRules && ccnRules.sansContingent);
         const seuilC     = this._contract?.seuilHebdo || ccnRules?.seuil || 35;
         const contingent = this._contract?.contingent || ccnRules?.contingent || 220;
         const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, window.M6_hRetenues(v,this._contract) - seuilC), 0);
@@ -438,7 +525,8 @@ const VFH = {
           if (rtPanel && h > 0) { rtPanel.style.display = ''; }
           if (rtHS) rtHS.textContent = hs > 0 ? `+${window._m6fmtH(hs)} HS` : '0h HS';
           const reste = Math.max(0, contingent - totalHSActuel - hs);
-          if (rtReste) { rtReste.textContent = `${window._m6fmtH(reste)} / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
+          if (rtReste && sansCont) { rtReste.textContent = 'aucun (convention)'; rtReste.style.color = 'var(--pierre)'; }
+          else if (rtReste) { rtReste.textContent = `${window._m6fmtH(reste)} / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
         };
         hInputH?.addEventListener('input', updateRT); hInputM?.addEventListener('input', updateRT);
         updateRT(); // initial render
