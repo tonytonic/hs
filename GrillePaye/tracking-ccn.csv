@@ -106,7 +106,7 @@
 2543,Cabinets géomètres-experts topographes,2,vérifiée,5,2026,,,,
 3222,Menuiseries charpentes constructions industrialisées,2,vérifiée,11,01/05/2026,,,,
 3238,Papiers et cartons industries,2,vérifiée,2,01/06/2026,ACTIF,,juristique.org (page complète),"Papiers-cartons. Table complète: OETAM 15 échelons (1843€ à 3258€) + Cadres 6 niveaux (RAM annuelle 32000€ à 66307€, soit ~2133€ à 4420€/mois à 80%). Avenants n°21/22/23 du 30/01/2026, en attente d'extension au moment de l'article."
-3249,Industries de carrières et matériaux de construction,2,sourcée,20,01/01/2026,,,,
+3249,Industries de carrières et matériaux de construction,2,vérifiée,20,01/01/2026,,,,
 7005,Caves coopératives vinicoles,2,sourcée,9,01/01/2018,,,,
 43,Import-export et commerce international,1,vérifiée,7,01/03/2026,ACTIF,,,
 87,,1,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
@@ -181,7 +181,7 @@
 652,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 653,Producteurs salariés assurances services extérieurs,0,sourcée,2,01/01/2026,ACTIF,,,
 673,Fourrure,0,vérifiée,6,01/06/2026,HISTORIQUE_PERIME,,,
-675,Succursales de vente au détail d'habillement,0,estimation à confirmer,8,01/05/2026,ACTIF,oui (1824.0 €),,
+675,Succursales de vente au détail d'habillement,0,estimation à confirmer,8,01/05/2026,ACTIF,oui (1824 €),,
 698,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 700,Production des papiers cartons cadres,0,vérifiée,5,01/06/2026,HISTORIQUE_PERIME,,,
 706,Reprographie personnel,0,sourcée,11,29/08/2023,HISTORIQUE_PERIME,oui (1768 €),,
@@ -212,7 +212,7 @@
 1182,Ports de plaisance,0,estimation à confirmer,3,2026,ACTIF,,,
 1237,Centres de gestion agréés,0,vérifiée,11,01/03/2026,HISTORIQUE_PERIME,,,
 1240,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
-1267,Pâtisserie,0,vérifiée,6,01/06/2026,ACTIF,,,
+1267,Pâtisserie,0,sourcée,34,01/01/2026,ACTIF,,,
 1278,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1307,Exploitation cinématographique,0,vérifiée,44,01/02/2025,ACTIF,,"Avenant n° 70 du 12/11/2024, Annexe 2 (barème au 1/02/2025), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1309,Presse quotidienne régionale (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
@@ -252,7 +252,7 @@
 1605,"Entreprises de désinfection, désinsectisation, dératisation (3D)",,sourcée,12,17/12/2025,,oui (1837.13 €),,
 1611,Communication écrite directe,0,vérifiée,3,2026,ACTIF,,DARES (ambigu),Logistique de communication (routage/façonnage postal) vs 'employé entreposage' actuel — chevauchement plausible (logistique). Pas tranché.
 1612,Personnel navigant essais et réceptions,0,estimation à confirmer,6,2026,,,,
-1621,Répartition pharmaceutique,,sourcée,37,01/01/2026,,,,
+1621,Répartition pharmaceutique,,vérifiée,37,01/01/2026,,,,
 1624,Confiserie chocolaterie — commerce de gros,0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 573","Ancien nom officiel: Convention collective nationale des commerces de gros de Confiserie, chocolaterie, biscuiterie et alimentation fine et des négociants distributeurs de levure. Ce numéro est remplacé par le 573 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
 1636,Agents commerciaux VRP multicarte (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1637,Industrie des ardoises,0,vérifiée,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
@@ -348,7 +348,7 @@
 2190,Missions locales et PAIO,0,vérifiée,3,2026,ACTIF,,DARES,Missions locales/PAIO (insertion jeunes) vs 'agent service hospitalier CLCC' actuel. Aucun rapport.
 2219,Taxis,,sourcée,11,20/06/2025,,oui (1837.86 €),,
 2230,Surveillance de la qualité de l air,0,vérifiée,17,01/06/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1486",Ancien nom officiel: Convention collective nationale des associations agréées de surveillance de la qualité de l'air. Ce numéro est remplacé par le 1486 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
-2272,Assainissement et maintenance industrielle,,sourcée,15,20/02/2026,,oui (1863.0 €),,
+2272,Assainissement et maintenance industrielle,,sourcée,15,20/02/2026,,oui (1863 €),,
 2344,Sidérurgie,0,vérifiée,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3248",Ancien nom officiel: Convention collective de la sidérurgie. Ce numéro est remplacé par le 3248 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2372,Distribution directe,0,estimation à confirmer,3,2026,ACTIF,,DARES,Distribution directe (prospectus/imprimés pub) vs 'clerc commissaire de justice' actuel. Aucun rapport.
 2395,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
@@ -369,7 +369,7 @@
 3082,Agents généraux assurances personnel (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 3107,Bâtiment TP ETAM Martinique,,sourcée,8,01/09/2025,,,,
 3139,Parcs de loisirs jardins zoologiques (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
-3144,Bâtiment TP ETAM Guadeloupe,,sourcée,8,01/05/2024,,,,
+3144,Bâtiment TP ETAM Guadeloupe,,vérifiée,8,01/05/2024,,,,
 3151,Fabrication de la chaux,0,sans grille (estimation % SMIC),0,,,,,
 3160,Associations gestion comptabilité,0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 787",Ancien nom officiel: Convention collective nationale des associations de gestion et de comptabilité  (annexée à la convention collective nationale du personnel des cabinets d'experts-comptables et de commissaires aux comptes 0787). Ce numéro est remplacé par le 787 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 3168,Professions de la photographie,,sourcée,18,15/02/2024,,oui (1767 €),,
@@ -390,7 +390,7 @@
 3241,Télédiffusion (CDDU),,estimation à confirmer,12,01/06/2026,,,,
 3243,Quincaillerie fournitures industrielles (grandes chaînes),0,vérifiée,3,01/06/2026,,,,
 3244,Professions réglementées auprès des juridictions,0,vérifiée,5,01/06/2026,,,,
-3252,Entreprises au service de la création et de l'événement,,sourcée,8,01/01/2025,,,,
+3252,Entreprises au service de la création et de l'événement,,vérifiée,8,01/01/2025,,,,
 3257,Mutuelles organismes mutualistes (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
 3326,Bâtiment agents de maîtrise et techniciens (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 3381,Acteurs du lien social et familial ALISFA (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
