@@ -7,7 +7,7 @@
  *
  * Références légales :
  *   Art. L3131-1  — 11h repos obligatoire entre deux journées
- *   Art. L3122-2  — travailleur de nuit : ≥3h entre 21h-6h, ≥2×/sem
+ *   Art. L3122-5 — travailleur de nuit : ≥3h de nuit, ≥2×/sem (période 21h-6h à défaut d'accord, L3122-20)
  *   Art. L3121-18 — durée max journalière : 10h (dérogatoire 12h)
  *
  * Références scientifiques :
@@ -45,7 +45,7 @@ const REGIME_LABELS = {
   standard:       { label: 'Horaires standards',    desc: '8h-20h — baseline OMS',            icon: '☀️' },
   decale:         { label: 'Horaires décalés',       desc: 'Fin >21h ou début <6h',             icon: '🌆' },
   nuit_partielle: { label: 'Nuit partielle',          desc: '1-2h entre 21h-6h',                icon: '🌙' },
-  nuit_complete:  { label: 'Nuit complète',           desc: '≥3h entre 21h-6h (Art. L3122-2)',  icon: '🌑' },
+  nuit_complete:  { label: 'Nuit complète',           desc: '≥3h entre 21h-6h (Art. L3122-5)',  icon: '🌑' },
 };
 
 /* ── LECTURE / ÉCRITURE ─────────────────────────────────────────── */
@@ -436,7 +436,7 @@ function renderSchedulePanel(containerId) {
       <div style="margin-top:14px;padding:8px;background:rgba(255,255,255,0.03);
         font-size:9px;color:var(--text-dim);font-family:var(--font-mono);line-height:1.7;">
         L3131-1 · 11h repos entre journées<br>
-        L3122-2 · Nuit = ≥3h entre 21h-6h, ≥2×/sem<br>
+        L3122-5 · Travailleur de nuit = ≥3h entre 21h-6h, ≥2×/sem<br>
         L3121-18 · Max journalier : 10h (dérogatoire 12h)<br>
         IARC 2019 · Travail nuit = cancérogène probable (Groupe 2A)
       </div>
