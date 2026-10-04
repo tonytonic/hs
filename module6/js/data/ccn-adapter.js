@@ -43,7 +43,7 @@ const FALLBACK_HS = [
   // Contingents réels 2024 — sources : Légifrance + avenants de branche
   { idcc: 1486, nom: 'Syntec / Bureaux études',      contingent: 130, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 3248, nom: 'Métallurgie (ANI 2024)',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.99.4 : 220h (175h si annualisé) + 80h complémentaire 1 an/2
-  { idcc: 1979, nom: 'HCR',                           contingent: 360, seuil: 39, taux1: 10, palier1: 4, taux_inter: 20, palier_inter: 4, taux2: 50 },
+  { idcc: 1979, nom: 'HCR',                           contingent: 360, seuil: 35, taux1: 10, palier1: 4, taux_inter: 20, palier_inter: 4, taux2: 50 },
   { idcc: 2120, nom: 'Banque AFB',                    contingent: 202, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 1672, nom: 'Sociétés assurances',           contingent:  70, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.46 CCN 1672 : contingent individuel 70h
   { idcc: 1996, nom: 'Pharmacie officine',            contingent: 180, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
@@ -51,7 +51,7 @@ const FALLBACK_HS = [
   { idcc: 2511, nom: 'Sport',                         contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 1501, nom: 'Restauration rapide',           contingent: 220, seuil: 35, taux1: 10, palier1: 8, taux_inter: 20, palier_inter: 8, taux2: 50 },
   { idcc: 1597, nom: 'Bâtiment ETAM',                contingent: 130, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1090, nom: 'Réparation automobile',        contingent: 250, taux1: 25, taux2: 50, seuil: 39, palier1: 8 },
+  { idcc: 1090, nom: 'Réparation automobile',        contingent: 250, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // 03/10/2026 : seuil 35 h (la table de secours ne sert que si ccn/conventions-collectives.js ne charge pas)
   { idcc: 1413, nom: 'Travail temporaire',            contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 2264, nom: 'Hospitalisation privée',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
   { idcc: 2941, nom: 'Aide à domicile (BASS)',        contingent:  90, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
@@ -121,6 +121,18 @@ const M6_CCN_Adapter = {
   buildContractDefaults(ccn, regime) {
     if (!ccn) return {};
     regime = regime || 'forfait_jours';
+    // 04/10/2026 : forfait heures → règles de l'entrée choisie (ccn déjà normalisé par
+    // _normalizeHS). Avant, on repassait par l'IDCC seul : en 3239, l'assistant maternel
+    // recevait les règles du salarié du particulier employeur selon la convention du menu.
+    if (regime === 'forfait_heures' && ccn.seuil !== undefined) {
+      return { ccnLabel: ccn.nom||'Droit commun', ccnIdcc: ccn.idcc||0,
+        seuilHebdo: ccn.seuil||35, taux1: ccn.taux1||25, taux2: ccn.taux2||50,
+        palier1: ccn.palier1||8, contingent: ccn.contingent||220,
+        sansContingent: !!ccn.sansContingent,
+        taux_inter: ccn.taux_inter || null,
+        palier_inter: ccn.palier_inter || null,
+        ccnNotes: ccn.notes||'', ccnGroupe: ccn.groupe||'DC' };
+    }
     if (_hasCadresAPI() && global.CCN_CADRES_API.buildContractDefaults) {
       return global.CCN_CADRES_API.buildContractDefaults(ccn._raw || ccn, regime);
     }
@@ -172,8 +184,11 @@ const M6_CCN_Adapter = {
     if (ccn.idcc) rows.push(['IDCC', ccn.idcc]);
     if (regime === 'forfait_heures') {
       rows.push(['Seuil HS', (ccn.seuil||35)+'h']);
-      rows.push(['Contingent', (ccn.contingent||220)+'h']);
-      if (ccn.taux_inter) {
+      rows.push(['Contingent', ccn.sansContingent ? 'Aucun (convention)' : (ccn.contingent||220)+'h']);
+      if (!ccn.taux_inter && Number(ccn.taux1||25) === Number(ccn.taux2||50)) {
+        // 04/10/2026 : un seul taux (ex. assistant maternel 10 %) → une seule valeur
+        rows.push(['Majoration', `+${ccn.taux1||25}% sur toutes les heures sup`]);
+      } else if (ccn.taux_inter) {
         // 3 paliers (ex: HCR — 10%/4h + 20%/4h + 50%)
         rows.push(['Majoration', `+${ccn.taux1||10}%(${ccn.palier1||4}h) / +${ccn.taux_inter}%(${ccn.palier_inter||4}h) / +${ccn.taux2||50}%`]);
       } else {
@@ -232,7 +247,9 @@ const M6_CCN_Adapter = {
             onSelect(ccn);
             // Afficher carte info CCN
             const parent = inputEl.closest('.m6-field') || inputEl.parentElement;
-            if (parent) {
+            // 04/10/2026 : l'assistant affiche déjà la carte dans sa zone « …-info » :
+            // on n'en ajoute pas une seconde (la carte apparaissait en double).
+            if (parent && !parent.querySelector('[id$="-info"]')) {
               parent.querySelector('.m6-ccn-info-card')?.remove();
               const card = document.createElement('div');
               card.className = 'm6-ccn-info-card';
@@ -269,10 +286,15 @@ const M6_CCN_Adapter = {
   _normalizeHS(r) {
     if (!r) return null;
     if (r.i !== undefined) {
-      const rules = _hasCommonAPI() ? global.CCN_API.getGroupeForCCN(r.i) : {seuil:35,taux1:25,palier1:8,taux2:50,contingent:220};
+      // 04/10/2026 : règles de CETTE entrée (3239 a deux entrées), pas de celle du menu
+      const rules = _hasCommonAPI()
+        ? (global.CCN_API.reglesEntree ? global.CCN_API.reglesEntree(r) : global.CCN_API.getGroupeForCCN(r.i))
+        : {seuil:35,taux1:25,palier1:8,taux2:50,contingent:220};
       return { idcc: r.i, nom: r.n||'Convention collective', secteur: r.s||'',
         seuil: rules.seuil||35, taux1: rules.taux1||25, palier1: rules.palier1||8,
         taux2: rules.taux2||50, contingent: rules.contingent||220,
+        sansContingent: !!rules.sansContingent,
+        renvoi: r.renvoi || null, // ancienne convention fusionnée (2111, 2395)
         // 3 paliers (ex: HCR 10/20/50) — préserver si la source en a
         taux_inter:   rules.taux_inter   || null,
         palier_inter: rules.palier_inter || null,
@@ -282,6 +304,7 @@ const M6_CCN_Adapter = {
     return { idcc:0, nom: r.nom||'Droit commun', secteur:'',
       seuil: r.seuil||35, taux1: r.taux1||25, palier1: r.palier1||8,
       taux2: r.taux2||50, contingent: r.contingent||220,
+      sansContingent: !!r.sansContingent,
       taux_inter:   r.taux_inter   || null,
       palier_inter: r.palier_inter || null,
       groupe: r.id||'DC', groupeNom: r.nom||'Droit commun',
@@ -302,6 +325,7 @@ const M6_CCN_Adapter = {
   },
   _getRegimeBadge(r, regime) {
     if (regime === 'forfait_heures') {
+      if (r.sansContingent) return `<span style="font-size:0.6rem;color:var(--pierre);background:rgba(0,0,0,0.05);border-radius:99px;padding:1px 6px">sans contingent</span>`;
       const c = (r.contingent||220)<=100?'var(--alerte)':(r.contingent||220)<=150?'var(--warning)':'var(--succes)';
       return `<span style="font-size:0.6rem;color:${c};background:${c}18;border-radius:99px;padding:1px 6px">${r.contingent||220}h</span>`;
     }
@@ -313,7 +337,7 @@ const M6_CCN_Adapter = {
     return '';
   },
   _getSubtitle(r, regime) {
-    if (regime === 'forfait_heures') return `IDCC ${r.idcc||'—'} · ${r.secteur||''} · ${r.contingent||220}h · +${r.taux1||25}%/${r.taux2||50}%`;
+    if (regime === 'forfait_heures') return `IDCC ${r.idcc||'—'}${r.renvoi?' (ex-'+r.renvoi+')':''} · ${r.secteur||''} · ${r.sansContingent?'pas de contingent':(r.contingent||220)+'h'} · ${(!r.taux_inter && Number(r.taux1||25)===Number(r.taux2||50)) ? '+'+(r.taux1||25)+'%' : '+'+(r.taux1||25)+'%/'+(r.taux2||50)+'%'}`;
     if (regime === 'cadre_dirigeant') return `IDCC ${r.idcc||'—'} · ${r.secteur||''} · L3111-2`;
     const e = r.entretienFreq==='semestriel'?'⚠️ Semestriel':'Annuel';
     return `IDCC ${r.idcc||'—'} · ${r.secteur||''} · ${r.plafond||218}j · ${e} · Rachat ${r.tauxRachat||10}%`;
@@ -328,7 +352,13 @@ M6_CCN_Adapter.duMenu = function(regime) {
     const idcc = parseInt(localStorage.getItem('CCN_IDCC') || '0', 10); if (!idcc) return null;
     let ccn = null;
     if (regime === 'forfait_heures') {
-      if (_hasCommonAPI()) { const e = (global.CCN_API.search(String(idcc), 20) || []).find(x => x.i === idcc); if (e) ccn = this._normalizeHS(e); }
+      if (_hasCommonAPI()) {
+        // 04/10/2026 : même IDCC, plusieurs entrées (3239) → celle choisie dans le menu (CCN_NOM)
+        const lst = (global.CCN_API.search(String(idcc), 20) || []).filter(x => x.i === idcc);
+        const nomMenu = localStorage.getItem('CCN_NOM') || '';
+        const e = lst.find(x => x.n === nomMenu) || lst[0];
+        if (e) ccn = this._normalizeHS(e);
+      }
       if (!ccn) ccn = FALLBACK_HS.find(c => c.idcc === idcc) || null;
     } else {
       const r = this.get(idcc, regime); if (r && +r.idcc === idcc) ccn = r;
@@ -339,6 +369,39 @@ M6_CCN_Adapter.duMenu = function(regime) {
 /* Contrat Zenji déjà enregistré sans CCN : reprise une fois (M6_CCN_MENU_<régime> garde
    l'IDCC déjà proposé). Seules les valeurs restées au défaut légal sont remplacées ;
    une valeur saisie à la main n'est jamais écrasée. Renvoie le nom repris, sinon ''. */
+/* 04/10/2026 : règles de la convention corrigées (fonds droit) : un contrat forfait heures
+   déjà rattaché à une convention reprend les nouvelles valeurs (contingent, seuil, taux,
+   paliers) une fois par version des règles, seulement là où la valeur est restée au défaut
+   légal. Une valeur saisie à la main n'est jamais écrasée. Renvoie true si modifié. */
+M6_CCN_Adapter.resyncRegles = function(regime) {
+  try {
+    if (regime !== 'forfait_heures' || !global.M6_Storage || !global.CCN_API) return false;
+    const c = M6_Storage.getContract(regime); if (!c || !c.ccnIdcc) return false;
+    const ver = String(global.CCN_API.version || '') + ':' + c.ccnIdcc;
+    if (localStorage.getItem('M6_CCN_REGLES_VER') === ver) return false;
+    localStorage.setItem('M6_CCN_REGLES_VER', ver);
+    const r = M6_CCN_Adapter.reglesContrat(c); if (!r) return false;
+    const def = (v, x) => v === undefined || v === null || v === '' || v === 0 || v === x;
+    const n = Object.assign({}, c); let ch = false;
+    const set = (k, v, d) => { if (v != null && def(c[k], d) && c[k] !== v) { n[k] = v; ch = true; } };
+    set('contingent', r.contingent, 220); set('taux1', r.taux1, 25); set('taux2', r.taux2, 50); set('palier1', r.palier1, 8);
+    set('seuilHebdo', r.seuil, 35);
+    if (!c.taux_inter && !c.palier_inter && r.taux_inter) { n.taux_inter = r.taux_inter; n.palier_inter = r.palier_inter || null; ch = true; }
+    if (ch) M6_Storage.setContract(regime, n);
+    return ch;
+  } catch (_) { return false; }
+};
+/* 04/10/2026 : règles HS de la convention d'un contrat M6, d'après l'IDCC ET le nom
+   enregistrés dans le contrat (indépendant de la convention du menu). null sans IDCC. */
+M6_CCN_Adapter.reglesContrat = function(contract) {
+  try {
+    if (!contract || !global.CCN_API) return null;
+    const idcc = parseInt(contract.ccnIdcc || 0, 10); if (!idcc) return null;
+    return global.CCN_API.reglesPour
+      ? global.CCN_API.reglesPour(idcc, contract.ccnLabel || '')
+      : global.CCN_API.getGroupeForCCN(idcc);
+  } catch (_) { return null; }
+};
 M6_CCN_Adapter.appliquerDuMenu = function(regime) {
   try {
     if (!regime || !global.M6_Storage) return '';
