@@ -1219,7 +1219,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 3109, nom: 'Métiers du commerce détail alimentaire spécialisé 5 branches', secteur: 'Commerce alim spécialisé 5B',
+    idcc: 3109, nom: 'Cinq branches industries alimentaires diverses', secteur: 'Industries alimentaires diverses',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -4199,13 +4199,13 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 3109, nom: 'Métiers du commerce détail alimentaire spécialisé 5 branches — Cadres Dirigeants', secteur: 'Commerce alim spécialisé 5B',
+    idcc: 3109, nom: 'Cinq branches industries alimentaires diverses — Cadres Dirigeants', secteur: 'Industries alimentaires diverses',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
     droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
-    notesCD: 'Métiers du commerce détail alimentaire spécialisé 5 branches — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce alim spécialisé 5B.',
+    notesCD: 'Cinq branches industries alimentaires diverses — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce alim spécialisé 5B.',
   }
 ,
   {
@@ -6161,7 +6161,9 @@ function buildContractDefaults(ccn, regime) {
   regime = regime || 'forfait_jours';
 
   if (regime === 'forfait_heures') {
-    const hs = ccn.g ? (global.CCN_API ? global.CCN_API.getRules(ccn.g) : null) : null;
+    // 03/10/2026 : règles de la convention elle-même (exceptions comprises), pas seulement de son groupe
+    const _id = ccn.i || ccn.idcc || 0;
+    const hs = global.CCN_API ? (_id ? global.CCN_API.getGroupeForCCN(_id) : (ccn.g ? global.CCN_API.getRules(ccn.g) : null)) : null;
     return {
       ccnLabel:   ccn.n || ccn.nom || 'Droit commun', ccnIdcc: ccn.i || ccn.idcc || 0,
       seuilHebdo: (hs?.seuil) || 35, taux1: (hs?.taux1) || 25, taux2: (hs?.taux2) || 50,
