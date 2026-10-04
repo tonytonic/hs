@@ -156,7 +156,7 @@ class Heatmap {
       ? (CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')) || {contingent:220})
       : {contingent:220};
     const _heatLimit = _heatCCN.contingent;
-    const contingentPct = totalHS > 0 ? (totalHS / _heatLimit) * 100 : (norm ? (norm._contingentPct || 0) : 0);
+    const contingentPct = _heatCCN.sansContingent ? 0 : (totalHS > 0 ? (totalHS / _heatLimit) * 100 : (norm ? (norm._contingentPct || 0) : 0)); // 04/10/2026 : pas de contingent (IDCC 3239)
 
     // Génération des mois
     const monthsHTML = Array.from({length:12}, (_, m) => {
