@@ -91,6 +91,14 @@ const MSGS_JOUR_10H = [
 
 // ── Rotation intelligente ─────────────────────────────────────────
 function _nextMsg(pool) {
+  /* 04/10/2026 : IDCC 3239 : les articles du Code sur la durée et le temps partiel ne
+     s'appliquent pas (L7221-2) → on écarte les messages qui les citent. */
+  try {
+    if (global.M5_est3239 && global.M5_est3239()) {
+      const f = pool.filter(fn => { try { return !/L31[23]\d-\d/.test(fn('', 0, 0, 0)); } catch (e) { return true; } });
+      if (f.length) pool = f;
+    }
+  } catch (e) {}
   let idx = parseInt(_get(K.MSG_IDX,'0'));
   const today = new Date();
   const seed = (today.getDate()*31 + today.getMonth()*7 + idx*3) % pool.length;
@@ -111,21 +119,35 @@ const Mizuki = {
     const daily = analysis && analysis.dailyFlags;
     const _al = (weekResult && weekResult.alerts) || [];
     // Requalification (seuil temps plein) = le plus grave → prioritaire
-    if (_al.some(a=>a.code==='REQUALIFICATION')) return _nextMsg(MSGS_REQUALIF)(n, weekResult.workedH);
+    if (_al.some(a=>a.code==='REQUALIFICATION') && !(weekResult.rate1 === 0 && weekResult.rate2 === 0)) return _nextMsg(MSGS_REQUALIF)(n, weekResult.workedH);
+    if (_al.some(a=>a.code==='REQUALIFICATION'))   // IDCC 3239 : au-delà du temps plein de la convention (04/10/2026)
+      return weekResult.tempsPlein===45
+        ? `🦊 ${n}${weekResult.workedH}h cette semaine : au-delà de 45 h, ce sont des heures majorées, au taux prévu dans ton contrat (au moins +10 %). Note-les bien.`
+        : `🦊 ${n}${weekResult.workedH}h cette semaine : au-delà de 40 h, ce sont des heures supplémentaires (+25 % jusqu'à 48 h, puis +50 %). Note-les bien.`;
     // Journée > 10h : signal santé/légal (Art. L3121-18)
-    if (daily && daily.count > 0) return _nextMsg(MSGS_JOUR_10H)(n, daily.max);
+    // 04/10/2026 : IDCC 3239 (taux normal) : 10 h/jour du Code non applicable (L7221-2) → pas de message
+    if (daily && daily.count > 0 && !(weekResult && weekResult.rate1 === 0 && weekResult.rate2 === 0)) return _nextMsg(MSGS_JOUR_10H)(n, daily.max);
 
     if (!weekResult || weekResult.workedH <= weekResult.contractH) {
       return _nextMsg(MSGS_NORMAL)(n);
     }
 
     const alerts = weekResult.alerts || [];
+    if (weekResult.rate1 === 0 && weekResult.rate2 === 0 && alerts.some(a=>a.code==='REQUALIFICATION'))
+      return weekResult.tempsPlein===45
+        ? `🦊 ${n}${weekResult.workedH}h cette semaine : au-delà de 45 h, ce sont des heures majorées, au taux prévu dans ton contrat (au moins +10 %). Note-les bien.`
+        : `🦊 ${n}${weekResult.workedH}h cette semaine : au-delà de 40 h, ce sont des heures supplémentaires (+25 % jusqu'à 48 h, puis +50 %). Note-les bien.`;
+    if (weekResult.rate1 === 0 && weekResult.rate2 === 0 && alerts.some(a=>a.code==='PROCHE_TEMPS_PLEIN'))
+      return `🦊 ${n}${weekResult.workedH}h cette semaine : tu approches des ${weekResult.tempsPlein||40} h, le temps plein de ta convention.`;
     if (alerts.some(a=>a.code==='REQUALIFICATION')) return _nextMsg(MSGS_REQUALIF)(n, weekResult.workedH);
     if (rule12 && rule12.triggered) return _nextMsg(MSGS_12SEM)(n, rule12.maxConsec);
     if (alerts.some(a=>a.code==='PROCHE_TEMPS_PLEIN')) return _nextMsg(MSGS_PROCHE_35)(n, weekResult.workedH);
     if (alerts.some(a=>a.code==='PLAFOND_CCN')) return _nextMsg(MSGS_PLAFOND)(n, weekResult.cap);
 
     const total = weekResult.totalCompH || 0;
+    // 03/10/2026 : employé de maison (IDCC 3239) — pas de majoration, temps plein 40 h
+    if (weekResult.rate1 === 0 && weekResult.rate2 === 0 && total > 0)
+      return `🦊 ${n}${total}h au-delà de ton contrat cette semaine, payées au taux normal (sauf majoration prévue dans ton contrat). Vérifie qu'elles apparaissent bien sur ta fiche de paie.`;
     if (weekResult.compH2 > 0) return _nextMsg(MSGS_COMP_HIGH)(n, total);
     if (total > 0) return _nextMsg(MSGS_COMP_LOW)(n, total, weekResult.rate1);
     return _nextMsg(MSGS_NORMAL)(n);
@@ -142,7 +164,7 @@ const Mizuki = {
 
     const today = new Date().toISOString().slice(0,10);
     const workedKey = weekResult ? Math.round((weekResult.workedH||0)*10) : 0;
-    const cacheKey = `${today}_${workedKey}_${(daily&&daily.count)||0}`;
+    const cacheKey = `${today}_${workedKey}_${(daily&&daily.count)||0}_v50_${(global.M5_est3239&&global.M5_est3239())?'c39':'cd'}`; // 04/10/2026 : nouveau message si version ou convention change
     const cached = _json(K.POPUP_CACHE,{});
     if (cached.key === cacheKey && cached.msg) return cached.msg;
 
@@ -185,7 +207,18 @@ const Mizuki = {
       const hasCap = alerts.some(a=>a.code==='PLAFOND_CCN');
       const hasProche = alerts.some(a=>a.code==='PROCHE_TEMPS_PLEIN');
 
-      if (hasRequalif) {
+      const _pemp = weekResult.rate1 === 0 && weekResult.rate2 === 0;   // IDCC 3239 (04/10/2026)
+      const _tp = weekResult.tempsPlein || 35;
+      if (hasRequalif && _pemp) {
+        msg = {
+          titre: _tp===45 ? '🧸 Au-delà de 45 h' : '🏠 Au-delà de 40 h',
+          icon: '⏱️', level: 'alerte',
+          message: _tp===45
+            ? `Cette semaine, tu as fait ${weekResult.workedH}h. Au-delà de 45 h, ce sont des heures majorées, au taux fixé dans ton contrat (au moins +10 %, art. 110.1 de ta convention). Mizuki ne les majore pas : vérifie-les sur ta fiche de paie.`
+            : `Cette semaine, tu as fait ${weekResult.workedH}h. Au-delà de 40 h, ce sont des heures supplémentaires : +25 % jusqu'à 48 h, puis +50 % (art. 136 et 147 de ta convention). Mizuki ne les majore pas : vérifie-les sur ta fiche de paie.`,
+          actions: ['Comparer avec la fiche de paie', 'Garder une trace écrite'],
+        };
+      } else if (hasRequalif) {
         msg = {
           titre: '🚨 Risque de requalification',
           icon: '🚨', level: 'critique',
@@ -196,14 +229,14 @@ const Mizuki = {
         msg = {
           titre: '⚖️ Règle des 12 semaines',
           icon: '⚖️', level: 'alerte',
-          message: `Depuis ${rule12.maxConsec} semaines consécutives, tes heures dépassent le contrat de plus de 2h/sem. L'Art. L3123-13 prévoit que le contrat peut être modifié à la hausse (préavis 7j, sauf opposition). Tu peux en faire la demande écrite, ou conserver ton horaire actuel — c'est ton choix.`,
+          message: `Depuis ${rule12.maxConsec} semaines consécutives, tes heures dépassent le contrat de 2 h ou plus par semaine en moyenne. L'Art. L3123-13 prévoit que le contrat peut être modifié à la hausse (préavis 7j, sauf opposition). Tu peux en faire la demande écrite, ou conserver ton horaire actuel — c'est ton choix.`,
           actions: ['Demander une modification de contrat', 'Garder l\'historique', 'Voir l\'Art. L3123-13'],
         };
       } else if (hasProche) {
         msg = {
           titre: '👀 Proche du temps plein',
           icon: '👀', level: 'vigilance',
-          message: `Tu as travaillé ${weekResult.workedH}h cette semaine, soit ${Math.round(weekResult.workedH/35*100)}% du temps plein légal. Il reste seulement ${(35-weekResult.workedH).toFixed(1)}h avant le seuil de requalification. Sois attentive la semaine prochaine.`,
+          message: _pemp ? `Tu as travaillé ${weekResult.workedH}h cette semaine. Il reste ${(_tp-weekResult.workedH).toFixed(1)}h avant les ${_tp} h de ta convention : au-delà, ${_tp===45?'les heures sont majorées (au moins +10 %)':'ce sont des heures supplémentaires (+25 %)'}.` : `Tu as travaillé ${weekResult.workedH}h cette semaine, soit ${Math.round(weekResult.workedH/35*100)}% du temps plein légal. Il reste seulement ${(35-weekResult.workedH).toFixed(1)}h avant le seuil de requalification. Sois attentive la semaine prochaine.`,
           actions: ['Surveiller les prochaines semaines', 'Voir les règles de requalification'],
         };
       } else if (hasCap) {
@@ -213,12 +246,21 @@ const Mizuki = {
           message: `Le nombre d'heures complémentaires dépasse le plafond de ta convention collective (${Math.round((weekResult.cap||0.10)*100)}% du contrat). Ces heures au-delà du plafond peuvent créer des droits supplémentaires pour toi.`,
           actions: ['Vérifier ta fiche de paie', 'Consulter ta CCN', 'Voir le glossaire'],
         };
+      } else if (_pemp) {
+        // 04/10/2026 : IDCC 3239 : heures en plus du contrat payées au taux normal
+        const total = weekResult.totalCompH || 0;
+        msg = {
+          titre: `🟡 ${total}h en plus du contrat`,
+          icon: '🟡', level: 'info',
+          message: `Tu as effectué ${total}h au-delà de ton contrat cette semaine. Chez un particulier employeur (IDCC 3239), elles sont payées au taux normal jusqu'à ${_tp} h, sauf majoration prévue dans ton contrat.`,
+          actions: ['Vérifier ta fiche de paie', 'Voir le glossaire'],
+        };
       } else {
         const total = weekResult.totalCompH || 0;
         msg = {
           titre: `🟡 ${total}h complémentaires`,
           icon: '🟡', level: 'info',
-          message: `Tu as effectué ${total}h au-delà de ton contrat cette semaine.${weekResult.compH1>0?` ${weekResult.compH1.toFixed(1)}h à +${Math.round((weekResult.rate1||0.10)*100)}%`:''}${weekResult.compH2>0?` et ${weekResult.compH2.toFixed(1)}h à +${Math.round((weekResult.rate2||0.25)*100)}%`:''}. ${weekResult.totalAmount>0?`Estimé : ${weekResult.totalAmount.toFixed(2)} € brut.`:''} Vérifie bien que ces heures apparaissent sur ta prochaine fiche de paie.`,
+          message: `Tu as effectué ${total}h au-delà de ton contrat cette semaine.${weekResult.compH1>0?` ${weekResult.compH1.toFixed(1)}h ${M5_tauxTxt(weekResult.rate1??0.10)}`:''}${weekResult.compH2>0?` et ${weekResult.compH2.toFixed(1)}h à +${Math.round((weekResult.rate2??0.25)*100)}%`:''}. ${weekResult.totalAmount>0?`Estimé : ${weekResult.totalAmount.toFixed(2)} € brut.`:''} Vérifie bien que ces heures apparaissent sur ta prochaine fiche de paie.`,
           actions: ['Vérifier ta fiche de paie', 'Comprendre les majorations', 'Voir le glossaire'],
         };
       }

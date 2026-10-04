@@ -71,8 +71,8 @@ const M5_PdfReport = {
     row('Convention collective',contract.ccnNom||'Droit commun');
     const capPct=Math.round((contract.cap||0.10)*100);
     const capH=(contract.hoursBase*(contract.cap||0.10)).toFixed(1);
-    row('Plafond heures comp.',`${capPct}% du contrat (max ${capH}h/sem)`);
-    row("Majorations",`+${Math.round((contract.rate1||0.10)*100)}% jusqu'à ${(contract.hoursBase*((contract.threshold||0.10))).toFixed(1)}h · +${Math.round((contract.rate2||0.25)*100)}% au-delà`);
+    row('Plafond heures comp.',contract.sansMajoration?`Pas de plafond (jusqu'à ${contract.tempsPlein||40} h)`:`${capPct}% du contrat (max ${capH}h/sem)`);
+    row("Majorations",contract.sansMajoration?"Aucune (IDCC 3239 : taux normal jusqu'à "+(contract.tempsPlein||40)+" h, sauf contrat)":`+${Math.round((contract.rate1??0.10)*100)}% jusqu'à ${(contract.hoursBase*((contract.threshold||0.10))).toFixed(1)}h · +${Math.round((contract.rate2??0.25)*100)}% au-delà`);
     row('Mode de calcul',modeLabel);
     row("Jours fériés", contract.neutraliseFeries!==false ? "Neutralisés (assimilation temps effectif)" : "Inclus dans l'assiette (accord spécifique)");
     row('Début exercice',contract.exerciceStart||String(new Date().getFullYear()));
@@ -105,16 +105,18 @@ const M5_PdfReport = {
       row('Heures ce mois',`${mr.totalWorked}h`);
       row('Delta vs seuil',`${mr.delta>=0?'+':''}${mr.delta.toFixed(1)}h`,mr.delta>0);
       row('Heures comp. mois',`${mr.totalCompH}h`);
-      row(`dont +${Math.round((contract.rate1||0.10)*100)}%`,`${mr.compH1.toFixed(1)}h`);
-      row(`dont +${Math.round((contract.rate2||0.25)*100)}%`,`${mr.compH2.toFixed(1)}h`);
+      if(Math.abs((contract.rate1??0.10)-(contract.rate2??0.25))<1e-9) row(`dont ${M5_tauxTxt(contract.rate1??0.10)}`,`${(mr.compH1+mr.compH2).toFixed(1)}h`);
+      else { row(`dont ${M5_tauxTxt(contract.rate1??0.10)}`,`${mr.compH1.toFixed(1)}h`);
+      row(`dont ${M5_tauxTxt(contract.rate2??0.25)}`,`${mr.compH2.toFixed(1)}h`); }
       if(contract.hourlyRate>0) row('Montant estimé brut',`${mr.totalCompAmount.toFixed(2)} €`);
       row('Plafond mensuel',`${mr.maxAllowed.toFixed(1)}h`);
     } else if(stats) {
       row('Semaines saisies',String(stats.totalWeeks));
       row('Semaines en dépassement',`${stats.weeksWithComp} (${stats.pctOverContract}%)`);
       row('Total heures comp.',`${stats.totalComp.toFixed(1)}h`,stats.totalComp>0);
-      row(`dont +${Math.round((contract.rate1||0.10)*100)}%`,`${(stats.totalComp1||0).toFixed(1)}h`);
-      row(`dont +${Math.round((contract.rate2||0.25)*100)}%`,`${(stats.totalComp2||0).toFixed(1)}h`);
+      if(Math.abs((contract.rate1??0.10)-(contract.rate2??0.25))<1e-9) row(`dont ${M5_tauxTxt(contract.rate1??0.10)}`,`${((stats.totalComp1||0)+(stats.totalComp2||0)).toFixed(1)}h`);
+      else { row(`dont ${M5_tauxTxt(contract.rate1??0.10)}`,`${(stats.totalComp1||0).toFixed(1)}h`);
+      row(`dont ${M5_tauxTxt(contract.rate2??0.25)}`,`${(stats.totalComp2||0).toFixed(1)}h`); }
       row('Moyenne hebdo',`${stats.avgWorked}h/sem`);
       row('Semaine la plus chargée',`${stats.maxWorked}h`);
     }
@@ -124,11 +126,12 @@ const M5_PdfReport = {
     if(contract.pay && mode!=='ANNUEL'){
       const P=contract.pay, f=(h)=>{h=Math.round((h||0)*60);return Math.floor(h/60)+'h'+(h%60?String(h%60).padStart(2,'0'):'');};
       h1('Paiement des heures complémentaires');
-      row(`Dues à +${Math.round((contract.rate1||0.10)*100)}%`,f(P.du10));
-      row(`Dues à +${Math.round((contract.rate2||0.25)*100)}%`,f(P.du25));
+      if(Math.abs((contract.rate1??0.10)-(contract.rate2??0.25))<1e-9) row(`Dues ${M5_tauxTxt(contract.rate1??0.10)}`,f(P.du10+P.du25));
+      else { row(`Dues ${M5_tauxTxt(contract.rate1??0.10)}`,f(P.du10));
+      row(`Dues ${M5_tauxTxt(contract.rate2??0.25)}`,f(P.du25)); }
       row('Payées (cochées dans Mizuki)',f(P.paye10+P.paye25)+(P.paye10+P.paye25>0?` (${f(P.paye10)} + ${f(P.paye25)})`:''));
       row('Reste à payer',f(P.reste10+P.reste25),P.reste10+P.reste25>0.01);
-      if(contract.hourlyRate>0) row('Reste estimé (brut)',((P.reste10*(1+(contract.rate1||0.10))+P.reste25*(1+(contract.rate2||0.25)))*contract.hourlyRate).toFixed(2)+' €',P.reste10+P.reste25>0.01);
+      if(contract.hourlyRate>0) row('Reste estimé (brut)',((P.reste10*(1+(contract.rate1??0.10))+P.reste25*(1+(contract.rate2??0.25)))*contract.hourlyRate).toFixed(2)+' €',P.reste10+P.reste25>0.01);
       if(P.reste10+P.reste25>0.01){ checkPage(10); doc.setFontSize(8); doc.setTextColor(120,70,0);
         const l=doc.splitTextToSize("Heures restant dues : tu as 3 ans pour les réclamer à ton employeur (art. L3245-1 du Code du travail), à compter de la paie où elles auraient dû figurer.",PW); doc.text(l,M,y); y+=l.length*4+2; doc.setTextColor(0,0,0); }
       y+=4;
@@ -150,7 +153,7 @@ const M5_PdfReport = {
         const ratio=maxW>0?wh/maxW:0;
         // Couleur : vert si OK, ambre si HC, rouge si proche 35h
         let r=230,g=230,b=255;
-        if(wh>=35){ r=220;g=80;b=80; }
+        if(wh>=(contract.tempsPlein||35)){ r=220;g=80;b=80; }
         else if(wh>contract.hoursBase){ r=Math.round(245+ratio*0); g=Math.round(158*(1-ratio*0.3)); b=Math.round(11+ratio*20); }
         else if(wh>0){ r=16;g=185;b=129; }
         doc.setFillColor(r,g,b);
@@ -164,7 +167,7 @@ const M5_PdfReport = {
       y=wy+CELL+6;
       // Légende
       doc.setFontSize(7); doc.setFont('helvetica','normal');
-      [[16,185,129,'Conforme'],[245,158,11,'Heures comp.'],[220,80,80,'35h et +']].forEach(([r,g,b,lbl],i)=>{
+      [[16,185,129,'Conforme'],[245,158,11,'Heures comp.'],[220,80,80,(contract.tempsPlein||35)+'h et +']].forEach(([r,g,b,lbl],i)=>{
         const lx=M+i*40;
         doc.setFillColor(r,g,b); doc.rect(lx,y,5,4,'F');
         doc.setTextColor(0,0,0); doc.text(lbl,lx+7,y+3);
@@ -180,7 +183,12 @@ const M5_PdfReport = {
       doc.setFillColor(...VIOLET_LIGHT);
       doc.rect(M,y-4,PW,7,'F');
       doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...VIOLET);
-      ['Semaine','Travaillées','Comp.',`+${Math.round((contract.rate1||0.10)*100)}%`,`+${Math.round((contract.rate2||0.25)*100)}%`,'Montant','OK'].forEach((h,i)=>doc.text(h,cols[i],y));
+      // 04/10/2026 : taux égaux (3239 : taux normal) → une seule colonne de taux
+      const _uniT=Math.abs((contract.rate1??0.10)-(contract.rate2??0.25))<1e-9;
+      const _lblT=r=>{ const v=Math.round((r||0)*100); return v>0?'+'+v+'%':'Taux normal'; };
+      (_uniT
+        ? ['Semaine','Travaillées','Comp.',_lblT(contract.rate1??0.10),'','Montant','OK']
+        : ['Semaine','Travaillées','Comp.',_lblT(contract.rate1??0.10),_lblT(contract.rate2??0.25),'Montant','OK']).forEach((h,i)=>doc.text(h,cols[i],y));
       doc.setTextColor(0,0,0); y+=7;   // 27/09/2026 : la 1re ligne ne chevauche plus le bandeau d'en-tête
       doc.setFontSize(8); doc.setFont('helvetica','normal');
       let alt=false, auFerie=false;
@@ -203,18 +211,20 @@ const M5_PdfReport = {
         doc.text(lbl,cols[0],y);
         doc.text(`${wh}h`,cols[1],y);
         if(diff>0){
-          const montant=contract.hourlyRate>0?c1*contract.hourlyRate*(1+(contract.rate1||0.10))+c2*contract.hourlyRate*(1+(contract.rate2||0.25)):0;
+          const montant=contract.hourlyRate>0?c1*contract.hourlyRate*(1+(contract.rate1??0.10))+c2*contract.hourlyRate*(1+(contract.rate2??0.25)):0;
           doc.setTextColor(...VIOLET);
           doc.text(`+${diff.toFixed(1)}h${w.hcFerie?'*':''}`,cols[2],y);
+          if(_uniT){ doc.text(`${diff.toFixed(1)}h`,cols[3],y); }
+          else {
           doc.text(c1>0?`${c1.toFixed(1)}h`:'--',cols[3],y);
-          doc.text(c2>0?`${c2.toFixed(1)}h`:'--',cols[4],y);
+          doc.text(c2>0?`${c2.toFixed(1)}h`:'--',cols[4],y); }
           doc.text(montant>0?`${montant.toFixed(2)}€`:'--',cols[5],y);
-          doc.setTextColor(wh>=35?180:0,0,0);
-          doc.text(wh>=35?'! 35h':' ',cols[6],y);
+          doc.setTextColor(wh>(contract.tempsPlein||34.99)?180:0,0,0);
+          doc.text(wh>(contract.tempsPlein||34.99)?'! '+(contract.tempsPlein||35)+'h':' ',cols[6],y);
           doc.setTextColor(0,0,0);
         } else {
           doc.setTextColor(180,180,180);
-          ['--','--','--','--','OK'].forEach((t,i)=>doc.text(t,cols[i+2],y));
+          (_uniT?['--','--','','--','OK']:['--','--','--','--','OK']).forEach((t,i)=>doc.text(t,cols[i+2],y));
           doc.setTextColor(0,0,0);
         }
         y+=5.5;
@@ -230,14 +240,19 @@ const M5_PdfReport = {
     h1('5. Mes droits — Rappels légaux');
     doc.setFontSize(9); doc.setFont('helvetica','normal');
     const noticeDefaut = contract.noticeDays || 7;
-    const droits=[
-      ["Art. L3123-28",`Plafond heures complémentaires : ${Math.round((contract.cap||0.10)*100)}% du contrat (selon ta CCN : 1/10 ou 1/3).`],
-      ["Art. L3123-29",`Majorations supplétives : +${Math.round((contract.rate1||0.10)*100)}% jusqu'à 1/${Math.round(1/(contract.threshold||0.10))}e du contrat, puis +${Math.round((contract.rate2||0.25)*100)}%.`],
+    const droits=contract.sansMajoration?[
+      ["Art. L7221-2","Employé(e) de maison (IDCC 3239) : les règles du Code sur le temps partiel ne s'appliquent pas."],
+      (contract.tempsPlein===45
+        ?["CCN 3239","Assistant(e) maternel(le) : heures au-delà du contrat jusqu'à 45 h = heures complémentaires, majorées seulement si le contrat le prévoit (art. 110.2) ; au-delà de 45 h : heures majorées au taux du contrat, au moins 10 % (art. 96.2 et 110.1)."]
+        :["CCN 3239","Heures au-delà du contrat payées au taux normal jusqu'à 40 h par semaine, sauf majoration prévue au contrat ; au-delà de 40 h (moyenne sur 8 semaines) : heures supplémentaires +25 % jusqu'à 48 h, puis +50 % (art. 136 et 147)."]),
+    ]:[
+      ["Art. L3123-28",`Plafond heures complémentaires : ${Math.round((contract.cap||0.10)*100)}% du contrat (selon ta CCN : 1/10 par défaut, jusqu'à 1/3 par accord de branche).`],
+      ["Art. L3123-29",`Majorations supplétives : +${Math.round((contract.rate1??0.10)*100)}% jusqu'à 1/${Math.round(1/(contract.threshold||0.10))}e du contrat, puis +${Math.round((contract.rate2??0.25)*100)}%.`],
       ["Art. L3123-9","Jamais 35h : les heures complémentaires ne peuvent jamais porter la durée au niveau du temps plein légal (35h) ou conventionnel."],
       ["Art. L3123-31","Délai de prévenance par défaut : 7 jours ouvrés minimum pour toute modification de la répartition."],
       [noticeDefaut===3?"Art. L3123-24":"Application L3123-31",`Ton contrat indique : ${noticeDefaut} jours ouvrés (${noticeDefaut===3?'réduit par accord collectif étendu avec contreparties':'délai légal par défaut, aucun accord dérogatoire'}).`],
       ["Art. L3123-10","Refus sans faute : tu peux refuser des HC si (1) elles dépassent les limites du contrat, (2) le délai de prévenance n'a pas été respecté, ou (3) ton contrat ne mentionne pas la possibilité d'en faire."],
-      ["Art. L3123-13","Règle des 12 semaines : si tu dépasses ton contrat de +2h/sem pendant 12 semaines consécutives (ou 12 sur 15), ton contrat doit être modifié à la hausse (sauf opposition de ta part)."],
+      ["Art. L3123-13","Règle des 12 semaines : si ton horaire moyen dépasse ton contrat de 2 h ou plus par semaine pendant 12 semaines consécutives (ou 12 sur 15), ton contrat doit être modifié à la hausse (sauf opposition de ta part)."],
       ["Art. L3123-22","Avenant complément d'heures : possible uniquement si ta CCN le prévoit. Max 8 avenants / an / salarié."],
       ["Art. L3123-7","Durée minimale : 24h/sem sauf dérogations légales (demande du salarié, accord de branche, étudiant, CDD court…)."],
       ["Art. L3123-3","Priorité d'accès au temps plein : l'employeur doit t'informer des postes à temps plein disponibles."],

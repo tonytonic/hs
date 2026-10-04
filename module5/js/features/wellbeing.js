@@ -135,7 +135,7 @@ const M5_Wellbeing = {
     // Cap réel : priorité à la CCN sélectionnée (évite les bugs si contrat mal sauvegardé)
     let cap = contract.cap || 0.10;
     if(contract.idcc > 0 && typeof CCN_PARTIEL_API !== 'undefined') {
-      const ccnRules = CCN_PARTIEL_API.getRules(contract.idcc);
+      const ccnRules = CCN_PARTIEL_API.getRules(contract.idcc,contract.ccnNom);
       if(ccnRules && ccnRules.cap) cap = ccnRules.cap;
     }
     const plafondH = contractH * (1 + cap);
