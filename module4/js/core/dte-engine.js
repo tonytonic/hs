@@ -476,7 +476,7 @@ function readSchedule(dateKey) {
 }
 
 /**
- * CLASSIFICATION LÉGALE DU RÉGIME — Art. L3122-2 Code du travail
+ * CLASSIFICATION LÉGALE DU RÉGIME — Art. L3122-5 Code du travail (travailleur de nuit)
  *
  * Travailleur de nuit : ≥3h de travail entre 21h et 6h, ≥2 fois/semaine
  * Horaire décalé      : fin > 21h OU début < 6h (sans atteindre le seuil nuit)
@@ -504,7 +504,7 @@ function classifySchedule(startH, endH) {
   }
   nightH = Math.max(0, nightH);
 
-  const isNightComplete = nightH >= 3;    // L3122-2 : ≥3h entre 21h-6h
+  const isNightComplete = nightH >= 3;    // L3122-5 : ≥3h entre 21h-6h
   const isNightPartial  = nightH > 0 && nightH < 3;
   const isDecale        = !isNightComplete && !isNightPartial &&
                           (endH > 21 || startH < 6);
