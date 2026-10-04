@@ -924,7 +924,9 @@ function _absRetenue(v){if(!v)return 0;if(CP_JURIS&&v.cp)return 0;return v.absen
 if(localStorage.getItem('AUTO_IMPORT_FERIES')==='true'){
   setTimeout(()=>{ if(typeof importFeries==='function') importFeries(); }, 2000);
 }
-const DAILY_WORK_HOURS=7,ALLOW_RECUP_FREE=true;
+const ALLOW_RECUP_FREE=true;
+// 04/10/2026 : journée type = seuil hebdo de la convention / 5 (7 h en droit commun, 8 h pour 40 h)
+Object.defineProperty(window,'DAILY_WORK_HOURS',{get(){try{return (getCCNRules().seuil||35)/5;}catch(_){return 7;}},configurable:true});
 
 /* ── CCN : règles actives ── */
 function getCCNRules() {
@@ -1291,14 +1293,16 @@ function calculate(){
     const[y,m,d]=week.split("-").map(Number);
     const t1lbl=rules.taux1+'%',t2lbl=rules.taux2+'%';
     const interPart=rules.taux_inter?` / ${fmtH(p.hInter)} à ${rules.taux_inter}%`:'';
-    details.push(`Semaine du ${new Date(y,m-1,d).toLocaleDateString()} : ${fmtH(p.h1)} à ${t1lbl}${interPart} / ${fmtH(p.h2)} à ${t2lbl}`);
+    // 04/10/2026 : un seul taux (ex. assistant maternel 10 %) → une seule valeur par semaine
+    if(!rules.taux_inter && Number(rules.taux1)===Number(rules.taux2)) details.push(`Semaine du ${new Date(y,m-1,d).toLocaleDateString()} : ${fmtH(p.h1+p.h2)} à ${t1lbl}`);
+    else details.push(`Semaine du ${new Date(y,m-1,d).toLocaleDateString()} : ${fmtH(p.h1)} à ${t1lbl}${interPart} / ${fmtH(p.h2)} à ${t2lbl}`);
   });
   const coef1=1+rules.taux1/100,coefInter=rules.taux_inter?(1+rules.taux_inter/100):0,coef2=1+rules.taux2/100;
   const brut1=h1*coef1,brutInter=hInter*coefInter,brut2=h2*coef2;
   const brut=brut1+brutInter+brut2+reportPrev,net=brut-totalRecup;
   reports[period.index]=net;localStorage.setItem(STORAGE.reports,JSON.stringify(reports));
   const interLine=rules.taux_inter?`<br>${rules.taux_inter}% : ${fmtH(hInter)} × ${coefInter.toFixed(2)} = ${fmtH(brutInter)}`:'';
-  totaux.innerHTML=`<details class="calc-details"><summary>📊 Détails des calculs</summary><div class="breakdown">${details.join("<br>")}<hr>${rules.taux1}% : ${fmtH(h1)} × ${coef1.toFixed(2)} = ${fmtH(brut1)}${interLine}<br>${rules.taux2}% : ${fmtH(h2)} × ${coef2.toFixed(2)} = ${fmtH(brut2)}<br>Report précédent : ${fmtH(reportPrev)}</div></details><div class="soldes-grid"><div class="solde-card"><div class="solde-card-label">Solde brut</div><div class="solde-card-value">${fmtH(brut)}</div></div><div class="solde-card recup"><div class="solde-card-label">Récupération</div><div class="solde-card-value">${fmtH(totalRecup)}</div></div></div><div class="solde-card-net"><div class="solde-card-label">Solde net</div><div class="solde-card-value">${fmtH(net)}</div></div>`;
+  totaux.innerHTML=`<details class="calc-details"><summary>📊 Détails des calculs</summary><div class="breakdown">${details.join("<br>")}${rules.id==='PEMP40'?'<div style="font-size:0.85em;opacity:.8;margin-top:6px">Heures sup comptées semaine par semaine (art. 136 de ta convention). Si ton contrat prévoit une durée de travail irrégulière, elles se calculent sur une moyenne de 40 h sur 8 semaines : l\'appli peut alors en compter plus que ta paie.</div>':''}<hr>${(!rules.taux_inter && Number(rules.taux1)===Number(rules.taux2)) ? `${rules.taux1}% : ${fmtH(h1+h2)} × ${coef1.toFixed(2)} = ${fmtH(brut1+brut2)}` : `${rules.taux1}% : ${fmtH(h1)} × ${coef1.toFixed(2)} = ${fmtH(brut1)}${interLine}<br>${rules.taux2}% : ${fmtH(h2)} × ${coef2.toFixed(2)} = ${fmtH(brut2)}`}<br>Report précédent : ${fmtH(reportPrev)}</div></details><div class="soldes-grid"><div class="solde-card"><div class="solde-card-label">Solde brut</div><div class="solde-card-value">${fmtH(brut)}</div></div><div class="solde-card recup"><div class="solde-card-label">Récupération</div><div class="solde-card-value">${fmtH(totalRecup)}</div></div></div><div class="solde-card-net"><div class="solde-card-label">Solde net</div><div class="solde-card-value">${fmtH(net)}</div></div>`;
   const rateContainer=document.getElementById("rateContainer");rateContainer.innerHTML="";
   if(shouldShowAnnualClosure()){if(!document.getElementById("hourlyRateInput")){rateContainer.innerHTML=`<div style="background:#e0f4f7;padding:10px;border-radius:6px;border:1px solid #4FB3C2;margin-top:10px;box-sizing:border-box;width:100%;"><label style="display:block;font-weight:bold;margin-bottom:4px;">Taux horaire (€)</label><input type="number" id="hourlyRateInput" step="any" value="${annualRate}" style="width:100%;box-sizing:border-box;margin:0;"></div>`;const _hri=document.getElementById("hourlyRateInput");_hri.oninput=()=>{const v=Number(_hri.value);if(!isNaN(v)&&v>0){annualRate=v;localStorage.setItem("ANNUAL_RATE_"+currentSuffix,annualRate);}};_hri.onchange=()=>{calculate();};}else if(document.activeElement.id!=="hourlyRateInput"){document.getElementById("hourlyRateInput").value=annualRate;}totaux.innerHTML+=`<hr><div style="background:#e0f4f7;padding:15px;border:2px solid #2196a6;border-radius:8px;"><h3 style="margin:0;color:#2196a6;">🎯 Clôture Annuelle</h3><b>Paiement (${annualRate}€/h) :</b> ${(net*annualRate).toFixed(2)} €</div>`;}
 }
@@ -1460,6 +1464,7 @@ function updateContingent(){
   const rules=getCCNRules();
   BASE_HEBDO = rules.seuil;
   const LIMIT=rules.contingent;
+  try{localStorage.setItem("BASE_HEBDO_"+currentSuffix,String(rules.seuil));}catch(_){}
   const total=hsContingentExercice(data,specialDays,AUTO_FERIE,exerciseStart,annualDate);
   // Enregistré seulement si l'exercice a des saisies (un M1 ouvert mais vide ne doit pas masquer M2)
   if(Object.keys(data||{}).some(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)))hsEnregistrerOfficiel(currentSuffix,total);
@@ -1468,6 +1473,10 @@ function updateContingent(){
   const fill=document.getElementById("contingentFill");
   const txt=document.getElementById("contingentText");
   if(!fill||!txt)return;
+  if(rules.sansContingent){ // 04/10/2026 : IDCC 3239, pas de contingent annuel
+    fill.style.width="0%";txt.textContent=fmtH(total)+" · pas de contingent pour ta convention";
+    const rw=document.getElementById("rcoWrap");if(rw)rw.classList.remove("visible");return;
+  }
   fill.style.width=pct+"%";
   fill.style.background=pct<70?"#2ecc71":pct<90?"#f39c12":"#c0392b";
   txt.textContent=fmtH(total)+" / "+LIMIT+"h";
@@ -1557,17 +1566,13 @@ baseHebdoInput.oninput=()=>{BASE_HEBDO=Number(baseHebdoInput.value)||35;localSto
 function syncBaseHebdoWithCCN(){
   const r=getCCNRules();
   // Ne remplacer que si l'utilisateur n'a pas saisi de valeur personnalisée différente du droit commun
-  const storedBase=Number(localStorage.getItem("BASE_HEBDO_"+currentSuffix));
-  if(!storedBase||storedBase===35){
-    BASE_HEBDO=r.seuil;
-    localStorage.setItem("BASE_HEBDO_"+currentSuffix,BASE_HEBDO);
-    if(baseHebdoInput)baseHebdoInput.value=BASE_HEBDO;
-    if(typeof update==="function")update();
-  }else{
-    // La base perso est déjà set — juste rafraîchir l'affichage
-    if(baseHebdoInput)baseHebdoInput.value=BASE_HEBDO;
-  }
+  // 04/10/2026 : la base suit toujours la convention (le calcul l'impose déjà, cf. updateContingent)
+  BASE_HEBDO=r.seuil;
+  localStorage.setItem("BASE_HEBDO_"+currentSuffix,BASE_HEBDO);
+  if(baseHebdoInput)baseHebdoInput.value=BASE_HEBDO;
+  if(typeof update==="function")update();
 }
+try{ setTimeout(syncBaseHebdoWithCCN,0); }catch(_){}
 window.addEventListener('storage',e=>{if(e.key==='CCN_IDCC'||e.key==='CCN_CUSTOM')syncBaseHebdoWithCCN();});
 
 /* =====================================================
@@ -1871,9 +1876,10 @@ function exportPeriodPDF(){
   y=pdfRecapBox(pdf,y,[
     ["Report précédent",fmtH(rp)],
     ["Heures supplémentaires",fmtH(tExtra)],
+    ...((!pRules.taux_inter&&Number(pRules.taux1)===Number(pRules.taux2))?[["Total à "+pRules.taux1+"%",fmtH(t25+t50)]]:[
     ["Total à "+pRules.taux1+"%",fmtH(t25)],
     ...(pRules.taux_inter?[["Total à "+pRules.taux_inter+"%",fmtH(tInter||0)]]:[]),
-    ["Total à "+pRules.taux2+"%",fmtH(t50)],
+    ["Total à "+pRules.taux2+"%",fmtH(t50)]]),
     ["Absences période",fmtH(tAbs)],
     ...(tCp>0?[["CP comptés travaillés",fmtH(tCp)]]:[]),
     ["Récupérations",fmtH(tR)],
@@ -1925,9 +1931,10 @@ function exportPeriodPDF(){
   // Bloc solde final
   chk(30);
   y=pdfRecapBox(pdf,y,[
+    ...((!pRules.taux_inter&&Number(pRules.taux1)===Number(pRules.taux2))?[[pRules.taux1+"% (×"+coef1.toFixed(2)+")",fmtH((t25+t50)*coef1)]]:[
     [pRules.taux1+"% (×"+coef1.toFixed(2)+")",fmtH(t25*coef1)],
     ...(pRules.taux_inter?[[pRules.taux_inter+"% (×"+coefI.toFixed(2)+")",fmtH((tInter||0)*coefI)]]:[]),
-    [pRules.taux2+"% (×"+coef2.toFixed(2)+")",fmtH(t50*coef2)],
+    [pRules.taux2+"% (×"+coef2.toFixed(2)+")",fmtH(t50*coef2)]]),
     ["Report",fmtH(rp)],
     ["Récupérations","-"+fmtH(tR)],
     ["SOLDE NET",fmtH(net)],
@@ -1987,12 +1994,12 @@ function exportMonthlyFullPDF(){
   const _recap = [
     ["Semaines analysées",weekRows.length],
     ["Heures supplémentaires",fmtH(tExtra)],
-    ["Total à "+mRules.taux1+"%",fmtH(t25)],
+    ["Total à "+mRules.taux1+"%",fmtH((!mRules.taux_inter&&Number(mRules.taux1)===Number(mRules.taux2))?t25+t50:t25)],
   ];
   if(mRules.taux_inter){
     _recap.push(["Total à "+mRules.taux_inter+"%",fmtH(tInter2||0)]);
   }
-  _recap.push(["Total à "+mRules.taux2+"%",fmtH(t50)]);
+  if(!(!mRules.taux_inter&&Number(mRules.taux1)===Number(mRules.taux2))) _recap.push(["Total à "+mRules.taux2+"%",fmtH(t50)]);
   if(inclAbs)_recap.push(["Absences du mois",fmtH(tAbs)]);
   if(inclAbs&&tCp>0)_recap.push(["CP comptés travaillés",fmtH(tCp)]);
   if(inclRec)_recap.push(["Récupérations",fmtH(tR)]);
@@ -2044,9 +2051,10 @@ function exportMonthlyFullPDF(){
 
   chk(26);
   y=pdfRecapBox(pdf,y,[
+    ...((!mRules.taux_inter&&Number(mRules.taux1)===Number(mRules.taux2))?[[mRules.taux1+"% (×"+mCoef1.toFixed(2)+")",fmtH(brut25+brut50)]]:[
     [mRules.taux1+"% (×"+mCoef1.toFixed(2)+")",fmtH(brut25)],
     ...(mRules.taux_inter?[[mRules.taux_inter+"% (×"+mCoefI.toFixed(2)+")",fmtH(brutI2)]]:[]),
-    [mRules.taux2+"% (×"+mCoef2.toFixed(2)+")",fmtH(brut50)],
+    [mRules.taux2+"% (×"+mCoef2.toFixed(2)+")",fmtH(brut50)]]),
     ["Récupérations","-"+fmtH(tR)],
     ["Solde net",fmtH(net)],
   ]);
@@ -2102,6 +2110,8 @@ function exportAnnualPDF(){
     // TODO: stocker tInter séparément dans le calcul annuel
     recapLines.push([`Total à ${aRules.taux_inter}%`, "0h"]);
     recapLines.push([`Total à ${aRules.taux2}%`, fmtH(annualH50)]);
+  } else if ((!aRules.taux_inter&&Number(aRules.taux1)===Number(aRules.taux2))) {
+    recapLines.push([`Total à ${aRules.taux1}%`, fmtH(annualH25+annualH50)]);
   } else {
     // Droit commun : 2 paliers
     recapLines.push([`Total à ${aRules.taux1}%`, fmtH(annualH25)]);
@@ -2691,9 +2701,10 @@ function closeTip(){
     var cpt=h1+hI+h2,ecart=Math.round((ext-cpt)*100)/100;
     var l=[['Heures sup saisies',fmtH(ext)]];
     if(ecart>0.01)l.push(['Heures sup comptées',fmtH(cpt)]);
-    l.push(['Dont majorées à '+r.taux1+' %',fmtH(h1)]);
+    if((!r.taux_inter&&Number(r.taux1)===Number(r.taux2))) l.push(['Dont majorées à '+r.taux1+' %',fmtH(h1+h2)]);
+    else { l.push(['Dont majorées à '+r.taux1+' %',fmtH(h1)]);
     if(r.taux_inter)l.push(['Dont majorées à '+r.taux_inter+' %',fmtH(hI)]);
-    l.push(['Dont majorées à '+r.taux2+' %',fmtH(h2)]);
+    l.push(['Dont majorées à '+r.taux2+' %',fmtH(h2)]); }
     if(rec>0)l.push(['Heures récupérées',fmtH(rec)]);
     if(annualNet>0)l.push(['Solde à payer (majoré)',fmtH(annualNet)]);
     if(localStorage.getItem('ANNUAL_RATE_'+currentSuffix)!==null&&annualRate>0&&annualNet>0)
