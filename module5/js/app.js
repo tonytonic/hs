@@ -67,7 +67,8 @@ function runAnalysis() {
 
   const allWeeks=M5_DataStore.getWeeksSorted(year);
   const last12=M5_DataStore.getLast12Weeks(year);
-  const rule12=CalcEngine.check12WeeksRule(last12,contract.hoursBase);
+  // 04/10/2026 : règle des 12 semaines (L3123-13) non applicable aux employés de maison (L7221-2)
+  const rule12=contract.sansMajoration?{triggered:false,maxConsec:0}:CalcEngine.check12WeeksRule(last12,contract.hoursBase);
   const stats=M5_DataStore.getAnnualStats(year,contract.hoursBase,contract);
 
   // Mode ANNUEL
@@ -153,8 +154,12 @@ function runAnalysis() {
           wbWeeks=all.slice(-16); wbContract=Object.assign({},cc,{_vacLundis:conges});
           // Repères légaux, tous employeurs : 48 h sur une semaine (L3121-20),
           // 44 h en moyenne sur 12 semaines consécutives (L3121-22)
-          const d12=all.slice(-12), moy12=d12.length?d12.reduce((a,w)=>a+w.worked,0)/d12.length:0;
-          cumul={n:ex.length, base:cc.hoursBase, sem48:all.slice(-12).filter(w=>w.worked>48), moy12:Math.round(moy12*100)/100, nb12:d12.length};
+          // 04/10/2026 : heures des contrats IDCC 3239 hors repères du Code (L7221-2)
+          const c39=ex.filter(n=>M5_Contrats.est3239&&M5_Contrats.est3239(n));
+          const legal=w=>Math.round((w.worked-c39.reduce((a,n)=>a+(w.parContrat[n]||0),0))*100)/100;
+          const d12=all.slice(-12), moy12=d12.length?d12.reduce((a,w)=>a+legal(w),0)/d12.length:0;
+          const codeOk=c39.length<ex.length;
+          cumul={n:ex.length, base:cc.hoursBase, sem48:codeOk?all.slice(-12).map(w=>({monday:w.monday,worked:legal(w)})).filter(w=>w.worked>48):[], moy12:codeOk?Math.round(moy12*100)/100:0, nb12:codeOk?d12.length:0, hors3239:c39.length};
         }
       }
     }catch(e){}
@@ -198,9 +203,13 @@ function _weekResultFor(monday){
       { feriesMap, neutraliseFeries: contract.neutraliseFeries===true || contract.neutraliseFeries===undefined, mondayStr:monday, joursOuvresContrat: contract.joursOuvresContrat||5, workedDaysMap:_workedDaysMap(monday,year) });
   }catch(e){ return null; }
 }
+/* 04/10/2026 : contrat chez un particulier employeur (IDCC 3239) : pas de repère 10 h/jour
+   du Code (L7221-2) dans les calendriers. */
+window.M5_est3239=function(){try{const c=M5_Contract.get();return !!(c&&(c.sansMajoration||parseInt(c.idcc,10)===3239));}catch(e){return false;}};
 // Analyse par JOUR d'une semaine : repère les journées > 10h (Art. L3121-18)
 function _dailyFlags(monday, year){
   var out={max:0, count:0, days:[]};
+  if(window.M5_est3239&&window.M5_est3239()) return out; // 04/10/2026 : IDCC 3239, pas de repère 10 h/jour (L7221-2)
   try{
     var wd=M5_DataStore.getWeekDays(monday, year); var arr=(wd&&wd.length)?wd:[];
     for(var i=0;i<arr.length;i++){
@@ -398,9 +407,10 @@ function renderCalendar() {
     } else if(worked!==null) {
       const diff=worked-contract_daily;
       cellClass+= diff>0?' over': diff<-0.5?' under':' normal';
-      if(worked>10) cellClass+=' m5-day-over10';
+      const _o10=worked>10&&!window.M5_est3239();
+      if(_o10) cellClass+=' m5-day-over10';
       hoursHtml=`<span class="m5-cal-day-hours">${window._m5fmtH(worked)}</span>`;
-      if(worked>10) hoursHtml+='<span class="m5-cal-day-warn" title="Plus de 10h — Art. L3121-18">⚠️</span>';
+      if(_o10) hoursHtml+='<span class="m5-cal-day-warn" title="Plus de 10h — Art. L3121-18">⚠️</span>';
       if(diff>0) hoursHtml+=`<span class="m5-cal-day-diff">+${window._m5fmtH(diff)}</span>`;
     }
 
@@ -421,11 +431,11 @@ function renderCalendar() {
   const total=wk.total;
   if(total!==null) {
     const diff=total-contract.hoursBase;
-    const pct35=Math.round(total/35*100);
+    const pct35=Math.round(total/(contract.tempsPlein||35)*100);
     html+=`<div class="m5-cal-total">
       <span>Total semaine</span>
       <span style="font-weight:700;color:${diff>0?'var(--miz-warning)':'var(--miz-success)'}">
-        ${window._m5fmtH(total)} ${diff>0?'(+'+window._m5fmtH(diff)+' comp.)':''}
+        ${window._m5fmtH(total)} ${diff>0?'(+'+window._m5fmtH(diff)+(contract.sansMajoration?' en plus du contrat)':' comp.)'):''}
       </span>
       <span style="font-size:11px;color:var(--miz-text3)">${pct35}% du temps plein</span>
     </div>`;
@@ -718,7 +728,7 @@ function updateWeekPreview() {
 
   const useAvenant=document.getElementById('week-avenant-toggle')?.checked;
   const avenatH=parseFloat(document.getElementById('week-avenant-hours')?.value)||0;
-  const pct35=Math.round(worked/35*100);
+  const pct35=Math.round(worked/(contract.tempsPlein||35)*100);
 
   let result, html='';
 
@@ -757,8 +767,9 @@ function updateWeekPreview() {
 function saveWeeklySaisie() {
   const monday=document.getElementById('week-saisie-monday').value;
   const worked=window._hmVal('week-saisie-hoursH','week-saisie-hoursM');
-  if(!monday||isNaN(worked)||worked<0||worked>=35) {
-    toast('Saisis un total entre 0 et 34,5h.','error'); return;
+  const _maxSem=(M5_Contract.get().tempsPlein>35)?60:35; // 03/10/2026 : IDCC 3239, heures au-delà de 35 h possibles
+  if(!monday||isNaN(worked)||worked<0||worked>=_maxSem) {
+    toast('Saisis un total entre 0 et '+(_maxSem-0.5).toString().replace('.',',')+'h.','error'); return;
   }
   const year=M5_DataStore.getYear();
   M5_DataStore.saveWeekTotal(monday,worked,year);
@@ -847,9 +858,10 @@ function renderWeekSummary(analysis) {
   });
   if(weekResult.totalCompH>0&&contract.hourlyRate>0&&!prevenanceAlert) {
     const _cw=(weekResult.comp1Amount||0)+(weekResult.comp2Amount||0);
-    html+=`<div class="m5-alert info"><span>💰</span><div>Majoration estimée cette semaine : <strong>${_cw.toFixed(2)} € brut</strong> (${window._m5fmtH(weekResult.totalCompH)} comp. × taux majoré). Estimation brute basée sur votre taux horaire contractuel.</div></div>`;
+    html+=`<div class="m5-alert info"><span>💰</span><div>${contract.sansMajoration?'Montant estimé de ces heures':'Majoration estimée cette semaine'} : <strong>${_cw.toFixed(2)} € brut</strong> (${window._m5fmtH(weekResult.totalCompH)} ${contract.sansMajoration?'en plus du contrat':'comp.'} × ${contract.sansMajoration?'taux normal, sans majoration (IDCC 3239)':'taux majoré'}). Estimation brute basée sur votre taux horaire contractuel.</div></div>`;
   }
   el.innerHTML=html;
+  try{ window.M5_majDroitsCard && M5_majDroitsCard(contract); }catch(_){}
 }
 
 // ── Historique ────────────────────────────────────────────────────
@@ -937,9 +949,9 @@ function renderQuickStats(analysis) {
     html+=`<div class="m5-stat-grid">
       <div class="m5-stat"><div class="m5-stat-val">${annualStats.totalWeeks}</div><div class="m5-stat-label">Semaines saisies</div></div>
       <div class="m5-stat"><div class="m5-stat-val ${weeksWithHC>0?'warn':'ok'}">${weeksWithHC}</div><div class="m5-stat-label">Sem. avec HC</div></div>
-      <div class="m5-stat"><div class="m5-stat-val ${r12Cls}" title="Semaines consécutives avec +2h ou plus (Art. L3123-13)">${rule12.maxConsec}</div><div class="m5-stat-label">Consécutives +2h</div></div>
+      ${contract.sansMajoration?'<div class="m5-stat"><div class="m5-stat-val ok" title="Règle des 12 semaines (L3123-13) non applicable aux employés de maison (L7221-2)">—</div><div class="m5-stat-label">Règle 12 sem. : sans objet</div></div>':`<div class="m5-stat"><div class="m5-stat-val ${r12Cls}" title="Semaines consécutives avec +2h ou plus (Art. L3123-13)">${rule12.maxConsec}</div><div class="m5-stat-label">Consécutives +2h</div></div>`}
     </div>
-    ${weeksWithHC>0&&rule12.maxConsec<weeksWithHC?`<div style="font-size:11px;color:var(--miz-text3);padding:4px 2px;">
+    ${weeksWithHC>0&&!contract.sansMajoration&&rule12.maxConsec<weeksWithHC?`<div style="font-size:11px;color:var(--miz-text3);padding:4px 2px;">
       ℹ️ ${weeksWithHC} sem. avec des HC — mais la règle des 12 sem. ne s'applique que si tu dépasses de <strong>+2h ou plus</strong> chaque semaine (Art. L3123-13).
     </div>`:''}`;
   } else {
@@ -981,7 +993,7 @@ function renderWellbeing(analysis) {
     const cu=wb.cumul, f=window._m5fmtH;
     html+=`<div style="background:rgba(108,63,197,0.08);border:1px solid rgba(108,63,197,0.25);border-radius:8px;padding:8px 12px;font-size:11.5px;color:#6c3fc5;margin-bottom:10px;">
       <strong>Cumul de tes ${cu.n} contrats · ${f(cu.base)} prévues par semaine</strong><br>
-      Ta santé dépend de toutes tes heures, tous employeurs confondus. Les heures complémentaires restent calculées contrat par contrat.</div>`;
+      Ta santé dépend de toutes tes heures, tous employeurs confondus. Les heures complémentaires restent calculées contrat par contrat.${cu.hors3239?' Les repères 48 h et 44 h du Code ne comptent pas les heures chez un particulier employeur (IDCC 3239, art. L7221-2).':''}</div>`;
     if(cu.sem48.length){
       html+=`<div style="background:#fdecea;border:1.5px solid #e57373;border-radius:8px;padding:8px 12px;font-size:11.5px;color:#b71c1c;margin-bottom:10px;">
         <strong>⚠️ Plus de 48 h sur ${cu.sem48.length>1?cu.sem48.length+' semaines':'une semaine'}</strong> (${cu.sem48.map(w=>f(w.worked)).join(', ')}), tous contrats réunis.
@@ -1380,7 +1392,7 @@ function renderHistorique() {
     const isVac=w.mode==='vac'||M5_DataStore.isVacWeek(w.monday,year);
     const worked=w.worked||0;
     const diff=Math.max(0,worked-contract.hoursBase);
-    const pct35=Math.round(worked/35*100);
+    const pct35=Math.round(worked/(contract.tempsPlein||35)*100);
     const d=new Date(w.monday+'T12:00:00'),fn=new Date(w.monday+'T12:00:00');
     fn.setDate(fn.getDate()+6); // semaine complète 7 jours
     const label=`${d.getDate()}/${d.getMonth()+1} → ${fn.getDate()}/${fn.getMonth()+1}`;
@@ -1460,7 +1472,7 @@ function renderStats() {
         <div class="m5-alert info" style="margin-bottom:8px;">
           <span>📊</span><div>Seuil mensuel : <strong>${window._m5fmtH(mr.seuilMensuel)}</strong> (${(contract.dureeContrat&&contract.dureeContrat.unite==='M'&&contract.dureeContrat.valeur>0)?'ton contrat : '+String(contract.dureeContrat.valeur).replace('.',',')+' h/mois':contract.hoursBase+'h × 52 / 12'})</div>
         </div>
-        ${mr.totalCompH>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(mr.compH1)} à +${Math.round((contract.rate1||0.10)*100)}%${mr.compH2>0?' | '+window._m5fmtH(mr.compH2)+' à +'+Math.round((contract.rate2||0.25)*100)+'%':''}</div></div>`:''}
+        ${mr.totalCompH>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(mr.compH1)} ${M5_tauxTxt(contract.rate1??0.10)}${mr.compH2>0?' | '+window._m5fmtH(mr.compH2)+' '+M5_tauxTxt(contract.rate2??0.25):''}</div></div>`:''}
       </div></div>`;
   } else if(stats) {
     html+=`<div class="m5-card" style="margin:12px 0;">
@@ -1475,7 +1487,7 @@ function renderStats() {
           <span>⏱️</span><div><strong>${window._m5fmtH(stats.totalComp)}</strong> complémentaires<br>
           <small>Plafond annuel estimé : ${window._m5fmtH(caps.annual)}</small></div>
         </div>
-        ${stats.totalComp1>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(stats.totalComp1)} à +${Math.round((contract.rate1||0.10)*100)}%${stats.totalComp2>0?' | '+window._m5fmtH(stats.totalComp2)+' à +'+Math.round((contract.rate2||0.25)*100)+'%':' | Aucune tranche à 25%'}</div></div>`:''}
+        ${stats.totalComp1>0?`<div class="m5-alert ok"><span>💰</span><div>${window._m5fmtH(stats.totalComp1)} ${M5_tauxTxt(contract.rate1??0.10)}${stats.totalComp2>0?' | '+window._m5fmtH(stats.totalComp2)+' '+M5_tauxTxt(contract.rate2??0.25):(Math.abs((contract.rate1??0.10)-(contract.rate2??0.25))<1e-9?'':' | Aucune heure '+M5_tauxTxt(contract.rate2??0.25))}</div></div>`:''}
       </div></div>`;
   } else {
     html='<div class="m5-empty"><div class="m5-empty-icon">📊</div><div class="m5-empty-text">Aucune semaine saisie pour '+year+'.</div></div>';
@@ -1495,7 +1507,7 @@ function renderStats() {
       const wh=w.worked||0;
       const ratio=maxHours>0?Math.min(wh/maxHours,1):0;
       let bg='rgba(108,63,197,0.08)', border='rgba(108,63,197,0.15)', txt='rgba(255,255,255,0.40)';
-      if(wh>=35){ bg='rgba(220,38,38,0.92)'; border='rgba(185,28,28,1)'; txt='#fff'; }
+      if(wh>((typeof contract!=='undefined'&&contract&&contract.tempsPlein)||34.99)){ bg='rgba(220,38,38,0.92)'; border='rgba(185,28,28,1)'; txt='#fff'; }
       else if(wh>contract.hoursBase){ /* HC : jaune-orange clair, distinct du rouge */ const i=Math.min(Math.round(ratio*255),255); bg=`rgba(251,191,36,${0.55+ratio*0.30})`; border=`rgba(217,119,6,0.85)`; txt='#1f1f1f'; }
       else if(wh>0){ bg=`rgba(16,185,129,${0.25+ratio*0.5})`; border='rgba(16,185,129,0.5)'; txt='#fff'; }
       const d=new Date(w.monday+'T12:00:00');
@@ -1570,10 +1582,10 @@ function openContractModal() {
   // Cap : priorité à la CCN sélectionnée
   let capToShow = c.cap||0.10;
   if(c.idcc>0 && typeof CCN_PARTIEL_API!=='undefined') {
-    const ccnR=CCN_PARTIEL_API.getRules(c.idcc);
+    const ccnR=CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom);
     if(ccnR && ccnR.cap) capToShow=ccnR.cap;
   }
-  document.getElementById('contract-cap').value = capToShow===0.33?'0.33':'0.10';
+  document.getElementById('contract-cap').value = Number(capToShow).toFixed(2);
   document.getElementById('contract-name').value    =(localStorage.getItem('M5_USER_NAME')||localStorage.getItem('SH_PRENOM')||'');
   const startDayEl=document.getElementById('contract-start-day');
   if(startDayEl) startDayEl.value=String(c.weekStartDay||0);
@@ -1659,20 +1671,21 @@ window.setContractUnite=setContractUnite; window.updateContractHoursPreview=upda
 function saveContract() {
   const _uC=_WIZ_UNITES[_contractUnite], _vC=_contractValeur();
   if(!_vC||_vC<=0) { toast('Saisis la durée de ton contrat ('+_uC.ph+').','error'); return; }
-  if(_vC>=_uC.plein) { toast('À partir de '+_uC.pleinTxt+', c\u2019est un temps plein : Mizuki suit les temps partiels.','error'); return; }
+  const _tpCCN=(typeof CCN_PARTIEL_API!=='undefined'&&CCN_PARTIEL_API.getRules(parseInt(document.getElementById('contract-ccn').value)||0,document.getElementById('contract-ccn-search')?.value).tempsPlein)||35;
+  if(_tpCCN===35&&_vC>=_uC.plein) { toast('À partir de '+_uC.pleinTxt+', c\u2019est un temps plein : Mizuki suit les temps partiels.','error'); return; }
   const hoursBase =_contractHebdo();
   const hourlyRate=parseFloat(document.getElementById('contract-rate').value)||0;
   const idcc      =parseInt(document.getElementById('contract-ccn').value)||0;
   const capManuel =parseFloat(document.getElementById('contract-cap').value)||0.10;
   const name      =document.getElementById('contract-name').value.trim();
-  if(!hoursBase||hoursBase<=0||hoursBase>=35) { toast('Saisis une durée entre 1 et 34,5h.','error'); return; }
+  if(!hoursBase||hoursBase<=0||hoursBase>=_tpCCN) { toast('Saisis une durée entre 1 et '+(_tpCCN-0.5).toString().replace('.',',')+'h.','error'); return; }
   // Art. L3123-27 et L3123-7 : 24 h/sem minimum, ou l'équivalent mensuel (104 h) ou sur la période
   // d'aménagement (24/35 de 1 607 h ≈ 1 102 h/an), sauf dérogations (demande du salarié, accord, étudiant…)
   const _min24={S:24,M:104,A:1102}[_contractUnite];
   if(_vC < _min24) {
     toast("⚠️ Moins de 24 h/sem (ou l'équivalent "+(_contractUnite==='S'?'':'sur ton contrat')+") : vérifie qu'une dérogation légale s'applique (art. L3123-7)",'warn');
   }
-  const ccnRules=typeof CCN_PARTIEL_API!=='undefined'?CCN_PARTIEL_API.getRules(idcc):{cap:capManuel,rate1:0.10,rate2:0.25,threshold:0.10};
+  const ccnRules=typeof CCN_PARTIEL_API!=='undefined'?CCN_PARTIEL_API.getRules(idcc,document.getElementById('contract-ccn-search')?.value):{cap:capManuel,rate1:0.10,rate2:0.25,threshold:0.10};
   // Si une CCN est sélectionnée, son cap fait foi — sinon le sélecteur manuel
   const cap = (idcc>0 && ccnRules.cap) ? ccnRules.cap : capManuel;
   const weekStartDay=parseInt(document.getElementById('contract-start-day')?.value||'0');
@@ -1693,7 +1706,7 @@ function saveContract() {
     if(el&&el.value) cloturesDates[m]=el.value;
   }
   M5_Contract.save({hoursBase,hourlyRate,idcc,ccnNom:ccnRules.nom||'Droit commun',cap,
-    rate1:ccnRules.rate1||0.10,rate2:ccnRules.rate2||0.25,threshold:ccnRules.threshold||0.10,
+    rate1:ccnRules.rate1??0.10,rate2:ccnRules.rate2??0.25,threshold:ccnRules.threshold||0.10,
     weekStartDay,exerciceStart,cloturesDates,modeCalcul,neutraliseFeries,
     accordCollectifPrevenance,joursOuvresContrat,
     dureeContrat:{unite:_contractUnite,valeur:_vC},
@@ -1789,7 +1802,7 @@ function launchPDFContrat(n){
     if(!window.M5_Contrats||n===M5_Contrats.active){launchPDF();return;}
     let c={};try{c=JSON.parse(localStorage.getItem(M5_Contrats.keyFor(n,'M5_CONTRACT'))||'{}')||{};}catch(e){}
     if(!c.hoursBase){toast('Ce contrat n\'est pas configuré','error');return;}
-    try{if(c.idcc>0&&window.CCN_PARTIEL_API)c.cap=CCN_PARTIEL_API.getRules(c.idcc).cap||c.cap;}catch(e){}
+    try{if(c.idcc>0&&window.CCN_PARTIEL_API)c.cap=CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom).cap||c.cap;}catch(e){}
     const year=M5_DataStore.getYear(),y0=parseInt(year,10),periode=document.getElementById('pdf-periode')?.value||'ANNUEL';
     const cum=M5_Contrats.semainesCumul([String(y0-1),String(y0),String(y0+1)],M5_Contract.get().weekStartDay||0)
       .filter(w=>w.parContrat[n]>0).map(w=>({monday:w.monday,worked:w.parContrat[n]}));
@@ -1873,7 +1886,7 @@ function launchPDFCommun(){
     const sem=filterWeeksByPeriode(all,periode,year).filter(w=>w.worked>0);
     const contrats=M5_Contrats.existing().map(n=>{
       let c={};try{c=JSON.parse(localStorage.getItem(M5_Contrats.keyFor(n,'M5_CONTRACT'))||'{}')||{};}catch(e){}
-      let cap=c.cap||0.10;try{if(c.idcc>0&&window.CCN_PARTIEL_API)cap=CCN_PARTIEL_API.getRules(c.idcc).cap||cap;}catch(e){}
+      let cap=c.cap||0.10;try{if(c.idcc>0&&window.CCN_PARTIEL_API)cap=CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom).cap||cap;}catch(e){}
       const ws=sem.filter(w=>w.parContrat[n]>0).map(w=>({monday:w.monday,worked:w.parContrat[n]}));
       const pay=_m5PayePeriode(c,ws,M5_Contrats.keyFor(n,'M5_HC_PAID'));
       return {n,nom:M5_Contrats.nom(n),c,cap,heures:ws.reduce((a,w)=>a+w.worked,0),du10:pay.du10,du25:pay.du25,paye10:pay.paye10,paye25:pay.paye25};
@@ -1906,27 +1919,59 @@ function searchCCN(term) {
       onmouseenter="this.style.background='rgba(109,40,217,0.20)'"
       onmouseleave="this.style.background=''">
       <span style="font-weight:600;color:#E9D5FF;">${ccn.n}</span>
-      <span style="font-size:11px;color:#A78BFA;">${ccn.s} — IDCC ${ccn.i} — plafond <strong style="color:#DDD6FE;">${ccn.cap===0.33?'33%':'10%'}</strong></span>
+      <span style="font-size:11px;color:#A78BFA;">${ccn.s} — IDCC ${ccn.i}${ccn.renvoi?' (remplace l\'ex-IDCC '+ccn.renvoi+')':''} — plafond <strong style="color:#DDD6FE;">${CCN_PARTIEL_API.capLabel(ccn.cap,true)}</strong></span>
     </div>`).join('');
 }
+
+/* 03/10/2026 : carte « Tes droits » de l'accueil selon la convention du contrat */
+window.M5_majDroitsCard=function(c){
+  const g=document.querySelector('.acc-droits-grid'); if(!g||!c) return;
+  const it=g.querySelectorAll('.acc-droit-item span:last-child'); if(it.length<3) return;
+  if(c.sansMajoration){
+    const tp=c.tempsPlein||40;
+    it[0].innerHTML='Pas de plafond : heures en plus jusqu\'à <strong>'+tp+'h</strong>';
+    it[1].innerHTML='<strong>Taux normal</strong> (sauf contrat) · au-delà de '+tp+'h : '+(tp===45?'<strong>au moins +10%</strong>':'<strong>+25%</strong> puis <strong>+50%</strong>');
+    it[2].innerHTML='Temps plein : <strong>'+tp+'h</strong> (IDCC 3239)';
+  } else {
+    const cap=Math.round((c.cap||0.10)*100), r1=Math.round((c.rate1??0.10)*100), r2=Math.round((c.rate2??0.25)*100);
+    it[0].innerHTML='Plafond <strong>'+cap+'%</strong> du contrat'+(c.idcc>0?' (ta convention)':' (droit commun)');
+    it[1].innerHTML=r1===r2?'Majoration <strong>+'+r1+'%</strong> pour chaque heure':'Majoration <strong>+'+r1+'%</strong> puis <strong>+'+r2+'%</strong>';
+  }
+};
+
+try{ document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{ try{ M5_majDroitsCard(M5_Contract.get()); }catch(_){} },300)); }catch(_){}
+
+/* 03/10/2026 : encart propre à une convention (IDCC 3239 : employés de maison) */
+window.M5_encartCCN=function(idcc,nom){
+  if(parseInt(idcc,10)!==3239) return '';
+  if(/maternel/i.test(nom||'')) return `<div class="m5-alert warn" style="margin-top:8px;font-size:12px;line-height:1.45;text-align:left;"><span>🧸</span><div>
+    <strong>Assistant(e) maternel(le) (IDCC 3239)</strong> — Les règles du Code du travail sur le temps partiel ne s'appliquent pas à ton emploi.
+    Les heures en plus de ton contrat, jusqu'à <strong>45 h par semaine</strong>, sont des heures complémentaires : elles ne sont majorées que si ton contrat le prévoit (art. 110.2). Mizuki les compte donc sans majoration et sans plafond.
+    Au-delà de 45 h, ce sont des heures majorées, au taux fixé dans ton contrat, <strong>au moins +10 %</strong> (art. 110.1).</div></div>`;
+  return `<div class="m5-alert warn" style="margin-top:8px;font-size:12px;line-height:1.45;text-align:left;"><span>🏠</span><div>
+    <strong>Particuliers employeurs (IDCC 3239)</strong> — Les règles du Code du travail sur le temps partiel ne s'appliquent pas à ton emploi (art. L7221-2).
+    Les heures en plus de ton contrat, jusqu'à <strong>40 h par semaine</strong>, sont payées au <strong>taux normal</strong>, sauf si ton contrat prévoit une majoration : Mizuki les compte donc sans majoration et sans plafond.
+    Au-delà de 40 h (en moyenne sur 8 semaines), ce sont des heures supplémentaires : +25 % jusqu'à 48 h, puis +50 % (art. 147). Si tu dépasses souvent 40 h, utilise plutôt le module heures mensualisées.
+    <br><em>Assistant(e) maternel(le) : choisis l'entrée « Assistant(e) maternel(le) » de la convention 3239.</em></div></div>`;
+};
 
 function selectCCN(idcc, nom, secteur) {
   document.getElementById('contract-ccn').value=idcc;
   document.getElementById('contract-ccn-search').value=nom;
   const sel=document.getElementById('contract-ccn-selected');
   if(sel) {
-    const rules=typeof CCN_PARTIEL_API!=='undefined'?CCN_PARTIEL_API.getRules(idcc):null;
-    const capTxt=rules&&rules.cap===0.33?'33% (accord de branche)':'10% (droit commun)';
+    const rules=typeof CCN_PARTIEL_API!=='undefined'?CCN_PARTIEL_API.getRules(idcc,nom):null;
+    const capTxt=rules?CCN_PARTIEL_API.capLabel(rules.cap):'10% (droit commun)';
     sel.innerHTML=`<strong style="color:#E9D5FF;">✓ ${nom}</strong><br>
-      <span style="font-size:11px;color:#A78BFA;">IDCC ${idcc} · Plafond <strong style="color:#DDD6FE;">${capTxt}</strong></span>`;
+      <span style="font-size:11px;color:#A78BFA;">IDCC ${idcc} · Plafond <strong style="color:#DDD6FE;">${capTxt}</strong></span>${window.M5_encartCCN?M5_encartCCN(idcc,nom):''}`;
   }
   const res=document.getElementById('contract-ccn-results');
   if(res) res.style.display='none';
   // Auto-appliquer le plafond si CCN a un accord étendu
   if(typeof CCN_PARTIEL_API!=='undefined') {
-    const rules=CCN_PARTIEL_API.getRules(idcc);
+    const rules=CCN_PARTIEL_API.getRules(idcc,nom);
     const capEl=document.getElementById('contract-cap');
-    if(capEl && rules.cap) capEl.value=String(rules.cap);
+    if(capEl && rules.cap) capEl.value=Number(rules.cap).toFixed(2);
   }
 }
 
@@ -2277,7 +2322,7 @@ function _wizPrefillMenu(){
     if(window.M5_Contrats&&M5_Contrats.active!==1) return;
     const idcc=parseInt(localStorage.getItem('CCN_IDCC')||'0',10);
     if(!idcc||typeof CCN_PARTIEL_API==='undefined') return;
-    const x=CCN_PARTIEL_API.getById(idcc); if(!x) return;
+    const x=CCN_PARTIEL_API.getById(idcc,localStorage.getItem('CCN_NOM')); if(!x) return;
     wizPickCCN(x.i,x.n,x.s,x.cap);
   }catch(e){}
 }
@@ -2294,8 +2339,8 @@ function M5_ccnDuMenu(){
     const c=M5_Contract.get();
     localStorage.setItem('M5_CCN_MENU',String(idcc));
     if(!c.hoursBase||(c.idcc&&c.idcc>0)) return;
-    const r=CCN_PARTIEL_API.getRules(idcc);
-    M5_Contract.save({...c,idcc,ccnNom:r.nom,cap:r.cap,rate1:r.rate1||0.10,rate2:r.rate2||0.25,threshold:r.threshold||0.10});
+    const r=CCN_PARTIEL_API.getRules(idcc,localStorage.getItem('CCN_NOM'));
+    M5_Contract.save({...c,idcc,ccnNom:r.nom,cap:r.cap,rate1:r.rate1??0.10,rate2:r.rate2??0.25,threshold:r.threshold||0.10});
     setTimeout(()=>toast('Ta convention collective est reprise du menu : '+r.nom,'success',4000),900);
   }catch(e){}
 }
@@ -2349,7 +2394,9 @@ function _wizHeuresHebdo(){
 function _wizHeuresErreur(){
   const v=_wizValeurSaisie(), u=_WIZ_UNITES[_wizUnite];
   if(!v||v<=0) return 'Saisis tes heures contractuelles ('+u.ph+')';
-  if(v>=u.plein) return 'À partir de '+u.pleinTxt+', c\u2019est un temps plein : Mizuki suit les temps partiels.';
+  let _tp=35; try{ if(_wizCCN&&typeof CCN_PARTIEL_API!=='undefined') _tp=CCN_PARTIEL_API.getRules(_wizCCN.i,_wizCCN.n).tempsPlein||35; }catch(_){}
+  const _plein=_tp===35?u.plein:(_wizUnite==='M'?_tp*52/12:_wizUnite==='A'?_tp*52:_tp);
+  if(v>=_plein) return 'À partir de '+(_tp===35?u.pleinTxt:(Math.round(_plein*100)/100).toString().replace('.',',')+' h'+(_wizUnite==='S'?' par semaine':_wizUnite==='M'?' par mois':' par an'))+', c\u2019est un temps plein : Mizuki suit les temps partiels.';
   return '';
 }
 function wizSetUnite(u){
@@ -2393,7 +2440,7 @@ function wizSearchCCN(term) {
     <div onclick="wizPickCCN(${ccn.i},'${ccn.n.replace(/'/g,"\'")}','${ccn.s}',${ccn.cap})"
       style="padding:10px 12px;font-size:13px;cursor:pointer;border-bottom:1px solid rgba(167,139,250,0.15);">
       <div style="font-weight:600;color:#E9D5FF;">${ccn.n}</div>
-      <div style="font-size:11px;color:#A78BFA;">${ccn.s} — plafond <strong style="color:#DDD6FE;">${ccn.cap===0.33?'33%':'10%'}</strong></div>
+      <div style="font-size:11px;color:#A78BFA;">${ccn.s}${ccn.renvoi?' — IDCC 3239, remplace l\'ex-IDCC '+ccn.renvoi:''} — plafond <strong style="color:#DDD6FE;">${CCN_PARTIEL_API.capLabel(ccn.cap,true)}</strong></div>
     </div>`).join('');
 }
 
@@ -2407,7 +2454,7 @@ function wizPickCCN(idcc, nom, secteur, cap) {
   if(sel) {
     sel.style.display='block';
     sel.innerHTML=`<strong style="color:#E9D5FF;">${nom}</strong><br>
-      <span style="font-size:11px;color:#A78BFA;">Plafond HC : <strong style="color:#DDD6FE;">${cap===0.33?'33% (accord de branche)':'10% (droit commun)'}</strong></span>`;
+      <span style="font-size:11px;color:#A78BFA;">Plafond HC : <strong style="color:#DDD6FE;">${CCN_PARTIEL_API.capLabel(cap)}</strong></span>${window.M5_encartCCN?M5_encartCCN(idcc,nom):''}`;
   }
 }
 
@@ -2445,7 +2492,7 @@ function _wizUpdateSummary() {
   const _u=_WIZ_UNITES[_wizUnite];
   const _dur=_wizUnite==='S'?`${window._m5fmtH(h)}/semaine`:`${window._m5fmtH(_wizValeurSaisie())}/${_u.court} (≈ ${window._m5fmtH(h)}/semaine)`;
   _set('wiz-sum-hours', `⏱️ Contrat : <strong>${_dur}</strong>${rate>0?' · '+rate.toFixed(2)+' €/h':''}`);
-  _set('wiz-sum-ccn',   `🏢 CCN : <strong>${_wizCCN?_wizCCN.n+' ('+Math.round(_wizCCN.cap*100)+'%)':'Droit commun (10%)'}</strong>`);
+  _set('wiz-sum-ccn',   `🏢 CCN : <strong>${_wizCCN?_wizCCN.n+' ('+CCN_PARTIEL_API.capLabel(_wizCCN.cap,true)+')':'Droit commun (10%)'}</strong>`);
   _set('wiz-sum-mode',  `📅 Mode : <strong>${modeLbls[_wizMode]||_wizMode}</strong>`);
   _set('wiz-sum-feries',`🎌 Fériés : <strong>${_wizNeutraliseFeries?"Neutralisés (L3133-3 + jurisprudence)":"Dans l'assiette (accord spécifique)"}</strong>`);
   if(exercice) _set('wiz-sum-exercice',`📆 Début exercice : <strong>${new Date(exercice+'T12:00:00').toLocaleDateString('fr-FR')}</strong>`);
@@ -2514,7 +2561,7 @@ function wizFinish() {
   const name=(document.getElementById('wiz-name')?.value||'').trim();
   const startDay=parseInt(document.getElementById('wiz-start-day')?.value||'0');
   const joursOuvresContrat=Math.max(1,Math.min(7,parseInt(document.getElementById('wiz-jours-ouvres')?.value||'5')||5));
-  const ccnRules=_wizCCN?CCN_PARTIEL_API.getRules(_wizCCN.i):{cap:0.10,rate1:0.10,rate2:0.25,threshold:0.10,nom:'Droit commun'};
+  const ccnRules=_wizCCN?CCN_PARTIEL_API.getRules(_wizCCN.i,_wizCCN.n):{cap:0.10,rate1:0.10,rate2:0.25,threshold:0.10,nom:'Droit commun'};
   // Récupérer les 12 clôtures
   const cloturesDates={};
   if(_wizClotureMode==='auto') {
@@ -2543,8 +2590,8 @@ function wizFinish() {
     idcc:_wizCCN?_wizCCN.i:0,
     ccnNom:_wizCCN?_wizCCN.n:'Droit commun',
     cap:ccnRules.cap||0.10,
-    rate1:ccnRules.rate1||0.10,
-    rate2:ccnRules.rate2||0.25,
+    rate1:ccnRules.rate1??0.10,
+    rate2:ccnRules.rate2??0.25,
     threshold:ccnRules.threshold||0.10,
     weekStartDay:startDay,
     joursOuvresContrat:joursOuvresContrat,
@@ -2657,7 +2704,7 @@ window.exportDataJSON=exportDataJSON; window.importDataJSON=importDataJSON;
 function quickSave(hours) {
   try {
     if(window.M5_isDayLocked&&window.M5_isDayLocked(calendarMonday)){ toast('Période verrouillée 🔒 — déverrouille-la pour saisir','info'); return; }
-    if(!hours||isNaN(hours)||hours<=0||hours>=35) return;
+    if(!hours||isNaN(hours)||hours<=0||hours>=((M5_Contract.get().tempsPlein>35)?60:35)) return;
     const year=M5_DataStore.getYear();
     M5_DataStore.saveWeekTotal(calendarMonday, hours, year);
     Mizuki.clearCache();
@@ -3005,11 +3052,12 @@ document.addEventListener('DOMContentLoaded',()=>{
   window._m5UpdateNet=function(){
     var card=document.getElementById('m5-solde-card'); if(!card) return;
     var due10=+card.getAttribute('data-due10')||0, due25=+card.getAttribute('data-due25')||0;
-    var rate=+card.getAttribute('data-rate')||0, r1=+card.getAttribute('data-r1')||0.10, r2=+card.getAttribute('data-r2')||0.25;
+    var rate=+card.getAttribute('data-rate')||0, r1=(card.getAttribute('data-r1')!=null?+card.getAttribute('data-r1'):0.10), r2=(card.getAttribute('data-r2')!=null?+card.getAttribute('data-r2'):0.25);
     var p=_getPaid(_periodKey());
     var n10=Math.max(0,due10-p.h10), n25=Math.max(0,due25-p.h25), nT=Math.round((n10+n25)*100)/100;
     function set(id,t){ var e=document.getElementById(id); if(e) e.textContent=t; }
-    set('m5-rep-10',_fmtH(n10)); set('m5-rep-25',_fmtH(n25));
+    if(card.getAttribute('data-uni')==='1') set('m5-rep-10',_fmtH(nT)); // 04/10/2026 : une seule tranche affichée
+    else { set('m5-rep-10',_fmtH(n10)); set('m5-rep-25',_fmtH(n25)); }
     set('m5-net-h',_fmtH(nT)); set('m5-hdr-net',_fmtH(nT));
     var eEl=document.getElementById('m5-net-eur');
     if(eEl) eEl.textContent = rate>0 ? ((n10*rate*(1+r1)+n25*rate*(1+r2)).toFixed(2)+' €') : '—';
@@ -3024,6 +3072,22 @@ document.addEventListener('DOMContentLoaded',()=>{
     m[k][tranche]=Math.round((h+min/60)*100)/100;
     try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(m)); }catch(e){}
   }
+  /* 04/10/2026 : taux égaux (ex. 3239 : taux normal / taux normal) → un seul champ « payé ».
+     Le total saisi est réparti d'abord sur la 1re tranche (jusqu'à son dû), le reste sur la 2e :
+     les reports par tranche restent justes. */
+  function _savePaidUni(part, v){
+    var card=document.getElementById('m5-solde-card');
+    var due10=card?(+card.getAttribute('data-due10')||0):0;
+    var m=_getPaidMap(), k=_periodKey(); if(!m[k]||typeof m[k]!=='object') m[k]={};
+    var cur=(+m[k].h10||0)+(+m[k].h25||0), h=Math.floor(cur+1e-9), min=Math.round((cur-h)*60); if(min===60){h++;min=0;}
+    if(part==='h') h=Math.max(0,parseInt(String(v),10)||0);
+    else min=Math.max(0,Math.min(59,parseInt(String(v),10)||0));
+    var tot=Math.round((h+min/60)*100)/100, a10=Math.min(tot,due10);
+    m[k].h10=Math.round(a10*100)/100; m[k].h25=Math.round((tot-a10)*100)/100;
+    try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(m)); }catch(e){}
+  }
+  window.M5setHCPaidUh=function(v){ _savePaidUni('h',v); window._m5UpdateNet(); };
+  window.M5setHCPaidUm=function(v){ _savePaidUni('m',v); window._m5UpdateNet(); };
   window.M5setHCPaid10h=function(v){ _savePaidHM('h10','h',v); window._m5UpdateNet(); };
   window.M5setHCPaid10m=function(v){ _savePaidHM('h10','m',v); window._m5UpdateNet(); };
   window.M5setHCPaid25h=function(v){ _savePaidHM('h25','h',v); window._m5UpdateNet(); };
@@ -3031,7 +3095,19 @@ document.addEventListener('DOMContentLoaded',()=>{
   // Paiement au niveau de la PÉRIODE (vue mois) : le champ représente le total payé
   // de la période ; on ajuste la semaine de début pour atteindre ce total (les
   // paiements déjà saisis par semaine en vue semaine sont conservés).
-  window.M5setHCPaidPeriode=function(debutStr, finStr, tranche, part, v){
+  window.M5setHCPaidPeriode=function(debutStr, finStr, tranche, part, v, due10){
+    if(tranche==='u'){ // 04/10/2026 : taux égaux, un seul champ pour la période
+      var pmU=_getPaidMap(), t={h10:0,h25:0}, dk={h10:0,h25:0};
+      Object.keys(pmU).forEach(function(k){ if(k.indexOf('week:')===0){ var md=k.slice(5); if(md>=debutStr && md<=finStr){ ['h10','h25'].forEach(function(tr){ var val=+((pmU[k]||{})[tr])||0; t[tr]+=val; if(md===debutStr) dk[tr]=val; }); } } });
+      var curU=t.h10+t.h25, hU=Math.floor(curU+1e-9), mU=Math.round((curU-hU)*60); if(mU===60){hU++;mU=0;}
+      if(part==='h') hU=Math.max(0,parseInt(String(v),10)||0); else mU=Math.max(0,Math.min(59,parseInt(String(v),10)||0));
+      var totU=Math.round((hU+mU/60)*100)/100, a10=Math.min(totU, Math.max(0,+due10||0)), alloc={h10:a10,h25:totU-a10};
+      var kU='week:'+debutStr; if(!pmU[kU]||typeof pmU[kU]!=='object') pmU[kU]={};
+      ['h10','h25'].forEach(function(tr){ var other=t[tr]-dk[tr]; pmU[kU][tr]=Math.max(0, Math.round((alloc[tr]-other)*100)/100); });
+      try{ localStorage.setItem(M5_key('M5_HC_PAID'), JSON.stringify(pmU)); }catch(e){}
+      if(window.M5_refreshUI) requestAnimationFrame(window.M5_refreshUI);
+      return;
+    }
     var pm=_getPaidMap(), total=0, dkPaid=0;
     Object.keys(pm).forEach(function(k){ if(k.indexOf('week:')===0){ var md=k.slice(5); if(md>=debutStr && md<=finStr){ var val=+((pm[k]||{})[tranche])||0; total+=val; if(md===debutStr) dkPaid=val; } } });
     var other=Math.round((total-dkPaid)*100)/100;
@@ -3103,7 +3179,7 @@ document.addEventListener('DOMContentLoaded',()=>{
         +'<div style="display:flex;align-items:center;gap:9px;"><span style="font-size:15px;font-weight:800;color:#8FD3E0;">'+_fmtH(totP)+'</span>'
         +'<span id="m5-persolde-chev" style="color:#C4A8FF;font-size:13px;transition:transform .2s;transform:'+(open?'rotate(180deg)':'')+';">▾</span></div></div>';
       var body='<div id="m5-persolde-body" style="display:'+(open?'':'none')+';margin-top:11px;">'
-        +'<div style="display:flex;gap:7px;">'+tile(totP,'Total période','#8FD3E0')+tile(s.comp10,'à +'+Math.round(r1*100)+'%','#FFC24B')+tile(s.comp25,'à +'+Math.round(r2*100)+'%','#FF7A59')+'</div>'
+        +'<div style="display:flex;gap:7px;">'+tile(totP,'Total période','#8FD3E0')+(Math.abs(r1-r2)<1e-9?tile(s.comp10+s.comp25,M5_tauxTxt(r1),'#FFC24B'):tile(s.comp10,M5_tauxTxt(r1),'#FFC24B')+tile(s.comp25,M5_tauxTxt(r2),'#FF7A59'))+'</div>'
         +'<div style="display:flex;justify-content:space-between;margin-top:11px;font-size:13px;color:rgba(255,255,255,0.82);"><span>Report précédent</span><b>'+_fmtH(repP)+'</b></div>'
         +'<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:13px;color:rgba(255,255,255,0.82);"><span>Payées (période)</span><b>'+_fmtH(Math.round((s.paid10+s.paid25)*100)/100)+'</b></div>'
         +'<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:9px;border-top:1px solid rgba(196,168,255,0.18);">'
@@ -3120,6 +3196,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   // chaque semaine avec ses propres cases de paiement (clé par semaine, sans ambiguïté).
   function _m5PeriodeWeeksCard(c, rate, r1, r2){
     var per=_currentPeriodBounds(); if(!per||!per.debutStr) return '';
+    var uni=Math.abs(r1-r2)<1e-9, L1=M5_tauxTxt(r1), L2=M5_tauxTxt(r2); // 04/10/2026 : libellés réels (taux normal en 3239)
     var rep=_computeHebdoReport(c, per.debutStr);
     var pm=_getPaidMap();
     var wks=_allWeeksRaw().filter(function(w){ return w.monday>=per.debutStr && w.monday<=per.finStr; });
@@ -3151,20 +3228,20 @@ document.addEventListener('DOMContentLoaded',()=>{
       var lbl='Sem. '+startTxt+' → '+JC[dowE]+' '+e.getDate()+' '+MOISC[e.getMonth()];
       return '<div style="background:rgba(255,255,255,0.06);border-radius:9px;padding:8px 11px;margin-top:7px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">'
         +'<span style="font-weight:700;font-size:12px;color:'+C_TXT+';">'+lbl+'</span>'
-        +'<span style="font-size:12px;"><b style="color:#FFC24B;">+10% '+_fmtH(w.g10)+'</b> &nbsp; <b style="color:#FF9B8A;">+25% '+_fmtH(w.g25)+'</b></span></div>';
+        +'<span style="font-size:12px;">'+(uni?'<b style="color:#FFC24B;">'+_fmtH(w.g10+w.g25)+' '+L1+'</b>':'<b style="color:#FFC24B;">'+_fmtH(w.g10)+' '+L1+'</b> &nbsp; <b style="color:#FF9B8A;">'+_fmtH(w.g25)+' '+L2+'</b>')+'</span></div>';
     }
     // Champ de paiement AU NIVEAU DE LA PÉRIODE (toujours présent, toujours éditable)
-    function periodPaid(tranche, paidVal, color, label){
+    function periodPaid(tranche, paidVal, color, label, d10){
       var _ph=Math.floor((paidVal||0)+1e-9), _pm=Math.round(((paidVal||0)-_ph)*60); if(_pm===60){_ph++;_pm=0;}
       var st='width:38px;padding:4px;border:1px solid rgba(255,255,255,0.3);border-radius:7px;text-align:center;font-size:12.5px;background:#fff;color:#18102E;';
       return '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:7px;font-size:12.5px;color:'+C_SUB+';gap:8px;flex-wrap:wrap;">'
         +'<span>On m\'a payé <b style="color:'+color+';">'+label+'</b> :</span>'
-        +'<span><input type="number" inputmode="numeric" min="0" value="'+(paidVal?_ph:'')+'" placeholder="0" onchange="window.M5setHCPaidPeriode(\''+per.debutStr+'\',\''+per.finStr+'\',\''+tranche+'\',\'h\',this.value)" style="'+st+'">h '
-        +'<input type="number" inputmode="numeric" min="0" max="59" value="'+(paidVal?String(_pm).padStart(2,"0"):'')+'" placeholder="00" onchange="window.M5setHCPaidPeriode(\''+per.debutStr+'\',\''+per.finStr+'\',\''+tranche+'\',\'m\',this.value)" style="'+st+'">min</span></div>';
+        +'<span><input type="number" inputmode="numeric" min="0" value="'+(paidVal?_ph:'')+'" placeholder="0" onchange="window.M5setHCPaidPeriode(\''+per.debutStr+'\',\''+per.finStr+'\',\''+tranche+'\',\'h\',this.value,'+(+d10||0)+')" style="'+st+'">h '
+        +'<input type="number" inputmode="numeric" min="0" max="59" value="'+(paidVal?String(_pm).padStart(2,"0"):'')+'" placeholder="00" onchange="window.M5setHCPaidPeriode(\''+per.debutStr+'\',\''+per.finStr+'\',\''+tranche+'\',\'m\',this.value,'+(+d10||0)+')" style="'+st+'">min</span></div>';
     }
     var euroBtn='<button id="m5-euro-btn" onclick="event.stopPropagation();window.M5toggleEuro()" style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:9px;border:1px solid rgba(255,255,255,0.28);background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;white-space:nowrap;">'+(shown?'🙈 Masquer €':'👁️ Afficher €')+'</button>';
     var repLine=(rep.h10>0||rep.h25>0)
-      ? '<div style="display:flex;justify-content:space-between;font-size:12px;color:'+C_REP+';margin-top:8px;"><span>Report précédent</span><b>'+_fmtH(rep.h10)+' (+10%) · '+_fmtH(rep.h25)+' (+25%)</b></div>'
+      ? '<div style="display:flex;justify-content:space-between;font-size:12px;color:'+C_REP+';margin-top:8px;"><span>Report précédent</span><b>'+(uni?_fmtH(rep.h10+rep.h25)+' ('+L1+')':_fmtH(rep.h10)+' ('+L1+') · '+_fmtH(rep.h25)+' ('+L2+')')+'</b></div>'
       : '';
     var rowsHtml=rows.length? rows.map(weekBlock).join('') : '<div style="font-size:12px;color:'+C_SUB+';margin-top:8px;">Aucune heure comp. saisie dans cette période. Tu peux quand même enregistrer un paiement du report ci-dessous.</div>';
     var body=''
@@ -3173,8 +3250,8 @@ document.addEventListener('DOMContentLoaded',()=>{
       +repLine
       +rowsHtml
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.18);font-size:12.5px;color:'+C_TXT+';font-weight:700;"><span>Total dû (brut) : '+_fmtH(due10+due25)+'</span><span>'+eur(due10*rate*(1+r1)+due25*rate*(1+r2))+'</span></div>'
-      +periodPaid('h10',paid10,'#FFC24B','+10%')
-      +periodPaid('h25',paid25,'#FF9B8A','+25%')
+      +(uni ? periodPaid('u',paid10+paid25,'#FFC24B',L1,due10)
+            : periodPaid('h10',paid10,'#FFC24B',L1)+periodPaid('h25',paid25,'#FF9B8A',L2))
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:9px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.18);font-size:14px;font-weight:800;color:'+C_TXT+';"><span>💰 Reste à payer (net) : '+_fmtH(net10+net25)+'</span><span class="m5-euro-val'+blur+'">'+(rate>0?(eT.toFixed(2)+' €'):'—')+'</span></div>';
     var head='<div onclick="window.M5toggleSolde()" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 13px;cursor:pointer;user-select:none;">'
       +'<span style="font-size:12.5px;font-weight:800;color:'+C_TXT+';">💠 Heures comp. — semaine par semaine <span style="font-weight:500;color:'+C_SUB+';">(reste '+_fmtH(net10+net25)+')</span></span>'
@@ -3193,6 +3270,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       due10=Math.round((rep.h10+hc10)*100)/100; due25=Math.round((rep.h25+hc25)*100)/100;
       dtl10='report '+_fmtH(rep.h10)+' + période '+_fmtH(hc10); dtl25='report '+_fmtH(rep.h25)+' + période '+_fmtH(hc25);
       suffix='report par période';
+      var _dtlU='report '+_fmtH(rep.h10+rep.h25)+' + période '+_fmtH(hc10+hc25);
     } else if(_mode()==='HEBDO'){
       var wr=analysis.weekResult||{}, whc10=wr.compH1||0, whc25=wr.compH2||0;
       var cm=(window.M5_getCalMonday&&window.M5_getCalMonday())||'';
@@ -3200,6 +3278,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       due10=Math.round((wrep.h10+whc10)*100)/100; due25=Math.round((wrep.h25+whc25)*100)/100;
       dtl10='report '+_fmtH(wrep.h10)+' + semaine '+_fmtH(whc10); dtl25='report '+_fmtH(wrep.h25)+' + semaine '+_fmtH(whc25);
       suffix='semaine par semaine';
+      var _dtlU='report '+_fmtH(wrep.h10+wrep.h25)+' + semaine '+_fmtH(whc10+whc25);
     } else if(_mode()==='ANNUEL' && analysis.annuelResult){
       var ar=analysis.annuelResult, obj=+ar.objectifAnnuel||0, reel=+ar.reelCumule||0;
       var over=Math.max(0, reel-obj), thr=(c.threshold!=null?c.threshold:0.10);
@@ -3210,6 +3289,9 @@ document.addEventListener('DOMContentLoaded',()=>{
     } else { return ''; }
     var e10=due10*rate*(1+r1), e25=due25*rate*(1+r2), eT=e10+e25;
     var p=_getPaid(_periodKey()), out10=Math.max(0,due10-p.h10), out25=Math.max(0,due25-p.h25);
+    // 04/10/2026 : libellés réels (« au taux normal » en 3239) et une seule ligne si les taux sont égaux
+    var uni=Math.abs(r1-r2)<1e-9, L1=M5_tauxTxt(r1), L2=M5_tauxTxt(r2);
+    var dtlU=(typeof _dtlU==='string')?_dtlU:dtl10;
     var shown=localStorage.getItem('M5_EURO_SHOWN')==='1', blur=shown?'':' m5-blur';
     var open=localStorage.getItem('M5_SOLDE_OPEN')==='1';
     var C_TXT='#ffffff', C_SUB='rgba(255,255,255,0.62)', C_REP='#CDB8FF';
@@ -3226,13 +3308,14 @@ document.addEventListener('DOMContentLoaded',()=>{
     var body=''
       +'<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><span style="font-size:11px;color:'+C_SUB+';">Non payées → reportées, tranche conservée.</span>'+euroBtn+'</div>'
       +(rate>0?'':'<div style="font-size:11.5px;color:'+C_SUB+';margin-top:4px;">💡 Renseigne ton <b>taux horaire</b> (⚙️) pour voir les montants.</div>')
-      +row('à +10 %','#FFC24B',dtl10,due10,eur(e10),p.h10,out10,'window.M5setHCPaid10','m5-rep-10')
-      +row('à +25 %','#FF9B8A',dtl25,due25,eur(e25),p.h25,out25,'window.M5setHCPaid25','m5-rep-25')
+      +(uni ? row(L1,'#FFC24B',dtlU,due10+due25,eur(e10+e25),p.h10+p.h25,out10+out25,'window.M5setHCPaidU','m5-rep-10')
+            : row(L1,'#FFC24B',dtl10,due10,eur(e10),p.h10,out10,'window.M5setHCPaid10','m5-rep-10')
+             +row(L2,'#FF9B8A',dtl25,due25,eur(e25),p.h25,out25,'window.M5setHCPaid25','m5-rep-25'))
       +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.18);font-size:12px;color:'+C_SUB+';"><span>Total généré (brut) : '+_fmtH(due10+due25)+'</span><span>'+eur(eT)+'</span></div>'+'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;font-size:14px;font-weight:800;color:'+C_TXT+';"><span>💰 Reste à payer (net) : <span id="m5-net-h">'+_fmtH(out10+out25)+'</span></span><span id="m5-net-eur" class="m5-euro-val'+blur+'">'+(rate>0?((out10*rate*(1+r1)+out25*rate*(1+r2)).toFixed(2)+' €'):'—')+'</span></div>';
     var head='<div onclick="window.M5toggleSolde()" style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 13px;cursor:pointer;user-select:none;">'
       +'<span style="font-size:12.5px;font-weight:800;color:'+C_TXT+';">💠 Heures comp. — '+suffix+' <span style="font-weight:500;color:'+C_SUB+';">(reste <span id="m5-hdr-net">'+_fmtH(out10+out25)+'</span>)</span></span>'
       +'<span id="m5-solde-chev" style="color:'+C_SUB+';font-size:13px;transition:transform .2s;'+(open?'transform:rotate(180deg);':'')+'">▾</span></div>';
-    return '<div id="m5-solde-card" data-due10="'+due10+'" data-due25="'+due25+'" data-rate="'+rate+'" data-r1="'+r1+'" data-r2="'+r2+'" style="margin-top:12px;background:linear-gradient(160deg,rgba(23,16,46,0.72),rgba(44,24,76,0.72));border:1.5px solid rgba(180,150,255,0.55);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.30);">'
+    return '<div id="m5-solde-card" data-uni="'+(uni?'1':'0')+'" data-due10="'+due10+'" data-due25="'+due25+'" data-rate="'+rate+'" data-r1="'+r1+'" data-r2="'+r2+'" style="margin-top:12px;background:linear-gradient(160deg,rgba(23,16,46,0.72),rgba(44,24,76,0.72));border:1.5px solid rgba(180,150,255,0.55);border-radius:14px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,0.30);">'
       + head + '<div id="m5-solde-body" style="padding:0 13px 12px;'+(open?'':'display:none;')+'">'+body+'</div></div>';
   };
 
@@ -3378,7 +3461,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       var v=val(dk), lab=jr[(offset+d-1)%7];
       var _pi=_pIdx(dk);
       var _lk=(window.M5_isDayLocked&&window.M5_isDayLocked(dk));
-      var _over10=(v!=null && v>10);
+      var _over10=(v!=null && v>10 && !window.M5_est3239());
       var _wt=(v==null)?weekTotalFor(dk):null;
       var _isWS=(_wt!=null && window.M5_weekStartOf && window.M5_weekStartOf(dk,sd)===dk);
       var _vac=isVacDay(dk);
@@ -3536,7 +3619,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     var l=[['Heures travaillées',f(r(tot))],['Semaines saisies',String(ws.length)]];
     if(c.modeCalcul==='ANNUEL'){var obj=r(base*52),so=r(tot-obj);l.push(['Objectif annuel du contrat',f(obj)],['Écart avec l\'objectif',(so>0?'+':so<0?'−':'')+f(Math.abs(so))]);}
     else{var HX=window.M5_hcExercice?M5_hcExercice(c,deb,fin):null;if(HX){h1=HX.d10;h2=HX.d25;hc=h1+h2;}
-      l.push(['Heures complémentaires',f(r(hc))],['Dont à +'+Math.round((c.rate1||0.10)*100)+' %',f(r(h1))],['Dont à +'+Math.round((c.rate2||0.25)*100)+' %',f(r(h2))]);}
+      l.push(['Heures complémentaires',f(r(hc))],['Dont '+M5_tauxTxt(c.rate1??0.10),f(r(h1))],['Dont '+M5_tauxTxt(c.rate2??0.25),f(r(h2))]);}
     if(n35>0)l.push(['Semaines à 35 h ou plus',String(n35)]);
     /* 26/09/2026 : reste à payer en fin d'exercice. Heures complémentaires de l'exercice
        moins les paiements saisis sur l'exercice (cases « payé » par semaine ou période). */
@@ -3555,7 +3638,7 @@ document.addEventListener('DOMContentLoaded',()=>{
       window.__m5Reste={h10:n1,h25:n2,deb:deb,fin:fin};
       if(p1+p2>0)l.push(['Heures complémentaires payées',f(r(p1+p2))]);
       if(nT>0.01){l.push(['Reste à payer en fin d\'exercice',f(nT)]);
-        var det=[];if(n1>0.01)det.push(f(n1)+' à +'+Math.round((c.rate1||0.10)*100)+' %');if(n2>0.01)det.push(f(n2)+' à +'+Math.round((c.rate2||0.25)*100)+' %');
+        var det=[];if(n1>0.01)det.push(f(n1)+' '+M5_tauxTxt(c.rate1??0.10));if(n2>0.01)det.push(f(n2)+' '+M5_tauxTxt(c.rate2??0.25));
         window.__m5Alerte={titre:'⚠️ Exercice non soldé : '+f(nT)+' d\'heures complémentaires non payées',
           texte:(det.length>1?'Soit '+det.join(' + ')+'. ':'')+'Même calcul que la carte « Solde » à la fin de l\'exercice : les heures non payées sont reportées de semaine en semaine (un paiement en trop n\'efface pas les semaines suivantes). '+((window.hsBilanAnnee&&hsBilanAnnee.delai)||'')};
       }
@@ -3609,7 +3692,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   /* Fenêtre de choix : une ligne par exercice, cochée par défaut */
   window.M5_demanderReports=function(items,to,apres){
     if(!items||!items.length){if(apres)apres();return;}
-    var c=M5_Contract.get(),r1=Math.round((c.rate1||0.10)*100),r2=Math.round((c.rate2||0.25)*100),tot=0;
+    var c=M5_Contract.get(),r1=Math.round((c.rate1??0.10)*100),r2=Math.round((c.rate2??0.25)*100),tot=0;
     items.forEach(function(it){tot+=it.h10+it.h25;});
     function fin(coches){enregistrer(to,items,coches);
       var n=0;coches.forEach(function(x,i){if(x)n+=items[i].h10+items[i].h25;});
