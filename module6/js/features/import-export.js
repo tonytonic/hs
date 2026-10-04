@@ -24,7 +24,9 @@ const M6_ImportExport = {
         moods:       M6_Storage.getMoods(regime, y),
         validations: M6_Storage.getValidations(regime, y),
         deplacements:M6_Storage.getDeplacements(regime, y),
-        log:         M6_Storage.getLog(regime, y)
+        log:         M6_Storage.getLog(regime, y),
+        // 04/10/2026 : paiements des heures sup mois par mois (forfait heures)
+        paie:        M6_Storage._json(`M6_${regime}_${y}_PAIE`)
       };
     }
     dump.entretiens = M6_Storage.getEntretiens(regime);
@@ -86,6 +88,7 @@ const M6_ImportExport = {
       if (yData.moods)       localStorage.setItem(`M6_${regime}_${y}_MOODS`,       JSON.stringify(yData.moods));
       if (yData.validations) localStorage.setItem(`M6_${regime}_${y}_VALID`,       JSON.stringify(yData.validations));
       if (yData.deplacements)localStorage.setItem(`M6_${regime}_${y}_DEPLACEMENT`, JSON.stringify(yData.deplacements));
+      if (yData.paie)        localStorage.setItem(`M6_${regime}_${y}_PAIE`,        JSON.stringify(yData.paie));
       imported++;
     }
     if (obj.entretiens) localStorage.setItem(`M6_${regime}_ENTRETIENS`, JSON.stringify(obj.entretiens));

@@ -208,7 +208,7 @@ function _selectPopup(analysis, bio, prenom, regime) {
     if (b.phase?.code === 'P3') return _pick(MSG_P3)(n);
     if (!a || !a.semaines) {
       return { titre: 'Démarrage', icon: '⏱️', level: 'ok',
-        msg: `${n}Saisissez vos premières semaines pour que je puisse analyser votre rythme. Je calculerai automatiquement vos heures supplémentaires et la consommation de votre contingent.`,
+        msg: `${n}Saisissez vos premières semaines pour que je puisse analyser votre rythme. Je calculerai automatiquement vos heures supplémentaires${a && a.sansContingent ? '' : ' et la consommation de votre contingent'}.`,
         actions: ['Saisir une semaine'] };
     }
     const tauxRempli = a.tauxRemplissage || 0;

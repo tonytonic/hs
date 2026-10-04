@@ -876,7 +876,7 @@ const M6_PDF = {
     rect(M,y,PW,7,[240,235,228]);
     txt('PARAMÈTRES CONTRAT',M+3,y+5,8,[70,65,60],'bold');
     y += 10;
-    [[`Seuil déclenchement HS`, `${contract.seuilHebdo||35}h/sem`],[`Contingent annuel`, `${analysis?.contingent||contract.contingent||220}h`],[`Taux majorations`, analysis?.a3Paliers ? `+${analysis.taux1||25}%(${analysis.palier||8}h) / +${analysis.taux_inter}%(${analysis.palier_inter}h) / +${analysis.taux2||50}%`:`+${analysis?.taux1||25}%(${analysis?.palier||8}h) / +${analysis?.taux2||50}%`],[`CCN`, _pdfSanitize(analysis?.ccnNom||contract.ccnLabel||'Droit commun')]].forEach(([l,v],i)=>{
+    [[`Seuil déclenchement HS`, `${contract.seuilHebdo||35}h/sem`],[`Contingent annuel`, analysis?.sansContingent ? 'Aucun (convention)' : `${analysis?.contingent||contract.contingent||220}h`],[`Taux majorations`, analysis?.tauxUnique ? `+${analysis.taux1}% sur toutes les HS` : analysis?.a3Paliers ? `+${analysis.taux1||25}%(${analysis.palier||8}h) / +${analysis.taux_inter}%(${analysis.palier_inter}h) / +${analysis.taux2||50}%`:`+${analysis?.taux1||25}%(${analysis?.palier||8}h) / +${analysis?.taux2||50}%`],[`CCN`, _pdfSanitize(analysis?.ccnNom||contract.ccnLabel||'Droit commun')]].forEach(([l,v],i)=>{
       if(i%2===0){doc.setFillColor(248,245,241);doc.rect(M,y-1.5,PW,5.5,'F');}
       txt(l,M+2,y+2.5,8,[70,65,60]); txt(v,W-M-2,y+2.5,8,[26,23,20],'bold','right'); y+=5.5;
     });
@@ -965,6 +965,8 @@ const M6_PDF = {
         const exoMois = Math.min(totalMnt, 7500/12);
         const tepaRows = has3
           ? [[`HS à +${analysis?.taux1||10}%`,`${totalHS1.toFixed(1)}h`],[`HS à +${analysis.taux_inter}%`,`${totalHSinter.toFixed(1)}h`],[`HS à +${analysis?.taux2||50}%`,`${totalHS2.toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]]
+          : analysis?.tauxUnique
+          ? [[`HS à +${analysis.taux1}%`,`${(totalHS1+totalHS2).toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]]
           : [[`HS à +${analysis?.taux1||25}%`,`${totalHS1.toFixed(1)}h`],[`HS à +${analysis?.taux2||50}%`,`${totalHS2.toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]];
         tepaRows.forEach(([l,v],i)=>{
           if(i%2===0){doc.setFillColor(248,245,241);doc.rect(M,y-1.5,PW,5.5,'F');}
@@ -1028,7 +1030,7 @@ const M6_PDF = {
     const a = analysis || {};
     const seuil = contract.seuilHebdo || a.seuil || 35;
     const contingent = a.contingent || contract.contingent || 220;
-    txt(`${_pdfSanitize(contract.nomCadre||'Cadre')}  ·  ${_pdfSanitize(a.ccnNom||contract.ccnLabel||'Droit commun')}  ·  Seuil ${seuil}h/sem  ·  Contingent ${contingent}h`,M,33,8,[189,181,168]);
+    txt(`${_pdfSanitize(contract.nomCadre||'Cadre')}  ·  ${_pdfSanitize(a.ccnNom||contract.ccnLabel||'Droit commun')}  ·  Seuil ${seuil}h/sem  ·  ${a.sansContingent?'Pas de contingent':'Contingent '+contingent+'h'}`,M,33,8,[189,181,168]);
     const hashStr = _localHash(`${regime}-FH-${year}-${contract.nomCadre||''}-${a.totalHS||0}`);
     txt(`Réf. : ${hashStr}`,W-M,9,6,[150,140,130],'normal','right');
     txt(`Généré le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}`,W-M,14,6.5,[150,140,130],'normal','right');
@@ -1042,9 +1044,11 @@ const M6_PDF = {
     const synthRows = [
       ['Total heures travaillées',  `${a.totalHeures||0}h`],
       ['Semaines saisies',          `${a.semaines||0}`],
-      ['Total heures supplémentaires',`${a.totalHS||0}h`, (a.totalHS||0)>contingent?[155,44,44]:[26,23,20]],
-      ['Contingent annuel',         `${contingent}h${a.contingentProrata?' (prorata)':''}`],
-      ['Consommation contingent',   `${a.tauxRemplissage||0}%`, (a.tauxRemplissage||0)>=100?[155,44,44]:(a.tauxRemplissage||0)>=90?[196,133,58]:[45,107,79]],
+      ['Total heures supplémentaires',`${a.totalHS||0}h`, (!a.sansContingent&&(a.totalHS||0)>contingent)?[155,44,44]:[26,23,20]],
+      ...(a.sansContingent
+        ? [['Contingent annuel', 'Aucun (convention, L7221-2)']]
+        : [['Contingent annuel',         `${contingent}h${a.contingentProrata?' (prorata)':''}`],
+           ['Consommation contingent',   `${a.tauxRemplissage||0}%`, (a.tauxRemplissage||0)>=100?[155,44,44]:(a.tauxRemplissage||0)>=90?[196,133,58]:[45,107,79]]]),
     ];
     synthRows.forEach(([l,v,col],i) => {
       const ry = y + i*5.5;
@@ -1066,6 +1070,9 @@ const M6_PDF = {
       palierRows.push([`Palier 1 — HS à +${a.taux1||10}% (${a.palier||4}h hebdo)`, `${a.totalHSTaux1||0}h`, tauxH>0?`${(a.montantHS1||0).toFixed(0)}€`:'—']);
       palierRows.push([`Palier 2 — HS à +${a.taux_inter}% (${a.palier_inter||4}h hebdo)`, `${a.totalHSTaux_inter||0}h`, tauxH>0?`${(a.montantHS_inter||0).toFixed(0)}€`:'—']);
       palierRows.push([`Palier 3 — HS à +${a.taux2||50}% (au-delà)`, `${a.totalHSTaux2||0}h`, tauxH>0?`${(a.montantHS2||0).toFixed(0)}€`:'—']);
+    } else if (a.tauxUnique) {
+      // 04/10/2026 : un seul taux (ex. assistant maternel 10 %)
+      palierRows.push([`HS à +${a.taux1}% (toutes les heures sup)`, `${a.totalHS||0}h`, tauxH>0?`${(a.montantTotal||0).toFixed(0)}€`:'—']);
     } else {
       // Droit commun : 2 paliers (+25% / +50%)
       palierRows.push([`Palier 1 — HS à +${a.taux1||25}% (${a.palier||8}h hebdo)`, `${a.totalHSTaux1||0}h`, tauxH>0?`${(a.montantHS1||0).toFixed(0)}€`:'—']);
@@ -1361,8 +1368,8 @@ const M6_PDF = {
       : [
           ['Total HS',           `${analysis?.totalHS||0}h`],
           ['Semaines saisies',   `${analysis?.semaines||0}`],
-          ['Contingent',         `${analysis?.contingent||contract.contingent||220}h`],
-          ['Consommation',       `${analysis?.tauxRemplissage||0}%`],
+          ['Contingent',         analysis?.sansContingent ? 'Aucun' : `${analysis?.contingent||contract.contingent||220}h`],
+          ['Consommation',       analysis?.sansContingent ? 'Sans objet' : `${analysis?.tauxRemplissage||0}%`],
           ['CP pris',            `${analysis?.cpPris||0}`],
         ];
     forfaitRows.forEach(([l,v],i) => {

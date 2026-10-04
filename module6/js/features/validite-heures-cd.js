@@ -57,7 +57,8 @@ const M6_ValiditeFH = {
     // Prorata si arrivée en cours d'exercice
     let contingent = contingentBase;
     if (analysis?.contingentProrata && analysis?.contingent) contingent = analysis.contingent;
-    const respectContingent = totalHS <= contingent;
+    const sansCont = !!analysis?.sansContingent; // 04/10/2026 : IDCC 3239, pas de contingent
+    const respectContingent = sansCont || totalHS <= contingent;
     const contingentLabel = (contingent < contingentBase)
       ? `${contingent}h proraté (/${contingentBase}h sur l'exercice complet)`
       : `${contingent}h`;
@@ -67,8 +68,10 @@ const M6_ValiditeFH = {
       loi: 'Art. L3121-30 + L3121-33',
       ok: respectContingent,
       niveau: respectContingent ? 'ok' : (totalHS > contingent * 1.1 ? 'danger' : 'warning'),
-      detail: `${totalHS}h sur ${contingentLabel} de contingent (${Math.round(totalHS/Math.max(1,contingent)*100)}%).${!respectContingent ? ' Au-delà : repos compensateur obligatoire.' : ''}`,
-      recommandation: 'Au-delà du contingent, chaque HS ouvre droit à un repos compensateur obligatoire (100% pour entreprises >20 salariés).',
+      detail: sansCont
+        ? 'Sans objet : la convention ne fixe pas de contingent annuel d\'heures sup (L7221-2). Seules les durées maximales s\'appliquent.'
+        : `${totalHS}h sur ${contingentLabel} de contingent (${Math.round(totalHS/Math.max(1,contingent)*100)}%).${!respectContingent ? ' Au-delà : repos compensateur obligatoire.' : ''}`,
+      recommandation: sansCont ? 'Pas de contingent pour cette convention : vérifie surtout la durée maximale et le paiement des heures sup.' : 'Au-delà du contingent, chaque HS ouvre droit à un repos compensateur obligatoire (100% pour entreprises >20 salariés).',
     });
 
     // ── 4. Majoration des HS appliquée (L3121-28) ──────────────
@@ -113,19 +116,33 @@ const M6_ValiditeFH = {
       recommandation: 'Tout salarié bénéficie d\'un repos quotidien minimum de 11h consécutives entre deux journées de travail.',
     });
 
-    // ── 6. Durée maximale hebdo (L3121-20) ─────────────────────
+    // ── 6. Durée maximale hebdo ─────────────────────────────────
+    // 04/10/2026 : droit commun = 48 h sur une même semaine (L3121-20, plafond par semaine
+    // en droit français ; la directive européenne, elle, raisonne en moyenne).
+    // IDCC 3239 (Code non applicable, L7221-2) : maximum de la convention — 50 h par semaine
+    // (emploi à domicile) ou 48 h EN MOYENNE (assistant maternel).
     const maxHebdo = analysis?.max || 0;
-    const respectMax = maxHebdo <= 48;
+    let _r39 = null;
+    try { if (analysis?.sansContingent && window.M6_CCN_Adapter && contract) _r39 = M6_CCN_Adapter.reglesContrat(contract); } catch (_) {}
+    const _lim = _r39 ? (_r39.maxHebdo || 48) : 48;
+    const _moy = !!(_r39 && _r39.maxHebdoMoyenne);
+    // Assistant maternel : jugé sur la moyenne de 4 mois quand assez de semaines sont saisies
+    const _avgOk = !(_moy && analysis?.avgConvN && (analysis?.detailSemaines||[]).length >= analysis.avgConvN && (analysis.avgConv||0) > (_r39.maxMoyenne||48));
+    const respectMax = maxHebdo <= _lim;
     conditions.push({
       id: 'duree_max_h',
-      titre: 'Durée maximale hebdo (48h) respectée',
-      loi: 'Art. L3121-20 + Directive 2003/88/CE',
-      ok: respectMax,
-      niveau: respectMax ? 'ok' : 'danger',
+      titre: `Durée maximale hebdo (${_lim}h${_moy ? ' en moyenne' : ''}) respectée`,
+      loi: _r39 ? 'CCN 3239 (L7221-2)' : 'Art. L3121-20',
+      ok: _moy ? _avgOk : respectMax,
+      niveau: _moy ? (_avgOk ? (respectMax ? 'ok' : 'info') : 'warning') : (respectMax ? 'ok' : 'danger'),
       detail: respectMax
-        ? `Maximum hebdomadaire : ${maxHebdo}h — sous le plafond légal de 48h.`
-        : `Pic à ${maxHebdo}h détecté — dépasse le plafond absolu de 48h fixé par la directive européenne.`,
-      recommandation: 'La durée hebdomadaire ne peut excéder 48h (plafond absolu UE). 44h en moyenne sur 12 semaines consécutives (L3121-22).',
+        ? `Maximum hebdomadaire : ${maxHebdo}h — sous ${_moy ? 'la moyenne maximale' : 'le maximum'} de ${_lim}h.`
+        : _moy
+          ? `Pic à ${maxHebdo}h : possible si la moyenne reste sous ${_lim}h (la convention raisonne en moyenne).`
+          : `Pic à ${maxHebdo}h détecté — dépasse le maximum de ${_lim}h par semaine${_r39 ? ' fixé par la convention' : ''}.`,
+      recommandation: _r39
+        ? (_moy ? `Ta convention limite la durée à ${_lim}h en moyenne sur 4 mois (art. 96.3)${analysis?.avgConv ? ' — ta moyenne la plus haute : ' + analysis.avgConv + 'h' : ''}.` : `Ta convention fixe un maximum de ${_lim}h sur une même semaine et 48h en moyenne sur 12 semaines (art. 134).`)
+        : 'La durée hebdomadaire ne peut excéder 48h sur une même semaine (L3121-20), ni 44h en moyenne sur 12 semaines consécutives (L3121-22).',
     });
 
     // ── PROMOTION par auto-attestation ─────────────────────────
