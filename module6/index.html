@@ -331,6 +331,7 @@ if ('serviceWorker' in navigator) {
   try{
     var regC=localStorage.getItem('M6_REGIME');
     var nomC=regC&&window.M6_CCN_Adapter&&M6_CCN_Adapter.appliquerDuMenu?M6_CCN_Adapter.appliquerDuMenu(regC):'';
+    try{ if(regC&&window.M6_CCN_Adapter&&M6_CCN_Adapter.resyncRegles) M6_CCN_Adapter.resyncRegles(regC); }catch(e){}
     if(nomC)window.addEventListener('load',function(){setTimeout(function(){if(window.M6_toast)M6_toast('Ta convention collective est reprise du menu : '+nomC);},900);});
   }catch(e){}
   if(location.hash!=='#saisie-aujourdhui')return;
