@@ -62,9 +62,53 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">4 octobre 2026</span>
+    <span class="v-num">v10.12</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Ta convention, tes règles</b> : grâce à notre veille Légifrance et à l'arrivée toute récente du <b>BOCC</b> (Bulletin officiel des conventions collectives) dans nos sources, <b>près de 90 conventions</b> qui suivaient jusqu'ici les règles du Code du travail par défaut ont maintenant <b>leurs propres règles</b> : seuil des heures sup, taux de majoration, contingent annuel et heures complémentaires du temps partiel. Tes compteurs, ton bulletin et les analyses de Fox, Mizuki et Zenji en tiennent compte tout seuls, sans rien ressaisir. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Emploi à domicile (IDCC 3239)</b> : les heures sup commencent à <b>40&nbsp;h</b> par semaine (25&nbsp;% les 8 premières, puis 50&nbsp;%), et il n'y a <b>pas de contingent</b>. À temps partiel, les heures en plus de ton contrat jusqu'à 40&nbsp;h sont des heures complémentaires payées <b>au taux normal</b>, sans plafond : Mizuki adapte ses alertes et ses conseils. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Assistant(e) maternel(le)</b> : une entrée dédiée dans le choix de convention : heures sup à partir de <b>45&nbsp;h</b>, majorées de 10&nbsp;%, sans contingent annuel. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Pas de contingent ? L'appli le dit</b> : quand ta convention ne prévoit pas de contingent d'heures sup, le compteur, le bulletin, le tableau de bord et Fox affichent <b>« pas de contingent »</b> au lieu d'une jauge, et aucune alerte inutile ne s'affiche. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Temps partiel (Mizuki)</b> : le plafond d'heures complémentaires, les taux et le délai de prévenance affichés sont ceux de <b>ta convention</b>, un encart rappelle ses règles dans les paramètres, et quand les deux taux sont identiques une seule tuile les regroupe. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Forfait heures (Zenji)</b> : le contingent et les taux de ta convention sont repris automatiquement ; les réglages que tu avais personnalisés sont conservés. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Grilles de salaires</b> : grilles mises à jour pour plusieurs conventions (dont emploi à domicile, pâtisserie et coopération maritime), et le tableau des heures sup affiché sous chaque grille suit maintenant les règles de la convention. <span class="v-tag tag-fix">Mise à jour</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
     <span class="v-date">2 octobre 2026</span>
     <span class="v-num">v10.11</span>
-    <span class="v-new-badge">NOUVEAU</span>
   </div>
 
   <div class="item">
@@ -768,7 +812,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <script>
 // Marquer comme vu quand l'utilisateur ouvre la page
 /* La version lue (et plus seulement « déjà vu ») : le badge du menu revient à chaque nouvelle version. */
-try{ localStorage.setItem('NV_SEEN','v10.11'); }catch(e){}
+try{ localStorage.setItem('NV_SEEN','v10.12'); }catch(e){}
 </script>
 </body>
 </html>
