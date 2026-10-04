@@ -1,3 +1,6 @@
+
+/* 04/10/2026 : base hebdo = max(base enregistrée par M1, seuil de la convention) */
+function _mrSeuilCCN(){ try{ if(typeof CCN_API!=='undefined'){ const r=CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')); if(r&&r.seuil) return r.seuil; } }catch(_){} return 35; }
 /* Congés payés (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026 n° 24-19.410) : une absence M1 marquée cp:1 ne réduit pas
    le seuil des heures sup, sauf si la règle est désactivée pour l'exercice (CP_JURIS_<exercice> = "false"). Même règle que le compteur M1.
    y = suffixe de l'exercice M1, c'est-à-dire celui de la clé DATA_REPORT_<y> d'où vient le jour — PAS l'année de la date :
@@ -31,7 +34,7 @@ class ModuleReader {
       const rawData     = JSON.parse(localStorage.getItem('DATA_REPORT_'    + this.year) || '{}');
       const rawReports  = JSON.parse(localStorage.getItem('REPORTS_REPORT_' + this.year) || '{}');
       const annualRate  = Number(localStorage.getItem('ANNUAL_RATE_'  + this.year)) || 10;
-      const baseHebdo   = Number(localStorage.getItem('BASE_HEBDO_'   + this.year)) || 35;
+      const baseHebdo   = Math.max(Number(localStorage.getItem('BASE_HEBDO_'   + this.year)) || 0, _mrSeuilCCN());
       const periodMeta  = JSON.parse(localStorage.getItem('PERIOD_META_REPORT_' + this.year) || '{}');
       const exerciseStart = localStorage.getItem('EXERCISE_START_' + this.year) || '';
 
@@ -245,7 +248,7 @@ class ModuleReaderPro extends ModuleReader {
     try {
       const rawData    = JSON.parse(localStorage.getItem(`DATA_REPORT_${year}`)    || '{}');
       const annualRate = Number(localStorage.getItem(`ANNUAL_RATE_${year}`))  || 10;
-      const baseHebdo  = Number(localStorage.getItem(`BASE_HEBDO_${year}`))   || 35;
+      const baseHebdo  = Math.max(Number(localStorage.getItem(`BASE_HEBDO_${year}`)) || 0, _mrSeuilCCN());
 
       let totalExtra = 0, totalRecup = 0, totalAbsent = 0;
       const monthlyBreakdown = {};
@@ -673,7 +676,7 @@ class ModuleReaderPro extends ModuleReader {
             tmpWeeks[wk].months.add(dk.substring(0,7));
           });
           // Calculer OT net par semaine (M1 : base 35h, absences deduites)
-          const base = Number(localStorage.getItem('BASE_HEBDO_' + y)) || 35;
+          const base = Math.max(Number(localStorage.getItem('BASE_HEBDO_' + y)) || 0, _mrSeuilCCN());
           Object.entries(tmpWeeks).forEach(([wk, w]) => {
             const effective = base + w.extra - w.recup - w.absent;
             const ot = Math.max(0, effective - base); // = max(0, extra - recup - absent)

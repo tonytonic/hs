@@ -128,9 +128,9 @@
   function getPatterns() { try { return JSON.parse(localStorage.getItem('FOX_PATTERNS')||'[]').slice(0,6); } catch(e){ return []; } }
 
   // ── Recommandations légales ─────────────────────────────────────
-  function buildAdvice(a, annual, today, burnout, contingent) {
+  function buildAdvice(a, annual, today, burnout, contingent, sansCont) {
     contingent = contingent || 220; // Fallback si non fourni
-    var items = []; var pct = annual.total > 0 ? Math.round(annual.total/contingent*100) : 0;
+    var items = []; var pct = (!sansCont && annual.total > 0) ? Math.round(annual.total/contingent*100) : 0;
     if (!a && annual.total === 0) {
       return [{ icon:'ℹ️', titre:'Aucune donnée enregistrée', texte:'Saisissez vos heures dans le module M1 (annuel) ou M2 (mensuel) pour obtenir une analyse personnalisée.', loi:null }];
     }
@@ -143,7 +143,7 @@
     if (burnout >= 70) items.push({ icon:'🔴', titre:'Niveau de surmenage élevé (' + burnout + '/100)', texte:'L\'employeur a une obligation de résultat sur la santé des salariés. Une consultation du médecin du travail est recommandée — gratuite et confidentielle.', loi:'Art. L4121-1' });
     else if (burnout >= 40) items.push({ icon:'🟠', titre:'Surmenage modéré (' + burnout + '/100)', texte:'Veillez à respecter les 11h de repos entre deux prises de poste et les 35h de repos hebdomadaire consécutives.', loi:'Art. L3131-1' });
     if (today.extra > 2) items.push({ icon:'📋', titre:'Journée chargée aujourd\'hui (' + fmtH(today.extra) + ' sup.)', texte:'Ces heures constituent une créance sur votre employeur. Taux de majoration : ' + (today.extra <= 8 ? '25%' : '50%') + '. Réclamables jusqu\'à 3 ans après réalisation.', loi:'Art. L3245-1' });
-    if (!items.length && annual.total > 0) items.push({ icon:'✅', titre:'Situation dans les limites légales', texte:fmtH(annual.total) + ' de HS enregistrées (' + pct + '% du contingent). Aucune violation détectée. Continuez à documenter régulièrement.', loi:null });
+    if (!items.length && annual.total > 0) items.push({ icon:'✅', titre:'Situation dans les limites légales', texte:fmtH(annual.total) + ' de HS enregistrées' + (sansCont ? ' (pas de contingent annuel pour votre convention)' : ' (' + pct + '% du contingent)') + '. Aucune violation détectée. Continuez à documenter régulièrement.', loi:null });
     if (annual.total > 0) items.push({ icon:'📌', titre:'Prescription 3 ans', texte:'Les heures supplémentaires impayées sont réclamables jusqu\'à 3 ans après leur réalisation. Exportez régulièrement vos données pour conserver un historique opposable.', loi:'Art. L3245-1' });
     return items;
   }
@@ -206,18 +206,20 @@
   }
 
   // ── Historique multi-années ──────────────────────────────────────
-  function renderHistory(contingent) {
+  function renderHistory(contingent, sansCont) {
     contingent = contingent || 220; // Fallback
     var yrs = getAllYears(); if (!yrs.length) return '<div style="color:#37474F;font-size:0.8rem;">Aucun historique disponible.</div>';
+    // 04/10/2026 : sans contingent, la barre se cale sur l'année la plus chargée
+    var maxH = 1; if (sansCont) yrs.forEach(function(y){ maxH = Math.max(maxH, calcAnnual(y).total || 0); });
     return yrs.reverse().map(function(yr) {
-      var a = calcAnnual(yr); var pct = Math.min(Math.round(a.total/contingent*100), 100);
+      var a = calcAnnual(yr); var pct = sansCont ? Math.round((a.total||0)/maxH*100) : Math.min(Math.round(a.total/contingent*100), 100);
       var col = pct >= 100 ? '#EF5350' : pct >= 75 ? '#FFA726' : pct > 0 ? '#546E7A' : '#1C2B35';
       return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);">'
         + '<div style="font-size:0.8rem;color:#546E7A;font-weight:600;min-width:34px;">' + yr + '</div>'
         + '<div style="flex:1;background:rgba(255,255,255,0.05);border-radius:3px;height:5px;">'
         + '<div style="background:' + col + ';width:' + pct + '%;height:5px;border-radius:3px;"></div></div>'
         + '<div style="font-size:0.78rem;color:#546E7A;min-width:38px;text-align:right;">' + fmtH(a.total) + '</div>'
-        + '<div style="font-size:0.65rem;color:' + col + ';min-width:30px;text-align:right;">' + pct + '%</div>'
+        + '<div style="font-size:0.65rem;color:' + col + ';min-width:30px;text-align:right;">' + (sansCont ? '' : pct + '%') + '</div>'
         + '</div>';
     }).join('');
   }
@@ -262,12 +264,14 @@
     
     // Récupérer le contingent selon CCN — getGroupeForCCN retourne l'objet de règles directement
     var contingent = 220; // Fallback
+    var sansCont = false; // 04/10/2026 : IDCC 3239, pas de contingent annuel
     if (typeof CCN_API !== 'undefined') {
       var idcc = parseInt((localStorage.getItem('CCN_IDCC') || '0'));
       var ccnRules = CCN_API.getGroupeForCCN(idcc);
       if (ccnRules && ccnRules.contingent) {
         contingent = ccnRules.contingent;
       }
+      sansCont = !!(ccnRules && ccnRules.sansContingent && !localStorage.getItem('CCN_CUSTOM'));
     }
     
     var annual = calcAnnual(yr);
@@ -275,8 +279,8 @@
     var months = getMonthly(yr);
     var analy  = getAnalysis();
     var burnout= getBurnout();
-    var advice = buildAdvice(analy, annual, today, burnout, contingent);
-    var pct    = Math.min(annual.total > 0 ? Math.round(annual.total/contingent*100) : 0, 100);
+    var advice = buildAdvice(analy, annual, today, burnout, contingent, sansCont);
+    var pct    = sansCont ? 0 : Math.min(annual.total > 0 ? Math.round(annual.total/contingent*100) : 0, 100);
     var sc     = pct >= 100 ? '#EF5350' : pct >= 75 ? '#FFA726' : pct >= 50 ? '#FFCA28' : annual.total > 0 ? '#66BB6A' : '#263238';
     var bo     = getBurnout(); var boc = bo > 60 ? '#EF5350' : bo > 30 ? '#FFA726' : '#66BB6A';
     var hasUrgent = advice.some(function(a){ return a.urgent; });
@@ -322,13 +326,14 @@
       + section('Synthèse ' + yr,
           '<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;">'
           + statBox('Heures sup.', fmtH(annual.total), 'Source ' + annual.src, sc)
-          + statBox('Contingent', pct + '%', 'Plafond légal ' + contingent + 'h', sc)
+          + (sansCont ? statBox('Contingent', 'Aucun', 'Pas de contingent (convention)', '#78909C') : statBox('Contingent', pct + '%', 'Plafond légal ' + contingent + 'h', sc))
           + statBox("Aujourd'hui", today.extra > 0 ? fmtH(today.extra) : '—', today.extra > 0 ? 'Journée ' + fmtH(today.total || (7+today.extra)) : 'Aucune saisie', today.extra > 0 ? '#78909C' : '#263238')
           + statBox('Surmenage', bo + '/100', bo > 60 ? 'Niveau élevé' : bo > 30 ? 'Modéré' : 'Satisfaisant', boc)
           + '</div>'
       )
 
-      // ══ BARRE CONTINGENT ══════════════════════════════════════
+      // ══ BARRE CONTINGENT ══════════════════════════════════════ (04/10/2026 : masquée sans contingent)
+      + (sansCont ? '' : (''
       + '<div style="margin-bottom:20px;">'
       +   '<div style="display:flex;justify-content:space-between;margin-bottom:5px;">'
       +   '<div style="font-size:0.58rem;color:#2D3F4A;text-transform:uppercase;letter-spacing:1.2px;">Contingent annuel ' + contingent + 'h</div>'
@@ -339,7 +344,7 @@
       +   (pct < 100 ? '<div style="position:absolute;top:0;left:50%;width:1px;height:7px;background:rgba(255,255,255,0.06);"></div>' : '')
       +   '</div>'
       +   '<div style="display:flex;justify-content:space-between;margin-top:3px;"><span style="font-size:0.58rem;color:#263238;">0h</span><span style="font-size:0.58rem;color:#263238;">' + Math.round(contingent/2) + 'h</span><span style="font-size:0.58rem;color:#263238;">' + contingent + 'h</span></div>'
-      + '</div>'
+      + '</div>'))
 
       // ══ GRAPHIQUE MENSUEL ══════════════════════════════════════
       + section('Répartition mensuelle — ' + yr,
@@ -408,8 +413,8 @@
       // ══ HISTORIQUE ANNUEL ══════════════════════════════════════
       + section('Historique annuel',
           '<div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:9px;padding:13px;">'
-          + renderHistory(contingent)
-          + '<div style="font-size:0.6rem;color:#1C2B35;margin-top:8px;">Plafond légal ' + contingent + 'h/an · Rouge = dépassement</div>'
+          + renderHistory(contingent, sansCont)
+          + '<div style="font-size:0.6rem;color:#1C2B35;margin-top:8px;">' + (sansCont ? 'Pas de contingent annuel pour votre convention' : 'Plafond légal ' + contingent + 'h/an · Rouge = dépassement') + '</div>'
           + '</div>'
       )
 
@@ -420,11 +425,11 @@
             ['L3121-18','Durée max journalière : 10h (12h par accord)'],
             ['L3121-20','Durée max hebdomadaire absolue : 48h'],
             ['L3121-22','Moyenne max sur 12 semaines glissantes : 44h'],
-            ['L3121-30','Contingent annuel : ' + contingent + 'h'],
+            sansCont ? ['L7221-2','Particulier employeur : pas de contingent annuel (convention)'] : ['L3121-30','Contingent annuel : ' + contingent + 'h'],
             ['L3121-36','Majorations HS : 25% (8 prem.) puis 50%'],
             ['L3131-1', 'Repos quotidien minimum : 11h'],
             ['L3132-2', 'Repos hebdomadaire : 35h consécutives'],
-            ['L3121-33','Contrepartie obligatoire au-delà du contingent'],
+            ...(sansCont ? [] : [['L3121-33','Contrepartie obligatoire au-delà du contingent']]),
             ['L3245-1', 'Prescription pour réclamer des HS : 3 ans'],
             ['L4121-1', 'Obligation santé/sécurité de l\'employeur'],
             ['L3121-28','Heures supplémentaires — définition'],
