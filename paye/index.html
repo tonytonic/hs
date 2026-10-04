@@ -1405,9 +1405,12 @@ function recalc(){
   if(sgc){
     const paliers = [
       { val: fmtH(ph),     lbl: 'Total<br>période', color: 'var(--accent)' },
+      ...(m2TauxUnique(rules)
+        ? [{ val: fmtH(t25d + t50d), lbl: 'À&nbsp;'+rules.taux1+'%', color: '#f39c12' }]
+        : [
       { val: fmtH(t25d),   lbl: 'À&nbsp;'+rules.taux1+'%',          color: '#f39c12' },
       ...(rules.taux_inter !== null ? [{ val: fmtH(tInterd), lbl: 'À&nbsp;'+rules.taux_inter+'%', color: '#e67e22' }] : []),
-      { val: fmtH(t50d),   lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' },
+      { val: fmtH(t50d),   lbl: 'À&nbsp;'+rules.taux2+'%',          color: '#e74c3c' }]),
     ];
     sgc.style.gridTemplateColumns = 'repeat('+paliers.length+',1fr)';
     sgc.innerHTML = paliers.map(p =>
@@ -1427,9 +1430,14 @@ function recalc(){
   if (infoEl) {
     if (rules.taux_inter !== null) {
       infoEl.innerHTML = `ℹ️ CCN ${rules.nom||'personnalisée'} : ${rules.taux1}% jusqu'à ${rules.palier1}h, ${rules.taux_inter}% jusqu'à ${rules.palier1+rules.palier_inter}h, puis ${rules.taux2}%.`;
+    } else if (m2TauxUnique(rules)) {
+      infoEl.innerHTML = `ℹ️ Calcul : ${rules.taux1}% sur toutes les heures sup.`;
     } else {
       infoEl.innerHTML = `ℹ️ Calcul : ${rules.taux1}% jusqu'à ${rules.palier1}h hebdomadaires, puis ${rules.taux2}%.`;
     }
+    // 04/10/2026 : IDCC 3239 emploi à domicile — décompte par semaine (art. 136) ; durée irrégulière
+    // prévue au contrat → moyenne de 40 h sur 8 semaines, que l'appli ne calcule pas.
+    if (rules.id === 'PEMP40') infoEl.innerHTML += `<br><span style="font-size:0.92em;opacity:.85">Heures sup comptées semaine par semaine, du lundi au dimanche (art. 136 de ta convention). Si ton contrat prévoit une durée de travail <b>irrégulière</b>, elles se calculent sur une moyenne de 40 h sur 8 semaines : l'appli peut alors en compter plus que ta paie.</span>`;
   }
   if(unlocked)calcEuro();
   updateContingent();
@@ -1723,6 +1731,9 @@ function updatePeriodLockUI(){
   }
 }
 
+/* 04/10/2026 : toutes les heures sup au même taux (ex. assistant maternel 10 % / 10 %) :
+   une seule tranche affichée, saisie et reportée (la 2e tranche est fondue dans la 1re). */
+function m2TauxUnique(r){ return !!r && !r.taux_inter && Number(r.taux1)===Number(r.taux2); }
 function renderPaidInputs(rules){
   const container = document.getElementById("paidInputsContainer");
   if(!container) return;
@@ -1740,9 +1751,10 @@ function renderPaidInputs(rules){
     const r = rules;
     const rows = [];
     if(m.paid1 !== undefined || m.paid2 !== undefined || m.paidInter !== undefined){
-      if((Number(m.paid1)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#f39c12">À ${r.taux1}% payées</span><b>${fmtH(Number(m.paid1)||0)}</b></div>`);
+      if(m2TauxUnique(r)){ const _pu=(Number(m.paid1)||0)+(Number(m.paid2)||0); if(_pu>0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#f39c12">À ${r.taux1}% payées</span><b>${fmtH(_pu)}</b></div>`); }
+      else if((Number(m.paid1)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#f39c12">À ${r.taux1}% payées</span><b>${fmtH(Number(m.paid1)||0)}</b></div>`);
       if((Number(m.paidInter)||0) > 0 && r.taux_inter) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#e67e22">À ${r.taux_inter}% payées</span><b>${fmtH(Number(m.paidInter)||0)}</b></div>`);
-      if((Number(m.paid2)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#e74c3c">À ${r.taux2}% payées</span><b>${fmtH(Number(m.paid2)||0)}</b></div>`);
+      if(!m2TauxUnique(r) && (Number(m.paid2)||0) > 0) rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:#e74c3c">À ${r.taux2}% payées</span><b>${fmtH(Number(m.paid2)||0)}</b></div>`);
     }
     if(rows.length === 0 && (Number(m.paid)||0) > 0){
       rows.push(`<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0"><span style="color:var(--muted)">Heures payées</span><b>${fmtH(Number(m.paid)||0)}</b></div>`);
@@ -1792,7 +1804,10 @@ function renderPaidInputs(rules){
   }
 
   /* ── MODE PER-TAUX (ou legacy détaillé) : saisie séparée par taux ── */
-  const paliers = [
+  const _uniP = m2TauxUnique(rules);
+  const paliers = _uniP
+    ? [{ id:'paidH1', key:'paid1', taux:rules.taux1, color:'#f39c12', label:'\u00c0 '+rules.taux1+'%' }]
+    : [
     { id:'paidH1',  key:'paid1',     taux:rules.taux1,      color:'#f39c12', label:'\u00c0 '+rules.taux1+'%' },
     ...(rules.taux_inter ? [{ id:'paidHI', key:'paidInter', taux:rules.taux_inter, color:'#e67e22', label:'\u00c0 '+rules.taux_inter+'%' }] : []),
     { id:'paidH2',  key:'paid2',     taux:rules.taux2,      color:'#e74c3c', label:'\u00c0 '+rules.taux2+'%' },
@@ -1832,6 +1847,7 @@ function renderPaidInputs(rules){
           }
         });
         DATA[currentKey][p.key] = window._hmToDec(p.id+'H',p.id+'M');
+        if(_uniP) DATA[currentKey].paid2 = 0; // taux unique : tout le paiement est porté par la 1re tranche
         // Le total payé devient la somme des paliers ventilés
         DATA[currentKey].paid = paliers.reduce((s,t)=>s+(Number(DATA[currentKey][t.key])||0), 0);
         const h = document.getElementById('paidHours');
@@ -1861,7 +1877,8 @@ function renderPaidInputs(rules){
   const legacyPaidNoDetail = !hasDetailVals && (Number(m.paid)||0) > 0;
 
   paliers.forEach((p) => {
-    window._decToHM(m[p.key] !== undefined ? m[p.key] : 0, p.id+'H', p.id+'M');
+    const _v = (_uniP && p.key==='paid1') ? (Number(m.paid1)||0)+(Number(m.paid2)||0) : (m[p.key] !== undefined ? m[p.key] : 0);
+    window._decToHM(_v, p.id+'H', p.id+'M');
   });
 
   // Si un total a été payé sans ventilation par taux (mois saisi avant le détail),
@@ -2136,7 +2153,13 @@ function recalcCascade(){
     const {h25, hInter, h50} = calcWeeks(buildDayList(start, end));
     const hasPerTaux = m.paid1!==undefined || m.paid2!==undefined || m.paidInter!==undefined;
 
-    if(hasPerTaux){
+    if(hasPerTaux && m2TauxUnique(rules)){
+      // 04/10/2026 : taux unique → une seule tranche, paiements additionnés
+      due1     += h25 + h50 + due2; due2 = 0;
+      dueInter += (hInter||0);
+      due1     = Math.max(0, due1 - (Number(m.paid1)||0) - (Number(m.paid2)||0));
+      dueInter = Math.max(0, dueInter - (Number(m.paidInter)||0));
+    } else if(hasPerTaux){
       // ── CAS 1 : paiements per-taux saisis manuellement ──
       // Soustraction directe par taux (PAS de FIFO, la saisie manuelle fait foi).
       // Exemple : 8@25 + 2@50, paid1=6 → reste 2@25 + 2@50 (et non 4@25 avec FIFO).
@@ -2178,6 +2201,7 @@ function recalcCascade(){
       }
     }
 
+    if(m2TauxUnique(rules)){ due1 += due2; due2 = 0; } // taux unique : une seule tranche
     // Réconciliation de sécurité (arrondi à la minute)
     const round25 = v => Math.round(v * 60) / 60;
     due1 = round25(Math.max(0, due1));
@@ -2991,6 +3015,10 @@ function updateContingent(){
   const fill=document.getElementById("contingentFill");
   const txt=document.getElementById("contingentText");
   if(!fill||!txt)return;
+  if(rules.sansContingent){ // 04/10/2026 : IDCC 3239, pas de contingent annuel
+    fill.style.width="0%";txt.textContent=fmtH(total)+" · pas de contingent pour ta convention";
+    const rw=document.getElementById("rcoWrap");if(rw)rw.classList.remove("visible");return;
+  }
   fill.style.width=pct+"%";
   fill.style.background=pct<70?"#2ecc71":pct<90?"#f39c12":"#c0392b";
   txt.textContent=fmtH(total)+" / "+LIMIT+"h";
@@ -3300,7 +3328,7 @@ function closeTip(){
       l.push(['Dont majorées à '+r.taux2+' %',fmtH(h2)]);if(paid>0)l.push(['Heures payées',fmtH(paid)]);
       var rel=m2ReliquatAnnee(yearStr);if(rel)carry=rel.h; // recalculé : la valeur enregistrée peut être ancienne
       if(carry>0)l.push(['Reste à payer en fin d\'exercice',fmtH(carry)]);
-      l.push(['Contingent annuel utilisé',fmtH(tot)+' / '+r.contingent+'h'],['Mois avec des heures sup',mois+' mois']);
+      l.push(['Contingent annuel utilisé',r.sansContingent?fmtH(tot)+' (pas de contingent pour la convention)':fmtH(tot)+' / '+r.contingent+'h'],['Mois avec des heures sup',mois+' mois']);
       return l.filter(function(x){return !/^Dont /.test(x[0])||/[1-9]/.test(String(x[1]));});
     }catch(e){return null;}
   }
