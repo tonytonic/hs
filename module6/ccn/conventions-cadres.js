@@ -2913,7 +2913,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises du paysage — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Paysage.',
   }
@@ -2923,7 +2923,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Production agricole et CUMA — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Agriculture.',
   }
@@ -2933,7 +2933,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Caves coopératives vinicoles — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Viticulture.',
   }
@@ -2943,7 +2943,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sucre sucreries distilleries raffineries — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). IAA sucre.',
   }
@@ -2953,7 +2953,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie laitière — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). IAA laitier.',
   }
@@ -2963,7 +2963,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Boulangerie-pâtisserie artisanale — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Artisanat alimentaire.',
   }
@@ -2973,7 +2973,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Charcuterie de détail — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Artisanat charcuterie.',
   }
@@ -2983,7 +2983,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets d\'avocats (personnel salarié) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Avocats.',
   }
@@ -2993,7 +2993,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pâtes alimentaires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). IAA pâtes.',
   }
@@ -3003,7 +3003,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment Ouvriers plus 10 salariés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment.',
   }
@@ -3013,7 +3013,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment Ouvriers moins 10 salariés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment.',
   }
@@ -3023,7 +3023,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Architecture cabinets — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Architecture.',
   }
@@ -3033,7 +3033,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries chimiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie chimique.',
   }
@@ -3043,7 +3043,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie du pétrole — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Energie pétrolière.',
   }
@@ -3053,7 +3053,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Plasturgie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie plastique.',
   }
@@ -3063,7 +3063,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie pharmaceutique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie pharmaceutique.',
   }
@@ -3073,7 +3073,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Fabrication commerce produits pharma para-pharma vétérinaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pharmacie vétérinaire.',
   }
@@ -3083,7 +3083,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Vins, cidres, jus de fruits, sirops, spiritueux et liqueurs de France — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Vins spiritueux.',
   }
@@ -3093,7 +3093,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Papiers et cartons industries — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie papier.',
   }
@@ -3103,7 +3103,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cartonnage industries — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie cartonnage.',
   }
@@ -3113,7 +3113,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Métallurgie accord national unique 2023 — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Métallurgie.',
   }
@@ -3123,7 +3123,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Centres de lutte contre le cancer (CLCC) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé oncologie.',
   }
@@ -3133,7 +3133,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries de l\'habillement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Habillement.',
   }
@@ -3143,7 +3143,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Chaussure industrie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie chaussure.',
   }
@@ -3153,7 +3153,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Maroquinerie gainerie bracelets cuir — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie maroquinerie.',
   }
@@ -3163,7 +3163,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries électriques et gazières IEG — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Energie EDF GDF.',
   }
@@ -3173,7 +3173,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Salariés permanents des entreprises de travail temporaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Travail temporaire.',
   }
@@ -3183,7 +3183,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Récupération industrie et commerces — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Recyclage récupération.',
   }
@@ -3193,7 +3193,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Grande distribution alimentaire supermarchés hypermarchés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Grande distribution alim..',
   }
@@ -3203,7 +3203,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de gros alimentaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce de gros alim..',
   }
@@ -3213,7 +3213,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de gros non alimentaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce de gros non alim..',
   }
@@ -3223,7 +3223,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Restauration rapide — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Restauration rapide.',
   }
@@ -3233,7 +3233,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Hôtels Cafés Restaurants HCR — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). HCR.',
   }
@@ -3243,7 +3243,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de détail non alimentaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce de détail.',
   }
@@ -3253,7 +3253,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Habillement commerce de détail — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce textile.',
   }
@@ -3263,7 +3263,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Chaussure commerce succursaliste — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce chaussures.',
   }
@@ -3273,7 +3273,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Optique lunetterie de détail — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Optique.',
   }
@@ -3283,7 +3283,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Activités industrielles de boulangerie et pâtisserie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Boulangerie industrielle.',
   }
@@ -3293,7 +3293,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pharmacies officine — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pharmacie.',
   }
@@ -3303,7 +3303,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bricolage commerce de détail — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce bricolage.',
   }
@@ -3313,7 +3313,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Prothèse dentaire laboratoires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé dentaire labo.',
   }
@@ -3323,7 +3323,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de détail alimentaire spécialisé — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce alim spécialisé.',
   }
@@ -3333,7 +3333,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coiffure entreprises — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coiffure.',
   }
@@ -3343,7 +3343,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sociétés assurances — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Assurance.',
   }
@@ -3353,7 +3353,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Banques populaires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Banque mutualiste.',
   }
@@ -3363,7 +3363,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Prévention et sécurité privée gardiennage — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sécurité privée.',
   }
@@ -3373,7 +3373,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Nettoyage entreprises de propreté — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Propreté.',
   }
@@ -3383,7 +3383,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Immobilier agents gestionnaires syndics — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Immobilier.',
   }
@@ -3393,7 +3393,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Promotion immobilière — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Promotion immobilière.',
   }
@@ -3403,7 +3403,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Organismes de Sécurité sociale (UCANSS) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sécurité sociale.',
   }
@@ -3413,7 +3413,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commissaires de justice et sociétés de ventes volontaires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commissaires justice ventes volontaires.',
   }
@@ -3423,7 +3423,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Syntec bureaux études techniques informatique ingénierie conseil — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). IT ingénierie conseil.',
   }
@@ -3433,7 +3433,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Hospitalisation privée — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé privée.',
   }
@@ -3443,7 +3443,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Radiodiffusion audiovisuel public et privé — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Audiovisuel.',
   }
@@ -3453,7 +3453,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Imprimerie de labeur industries graphiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Imprimerie.',
   }
@@ -3463,7 +3463,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Edition livres presse multimédia — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Edition.',
   }
@@ -3473,7 +3473,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets dentaires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé dentaire.',
   }
@@ -3483,7 +3483,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Aide accompagnement soins à domicile BASS — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Aide à domicile.',
   }
@@ -3493,7 +3493,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'CCN 66 inadaptés handicapés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Médico-social CCN 66.',
   }
@@ -3503,7 +3503,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Branche ferroviaire (CCN du 31 mai 2016) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport ferroviaire.',
   }
@@ -3513,7 +3513,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Notariat — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Notariat.',
   }
@@ -3523,7 +3523,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transport routier de marchandises — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport routier marchandises.',
   }
@@ -3533,7 +3533,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Blanchisserie, teinturerie et nettoyage (pressing) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Blanchisserie pressing.',
   }
@@ -3543,7 +3543,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Navigation intérieure bateliers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport fluvial.',
   }
@@ -3553,7 +3553,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Organismes de tourisme et hôtellerie de plein air — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Tourisme.',
   }
@@ -3563,7 +3563,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sport entreprises du secteur sportif — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sport.',
   }
@@ -3573,7 +3573,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Casinos — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Jeux casinos.',
   }
@@ -3583,7 +3583,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Formation professionnelle continue — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Formation professionnelle.',
   }
@@ -3593,7 +3593,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Animation ÉCLAT structures employant animateurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Animation ESS.',
   }
@@ -3603,7 +3603,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Centres sociaux et socio-culturels — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Action sociale.',
   }
@@ -3613,7 +3613,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Vente à distance e-commerce — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce distance.',
   }
@@ -3623,7 +3623,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Médico-social FEHAP CCN 51 — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Médico-social FEHAP.',
   }
@@ -3633,7 +3633,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Import-export et commerce international — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce international.',
   }
@@ -3643,7 +3643,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Caoutchouc industrie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie caoutchouc.',
   }
@@ -3653,7 +3653,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Menuiseries charpentes constructions industrialisées — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie bois.',
   }
@@ -3663,7 +3663,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries de carrières et matériaux de construction — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Carrières matériaux construction.',
   }
@@ -3673,7 +3673,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bois scieries négoce importation — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie bois négoce.',
   }
@@ -3683,7 +3683,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopératives de consommation — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopératives.',
   }
@@ -3693,7 +3693,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Professions réglementées auprès des juridictions — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Juridictions professions réglementées.',
   }
@@ -3703,7 +3703,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transport aérien personnel au sol accord national — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport aérien sol.',
   }
@@ -3713,7 +3713,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Couture parisienne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Mode couture.',
   }
@@ -3723,7 +3723,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Ouvriers négoce matériaux construction — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Négoce matériaux.',
   }
@@ -3733,7 +3733,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Production cinématographique acteurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cinéma production.',
   }
@@ -3743,7 +3743,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Remontées mécaniques domaines skiables — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Tourisme ski.',
   }
@@ -3753,7 +3753,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sociétés financières établissements financiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Finance.',
   }
@@ -3763,7 +3763,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce gros habillement mercerie chaussure jouet — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce gros habillement.',
   }
@@ -3773,7 +3773,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Manutention ferroviaire travaux connexes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport ferroviaire manut..',
   }
@@ -3783,7 +3783,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries textiles — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie textile.',
   }
@@ -3793,7 +3793,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries de fabrication mécanique du verre — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie verrière.',
   }
@@ -3803,7 +3803,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Métiers de la transformation des grains (meunerie) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Meunerie.',
   }
@@ -3813,7 +3813,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Habitat et logement accompagnés (ex-foyers de jeunes travailleurs) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). FJT habitat jeunes.',
   }
@@ -3823,7 +3823,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Salariés intérimaires des entreprises de travail temporaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Travail temporaire.',
   }
@@ -3833,7 +3833,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises au service de la création et de l\'événement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Création événement entreprises.',
   }
@@ -3843,7 +3843,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pêche professionnelle maritime (CCN provisoire) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pêche maritime.',
   }
@@ -3853,7 +3853,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Producteurs salariés assurances services extérieurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Assurance producteurs.',
   }
@@ -3863,7 +3863,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Employés ouvriers distribution cinématographique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cinéma distribution.',
   }
@@ -3873,7 +3873,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces de quincaillerie, fournitures industrielles, fers, métaux et équipements de la maison — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Quincaillerie fournitures.',
   }
@@ -3883,7 +3883,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Détaillants en chaussures — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce chaussures détail.',
   }
@@ -3893,7 +3893,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pompes funèbres — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Services funéraires.',
   }
@@ -3903,7 +3903,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets experts-comptables commissaires aux comptes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Finance audit comptable.',
   }
@@ -3913,7 +3913,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Distribution et commerce de gros des papiers-cartons — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Distribution papiers cartons.',
   }
@@ -3923,7 +3923,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Voyageurs représentants placiers VRP accord national — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). VRP.',
   }
@@ -3933,7 +3933,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres distribution films cinéma — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cinéma distribution cadres.',
   }
@@ -3943,7 +3943,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Services de santé au travail interentreprises — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé travail.',
   }
@@ -3953,7 +3953,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Expertises évaluations industrielles commerciales — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Expertise évaluation.',
   }
@@ -3963,7 +3963,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Laboratoires analyses médicales extra-hospitaliers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Biologie médicale labo.',
   }
@@ -3973,7 +3973,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Boucherie-Poissonnerie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Boucherie poissonnerie.',
   }
@@ -3983,7 +3983,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Exploitation équipements thermiques génie climatique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Génie climatique exploitation.',
   }
@@ -3993,7 +3993,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Gardiens concierges employés immeubles résidences — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Gardiennage immeuble.',
   }
@@ -4003,7 +4003,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Négoce industrie produits sol engrais — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Négoce agricole.',
   }
@@ -4013,7 +4013,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce réparation automobile cycle motocycle — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Automobile commerce réparation.',
   }
@@ -4023,7 +4023,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie tuiles et briques CCNTB — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie matériaux.',
   }
@@ -4033,7 +4033,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres entreprises équipements thermiques climatisation — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Génie climatique cadres.',
   }
@@ -4043,7 +4043,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pâtisserie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Artisanat pâtisserie.',
   }
@@ -4053,7 +4053,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Confiserie chocolaterie biscuiterie détail artisans — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Artisanat confiserie.',
   }
@@ -4063,7 +4063,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Exploitation cinématographique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cinéma exploitation.',
   }
@@ -4073,7 +4073,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Expédition exportation fruits légumes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce fruits légumes.',
   }
@@ -4083,7 +4083,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Distribution logistique services énergies proximité — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Distribution énergie.',
   }
@@ -4093,7 +4093,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Installation entretien réparation matériel thermique frigorifique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Génie climatique install..',
   }
@@ -4103,7 +4103,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel agences générales assurances — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Assurance agences personnel.',
   }
@@ -4113,7 +4113,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Portage de presse — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse portage.',
   }
@@ -4123,7 +4123,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Enseignement privé indépendant — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Education privée.',
   }
@@ -4133,7 +4133,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Omnipraticiens entreprises privées — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Santé omnipraticiens.',
   }
@@ -4143,7 +4143,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Activités marchés financiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Finance marchés.',
   }
@@ -4153,7 +4153,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel sédentaire navigation — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport maritime.',
   }
@@ -4163,7 +4163,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Librairie indépendante — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce librairie.',
   }
@@ -4173,7 +4173,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Ateliers chantiers insertion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Insertion professionnelle.',
   }
@@ -4183,7 +4183,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Ports et manutention unifiée — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport maritime port.',
   }
@@ -4193,7 +4193,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Esthétique cosmétique parfumerie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Esthétique beauté.',
   }
@@ -4203,7 +4203,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cinq branches industries alimentaires diverses — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce alim spécialisé 5B.',
   }
@@ -4213,7 +4213,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises services à la personne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Services personne.',
   }
@@ -4223,7 +4223,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Structures coopératives agricoles bétail viande — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopérative viande.',
   }
@@ -4233,7 +4233,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets géomètres-experts topographes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Géomètre expert.',
   }
@@ -4243,7 +4243,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Presse quotidienne et hebdomadaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse.',
   }
@@ -4253,7 +4253,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Particuliers employeurs emploi à domicile — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Emploi domicile.',
   }
@@ -4263,7 +4263,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Jeux jouets articles de fêtes puériculture — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie jouets puériculture.',
   }
@@ -4273,7 +4273,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Restauration de collectivités — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Restauration collective.',
   }
@@ -4283,7 +4283,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Fleuristes vente et services animaux familiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Fleuristes animalerie.',
   }
@@ -4293,7 +4293,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Courtage assurances et réassurances — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Assurance courtage.',
   }
@@ -4303,7 +4303,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopératives agricoles céréales meunerie alimentation bétail oléagineux — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopératives agricoles.',
   }
@@ -4313,7 +4313,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises de publicité et assimilées — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Publicité.',
   }
@@ -4323,7 +4323,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Exploitations frigorifiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Froid industriel.',
   }
@@ -4333,7 +4333,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres techniques de la presse quotidienne parisienne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse parisienne cadres.',
   }
@@ -4343,7 +4343,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Employés de la presse quotidienne parisienne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse parisienne employés.',
   }
@@ -4353,7 +4353,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Établissements médico-sociaux UNISSS FFESCPE (enfants, adolescents) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Médico-social enfants.',
   }
@@ -4363,7 +4363,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres administratifs de la presse quotidienne parisienne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse parisienne administratifs.',
   }
@@ -4373,7 +4373,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bijouterie, joaillerie, orfèvrerie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bijouterie joaillerie.',
   }
@@ -4383,7 +4383,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Maisons à succursales de vente au détail d\'habillement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Habillement succursales.',
   }
@@ -4393,7 +4393,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Centres d\'hébergement et de réadaptation sociale (CHRS, SOP) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Hébergement réadaptation sociale.',
   }
@@ -4403,7 +4403,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Fédération nationale des associations familiales rurales (FNAFR) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Associations familiales rurales.',
   }
@@ -4413,7 +4413,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des cabinets médicaux — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cabinets médicaux.',
   }
@@ -4423,7 +4423,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnels des ports de plaisance — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Ports de plaisance.',
   }
@@ -4433,7 +4433,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises artistiques et culturelles (SYNDEAC) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Entreprises artistiques culturelles.',
   }
@@ -4443,7 +4443,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Restauration ferroviaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Restauration ferroviaire.',
   }
@@ -4453,7 +4453,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Organismes de tourisme social et familial — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Tourisme social familial.',
   }
@@ -4463,7 +4463,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries de produits alimentaires élaborés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Produits alimentaires élaborés.',
   }
@@ -4473,7 +4473,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce, location, réparation de tracteurs et matériels agricoles, TP, bâtiment, motoculture (SEDIMA) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Matériels agricoles TP SEDIMA.',
   }
@@ -4483,7 +4483,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Fabrication de l\'ameublement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Ameublement fabrication.',
   }
@@ -4493,7 +4493,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Réseaux de transports publics urbains de voyageurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transports urbains voyageurs.',
   }
@@ -4503,7 +4503,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Branche du Crédit mutuel — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Crédit mutuel.',
   }
@@ -4513,7 +4513,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Journalistes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Journalisme.',
   }
@@ -4523,7 +4523,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de détail de l\'horlogerie-bijouterie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Horlogerie bijouterie détail.',
   }
@@ -4533,7 +4533,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Miroiterie, transformation et négoce du verre — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Miroiterie verre.',
   }
@@ -4543,7 +4543,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce de détail alimentaire non spécialisé — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Alimentaire détail non spécialisé.',
   }
@@ -4553,7 +4553,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Activités de production des eaux embouteillées, boissons rafraîchissantes sans alcool et bière — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Eaux embouteillées boissons.',
   }
@@ -4563,7 +4563,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises de l\'industrie et des commerces en gros des viandes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce gros viandes.',
   }
@@ -4573,7 +4573,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Distributeurs conseils hors domicile (CHD) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Distributeurs boissons CHD.',
   }
@@ -4583,7 +4583,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces de détail de papeterie, fournitures de bureau, bureautique, informatique et librairie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Papeterie fournitures bureau.',
   }
@@ -4593,7 +4593,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce des articles de sports et d\'équipements de loisirs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sports équipements loisirs.',
   }
@@ -4603,7 +4603,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des industries céramiques de France — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industries céramiques.',
   }
@@ -4613,7 +4613,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie de la salaison, charcuterie en gros et conserves de viandes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Salaison charcuterie gros.',
   }
@@ -4623,7 +4623,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Mareyeurs-expéditeurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Mareyeurs expéditeurs.',
   }
@@ -4633,7 +4633,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises de désinfection, désinsectisation, dératisation (3D) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Désinfection dératisation.',
   }
@@ -4643,7 +4643,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises de logistique de communication écrite directe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Logistique publicité directe.',
   }
@@ -4653,7 +4653,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel navigant des essais et réceptions — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Aviation essais réceptions.',
   }
@@ -4663,7 +4663,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Répartition pharmaceutique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Répartition pharmaceutique.',
   }
@@ -4673,7 +4673,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Maisons d\'étudiants — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Maisons d\'étudiants.',
   }
@@ -4683,7 +4683,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Inspection d\'assurance — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Inspection d\'assurance.',
   }
@@ -4693,7 +4693,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces et services de l\'audiovisuel, de l\'électronique et de l\'équipement ménager — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Audiovisuel électroménager.',
   }
@@ -4703,7 +4703,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Ouvriers de travaux publics — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Travaux publics ouvriers.',
   }
@@ -4713,7 +4713,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Jardineries et graineteries — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Jardineries graineteries.',
   }
@@ -4723,7 +4723,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Espaces de loisirs, d\'attractions et culturels — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Loisirs attractions culturels.',
   }
@@ -4733,7 +4733,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des institutions de retraite complémentaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Retraite complémentaire.',
   }
@@ -4743,7 +4743,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sociétés d\'assistance — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sociétés d\'assistance.',
   }
@@ -4753,7 +4753,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Professions regroupées du cristal, du verre et du vitrail — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cristal verre vitrail.',
   }
@@ -4763,7 +4763,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets et cliniques vétérinaires, personnel salarié — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cliniques vétérinaires.',
   }
@@ -4773,7 +4773,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Négoce de l\'ameublement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Négoce ameublement.',
   }
@@ -4783,7 +4783,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Organismes de tourisme — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Organismes de tourisme.',
   }
@@ -4793,7 +4793,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industries de la transformation des volailles — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transformation volailles.',
   }
@@ -4803,7 +4803,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel navigant technique des exploitants d\'hélicoptères — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Hélicoptères personnel navigant.',
   }
@@ -4813,7 +4813,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets ou entreprises d\'expertises en automobile — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Expertise automobile.',
   }
@@ -4823,7 +4823,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Négoce et prestations de services dans les domaines médico-techniques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Médico-technique négoce.',
   }
@@ -4833,7 +4833,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Golf — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Golf.',
   }
@@ -4843,7 +4843,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Chaînes de cafétérias et assimilés — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cafétérias chaînes.',
   }
@@ -4853,7 +4853,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'ETARF entreprises travaux et services agricoles ruraux forestiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Agriculture ETARF.',
   }
@@ -4863,7 +4863,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Mutualité sociale agricole — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). MSA.',
   }
@@ -4873,7 +4873,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Distilleries coopératives viticoles — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Viticulture distillerie.',
   }
@@ -4883,7 +4883,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Maisons familiales rurales — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Enseignement rural.',
   }
@@ -4893,7 +4893,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Centres initiatives en milieu rural — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Développement rural.',
   }
@@ -4903,7 +4903,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Organismes de la Confédération paysanne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Syndicat agricole.',
   }
@@ -4913,7 +4913,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises privées du spectacle vivant — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Spectacle vivant privé.',
   }
@@ -4923,7 +4923,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Branche des salariés en portage salarial — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Portage salarial.',
   }
@@ -4933,7 +4933,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Parcs et jardins zoologiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Zoos parcs animaliers.',
   }
@@ -4943,7 +4943,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Régies de quartier — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Régies de quartier.',
   }
@@ -4953,7 +4953,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Professions de la photographie — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Photographie.',
   }
@@ -4963,7 +4963,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Banque Populaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Banque Populaire.',
   }
@@ -4973,7 +4973,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres des travaux publics — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Travaux publics cadres.',
   }
@@ -4983,7 +4983,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Économistes de la construction et métreurs-vérificateurs — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Économistes construction.',
   }
@@ -4993,7 +4993,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Enseignement privé non lucratif — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Enseignement privé non lucratif.',
   }
@@ -5003,7 +5003,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Offices publics de l\'habitat — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Offices publics habitat.',
   }
@@ -5013,7 +5013,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Agences de presse (employés, techniciens, cadres) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Agences de presse.',
   }
@@ -5023,7 +5023,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transports et services maritimes, personnels navigants officiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transports maritimes officiers.',
   }
@@ -5033,7 +5033,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Éditeurs de la presse magazine (employés et cadres) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse magazine.',
   }
@@ -5043,7 +5043,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Armateurs de services de passages d\'eau, personnel navigant — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Passages d\'eau navigants.',
   }
@@ -5053,7 +5053,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel sédentaire du transport de marchandises en navigation intérieure — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Navigation intérieure marchandises.',
   }
@@ -5063,7 +5063,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Agents de direction des organismes du régime général de sécurité sociale — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sécu agents de direction.',
   }
@@ -5073,7 +5073,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie de la fabrication des ciments — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Ciment fabrication.',
   }
@@ -5083,7 +5083,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Parfumerie sélective — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Parfumerie sélective.',
   }
@@ -5093,7 +5093,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie et services nautiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Nautisme.',
   }
@@ -5103,7 +5103,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Télédiffusion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Télédiffusion.',
   }
@@ -5113,7 +5113,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Presse quotidienne et hebdomadaire en régions — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse régionale.',
   }
@@ -5123,7 +5123,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Opérateurs de voyages et guides — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Voyages guides.',
   }
@@ -5133,7 +5133,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Presse Région parisienne ouvriers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Presse Région parisienne ouvriers.',
   }
@@ -5143,7 +5143,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerces Martinique.',
   }
@@ -5153,7 +5153,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sucrerie Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sucrerie Réunion.',
   }
@@ -5163,7 +5163,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ETAM La Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ETAM La Réunion.',
   }
@@ -5173,7 +5173,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ouvriers Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ouvriers Martinique.',
   }
@@ -5183,7 +5183,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP Cadres La Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP Cadres La Réunion.',
   }
@@ -5193,7 +5193,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Boulangerie Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Boulangerie Martinique.',
   }
@@ -5203,7 +5203,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des garages de la Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Personnel des garages de la Martinique.',
   }
@@ -5213,7 +5213,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ouvriers St Pierre Miquelon — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ouvriers St Pierre Miquelon.',
   }
@@ -5223,7 +5223,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces St Pierre Miquelon — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerces St Pierre Miquelon.',
   }
@@ -5233,7 +5233,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Consignataire de navires Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Consignataire de navires Martinique.',
   }
@@ -5243,7 +5243,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Métallurgie Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Métallurgie Martinique.',
   }
@@ -5253,7 +5253,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Répartition pharmaceutique Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Répartition pharmaceutique Martinique.',
   }
@@ -5263,7 +5263,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Manutention portuaire St Pierre — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Manutention portuaire St Pierre.',
   }
@@ -5273,7 +5273,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Hôtels St Pierre Miquelon — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Hôtels St Pierre Miquelon.',
   }
@@ -5283,7 +5283,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces services Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerces services Guadeloupe.',
   }
@@ -5293,7 +5293,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces la Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerces la Réunion.',
   }
@@ -5303,7 +5303,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Hôtellerie Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Hôtellerie Guadeloupe.',
   }
@@ -5313,7 +5313,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerces de l\'automobile la Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerces de l\'automobile la Réunion.',
   }
@@ -5323,7 +5323,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pharmacie d\'officine Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pharmacie d\'officine Réunion.',
   }
@@ -5333,7 +5333,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie agro alimentaires Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie agro alimentaires Réunion.',
   }
@@ -5343,7 +5343,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Soins infirmiers à domicile Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Soins infirmiers à domicile Guadeloupe.',
   }
@@ -5353,7 +5353,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sucrerie distillerie Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sucrerie distillerie Guadeloupe.',
   }
@@ -5363,7 +5363,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment cadres Région parisienne — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment cadres Région parisienne.',
   }
@@ -5373,7 +5373,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Manutention portuaire Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Manutention portuaire Guadeloupe.',
   }
@@ -5383,7 +5383,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Stations Service Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Stations Service Guadeloupe.',
   }
@@ -5393,7 +5393,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commissionnaires en douane Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commissionnaires en douane Martinique.',
   }
@@ -5403,7 +5403,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Mines Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Mines Guyane.',
   }
@@ -5413,7 +5413,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Boulangerie pâtisserie de la Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Boulangerie pâtisserie de la Guyane.',
   }
@@ -5423,7 +5423,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ouvriers Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ouvriers Guadeloupe.',
   }
@@ -5433,7 +5433,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transport sanitaire en Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport sanitaire en Martinique.',
   }
@@ -5443,7 +5443,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Services de l\'automobile Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Services de l\'automobile Guyane.',
   }
@@ -5453,7 +5453,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ouvriers La Réunion — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ouvriers La Réunion.',
   }
@@ -5463,7 +5463,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Hospitalisation Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Hospitalisation Guadeloupe.',
   }
@@ -5473,7 +5473,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Manutention portuaire Fort de France — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Manutention portuaire Fort de France.',
   }
@@ -5483,7 +5483,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie sucrière et rhumière Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Industrie sucrière et rhumière Martinique.',
   }
@@ -5493,7 +5493,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Culture canne à sucre Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Culture canne à sucre Martinique.',
   }
@@ -5503,7 +5503,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Télédiffusion (accords CDD) — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Télédiffusion (accords CDD).',
   }
@@ -5513,7 +5513,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Guides et accompagnateurs milieu amazonien — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Guides et accompagnateurs milieu amazonien.',
   }
@@ -5523,7 +5523,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Banques Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Banques Guyane.',
   }
@@ -5533,7 +5533,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Banques Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Banques Martinique.',
   }
@@ -5543,7 +5543,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Banques Guadeloupe St Martin — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Banques Guadeloupe St Martin.',
   }
@@ -5553,7 +5553,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sécurité sociale des mines personnels non cadres — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Sécurité sociale des mines personnels non cadres.',
   }
@@ -5563,7 +5563,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ouvriers Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ouvriers Guyane.',
   }
@@ -5573,7 +5573,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transport de proximité produits pétroliers Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transport de proximité produits pétroliers Martinique.',
   }
@@ -5583,7 +5583,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transports routiers de la Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transports routiers de la Guadeloupe.',
   }
@@ -5593,7 +5593,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ETAM Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ETAM Martinique.',
   }
@@ -5603,7 +5603,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Ambulances Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Ambulances Guyane.',
   }
@@ -5613,7 +5613,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'BTP Industrie activités connexes Guyane - ETAM — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). BTP Industrie activités connexes Guyane - ETAM.',
   }
@@ -5623,7 +5623,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Commerce Sces commerciaux HCR St Pierre et Miquelon — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Commerce Sces commerciaux HCR St Pierre et Miquelon.',
   }
@@ -5633,7 +5633,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ETAM Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ETAM Guadeloupe.',
   }
@@ -5643,7 +5643,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Bâtiment TP ingénieurs et cadres Guyane — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment TP ingénieurs et cadres Guyane.',
   }
@@ -5653,7 +5653,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cabinets médicaux Martinique — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Cabinets médicaux Martinique.',
   }
@@ -5663,7 +5663,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transports sanitaires de Guadeloupe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transports sanitaires de Guadeloupe.',
   }
@@ -5673,7 +5673,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Transports maritimes personnel navigant d\'exécution — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Transports maritimes personnel navigant d\'exécution.',
   }
@@ -5683,7 +5683,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Remorquage maritime officiers — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Remorquage maritime officiers.',
   }
@@ -5693,7 +5693,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Remorquage maritime navigant d\'exécution — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Remorquage maritime navigant d\'exécution.',
   }
@@ -5703,7 +5703,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Rouissage teillage du lin — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Lin rouissage teillage.',
   }
@@ -5713,7 +5713,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopératives et SICA bétail et viandes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopératives agricoles bétail.',
   }
@@ -5723,7 +5723,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopératives laitières et unions de coopératives — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopératives laitières.',
   }
@@ -5733,7 +5733,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises d\'accouvage et de sélection avicole — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Accouvage sélection avicole.',
   }
@@ -5743,7 +5743,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des élevages aquacoles — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Aquaculture élevage.',
   }
@@ -5753,7 +5753,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Conchyliculture — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Conchyliculture.',
   }
@@ -5763,7 +5763,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Réseau des centres d\'économie rurale — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Centres économie rurale.',
   }
@@ -5773,7 +5773,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Activités hippiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Activités hippiques.',
   }
@@ -5783,7 +5783,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Conseil et service en élevage — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Conseil service élevage.',
   }
@@ -5793,7 +5793,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopératives agricoles et unions de coopératives — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopératives agricoles.',
   }
@@ -5803,7 +5803,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Caisses régionales du Crédit agricole — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Crédit agricole.',
   }
@@ -5813,7 +5813,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Salariés des établissements d\'enseignement agricole privé — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Enseignement agricole privé.',
   }
@@ -5823,7 +5823,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Industrie des panneaux à base de bois — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Panneaux bois.',
   }
@@ -5833,7 +5833,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel des prestataires de services du secteur tertiaire — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Prestataires services tertiaire.',
   }
@@ -5843,7 +5843,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Mutualité — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Mutualité.',
   }
@@ -5853,7 +5853,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises des services d\'eau et d\'assainissement — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Eau assainissement.',
   }
@@ -5863,7 +5863,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Télécommunications — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Télécommunications.',
   }
@@ -5873,7 +5873,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Activités du déchet — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Déchet activités.',
   }
@@ -5883,7 +5883,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnels des sociétés anonymes et fondations d\'HLM — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). HLM sociétés anonymes.',
   }
@@ -5893,7 +5893,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Grands magasins et magasins populaires — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Grands magasins.',
   }
@@ -5903,7 +5903,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Missions locales et PAIO — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Missions locales PAIO.',
   }
@@ -5913,7 +5913,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Taxis — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Taxis.',
   }
@@ -5923,7 +5923,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Assainissement et maintenance industrielle — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Assainissement industriel.',
   }
@@ -5933,7 +5933,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Entreprises de la distribution directe — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Distribution directe.',
   }
@@ -5943,7 +5943,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Production de films d\'animation — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Films d\'animation production.',
   }
@@ -5953,7 +5953,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres du bâtiment — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment cadres.',
   }
@@ -5963,7 +5963,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Coopération maritime — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Coopération maritime.',
   }
@@ -5973,7 +5973,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Sociétés concessionnaires ou exploitantes d\'autoroutes — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Autoroutes concessionnaires.',
   }
@@ -5983,7 +5983,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Praticiens-conseils du régime général de sécurité sociale — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Praticiens-conseils sécu.',
   }
@@ -5993,7 +5993,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Employés, techniciens et agents de maîtrise du bâtiment — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Bâtiment ETAM.',
   }
@@ -6003,7 +6003,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Employés, techniciens et agents de maîtrise des travaux publics — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Travaux publics ETAM.',
   }
@@ -6013,7 +6013,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Production audiovisuelle — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Production audiovisuelle.',
   }
@@ -6023,7 +6023,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Cadres supérieurs des sociétés de secours minières — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Secours minières cadres.',
   }
@@ -6033,7 +6033,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnels des structures associatives cynégétiques — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Chasse associations.',
   }
@@ -6043,7 +6043,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pharmaciens du régime minier — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pharmaciens régime minier.',
   }
@@ -6053,7 +6053,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Pôle Emploi — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Pôle Emploi.',
   }
@@ -6063,7 +6063,7 @@ const CCN_CD_DATA = [
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
-    droitsCP: '25 jours ouvrables minimum (Art. L3141-1)',
+    droitsCP: '30 jours ouvrables minimum, soit 5 semaines (Art. L3141-3)',
     alertesCD: ['3 critères cumulatifs L3111-2 obligatoires', 'En cas de requalification : rappel HS sur 3 ans (Cass. Soc. 2011)', 'Obligation de sécurité maintenue (Art. L4121-1)', '218 jours dépassés : recommander un entretien de charge'],
     notesCD: 'Personnel salarié des agences de recherches privées — Application standard L3111-2 (pouvoir de direction effectif, rémunération parmi les plus élevées, autonomie d\'organisation). Agences recherches privées.',
   }
