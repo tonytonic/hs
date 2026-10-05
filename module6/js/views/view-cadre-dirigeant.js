@@ -331,7 +331,7 @@ const VCD = {
         <div><div class="m6-card-label">Protections légales</div><div class="m6-card-title">Droits maintenus (L3111-2)</div></div>
       </div>
       <div class="m6-card-body">
-        ${[['Congés payés','25j ouvrables min (L3141-1)','✅'],['Protection licenciement','Régime commun','✅'],['Maternité / Paternité','Protection complète','✅'],['Médecine du travail','VIP obligatoire','✅'],['Entretien de charge','Si engagement contractuel','✅'],['Durée légale 35h','Non applicable','—'],['Heures supplémentaires','Non applicable','—'],['Repos légaux','Recommandés, non imposés','—']].map(([l,d,ico])=>`<div class="m6-row" style="align-items:flex-start;padding:7px 0"><div><div style="font-size:0.8rem;font-weight:500">${l}</div><div style="font-size:0.7rem;color:var(--pierre)">${d}</div></div><span style="font-size:0.9rem;margin-left:auto;flex-shrink:0">${ico}</span></div>`).join('')}
+        ${[['Congés payés','30 jours ouvrables, soit 5 semaines (L3141-3)','✅'],['Protection licenciement','Régime commun','✅'],['Maternité / Paternité','Protection complète','✅'],['Médecine du travail','VIP obligatoire','✅'],['Entretien de charge','Si engagement contractuel','✅'],['Durée légale 35h','Non applicable','—'],['Heures supplémentaires','Non applicable','—'],['Repos légaux','Recommandés, non imposés','—']].map(([l,d,ico])=>`<div class="m6-row" style="align-items:flex-start;padding:7px 0"><div><div style="font-size:0.8rem;font-weight:500">${l}</div><div style="font-size:0.7rem;color:var(--pierre)">${d}</div></div><span style="font-size:0.9rem;margin-left:auto;flex-shrink:0">${ico}</span></div>`).join('')}
       </div>
     </div>
 
