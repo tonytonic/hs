@@ -1142,3 +1142,13 @@ input[type=range] {
     display: none !important;
   }
 }
+
+/* ── 05/10/2026 : iPhone — la 2e ligne de la barre du bas tombait dans la zone du geste
+   « barre d'accueil » (et de la barre d'outils de Safari) : les boutons Validité, Entretien,
+   Export, Glossaire ne répondaient pas. On remonte la barre d'au moins 22 px sur iOS
+   (ou de la zone de sécurité si elle est plus grande), et le contenu suit. ── */
+@supports (-webkit-touch-callout: none) {
+  .m6-bottom-nav { padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+  .m6-main { padding-bottom: calc(162px + env(safe-area-inset-bottom, 0px)); }
+  .m6-toast { bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
+}
