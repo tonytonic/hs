@@ -37,7 +37,7 @@ const M6_RuptureCalculateur = {
     const annees   = diffJours / 365.25;
     const moisTotal = Math.floor(annees * 12);
 
-    // ── Indemnité légale (L1237-19 + R1234-2) ─────────────────
+    // ── Indemnité légale (L1234-9 + R1234-2) ─────────────────
     // = 1/4 de mois par année jusqu'à 10 ans + 1/3 de mois au-delà
     // Base de calcul : 1/12e de la rémunération brute des 12 derniers mois
     // OU 1/3 des 3 derniers mois si plus favorable
@@ -45,7 +45,7 @@ const M6_RuptureCalculateur = {
     const salRef = parseFloat(salaireRefBrut) || 0;
 
     let indemLegale = 0;
-    if (annees >= 8/12) { // seuil 8 mois minimum L1237-19
+    if (annees >= 8/12) { // seuil 8 mois minimum L1234-9
       const annees10 = Math.min(annees, 10);
       const au_dela  = Math.max(0, annees - 10);
       indemLegale = salRef * (0.25 * annees10 + (1/3) * au_dela);
@@ -63,7 +63,8 @@ const M6_RuptureCalculateur = {
           ccnRegles = ccnObj;
           // Règles courantes des CCN cadres (approximatives — toujours vérifier la CCN)
           const groupe = ccnObj.groupe || '';
-          if (groupe.includes('Syntec') || groupe.includes('SYNTEC')) {
+          // 05/10/2026 : formules conventionnelles écrites en dur non vérifiées → désactivées
+          if (false && groupe.includes('Syntec') || groupe.includes('SYNTEC')) {
             // Syntec : 3/10e de mois par an jusqu'à 10 ans, 4/10e au-delà
             const a10 = Math.min(annees, 10);
             const ad  = Math.max(0, annees - 10);
