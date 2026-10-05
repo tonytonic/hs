@@ -260,16 +260,22 @@ const M6_ForfaitJours = {
     // Repos hebdomadaire
     const parSemaine={};
     for(const e of joursTrack){ const wk=this._isoWeek(new Date(e.dk+'T12:00:00')); parSemaine[wk]=(parSemaine[wk]||0)+1; }
+    // 05/10/2026 : 6 jours travaillés dans la semaine restent légaux (repos de 24 h + 11 h le
+    // 7e jour) ; l'interdiction porte sur plus de 6 jours (L3132-1). Avant : alerte dès 6 jours.
     for(const [wk,nb] of Object.entries(parSemaine))
-      if(nb>=6) alertes.push({niveau:'danger',icon:'🔴',titre:`Repos hebdo insuffisant (${wk})`,
-        texte:`${nb} jours travaillés. Repos 35h consécutives requis (L3132-2).`,loi:'L3132-2'});
+      if(nb>=7) alertes.push({niveau:'danger',icon:'🔴',titre:`Repos hebdo absent (${wk})`,
+        texte:`${nb} jours travaillés : interdit de travailler plus de 6 jours par semaine (L3132-1), repos de 35h consécutives requis (L3132-2).`,loi:'L3132-1'});
     // Dépassement plafond
     if(travailles>recap.joursTravailMax) alertes.push({niveau:'danger',icon:'⚠️',
       titre:`Dépassement forfait — ${travailles-recap.joursTravailMax}j`,
       texte:`Avenant rachat ≥10% obligatoire (L3121-59).`,loi:'L3121-59'});
     else if(travailles>=Math.floor(recap.joursTravailMax*0.9)) alertes.push({niveau:'warning',icon:'📅',
       titre:`Approche du plafond — ${recap.joursTravailMax-travailles}j restants`,
-      texte:'Planifiez vos RTT avant la fin de l\'exercice.',loi:'L3121-41'});
+      texte:'Planifiez vos RTT avant la fin de l\'exercice.',loi:'L3121-64'});
+    // 05/10/2026 : même avec rachat de jours de repos, 235 jours au plus à défaut d'accord
+    // fixant un autre maximum (L3121-66)
+    if(travailles>235) alertes.push({niveau:'danger',icon:'⛔',titre:`${travailles} jours : au-delà de 235`,
+      texte:'À défaut d\'accord fixant un autre maximum, le nombre de jours travaillés ne peut pas dépasser 235 par an, rachat compris (L3121-66).',loi:'L3121-66'});
     // Entretien — considéré "fait" si date OU case auto-attestée dans Validité
     let _entretienAutoOk = false;
     try { _entretienAutoOk = (localStorage.getItem(`M6_VALID_CHECK_forfait_jours_${year}_entretien_annuel`) === '1'); } catch(_) {}
@@ -437,10 +443,12 @@ const M6_ForfaitHeures = {
         if(h>maxHebdo) alertes.push({niveau:'danger',icon:'⚠️',titre:`${wk} — ${h}h > ${maxHebdo}h`,
           texte:`Maximum hebdomadaire de la convention (${maxHebdo}h) dépassé.`,loi:'CCN 3239'});
       }
-      else if(h>60) alertes.push({niveau:'danger',icon:'⛔',titre:`${wk} — ${h}h > 60h absolu`,
-        texte:'Dépassement absolu interdit (L3121-20).',loi:'L3121-20'});
-      else if(h>maxHebdo) alertes.push({niveau:'danger',icon:'⚠️',titre:`${wk} — ${h}h > ${maxHebdo}h CCN`,
-        texte:`Maximum CCN "${ccnNom}" dépassé.`,loi:'L3121-20'});
+      // 05/10/2026 : 48 h sur une même semaine (L3121-20) ; jusqu'à 60 h seulement sur
+      // autorisation exceptionnelle de l'inspection du travail (L3121-21) ; jamais au-delà.
+      else if(h>60) alertes.push({niveau:'danger',icon:'⛔',titre:`${wk} — ${h}h : au-delà de 60h`,
+        texte:'Interdit dans tous les cas : 48h maximum par semaine (L3121-20), 60h au plus même avec une autorisation exceptionnelle (L3121-21).',loi:'L3121-21'});
+      else if(h>maxHebdo) alertes.push({niveau:'danger',icon:'⚠️',titre:`${wk} — ${h}h > ${maxHebdo}h`,
+        texte:`Durée maximale de ${maxHebdo}h par semaine dépassée (L3121-20). Seule une autorisation exceptionnelle de l'inspection du travail permet d'aller jusqu'à 60h (L3121-21).`,loi:'L3121-20'});
       detailSemaines.push({semaine:wk,heures:h,hs1,hs_inter,hs2,
         paliers:taux_inter!==null?`+${taux1}%(${hs1}h)+${taux_inter}%(${hs_inter}h)+${taux2}%(${hs2}h)`:`+${taux1}%(${hs1}h)+${taux2}%(${hs2}h)`});
     }
@@ -456,6 +464,16 @@ const M6_ForfaitHeures = {
       const mx=ccnRules.maxMoyenne||48;
       if(hs.length>=avgConvN && avgConv>mx) alertes.push({niveau:'warning',icon:'⚠️',titre:`Moyenne ${avgConv}h > ${mx}h`,
         texte:`Sur ${avgConvN>=17?'4 mois':avgConvN+' semaines'} consécutifs, la moyenne dépasse les ${mx}h de la convention (${avgConvN>=17?'art. 96.3':'art. 134'}).`,loi:'CCN 3239'});
+    }
+    // 05/10/2026 : semaine la plus chargée (lue par Validité, qui affichait toujours 0 h) et
+    // moyenne de 44 h sur 12 semaines (L3121-22), hors IDCC 3239 (règles de la convention)
+    const maxSemaine=detailSemaines.reduce((m,d)=>Math.max(m,d.heures||0),0);
+    let avg12=0;
+    if(!sansContingent && detailSemaines.length>=12){
+      for(let i=11;i<detailSemaines.length;i++){ const w=detailSemaines.slice(i-11,i+1); const m=w.reduce((a,d)=>a+(d.heures||0),0)/12; if(m>avg12) avg12=m; }
+      avg12=Math.round(avg12*100)/100;
+      if(avg12>44) alertes.push({niveau:'warning',icon:'⚠️',titre:`Moyenne ${avg12}h sur 12 semaines`,
+        texte:'Au-delà de 44h en moyenne sur 12 semaines consécutives (L3121-22), sauf accord qui porte cette moyenne à 46h au plus (L3121-23).',loi:'L3121-22'});
     }
     const pct=sansContingent?0:Math.min(100,Math.round(totalHS/contingent*100));
     if(sansContingent){ /* pas de contingent : aucune alerte de contingent */ }
@@ -495,6 +513,7 @@ const M6_ForfaitHeures = {
             contingentBase, contingentProrata,
             ccnNom,prediction,
             tauxHoraire:tauxH, sansContingent, parMois, avgConv, avgConvN,
+            max:maxSemaine, avg12,
             // un seul taux pour toutes les heures sup (ex. assistant maternel 10 %/10 %)
             tauxUnique: taux_inter === null && Number(taux1) === Number(taux2),
             a3Paliers: taux_inter !== null};
