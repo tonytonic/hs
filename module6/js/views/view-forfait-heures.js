@@ -127,6 +127,7 @@ const VFH = {
           contingent:     analysis.contingent,
           tauxRemplissage:analysis.tauxRemplissage,
           sansContingent: !!analysis.sansContingent,
+          max:            analysis.max,
           rttPris:0, rttSolde:0, rachetes:0, cpPris:0,
           alertes: analysis.alertes,
           rttTheoriques:0, joursRestants: analysis.contingent - analysis.totalHS },
