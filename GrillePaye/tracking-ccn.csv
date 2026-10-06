@@ -38,7 +38,7 @@
 2247,Entreprises de courtage d'assurances réassurances,6,vérifiée,3,01/07/2025,ACTIF,,travail-industrie.com,"IDCC 2247 réel = Courtage d'assurances/réassurances (brochure 3110) — gestionnaires, chargés clientèle, cadres techniques. Contenu actuel = 'Ouvrier(ère)/Employé(e) débutant coef 100' générique industrie. Incohérent (courtage = bureau, pas ouvrier). A signaler."
 2596,Coiffure entreprises,6,vérifiée,9,01/03/2026,ACTIF,,,
 2642,Production audiovisuelle,6,vérifiée,5,01/06/2026,ACTIF,,USPA identifiée mais inaccessible (robots) ; sources secondaires rejetées (incohérentes),"Production audiovisuelle - identité DARES confirmée. MAIS: sources secondaires trouvées (clakprod.com, plusieurs articles) se CONTREDISENT sur le niveau 1 (1747€ / 1800€ / 2100€ selon l'article, même site) — signal net de contenu peu fiable, probablement généré automatiquement, à ne PAS utiliser. La vraie source primaire existe (USPA, syndicat employeur signataire, avenant n°19 'fiction et flux', grille officielle au 01/01/2026 mentionnée) mais bloque l'accès automatisé (robots.txt). Non résolu — nécessite consultation manuelle de uspa.fr/conventions-collectives-et-accords-sociaux par un humain."
-3109,Métiers du commerce détail alimentaire spécialisé 5 branches,6,sourcée,20,01/01/2026,ACTIF,,juristique.org+legisocial+advizexperts,"IDCC 3109 réel = '5 branches industries alimentaires diverses' (brochure 3384), grille confirmée 1841,03€-5294,03€, avenant n°31 16/01/2026 étendu. MAIS contenu actuel du fichier = boucher/poissonnier/primeur (commerce détail), pas de rapport. A signaler."
+3109,"Cinq branches industries alimentaires diverses (biscuiterie, confiserie, chocolaterie…)",6,sourcée,20,01/01/2026,ACTIF,,juristique.org+legisocial+advizexperts,"IDCC 3109 réel = '5 branches industries alimentaires diverses' (brochure 3384), grille confirmée 1841,03€-5294,03€, avenant n°31 16/01/2026 étendu. MAIS contenu actuel du fichier = boucher/poissonnier/primeur (commerce détail), pas de rapport. A signaler."
 3251,Bijouterie Joaillerie Orfèvrerie Horlogerie (BJOH),6,sourcée,28,01/07/2026,,,,
 3254,"Boucherie, charcuterie, poissonnerie",6,vérifiée,6,01/06/2026,,,,
 759,Pompes funèbres,5,estimation à confirmer,12,01/01/2026,ACTIF,,,
@@ -202,7 +202,7 @@
 925,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 951,Théâtres privés spectacle vivant lieux fixes,0,vérifiée,7,01/06/2026,HISTORIQUE_PERIME,,,
 953,Charcuterie de détail,0,vérifiée,13,01/01/2026,,,"Avenant n° 64 du 15/01/2026 (salaires au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
-993,Prothèse dentaire laboratoires,0,sourcée,12,01/10/2026,ACTIF,,"Protocole du 15/06/2026, étendu par arrêté du 24/08/2026 (JO 04/09/2026), en vigueur au 01/10/2026 — montants de sources secondaires concordantes, à recouper avec le BOCC 2026/28",
+993,Prothèse dentaire laboratoires,0,estimation à confirmer,12,01/10/2026,ACTIF,,"Protocole du 15/06/2026, étendu par arrêté du 24/08/2026 (JO 04/09/2026), en vigueur au 01/10/2026 — montants de sources secondaires concordantes, à recouper avec le BOCC 2026/28",
 1031,Associations Familles rurales,0,estimation à confirmer,8,01/06/2026,ACTIF,,,
 1040,,0,absente de CCN_ALL — hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
 1044,Horlogerie — commerce de gros,0,estimation à confirmer,5,01/06/2026,HISTORIQUE_PERIME,,,
@@ -318,7 +318,7 @@
 1780,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1597",Ancien nom officiel: Convention collective du bâtiment de la région Provence-Alpes-Côte d'azur concernant les ouvriers employés par les entreprises occupant plus de 10 salariés. Ce numéro est remplacé par le 1597 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 1782,Clubs sportifs professionnels (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1783,Professions libérales diverses (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
-1790,Espaces de loisirs d'attractions et culturels,0,vérifiée,16,01/04/2026,ACTIF,,"Avenant n° 76 du 13/03/2026, étendu par arrêté du 06/07/2026 (JO 10/07/2026), en vigueur au 01/04/2026 — vérifié le 06/10/2026",Espaces de loisirs/attractions/culturels (parcs) vs 'assistant éditorial musical' actuel. Aucun rapport.
+1790,Espaces de loisirs d'attractions et culturels,0,estimation à confirmer,16,01/04/2026,ACTIF,,"Avenant n° 76 du 13/03/2026, étendu par arrêté du 06/07/2026 (JO 10/07/2026), en vigueur au 01/04/2026 — vérifié le 06/10/2026",Espaces de loisirs/attractions/culturels (parcs) vs 'assistant éditorial musical' actuel. Aucun rapport.
 1794,Institutions de retraite complémentaire et prévoyance,0,estimation à confirmer,7,01/12/2025,ACTIF,,,
 1801,Sociétés d'assistance,,sourcée,9,12/12/2024,,,,
 1821,Verre vitrail cristal professions,0,vérifiée,6,01/06/2026,ACTIF,,,
@@ -341,6 +341,7 @@
 2070,Organismes de développement économique,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 5025",Ancien nom officiel: Convention collective relative au statut des personnels des organismes de développement économique. Ce numéro est remplacé par le 5025 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2075,Centres conditionnement œufs (fusionné boulangerie),0,vérifiée,3,01/02/2025,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1747","Ancien nom officiel: Convention collective nationale des centres immatricules de conditionnement, de commercialisation et de transformation des œufs et des industries en produits d'œufs. Ce numéro est remplacé par le 1747 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
 2089,Industrie des panneaux à base de bois,,sourcée,7,01/07/2026,,,,
+2111,"Salariés du particulier employeur (ancienne convention, fusionnée dans l'IDCC 3239)",,sans grille (estimation % SMIC),0,,,,,
 2140,Assistants maternels du particulier employeur (identité non confirmée),0,vérifiée,12,01/06/2026,ALIAS_OK,,DARES,Ouvriers de presse régionale (imprimerie) vs 'assistant maternel agréé' actuel. Aucun rapport.
 2147,Entreprises des services d'eau et d'assainissement,,sourcée,8,10/06/2025,,,,
 2149,Activités du déchet,,sourcée,11,01/01/2025,,,,
@@ -351,7 +352,7 @@
 2272,Assainissement et maintenance industrielle,,sourcée,15,20/02/2026,,oui (1863 €),,
 2344,Sidérurgie,0,vérifiée,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3248",Ancien nom officiel: Convention collective de la sidérurgie. Ce numéro est remplacé par le 3248 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2372,Distribution directe,0,estimation à confirmer,3,2026,ACTIF,,DARES,Distribution directe (prospectus/imprimés pub) vs 'clerc commissaire de justice' actuel. Aucun rapport.
-2395,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
+2395,"Assistants maternels du particulier employeur (ancienne convention, fusionnée dans l'IDCC 3239)",0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 2408,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 2409,Travaux publics cadres,0,vérifiée,5,01/01/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3212",Ancien nom officiel: Convention collective nationale des cadres des travaux publics. Ce numéro est remplacé par le 3212 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2412,Production de films d'animation,,vérifiée,147,01/10/2023,,,"Avenant n° 18 du 1/08/2023, annexe CDD d'usage (au 1/10/2023), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026 — avenant n° 19 (NAO 2024) présent au fonds sans texte",
@@ -381,7 +382,7 @@
 3220,Offices publics de l'habitat,0,vérifiée,3,01/01/2026,ACTIF,,DARES + analyse terminologique,"TRANCHÉ: IDCC 3220 réel = personnel des OFFICES PUBLICS DE L'HABITAT (organismes publics gestionnaires de HLM). Le contenu actuel utilise le terme 'Employé(e) de maison' — un statut juridique précis en France réservé à l'emploi domestique PRIVÉ chez un particulier (relève normalement d'une CCN distincte, 'Salariés du particulier employeur'). Un office public de l'habitat emploierait plutôt des 'gardien(ne)s d'immeuble' ou 'agents d'entretien d'immeubles', pas des 'employés de maison'. Terminologie incompatible avec le champ réel — signalé comme mismatch, pas juste ambigu."
 3221,"Agences de presse (employés, techniciens, cadres)",,sourcée,5,01/01/2025,,,,
 3223,Personnels navigants officiers maritimes,,sourcée,5,01/01/2025,,,,
-3225,Éditeurs de la presse magazine,,sourcée,5,01/01/2024,,,,
+3225,Éditeurs de la presse magazine (fusionnée dans l'IDCC 3230),,sourcée,5,01/01/2024,,,,
 3227,Industries de fabrication de la chaux,0,vérifiée,3,01/01/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3249",Ancien nom officiel: Convention collective nationale des industries de la fabrication de la chaux. Ce numéro est remplacé par le 3249 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 3228,Personnel navigant maritime (Officier/Appui),,sourcée,8,01/01/2022,,,,
 3229,Personnel sédentaire du transport de marchandises en navigation intérieure,,sourcée,12,01/01/2026,,,,
