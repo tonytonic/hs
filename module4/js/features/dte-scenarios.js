@@ -4719,7 +4719,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4740,7 +4740,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4761,7 +4761,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4782,7 +4782,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4803,7 +4803,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4824,7 +4824,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4845,7 +4845,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4866,7 +4866,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4887,7 +4887,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4908,7 +4908,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4929,7 +4929,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4950,7 +4950,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4971,7 +4971,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -4992,7 +4992,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
@@ -5013,7 +5013,7 @@ const DTE_SCENARIOS = [
 ],
 "refs": [
 "Art. L3131-1 C. trav. — Repos quotidien 11h minimum",
-"Art. R3131-1 — Sanctions pénales"
+"Art. R3135-1 C. trav. — Sanctions pénales (repos quotidien)"
 ],
 "urgence": 3,
 "question": "Que faire en zone d'alerte ?"
