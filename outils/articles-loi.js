@@ -51,7 +51,7 @@
        à re-vérifier au prochain trimestre Insee.
      - FMD (forfait mobilités durables) CORRIGÉ : 700€/800€ (limite temporaire
        2022-2024) remplacés par 600€/900€, en vigueur depuis le 01/01/2025
-       (Art. D3261-15-2 CT ; urssaf.fr ; ecologie.gouv.fr). Bug identique
+       (art. L3261-3-1 et R3261-13-1 CT, plafond d'exonération : art. 81, 19° ter du CGI ; urssaf.fr ; ecologie.gouv.fr — l'ancien D3261-15-2 est abrogé depuis 2020). Bug identique
        trouvé et corrigé dans module-lexique.html (glossaire, texte figé
        affichait encore 700/800). Aucun module n'appelait SH.val() pour ces
        clés — impact live limité à articles-loi.js + module-lexique.html.
@@ -154,7 +154,7 @@
     c2p_points_par_facteur:{ v: 4, u: 'points',  maj: '2023-09-01', src: 'par facteur/an' },
 
     /* ----- Transport / mobilités ----- */
-    fmd_plafond_seul: { v: 600,    u: '€/an',    maj: '2025-01-01', src: 'Forfait mobilités durables seul, secteur privé — Art. D3261-15-2 code du travail. La limite temporaire de 700 € (2022-2024) n\'a pas été reconduite ; 600 € s\'applique depuis le 1er janvier 2025 (urssaf.fr/employeur/beneficier-exonerations/frais-professionnels ; ecologie.gouv.fr/politiques-publiques/soutien-employeurs-aux-mobilites-durables)' },
+    fmd_plafond_seul: { v: 600,    u: '€/an',    maj: '2025-01-01', src: 'Forfait mobilités durables seul, secteur privé — art. L3261-3-1 et R3261-13-1 code du travail ; plafond d\'exonération : art. 81, 19° ter du CGI (l\'ancien D3261-15-2 est abrogé depuis le décret du 9 mai 2020). La limite temporaire de 700 € (2022-2024) n\'a pas été reconduite ; 600 € s\'applique depuis le 1er janvier 2025 (urssaf.fr/employeur/beneficier-exonerations/frais-professionnels ; ecologie.gouv.fr/politiques-publiques/soutien-employeurs-aux-mobilites-durables)' },
     fmd_plafond_cumul:{ v: 900,    u: '€/an',    maj: '2025-01-01', src: 'Cumul FMD + prise en charge transports en commun — 900 € (contre 800 € auparavant), confirmé urssaf.fr' },
     fmd_plafond_public:{ v: 300,   u: '€/an',    maj: '—',          src: 'Fonction publique — 300 € max (barème progressif 100/200/300 € selon jours d\'usage, inchangé)' },
     tc_prise_charge:  { v: 0.50,   u: '',        maj: '—',          src: '50 % abonnement TC obligatoire' },
