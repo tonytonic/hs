@@ -1255,7 +1255,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 3230, nom: 'Presse quotidienne et hebdomadaire', secteur: 'Presse',
+    idcc: 3230, nom: 'Presse magazine et presse d\'information spécialisée', secteur: 'Presse',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -1966,7 +1966,7 @@ const CCN_FJ_DATA = [
   }
 ,
   {
-    idcc: 3225, nom: 'Éditeurs de la presse magazine (employés et cadres)', secteur: 'Presse magazine',
+    idcc: 3225, nom: 'Éditeurs de la presse magazine (fusionnée dans l\'IDCC 3230)', secteur: 'Presse magazine',
     plafond: 218, plafondCDRef: 218, tauxRachat: 10,
     entretienFreq: 'annuel', entretienRef: 'Art. L3121-65',
     clauseDeconn: false, suiviCharge: 'Art. L3121-65',
@@ -4239,7 +4239,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 3230, nom: 'Presse quotidienne et hebdomadaire — Cadres Dirigeants', secteur: 'Presse',
+    idcc: 3230, nom: 'Presse magazine et presse d\'information spécialisée — Cadres Dirigeants', secteur: 'Presse',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
@@ -5029,7 +5029,7 @@ const CCN_CD_DATA = [
   }
 ,
   {
-    idcc: 3225, nom: 'Éditeurs de la presse magazine (employés et cadres) — Cadres Dirigeants', secteur: 'Presse magazine',
+    idcc: 3225, nom: 'Éditeurs de la presse magazine (fusionnée dans l\'IDCC 3230) — Cadres Dirigeants', secteur: 'Presse magazine',
     critereCD: 'Application standard Art. L3111-2 : pouvoir de direction effectif, rémunération parmi les plus élevées de l\'entreprise, autonomie réelle dans l\'organisation du temps. Ces 3 critères sont CUMULATIFS (Cass. Soc. 31/01/2012).',
     rmgCD: 'Aucun minimum fixé conventionnellement — hors grille de classification',
     entretienCD: 'Pas d\'obligation légale formelle pour les CD — recommandé annuellement (Art. L4121-1)',
