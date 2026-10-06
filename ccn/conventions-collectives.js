@@ -734,7 +734,7 @@ const CCN_ALIASES = [
   {i:3127,b:null,n:"Entreprises services à la personne",s:"Services personne",g:"DC",fj:false},
   {i:3203,b:null,n:"Structures coopératives agricoles bétail viande",s:"Coopérative viande",g:"DC",fj:false},
   {i:2543,b:null,n:"Cabinets géomètres-experts topographes",s:"Géomètre expert",g:"DC",fj:false,x:{contingent:180, src:'art. 9.4 : 180 h (90 h si horaire modulé)'}},
-  {i:3230,b:null,n:"Presse quotidienne et hebdomadaire",s:"Presse",g:"DC",fj:false},
+  {i:3230,b:null,n:"Presse magazine et presse d'information spécialisée",s:"Presse",g:"DC",fj:false},
   
   {i:3239,b:null,n:"Particuliers employeurs emploi à domicile",s:"Emploi domicile",g:"PEMP40",fj:false},  // 03/10/2026 : seuil 40h (art. 136-147)
   {i:3239,b:null,n:"Assistant(e) maternel(le) agréé(e) — particuliers employeurs",s:"Assistant maternel",g:"AMAT45",fj:false},  // 03/10/2026 : seuil 45h (art. 96.2, 110.1)
@@ -822,7 +822,7 @@ const CCN_ALIASES = [
   {i:3220,b:3385,n:"Offices publics de l'habitat",s:"Offices publics habitat",g:"DC",fj:false},
   {i:3221,b:null,n:"Agences de presse (employés, techniciens, cadres)",s:"Agences de presse",g:"DC",fj:false,x:{palier1:5, src:'art. 7.2.2 : +25 % pour les 5 premières HS, +50 % ensuite'}},
   {i:3223,b:null,n:"Transports et services maritimes, personnels navigants officiers",s:"Transports maritimes officiers",g:"DC",fj:false},
-  {i:3225,b:null,n:"Éditeurs de la presse magazine (employés et cadres)",s:"Presse magazine",g:"DC",fj:false},
+  {i:3225,b:null,n:"Éditeurs de la presse magazine (fusionnée dans l'IDCC 3230)",s:"Presse magazine",g:"DC",fj:false},
   {i:3228,b:null,n:"Armateurs de services de passages d'eau, personnel navigant",s:"Passages d'eau navigants",g:"DC",fj:false},
   {i:3229,b:null,n:"Personnel sédentaire du transport de marchandises en navigation intérieure",s:"Navigation intérieure marchandises",g:"DC",fj:false},
   {i:3232,b:null,n:"Agents de direction des organismes du régime général de sécurité sociale",s:"Sécu agents de direction",g:"DC",fj:false},
