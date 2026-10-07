@@ -2,8 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
 <title>Nuit, Astreinte &amp; Primes</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0a1228">
 <meta name="screen-orientation" content="portrait">
@@ -16,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,900;1,9..144,500&family=Outfit:wght@300;400;500;600;700;800&display=swap">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script src="../js/vendor/jspdf.umd.min.js" defer></script>
 <style>
 :root{
   --night:#0a1228; --night2:#0d1838; --ink:#070d1c;
@@ -383,7 +385,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       <div class="deHead" data-sec="deNuit"><div class="cb"></div><div class="dt">🌙 Heures de nuit<small id="deNuitSub">Tu as travaillé de nuit</small></div></div>
       <div class="deBody">
         <div class="field"><label>Heures de nuit ce jour</label>
-          <div class="inline"><input class="ip" id="deNHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+          <div class="inline"><input class="ip" id="deNHoursH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deNHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
         <div class="toggle" id="deNMode">
           <div class="t on" data-mode="majo">💶 Majorées</div>
           <div class="t" data-mode="repos">😴 Repos compensateur</div></div>
@@ -407,7 +409,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
           <div class="t" data-mode="forfait">Au forfait</div></div>
         <div id="deAHeure">
           <div class="field"><label>Temps d'astreinte (joignable)</label>
-            <div class="inline"><input class="ip" id="deAHours" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+            <div class="inline"><input class="ip" id="deAHoursH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deAHoursM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
           <div class="field"><label>Indemnité d'astreinte</label>
             <div class="inline"><input class="ip" id="deARate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div></div>
         </div>
@@ -416,7 +418,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
             <div class="inline"><input class="ip" id="deAForfaitAmt" type="number" inputmode="decimal" value="0"><span class="unit">€</span></div></div>
         </div>
         <div class="field"><label>Intervention réelle ce jour</label>
-          <div class="inline"><input class="ip" id="deAInter" type="number" inputmode="decimal" value="0"><span class="unit">heures</span></div></div>
+          <div class="inline"><input class="ip" id="deAInterH" type="number" inputmode="numeric" min="0" placeholder="0" value="" style="max-width:64px"><span class="unit">h</span><input class="ip" id="deAInterM" type="number" inputmode="numeric" min="0" max="59" placeholder="00" value="" style="max-width:64px"><span class="unit">min</span></div></div>
         <div class="field"><label>Taux horaire d'intervention</label>
           <div class="inline"><input class="ip" id="deAInterRate" type="number" inputmode="decimal" value="0"><span class="unit">€ / h</span></div>
           <div class="check-row" id="deAInterNight"><div class="cb"></div><div>Intervention de nuit (ajoute la majoration nuit)</div></div>
@@ -430,7 +432,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     <div class="deSection" id="dePrimes">
       <div class="deHead" data-sec="dePrimes"><div class="cb"></div><div class="dt">🎁 Primes du jour<small>Panier, dimanche, férié…</small></div></div>
       <div class="deBody">
-        <div class="deMini">Coche et indique la quantité pour ce jour.</div>
+        <div class="deMini">Indique le montant en € du jour. Si tu as réglé un montant par unité (appui sur le nom de la prime), indique plutôt la quantité.</div>
         <div id="dePrimeList"></div>
         <div class="addprime" style="margin-top:8px;"><button id="deAddPrime">＋ Ajouter une prime jour</button></div>
       </div>
@@ -616,7 +618,9 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     if(a.night) extra+=interH*(settings.baseRate||0)*((day.nuit&&day.nuit.rate)||settings.nRate||0)/100;
     if(a.sun) extra+=interBase*(a.sunRate||0)/100;
     return indem+interBase+extra; }
-  function dayPrimesVal(day){ if(!day||!day.primes)return 0; var v=0; dayPrimes.forEach(function(p){ var q=day.primes[p.id]||0; v+=(p.amount||0)*q; }); return v; }
+  /* 27/09/2026 : prime avec un montant unitaire → la case est une quantité (× montant) ; sans montant
+     unitaire → la case est directement le montant en euros (avant : 10 × 0 € = 0 €). */
+  function dayPrimesVal(day){ if(!day||!day.primes)return 0; var v=0; dayPrimes.forEach(function(p){ var q=day.primes[p.id]||0; v+=(p.amount>0)?p.amount*q:q; }); return v; }
   function dayTotal(day){ return dayNuit(day)+dayAstr(day)+dayPrimesVal(day); }
   function dayHasContent(day){ if(!day)return false;
     if(day.nuit&&(day.nuit.hours||0)>0)return true;
@@ -704,7 +708,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       var dt=new Date(y,mo-1,dnum), wd=dt.getDay(), day=m.days[dnum];
       var row=document.createElement('div'); row.className='dayrow'+(dayHasContent(day)?' has':'')+((wd===0||wd===6)?' we':'');
       var tags='';
-      if(day){ if(day.nuit&&(day.nuit.hours||0)>0)tags+='<span class="dtag nuit">🌙 '+(day.nuit.hours)+'h</span>';
+      if(day){ if(day.nuit&&(day.nuit.hours||0)>0)tags+='<span class="dtag nuit">🌙 '+fmtRepos((day.nuit.hours||0)*60)+'</span>';
         if(day.astr&&((day.astr.hours||0)>0||(day.astr.fAmt||0)>0||(day.astr.inter||0)>0))tags+='<span class="dtag astr">📟</span>';
         var pc=0; if(day.primes){for(var k in day.primes){if(day.primes[k]>0)pc++;}} if(pc)tags+='<span class="dtag prime">🎁 '+pc+'</span>'; }
       if(!tags)tags='<span class="empty">—</span>';
@@ -735,13 +739,13 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     $('#deTitle').textContent=WD[dt.getDay()]+' '+dnum+' '+MONTH_ABBR[monthNum(curKey)-1];
     $('#deCopyPrev').style.display = (dnum>1 && m.days[dnum-1]) ? 'block' : 'none';
     // fill nuit
-    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0;
+    window._decToHM(deDay.nuit.hours||0,'deNHoursH','deNHoursM'); $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0;
     $('#deNBase').value=settings.baseRate||0;
     setDeNMode(deDay.nuit.mode||'majo');
     // fill astr
     setDeAMode(deDay.astr.mode||'heure');
-    $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
-    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    window._decToHM(deDay.astr.hours||0,'deAHoursH','deAHoursM'); $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    window._decToHM(deDay.astr.inter||0,'deAInterH','deAInterM'); $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
     setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun);
     $('#deASunField').style.display=deDay.astr.sun?'block':'none';
     // sections
@@ -766,9 +770,9 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   $('#deAInterSun').addEventListener('click',function(){deDay.astr.sun=!deDay.astr.sun;setDeCheck('#deAInterSun',deDay.astr.sun);$('#deASunField').style.display=deDay.astr.sun?'block':'none';updateDeTotal();});
 
   function readDeInputs(){
-    deDay.nuit.hours=parseFloat($('#deNHours').value)||0; deDay.nuit.rate=parseFloat($('#deNRate').value)||0; deDay.nuit.reposRate=parseFloat($('#deNReposRate').value)||0;
-    deDay.astr.hours=parseFloat($('#deAHours').value)||0; deDay.astr.rate=parseFloat($('#deARate').value)||0; deDay.astr.fAmt=parseFloat($('#deAForfaitAmt').value)||0;
-    deDay.astr.inter=parseFloat($('#deAInter').value)||0; deDay.astr.interRate=parseFloat($('#deAInterRate').value)||0; deDay.astr.sunRate=parseFloat($('#deASunRate').value)||0;
+    deDay.nuit.hours=window._hmToDec('deNHoursH','deNHoursM'); deDay.nuit.rate=parseFloat($('#deNRate').value)||0; deDay.nuit.reposRate=parseFloat($('#deNReposRate').value)||0;
+    deDay.astr.hours=window._hmToDec('deAHoursH','deAHoursM'); deDay.astr.rate=parseFloat($('#deARate').value)||0; deDay.astr.fAmt=parseFloat($('#deAForfaitAmt').value)||0;
+    deDay.astr.inter=window._hmToDec('deAInterH','deAInterM'); deDay.astr.interRate=parseFloat($('#deAInterRate').value)||0; deDay.astr.sunRate=parseFloat($('#deASunRate').value)||0;
     // Report auto : un taux saisi devient le defaut, repris pour les jours suivants (jusqu'a nouveau changement)
     if(deDay.nuit.rate>0) settings.nRate=deDay.nuit.rate;
     if(deDay.astr.rate>0) settings.aRate=deDay.astr.rate;
@@ -778,7 +782,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     var b=parseFloat($('#deNBase').value); if(!isNaN(b)&&b>0) settings.baseRate=b;
     set(LS.SET,settings);
   }
-  ['deNHours','deNRate','deNBase','deNReposRate','deAHours','deARate','deAForfaitAmt','deAInter','deAInterRate','deASunRate'].forEach(function(id){
+  ['deNHoursH','deNHoursM','deNRate','deNBase','deNReposRate','deAHoursH','deAHoursM','deARate','deAForfaitAmt','deAInterH','deAInterM','deAInterRate','deASunRate'].forEach(function(id){
     $('#'+id).addEventListener('input',function(){ readDeInputs(); updateDeTotal(); });
   });
   function updateDeTotal(){ readDeInputs();
@@ -797,11 +801,11 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
       var row=document.createElement('div'); row.className='dprime'+(on?' on':'');
       var custom=DEFAULT_DAYPRIMES.findIndex(function(d){return d.id===p.id;})===-1;
       row.innerHTML='<div class="pc">'+(on?'✓':'')+'</div><div class="pn">'+p.name+'<small>'+(p.amount?eur(p.amount).replace('+','')+' · '+p.desc:p.desc)+'</small></div>'+
-        '<div class="pq"><input type="number" inputmode="numeric" value="'+(q||'')+'" placeholder="0"></div>'+
+        '<div class="pq"><input type="number" inputmode="decimal" step="any" value="'+(q||'')+'" placeholder="'+(p.amount>0?'Qté':'€')+'"><small style="display:block;font-size:10px;color:var(--mut);text-align:center;margin-top:2px">'+(p.amount>0?'× '+eur(p.amount).replace('+',''):'montant €')+'</small></div>'+
         (custom?'<button class="del" style="background:none;border:none;color:var(--soft);font-size:15px;cursor:pointer;">🗑</button>':'');
       var inp=row.querySelector('input');
       inp.addEventListener('input',function(){ deDay.primes[p.id]=parseFloat(inp.value)||0; row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
-      row.querySelector('.pc').addEventListener('click',function(){ if((deDay.primes[p.id]||0)>0){deDay.primes[p.id]=0;inp.value='';}else{ if(!p.amount){ editDayPrimeAmount(p); return;} deDay.primes[p.id]=1;inp.value=1;} row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
+      row.querySelector('.pc').addEventListener('click',function(){ if((deDay.primes[p.id]||0)>0){deDay.primes[p.id]=0;inp.value='';}else{ if(!p.amount){ inp.focus(); return;} deDay.primes[p.id]=1;inp.value=1;} row.classList.toggle('on',(deDay.primes[p.id]||0)>0); row.querySelector('.pc').textContent=(deDay.primes[p.id]||0)>0?'✓':''; updateDeTotal(); });
       row.querySelector('.pn').addEventListener('click',function(){ editDayPrimeAmount(p); });
       var del=row.querySelector('.del'); if(del)del.addEventListener('click',function(){ if(confirm('Supprimer « '+p.name+' » ?')){ var ix=dayPrimes.findIndex(function(x){return x.id===p.id;}); if(ix>=0)dayPrimes.splice(ix,1); saveAll(); renderDayPrimes(); } });
       c.appendChild(row);
@@ -823,10 +827,10 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   });
   function openDayFromObj(){
     if(!deDay.nuit)deDay.nuit=blankDay().nuit; if(!deDay.astr)deDay.astr=blankDay().astr; if(!deDay.primes)deDay.primes={};
-    $('#deNHours').value=deDay.nuit.hours||0; $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0; setDeNMode(deDay.nuit.mode||'majo');
+    window._decToHM(deDay.nuit.hours||0,'deNHoursH','deNHoursM'); $('#deNRate').value=deDay.nuit.rate||0; $('#deNReposRate').value=deDay.nuit.reposRate||0; setDeNMode(deDay.nuit.mode||'majo');
     $('#deNBase').value=settings.baseRate||0;
-    setDeAMode(deDay.astr.mode||'heure'); $('#deAHours').value=deDay.astr.hours||0; $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
-    $('#deAInter').value=deDay.astr.inter||0; $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
+    setDeAMode(deDay.astr.mode||'heure'); window._decToHM(deDay.astr.hours||0,'deAHoursH','deAHoursM'); $('#deARate').value=deDay.astr.rate||0; $('#deAForfaitAmt').value=deDay.astr.fAmt||0;
+    window._decToHM(deDay.astr.inter||0,'deAInterH','deAInterM'); $('#deAInterRate').value=deDay.astr.interRate||0; $('#deASunRate').value=deDay.astr.sunRate||0;
     setDeCheck('#deAInterNight',deDay.astr.night); setDeCheck('#deAInterSun',deDay.astr.sun); $('#deASunField').style.display=deDay.astr.sun?'block':'none';
     deDay._nuitOn=(deDay.nuit.hours||0)>0; deDay._astrOn=(deDay.astr.hours||0)>0||(deDay.astr.fAmt||0)>0||(deDay.astr.inter||0)>0; var pc=false;for(var k in deDay.primes){if(deDay.primes[k]>0)pc=true;} deDay._primesOn=pc;
     setSection('deNuit',deDay._nuitOn); setSection('deAstr',deDay._astrOn); setSection('dePrimes',deDay._primesOn);
@@ -909,7 +913,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
     var payload={app:'SimulHeures',module:'M7',version:4,date:new Date().toISOString(),settings:settings,fixes:fixes,dayPrimes:dayPrimes,months:months};
     var blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
     var d=new Date(),stamp=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-    a.href=url;a.download='nuit-primes-sauvegarde-'+stamp+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);toast('Sauvegarde téléchargée 💾');
+    a.href=url;a.download='nuit-primes-sauvegarde-'+stamp+'.json';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},1000);if(window.hsIsAndroid&&window.hsIsAndroid()){window.hsFileSnack(blob,a.download,{kind:'backup',accent:'#5b8def'});}else{toast('Sauvegarde téléchargée 💾');}
   }catch(e){alert('Erreur export : '+e.message);} });
   $('#importJsonBtn').addEventListener('click',function(){$('#jsonInput').click();});
   $('#jsonInput').addEventListener('change',function(ev){ var f=ev.target.files&&ev.target.files[0];if(!f)return;var r=new FileReader();
@@ -950,7 +954,7 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
         document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(function(){ URL.revokeObjectURL(url); },2000);
       }catch(e2){ doc.save(fname); }
-      toast('PDF généré 📄');
+      if(window.hsIsAndroid&&window.hsIsAndroid()){window.hsFileSnack(blob,fname,{kind:'pdf',accent:'#5b8def'});}else{toast('PDF généré 📄');}
     }catch(e){alert('Erreur PDF : '+e.message);} });
 
   /* ===== INIT ===== */
@@ -962,5 +966,31 @@ select.ip{appearance:none;-webkit-appearance:none;background-image:url("data:ima
   if(!get(LS.WELCOME,0)){ openWizard(); }
 })();
 </script>
+<!-- Snackbar Android : confirme l'enregistrement des fichiers (PDF / sauvegarde). iOS garde l'ouverture/partage auto. -->
+<script>
+(function(){
+  function isAnd(){return /Android/i.test((navigator&&navigator.userAgent)||'');}
+  window.hsIsAndroid=isAnd;
+  window.hsFileSnack=function(blob,filename,opt){opt=opt||{};
+    var isPdf=(opt.kind==='pdf')||/\.pdf$/i.test(filename||'');
+    var ac=opt.accent||'#2196a6',bg=opt.bg||'#122234',bd=opt.border||'rgba(150,190,220,.45)';
+    var ic=isPdf?'\ud83d\udcc4':'\ud83d\udcbe',noun=isPdf?'PDF enregistr\u00e9':'Sauvegarde enregistr\u00e9e',lbl=isPdf?'Ouvrir':'Partager',mime=isPdf?'application/pdf':'application/json';
+    try{var o=document.getElementById('hs-file-snack');if(o)o.remove();
+      var url=URL.createObjectURL(blob);
+      var s=document.createElement('div');s.id='hs-file-snack';
+      s.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:99999;background:'+bg+';border:1px solid '+bd+';border-radius:13px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,.5);font-family:inherit';
+      var sp=document.createElement('span');sp.textContent=ic+' '+noun+' dans tes fichiers';sp.style.cssText='color:#fff;font-size:13px;font-weight:600;flex:1;line-height:1.3';
+      var b=document.createElement('button');b.textContent=lbl;b.style.cssText='background:'+ac+';color:#fff;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:800;white-space:nowrap;touch-action:manipulation';
+      b.onclick=function(){try{var f=new File([blob],filename||'document',{type:mime});
+        if(navigator.canShare&&navigator.canShare({files:[f]})){navigator.share({files:[f]}).catch(function(){window.open(url,'_blank');});}
+        else{window.open(url,'_blank');}}catch(e){try{window.open(url,'_blank');}catch(_){}}
+        if(s.parentNode)s.remove();};
+      s.appendChild(sp);s.appendChild(b);document.body.appendChild(s);
+      setTimeout(function(){if(s.parentNode)s.remove();},12000);
+    }catch(e){}};
+  window.hsSavePdf=function(doc,fn,ac){if(isAnd()){try{var b=doc.output('blob');doc.save(fn);window.hsFileSnack(b,fn,{kind:'pdf',accent:ac});}catch(e){try{doc.save(fn);}catch(_){}}}else{doc.save(fn);}};
+})();
+</script>
+<script>window._hmToDec=function(hId,mId){var he=document.getElementById(hId),me=document.getElementById(mId);var h=Number(he&&he.value)||0,m=Number(me&&me.value)||0;if(h<0)h=0;if(m<0)m=0;return h+m/60;};window._decToHM=function(dec,hId,mId){dec=Number(dec)||0;var he=document.getElementById(hId),me=document.getElementById(mId);var tot=Math.round(dec*60);if(tot<=0){if(he)he.value='';if(me)me.value='';return;}if(he)he.value=Math.floor(tot/60);if(me)me.value=tot%60;};</script>
 </body>
 </html>
