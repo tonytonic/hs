@@ -50,7 +50,7 @@ const VFH = {
     </span>`;
     window.M6_Header?.set({
       title: `Forfait Heures ${this._year}`,
-      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · Contingent ${this._contract.contingent||220}h · ${analysis.totalHS}h HS`,
+      sub: `Seuil ${this._formatH(this._contract.seuilHebdo)} · ${analysis.sansContingent ? 'Pas de contingent' : 'Contingent '+(this._contract.contingent||220)+'h'} · ${this._formatH(analysis.totalHS)} HS`,
       showReset: true,
       showSwitch: true,
       onReset: () => {
@@ -126,6 +126,8 @@ const VFH = {
           totalHS:        analysis.totalHS,
           contingent:     analysis.contingent,
           tauxRemplissage:analysis.tauxRemplissage,
+          sansContingent: !!analysis.sansContingent,
+          max:            analysis.max,
           rttPris:0, rttSolde:0, rachetes:0, cpPris:0,
           alertes: analysis.alertes,
           rttTheoriques:0, joursRestants: analysis.contingent - analysis.totalHS },
@@ -146,44 +148,52 @@ const VFH = {
   _tplBilan(a, bio) {
     return `
     <div class="m6-stats-grid" style="margin-bottom:14px">
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHS}h</div><div class="m6-stat-label">Total HS</div></div>
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHS)}</div><div class="m6-stat-label">Total HS</div></div>
       <div class="m6-stat-box"><div class="m6-stat-val">${a.semaines}</div><div class="m6-stat-label">Semaines saisies</div></div>
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux1}h</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
-      ${a.a3Paliers && a.taux_inter ? `<div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux_inter}h</div><div class="m6-stat-label">HS à +${a.taux_inter}%</div></div>` : ''}
-      <div class="m6-stat-box"><div class="m6-stat-val">${a.totalHSTaux2}h</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>
+      ${a.tauxUnique
+        ? `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHS)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>`
+        : `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux1)}</div><div class="m6-stat-label">HS à +${a.taux1}%</div></div>
+      ${a.a3Paliers && a.taux_inter ? `<div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux_inter)}</div><div class="m6-stat-label">HS à +${a.taux_inter}%</div></div>` : ''}
+      <div class="m6-stat-box"><div class="m6-stat-val">${this._formatH(a.totalHSTaux2)}</div><div class="m6-stat-label">HS à +${a.taux2}%</div></div>`}
       <div class="m6-stat-box" style="border-color:rgba(196,163,90,0.35)">
-        <div class="m6-stat-val" style="color:var(--champagne-2)">${a.tauxHoraire>0?a.montantTotal.toFixed(0)+'€':'—'}</div>
+        <div class="m6-stat-val" style="color:var(--champagne-2)">${a.tauxHoraire>0?(Math.round(a.montantTotal*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:2})+' €':'—'}</div>
         <div class="m6-stat-label">Montant brut HS</div>
       </div>
     </div>
 
+    ${a.sansContingent ? `<div class="m6-alert info" style="margin-bottom:14px"><span class="m6-alert-icon">ℹ️</span><div><strong>Pas de contingent annuel</strong> pour cette convention : ni plafond annuel d'heures sup ni repos obligatoire lié au contingent (la convention n'en fixe pas, L7221-2). Les heures sup restent dues et majorées${a.tauxUnique?' (+'+a.taux1+' %)':''}, dans la limite de la durée maximale.</div></div>` : `
     <!-- Barre de progression forfait heures -->
     <div class="m6-progress-bar-wrap">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
         <span style="font-size:0.72rem;font-weight:600;color:var(--charbon)">Consommation du contingent <span class="m6-tooltip-wrap" id="fh-cont-tip" style="cursor:pointer;font-size:0.65rem;color:var(--pierre)">ⓘ<span class="m6-tooltip-bubble">Contingent annuel de ${a.contingent||220}h fixé par votre CCN ou accord d'entreprise. Au-delà, une autorisation de l'inspection du travail peut être requise (Art. L3121-30).</span></span></span>
-        <span style="font-size:0.72rem;color:${a.tauxRemplissage>=90?'var(--alerte)':'var(--pierre)'}"><strong>${a.totalHS}h</strong> / ${a.contingent||220}h</span>
+        <span style="font-size:0.72rem;color:${a.tauxRemplissage>=90?'var(--alerte)':'var(--pierre)'}"><strong>${this._formatH(a.totalHS)}</strong> / ${a.contingent||220}h</span>
       </div>
       <div class="m6-progress-track">
         <div class="m6-progress-fill" style="width:${Math.min(100,a.tauxRemplissage)}%;background:${a.tauxRemplissage>=100?'linear-gradient(90deg,#9B2C2C,#E53E3E)':a.tauxRemplissage>=90?'linear-gradient(90deg,var(--champagne-2),var(--champagne))':'linear-gradient(90deg,#2D6A4F,#4A7C6F)'}"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:0.65rem;color:var(--pierre);margin-top:3px">
         <span>${a.tauxRemplissage}% utilisé</span>
-        <span style="color:${(a.contingent||220)-a.totalHS <= 20?'var(--alerte)':'inherit'}">Reste : <strong>${Math.max(0,(a.contingent||220)-a.totalHS)}h</strong></span>
+        <span style="color:${(a.contingent||220)-a.totalHS <= 20?'var(--alerte)':'inherit'}">Reste : <strong>${this._formatH(Math.max(0,(a.contingent||220)-a.totalHS))}</strong></span>
       </div>
     </div>
+    `}
 
     ${a.tauxHoraire>0||this._contract.tauxHoraire>0?`<div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">💶</div><div><div class="m6-card-label">Loi TEPA 2007 ${a.ccnNom?'· '+a.ccnNom:''}</div><div class="m6-card-title">Réduction de cotisations salariales et exonération fiscale</div></div></div><div class="m6-card-body">
-      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux1||25}% (${a.palier||8}h/sem)</span><span class="m6-row-val">${(a.montantHS1||0).toFixed(2)} €</span></div>
+      ${a.tauxUnique
+        ? `<div class="m6-row"><span class="m6-row-label">HS à +${a.taux1}% (${this._formatH(a.totalHS)})</span><span class="m6-row-val">${(a.montantTotal||0).toFixed(2)} €</span></div>`
+        : `<div class="m6-row"><span class="m6-row-label">HS à +${a.taux1||25}% (${a.palier||8}h/sem)</span><span class="m6-row-val">${(a.montantHS1||0).toFixed(2)} €</span></div>
       ${a.a3Paliers&&a.taux_inter?`<div class="m6-row"><span class="m6-row-label">HS à +${a.taux_inter}% (${a.palier_inter}h/sem)</span><span class="m6-row-val">${(a.montantHS_inter||0).toFixed(2)} €</span></div>`:''}
-      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux2||50}%</span><span class="m6-row-val">${(a.montantHS2||0).toFixed(2)} €</span></div>
+      <div class="m6-row"><span class="m6-row-label">HS à +${a.taux2||50}%</span><span class="m6-row-val">${(a.montantHS2||0).toFixed(2)} €</span></div>`}
       <div class="m6-row"><span style="font-weight:600">Total brut</span><span class="m6-row-val gold" style="font-family:var(--font-display);font-size:1.2rem">${(a.montantTotal||0).toFixed(2)} €</span></div>
       <div class="m6-row"><span class="m6-row-label">Exo IR (plaf. 7 500€/an)</span><span class="m6-row-val ok">${(a.exoFiscale||0).toFixed(2)} €</span></div>
       <div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">Art. L241-17 CSS · Loi TEPA 2007 · Loi 2022-1158</div>
     </div></div>`:''}
 
+    ${this._tplPaiement(a)}
+
     ${bio.hasData?`<div class="m6-card" style="margin-bottom:14px;cursor:pointer" id="fh-bio-card"><div class="m6-card-body" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="m6-card-label">Santé — Phase ${bio.phase?.code}</div><span class="m6-badge" style="background:${bio.phase?.color}20;color:${bio.phase?.color};border-radius:99px;font-size:0.65rem;padding:2px 8px">${bio.phase?.label}</span></div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center">${[['Fatigue',bio.fatigue,true],['Stress',bio.stress,true],['Récup.',bio.recovery,false],['Perf.',bio.performance,false]].map(([l,v,inv])=>{const c=inv?(v>60?'#B85C50':v>35?'#C4853A':'#4A7C6F'):(v<40?'#B85C50':v<65?'#C4853A':'#4A7C6F');return `<div style="background:var(--ivoire);border-radius:8px;padding:8px 4px"><div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:${c}">${v}</div><div style="font-size:0.6rem;color:var(--pierre);text-transform:uppercase">${l}</div></div>`;}).join('')}</div><div style="font-size:0.68rem;color:var(--pierre);margin-top:6px;text-align:right">→ onglet Santé</div></div></div>`:''}
 
-    ${a.alertes.length?a.alertes.map(al=>`<div class="m6-alert ${al.niveau}" style="margin-bottom:10px"><span class="m6-alert-icon">${al.icon}</span><div><strong>${al.titre}</strong><br><span style="font-size:0.77rem">${al.texte}</span><br><span style="font-size:0.65rem;color:var(--pierre)">Art. ${al.loi}</span></div></div>`).join('') : `<div class="m6-alert success" style="margin-bottom:14px"><span class="m6-alert-icon">✅</span><div><strong>Contingent conforme</strong> — Aucune alerte pour ${this._year}.</div></div>`}
+    ${a.alertes.length?a.alertes.map(al=>`<div class="m6-alert ${al.niveau}" style="margin-bottom:10px"><span class="m6-alert-icon">${al.icon}</span><div><strong>${al.titre}</strong><br><span style="font-size:0.77rem">${al.texte}</span><br><span style="font-size:0.65rem;color:var(--pierre)">Art. ${al.loi}</span></div></div>`).join('') : `<div class="m6-alert success" style="margin-bottom:14px"><span class="m6-alert-icon">✅</span><div><strong>${a.sansContingent?'Aucune alerte':'Contingent conforme'}</strong> — ${a.sansContingent?'durée maximale respectée pour '+this._year+'.':'Aucune alerte pour '+this._year+'.'}</div></div>`}
 
     <button class="m6-btn m6-btn-primary" id="fh-saisir" style="margin-bottom:8px">＋ Saisir une semaine</button>
     <div style="display:flex;gap:8px">
@@ -195,7 +205,84 @@ const VFH = {
   _bindBilan(analysis) {
     this._c.querySelector('#fh-saisir')?.addEventListener('click', () => { this._section='semaines'; this.render(); setTimeout(()=>this._c.querySelector('#fh-add')?.click(),200); });
     this._c.querySelector('#fh-bio-card')?.addEventListener('click', () => { this._section='bio'; this.render(); });
-    this._c.querySelector('#fh-newyr')?.addEventListener('click', () => { const y=prompt(`Exercice (ex: ${this._year+1})`,this._year+1); if(!y||isNaN(y))return; const yr=parseInt(y); M6_Storage.createYear(this._regime,yr); this._year=yr; M6_Storage.setActiveYear(this._regime, yr); this._load(); this.render(); M6_toast(`✓ Exercice ${yr} créé`); });
+    this._c.querySelector('#fh-newyr')?.addEventListener('click',()=>{ if(window.M6_nouvelExercice) return M6_nouvelExercice(); });
+    this._c.querySelectorAll('[data-paie-mois]').forEach(inp => inp.addEventListener('change', () => {
+      const mois = inp.dataset.paieMois, k = inp.dataset.paieK;
+      const hEl = this._c.querySelector(`[data-paie-mois="${mois}"][data-paie-k="${k}"][data-paie-part="h"]`);
+      const mEl = this._c.querySelector(`[data-paie-mois="${mois}"][data-paie-k="${k}"][data-paie-part="m"]`);
+      const h = Math.max(0, parseInt(hEl?.value, 10) || 0), mn = Math.max(0, Math.min(59, parseInt(mEl?.value, 10) || 0));
+      const p = this._getPaie();
+      if (!p[mois] || typeof p[mois] !== 'object') p[mois] = {};
+      p[mois][k] = Math.round((h + mn / 60) * 100) / 100;
+      this._setPaie(p);
+      this.render(); M6_toast('✓ Paiement enregistré');
+    }));
+  },
+
+  // ── PAIEMENT DES HEURES SUP, MOIS PAR MOIS (04/10/2026) ────────
+  // Forfait en heures hebdomadaire ou mensuel : ni report ni modulation. Les heures
+  // au-delà du forfait se paient sur la paie du mois, majorées. Ce qui n'est pas payé
+  // reste dû et passe au mois suivant (même taux).
+  _paieKey() { return `M6_${this._regime}_${this._year}_PAIE`; },
+  _getPaie() { try { return JSON.parse(localStorage.getItem(this._paieKey()) || '{}') || {}; } catch (_) { return {}; } },
+  _setPaie(p) { try { localStorage.setItem(this._paieKey(), JSON.stringify(p)); } catch (_) {} },
+
+  _paieCalcul(a) {
+    const paie = this._getPaie();
+    const tr = a.tauxUnique
+      ? [{ k:'p1', taux:a.taux1, gen:m => m.hs1 + m.hs_inter + m.hs2 }]
+      : [{ k:'p1', taux:a.taux1, gen:m => m.hs1 },
+         ...(a.a3Paliers && a.taux_inter ? [{ k:'pi', taux:a.taux_inter, gen:m => m.hs_inter }] : []),
+         { k:'p2', taux:a.taux2, gen:m => m.hs2 }];
+    const rep = {}; tr.forEach(t => rep[t.k] = 0);
+    const r60 = v => Math.round(v * 60) / 60;
+    const mois = (a.parMois || []).map(m => {
+      const lignes = tr.map(t => {
+        const report = rep[t.k], gen = t.gen(m), du = r60(report + gen);
+        const paye = Math.min(du, Math.max(0, Number((paie[m.mois] || {})[t.k]) || 0));
+        const reste = r60(Math.max(0, du - paye));
+        rep[t.k] = reste;
+        return { k:t.k, taux:t.taux, report:r60(report), gen:r60(gen), du, paye, reste };
+      });
+      return { mois:m.mois, lignes };
+    });
+    const resteTotal = r60(tr.reduce((s, t) => s + rep[t.k], 0));
+    const resteEur = a.tauxHoraire > 0 ? tr.reduce((s, t) => s + rep[t.k] * a.tauxHoraire * (1 + t.taux / 100), 0) : 0;
+    return { mois, resteTotal, resteEur };
+  },
+
+  _tplPaiement(a) {
+    if (!a.parMois || !a.parMois.length || !a.totalHS) return '';
+    const calc = this._paieCalcul(a);
+    const NOMS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+    const lib = mk => { const [y, m] = mk.split('-'); return NOMS[parseInt(m, 10) - 1] + ' ' + y; };
+    const eur = (h, t) => a.tauxHoraire > 0 ? ' · ' + (h * a.tauxHoraire * (1 + t / 100)).toFixed(2) + ' €' : '';
+    const inp = (mk, k, part, val) => `<input type="number" inputmode="numeric" min="0" ${part==='m'?'max="59"':''} data-paie-mois="${mk}" data-paie-k="${k}" data-paie-part="${part}" value="${val}" placeholder="${part==='h'?'0':'00'}" style="font-size:16px;width:58px;text-align:center;padding:5px 4px">`;
+    const blocs = calc.mois.filter(m => m.lignes.some(l => l.du > 0)).reverse().map(m => {
+      const rows = m.lignes.filter(l => l.du > 0 || l.paye > 0).map(l => {
+        const ph = Math.floor(l.paye + 1e-9); let pm = Math.round((l.paye - ph) * 60); let phh = ph; if (pm === 60) { phh++; pm = 0; }
+        return `<div style="padding:8px 0;border-bottom:1px solid rgba(26,23,20,0.06)">
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem"><span style="font-weight:600">HS à +${l.taux}%</span><span>${this._formatH(l.du)} dues${eur(l.du, l.taux)}</span></div>
+          <div style="font-size:0.66rem;color:var(--pierre);margin-top:2px">${this._formatH(l.gen)} ce mois${l.report > 0 ? ' + ' + this._formatH(l.report) + ' reportées' : ''}</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;font-size:0.74rem;color:var(--pierre)">
+            <span>Payées sur la paie :</span>
+            <span style="display:flex;align-items:center;gap:4px">${inp(m.mois, l.k, 'h', l.paye ? phh : '')}h ${inp(m.mois, l.k, 'm', l.paye ? String(pm).padStart(2, '0') : '')}min</span>
+          </div>
+          ${l.reste > 0 ? `<div style="font-size:0.7rem;color:var(--alerte);margin-top:4px;text-align:right">Reste dû : ${this._formatH(l.reste)}${eur(l.reste, l.taux)}</div>` : `<div style="font-size:0.7rem;color:var(--succes);margin-top:4px;text-align:right">✓ Payées</div>`}
+        </div>`;
+      }).join('');
+      return `<div style="margin-top:10px"><div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--champagne-2);font-weight:600">${lib(m.mois)}</div>${rows}</div>`;
+    }).join('');
+    const total = calc.resteTotal > 0
+      ? `<div class="m6-row" style="margin-top:8px"><span style="font-weight:600;color:var(--alerte)">⚠️ Restant dû à ce jour</span><span class="m6-row-val" style="color:var(--alerte)">${this._formatH(calc.resteTotal)}${a.tauxHoraire > 0 ? ' · ' + calc.resteEur.toFixed(2) + ' €' : ''}</span></div>`
+      : `<div class="m6-row" style="margin-top:8px"><span style="font-weight:600;color:var(--succes)">✅ Toutes les heures sup saisies sont payées</span><span></span></div>`;
+    return `<div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">🧾</div><div><div class="m6-card-label">Paiement des heures sup</div><div class="m6-card-title">Mois par mois</div></div></div><div class="m6-card-body">
+      <div style="font-size:0.7rem;color:var(--pierre);line-height:1.5">Forfait hebdomadaire ou mensuel : ni report ni modulation. Les heures au-delà du forfait se paient sur la paie du mois, avec leur majoration. Le remplacement par du repos n'est possible que si un accord d'entreprise ou de branche le prévoit. Une semaine compte dans le mois de son dimanche.</div>
+      ${a.tauxHoraire > 0 ? '' : '<div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">💡 Renseigne ton taux horaire (⚙️ Contrat ou Export) pour voir les montants.</div>'}
+      ${blocs}
+      ${total}
+      <div style="font-size:0.66rem;color:var(--pierre);margin-top:6px">Heures non payées : 3 ans pour les réclamer (Art. L3245-1).</div>
+    </div></div>`;
   },
 
   // ── SEMAINES ───────────────────────────────────────────────,
@@ -208,7 +295,7 @@ const VFH = {
     ${!entries.length?`<div class="m6-alert info"><span>📋</span><div>Aucune semaine saisie pour ${this._year}.</div></div>`:''}
 
     ${entries.map(([wk,v])=>{
-      const h=parseFloat(v.heures)||0, extra=Math.max(0,h-a.seuil);
+      const h=parseFloat(v.heures)||0, extra=Math.max(0,window.M6_hRetenues(v,this._contract)-a.seuil);
       // 3 paliers si CCN HCR/Restauration : palier1 + palier_inter + reste
       let hs1, hs_inter, hs2;
       if (a.taux_inter && a.palier_inter) {
@@ -230,7 +317,7 @@ const VFH = {
               <div style="font-family:var(--font-display);font-size:1.3rem;font-weight:600">${this._formatH(h)}</div>
             </div>
             <div style="text-align:right">
-              ${extra>0?`<div style="font-size:0.78rem;color:var(--champagne-2);font-weight:500">+${this._formatH(extra)} HS</div><div style="font-size:0.68rem;color:var(--pierre)">${hs1>0?this._formatH(hs1)+' à +'+a.taux1+'%':''}${hs_inter>0?' · '+this._formatH(hs_inter)+' à +'+a.taux_inter+'%':''}${hs2>0?' · '+this._formatH(hs2)+' à +'+a.taux2+'%':''}</div>`:`<div style="font-size:0.78rem;color:var(--succes)">Conforme</div>`}
+              ${extra>0?`<div style="font-size:0.78rem;color:var(--champagne-2);font-weight:500">+${this._formatH(extra)} HS</div><div style="font-size:0.68rem;color:var(--pierre)">${a.tauxUnique ? this._formatH(extra)+' à +'+a.taux1+'%' : `${hs1>0?this._formatH(hs1)+' à +'+a.taux1+'%':''}${hs_inter>0?' · '+this._formatH(hs_inter)+' à +'+a.taux_inter+'%':''}${hs2>0?' · '+this._formatH(hs2)+' à +'+a.taux2+'%':''}`}</div>`:`<div style="font-size:0.78rem;color:var(--succes)">Conforme</div>`}
             </div>
             <button data-del="${wk}" style="background:none;border:none;color:var(--pierre);font-size:1rem;cursor:pointer;padding:4px 8px;margin-left:4px">✕</button>
           </div>
@@ -291,8 +378,12 @@ const VFH = {
           <div id="fh-zone-global" style="${saisieMode==='jours'?'display:none':''}">
             <div class="m6-field">
               <label>Heures travaillées cette semaine (ex: 41.5)</label>
-              <input type="number" id="fh-h" min="0" max="80" step="0.25"
-                value="${entry.heures||''}" placeholder="${seuil}" style="font-size:16px">
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="number" id="fh-hH" min="0" inputmode="numeric" value="${entry.heures?Math.floor(entry.heures):''}" placeholder="${Math.floor(seuil)}" style="font-size:16px;max-width:82px;text-align:center">
+                <span style="font-weight:600;color:var(--pierre)">h</span>
+                <input type="number" id="fh-hM" min="0" max="59" inputmode="numeric" value="${entry.heures?Math.round((entry.heures%1)*60):''}" placeholder="00" style="font-size:16px;max-width:82px;text-align:center">
+                <span style="font-weight:600;color:var(--pierre)">min</span>
+              </div>
               <div style="font-size:0.7rem;color:var(--pierre);margin-top:3px">
                 Seuil contractuel : ${seuil}h · Au-delà = heures supplémentaires
               </div>
@@ -313,20 +404,28 @@ const VFH = {
               return `<div class="m6-field" style="margin-bottom:8px;${isWE?'opacity:0.7':''}">
                 <label style="display:flex;justify-content:space-between">
                   <span>${j}${isWE?' <span style="font-size:0.65rem;color:var(--pierre)">(WE)</span>':''}</span>
-                  <span id="fh-j${i}-val" style="color:var(--champagne-2)">${stored}h</span>
+                  <span id="fh-j${i}-val" style="color:var(--champagne-2)">${window._m6fmtH(stored)}</span>
                 </label>
                 <input type="range" id="fh-j${i}" min="0" max="14" step="0.5" value="${stored}"
                   oninput="document.getElementById('fh-j${i}-val').textContent=this.value+'h';
                            const t=[0,1,2,3,4,5,6].reduce((s,x)=>s+(parseFloat(document.getElementById('fh-j'+x)?.value)||0),0);
-                           document.getElementById('fh-total-jours').textContent=t.toFixed(1)+'h';">
+                           document.getElementById('fh-total-jours').textContent=window._m6fmtH(t);">
               </div>`;
             }).join('')}
             <div style="display:flex;justify-content:space-between;font-size:0.82rem;font-weight:600;margin-top:4px;padding:8px;background:var(--ivoire-2);border-radius:var(--radius)">
               <span>Total semaine</span>
               <span id="fh-total-jours" style="color:var(--champagne-2)">
-                ${entry.jours ? entry.jours.reduce((s,v)=>s+(v||0),0).toFixed(1) : (seuil).toFixed(1)}h
+                ${window._m6fmtH(entry.jours ? entry.jours.reduce((s,v)=>s+(v||0),0) : seuil)}
               </span>
             </div>
+          </div>
+
+          <div class="m6-field" style="margin-top:12px">
+            <label>🌴 Jours de congés payés cette semaine</label>
+            <input type="number" id="fh-cp" min="0" max="6" step="0.5" inputmode="decimal" value="${entry.cpJours||''}" placeholder="0" style="font-size:16px;max-width:100px;text-align:center">
+            <div style="font-size:0.7rem;color:var(--pierre);margin-top:3px">${this._contract?.cpJuris===false
+              ? 'Règle des congés payés désactivée dans le contrat : ces jours ne comptent pas pour le seuil.'
+              : 'Chaque jour de CP compte pour ' + window._m6fmtH((this._contract?.seuilHebdo||35)/5) + ' dans le seuil des heures sup (Cass. soc. 10 sept. 2025, n° 23-14.455).'}</div>
           </div>
 
           <div class="m6-field" style="margin-top:12px">
@@ -391,12 +490,14 @@ const VFH = {
             joursArr = [0,1,2,3,4,5,6].map(i => parseFloat(sh.querySelector('#fh-j'+i)?.value) || 0);
             heures = Math.round(joursArr.reduce((s,v)=>s+v,0) * 100) / 100;
           } else {
-            heures = parseFloat(sh.querySelector('#fh-h')?.value);
+            heures = window._hmVal('fh-hH','fh-hM');
             if (isNaN(heures)) { M6_toast('Saisissez les heures'); return; }
           }
           const note = sh.querySelector('#fh-note')?.value.trim().replace(/['"]/g, '') || null;
           const payload = { heures, note };
           if (joursArr) payload.jours = joursArr;
+          const cpJours = parseFloat(sh.querySelector('#fh-cp')?.value) || 0;
+          if (cpJours > 0) payload.cpJours = cpJours;
           this._save(wk, payload);
           ov.classList.remove('open');
         });
@@ -405,27 +506,30 @@ const VFH = {
       renderSheet();
       // Calcul temps réel — affiche les HS et le reste du contingent
       const bindRealtime = () => {
-        const hInput = sh.querySelector('#fh-h');
+        const hInputH = sh.querySelector('#fh-hH'), hInputM = sh.querySelector('#fh-hM');
         const rtPanel = sh.querySelector('#fh-realtime-calcul');
         const rtHS = sh.querySelector('#fh-rt-hs');
         const rtReste = sh.querySelector('#fh-rt-reste');
         // PRIORITÉ : saisie manuelle (contract) > CCN > droit commun
         let ccnRules = null;
         if (window.CCN_API && this._contract?.ccnIdcc && this._contract.ccnIdcc > 0) {
-          try { ccnRules = CCN_API.getGroupeForCCN(this._contract.ccnIdcc); } catch(_) {}
+          try { ccnRules = (window.M6_CCN_Adapter && M6_CCN_Adapter.reglesContrat) ? M6_CCN_Adapter.reglesContrat(this._contract) : CCN_API.getGroupeForCCN(this._contract.ccnIdcc); } catch(_) {}
         }
+        const sansCont   = !!(ccnRules && ccnRules.sansContingent);
         const seuilC     = this._contract?.seuilHebdo || ccnRules?.seuil || 35;
         const contingent = this._contract?.contingent || ccnRules?.contingent || 220;
-        const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, (v.heures||0) - seuilC), 0);
+        const totalHSActuel = Object.values(this._data).reduce((acc, v) => acc + Math.max(0, window.M6_hRetenues(v,this._contract) - seuilC), 0);
         const updateRT = () => {
-          const h = parseFloat(hInput?.value) || 0;
-          const hs = Math.max(0, h - seuilC);
+          const h = window._hmToDec('fh-hH','fh-hM');
+          const _cpJ = parseFloat(sh.querySelector('#fh-cp')?.value) || 0;
+          const hs = Math.max(0, window.M6_hRetenues({heures:h, cpJours:_cpJ}, this._contract) - seuilC);
           if (rtPanel && h > 0) { rtPanel.style.display = ''; }
-          if (rtHS) rtHS.textContent = hs > 0 ? `+${hs.toFixed(1)}h HS` : '0h HS';
+          if (rtHS) rtHS.textContent = hs > 0 ? `+${window._m6fmtH(hs)} HS` : '0h HS';
           const reste = Math.max(0, contingent - totalHSActuel - hs);
-          if (rtReste) { rtReste.textContent = `${reste.toFixed(0)}h / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
+          if (rtReste && sansCont) { rtReste.textContent = 'aucun (convention)'; rtReste.style.color = 'var(--pierre)'; }
+          else if (rtReste) { rtReste.textContent = `${window._m6fmtH(reste)} / ${contingent}h`; rtReste.style.color = reste < 20 ? 'var(--alerte)' : 'var(--succes)'; }
         };
-        hInput?.addEventListener('input', updateRT);
+        hInputH?.addEventListener('input', updateRT); hInputM?.addEventListener('input', updateRT);
         updateRT(); // initial render
       };
       bindRealtime();
@@ -446,7 +550,7 @@ const VFH = {
     <div class="m6-alert info" style="margin-bottom:12px;font-size:0.72rem"><span>⚠️</span><div>Le score de Risque CV est un <strong>indicateur épidémiologique</strong>, pas un diagnostic médical. Il ne remplace pas un avis médical. En cas de doute, consultez votre médecin du travail.</div></div>
     <div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">🩺</div><div><div class="m6-card-label">Phase INRS</div><div class="m6-card-title" style="color:${bio.phase?.color}">${bio.phase?.code} — ${bio.phase?.label}</div></div></div><div class="m6-card-body">${bar('Fatigue',bio.fatigue,true)}${bar('Stress',bio.stress,true)}${bar('Récupération',bio.recovery,false)}${bar('Performance (Pencavel)',bio.performance,false)}</div></div>
     <div class="m6-card" style="margin-bottom:14px"><div class="m6-card-header"><div class="m6-card-icon">❤️</div><div><div class="m6-card-label">Long terme</div><div class="m6-card-title">Risques</div></div></div><div class="m6-card-body">${bar('Risque CV (OMS/OIT 2021)',bio.cvRisk,true)}${bar('Charge cognitive',bio.cogRisk,true)}<div style="font-size:0.7rem;color:var(--pierre);margin-top:6px">Pega et al. WHO/ILO 2021 · Kivimäki 2015 · Jang 2025<br>⚠️ Ces indicateurs ne remplacent pas un avis médical.</div></div></div>
-    <div class="m6-card"><div class="m6-card-body"><div class="m6-row"><span class="m6-row-label">Semaines saisies</span><span class="m6-row-val">${bio.details.n}</span></div><div class="m6-row"><span class="m6-row-label">Moyenne hebdo</span><span class="m6-row-val">${bio.details.mean}h</span></div><div class="m6-row"><span class="m6-row-label">Semaines surcharge (>120% seuil)</span><span class="m6-row-val">${bio.details.surcharge}</span></div></div></div>`;
+    <div class="m6-card"><div class="m6-card-body"><div class="m6-row"><span class="m6-row-label">Semaines saisies</span><span class="m6-row-val">${bio.details.n}</span></div><div class="m6-row"><span class="m6-row-label">Moyenne hebdo</span><span class="m6-row-val">${window._m6fmtH(bio.details.mean)}</span></div><div class="m6-row"><span class="m6-row-label">Semaines surcharge (>120% seuil)</span><span class="m6-row-val">${bio.details.surcharge}</span></div></div></div>`;
   },
 
   // ── EXPORT ─────────────────────────────────────────────────,
@@ -562,7 +666,7 @@ const VFH = {
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:var(--pierre);margin-bottom:3px">
-          <span><strong style="color:var(--ivoire)">${a.totalHS}h</strong> HS cumulées</span>
+          <span><strong style="color:var(--ivoire)">${window._m6fmtH(a.totalHS)}</strong> HS cumulées</span>
           <span><strong style="color:${pct>=90?'var(--alerte)':'var(--champagne)'}">${pct}%</strong> du contingent</span>
         </div>
         <div style="height:5px;background:rgba(255,255,255,0.1);border-radius:99px;overflow:hidden">
@@ -611,7 +715,7 @@ const VFH = {
     if (ypHdr2) ypHdr2.onchange = () => { this._year=parseInt(ypHdr2.value); M6_Storage.setActiveYear(this._regime, this._year); this._load(); this.render(); };
     const _goYearFH = (yr) => {
       const exist = M6_Storage.getAllYears(this._regime);
-      if (!exist.includes(yr)) M6_Storage.createYear(this._regime, yr);
+      if (!exist.includes(yr)) { if (yr > Math.max(...exist) && window.M6_nouvelExercice) { M6_nouvelExercice(); } else { M6_toast('Pas d\'exercice '+yr); } return; } /* 27/09/2026 : plus de création silencieuse */
       this._year = yr; M6_Storage.setActiveYear(this._regime, yr); this._load(); this.render();
     };
     const ypPrev = document.querySelector('#vfh-yr-prev');
