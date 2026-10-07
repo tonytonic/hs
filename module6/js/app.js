@@ -286,7 +286,8 @@ const M6_Router = {
               <div class="m6-field">
                 <label>Contingent annuel HS (h) <span style="font-weight:400;font-size:0.75rem;color:var(--pierre)">— légal : 220h, ou défini par votre CCN</span></label>
                 <input type="number" id="wiz-cont" value="${existing.contingent||220}" min="100" max="500" style="font-size:16px">
-                <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+                <div id="wiz-cont-sans" style="display:none;font-size:0.74rem;color:var(--pierre);margin-top:6px;line-height:1.45">Pas de contingent annuel pour cette convention (elle n'en fixe pas, L7221-2) : ce champ n'est pas utilisé.</div>
+                <div id="wiz-prorata-wrap" style="display:flex;align-items:center;gap:6px;margin-top:6px">
                   <input type="checkbox" id="wiz-prorata-cont" ${existing.prorataContingent?'checked':''} style="width:16px;height:16px">
                   <label for="wiz-prorata-cont" style="font-size:0.78rem;color:var(--pierre);cursor:pointer">Appliquer un prorata si j'arrive en cours d'année</label>
                 </div>
@@ -372,7 +373,16 @@ const M6_Router = {
         const wInpFH  = this._root.querySelector('#wiz-ccn-fh');
         const wDropFH = this._root.querySelector('#wiz-ccn-fh-drop');
         const wInfoFH = this._root.querySelector('#wiz-ccn-fh-info');
+        // 04/10/2026 : convention sans contingent (3239) → champ contingent désactivé
+        const wSansFH = (sans) => {
+          const contEl = this._root.querySelector('#wiz-cont'), note = this._root.querySelector('#wiz-cont-sans'), pr = this._root.querySelector('#wiz-prorata-wrap');
+          if (contEl) { contEl.disabled = sans; contEl.style.opacity = sans ? '0.45' : ''; }
+          if (note) note.style.display = sans ? '' : 'none';
+          if (pr) pr.style.display = sans ? 'none' : 'flex';
+        };
+        try { const _r0 = M6_CCN_Adapter.reglesContrat ? M6_CCN_Adapter.reglesContrat(existing) : null; wSansFH(!!(_r0 && _r0.sansContingent)); } catch (_) {}
         if (wInpFH && wDropFH) {
+          wInpFH.addEventListener('input', () => { if (!wInpFH.value.trim()) wSansFH(false); });
           const cbFH = (ccn) => {
             wInpFH.dataset.idcc = ccn.idcc || '';
             const defs = M6_CCN_Adapter.buildContractDefaults?.(ccn, 'forfait_heures');
@@ -380,6 +390,7 @@ const M6_Router = {
             const seuilEl = this._root.querySelector('#wiz-seuil');
             if (contEl  && defs?.contingent) contEl.value  = defs.contingent;
             if (seuilEl && defs?.seuilHebdo) seuilEl.value = defs.seuilHebdo;
+            wSansFH(!!(defs?.sansContingent ?? ccn.sansContingent));
             if (wInfoFH) wInfoFH.innerHTML = M6_CCN_Adapter.renderCCNCard(ccn, 'forfait_heures');
           };
           M6_CCN_Adapter.bindAutocomplete(wInpFH, wDropFH, cbFH, 'forfait_heures');
