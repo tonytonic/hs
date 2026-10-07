@@ -1,3 +1,16 @@
+
+/* 04/10/2026 : base hebdo = max(base enregistrée par M1, seuil de la convention) */
+function _mrSeuilCCN(){ try{ if(typeof CCN_API!=='undefined'){ const r=CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')); if(r&&r.seuil) return r.seuil; } }catch(_){} return 35; }
+/* Congés payés (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026 n° 24-19.410) : une absence M1 marquée cp:1 ne réduit pas
+   le seuil des heures sup, sauf si la règle est désactivée pour l'exercice (CP_JURIS_<exercice> = "false"). Même règle que le compteur M1.
+   y = suffixe de l'exercice M1, c'est-à-dire celui de la clé DATA_REPORT_<y> d'où vient le jour — PAS l'année de la date :
+   un exercice à cheval (29/12/2025 → 27/12/2026) est rangé sous 2026, ses jours de décembre 2025 aussi. */
+window.FOX_m1AbsHS = window.FOX_m1AbsHS || function(v, y){
+  const a = Number((v && v.absent) || 0);
+  if (!v || !v.cp) return a;
+  let k = null; try { k = localStorage.getItem('CP_JURIS_' + (y || '')); } catch (e) {}
+  return k === 'false' ? a : 0;
+};
 // ===============================
 //  FOX ENGINE \u2013 MODULE READER
 //  Lecture READ-ONLY de M1 (heures/) et M2 (paye/)
@@ -21,7 +34,7 @@ class ModuleReader {
       const rawData     = JSON.parse(localStorage.getItem('DATA_REPORT_'    + this.year) || '{}');
       const rawReports  = JSON.parse(localStorage.getItem('REPORTS_REPORT_' + this.year) || '{}');
       const annualRate  = Number(localStorage.getItem('ANNUAL_RATE_'  + this.year)) || 10;
-      const baseHebdo   = Number(localStorage.getItem('BASE_HEBDO_'   + this.year)) || 35;
+      const baseHebdo   = Math.max(Number(localStorage.getItem('BASE_HEBDO_'   + this.year)) || 0, _mrSeuilCCN());
       const periodMeta  = JSON.parse(localStorage.getItem('PERIOD_META_REPORT_' + this.year) || '{}');
       const exerciseStart = localStorage.getItem('EXERCISE_START_' + this.year) || '';
 
@@ -39,8 +52,8 @@ class ModuleReader {
         if (typeof val !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
         const extra  = Number(val.extra  || 0);
         const recup  = Number(val.recup  || 0);
-        const absent = Number(val.absent || 0);
-        totalAbsent += absent;
+        const absent = window.FOX_m1AbsHS(val, this.year);
+        totalAbsent += Number(val.absent || 0);
 
         // Semaine ISO
         const d    = new Date(dateKey);
@@ -235,7 +248,7 @@ class ModuleReaderPro extends ModuleReader {
     try {
       const rawData    = JSON.parse(localStorage.getItem(`DATA_REPORT_${year}`)    || '{}');
       const annualRate = Number(localStorage.getItem(`ANNUAL_RATE_${year}`))  || 10;
-      const baseHebdo  = Number(localStorage.getItem(`BASE_HEBDO_${year}`))   || 35;
+      const baseHebdo  = Math.max(Number(localStorage.getItem(`BASE_HEBDO_${year}`)) || 0, _mrSeuilCCN());
 
       let totalExtra = 0, totalRecup = 0, totalAbsent = 0;
       const monthlyBreakdown = {};
@@ -246,8 +259,8 @@ class ModuleReaderPro extends ModuleReader {
         if (typeof val !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
         const extra  = Number(val.extra  || 0);
         const recup  = Number(val.recup  || 0);
-        const absent = Number(val.absent || 0);
-        totalAbsent += absent;
+        const absent = window.FOX_m1AbsHS(val, year);
+        totalAbsent += Number(val.absent || 0);
 
         const weekKey = this._getISOWeek(dateKey);
         if (!weeklyData[weekKey]) weeklyData[weekKey] = {
@@ -654,7 +667,7 @@ class ModuleReaderPro extends ModuleReader {
             if (typeof val !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
             const extra  = parseFloat(val.extra  || 0);
             const recup  = parseFloat(val.recup  || 0);
-            const absent = parseFloat(val.absent || 0);
+            const absent = window.FOX_m1AbsHS(val, y);
             const wk = getMondayKey(dk);
             if (!tmpWeeks[wk]) tmpWeeks[wk] = { extra:0, recup:0, absent:0, months: new Set() };
             tmpWeeks[wk].extra  += extra;
@@ -663,7 +676,7 @@ class ModuleReaderPro extends ModuleReader {
             tmpWeeks[wk].months.add(dk.substring(0,7));
           });
           // Calculer OT net par semaine (M1 : base 35h, absences deduites)
-          const base = Number(localStorage.getItem('BASE_HEBDO_' + y)) || 35;
+          const base = Math.max(Number(localStorage.getItem('BASE_HEBDO_' + y)) || 0, _mrSeuilCCN());
           Object.entries(tmpWeeks).forEach(([wk, w]) => {
             const effective = base + w.extra - w.recup - w.absent;
             const ot = Math.max(0, effective - base); // = max(0, extra - recup - absent)
@@ -772,6 +785,17 @@ class ModuleReaderPro extends ModuleReader {
       });
 
       if (Object.keys(monthBreakdown).length === 0) return;
+
+      // 26/09/2026 : total officiel du module (contingent M1/M2) quand il existe ;
+      // les paliers sont remis à l'échelle pour rester cohérents avec ce total.
+      try {
+        const off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(y) : null;
+        if (off && yearOT > 0 && Math.abs(off.total - yearOT) > 0.01) {
+          const k = off.total / yearOT;
+          yearHs25 *= k; yearHs10 *= k; yearHs50 *= k;
+          yearOT = off.total;
+        } else if (off && yearOT <= 0) { yearOT = off.total; yearHs25 = off.total; }
+      } catch (_) {}
 
       monthCount  += Object.keys(monthBreakdown).length;
       totalExtra  += yearOT;
