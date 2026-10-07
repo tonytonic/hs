@@ -751,7 +751,7 @@ class Dashboard {
         ? CCN_API.getGroupeForCCN(parseInt((()=>{try{return localStorage.getItem('CCN_IDCC')}catch(_){return '0'}})() || '0'))
         : {contingent: 220};
       const _limit = (ccnRules && ccnRules.contingent) ? ccnRules.contingent : 220;
-      cont.textContent=`Contingent : ${raw&&raw.m1?Math.round(raw.m1.netOvertime||raw.m1.totalExtra||0):0}/${_limit}h`;
+      cont.textContent=(ccnRules&&ccnRules.sansContingent)?`Heures sup : ${raw&&raw.m1?Math.round(raw.m1.netOvertime||raw.m1.totalExtra||0):0} h (pas de contingent)`:`Contingent : ${raw&&raw.m1?Math.round(raw.m1.netOvertime||raw.m1.totalExtra||0):0}/${_limit}h`;
     }
     const st=document.getElementById('footer-status');
     if(st){

@@ -58,8 +58,13 @@ class Heatmap {
 
     const MONTHS = ['Janv','Févr','Mars','Avr','Mai','Juin','Juil','Août','Sept','Oct','Nov','Déc'];
 
-    // Stats globales
-    const allEntries = Object.entries(days);
+    // Stats de l'exercice affiché (26/09/2026) : du début de l'exercice à la clôture annuelle
+    // (31/12 à défaut) — avant, toutes les années chargées de M1 et M2 étaient comptées.
+    const _ld = d => d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const _exDeb = (/^\d{4}-\d{2}-\d{2}$/.test(localStorage.getItem('EXERCISE_START_'+year)||'')) ? localStorage.getItem('EXERCISE_START_'+year) : year+'-01-01';
+    const _exFin = (/^\d{4}-\d{2}-\d{2}$/.test(localStorage.getItem('ANNUAL_DATE_'+year)||'')) ? localStorage.getItem('ANNUAL_DATE_'+year) : year+'-12-31';
+    const _auj = _ld(new Date());
+    const allEntries = Object.entries(days).filter(([k]) => k >= _exDeb && k <= _exFin && k <= _auj);
     const daysHS     = allEntries.filter(([,e]) => !e.absent && e.extra > 0).length;
     const totalHS    = allEntries.reduce((s,[,e]) => s + (e.extra||0), 0);
     const maxExtraDay = allEntries.reduce((m,[d,e]) => e.extra > m.v ? {d, v:e.extra} : m, {d:null,v:0});
@@ -136,7 +141,8 @@ class Heatmap {
     const _today = new Date(); _today.setHours(0,0,0,0);
     let daysWorked = 0;
     let daysOff    = 0; // jours non travaillés (repos+férié+vacances+absence)
-    for (let d = new Date(_startYear); d <= _today; d.setDate(d.getDate()+1)) {
+    const _finCompte = new Date(Math.min(_today.getTime(), new Date(_exFin + 'T00:00:00').getTime()));
+    for (let d = new Date(_startYear); d <= _finCompte; d.setDate(d.getDate()+1)) {
       const dow = d.getDay();
       if (_restSet.has(dow)) { daysOff++; continue; } // jour de repos hebdo CCN exclu
       const dk = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -150,7 +156,7 @@ class Heatmap {
       ? (CCN_API.getGroupeForCCN(parseInt(localStorage.getItem('CCN_IDCC')||'0')) || {contingent:220})
       : {contingent:220};
     const _heatLimit = _heatCCN.contingent;
-    const contingentPct = totalHS > 0 ? (totalHS / _heatLimit) * 100 : (norm ? (norm._contingentPct || 0) : 0);
+    const contingentPct = _heatCCN.sansContingent ? 0 : (totalHS > 0 ? (totalHS / _heatLimit) * 100 : (norm ? (norm._contingentPct || 0) : 0)); // 04/10/2026 : pas de contingent (IDCC 3239)
 
     // Génération des mois
     const monthsHTML = Array.from({length:12}, (_, m) => {
