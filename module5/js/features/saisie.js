@@ -6,13 +6,14 @@
 'use strict';
 
 const K = {
-  DATA:        y => 'M5_DATA_' + y,
-  VACANCES:    y => 'M5_VACANCES_' + y,
-  AVENANT:     y => 'M5_AVENANT_' + y,
-  CONTRACT:    'M5_CONTRACT',
+  /* C6 : clés du contrat actif (contrat 1 = clés historiques) */
+  DATA:        y => M5_key('M5_DATA_') + y,
+  VACANCES:    y => M5_key('M5_VACANCES_') + y,
+  AVENANT:     y => M5_key('M5_AVENANT_') + y,
+  CONTRACT:    M5_key('M5_CONTRACT'),
   USER_NAME:   'M5_USER_NAME',
   WELCOMED:    'M5_WELCOMED',
-  ACTIVE_YEAR: 'M5_ACTIVE_YEAR',
+  ACTIVE_YEAR: M5_key('M5_ACTIVE_YEAR'),
 };
 
 function _get(k, def='') { try{return localStorage.getItem(k)??def;}catch(_){return def;} }
@@ -44,6 +45,22 @@ const Contract = {
     if(raw.accordCollectifPrevenance === undefined) raw.accordCollectifPrevenance = false;
     // noticeDays : 7 par défaut (L3123-31) ; 3 si accord d'entreprise/branche (L3123-24)
     raw.noticeDays = raw.accordCollectifPrevenance ? 3 : 7;
+    // 03/10/2026 : plafond, taux et prévenance toujours repris de la convention choisie
+    // (corrections du fonds droit appliquées aussi aux contrats déjà enregistrés).
+    if(raw.idcc>0 && typeof window!=='undefined' && window.CCN_PARTIEL_API){
+      try{
+        const r=window.CCN_PARTIEL_API.getRules(raw.idcc,raw.ccnNom);
+        if(r && r.idcc){
+          if(r.cap) raw.cap=r.cap;
+          if(r.rate1!=null) raw.rate1=r.rate1;
+          if(r.rate2!=null) raw.rate2=r.rate2;
+          if(r.threshold) raw.threshold=r.threshold;
+          if(r.tempsPlein) raw.tempsPlein=r.tempsPlein; else delete raw.tempsPlein;
+          raw.sansMajoration=!!r.sansMajoration;
+          if(!raw.accordCollectifPrevenance && r.notice) raw.noticeDays=r.notice;
+        }
+      }catch(_){}
+    }
     // joursOuvresContrat : nombre de jours travaillés/semaine (défaut 5)
     if(raw.joursOuvresContrat === undefined) raw.joursOuvresContrat = 5;
     return raw;
@@ -179,7 +196,19 @@ const DataStore = {
     }).filter(w=>w.worked!==null);
   },
 
-  getLast12Weeks(year) { return this.getWeeksSorted(year).slice(-12); },
+  // Semaines de l'année et des années voisines (26/09/2026). Les saisies sont rangées
+  // par année civile : un exercice à cheval (juin → mai) ou la fenêtre des
+  // 12 semaines en janvier ont besoin des semaines de l'année d'à côté.
+  getWeeksAround(year, avant=1, apres=1) {
+    const y=parseInt(year,10), vu={}, out=[];
+    for(let a=y-avant;a<=y+apres;a++){
+      this.getWeeksSorted(String(a)).forEach(w=>{ if(!vu[w.monday]){ vu[w.monday]=1; out.push(w); } });
+    }
+    return out.sort((p,q)=>p.monday.localeCompare(q.monday));
+  },
+  // Règle des 12 semaines (L3123-13) : fenêtre glissante, elle ne repart pas à zéro
+  // au 1er janvier — les semaines de décembre comptent encore en janvier.
+  getLast12Weeks(year) { return this.getWeeksAround(year,1,0).slice(-12); },
 
   // ── MULTI-ANNÉE pour les calculs biologiques ─────────────────────
   // Le corps ne repart pas de zéro en janvier : la fatigue et le niveau
@@ -211,7 +240,19 @@ const DataStore = {
   },
 
   getAnnualStats(year, contractH, ccnRules) {
-    const weeks=this.getWeeksSorted(year);
+    let weeks=this.getWeeksSorted(year);
+    // 26/09/2026 : statistiques de l'EXERCICE de cette année (début → dernière clôture),
+    // pas de l'année civile. Sinon la semaine du 29/12, qui ouvre l'exercice suivant,
+    // tombait dans l'année précédente.
+    try{
+      if(ccnRules&&ccnRules.exerciceStart&&typeof window.M5_contratPourAnnee==='function'){
+        const c=window.M5_contratPourAnnee(String(year),ccnRules);
+        const cl=Object.values(c.cloturesDates||{}).filter(Boolean).sort();
+        const deb=c.exerciceStart,fin=cl[cl.length-1];
+        if(deb&&fin&&fin.slice(0,4)===String(year)&&deb<=fin)
+          weeks=this.getWeeksAround(year).filter(w=>w.monday>=deb&&w.monday<=fin);
+      }
+    }catch(e){}
     if(!weeks.length) return null;
     let totalWorked=0,totalComp=0,totalComp1=0,totalComp2=0,weeksWithComp=0,maxWorked=0;
     weeks.forEach(w=>{
@@ -267,7 +308,7 @@ const DataStore = {
     if(!c.idcc || c.idcc <= 0) return false; // Droit commun → accord de branche obligatoire
     if(typeof window==='undefined' || !window.CCN_PARTIEL_API) return false;
     try {
-      const rules = window.CCN_PARTIEL_API.getRules(c.idcc);
+      const rules = window.CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom);
       // Liste des groupes CCN ayant un accord de branche étendu prévoyant L3123-22
       // (seuls ceux-ci peuvent utiliser les avenants compléments d'heures)
       const groupesAvecAvenant = ['HCR','BOULAN329','COIF200','SECU329','PROP190','HOSPI130','ANIM70'];
@@ -367,7 +408,7 @@ function formatMonday(mondayStr) {
 }
 function getExistingYears() {
   const years=new Set();
-  try{ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('M5_DATA_')){const y=k.replace('M5_DATA_','');if(/^\d{4}$/.test(y))years.add(y);}} }catch(_){}
+  try{ for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);const _p=M5_key('M5_DATA_');if(k&&k.startsWith(_p)){const y=k.slice(_p.length);if(/^\d{4}$/.test(y))years.add(y);}} }catch(_){}
   if(!years.size) years.add(String(new Date().getFullYear()));
   return [...years].sort();
 }
