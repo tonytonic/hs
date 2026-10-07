@@ -58,17 +58,21 @@ function getFeriesYear(year) {
   return getFeriesLocal(year);
 }
 
-function countFeriesInWeek(mondayStr, feriesMap, joursOuvresContrat) {
-  // Compte les fériés tombant sur les jours normalement travaillés.
+function countFeriesInWeek(mondayStr, feriesMap, joursOuvresContrat, workedDaysMap) {
+  // Compte les fériés tombant sur les jours normalement travaillés ET NON TRAVAILLÉS.
+  // Un férié réellement travaillé (heures saisies ce jour-là) n'est PAS "chômé" :
+  // il n'y a pas de perte à compenser, donc on n'abaisse pas le seuil (Art. L3133-3).
   // joursOuvresContrat : nombre de jours/semaine (défaut 5). On compte à partir
-  // du début de semaine (mondayStr représente le 1er jour de la semaine du salarié,
-  // pas forcément lundi — peut être samedi pour HCR, mardi, etc.)
+  // du début de semaine (mondayStr = 1er jour de la semaine du salarié, pas
+  // forcément lundi).
   let count=0;
   const nbJours = Math.max(1, Math.min(7, Math.round(joursOuvresContrat||5)));
   for(let d=0;d<nbJours;d++){
     const dt=new Date(mondayStr+'T12:00:00'); dt.setDate(dt.getDate()+d);
     const key=dk(dt);
-    if(feriesMap&&feriesMap[key]) count++;
+    if(feriesMap&&feriesMap[key]){
+      if(!(workedDaysMap && workedDaysMap[key] > 0)) count++; // chômé uniquement
+    }
   }
   return count;
 }
@@ -89,23 +93,29 @@ const CalcEngine = {
    */
   calcWeek(contractH, workedH, ccnRules, hourlyRate=0, options={}) {
     const cap       = ccnRules.cap       || 0.10;
-    const rate1     = ccnRules.rate1     || 0.10;
-    const rate2     = ccnRules.rate2     || 0.25;
+    const rate1     = ccnRules.rate1     ?? 0.10;   // 03/10/2026 : 0 % possible (IDCC 3239)
+    const rate2     = ccnRules.rate2     ?? 0.25;
     const threshold = ccnRules.threshold || 0.10;
+    const FULL      = ccnRules.tempsPlein || LEGAL_FULL_TIME; // 40 h pour l'IDCC 3239
     const joursOuvres = options.joursOuvresContrat || 5;
     const neutralise  = options.neutraliseFeries !== false; // true par défaut
 
-    // Calculer seuil ajusté selon les fériés
+    // Seuil déclencheur des heures complémentaires. Deux traitements du férié
+    // CHÔMÉ coexistent en droit/jurisprudence selon la convention (réglage
+    // "neutraliser les fériés") :
+    //  • neutralise = true  → férié chômé ASSIMILÉ à du temps de travail effectif :
+    //    le seuil est abaissé proportionnellement (Art. L3133-3, CCN assimilantes).
+    //  • neutralise = false → férié chômé EXCLU : le seuil reste la durée
+    //    contractuelle, seules les heures travaillées comptent (Cass. n°10-10.701).
+    // Dans les DEUX cas, un férié TRAVAILLÉ n'est jamais neutralisé : il compte
+    // dans les heures réellement saisies (pas de chômage à neutraliser).
     let contractAjuste = contractH;
     let feriesCount = 0;
     let feriesNote = null;
     if(options.feriesMap && neutralise) {
-      // ✅ Art. L3133-3 + jurisprudence : le chômage d'un jour férié ne peut entraîner
-      // de perte, donc le seuil est abaissé proportionnellement aux fériés tombant
-      // sur des jours normalement travaillés.
       const mondayStr = options.mondayStr;
       if(mondayStr) {
-        feriesCount = countFeriesInWeek(mondayStr, options.feriesMap, joursOuvres);
+        feriesCount = countFeriesInWeek(mondayStr, options.feriesMap, joursOuvres, options.workedDaysMap);
         if(feriesCount > 0) {
           const valJour = contractH / joursOuvres;
           contractAjuste = Math.max(0, contractH - feriesCount * valJour);
@@ -113,7 +123,6 @@ const CalcEngine = {
         }
       }
     }
-    // ⬜ Mode alternatif (jurisprudence) : seuil normal, fériés intégrés dans l'assiette
 
     const maxAllowed  = contractAjuste * (1 + cap);
     const threshold1H = contractAjuste * threshold;
@@ -127,19 +136,22 @@ const CalcEngine = {
     if(workedH > contractAjuste) {
       let diff = workedH - contractAjuste;
 
-      if(workedH >= LEGAL_FULL_TIME) {
+      if(workedH > FULL && ccnRules.sansMajoration) {   // 04/10/2026 : 40 h pile = temps plein, pas encore des heures sup
+        alerts.push({ level:'alerte', code:'REQUALIFICATION',
+          msg:`${workedH}h cette semaine : au-delà de ${FULL} h, ce sont des heures ${FULL===45?'majorées, au taux de ton contrat (au moins +10 %)':'supplémentaires (+25 % jusqu\'à 48 h, puis +50 %)'}. Mizuki ne les majore pas : vérifie-les sur ta fiche de paie.` });
+      } else if(workedH >= FULL && !ccnRules.sansMajoration) {
         alerts.push({ level:'critique', code:'REQUALIFICATION',
           msg:`Tu as atteint ${workedH}h cette semaine — le seuil légal du temps plein. La loi prévoit des droits dans ce cas. Conserve cet historique.` });
         isLegal = false;
       }
-      if(workedH > maxAllowed && workedH < LEGAL_FULL_TIME) {
+      if(workedH > maxAllowed && workedH < FULL && !ccnRules.sansPlafond && cap < 0.99) {
         alerts.push({ level:'alerte', code:'PLAFOND_CCN',
           msg:`Tes heures dépassent le plafond conventionnel (${Math.round(cap*100)}% du contrat = max ${maxAllowed.toFixed(1)}h). Garde une trace de ces semaines.` });
         isLegal = false;
       }
-      if(workedH >= LEGAL_FULL_TIME - 1 && workedH < LEGAL_FULL_TIME) {
+      if(workedH >= FULL - 1 && workedH < FULL) {
         alerts.push({ level:'vigilance', code:'PROCHE_TEMPS_PLEIN',
-          msg:`Tu es à ${(LEGAL_FULL_TIME - workedH).toFixed(1)}h du temps plein. Sois vigilante.` });
+          msg:`Tu es à ${(FULL - workedH).toFixed(1)}h du temps plein. Sois vigilante.` });
       }
       if(diff <= threshold1H) {
         compH1 = diff;
@@ -163,7 +175,7 @@ const CalcEngine = {
       comp1Amount: Math.round(comp1Amount*100)/100,
       comp2Amount: Math.round(comp2Amount*100)/100,
       totalAmount: Math.round(totalAmount*100)/100,
-      rate1, rate2, cap, maxAllowed: Math.round(maxAllowed*100)/100,
+      rate1, rate2, cap, maxAllowed: Math.round(maxAllowed*100)/100, tempsPlein: FULL,
       feriesCount, feriesNote, alerts, isLegal,
     };
   },
@@ -181,16 +193,17 @@ const CalcEngine = {
     const totalWorked  = weeks.reduce((s,w) => s + (w.worked||0), 0);
     const diff         = totalWorked - seuilMensuel;
     const cap          = ccnRules.cap || 0.10;
-    const rate1        = ccnRules.rate1 || 0.10;
-    const rate2        = ccnRules.rate2 || 0.25;
+    const rate1        = ccnRules.rate1 ?? 0.10;
+    const rate2        = ccnRules.rate2 ?? 0.25;
+    const FULL         = ccnRules.tempsPlein || LEGAL_FULL_TIME;
     const threshold    = ccnRules.threshold || 0.10;
     const maxAllowed   = Math.round(seuilMensuel * (1 + cap) * 100) / 100;
 
     // ⚠️ La limite 35h est HEBDOMADAIRE — elle s'applique même en mode mensuel
-    const semainesRequalif = weeks.filter(w => (w.worked||0) >= LEGAL_FULL_TIME);
+    const semainesRequalif = weeks.filter(w => (w.worked||0) >= FULL);
     const alerts = semainesRequalif.length > 0 ? [{
       level:'critique', code:'REQUALIFICATION',
-      msg:`${semainesRequalif.length} semaine(s) à 35h ou plus détectée(s) (${semainesRequalif.map(w=>w.monday).join(', ')}). La durée légale ne peut jamais être atteinte sur un contrat temps partiel — risque de requalification (Art. L3123-28). Conserve cet historique.`
+      msg:`${semainesRequalif.length} semaine(s) à ${FULL}h ou plus détectée(s) (${semainesRequalif.map(w=>w.monday).join(', ')}). La durée légale ne peut jamais être atteinte sur un contrat temps partiel — risque de requalification (Art. L3123-28). Conserve cet historique.`
     }] : [];
 
     let compH1 = 0, compH2 = 0;
@@ -199,7 +212,7 @@ const CalcEngine = {
       compH1 = Math.min(diff, th1);
       compH2 = Math.max(0, diff - th1);
       // Alerte si dépassement du plafond conventionnel
-      if(totalWorked > maxAllowed) {
+      if(totalWorked > maxAllowed && cap < 0.99) {
         alerts.push({ level:'alerte', code:'PLAFOND_CCN',
           msg:`Tes heures ce mois (${totalWorked}h) dépassent le plafond conventionnel de ${Math.round(cap*100)}% du seuil mensuel (max ${maxAllowed}h). Conserve ces relevés — Art. L3123-28.`
         });
@@ -353,13 +366,25 @@ const CalcEngine = {
         if(cnt>=12){ triggered15=true; break; }
       }
     }
-    const triggered=maxConsec>=12||triggered15;
+    // 04/10/2026 : L3123-13 raisonne sur l'HORAIRE MOYEN (dépassement d'au moins 2 h par semaine
+    // en moyenne), pas sur chaque semaine. Avant, une semaine à +1 h bloquait la règle même si la
+    // moyenne dépassait +2 h (au détriment du salarié). Fenêtre de 12 semaines consécutives, ou
+    // 12 semaines au cours de 15 (on retient les 12 plus chargées de la fenêtre).
+    const avg=a=>a.reduce((x,w)=>x+(w.worked||0),0)/a.length;
+    let triggeredMoy=false, triggeredMoy15=false;
+    for(let i=0;i+12<=weeklyData.length;i++){ if(avg(weeklyData.slice(i,i+12))>=contractH+2){ triggeredMoy=true; if(!triggerStart&&triggerStart!==0) triggerStart=i; break; } }
+    if(!triggeredMoy) for(let i=0;i+15<=weeklyData.length;i++){
+      const top=weeklyData.slice(i,i+15).slice().sort((a,b)=>(b.worked||0)-(a.worked||0)).slice(0,12);
+      if(avg(top)>=contractH+2){ triggeredMoy15=true; break; }
+    }
+    triggered15 = triggered15 || (triggeredMoy15 && maxConsec<12 && !triggeredMoy);
+    const triggered=maxConsec>=12||triggered15||triggeredMoy;
     return {
       triggered, maxConsec, triggerStart, triggered15,
       msg: triggered
         ? (triggered15&&maxConsec<12)
-          ? `12 semaines sur une période de 15 ont dépassé ton contrat de +2h/sem. L'Art. L3123-13 s'applique — tu peux demander par écrit la modification de ton contrat à la hausse (préavis 7j, sauf opposition de ta part).`
-          : `Depuis ${maxConsec} semaines consécutives, tes heures dépassent le contrat de +2h/sem. L'Art. L3123-13 prévoit la modification du contrat — tu peux en faire la demande écrite, ou t'y opposer pour conserver ton horaire actuel.`
+          ? `Sur 12 semaines d'une période de 15, tes heures ont dépassé ton contrat de 2 h ou plus par semaine en moyenne. L'Art. L3123-13 s'applique — tu peux demander par écrit la modification de ton contrat à la hausse (préavis 7j, sauf opposition de ta part).`
+          : `${maxConsec>=12?'Depuis '+maxConsec+' semaines consécutives':'Sur 12 semaines consécutives'}, tes heures dépassent le contrat de 2 h ou plus par semaine en moyenne. L'Art. L3123-13 prévoit la modification du contrat — tu peux en faire la demande écrite, ou t'y opposer pour conserver ton horaire actuel.`
         : maxConsec>=8
           ? `${maxConsec} semaines consécutives au-dessus du contrat. Encore ${12-maxConsec} semaines avant que la règle des 12 semaines s'applique.`
           : null
