@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nouveautés — Heures Supplémentaires France</title>
 <link rel="manifest" href="manifest.json">
 <style>
@@ -62,9 +62,297 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">4 octobre 2026</span>
+    <span class="v-num">v10.12</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Ta convention, tes règles</b> : grâce à notre veille Légifrance et à l'arrivée toute récente du <b>BOCC</b> (Bulletin officiel des conventions collectives) dans nos sources, <b>près de 90 conventions</b> qui suivaient jusqu'ici les règles du Code du travail par défaut ont maintenant <b>leurs propres règles</b> : seuil des heures sup, taux de majoration, contingent annuel et heures complémentaires du temps partiel. Tes compteurs, ton bulletin et les analyses de Fox, Mizuki et Zenji en tiennent compte tout seuls, sans rien ressaisir. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Emploi à domicile (IDCC 3239)</b> : les heures sup commencent à <b>40&nbsp;h</b> par semaine (25&nbsp;% les 8 premières, puis 50&nbsp;%), et il n'y a <b>pas de contingent</b>. À temps partiel, les heures en plus de ton contrat jusqu'à 40&nbsp;h sont des heures complémentaires payées <b>au taux normal</b>, sans plafond : Mizuki adapte ses alertes et ses conseils. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Assistant(e) maternel(le)</b> : une entrée dédiée dans le choix de convention : heures sup à partir de <b>45&nbsp;h</b>, majorées de 10&nbsp;%, sans contingent annuel. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Pas de contingent ? L'appli le dit</b> : quand ta convention ne prévoit pas de contingent d'heures sup, le compteur, le bulletin, le tableau de bord et Fox affichent <b>« pas de contingent »</b> au lieu d'une jauge, et aucune alerte inutile ne s'affiche. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Temps partiel (Mizuki)</b> : le plafond d'heures complémentaires, les taux et le délai de prévenance affichés sont ceux de <b>ta convention</b>, un encart rappelle ses règles dans les paramètres, et quand les deux taux sont identiques une seule tuile les regroupe. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Forfait heures (Zenji)</b> : le contingent et les taux de ta convention sont repris automatiquement ; les réglages que tu avais personnalisés sont conservés. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Grilles de salaires</b> : grilles mises à jour pour plusieurs conventions (dont emploi à domicile, pâtisserie et coopération maritime), et le tableau des heures sup affiché sous chaque grille suit maintenant les règles de la convention. <span class="v-tag tag-fix">Mise à jour</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">2 octobre 2026</span>
+    <span class="v-num">v10.11</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Congés payés et heures sup</b> : depuis l'arrêt de la Cour de cassation du 10 septembre 2025 (n° 23-14.455), confirmé le 7 janvier 2026, les jours de <b>congés payés comptent comme du temps de travail</b> pour savoir si tu dépasses le seuil des heures sup de la semaine. Dans le compteur annuel, le bouton 🌴 <b>Journée de congé payé</b> marque le jour en un geste ; dans le forfait heures, indique les jours de CP de la semaine. La règle est active par défaut ; tu peux la désactiver dans les Réglages si ton temps de travail est annualisé par un accord. <span class="v-tag tag-legal">Légal</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Les congés payés apparaissent dans tes PDF</b> : les relevés du compteur annuel (période, mois, bilan annuel) ont une colonne <b>CP</b>, et ceux du forfait heures affichent les jours de CP à côté des heures de la semaine. Une mention rappelle la règle appliquée, pour que ton employeur comprenne d'où viennent tes heures sup. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Relevé de période</b> : le PDF ne plante plus quand le tableau des semaines continue sur une deuxième page. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">1er octobre 2026</span>
+    <span class="v-num">v10.10</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Fin d'exercice : ton bilan et ce qu'on te doit</b> : à la fin de ton exercice, le compteur annuel, les heures mensualisées, le temps partiel et les forfaits t'affichent un <b>bilan</b> (heures, heures payées, <b>reste à payer</b>) que tu peux garder en image. Puis ils te proposent d'<b>ouvrir l'exercice suivant</b> dès le lendemain de ta dernière clôture, avec des clôtures automatiques ou choisies par toi. Tu peux même le préparer à l'avance. Rien ne bascule sans toi, et l'exercice terminé reste consultable. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Heures non payées : 3 ans pour les réclamer</b> : si des heures n'ont pas été payées, l'appli te le rappelle (art. L3245-1 du Code du travail) et te propose de les <b>reporter</b> dans le nouvel exercice pour suivre leur paiement. Celles que tu ne reportes pas restent dans le bilan de leur exercice et te sont reproposées à chaque nouvel exercice tant que les 3 ans ne sont pas passés. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Exercices à cheval sur deux années</b> : un exercice qui commence en décembre ou en cours d'année est géré partout, et il porte le nom de l'année où il a le plus de jours (29/12/2025 → 27/12/2026 = 2026). Les jours saisis sont toujours rangés dans l'exercice qui contient leur date, même si tu les as tapés depuis un autre exercice. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Heures mensualisées : ton propre exercice</b> : tu peux choisir le <b>premier mois de l'exercice</b> (écran Clôtures), par exemple octobre → septembre si un accord collectif le prévoit. Contingent, bilan et reports suivent ce découpage, et tes saisies ne bougent pas. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Temps partiel — plusieurs employeurs</b> : Mizuki gère jusqu'à <b>3 contrats</b> : vue d'ensemble de tes heures et de tes heures complémentaires par contrat, sur la semaine et la période affichées ; santé calculée sur <b>toutes</b> tes heures ; « Je suis en congés » sur tous tes contrats en un clic ; heatmap commune ; PDF par contrat ou commun. Repères 48&nbsp;h par semaine, 44&nbsp;h en moyenne et 10&nbsp;h par jour tous employeurs, et repère retraite progressive. La durée du contrat se saisit par semaine, par mois ou par an. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Forfaits cadres (Zenji)</b> : chaque exercice garde <b>ses propres réglages</b> : les modifier ne change pas les autres. Un bouton efface les dates pour revenir à l'année civile. Le <b>télétravail</b> compte bien comme jour travaillé, les RTT théoriques sont justes en année civile, et les indicateurs de santé reflètent tes 8 dernières semaines : un congé récent fait baisser la fatigue, puis son effet s'estompe. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Copie de sauvegarde, en toute sérénité</b> : le bouton 💾 du menu affiche la date de ta dernière copie, et un rappel te la propose au bon moment (fin de période, nouvel exercice), au plus une fois par mois. Avant de restaurer, le fichier est entièrement vérifié : si quelque chose cloche, rien n'est effacé. Sur iPhone, le fichier se retrouve dans l'onglet <b>Récents</b>. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Rappels dans ton calendrier</b> : 📅 depuis le menu, choisis tes rappels (saisie des heures, fin de période, bilan annuel) : ils s'ajoutent à <b>ton propre calendrier</b>. Tu les modifies ou les supprimes quand tu veux. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Mes outils du quotidien</b> : une nouvelle carte dans le menu : <b>saisir aujourd'hui</b> en un geste dans le module de ton choix (toujours sur l'exercice et la période du jour), ta to-do list, la personnalisation du menu, et tes <b>paramètres</b> : ton prénom et ta convention collective sont repris par les modules. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Grilles de salaires</b> : quand le minimum de ta convention est passé sous le SMIC, l'appli affiche le SMIC, et toutes les grilles suivent la prochaine hausse. Grilles mises à jour : tourisme social et familial, ports et manutention, bijouterie-joaillerie-horlogerie, horlogerie-bijouterie de détail, cabinets d'avocats. Quatre conventions ajoutées : céramique, désinfection-désinsectisation, inspection d'assurance, transformation de volailles. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Signaler un problème plus facilement</b> : dans « Nous contacter », tu peux joindre un <b>rapport de plantage</b> (version, appareil, dernières erreurs techniques). Tu le vois avant l'envoi, et il ne contient rien sur tes heures ni aucune donnée personnelle : ni prénom, ni employeur, ni taux horaire, ni montant. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>🩺 État de l'appli</b> (menu, sous « Nous contacter ») : vérifie en un coup d'œil si tu as la dernière version, si l'appli marche sans réseau, quand date ta dernière sauvegarde et si tes données sont en bon état, module par module. Tu peux aussi <b>forcer la mise à jour</b>, vider le cache de l'appli sans toucher à tes données, ou tester l'ouverture de tous les modules. Tout reste sur ton téléphone. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>PDF sans réseau</b> : l'export PDF est maintenant intégré à l'appli. Tu peux faire tes PDF en mode avion, dans tous les modules. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Chiffres plus justes</b> : le PDF du temps partiel applique partout ton réglage des jours fériés (bilan, détail par semaine et paiement concordent) ; Fox affiche le contingent officiel de ton compteur ; les compteurs et heatmaps se limitent à l'exercice affiché ; dans les primes du jour (nuit, astreinte, primes), une prime sans montant unitaire se saisit directement en euros. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Plus fluide sur iPhone et Android</b> : les en-têtes restent sous l'heure sur iOS 26 ; plus d'écran blanc ni de clignement à l'ouverture ou au changement de contrat ; les polices sont intégrées à l'appli (elle marche mieux hors ligne) ; les mises à jour de l'appli s'installent de façon plus fiable ; sur iPhone, la page ne zoome plus toute seule quand tu touches un champ. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Petites corrections</b> : un long texte dans Taiko n'élargit plus le calendrier ni l'encart du menu ; l'outil Préavis affiche sa référence en lien ; les fenêtres Sauvegarde et Rappels tiennent entre l'encoche et le bas de l'écran ; le conseiller des forfaits ne parle plus de « période estivale » en janvier. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Tes chiffres peuvent bouger un peu</b> : c'est normal, ce sont les calculs corrigés : dans Zenji, les RTT théoriques en année civile (souvent 2 de moins) et les jours restants si tu saisis du télétravail ; dans le PDF du temps partiel, les semaines avec un jour férié ; et le reste non payé d'un exercice ne s'ajoute plus tout seul au suivant : c'est toi qui choisis. Tes saisies, elles, ne changent pas. <span class="v-tag tag-legal">À savoir</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Septembre 2026</span>
+    <span class="v-num">v10.9</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Saisie en heures et minutes partout</b> : fini le décimal. Tu notes <b>5&nbsp;h&nbsp;45</b> au lieu de « 5.75 », dans deux petites cases <b>h</b> et <b>min</b> — sur tous les modules (compteur annuel, simulateur mensuel, temps partiel, forfait heures, nuit &amp; primes). Le calcul, lui, reste précis au centime en arrière-plan. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Simulateur mensuel au plus juste</b> : les heures sont désormais comptées <b>à la minute près</b> (2&nbsp;h&nbsp;10 reste 2&nbsp;h&nbsp;10, plus d'arrondi au quart d'heure), y compris dans la ventilation par taux (+25&nbsp;% / +50&nbsp;%). <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Confirmation d'enregistrement sur Android</b> : quand tu exportes un PDF ou une sauvegarde, un message confirme que le fichier est bien <b>enregistré dans les fichiers de ton téléphone</b>, avec un bouton pour l'ouvrir ou le partager. Plus besoin de cliquer plusieurs fois. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Compteur annuel — raccourcis enrichis</b> : la saisie rapide d'une journée gagne <b>+45&nbsp;min</b>, <b>−45&nbsp;min</b> et <b>−2&nbsp;h</b>, en plus des raccourcis déjà présents. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Temps partiel — congés dans le calendrier</b> : les semaines posées en <b>congés</b> s'affichent maintenant dans la vue mois (🌴), et les heures de nuit du module Nuit&nbsp;&amp;&nbsp;primes s'affichent proprement en heures et minutes. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Septembre 2026</span>
+    <span class="v-num">v10.8</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Temps partiel — Mizuki suit ce qu'on te doit</b> : le module ne se contente plus de vérifier si ton contrat est respecté, il calcule maintenant tes <b>heures complémentaires</b>, ce qui a déjà été payé et ce qui te <b>reste dû</b>. Même réflexe que les modules Heures sup : je saisis, on me doit, je sais où j'en suis. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Solde de la période</b> : une carte claire par période de paie — total des heures comp. (+10&nbsp;% / +25&nbsp;%), report de la période précédente, heures déjà payées, <b>restant dû</b> et reliquat reporté. Tu notes ce que l'employeur t'a payé, le solde non payé se reporte tout seul. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Pensé pour la retraite progressive et les passages à mi-temps</b> : si tu viens des modules Heures sup et que tu passes à temps partiel, tu gardes le même suivi. Le nombre de jours travaillés par semaine (4 jours, etc.) se règle dès la configuration. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Alertes santé</b> : Mizuki repère les journées de plus de <b>10&nbsp;h</b> (durée quotidienne maximale, Art. L3121-18) et rappelle le <b>repos de 11&nbsp;h</b> entre deux journées (Art. L3131-1). Le jour concerné est signalé dans le calendrier. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Calendrier par période</b> : vue mois avec navigation période par période (balayage), deux couleurs pour distinguer les périodes de paie, et verrouillage d'une période pour figer sa saisie une fois vérifiée. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Jours fériés au plus juste</b> : le calcul distingue le férié <b>travaillé</b> (compté normalement) du férié <b>chômé</b>, avec un réglage « assimilé / exclu » selon ta convention (Cass. soc. n°10-10.701, Art. L3133-3). Cohérent dans toutes les cartes. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Export PDF et navigation fluidifiés</b> : après un export PDF sur Android, un message « Ouvrir » s'affiche pour retrouver le fichier ; la barre du bas ne « saute » plus au défilement, et un total saisi à la semaine reste visible dans le calendrier mois (marqué d'un ∑). <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE ═══ -->
+<div class="version">
+  <div class="v-head">
+    <span class="v-date">Septembre 2026</span>
+    <span class="v-num">v10.7</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Menu en catégories déroulantes</b> : les modules sont désormais regroupés en trois dossiers — « Je gère mes heures supplémentaires », « Ma paie &amp; mes droits » et « Charge de travail &amp; santé ». Chaque dossier s'ouvre ou se replie d'un tap, et l'appli garde en mémoire ceux que tu laisses ouverts. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Épingler ses modules</b> : depuis « Personnaliser le menu », épingle tes modules favoris (📌) pour les faire remonter en tête de menu en accès rapide, ou masque (✕) ceux dont tu ne te sers pas. Un simple tap sur une vignette masquée la réactive, sans passer par le tiroir du bas. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Écran de présentation à la première ouverture</b> : un accueil qui montre tout ce que l'appli propose (suivi des heures, 105 outils, guides, MonLegiTexte), avec la possibilité de passer directement pour ceux qui veulent explorer tout de suite. Aucune donnée transmise, tout reste sur l'appareil. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Sommaire « Tout l'écosystème »</b> : une nouvelle page, accessible depuis le menu, qui réunit d'un coup d'œil les 8 modules, les 105 outils, le guide et MonLegiTexte — avec une recherche instantanée. Tape un mot du quotidien (« licenciement », « congés », « chômage », « permis »…) et tombe directement sur le bon outil. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Mode sobre affiné</b> : tuiles en gris anthracite bien distinctes des titres de dossiers, réordonnancement des modules selon ton type de contrat, et catégories repliables comme en mode illustré. La Trousse à outils et le module Fox suivent maintenant automatiquement le mode sobre — et si tu repasses en illustré à l'intérieur d'un outil, ton choix reste enregistré même si le menu est en sobre. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>MonLegiTexte se dévoile le 17 septembre</b> : le moteur de recherche juridique (Code du travail, conventions collectives, jurisprudence, EUR-Lex, CJUE, CEDH) s'ouvre à cette date. En attendant, sa vignette reste verrouillée dans le menu avec la date d'ouverture. <span class="v-tag tag-new">Nouveau</span></div>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Ouverture du module Fox sans à-coup</b> : en mode sobre, le compagnon d'analyse s'ouvre directement en vue « Pro », sans passer une seconde par l'affichage RPG le temps du chargement. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+
+</div>
+
+<div class="sep"></div>
+
+<!-- ═══ VERSION PRÉCÉDENTE (rentrée 2026) ═══ -->
+<div class="version">
+  <div class="v-head">
     <span class="v-date">Rentrée 2026</span>
     <span class="v-num">v10.6</span>
-    <span class="v-new-badge">NOUVEAU</span>
   </div>
 
   <div class="item">
@@ -523,7 +811,8 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 
 <script>
 // Marquer comme vu quand l'utilisateur ouvre la page
-try{ localStorage.setItem('NV_SEEN','1'); }catch(e){}
+/* La version lue (et plus seulement « déjà vu ») : le badge du menu revient à chaque nouvelle version. */
+try{ localStorage.setItem('NV_SEEN','v10.12'); }catch(e){}
 </script>
 </body>
 </html>
