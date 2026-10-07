@@ -4,7 +4,18 @@
    Ivoire · Charbon · Champagne
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap');
+/* 27/09/2026 : polices embarquées dans l'appli (dossier /fonts, licence SIL OFL), servies par le cache hors ligne :
+   plus de téléchargement Google à chaque ouverture, donc plus de « flash » au premier rechargement. */
+@font-face{font-family:'Outfit';font-style:normal;font-weight:300;font-display:block;src:url('../../fonts/outfit-latin-300-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:400;font-display:block;src:url('../../fonts/outfit-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:500;font-display:block;src:url('../../fonts/outfit-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Outfit';font-style:normal;font-weight:600;font-display:block;src:url('../../fonts/outfit-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:block;src:url('../../fonts/cormorant-garamond-latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:500;font-display:block;src:url('../../fonts/cormorant-garamond-latin-500-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:block;src:url('../../fonts/cormorant-garamond-latin-600-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:700;font-display:block;src:url('../../fonts/cormorant-garamond-latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:400;font-display:block;src:url('../../fonts/cormorant-garamond-latin-400-italic.woff2') format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:600;font-display:block;src:url('../../fonts/cormorant-garamond-latin-600-italic.woff2') format('woff2')}
 
 :root {
   --ivoire:       #F7F3ED;
@@ -1096,7 +1107,7 @@ input[type=range] {
    qui masque tout le contenu et invite à tourner le téléphone.
    Vérifie que body a min-width pour éviter les bugs de petits
    écrans en portrait étroit. */
-@media screen and (orientation: landscape) and (max-height: 600px) {
+@media screen and (orientation: landscape) and (max-device-width: 1024px) {
   body::before {
     content: '';
     position: fixed;
@@ -1130,4 +1141,14 @@ input[type=range] {
   #zenji-daily-bar {
     display: none !important;
   }
+}
+
+/* ── 05/10/2026 : iPhone — la 2e ligne de la barre du bas tombait dans la zone du geste
+   « barre d'accueil » (et de la barre d'outils de Safari) : les boutons Validité, Entretien,
+   Export, Glossaire ne répondaient pas. On remonte la barre d'au moins 22 px sur iOS
+   (ou de la zone de sécurité si elle est plus grande), et le contenu suit. ── */
+@supports (-webkit-touch-callout: none) {
+  .m6-bottom-nav { padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); }
+  .m6-main { padding-bottom: calc(162px + env(safe-area-inset-bottom, 0px)); }
+  .m6-toast { bottom: calc(140px + env(safe-area-inset-bottom, 0px)); }
 }
