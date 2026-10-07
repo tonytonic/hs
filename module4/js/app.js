@@ -3,45 +3,6 @@
  */
 window.DTE = window.DTE || {};
 
-// ── Lissage 3 jours des résidus physiologiques (anti-nervosité du score de tête) ──
-// Le hero score = 100 − max(fatigue, stress, cerveau). On le calcule sur la MOYENNE
-// glissante des 3 derniers jours au lieu de l'instantané : une seule journée (+2h) ne
-// bascule plus le score de ~16 pts d'un coup. La destination est INCHANGÉE (si la
-// charge dure, la moyenne y arrive) → aucune sous-déclaration.
-// Ne lisse QUE les résidus du hero number. NON lissés : barres + détails (live), marge
-// sécurité (distance à l'alerte fatigue) et pénalités de risque légal (un dépassement
-// doit s'afficher le jour même). Historique : localStorage DTE_SCORE_HIST_V1 (idempotent/j).
-DTE.smoothResidues = function (scores) {
-  var raw = { fatigue: (scores && scores.fatigue) || 0, stress: (scores && scores.stress) || 0, cogRisk: (scores && scores.cogRisk) || 0, _n: 1 };
-  if (!scores || scores._hasData === false) return raw;
-  try {
-    var now = new Date();
-    var dk = function (d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
-    var hist = {};
-    try { hist = JSON.parse(localStorage.getItem('DTE_SCORE_HIST_V1') || '{}') || {}; } catch (e) { hist = {}; }
-    var _tv = { f: raw.fatigue, s: raw.stress, c: raw.cogRisk };
-    hist[dk(now)] = _tv;                                                        // upsert du jour (écrase le slot du jour)
-    // BOOTSTRAP ROBUSTE : combler les jours MANQUANTS de la fenêtre 3 j avec la valeur du
-    // jour (uniquement si absents → figés/persistés). Garantit lissage + note dès le 1er
-    // affichage, que l'historique soit VIDE *ou* PARTIEL (appli déjà installée, vieilles
-    // entrées hors fenêtre). Les jours amorcés sont remplacés par les vrais et sortent de
-    // la fenêtre en 2 j. Score initial = instantané (3 valeurs identiques), puis l'amorti
-    // apparaît dès que l'état change.
-    for (var j = 1; j <= 2; j++) {
-      var _sd = new Date(now); _sd.setDate(now.getDate() - j); var _sk = dk(_sd);
-      if (!hist[_sk]) hist[_sk] = { f: _tv.f, s: _tv.s, c: _tv.c };            // seulement si absent
-    }
-    var ks = Object.keys(hist).sort();
-    while (ks.length > 7) { delete hist[ks.shift()]; }                           // garder 7 j max
-    try { localStorage.setItem('DTE_SCORE_HIST_V1', JSON.stringify(hist)); } catch (e) {}
-    var win = [];
-    for (var i = 0; i < 3; i++) { var d = new Date(now); d.setDate(now.getDate() - i); var k = dk(d); if (hist[k]) win.push(hist[k]); }
-    if (!win.length) return raw;
-    var avg = function (sel) { return win.reduce(function (a, x) { return a + sel(x); }, 0) / win.length; };
-    return { fatigue: avg(function (x) { return x.f; }), stress: avg(function (x) { return x.s; }), cogRisk: avg(function (x) { return x.c; }), _n: win.length };
-  } catch (e) { return raw; }   // jamais bloquant : retombe sur l'instantané
-};
-
 document.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
@@ -72,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function runAnalysis() {
     try {
       const state  = DTE.engine.analyze();
-      // autoAdapt() supprimé : M3 ne doit pas écrire dans M4 (lecture seule)
+      DTE.learning.autoAdapt();
       const risks  = DTE.risks.detect(state.scores, state.norm);
       let advice = [];
       try { advice = buildAdvice(state.scores, risks, state.norm); } catch(e) { console.warn('[DTE] buildAdvice error:', e); }
@@ -155,14 +116,13 @@ document.addEventListener('DOMContentLoaded', function () {
         DTE.app = { scoreGlobal: null };
       } else {
         const s = state.scores;
-        // Résidus biologiques actifs — le max domine (maillon le plus faible). LISSÉS 3 j.
-        const sm = DTE.smoothResidues(s);
-        const worstResidue = Math.max(sm.fatigue || 0, sm.stress || 0, sm.cogRisk || 0);
-        // Pénalité risques détectés — INSTANTANÉE (jamais lissée : alerte légale immédiate)
+        // Résidus biologiques actifs — le max domine (maillon le plus faible)
+        const worstResidue = Math.max(s.fatigue || 0, s.stress || 0, s.cogRisk || 0);
+        // Pénalité risques détectés
         const dangers = risks.filter(r => r.level === 'CRITIQUE').length;
         const alertes = risks.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - dangers * 5 - alertes * 2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - dangers * 5 - alertes * 2))) };
       }
 
       DTE.notifs.checkAndNotify(state, risks);
@@ -186,20 +146,20 @@ document.addEventListener('DOMContentLoaded', function () {
       return advice; // vide
     } else if (scores.fatigue >= 85) {
       advice.push({ type:'danger', emoji:'🔴',
-        titre:'Épuisement critique — fatigue très élevée',
+        titre:'Épuisement critique — Phase 4',
         message:'Votre corps envoie des signaux d\'alarme. ' +
           (cumW >= 4 ? 'Après ' + cumW + ' semaines de surcharge, la récupération sera longue.' : 'Réduisez vos heures immédiatement.') +
           ' Le sens que vous donnez à votre travail peut atténuer la perception, mais pas les risques biologiques réels.',
         source:'OMS/OIT 2021 · INRS · HAS 2017 · Art. L4121-1 Code du travail' });
     } else if (scores.fatigue >= 60) {
       advice.push({ type:'warning', emoji:'🟠',
-        titre:'Fatigue élevée',
+        titre:'Fatigue chronique — Phase 3',
         message:'À ' + weekH.toFixed(0) + 'h/sem sur ' + (cumW||1) + ' semaine(s), la fatigue s\'accumule. ' +
           'Votre hygiène de vie (sport, alimentation, sommeil) peut réduire l\'impact de 20 à 30% selon les études INRS.',
         source:'J.Occup.Health 2021 · INRS · Sonnentag 2003' });
     } else if (scores.fatigue >= 35) {
       advice.push({ type:'warning', emoji:'🟡',
-        titre:'Fatigue modérée',
+        titre:'Fatigue modérée — Phase 2',
         message:'Niveau gérable si vous récupérez bien le week-end. Si vous aimez votre travail et dormez ≥7h, ' +
           'vous pouvez maintenir ce rythme à court terme. Surveillez la durée.',
         source:'Thompson 2022 · Nature Hum.Behav. 2025 (Fan et al.)' });
@@ -211,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
         : weekH > 40 ? 'INRS — vigilance dès 40h/sem · J.Occup.Health 2021'
         : 'OMS — Zone optimale ≤40h/sem · INRS';
       advice.push({ type: weekH > 48 ? 'warning' : 'success', emoji: weekH > 40 ? '⚠️' : '🟢',
-        titre: weekH > 48 ? 'Attention : dépassement légal ('+weekH.toFixed(0)+'h/sem)' : 'Bonne forme',
+        titre: weekH > 48 ? 'Attention : dépassement légal ('+weekH.toFixed(0)+'h/sem)' : 'Bonne forme — Phase 1',
         message: p1weekMsg + ' La prévention est le meilleur investissement.',
         source: p1src });
     }
@@ -282,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const d2 = r2.filter(r => r.level === 'CRITIQUE').length;
         const al = r2.filter(r => r.level !== 'CRITIQUE').length;
         const base = Math.max(0, 100 - worstResidue);
-        DTE.app = { scoreGlobal: Math.max(0, Math.min(99, Math.round(base - d2*5 - al*2))) };
+        DTE.app = { scoreGlobal: Math.max(0, Math.min(100, Math.round(base - d2*5 - al*2))) };
       }
       DTE.dashboard.render(s, r2, a2);
       if (DTE.twin) DTE.twin.update(s.scores);
@@ -737,28 +697,47 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ── LIVE SYNC — re-analyse toutes les 3s
   let _syncHash = '';
+  setInterval(() => {
+    try {
+      // Hash rapide des données M1 pour détecter un vrai changement
+      const yr   = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || '';
+      const m1raw = localStorage.getItem('DATA_REPORT_' + yr) || '';
+      const m2raw = localStorage.getItem('CA_HS_TRACKER_V1_DATA_' + yr) || '';
+      // Inclure la date du jour dans le hash → recalcul automatique chaque nouveau jour
+      // sans ça, consecRestDays/consecNonOTDays ne progressent pas sans nouvelle saisie
+      const _today = new Date().toISOString().slice(0,10);
+      const _ciDate = localStorage.getItem('DTE_CHECKIN_DATE') || '';
+      const hash  = m1raw.length + '|' + m2raw.length + '|' + yr + '|' + _today + '|' + _ciDate;
+      if (hash === _syncHash) return; // rien changé → pas de re-analyse
+      _syncHash = hash;
 
-  // FIX LECTURE PASSÉ — déclaré APRÈS _syncHash pour que les callbacks y aient accès
-  const _watchedPfx = ['DATA_REPORT_', 'CA_HS_TRACKER_V1_DATA_', 'DTE_CHECKIN_', 'DTE_VACANCES', 'DTE_REST_DAYS'];
-  // Cross-tab (M2 dans un autre onglet) : storage event natif
-  window.addEventListener('storage', (ev) => {
-    if (!ev.key || !_watchedPfx.some(p => ev.key.startsWith(p))) return;
-    _syncHash = ''; try { runAnalysis(); } catch(_) {}
-  });
-  // Même onglet : patch setItem → runAnalysis() directement (plus de setInterval)
-  (function(){ const _orig = localStorage.setItem.bind(localStorage);
-    localStorage.setItem = function(k,v){ _orig(k,v);
-      if(_watchedPfx.some(p=>k.startsWith(p))) {
-        // Délai 50ms pour laisser M2 finir son écriture avant l'analyse
-        clearTimeout(window._dteWriteTimer);
-        window._dteWriteTimer = setTimeout(() => { try { runAnalysis(); } catch(_) {} }, 50);
+      const s = DTE.engine.analyze();
+      DTE._state = s;
+      const _risks  = DTE.risks.detect(s.scores, s.norm);
+      const _advice = buildAdvice(s.scores, _risks, s.norm);
+      DTE.lastRisks  = _risks;
+      DTE.lastAdvice = _advice;
+
+      // Mettre à jour TOUT : dashboard + twin + footer
+      DTE.dashboard.render(s, _risks, _advice);
+      if (DTE.twin) DTE.twin.update(s.scores);
+
+      // Mettre à jour la vue active si prédictions/simulation
+      const activeView = document.querySelector('.view:not(.hidden)');
+      if (activeView) {
+        const vid = activeView.id;
+        if (vid === 'view-predictions') renderPredictions(s);
+        if (vid === 'view-whatif' && DTE.whatif) DTE.whatif.render();
+        if (vid === 'view-heatmap' && DTE.heatmap) DTE.heatmap.render(s);
       }
-    };
-  })();
 
-  // LIVE SYNC supprimé — remplacé par storage events (cross-tab + même onglet)
-  // Avant : setInterval 3s → DOM recréé toutes les 3s → preview/simulation/recommandations sautent
-  // Après : analyse uniquement à l'ouverture + quand M1/M2 change réellement
+      // Mettre à jour le footer
+      const el = id => document.getElementById(id);
+      if(el('footer-year'))    el('footer-year').textContent    = 'ANNÉE ' + (s.raw && s.raw.year || '');
+      if(el('footer-time'))    el('footer-time').textContent    = 'ANALYSE : ' + new Date().toTimeString().slice(0,5);
+      if(el('footer-status'))  el('footer-status').textContent  = s.scores._hasData ? '■ SYNCHRONISÉ' : '○ EN ATTENTE';
+    } catch(_) {}
+  }, 3000);
 
   // Exposer le forçage de sync (bouton visible)
   // Helper : retourner les jours de repos selon les checkboxes
