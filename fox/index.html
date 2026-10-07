@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+<script src="../js/journal-erreurs.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>/* iPhone : pas de zoom automatique quand on touche un champ (27/09/2026). Remplace le script du 01/10 qui modifiait le viewport pendant le chargement : iOS recalculait alors la zone de l'encoche et l'en-tête remontait dessous. iOS ne zoome que sur un champ écrit en moins de 16 px ; cette règle ne vise que Safari iOS, et le zoom à deux doigts reste possible. */@supports(-webkit-touch-callout:none){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea{font-size:max(16px,1em)!important}}</style>
   <meta name="color-scheme" content="only light">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
@@ -47,6 +49,17 @@
 }
 </style>
 <script>
+/* Congés payés (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026 n° 24-19.410) : une absence M1 marquée cp:1 ne réduit pas
+   le seuil des heures sup, sauf si la règle est désactivée pour l'exercice (CP_JURIS_<exercice> = "false"). Même règle que le compteur M1.
+   y = suffixe de l'exercice M1, c'est-à-dire celui de la clé DATA_REPORT_<y> d'où vient le jour — PAS l'année de la date :
+   un exercice à cheval (29/12/2025 → 27/12/2026) est rangé sous 2026, ses jours de décembre 2025 aussi. */
+window.FOX_m1AbsHS = window.FOX_m1AbsHS || function(v, y){
+  const a = Number((v && v.absent) || 0);
+  if (!v || !v.cp) return a;
+  let k = null; try { k = localStorage.getItem('CP_JURIS_' + (y || '')); } catch (e) {}
+  return k === 'false' ? a : 0;
+};
+
 (function(){
   // Tentative de verrouillage orientation portrait quand supporté (Android, PWA)
   function tryLockPortrait(){
@@ -77,15 +90,18 @@
   <div class="lb-msg">Cette application est optimisée pour le mode portrait. Veuillez remettre votre appareil à la verticale pour continuer.</div>
 </div>
 
-<img id="bg-decor" src="../images/fox-bg.PNG" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
+<img id="bg-decor" alt="" decoding="async" fetchpriority="high" onerror="this.style.display='none'" style="position:fixed;top:0;left:0;width:100vw;height:100vh;object-fit:cover;object-position:center center;z-index:-999;pointer-events:none;">
 <script>
 // Appliquer la bonne saison IMMÉDIATEMENT (avant rendu) — évite flash hiver→printemps
+// 01/10/2026 : l'image n'a plus de src dans le HTML. Avant, le navigateur
+// commençait à télécharger le fond d'hiver (PNG de 3 Mo, trop gros pour être
+// gardé hors ligne) même en automne, puis passait à la bonne saison : le fond
+// arrivait tard, d'où un écran noir puis un saut. Hiver = fox-bg.jpg (390 Ko).
 (function(){
-  const _bgs=['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+  const _bgs=['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
   const q=Math.floor(new Date().getMonth()/3);
-  const bg=_bgs[q]||_bgs[0];
   const el=document.getElementById('bg-decor');
-  if(el && bg!==el.src.split('/').pop() && el.src!==new URL(bg,location.href).href) el.src=bg;
+  if(el) el.src=_bgs[q]||_bgs[0];
 })();
 </script>
 
@@ -151,7 +167,7 @@ window._fox_pre = (function() {
     <div class="hud-xp-label">
       <span style="display:flex;align-items:center;gap:5px;">
         <span style="background:linear-gradient(135deg,rgba(255,140,66,0.4),rgba(255,107,53,0.3));border:1px solid rgba(255,140,66,0.7);border-radius:6px;padding:2px 8px;font-weight:900;font-size:0.85rem;text-shadow:0 0 8px rgba(255,140,66,0.6);">NIV <span id="hud-level"><script>document.write(window._fox_pre.lvl)</script></span></span>
-        <span id="hud-league" style="background:rgba(205,127,50,0.2);border:1px solid rgba(205,127,50,0.5);border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.75rem;margin-left:6px;">🥉 Bronze</span>
+        <span id="hud-league" style="background:rgba(205,127,50,0.2);border:1px solid rgba(205,127,50,0.5);border-radius:6px;padding:2px 8px;font-weight:700;font-size:0.75rem;margin-left:6px;">🥉 Bronze</span><script>/* Sans flash (01/10/2026) : la ligue du dernier affichage, tout de suite (avant : « Bronze » puis la vraie ligue) */try{var _L=JSON.parse(localStorage.getItem('FOX_HUD_LEAGUE')||'null'),_e=document.getElementById('hud-league');if(_L&&_e){_e.innerHTML=_L.h;_e.style.color=_L.c;_e.style.background=_L.c+'33';_e.style.borderColor=_L.c+'99';}}catch(e){}</script>
       </span>
       <span style="color:#FF8C42;font-weight:900;font-size:0.82rem;"><span id="hud-xp"><script>document.write(window._fox_pre.xp)</script></span><span style="color:#444;font-size:0.65em;"> / <span id="hud-xp-max"><script>document.write(window._fox_pre.xpMax)</script></span></span> <span style="color:#888;font-size:0.65em;">XP</span></span>
     </div>
@@ -909,9 +925,11 @@ body {
 <!-- Scripts (ordre inchangé) -->
 <script src="../ccn/conventions-collectives.js"></script>
 <script src="../legi-ref.js"></script>
+<script src="../js/rappel-sauvegarde.js"></script>
 <script src="js/articles-loi.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/config.js"></script>
+<script src="../js/hs-officiel.js"></script>
 <script src="js/module-reader.js"></script>
 <script src="js/xp-system.js"></script>
 <script src="js/leagues.js"></script>
@@ -1030,6 +1048,27 @@ function _kitsuneGetCCN() {
   } catch(_) {}
 
   return defaultCCN;
+}
+/* 04/10/2026 : convention sans contingent annuel (IDCC 3239) et taux unique */
+function _kitsuneSansContingent() { try { return !!(_kitsuneGetCCN() || {}).sansContingent; } catch (_) { return false; } }
+function _kitsuneTauxUnique() { try { const c = _kitsuneGetCCN() || {}; return !c.taux_inter && Number(c.taux1) === Number(c.taux2); } catch (_) { return false; } }
+/* 04/10/2026 : majorations d'heures sup selon la convention (avant : « +25 % » écrit en dur) */
+function _kitsuneMajTxt(hs) {
+  const c = _kitsuneGetCCN() || {}, f = (typeof _fmtH === 'function') ? _fmtH : (x => x + 'h');
+  const t1 = Number(c.taux1 || 25), t2 = Number(c.taux2 || 50), p1 = Number(c.palier1 || 8);
+  if (!c.taux_inter && t1 === t2) return f(hs) + ' à +' + t1 + '%';
+  if (c.taux_inter) {
+    const pi = Number(c.palier_inter || 0), a = Math.min(hs, p1), b = Math.min(Math.max(0, hs - p1), pi), d = Math.max(0, hs - p1 - pi);
+    return [a > 0 ? f(a) + ' à +' + t1 + '%' : '', b > 0 ? f(b) + ' à +' + c.taux_inter + '%' : '', d > 0 ? f(d) + ' à +' + t2 + '%' : ''].filter(Boolean).join(' puis ');
+  }
+  return hs <= p1 ? f(hs) + ' à +' + t1 + '%' : f(p1) + ' à +' + t1 + '% puis ' + f(hs - p1) + ' à +' + t2 + '%';
+}
+function _kitsuneParleContingent(t) {
+  const x = String(t || '').replace(/pas de contingent[^.]*/gi, '');
+  // 04/10/2026 : en 3239, on écarte aussi les messages qui citent les durées maximales du Code
+  // (10 h/jour, 48 h, 44 h, repos L3131-1, temps partiel L3123) : non applicables (L7221-2).
+  return /contingent|220 ?h|220 heures/i.test(x)
+    || /L3121-1[89]|L3121-2[0-2]|L3131-1\b|L3123-\d|10 ?h ?(max|par jour|\/ ?jour)|48 ?h (maximum|max\b|absolu)|plafond légal/i.test(x);
 }
 function _kitsuneFormatMsg(msg, h) {
   const r = _kitsuneGetCCN();
@@ -1283,7 +1322,7 @@ function _getContextualGreeting() {
   const hour  = now.getHours();
   const date  = now.getDate();
   const month = now.getMonth() + 1;
-  const name  = localStorage.getItem('FOX_USER_NAME') || '';
+  const name  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr    = name ? name + ', ' : '';
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
 
@@ -1533,7 +1572,7 @@ function _getTodayOT() {
 function _getHourlyBubble(hour, day, todayOT) {
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const jr    = JOURS[day];
-  const name  = localStorage.getItem('FOX_USER_NAME') || '';
+  const name  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr    = name ? name + ' ' : '';
 
   // Seed : varie par heure + jour + HS → message change à chaque tranche horaire
@@ -1735,7 +1774,7 @@ function _getHourlyBubble(hour, day, todayOT) {
 function _getExtendedBubble(hour, day, todayOT, _seed) {
   const JOURS = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
   const jr  = JOURS[day];
-  const nm  = localStorage.getItem('FOX_USER_NAME') || '';
+  const nm  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr  = nm ? nm + ' ' : '';
   const xh  = todayOT ? todayOT.extra : 0;
   const th  = todayOT ? todayOT.total : 0;
@@ -1757,7 +1796,7 @@ function _getExtendedBubble(hour, day, todayOT, _seed) {
   const droits = [
     `🦊 [${jr} — ${hour}h] Le Code du travail est un plancher, jamais un plafond. Ta convention collective peut t'accorder plus — mais jamais moins.`,
     `🦊 Savais-tu ${pr}? Les heures sup doivent être majorées même si tu es cadre, sauf forfait jour signé. Vérifie ton contrat.`,
-    `🦊 [${hour}h] Refuser de faire des HS n'est pas une faute — sauf si un accord collectif le prévoit (Art. L3121-11).`,
+    `🦊 [${hour}h] Les heures sup demandées par ton employeur s'imposent en principe, mais chacune ouvre droit à une majoration ou à un repos équivalent (Art. L3121-28).`,
     `🦊 Ton employeur ne peut pas compenser des HS par des repos non écrits. Tout accord doit être tracé. C'est pour ça que FOX existe.`,
     `🦊 [${jr}] Le médecin du travail peut être ton allié si les HS s'accumulent. Il est indépendant de l'employeur.`,
     `🦊 Art. L3171-4 : en cas de litige, le juge apprécie les éléments des deux parties. Tes données FOX peuvent faire foi.`,
@@ -1881,7 +1920,7 @@ function _getExtendedBubble(hour, day, todayOT, _seed) {
     `🦊 [${jr} — ${hour}h] Les heures de nuit (21h-6h) peuvent ouvrir droit à des majorations spécifiques en plus des HS.`,
     `🦊 [${hour}h] Durée maximale en travail de nuit : 8h par poste (Art. L3122-7).`,
     `🦊 [${jr} — ${hour}h] Le travail de nuit régulier impacte le rythme circadien sur le long terme. FOX tient compte du profil nuit.`,
-    `🦊 [${jr}] La période de nuit légale est 21h-6h (Art. L3122-2) — ta convention peut la définir différemment.`,
+    `🦊 [${jr}] À défaut d'accord, la période de nuit est 21h-6h (Art. L3122-20) — ta convention peut la définir différemment.`,
     `🦊 [${jr} — ${hour}h] Passage nuit→jour : un délai de prévenance s'applique (généralement 5 jours ouvrés).`,
     `🦊 [${hour}h] La femme enceinte travaillant de nuit peut demander son affectation de jour sans perte de salaire.`,
     `🦊 [${jr}] Le travailleur de nuit peut demander un passage de nuit en jour si son état de santé l'exige.`,
@@ -2050,7 +2089,7 @@ function _getExtendedBubble(hour, day, todayOT, _seed) {
     `🦊 Art. L3122-5 : travailleur de nuit si ≥270h/an ou 2 nuits/semaine habituellement.`,
     `🦊 Art. L3171-4 : en cas de litige sur les HS, la preuve est partagée entre salarié et employeur.`,
     `🦊 Art. L3133-6 : le 1er mai est le seul jour férié légalement payé double.`,
-    `🦊 Art. L3121-11 : le salarié peut refuser de faire des HS sauf accord collectif les rendant obligatoires.`,
+    `🦊 Temps partiel : tu peux refuser des heures complémentaires demandées moins de 3 jours avant ou au-delà des limites de ton contrat, sans que ce soit une faute (Art. L3123-10).`,
     `🦊 Art. L1222-10 : l'employeur prend en charge les frais liés au télétravail.`,
     `🦊 Art. L3141-12 : l'employeur ne peut refuser des congés légaux acquis.`,
     `🦊 Art. L3122-7 : durée maximale de 8h par poste en travail de nuit.`,
@@ -2451,7 +2490,7 @@ function _analyzeLegalSituation() {
     const _seuilLegal = ccnRules.seuil; // seuil LÉGAL de déclenchement des HS (35h en droit commun)
     // Base CONTRACTUELLE réelle (ex: 39h) — lue depuis M1 (clé BASE_HEBDO_<année>),
     // même source que module-reader.js. Fallback sur le seuil légal si non défini.
-    const baseHebdo = Number(localStorage.getItem('BASE_HEBDO_' + year)) || _seuilLegal;
+    const baseHebdo = Math.max(Number(localStorage.getItem('BASE_HEBDO_' + year)) || 0, _seuilLegal || 35); // 04/10/2026 : jamais sous le seuil de la convention (40 h pour la 3239)
     const baseJour  = baseHebdo / 5;
     const contingentMax = ccnRules.contingent;
 
@@ -2532,8 +2571,9 @@ function _analyzeLegalSituation() {
       maxDayTotal:  Math.round(maxDayTotal * 100) / 100,
       maxDayExtra:  Math.round(maxDayExtra * 100) / 100,
       maxDayDate, daysOver10, daysOver12,
-      hasDailyRisk: maxDayTotal >= 10,
-      hasDailyCrit: maxDayTotal >= 12,
+      // 04/10/2026 : IDCC 3239 : 10 h / 12 h par jour du Code non applicables (L7221-2) → pas d'alerte
+      hasDailyRisk: !ccnRules.sansContingent && maxDayTotal >= 10,
+      hasDailyCrit: !ccnRules.sansContingent && maxDayTotal >= 12,
       // Jour de violation recent ? (<= 21 jours) — sert a NE PAS afficher dans la bulle/popup
       // une vieille journee >10h/12h comme si elle etait actuelle. Les COMPTEURS annuels
       // (daysOver10/12) restent eux non bornes (stats reelles de l'annee).
@@ -2552,7 +2592,7 @@ function _analyzeLegalSituation() {
       if (!weekMap[wk]) weekMap[wk] = { extra:0, recup:0, absent:0, mon: mondayOf(dk) };
       weekMap[wk].extra  += Number(val.extra  || 0);
       weekMap[wk].recup  += Number(val.recup  || 0);
-      weekMap[wk].absent += Number(val.absent || 0);
+      weekMap[wk].absent += window.FOX_m1AbsHS(val, year);
     });
     const weekArr = Object.entries(weekMap).map(([wk, w]) => {
       const total = Math.max(0, baseHebdo + w.extra - w.recup - w.absent);
@@ -2576,11 +2616,16 @@ function _analyzeLegalSituation() {
       return cnt >= 3; // au moins 3 jours vacances = semaine considérée vacances
     };
 
+    // 04/10/2026 : IDCC 3239 (Code du travail sur la durée non applicable, L7221-2) : plafond de la
+    // convention (50 h emploi à domicile ; 48 h EN MOYENNE assistant maternel), pas de moyenne 44 h/12 sem.
+    const _c3239 = !!ccnRules.sansContingent;
+    const _maxSem = _c3239 ? (ccnRules.maxHebdo || 48) : 48;
+    const _maxMoy = _c3239 && !!ccnRules.maxHebdoMoyenne;
     let maxWeekTotal = 0, maxWeekMon = '', weeksOver48 = 0, weeksOver44 = 0, maxAvg12 = 0;
     weekArr.forEach(w => {
       const isVac = _isVacWeekM4(w.mon) || weeksWithDayOff.has(isoWeekKey(w.mon || ''));
       if (!isVac && w.total > maxWeekTotal) { maxWeekTotal = w.total; maxWeekMon = w.mon; }
-      if (!isVac && w.total >= 48) weeksOver48++;
+      if (!isVac && w.total >= _maxSem) weeksOver48++;
       if (!isVac && w.total >= 44) weeksOver44++;
     });
     // Moyenne 12 semaines — les semaines vacances comptent comme baseHebdo (35h)
@@ -2594,6 +2639,15 @@ function _analyzeLegalSituation() {
       const win = weekArrAvg.slice(Math.max(0, i - 11), i + 1);
       const avg = win.reduce((s, w) => s + w.total, 0) / win.length;
       if (avg > maxAvg12) maxAvg12 = avg;
+    }
+    // 04/10/2026 : IDCC 3239 : moyenne maximale de la convention (emploi à domicile : 48 h sur
+    // 12 semaines, art. 134 ; assistant maternel : 48 h sur 4 mois ≈ 17 semaines, art. 96.3)
+    const _cvN = _c3239 ? (ccnRules.maxMoyenneSemaines || 0) : 0, _cvMax = ccnRules.maxMoyenne || 48;
+    let maxAvgConv = 0;
+    if (_cvN) for (let i = _cvN - 1; i < weekArrAvg.length; i++) {
+      const win = weekArrAvg.slice(i - _cvN + 1, i + 1);
+      const avg = win.reduce((a, w) => a + w.total, 0) / win.length;
+      if (avg > maxAvgConv) maxAvgConv = avg;
     }
     // ── Semaine ISO COURANTE et derniere semaine COMPLETE (calcul correct base+extra-recup-absent) ──
     // Reutilise weekArr (deja correct) au lieu de recompter manuellement ailleurs.
@@ -2609,10 +2663,13 @@ function _analyzeLegalSituation() {
       maxWeekTotal: Math.round(maxWeekTotal * 100) / 100,
       maxWeekMon, weeksOver48, weeksOver44,
       maxAvg12:     Math.round(maxAvg12 * 100) / 100,
-      hasWeekViol:  maxWeekTotal >= 48,
+      hasWeekViol:  !_maxMoy && maxWeekTotal >= _maxSem,
+      maxSem: _maxSem, maxSemMoyenne: _maxMoy, conv3239: _c3239,
+      avgConv: Math.round(maxAvgConv * 100) / 100, avgConvN: _cvN, avgConvMax: _cvMax,
+      hasAvgConvViol: !!_cvN && weekArr.length >= _cvN && maxAvgConv > _cvMax,
       // Art. L3121-22 : moyenne sur 12 sem CONSECUTIVES — il faut au moins 12 sem effectives
       // Sans cette protection, 1 seule semaine à 45h déclenche l'alerte (faux positif)
-      hasAvgViol:   weekArr.length >= 12 && maxAvg12 >= 44,
+      hasAvgViol:   !_c3239 && weekArr.length >= 12 && maxAvg12 >= 44,
       // Alerte uniquement à partir de 44h moyenne 12 sem (Art. L3121-22)
       // Pas d'alerte sous-seuil — le seuil légal est 44h, point.
       hasWeekAlert: false,
@@ -2656,14 +2713,17 @@ function _analyzeLegalSituation() {
     Object.values(rawM2).forEach(mv => {
       if (mv && mv.days) Object.values(mv.days).forEach(v => { m2annual += parseFloat(v) || 0; });
     });
-    const bestAnnual = Math.max(annualOT, m2annual);
+    // 26/09/2026 : chiffre officiel du module (contingent) quand il existe
+    const _off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(year) : null;
+    const bestAnnual = _off ? _off.total : Math.max(annualOT, m2annual);
     const pct = Math.round(bestAnnual / contingentMax * 100);
     const annual = {
       annualOT: Math.round(bestAnnual * 10) / 10,
       contingentMax, contingentPct: pct,
       contingentRem: Math.max(0, Math.round((contingentMax - bestAnnual) * 10) / 10),
-      hasContingentAlert:  pct >= 75,
-      hasContingentDanger: pct >= 100,
+      hasContingentAlert:  !ccnRules.sansContingent && pct >= 75,   // 04/10/2026 : pas de contingent (IDCC 3239)
+      hasContingentDanger: !ccnRules.sansContingent && pct >= 100,
+      sansContingent: !!ccnRules.sansContingent,
     };
 
     // 5. NIVEAU GLOBAL
@@ -2675,7 +2735,7 @@ function _analyzeLegalSituation() {
     //        (le seuil 44h ne s'applique qu'en MOYENNE sur 12 sem Art. L3121-22 → hasAvgViol)
     let globalLevel = 'ok';
     if (daily.hasDailyCrit || weekly.hasWeekViol || annual.hasContingentDanger) globalLevel = 'danger';
-    else if (daily.hasDailyRisk || weekly.hasAvgViol || annual.hasContingentAlert) globalLevel = 'warning';
+    else if (daily.hasDailyRisk || weekly.hasAvgViol || weekly.hasAvgConvViol || annual.hasContingentAlert) globalLevel = 'warning';
     // 'alert' supprimé — pas d'alerte ponctuelle sous-seuil légal
 
     return { daily, weekly, period, annual, globalLevel, baseHebdo, baseJour, year };
@@ -2684,7 +2744,7 @@ function _analyzeLegalSituation() {
     console.warn('_analyzeLegalSituation:', e);
     const fallbackCCN = _kitsuneGetCCN();
     const _fbYear = localStorage.getItem('ACTIVE_YEAR_SUFFIX') || String(new Date().getFullYear());
-    const _fbBase = Number(localStorage.getItem('BASE_HEBDO_' + _fbYear)) || fallbackCCN.seuil;
+    const _fbBase = Math.max(Number(localStorage.getItem('BASE_HEBDO_' + _fbYear)) || 0, fallbackCCN.seuil || 35);
     return {
       daily:  { hasDailyCrit:false, hasDailyRisk:false, dailyRecent:false, maxDayTotal:0, maxDayExtra:0, baseJour:_fbBase/5, daysOver10:0, daysOver12:0 },
       weekly: { hasWeekViol:false, hasAvgViol:false, hasWeekAlert:false, maxWeekTotal:0, maxAvg12:0, weeksOver48:0, weeksOver44:0, totalWeeks:0 },
@@ -2806,7 +2866,16 @@ function _nextMsgIdx(arr) {
   return idx;
 }
 
+/* 04/10/2026 : convention sans contingent → on saute les messages qui en parlent */
 function _generateDynamicMessage(situation, deltaH, burnoutScore) {
+  let _m = _generateDynamicMessageBase(situation, deltaH, burnoutScore);
+  if (_kitsuneSansContingent()) {
+    for (let _i = 0; _i < 8 && _m && _kitsuneParleContingent((_m.titre || '') + ' ' + (_m.message || '') + ' ' + (_m.actions || []).join(' ')); _i++)
+      _m = _generateDynamicMessageBase(situation, deltaH, burnoutScore);
+  }
+  return _m;
+}
+function _generateDynamicMessageBase(situation, deltaH, burnoutScore) {
   // Si semaine vacances M4 courante → message vacances prioritaire pour le popup aussi
   try {
     const now = new Date();
@@ -2852,25 +2921,42 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     const now_pr  = new Date();
     const jours   = ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
     const jourNow = jours[now_pr.getDay()];
-    const name_pr = localStorage.getItem('FOX_USER_NAME') || '';
+    const name_pr = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
     const pr_pr   = name_pr ? name_pr + ', ' : '';
     const _isPrevW = !!(s.weekly && s.weekly.isPrevWeek);
     const _semLbl  = _isPrevW ? 'La semaine passée' : 'Ta semaine';
     const _semLbl2 = _isPrevW ? 'la semaine passée' : 'cette semaine';
 
+    // 04/10/2026 : IDCC 3239 → plafond et majorations de la convention, pas les articles du Code
+    const _w3239 = !!s.weekly.conv3239, _wMax = s.weekly.maxSem || 48, _wMoy = !!s.weekly.maxSemMoyenne;
+    const _sansCont = _kitsuneSansContingent();
+    if (_w3239 && cwTotal >= _wMax) {
+      return {
+        titre: `${_wMoy ? '⚠️' : '🚨'} ${_isPrevW ? 'Sem. passée' : 'Semaine'} à ${_fmtH(cwTotal)} — ${_wMoy ? 'au-delà de ' + _wMax + 'h' : 'maximum de la convention'}`,
+        message: _wMoy
+          ? `${pr_pr}${_semLbl} atteint ${_fmtH(cwTotal)} (${_fmtH(cwHS)} d'heures sup). Ta convention (IDCC 3239, art. 96.3) limite la durée à ${_wMax}h en moyenne sur 4 mois : une semaine au-dessus reste possible si ta moyenne ne dépasse pas ${_wMax}h. Les heures au-delà de ${_fmtH(s.baseHebdo || 45)} sont majorées.`
+          : `${pr_pr}${_semLbl} atteint ${_fmtH(cwTotal)} (${_fmtH(cwHS)} d'heures sup). Ta convention (IDCC 3239, art. 134) fixe un maximum de ${_wMax}h sur une même semaine, et 48h en moyenne sur 12 semaines.`,
+        actions: [
+          `HS semaine : ${_kitsuneMajTxt(cwHS)}`,
+          _wMoy ? 'Surveille ta moyenne sur les semaines suivantes' : 'Conserve un relevé de tes horaires journaliers',
+          'Vérifie que ces heures apparaissent sur ton prochain bulletin'
+        ],
+        alerte: { niveau: _wMoy ? 'warning' : 'danger', texte: `⚠️ ${_fmtH(cwTotal)}/sem — IDCC 3239 : ${_wMax}h ${_wMoy ? 'en moyenne' : 'maximum'}` }
+      };
+    }
     // Choisir le message selon le niveau de surcharge
-    if (cwTotal >= 48) {
+    if (!_w3239 && cwTotal >= 48) {
       return {
         titre: `🚨 ${_isPrevW ? 'Sem. passée' : 'Semaine'} à ${_fmtH(cwTotal)} — plafond légal`,
         message: `${pr_pr}${_semLbl} atteint ${_fmtH(cwTotal)} (${_fmtH(cwHS)} de HS). Le plafond légal de 48h est dépassé (Art. L3121-20). Ces heures doivent être majorées et figurer sur ta fiche de paie.`,
         actions: [
-          `HS semaine : ${_fmtH(cwHS)} (${cwHS <= 8 ? '+25%' : '8h à +25% puis +50%'})`,
+          `HS semaine : ${_kitsuneMajTxt(cwHS)}`,
           'Conserve un relevé de tes horaires journaliers',
           'Vérifie que ces heures apparaissent sur ton prochain bulletin'
         ],
         alerte: { niveau: 'danger', texte: `⚠️ ${_fmtH(cwTotal)}/sem — Art. L3121-20 : 48h maximum` }
       };
-    } else if (cwTotal >= 44) {
+    } else if (!_w3239 && cwTotal >= 44) {
       // Lire la vraie moyenne 12 semaines depuis s.weekly pour ne pas alarmer à tort
       const avg12 = (s && s.weekly && s.weekly.maxAvg12) ? Math.round(s.weekly.maxAvg12 * 10) / 10 : 0;
       const avg12Over = avg12 >= 44;
@@ -2880,7 +2966,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
           ? `${pr_pr}${_fmtH(cwTotal)} ${_semLbl2} (${_fmtH(cwHS)} de HS). Ta moyenne sur 12 semaines atteint ${_fmtH(avg12)} — au-delà de la limite de 44h (Art. L3121-22).`
           : `${pr_pr}${_fmtH(cwTotal)} ${_semLbl2} (${_fmtH(cwHS)} de HS). C'est au-dessus de 44h mais ta moyenne sur 12 semaines reste raisonnable. Si ce rythme se répète, surveille la tendance (Art. L3121-22).`,
         actions: [
-          `HS majorées : ${cwHS <= 8 ? _fmtH(cwHS) + ' à +25%' : '8h à +25% + ' + _fmtH(cwHS-8) + ' à +50%'}`,
+          `HS majorées : ${_kitsuneMajTxt(cwHS)}`,
           avg12Over ? 'Deux seuils franchis — en parler à ton responsable' : 'Semaine ponctuelle — continue à saisir pour suivre la tendance',
           'Vérifier les majorations sur ta prochaine fiche de paie'
         ],
@@ -2899,16 +2985,27 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
           ? `Sem. passee — ${_fmtH(cwTotal)} (${_fmtH(cwHS)} de HS)`
           : `${jourNow} — semaine à ${_fmtH(cwTotal)}`,
         message: _isPrev
-          ? `${pr_pr}la semaine passée totalisait ${_fmtH(cwTotal)} (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36). Vérifie ton prochain bulletin.`
-          : `${pr_pr}${_fmtH(cwTotal)} cette semaine (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). ${hs50 > 0 ? `Majorations : ${_fmtH(hs25)} à +25% et ${_fmtH(hs50)} à +50%` : `Majoration : ${_fmtH(hs25)} à +25%`} (Art. L3121-36).`,
+          ? `${pr_pr}la semaine passée totalisait ${_fmtH(cwTotal)} (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). Majoration : ${_kitsuneMajTxt(cwHS)} ${_w3239 ? '(convention IDCC 3239)' : '(Art. L3121-36)'}. Vérifie ton prochain bulletin.`
+          : `${pr_pr}${_fmtH(cwTotal)} cette semaine (base ${_fmtH(s.baseHebdo || 35)} + ${_fmtH(cwHS)} de HS). Majoration : ${_kitsuneMajTxt(cwHS)} ${_w3239 ? '(convention IDCC 3239)' : '(Art. L3121-36)'}.`,
         actions: [
           'Saisies enregistrées dans FOX ✓',
           'Vérifier les majorations sur ta prochaine fiche de paie',
-          'Surveille le contingent annuel (max 220h par défaut)'
+          _sansCont ? 'Pas de contingent annuel pour ta convention' : 'Surveille le contingent annuel (max 220h par défaut)'
         ],
         alerte: cwTotal >= 40 ? { niveau: 'info', texte: `📊 ${_fmtH(cwTotal)}/sem — heures majorées à vérifier sur le bulletin` } : null
       };
     }
+  }
+
+  // 04/10/2026 : IDCC 3239 : moyenne maximale de la convention dépassée
+  if (s.weekly && s.weekly.hasAvgConvViol) {
+    const _n = s.weekly.avgConvN, _per = _n >= 17 ? '4 mois' : _n + ' semaines';
+    return {
+      titre: `⚠️ Moyenne de ${_fmtH(s.weekly.avgConv)}/sem sur ${_per}`,
+      message: `Sur ${_per} consécutifs, ta durée moyenne atteint ${_fmtH(s.weekly.avgConv)} par semaine. Ta convention (IDCC 3239) limite cette moyenne à ${s.weekly.avgConvMax}h (${_n >= 17 ? 'art. 96.3' : 'art. 134'}).`,
+      actions: ['Conserve un relevé de tes horaires', 'Parles-en à ton employeur', 'Vérifie tes heures sur tes bulletins'],
+      alerte: { niveau: 'warning', texte: `⚠️ Moyenne ${_fmtH(s.weekly.avgConv)} > ${s.weekly.avgConvMax}h — IDCC 3239` }
+    };
   }
 
   // ══════════════════════════════════════════════════════════════
@@ -2921,7 +3018,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
     const now = new Date();
     const hr  = now.getHours();
     const jr  = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][now.getDay()];
-    const name = localStorage.getItem('FOX_USER_NAME') || '';
+    const name = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
     const pr   = name ? name + ', ' : '';
 
     const pool = [
@@ -3768,7 +3865,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
             const _dt = new Date(_monCi); _dt.setDate(_monCi.getDate() + _dd);
             const _dk = _fmtCi(_dt);
             const _v1 = _rawM1ci[_dk];
-            if (_v1 && (_v1.extra||0) > 0) { _wkOT += Math.max(0, Number(_v1.extra||0) - Number(_v1.recup||0) - Number(_v1.absent||0)); continue; }
+            if (_v1 && (_v1.extra||0) > 0) { _wkOT += Math.max(0, Number(_v1.extra||0) - Number(_v1.recup||0) - window.FOX_m1AbsHS(_v1, _yr2)); continue; }
             const _mk = _dk.slice(0,7);
             const _mv = _rawM2ci[_mk];
             if (_mv && _mv.days) { const _h = parseFloat(_mv.days[String(parseInt(_dk.slice(8)))]||0); if (_h > 0) _wkOT += _h; }
@@ -3869,7 +3966,7 @@ function _generateDynamicMessage(situation, deltaH, burnoutScore) {
       const _dowNow_g = (new Date().getDay() + 6) % 7; // 0=lun … 5=sam, 6=dim
       const _semBouclee_g = _dowNow_g >= 5; // sam/dim : la PRIORITÉ -1 gère déjà le total réel
       if (_cwHS_g > 0 && _cwDay_g > 0 && !_semBouclee_g) {
-        const _nm_g  = localStorage.getItem('FOX_USER_NAME') || '';
+        const _nm_g  = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
         const _prn_g = _nm_g ? _nm_g + ', ' : '';
         const _jr_g  = ['lundi','mardi','mercredi','jeudi','vendredi'][_dowNow_g] || 'cette semaine';
         const _hsf_g = _fmtH(_cwHS_g);
@@ -4374,7 +4471,7 @@ function _buildDailyLoop5(s, h, todayOT) {
   const th   = todayOT ? todayOT.total : 0;
   const now  = new Date();
   const jr   = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'][now.getDay()];
-  const name = localStorage.getItem('FOX_USER_NAME') || '';
+  const name = (localStorage.getItem('FOX_USER_NAME') || localStorage.getItem('SH_PRENOM') || '');
   const pr   = name ? name + '\u00a0: ' : '';
   const bo   = (typeof gameState !== 'undefined' ? (gameState.burnout || 0) : 0);
 
@@ -4584,6 +4681,11 @@ function kitsuneNarrateOvertime(deltaH, source) {
     const _dailyLoop = [..._dailyLoop5, ..._extMsg]; // 10 messages
     const _visitIdx   = _getDailyVisitIdx(_todayOT ? _todayOT.extra : 0);  // 0-9
     let bubbleText    = _dailyLoop[_visitIdx] || _dailyLoop[0] || '🦊 Analyse en cours…';
+    if (_kitsuneSansContingent() && _kitsuneParleContingent(bubbleText)) {
+      // 04/10/2026 : pas de contingent pour la convention → message suivant qui n'en parle pas
+      const _okB = _dailyLoop.filter(t => t && !_kitsuneParleContingent(t));
+      bubbleText = _okB.length ? _okB[_visitIdx % _okB.length] : '🦊 Pas de contingent annuel pour ta convention : je surveille surtout tes durées maximales.';
+    }
 
     // Adapter la technicité selon le niveau utilisateur (bulle uniquement)
     const expertise    = _getUserExpertise();
@@ -4636,7 +4738,7 @@ function kitsuneNarrateOvertime(deltaH, source) {
       }
     } catch(_ek) {}
     const _baseKey = (typeof _kitsuneGetCCN === 'function') ? _kitsuneGetCCN().seuil : 35;
-    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_b' + _baseKey + '_r10';
+    const _popupKey   = _todayStr + '_' + Math.round((_todayOT ? _todayOT.extra : h) * 10) + '_v' + _vacKeyCount + '_' + _recoveryKey + '_h' + _globalHash + '_ci' + (localStorage.getItem('DTE_CHECKIN_HISTORY')||'').length + '_wk' + Math.round(_weekHSKey*10) + '_b' + _baseKey + '_r10' + '_m52_' + (localStorage.getItem('CCN_IDCC')||'0') + '-' + (localStorage.getItem('CCN_NOM')||'').length; // 04/10/2026 : nouveau message si le moteur ou la convention change (avant : ancien message gardé toute la journée)
     let _cachedPopup  = null;
     try {
       const _pc = JSON.parse(localStorage.getItem('FOX_POPUP_DAILY') || '{}');
@@ -4930,6 +5032,7 @@ function _checkAndResetXpCapYear() {
     localStorage.removeItem('FOX_NIGHT_WEEKEND_COUNT');
     console.log('🦊 XP cap reset : exercice ' + (prevYear||'?') + ' → ' + activeYear
       + ' (précédent: ' + prevUsed + 'h utilisées, clôture: ' + resetDate + ')');
+    if (prevYear && window.hsBackupNudge) hsBackupNudge('year');
     return newState;
   }
   return capState;
@@ -4979,7 +5082,7 @@ function _cappedHoursForXP(years) {
         if (typeof v !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
         const extra  = Math.min(CAP_DAY, Math.max(0, Number(v.extra  || 0)));
         const recup  = Math.max(0, Number(v.recup  || 0));
-        const absent = Math.max(0, Number(v.absent || 0));
+        const absent = Math.max(0, window.FOX_m1AbsHS(v, year));
         const wk = weekKey(dk);
         if (!weeks[wk]) weeks[wk] = { extra:0, recup:0, absent:0 };
         weeks[wk].extra  += extra;
@@ -5458,7 +5561,7 @@ window.addEventListener('storage', (e) => {
 //    ouverture (restauration de sauvegarde, import, edition), le cache popup/bulle
 //    est purge automatiquement -> recalcul propre, sans rien taper.
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
-const FOX_BUILD = '2026-06-15.14';  // version du moteur Kitsune (affichee par _foxDiag)
+const FOX_BUILD = '2026-10-04.52'; // 04/10/2026 : règles 3239 (plafond, majorations, pas d'alerte 10 h/jour) —  // version du moteur Kitsune (affichee par _foxDiag)
 (function _foxAutoClean(){
   // (0) Changement de VERSION du code -> purge du cache d'affichage.
   // Garantit qu'apres un deploiement, l'ancien message en cache (ex: '35h nickel'
@@ -5615,7 +5718,7 @@ window._foxDiag = function() {
   // M1 prioritaire
   Object.entries(rawM1).forEach(([dk,val]) => {
     if (typeof val !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(dk)) return;
-    days[dk] = { extra: Number(val.extra||0), recup:Number(val.recup||0), absent:Number(val.absent||0), src:'M1' };
+    days[dk] = { extra: Number(val.extra||0), recup:Number(val.recup||0), absent:window.FOX_m1AbsHS(val, year), src:'M1' };
   });
   log('Jours M1: ' + Object.keys(rawM1).length + ' | Mois M2: ' + m2Months + ' (non clotures: ' + (m2OpenMonths.join(',')||'aucun') + ')');
 
@@ -5989,6 +6092,7 @@ function refreshHUD() {
           if (!lgEl.dataset.leagueId || lgEl.dataset.leagueId !== String(leagueData.id)) {
             lgEl.dataset.leagueId = String(leagueData.id);
             lgEl.innerHTML = _lgNewHtml;
+            try { localStorage.setItem('FOX_HUD_LEAGUE', JSON.stringify({h:_lgNewHtml, c:_lc})); } catch(_) {}
             // Charger l'image une seule fois par ligue
             if (leagueData.img && !lgEl.dataset.imgLoaded) {
               const _tImg = new Image();
@@ -6378,12 +6482,20 @@ function refreshModulesPopup() {
       ${(() => {
         const ccn = _kitsuneGetCCN();
         const contingent = ccn.contingent || 220;
-        const totalHS = cum?.totalNetOvertime || 0;
+        // 26/09/2026 : le contingent est annuel — année en cours seulement, pas le cumul de toutes les années
+        const _yc = String(moduleReader.year || new Date().getFullYear());
+        const totalHS = (cum?.perYear?.[_yc]?.net) || 0;
+        if (ccn.sansContingent) return `
+        <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-top:8px;text-align:center;">
+          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Heures sup ${_yc}</div>
+          <div style="font-weight:900;font-size:1.2rem;color:#4CAF50;">${_fmtH(totalHS)}</div>
+          <div style="font-size:0.7rem;color:#888;margin-top:2px;">Pas de contingent annuel pour ta convention</div>
+        </div>`;
         const pct = Math.round((totalHS / contingent) * 100);
         const color = pct >= 100 ? '#E53935' : pct >= 75 ? '#FF8C42' : '#4CAF50';
         return `
         <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;margin-top:8px;text-align:center;">
-          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Contingent annuel</div>
+          <div style="color:#555;font-size:0.7rem;margin-bottom:4px;">Contingent annuel ${_yc}</div>
           <div style="font-weight:900;font-size:1.2rem;color:${color};">${_fmtH(totalHS)} / ${contingent}h</div>
           <div style="font-size:0.7rem;color:${color};margin-top:2px;">${pct}% consomm\u00E9</div>
         </div>`;
@@ -6407,11 +6519,12 @@ function refreshModulesPopup() {
             ${m2cov ? `<span style="color:#FFD700;background:rgba(255,215,0,0.1);border-radius:8px;padding:2px 7px;">M2: ${m2cov} mois</span>` : ''}
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:${(() => { const c=_kitsuneGetCCN(); return c.taux_inter!==null?'1fr 1fr 1fr 1fr':'1fr 1fr 1fr'; })()};gap:6px;font-size:0.82rem;">
+        <div style="display:grid;grid-template-columns:${(() => { const c=_kitsuneGetCCN(); return _kitsuneTauxUnique()?'1fr 1fr':(c.taux_inter!==null?'1fr 1fr 1fr 1fr':'1fr 1fr 1fr'); })()};gap:6px;font-size:0.82rem;">
           <div><div style="color:#555;font-size:0.7rem;">HS nettes</div><strong style="color:${netColor};">${_fmtH(net)}</strong></div>
+          ${_kitsuneTauxUnique() ? `<div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux1}%</div><strong>${_fmtH((py?.hs25||0)+(py?.hs50||0))}</strong></div>` : `
           <div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux1||25}%</div><strong>${_fmtH((py?.hs25||0))}</strong></div>
           ${(() => { const c=_kitsuneGetCCN(); return c.taux_inter!==null ? `<div><div style="color:#555;font-size:0.7rem;">HS +${c.taux_inter}%</div><strong>${_fmtH((py?.hs10||0))}</strong></div>` : ''; })()}
-          <div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux2||50}%</div><strong>${_fmtH((py?.hs50||0))}</strong></div>
+          <div><div style="color:#555;font-size:0.7rem;">HS +${_kitsuneGetCCN().taux2||50}%</div><strong>${_fmtH((py?.hs50||0))}</strong></div>`}
         </div>
       </div>`;
   });
@@ -7848,7 +7961,7 @@ function devSetSeason(q) {
   if (bgEl) {
     const idx = q >= 0 ? q : Math.floor(new Date().getMonth() / 3);
     const bgs = typeof _SEASONAL_BG !== 'undefined' ? _SEASONAL_BG :
-      ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+      ['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
     const target = bgs[idx] || bgs[0];
     bgEl.style.opacity = '0';
     bgEl.style.transition = 'opacity 1.2s ease';
@@ -8081,7 +8194,7 @@ function emuSimDays(nDays, withViolation) {
 
 // \u2500\u2500 D\u00E9cor saisonnier (4 backgrounds par trimestre) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const _SEASONAL_BG = [
-  '../images/fox-bg.PNG',     // Q1 : hiver (jan-mar)
+  '../images/fox-bg.jpg',     // Q1 : hiver (jan-mar)
   '../images/fox-bg-2.jpg',   // Q2 : printemps (avr-jun)
   '../images/fox-bg-3.jpg',   // Q3 : \u00E9t\u00E9 (jul-sep)
   '../images/fox-bg-4.jpg',   // Q4 : automne (oct-d\u00E9c)
@@ -8094,7 +8207,7 @@ function updateSeasonalBg() {
   // Défaut fallback si _SEASONAL_BG non défini globalement
   const _bgs = (typeof _SEASONAL_BG !== 'undefined' && Array.isArray(_SEASONAL_BG))
     ? _SEASONAL_BG
-    : ['../images/fox-bg.PNG','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
+    : ['../images/fox-bg.jpg','../images/fox-bg-2.jpg','../images/fox-bg-3.jpg','../images/fox-bg-4.jpg'];
   const bg   = _bgs[q] || _bgs[0];
   const bgEl = document.getElementById('bg-decor');
   if (!bgEl) return;
@@ -8766,7 +8879,7 @@ function showMonthlySummary(forceMonth) {
     if (bo) burnoutScore = bo.score || 0;
   } catch(e) {}
 
-  const pct = Math.round(totalHS / 220 * 100);
+  const pct = _kitsuneSansContingent() ? 0 : Math.round(totalHS / ((_kitsuneGetCCN().contingent) || 220) * 100);
   const level = totalHS === 0 ? 'ok' : totalHS < 50 ? 'light' : totalHS < 150 ? 'medium' : 'high';
   const colors = { ok:'#4CAF50', light:'#8BC34A', medium:'#FF8C42', high:'#E53935' };
   const msgs = {
@@ -8789,7 +8902,7 @@ function showMonthlySummary(forceMonth) {
     </div>
     <div class="monthly-stat">
       <span class="ms-label">📊 % du contingent annuel</span>
-      <span class="ms-val" style="color:${pct > 75 ? '#E53935' : '#FF8C42'};">${pct}%</span>
+      <span class="ms-val" style="color:${pct > 75 ? '#E53935' : '#FF8C42'};">${_kitsuneSansContingent() ? 'aucun (convention)' : pct + '%'}</span>
     </div>
     <div class="monthly-stat">
       <span class="ms-label">⚠️ Jours > seuil légal</span>
@@ -14903,8 +15016,10 @@ function _getYearData(year) {
   const monthVals = Object.values(months);
   const peakMonth = monthVals.length ? Math.max(...monthVals) : 0;
   const peakMonthKey = Object.keys(months).find(k => months[k] === peakMonth) || null;
+  // 26/09/2026 : total officiel du module (contingent) quand il existe
+  try { const _off = (typeof window.hsOfficiel === 'function') ? window.hsOfficiel(y) : null; if (_off) totalHS = _off.total; } catch (_) {}
   const avgPerMonth  = monthVals.length ? totalHS / monthVals.length : 0;
-  const pctContingent = Math.round(totalHS / 220 * 100);
+  const pctContingent = _kitsuneSansContingent() ? 0 : Math.round(totalHS / ((_kitsuneGetCCN().contingent) || 220) * 100);
 
   return { year, totalHS: Math.round(totalHS * 100) / 100, pctContingent, peakMonth, peakMonthKey, avgPerMonth: Math.round(avgPerMonth * 100) / 100, violationsDay, hasData: totalHS > 0 };
 }
@@ -14968,7 +15083,7 @@ function renderAnnualComparison() {
       ${datN.hasData ? `<div>
         <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
           <span style="color:#ccc;font-size:0.75rem;font-weight:700;">${now}</span>
-          <span style="color:${colN};font-size:0.75rem;font-weight:900;">${_fmtH(datN.totalHS)} <span style="color:#555;font-weight:400;">(${datN.pctContingent}%)</span></span>
+          <span style="color:${colN};font-size:0.75rem;font-weight:900;">${_fmtH(datN.totalHS)} ${_kitsuneSansContingent() ? '' : `<span style="color:#555;font-weight:400;">(${datN.pctContingent}%)</span>`}</span>
         </div>
         <div style="height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;">
           <div style="height:100%;width:${barN}%;background:${colN};border-radius:4px;transition:width 0.5s ease;"></div>
@@ -14977,7 +15092,7 @@ function renderAnnualComparison() {
       ${datP.hasData ? `<div>
         <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
           <span style="color:#777;font-size:0.75rem;">${now-1}</span>
-          <span style="color:${colP};font-size:0.75rem;">${_fmtH(datP.totalHS)} <span style="color:#444;font-weight:400;">(${datP.pctContingent}%)</span></span>
+          <span style="color:${colP};font-size:0.75rem;">${_fmtH(datP.totalHS)} ${_kitsuneSansContingent() ? '' : `<span style="color:#444;font-weight:400;">(${datP.pctContingent}%)</span>`}</span>
         </div>
         <div style="height:5px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden;">
           <div style="height:100%;width:${barP}%;background:${colP};opacity:0.6;border-radius:4px;"></div>
@@ -15019,8 +15134,11 @@ function renderAnnualComparison() {
 const _PROFILE_KEY = 'FOX_KITSUNE_PROFILE';
 
 function loadKitsuneProfile() {
-  try { return JSON.parse(localStorage.getItem(_PROFILE_KEY) || '{}'); }
-  catch(e) { return {}; }
+  // 26/09/2026 : sans prénom propre à Kitsune, celui des Paramètres du menu (SH_PRENOM)
+  let p = {};
+  try { p = JSON.parse(localStorage.getItem(_PROFILE_KEY) || '{}') || {}; } catch(e) { p = {}; }
+  if (!p.prenom) { try { const g = localStorage.getItem('SH_PRENOM'); if (g) p.prenom = g; } catch(e) {} }
+  return p;
 }
 
 function saveKitsuneProfile() {
@@ -15049,7 +15167,7 @@ function _applyProfileToHUD(p) {
 function _getSecteurContext(secteur) {
   const ctx = {
     commerce:      'En commerce de détail, le travail du dimanche est souvent dérogatoire — vérifie les compensations prévues (CCN Commerce détail et gros alimentaire).',
-    commerce_gros: 'La CCN du Commerce de gros (IDCC 573) fixe un contingent d\'heures sup à 130h/an, inférieur au plafond légal de 220h. Tes droits sont donc plus protecteurs que le Code du travail seul. Vérifie aussi les majorations spécifiques prévues par cette convention.',
+    commerce_gros: 'La CCN des commerces de gros (IDCC 573) fixe un contingent d\'heures sup de 180 h/an pour le secteur alimentaire (art. 44), en dessous des 220 h du droit commun, et autorise des heures complémentaires jusqu\'au tiers du contrat pour les temps partiels. Vérifie aussi un éventuel accord d\'entreprise.',
     btp:          'En BTP, les modulations horaires et chantiers peuvent impacter ton contingent — reste vigilant.',
     sante:        'En santé/social, les gardes et astreintes ont des règles spécifiques. Consulte ta CCN.',
     transport:    'En transport, les durées de conduite et repos sont réglementées distinctement du Code du travail général.',
@@ -15343,7 +15461,7 @@ function renderRapport() {
     <div class="rapport-section">
       <div class="rapport-title">⚖️ Situation légale — ${year}</div>
       <div class="rapport-row"><span class="rr-label">Heures sup cumulées</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${_fmtH(dN.totalHS)}</span></div>
-      <div class="rapport-row"><span class="rr-label">% du contingent ({contingent}h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>
+      ${_kitsuneSansContingent() ? `<div class="rapport-row"><span class="rr-label">Contingent annuel</span><span class="rr-val rr-ok">Aucun (convention)</span></div>` : `<div class="rapport-row"><span class="rr-label">% du contingent (${(s.annual&&s.annual.contingentMax)||(_kitsuneGetCCN().contingent||220)}h)</span><span class="rr-val ${annualCol === '#4CAF50' ? 'rr-ok' : annualCol === '#E53935' ? 'rr-danger' : 'rr-warn'}">${pct}%</span></div>`}
       <div class="rapport-row"><span class="rr-label">Journée max détectée</span><span class="rr-val ${s.daily?.hasDailyCrit ? 'rr-danger' : s.daily?.hasDailyRisk ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.daily?.maxDayTotal || 0)}</span></div>
       <div class="rapport-row"><span class="rr-label">Semaine max détectée</span><span class="rr-val ${s.weekly?.hasWeekViol ? 'rr-danger' : s.weekly?.hasWeekAlert ? 'rr-warn' : 'rr-ok'}">${_fmtH(s.weekly?.maxWeekTotal || 35)}</span></div>
       <div class="rapport-row"><span class="rr-label">Niveau global</span><span class="rr-val" style="color:${levelColor(s.globalLevel || 'ok')};text-transform:uppercase;">${s.globalLevel || 'ok'}</span></div>
@@ -15361,7 +15479,7 @@ function renderRapport() {
       <div class="rapport-title">📆 Comparaison annuelle</div>
       <div class="rapport-row"><span class="rr-label">${year}</span><span class="rr-val">${dN.totalHS}h</span></div>
       <div class="rapport-row"><span class="rr-label">${year-1}</span><span class="rr-val" style="color:#666;">${dP.totalHS}h</span></div>
-      <div class="rapport-row"><span class="rr-label">Évolution</span><span class="rr-val ${dN.totalHS > dP.totalHS ? 'rr-danger' : 'rr-ok'}">${dN.totalHS > dP.totalHS ? '+' : ''}${_fmtH(Math.abs(dN.totalHS - dP.totalHS))}</span></div>
+      <div class="rapport-row"><span class="rr-label">Évolution</span><span class="rr-val ${dN.totalHS > dP.totalHS ? 'rr-danger' : 'rr-ok'}">${dN.totalHS > dP.totalHS ? '+' : dN.totalHS < dP.totalHS ? '−' : ''}${_fmtH(Math.abs(dN.totalHS - dP.totalHS))}</span></div>
     </div>` : ''}
 
     <!-- Patterns -->
