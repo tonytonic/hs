@@ -57,7 +57,8 @@ const M6_ValiditeFH = {
     // Prorata si arrivée en cours d'exercice
     let contingent = contingentBase;
     if (analysis?.contingentProrata && analysis?.contingent) contingent = analysis.contingent;
-    const respectContingent = totalHS <= contingent;
+    const sansCont = !!analysis?.sansContingent; // 04/10/2026 : IDCC 3239, pas de contingent
+    const respectContingent = sansCont || totalHS <= contingent;
     const contingentLabel = (contingent < contingentBase)
       ? `${contingent}h proraté (/${contingentBase}h sur l'exercice complet)`
       : `${contingent}h`;
@@ -67,8 +68,10 @@ const M6_ValiditeFH = {
       loi: 'Art. L3121-30 + L3121-33',
       ok: respectContingent,
       niveau: respectContingent ? 'ok' : (totalHS > contingent * 1.1 ? 'danger' : 'warning'),
-      detail: `${totalHS}h sur ${contingentLabel} de contingent (${Math.round(totalHS/Math.max(1,contingent)*100)}%).${!respectContingent ? ' Au-delà : repos compensateur obligatoire.' : ''}`,
-      recommandation: 'Au-delà du contingent, chaque HS ouvre droit à un repos compensateur obligatoire (100% pour entreprises >20 salariés).',
+      detail: sansCont
+        ? 'Sans objet : la convention ne fixe pas de contingent annuel d\'heures sup (L7221-2). Seules les durées maximales s\'appliquent.'
+        : `${totalHS}h sur ${contingentLabel} de contingent (${Math.round(totalHS/Math.max(1,contingent)*100)}%).${!respectContingent ? ' Au-delà : repos compensateur obligatoire.' : ''}`,
+      recommandation: sansCont ? 'Pas de contingent pour cette convention : vérifie surtout la durée maximale et le paiement des heures sup.' : 'Au-delà du contingent, chaque HS ouvre droit à un repos compensateur obligatoire (100% pour entreprises >20 salariés).',
     });
 
     // ── 4. Majoration des HS appliquée (L3121-28) ──────────────
@@ -100,32 +103,53 @@ const M6_ValiditeFH = {
     });
 
     // ── 5. Repos quotidien (L3131-1) ───────────────────────────
+    // 05/10/2026 : le forfait heures se saisit à la semaine, sans horaires : le repos de 11 h
+    // ne peut pas être vérifié. Avant, l'écran affichait « Aucune violation » (vert) par défaut.
+    const maxHebdoQ = analysis?.max || (analysis?.detailSemaines||[]).reduce((m,d)=>Math.max(m,d.heures||0),0) || 0;
     const violationsQuotidien = analysis?.violationsQuotidien || 0;
+    const _verifQ = analysis?.violationsQuotidien !== undefined;
     conditions.push({
-      id: 'repos_quotidien_h',
-      titre: 'Repos quotidien 11h respecté',
+      id: 'repos_quotidien',
+      titre: _verifQ ? 'Repos quotidien 11h respecté' : 'Repos quotidien 11h',
       loi: 'Art. L3131-1',
-      ok: violationsQuotidien === 0,
-      niveau: violationsQuotidien === 0 ? 'ok' : (violationsQuotidien > 5 ? 'danger' : 'warning'),
-      detail: violationsQuotidien === 0
-        ? 'Aucune violation détectée dans les saisies.'
-        : `${violationsQuotidien} violation(s) du repos quotidien (amplitude > 13h).`,
-      recommandation: 'Tout salarié bénéficie d\'un repos quotidien minimum de 11h consécutives entre deux journées de travail.',
+      ok: _verifQ ? violationsQuotidien === 0 : true,
+      niveau: !_verifQ ? 'info' : (violationsQuotidien === 0 ? 'ok' : (violationsQuotidien > 5 ? 'danger' : 'warning')),
+      detail: !_verifQ
+        ? 'Non vérifiable : tes heures sont saisies à la semaine, sans horaires. ' + (maxHebdoQ > 0 ? 'Avec ' + maxHebdoQ + 'h sur ta semaine la plus chargée, v' : 'V') + 'érifie que tu as bien 11h de repos entre deux journées et 35h d\'affilée chaque semaine (L3132-2).'
+        : violationsQuotidien === 0
+          ? 'Aucune violation détectée dans les saisies.'
+          : `${violationsQuotidien} violation(s) du repos quotidien (amplitude > 13h).`,
+      recommandation: 'Tout salarié bénéficie d\'un repos quotidien minimum de 11h consécutives entre deux journées de travail (L3131-1).',
     });
 
-    // ── 6. Durée maximale hebdo (L3121-20) ─────────────────────
-    const maxHebdo = analysis?.max || 0;
-    const respectMax = maxHebdo <= 48;
+    // ── 6. Durée maximale hebdo ─────────────────────────────────
+    // 04/10/2026 : droit commun = 48 h sur une même semaine (L3121-20, plafond par semaine
+    // en droit français ; la directive européenne, elle, raisonne en moyenne).
+    // IDCC 3239 (Code non applicable, L7221-2) : maximum de la convention — 50 h par semaine
+    // (emploi à domicile) ou 48 h EN MOYENNE (assistant maternel).
+    // 05/10/2026 : semaine la plus chargée — calculée ici si l'analyse ne la fournit pas
+    const maxHebdo = analysis?.max || (analysis?.detailSemaines||[]).reduce((m,d)=>Math.max(m,d.heures||0),0) || 0;
+    let _r39 = null;
+    try { if (analysis?.sansContingent && window.M6_CCN_Adapter && contract) _r39 = M6_CCN_Adapter.reglesContrat(contract); } catch (_) {}
+    const _lim = _r39 ? (_r39.maxHebdo || 48) : 48;
+    const _moy = !!(_r39 && _r39.maxHebdoMoyenne);
+    // Assistant maternel : jugé sur la moyenne de 4 mois quand assez de semaines sont saisies
+    const _avgOk = !(_moy && analysis?.avgConvN && (analysis?.detailSemaines||[]).length >= analysis.avgConvN && (analysis.avgConv||0) > (_r39.maxMoyenne||48));
+    const respectMax = maxHebdo <= _lim;
     conditions.push({
       id: 'duree_max_h',
-      titre: 'Durée maximale hebdo (48h) respectée',
-      loi: 'Art. L3121-20 + Directive 2003/88/CE',
-      ok: respectMax,
-      niveau: respectMax ? 'ok' : 'danger',
+      titre: `Durée maximale hebdo (${_lim}h${_moy ? ' en moyenne' : ''}) respectée`,
+      loi: _r39 ? 'CCN 3239 (L7221-2)' : 'Art. L3121-20',
+      ok: _moy ? _avgOk : respectMax,
+      niveau: _moy ? (_avgOk ? (respectMax ? 'ok' : 'info') : 'warning') : (respectMax ? 'ok' : 'danger'),
       detail: respectMax
-        ? `Maximum hebdomadaire : ${maxHebdo}h — sous le plafond légal de 48h.`
-        : `Pic à ${maxHebdo}h détecté — dépasse le plafond absolu de 48h fixé par la directive européenne.`,
-      recommandation: 'La durée hebdomadaire ne peut excéder 48h (plafond absolu UE). 44h en moyenne sur 12 semaines consécutives (L3121-22).',
+        ? `Maximum hebdomadaire : ${maxHebdo}h — sous ${_moy ? 'la moyenne maximale' : 'le maximum'} de ${_lim}h.`
+        : _moy
+          ? `Pic à ${maxHebdo}h : possible si la moyenne reste sous ${_lim}h (la convention raisonne en moyenne).`
+          : `Pic à ${maxHebdo}h détecté — dépasse le maximum de ${_lim}h par semaine${_r39 ? ' fixé par la convention' : ''}.`,
+      recommandation: _r39
+        ? (_moy ? `Ta convention limite la durée à ${_lim}h en moyenne sur 4 mois (art. 96.3)${analysis?.avgConv ? ' — ta moyenne la plus haute : ' + analysis.avgConv + 'h' : ''}.` : `Ta convention fixe un maximum de ${_lim}h sur une même semaine et 48h en moyenne sur 12 semaines (art. 134).`)
+        : 'La durée hebdomadaire ne peut excéder 48h sur une même semaine (L3121-20), 60h au plus avec une autorisation exceptionnelle (L3121-21), ni 44h en moyenne sur 12 semaines consécutives (L3121-22).' + (analysis?.avg12 ? ` Ta moyenne la plus haute sur 12 semaines : ${analysis.avg12}h.` : ''),
     });
 
     // ── PROMOTION par auto-attestation ─────────────────────────
@@ -264,7 +288,7 @@ const M6_ValiditeCD = {
     conditions.push({
       id: 'pouvoir_direction',
       titre: 'Pouvoir de direction effectif',
-      loi: 'Art. L3111-2 alinéa 1 + Cass. Soc. 31/01/2012',
+      loi: 'Art. L3111-2 + Cass. Soc. 31/01/2012',
       ok: true,
       niveau: 'ok',
       detail: 'Vous avez déclaré exercer des fonctions de direction. Conservez des preuves : organigramme, procurations, fiche de poste.',
@@ -277,7 +301,7 @@ const M6_ValiditeCD = {
     conditions.push({
       id: 'remuneration_elevee',
       titre: 'Rémunération parmi les plus élevées de l\'entreprise',
-      loi: 'Art. L3111-2 alinéa 2',
+      loi: 'Art. L3111-2',
       ok: remuOK,
       niveau: tauxJ > 0 ? 'ok' : 'info',
       detail: tauxJ > 0
@@ -291,7 +315,7 @@ const M6_ValiditeCD = {
     conditions.push({
       id: 'autonomie_reelle',
       titre: 'Autonomie réelle dans l\'organisation du temps',
-      loi: 'Art. L3111-2 alinéa 3',
+      loi: 'Art. L3111-2',
       ok: true, // présumé OK si le user s'auto-déclare CD
       niveau: 'info',
       detail: 'Auto-déclaratif : vous avez une autonomie totale dans l\'organisation de vos journées (pas de pointage, pas de validation de congés, etc.).',

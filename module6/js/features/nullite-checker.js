@@ -99,7 +99,7 @@ const CONDITIONS_VALIDITE = [
   {
     id: 'droit_deconnexion',
     titre: 'Droit à la déconnexion prévu',
-    art: 'L3121-62',
+    art: 'L3121-64',
     question: 'Votre accord collectif ou charte d\'entreprise prévoit-il des modalités concrètes de droit à la déconnexion ?',
     risque_si_non: 'MODÉRÉ — Sans modalités de déconnexion, l\'accord peut être considéré insuffisant pour garantir le respect des temps de repos (Cass. Soc. 2 mars 2022).',
     jurisprudence: 'La charte de déconnexion ou l\'accord doit prévoir des règles concrètes (plages horaires, délais de réponse).',
@@ -126,24 +126,27 @@ const M6_RuptureCalc = {
    * @returns {object} { legal, baremeMax, baremeMin, methodeR, note }
    */
   calcLicenciement(salaireRef, ancienneteAns) {
-    if (!salaireRef || ancienneteAns < 1) return null;
+    // 05/10/2026 : droit à l'indemnité dès 8 mois d'ancienneté (L1234-9), pas 1 an
+    if (!salaireRef || ancienneteAns < 8/12) return null;
 
-    // L1237-19 : 1/4 mois par an jusqu'à 10 ans, 1/3 mois au-delà
+    // L1234-9 + R1234-2 : 1/4 mois par an jusqu'à 10 ans, 1/3 mois au-delà
     const tranches = [
       Math.min(ancienneteAns, 10) * (salaireRef / 4),
       Math.max(0, ancienneteAns - 10) * (salaireRef / 3),
     ];
     const indemnite_legale = Math.round(tranches[0] + tranches[1]);
 
-    // Barème Macron (2017) — montants approximatifs pour référence
-    // Le barème est en mois de salaire brut, min et max
+    // 05/10/2026 : barème de l'article L1235-3 (entreprises de 11 salariés et plus), en mois de
+    // salaire brut, par année complète d'ancienneté. Avant : minima et maxima approximatifs faux.
     const baremeBase = {
-      1: [0, 1], 2: [0.5, 3.5], 3: [1, 4], 4: [1.5, 5], 5: [2, 6],
-      6: [2.5, 7], 7: [3, 8], 8: [3, 8], 9: [3, 9], 10: [3, 10],
-      15: [4, 13.5], 20: [5, 15.5], 25: [6, 17.5], 30: [7, 20],
+      0: [0, 1], 1: [1, 2], 2: [3, 3.5], 3: [3, 4], 4: [3, 5], 5: [3, 6], 6: [3, 7], 7: [3, 8],
+      8: [3, 8], 9: [3, 9], 10: [3, 10], 11: [3, 10.5], 12: [3, 11], 13: [3, 11.5], 14: [3, 12],
+      15: [3, 13], 16: [3, 13.5], 17: [3, 14], 18: [3, 14.5], 19: [3, 15], 20: [3, 15.5],
+      21: [3, 16], 22: [3, 16.5], 23: [3, 17], 24: [3, 17.5], 25: [3, 18], 26: [3, 18.5],
+      27: [3, 19], 28: [3, 19.5], 29: [3, 20], 30: [3, 20],
     };
 
-    const ans = Math.round(ancienneteAns);
+    const ans = Math.floor(ancienneteAns); // années complètes
     const keys = Object.keys(baremeBase).map(Number).sort((a,b) => a-b);
     let bk = keys[0];
     for (const k of keys) { if (ans >= k) bk = k; }
@@ -159,7 +162,7 @@ const M6_RuptureCalc = {
       rupture_conv:  rupture_conv,
       anciennete:    ancienneteAns,
       salaireRef:    salaireRef,
-      note: 'Indemnité légale brute, avant impôt. Votre CCN peut prévoir un calcul plus favorable.'
+      note: 'Indemnité légale brute (L1234-9, R1234-2), avant impôt. Votre convention peut prévoir un calcul plus favorable : vérifiez-la. Barème L1235-3 pour une entreprise de 11 salariés et plus (minimum plus bas en dessous).'
     };
   },
 
@@ -169,6 +172,9 @@ const M6_RuptureCalc = {
    * retourne la méthode légale en indiquant de vérifier.
    */
   calcConventionnel(salaireRef, ancienneteAns, ccnLabel) {
+    // 05/10/2026 : formules conventionnelles écrites en dur non vérifiées (et contradictoires
+    // avec rupture-calculateur.js) → désactivées : seule l'indemnité légale est affichée.
+    return null;
     const ccn = (ccnLabel || '').toLowerCase();
     let methode = 'légale';
     let montant  = null;

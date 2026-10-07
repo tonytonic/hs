@@ -283,9 +283,14 @@ const M6_Zenji = {
     if (b.phase?.code === 'P2') return _next(POOL_P2)(n);
 
     // Saisonniers selon le mois
+    // Le message de la saison du mois, pas un message de saison au hasard :
+    // avant (corrigé le 24/09/2026), janvier pouvait afficher « Période
+    // estivale » et septembre « Fin d'année approche ».
+    // POOL_SAISONNIER : 0 début d'année · 1 mi-année · 2 fin d'année
+    //                   3 rentrée de septembre · 4 période estivale
     const m = new Date().getMonth();
-    if (m === 0 || m === 1) return _next(POOL_SAISONNIER)(n);
-    if (m === 8 || m === 9) return _next(POOL_SAISONNIER)(n);
+    if (m === 0 || m === 1) return POOL_SAISONNIER[0](n);   // début d'année
+    if (m === 8 || m === 9) return POOL_SAISONNIER[3](n);   // rentrée de septembre
 
     return _next(POOL_NORMAL)(n);
   },

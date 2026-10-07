@@ -60,12 +60,24 @@ const M6_Calendar = {
     this._year         = year;
     this._data         = data || {};
     this._moods        = moods || {};
-    this._feries       = M6_Feries.getSet(year);
     this._onSave       = onSave;
     this._contract     = contract || {};
+    // 26/09/2026 : bornes de l'exercice affiché. Le calendrier s'ouvre dessus (avant :
+    // toujours le mois d'aujourd'hui), la navigation y reste, et les fériés des deux
+    // années d'un exercice à cheval (juin → mai) sont marqués.
+    this._bornes = null;
+    try { if (global.M6_Periode && year) this._bornes = M6_Periode.bornes(this._contract, year); } catch (_) {}
+    this._feries       = this._bornes ? M6_Periode.feries(this._bornes) : M6_Feries.getSet(year);
     const now = new Date();
-    this._viewYear     = now.getFullYear();
-    this._viewMonth    = now.getMonth();
+    let vue = now;
+    if (this._bornes) {
+      const pad = n => String(n).padStart(2, '0');
+      const auj = now.getFullYear() + '-' + pad(now.getMonth() + 1) + '-' + pad(now.getDate());
+      if (auj < this._bornes.deb) vue = new Date(this._bornes.deb + 'T12:00:00');
+      else if (auj > this._bornes.fin) vue = new Date(this._bornes.fin + 'T12:00:00');
+    }
+    this._viewYear     = vue.getFullYear();
+    this._viewMonth    = vue.getMonth();
     this._currentMonth = this._viewMonth; // compatibilité
     this._render();
     this._bindSwipe();
@@ -648,7 +660,17 @@ const M6_Calendar = {
     if (lb)  lb.textContent = `${this._mName(this._viewMonth)} ${this._viewYear}`;
   },
 
+  // Mois (0-11) de l'année donnée à l'intérieur de l'exercice ?
+  _moisDansExo(y, m) {
+    if (!this._bornes) return true;
+    const pad = n => String(n).padStart(2, '0');
+    const deb = y + '-' + pad(m + 1) + '-01', fin = y + '-' + pad(m + 1) + '-' + pad(new Date(y, m + 1, 0).getDate());
+    return fin >= this._bornes.deb && deb <= this._bornes.fin;
+  },
+
   _prevMonth() {
+    { const y = this._viewMonth > 0 ? this._viewYear : this._viewYear - 1, m = this._viewMonth > 0 ? this._viewMonth - 1 : 11;
+      if (!this._moisDansExo(y, m)) { if (global.M6_toast) M6_toast('Début de l\'exercice'); return; } }
     if (this._viewMonth > 0) { this._viewMonth--; }
     else { this._viewMonth = 11; this._viewYear--; }
     this._currentMonth = this._viewMonth;
@@ -656,6 +678,8 @@ const M6_Calendar = {
   },
 
   _nextMonth() {
+    { const y = this._viewMonth < 11 ? this._viewYear : this._viewYear + 1, m = this._viewMonth < 11 ? this._viewMonth + 1 : 0;
+      if (!this._moisDansExo(y, m)) { if (global.M6_toast) M6_toast('Fin de l\'exercice'); return; } }
     if (this._viewMonth < 11) { this._viewMonth++; }
     else { this._viewMonth = 0; this._viewYear++; }
     this._currentMonth = this._viewMonth;

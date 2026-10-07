@@ -54,8 +54,24 @@ async function _shareOrSave(doc, filename, toastMsg) {
     }
   }
   // Téléchargement / enregistrement direct
-  doc.save(filename);
-  window.M6_toast?.(toastMsg + ' — enregistré');
+  var _b6=doc.output('blob'); doc.save(filename);
+  if(/Android/i.test((navigator&&navigator.userAgent)||'')&&window.hsFileSnack){window.hsFileSnack(_b6,filename,{kind:'pdf',accent:'#c4a35a'});}else{window.M6_toast?.(toastMsg + ' — enregistré');}
+}
+
+/* Mention de la règle des congés payés dans les PDF forfait heures (Cass. soc. 10/09/2025 n° 23-14.455 ; 07/01/2026 n° 24-19.410). */
+function _m6PdfCpNote(doc, y, M, PW, contract) {
+  const on = !contract || contract.cpJuris !== false;
+  const t = on
+    ? "Congés payés : chaque jour de CP compte pour " + (((contract && contract.seuilHebdo) || 35) / 5).toFixed(2).replace('.', ',').replace(/,00$/, '') + " h dans le seuil des heures supplémentaires (Cass. soc. 10 sept. 2025, n° 23-14.455 ; 7 janv. 2026, n° 24-19.410). Les heures sup sont calculées sur les heures travaillées + les CP de la semaine."
+    : "Congés payés : règle de la Cour de cassation (Cass. soc. 10 sept. 2025, n° 23-14.455) désactivée dans le contrat. Les jours de CP ne comptent pas pour le seuil des heures supplémentaires.";
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+  const lines = doc.splitTextToSize(t, PW - 6);
+  const h = lines.length * 3.6 + 4;
+  if (y + h > 280) { doc.addPage(); y = 15; }
+  doc.setFillColor(232, 245, 233); doc.rect(M, y, PW, h, 'F');
+  doc.setTextColor(27, 94, 32); doc.text(lines, M + 3, y + 4);
+  doc.setTextColor(26, 23, 20);
+  return y + h + 4;
 }
 
 function _pdfSanitize(str) {
@@ -264,7 +280,9 @@ const M6_PDF = {
     const d1 = new Date(dateDebut+'T12:00:00'), d2 = new Date(dateFin+'T12:00:00');
     const label1 = d1.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
     const label2 = d2.toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-    const feries = M6_Feries?.getSet(year) || new Set();
+    // Fériés de toutes les années de la période choisie (26/09/2026)
+    const feries = new Set();
+    for (let y=d1.getFullYear(); y<=d2.getFullYear(); y++) (M6_Feries?.getSet(y)||new Set()).forEach(x=>feries.add(x));
 
     // Filtrer les données sur la période
     const entries = Object.entries(data)
@@ -653,8 +671,8 @@ const M6_PDF = {
     doc.setFontSize(7); doc.setTextColor(180);
     doc.text(`Bilan ${year} - Genere le ${new Date().toLocaleDateString('fr-FR')}`, M, 290);
 
-    doc.save(`Forfait_Jours_Annuel_${year}.pdf`);
-    M6_toast?.('PDF annuel genere');
+    if(window.hsSavePdf){window.hsSavePdf(doc,`Forfait_Jours_Annuel_${year}.pdf`,'#c4a35a');}else{doc.save(`Forfait_Jours_Annuel_${year}.pdf`);}
+    if(!(/Android/i.test((navigator&&navigator.userAgent)||'')))M6_toast?.('PDF annuel genere');
     if (window.M6_Storage) M6_Storage.markFileSave?.('forfait_jours', year);
   },
 
@@ -819,8 +837,8 @@ const M6_PDF = {
     doc.setFontSize(7); doc.setTextColor(138,132,124); doc.setFont('helvetica','normal');
     doc.text('Ce document ne remplace pas un avis juridique ou medical professionnel.', M, 290);
 
-    doc.save(_pdfSanitize('dirigeant_' + (contract.nom||'cadre').replace(/\s+/g,'_').toLowerCase() + '_' + year + '.pdf'));
-    M6_toast?.('PDF Dirigeant genere');
+    var _fn6=_pdfSanitize('dirigeant_' + (contract.nom||'cadre').replace(/\s+/g,'_').toLowerCase() + '_' + year + '.pdf'); if(window.hsSavePdf){window.hsSavePdf(doc,_fn6,'#c4a35a');}else{doc.save(_fn6);}
+    if(!(/Android/i.test((navigator&&navigator.userAgent)||'')))M6_toast?.('PDF Dirigeant genere');
   },
   // ── PDF Mensuel Forfait Heures ────────────────────────────────
   exportMensuelFH({ regime, year, mois, contract, data, analysis }) {
@@ -858,7 +876,7 @@ const M6_PDF = {
     rect(M,y,PW,7,[240,235,228]);
     txt('PARAMÈTRES CONTRAT',M+3,y+5,8,[70,65,60],'bold');
     y += 10;
-    [[`Seuil déclenchement HS`, `${contract.seuilHebdo||35}h/sem`],[`Contingent annuel`, `${analysis?.contingent||contract.contingent||220}h`],[`Taux majorations`, analysis?.a3Paliers ? `+${analysis.taux1||25}%(${analysis.palier||8}h) / +${analysis.taux_inter}%(${analysis.palier_inter}h) / +${analysis.taux2||50}%`:`+${analysis?.taux1||25}%(${analysis?.palier||8}h) / +${analysis?.taux2||50}%`],[`CCN`, _pdfSanitize(analysis?.ccnNom||contract.ccnLabel||'Droit commun')]].forEach(([l,v],i)=>{
+    [[`Seuil déclenchement HS`, `${contract.seuilHebdo||35}h/sem`],[`Contingent annuel`, analysis?.sansContingent ? 'Aucun (convention)' : `${analysis?.contingent||contract.contingent||220}h`],[`Taux majorations`, analysis?.tauxUnique ? `+${analysis.taux1}% sur toutes les HS` : analysis?.a3Paliers ? `+${analysis.taux1||25}%(${analysis.palier||8}h) / +${analysis.taux_inter}%(${analysis.palier_inter}h) / +${analysis.taux2||50}%`:`+${analysis?.taux1||25}%(${analysis?.palier||8}h) / +${analysis?.taux2||50}%`],[`CCN`, _pdfSanitize(analysis?.ccnNom||contract.ccnLabel||'Droit commun')]].forEach(([l,v],i)=>{
       if(i%2===0){doc.setFillColor(248,245,241);doc.rect(M,y-1.5,PW,5.5,'F');}
       txt(l,M+2,y+2.5,8,[70,65,60]); txt(v,W-M-2,y+2.5,8,[26,23,20],'bold','right'); y+=5.5;
     });
@@ -890,12 +908,13 @@ const M6_PDF = {
         txt(h, M+2+i*colStep, y+4, 7, [70,65,60], 'bold');
       });
       y += 7;
-      let totalH=0, totalHS1=0, totalHSinter=0, totalHS2=0, totalHSm=0, totalMnt=0;
+      let totalH=0, totalHS1=0, totalHSinter=0, totalHS2=0, totalHSm=0, totalMnt=0, totalCpJ=0;
+      const cpOn = contract.cpJuris !== false;
       semsOfMonth.forEach(([wk,v],i)=>{
         chk();
         const h  = parseFloat(v.heures)||0;
         const seuil = contract.seuilHebdo||35;
-        const extra = Math.max(0,h-seuil);
+        const extra = Math.max(0,(window.M6_hRetenues?window.M6_hRetenues(v,contract):h)-seuil);
         const t1    = analysis?.taux1||25, pal=analysis?.palier||8;
         const t2    = analysis?.taux2||50;
         const tauxH = contract.tauxHoraire||0;
@@ -915,10 +934,12 @@ const M6_PDF = {
           mnt   = tauxH>0 ? Math.round((hs1*tauxH*(1+t1/100)+hs2*tauxH*(1+t2/100))*100)/100 : 0;
         }
         totalH+=h; totalHS1+=hs1; totalHS2+=hs2; totalHSm+=(hs1+hs_inter+hs2); totalMnt+=mnt;
+        const cpJ = parseFloat(v.cpJours)||0; totalCpJ += cpJ;
+        const hLbl = h+'h' + (cpJ>0 ? ' + '+cpJ+' j CP' : '');
         if(i%2===0){doc.setFillColor(248,245,241);doc.rect(M,y-1.5,PW,5.5,'F');}
         const cells = has3
-          ? [wk, h+'h', hs1>0?'+'+hs1+'h':'-', hs_inter>0?'+'+hs_inter+'h':'-', hs2>0?'+'+hs2+'h':'-', (hs1+hs_inter+hs2)>0?(hs1+hs_inter+hs2).toFixed(1)+'h':'-', mnt>0?mnt.toFixed(0)+'€':'-']
-          : [wk, h+'h', hs1>0?'+'+hs1+'h':'-', hs2>0?'+'+hs2+'h':'-', (hs1+hs2)>0?(hs1+hs2).toFixed(1)+'h':'-', mnt>0?mnt.toFixed(2)+'€':'-'];
+          ? [wk, hLbl, hs1>0?'+'+hs1+'h':'-', hs_inter>0?'+'+hs_inter+'h':'-', hs2>0?'+'+hs2+'h':'-', (hs1+hs_inter+hs2)>0?(hs1+hs_inter+hs2).toFixed(1)+'h':'-', mnt>0?mnt.toFixed(0)+'€':'-']
+          : [wk, hLbl, hs1>0?'+'+hs1+'h':'-', hs2>0?'+'+hs2+'h':'-', (hs1+hs2)>0?(hs1+hs2).toFixed(1)+'h':'-', mnt>0?mnt.toFixed(2)+'€':'-'];
         cells.forEach((v,j)=>{
           const col = j>=2&&parseFloat(v)>0?[155,44,44]:[26,23,20];
           txt(v, M+2+j*colStep, y+2.5, 7.5, col, j===0?'normal':'bold'); 
@@ -931,8 +952,9 @@ const M6_PDF = {
       y += 4;
       rect(M,y,PW,7,[232,245,238]);
       txt('TOTAUX DU MOIS',M+3,y+5,8,[30,90,60],'bold');
-      txt(`${totalH}h travaillées · ${totalHSm.toFixed(1)}h HS · ${totalMnt>0?totalMnt.toFixed(2)+'€ brut TEPA':'Taux horaire non renseigné'}`,W-M-2,y+5,8,[30,90,60],'normal','right');
+      txt(`${totalH}h travaillées${totalCpJ>0?' + '+totalCpJ+' j CP':''} · ${totalHSm.toFixed(1)}h HS · ${totalMnt>0?totalMnt.toFixed(2)+'€ brut TEPA':'Taux horaire non renseigné'}`,W-M-2,y+5,8,[30,90,60],'normal','right');
       y += 12;
+      if (totalCpJ > 0) y = _m6PdfCpNote(doc, y, M, PW, contract);
 
       // TEPA
       if (contract.tauxHoraire > 0) {
@@ -943,6 +965,8 @@ const M6_PDF = {
         const exoMois = Math.min(totalMnt, 7500/12);
         const tepaRows = has3
           ? [[`HS à +${analysis?.taux1||10}%`,`${totalHS1.toFixed(1)}h`],[`HS à +${analysis.taux_inter}%`,`${totalHSinter.toFixed(1)}h`],[`HS à +${analysis?.taux2||50}%`,`${totalHS2.toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]]
+          : analysis?.tauxUnique
+          ? [[`HS à +${analysis.taux1}%`,`${(totalHS1+totalHS2).toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]]
           : [[`HS à +${analysis?.taux1||25}%`,`${totalHS1.toFixed(1)}h`],[`HS à +${analysis?.taux2||50}%`,`${totalHS2.toFixed(1)}h`],[`Montant brut mensuel`,`${totalMnt.toFixed(2)} €`],[`Exonération IR estimée (plaf. 625€/mois)`,`${exoMois.toFixed(2)} €`]];
         tepaRows.forEach(([l,v],i)=>{
           if(i%2===0){doc.setFillColor(248,245,241);doc.rect(M,y-1.5,PW,5.5,'F');}
@@ -1006,7 +1030,7 @@ const M6_PDF = {
     const a = analysis || {};
     const seuil = contract.seuilHebdo || a.seuil || 35;
     const contingent = a.contingent || contract.contingent || 220;
-    txt(`${_pdfSanitize(contract.nomCadre||'Cadre')}  ·  ${_pdfSanitize(a.ccnNom||contract.ccnLabel||'Droit commun')}  ·  Seuil ${seuil}h/sem  ·  Contingent ${contingent}h`,M,33,8,[189,181,168]);
+    txt(`${_pdfSanitize(contract.nomCadre||'Cadre')}  ·  ${_pdfSanitize(a.ccnNom||contract.ccnLabel||'Droit commun')}  ·  Seuil ${seuil}h/sem  ·  ${a.sansContingent?'Pas de contingent':'Contingent '+contingent+'h'}`,M,33,8,[189,181,168]);
     const hashStr = _localHash(`${regime}-FH-${year}-${contract.nomCadre||''}-${a.totalHS||0}`);
     txt(`Réf. : ${hashStr}`,W-M,9,6,[150,140,130],'normal','right');
     txt(`Généré le ${new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}`,W-M,14,6.5,[150,140,130],'normal','right');
@@ -1020,9 +1044,11 @@ const M6_PDF = {
     const synthRows = [
       ['Total heures travaillées',  `${a.totalHeures||0}h`],
       ['Semaines saisies',          `${a.semaines||0}`],
-      ['Total heures supplémentaires',`${a.totalHS||0}h`, (a.totalHS||0)>contingent?[155,44,44]:[26,23,20]],
-      ['Contingent annuel',         `${contingent}h${a.contingentProrata?' (prorata)':''}`],
-      ['Consommation contingent',   `${a.tauxRemplissage||0}%`, (a.tauxRemplissage||0)>=100?[155,44,44]:(a.tauxRemplissage||0)>=90?[196,133,58]:[45,107,79]],
+      ['Total heures supplémentaires',`${a.totalHS||0}h`, (!a.sansContingent&&(a.totalHS||0)>contingent)?[155,44,44]:[26,23,20]],
+      ...(a.sansContingent
+        ? [['Contingent annuel', 'Aucun (convention, L7221-2)']]
+        : [['Contingent annuel',         `${contingent}h${a.contingentProrata?' (prorata)':''}`],
+           ['Consommation contingent',   `${a.tauxRemplissage||0}%`, (a.tauxRemplissage||0)>=100?[155,44,44]:(a.tauxRemplissage||0)>=90?[196,133,58]:[45,107,79]]]),
     ];
     synthRows.forEach(([l,v,col],i) => {
       const ry = y + i*5.5;
@@ -1044,6 +1070,9 @@ const M6_PDF = {
       palierRows.push([`Palier 1 — HS à +${a.taux1||10}% (${a.palier||4}h hebdo)`, `${a.totalHSTaux1||0}h`, tauxH>0?`${(a.montantHS1||0).toFixed(0)}€`:'—']);
       palierRows.push([`Palier 2 — HS à +${a.taux_inter}% (${a.palier_inter||4}h hebdo)`, `${a.totalHSTaux_inter||0}h`, tauxH>0?`${(a.montantHS_inter||0).toFixed(0)}€`:'—']);
       palierRows.push([`Palier 3 — HS à +${a.taux2||50}% (au-delà)`, `${a.totalHSTaux2||0}h`, tauxH>0?`${(a.montantHS2||0).toFixed(0)}€`:'—']);
+    } else if (a.tauxUnique) {
+      // 04/10/2026 : un seul taux (ex. assistant maternel 10 %)
+      palierRows.push([`HS à +${a.taux1}% (toutes les heures sup)`, `${a.totalHS||0}h`, tauxH>0?`${(a.montantTotal||0).toFixed(0)}€`:'—']);
     } else {
       // Droit commun : 2 paliers (+25% / +50%)
       palierRows.push([`Palier 1 — HS à +${a.taux1||25}% (${a.palier||8}h hebdo)`, `${a.totalHSTaux1||0}h`, tauxH>0?`${(a.montantHS1||0).toFixed(0)}€`:'—']);
@@ -1082,19 +1111,22 @@ const M6_PDF = {
     doc.setDrawColor(220,212,200); doc.line(M,y,W-M,y); y += 3;
 
     const semaines = Object.entries(data||{}).sort();
+    let _cpJTot = 0;
     semaines.forEach(([wk,v],i) => {
       chk();
       const h = parseFloat(v.heures)||0;
-      const extra = Math.max(0, h-seuil);
+      const extra = Math.max(0, (window.M6_hRetenues?window.M6_hRetenues(v,contract):h)-seuil);
       const conforme = h<=48;
       if (i%2===0) { doc.setFillColor(248,245,241); doc.rect(M,y-1.5,PW,5.5,'F'); }
       txt(wk, M+2, y+2.5, 7.5, [70,65,60]);
-      txt(`${h}h`, M+50, y+2.5, 7.5, [26,23,20], 'normal', 'right');
+      const _cpJ = parseFloat(v.cpJours)||0; _cpJTot += _cpJ;
+      txt(`${h}h${_cpJ>0?' + '+_cpJ+' j CP':''}`, M+50, y+2.5, 7.5, [26,23,20], 'normal', 'right');
       txt(extra>0?`+${extra}h`:'—', M+80, y+2.5, 7.5, extra>0?[196,133,58]:[120,114,106], 'normal', 'right');
       txt(conforme?'✓':'⚠ >48h', W-M-2, y+2.5, 7.5, conforme?[45,107,79]:[155,44,44], 'bold', 'right');
       y += 5.5;
     });
     y += 6;
+    if (_cpJTot > 0) { chk(); y = _m6PdfCpNote(doc, y, M, PW, contract); }
 
     // ── Alertes ──────────────────────────────────────────────
     if (a.alertes && a.alertes.length) {
@@ -1336,8 +1368,8 @@ const M6_PDF = {
       : [
           ['Total HS',           `${analysis?.totalHS||0}h`],
           ['Semaines saisies',   `${analysis?.semaines||0}`],
-          ['Contingent',         `${analysis?.contingent||contract.contingent||220}h`],
-          ['Consommation',       `${analysis?.tauxRemplissage||0}%`],
+          ['Contingent',         analysis?.sansContingent ? 'Aucun' : `${analysis?.contingent||contract.contingent||220}h`],
+          ['Consommation',       analysis?.sansContingent ? 'Sans objet' : `${analysis?.tauxRemplissage||0}%`],
           ['CP pris',            `${analysis?.cpPris||0}`],
         ];
     forfaitRows.forEach(([l,v],i) => {

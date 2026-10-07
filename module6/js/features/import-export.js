@@ -24,7 +24,9 @@ const M6_ImportExport = {
         moods:       M6_Storage.getMoods(regime, y),
         validations: M6_Storage.getValidations(regime, y),
         deplacements:M6_Storage.getDeplacements(regime, y),
-        log:         M6_Storage.getLog(regime, y)
+        log:         M6_Storage.getLog(regime, y),
+        // 04/10/2026 : paiements des heures sup mois par mois (forfait heures)
+        paie:        M6_Storage._json(`M6_${regime}_${y}_PAIE`)
       };
     }
     dump.entretiens = M6_Storage.getEntretiens(regime);
@@ -86,9 +88,12 @@ const M6_ImportExport = {
       if (yData.moods)       localStorage.setItem(`M6_${regime}_${y}_MOODS`,       JSON.stringify(yData.moods));
       if (yData.validations) localStorage.setItem(`M6_${regime}_${y}_VALID`,       JSON.stringify(yData.validations));
       if (yData.deplacements)localStorage.setItem(`M6_${regime}_${y}_DEPLACEMENT`, JSON.stringify(yData.deplacements));
+      if (yData.paie)        localStorage.setItem(`M6_${regime}_${y}_PAIE`,        JSON.stringify(yData.paie));
       imported++;
     }
     if (obj.entretiens) localStorage.setItem(`M6_${regime}_ENTRETIENS`, JSON.stringify(obj.entretiens));
+    // Un ancien export peut ranger janvier-mai sous l'année suivante : re-rangement à la prochaine ouverture
+    try { localStorage.removeItem('M6_MIGR_EXO_V1'); } catch (_) {}
 
     M6_toast(`✅ Import réussi — ${imported} exercice(s) chargé(s)`);
     if (onSuccess) onSuccess();
@@ -109,13 +114,15 @@ const M6_ImportExport = {
     document.body.appendChild(a); a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    try{if(/Android/i.test((navigator&&navigator.userAgent)||'')&&window.hsFileSnack)window.hsFileSnack(blob,fn,{kind:'backup',accent:'#c4a35a'});}catch(_e){}
   },
 
   // ── Export CSV SIRH (compatible Sage, Cegid, ADP) ─────────────
   exportCSV(regime, year) {
     const data     = M6_Storage.getData(regime, year);
     const contract = M6_Storage.getContract(regime) || {};
-    const feries   = M6_Feries?.getSet(year) || new Set();
+    const _b       = window.M6_Periode ? M6_Periode.bornes(contract, year) : null;
+    const feries   = _b ? M6_Periode.feries(_b) : (M6_Feries?.getSet(year) || new Set());
 
     const typeLabel = {
       travail:'TRAVAIL', rtt:'RTT', cp:'CONGE', ferie:'FERIE',
@@ -126,7 +133,7 @@ const M6_ImportExport = {
 
     const header = ['Date','Jour','Type','Amplitude_debut','Amplitude_fin','Deplacement','Note','Valeur_jours'];
     const rows = Object.entries(data)
-      .filter(([k]) => k.startsWith(String(year)))
+      .filter(([k]) => _b ? M6_Periode.inclut(k, _b) : k.startsWith(String(year)))
       .sort(([a],[b]) => a.localeCompare(b))
       .map(([dk, v]) => {
         const d = new Date(dk + 'T12:00:00');

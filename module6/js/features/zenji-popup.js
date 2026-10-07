@@ -55,7 +55,7 @@ const MSG_CONFORME = [
     msg: `${n}Parfait. Chaque journée saisie avec son amplitude vous protège doublement : contre un litige sur la durée de travail, et vous permet de suivre votre santé biologique avec précision.`,
     actions: ['Renseigner l\'amplitude d\'aujourd\'hui', 'Voir les scores santé'] }),
   n => ({ titre: 'Conformité maintenue', icon: '✅', level: 'ok',
-    msg: `${n}Votre forfait est dans les clous. Conseil stratégique : le droit à la déconnexion (Art. L3121-62) doit être prévu dans votre accord collectif — avez-vous vérifié les modalités prévues dans votre CCN ?`,
+    msg: `${n}Votre forfait est dans les clous. Conseil stratégique : le droit à la déconnexion (Art. L3121-64) doit être prévu dans votre accord collectif — avez-vous vérifié les modalités prévues dans votre CCN ?`,
     actions: ['Glossaire — Déconnexion', 'Voir mon contrat'] }),
 ];
 
@@ -208,9 +208,20 @@ function _selectPopup(analysis, bio, prenom, regime) {
     if (b.phase?.code === 'P3') return _pick(MSG_P3)(n);
     if (!a || !a.semaines) {
       return { titre: 'Démarrage', icon: '⏱️', level: 'ok',
-        msg: `${n}Saisissez vos premières semaines pour que je puisse analyser votre rythme. Je calculerai automatiquement vos heures supplémentaires et la consommation de votre contingent.`,
+        msg: `${n}Saisissez vos premières semaines pour que je puisse analyser votre rythme. Je calculerai automatiquement vos heures supplémentaires${a && a.sansContingent ? '' : ' et la consommation de votre contingent'}.`,
         actions: ['Saisir une semaine'] };
     }
+    // 05/10/2026 : durée maximale dépassée → priorité (avant : message « rythme soutenable »
+    // du forfait jours, même avec une semaine à 70 h)
+    const _dang = (a.alertes || []).filter(x => x.niveau === 'danger');
+    if (_dang.length) {
+      const _mx = a.max || 0;
+      return { titre: `Semaine à ${_mx}h — durée maximale dépassée`, icon: '🚨', level: 'critique',
+        msg: `${n}${_dang.length > 1 ? _dang.length + ' semaines dépassent' : 'Une semaine dépasse'} la durée maximale${a.sansContingent ? ' de votre convention' : ' de 48h (L3121-20)'}${_mx > 60 && !a.sansContingent ? ', et même le plafond absolu de 60h (L3121-21)' : ''}. Ces heures restent dues et majorées : gardez une trace de vos horaires et parlez-en à votre employeur ou au CSE.`,
+        actions: ['Voir les alertes du bilan', 'Exporter la preuve PDF'] };
+    }
+    const _warn = (a.alertes || []).find(x => x.niveau === 'warning' && /Moyenne/.test(x.titre || ''));
+    if (_warn) return { titre: _warn.titre, icon: '🟠', level: 'vigilance', msg: `${n}${_warn.texte}`, actions: ['Voir les alertes du bilan'] };
     const tauxRempli = a.tauxRemplissage || 0;
     const totalHS = Math.round(a.totalHS || 0);
     const contingent = a.contingent || 220;
@@ -220,7 +231,15 @@ function _selectPopup(analysis, bio, prenom, regime) {
     if (tauxRempli >= 80) return { titre: 'Contingent — vigilance', icon: '🟠', level: 'vigilance',
       msg: `${n}${totalHS}h de HS sur ${contingent}h de contingent (${tauxRempli}%). Planifiez la fin de l'année pour rester sous le plafond et éviter la procédure CSE/COR.`,
       actions: ['Voir le bilan'] };
-    return _pick(MSG_CONFORME)(n);
+    // Messages propres au forfait heures (avant : ceux du forfait jours, 218 j, RTT…)
+    return _pick([
+      n => ({ titre: 'Forfait heures maîtrisé', icon: '✅', level: 'ok',
+        msg: `${n}Aucun dépassement de durée maximale. Vos heures au-delà du forfait sont des heures sup, payées avec leur majoration sur la paie du mois.`,
+        actions: ['Voir le paiement des HS', 'Saisir une semaine'] }),
+      n => ({ titre: 'Situation conforme', icon: '⚖️', level: 'ok',
+        msg: `${n}Vos semaines restent sous la durée maximale. Saisissez-les chaque semaine : c'est ce qui donne sa valeur de preuve à votre historique.`,
+        actions: ['Saisir une semaine', 'Exporter un PDF mensuel'] }),
+    ])(n);
   }
 
   // ── Forfait Jours (défaut) ─────────────────────────────────────
@@ -404,7 +423,7 @@ const M6_ZenjiPopup = {
     _injectStyles();
     this._analysis = analysis;
     this._bio      = bio;
-    this._prenom   = contract?.nomCadre || contract?.nom || '';
+    this._prenom   = contract?.nomCadre || contract?.nom || (function(){try{return localStorage.getItem('SH_PRENOM')||'';}catch(_){return '';}})();
     this._regime   = regime || 'forfait_jours';
     this._onAction = onActionCallback || null;
 
