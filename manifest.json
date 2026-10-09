@@ -12,7 +12,7 @@
   ],
   "background_color": "#4FB3C2",
   "theme_color": "#4FB3C2",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "categories": [
     "productivity",
     "finance",
@@ -41,32 +41,6 @@
   "edge_side_panel": {
     "preferred_width": 400
   },
-  "widgets": [
-    {
-      "name": "Heures Sup",
-      "short_name": "Heures",
-      "description": "Aperçu rapide de vos heures",
-      "tag": "heures-widget",
-      "ms_ac_template": "widgets/template.json",
-      "data": "widgets/data.json",
-      "type": "application/json",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ],
-      "screenshots": [
-        {
-          "src": "02-compteur-annuel.png",
-          "sizes": "834x1386",
-          "type": "image/png",
-          "label": "Widget Preview"
-        }
-      ]
-    }
-  ],
   "share_target": {
     "action": "https://tonytonic.github.io/hs/menu.html",
     "method": "GET",
@@ -81,12 +55,16 @@
     {
       "action": "https://tonytonic.github.io/hs/menu.html",
       "accept": {
-        "application/json": [".json"],
-        "application/pdf": [".pdf"]
+        "application/json": [
+          ".json"
+        ],
+        "application/pdf": [
+          ".pdf"
+        ]
       }
     }
   ],
-  "prefer_related_applications": true,
+  "prefer_related_applications": false,
   "related_applications": [
     {
       "platform": "play",
@@ -136,6 +114,39 @@
       "name": "Simulateur mensuel",
       "short_name": "Mensuel",
       "url": "https://tonytonic.github.io/hs/paye/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Kitsune — Compagnon légal",
+      "short_name": "Kitsune",
+      "url": "https://tonytonic.github.io/hs/fox/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "DTE — Jumeau biologique",
+      "short_name": "DTE",
+      "url": "https://tonytonic.github.io/hs/module4/index.html",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Temps partiel — Mizuki",
+      "short_name": "Temps partiel",
+      "url": "https://tonytonic.github.io/hs/module5/index.html",
       "icons": [
         {
           "src": "icon-192.png",
@@ -195,5 +206,6 @@
       "label": "Vue large"
     }
   ],
-  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7",
+  "screen_orientation": "portrait"
 }
