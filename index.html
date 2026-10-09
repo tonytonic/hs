@@ -4,77 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Simulateur HS</title>
-
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icon-192.png">
   <meta name="theme-color" content="#4FB3C2">
-
-  <script>
-    const APP_VERSION = "10.0.0"; 
-
-    async function registerSW() {
-      if ('serviceWorker' in navigator) {
-        try {
-          const reg = await navigator.serviceWorker.register('./sw.js');
-          console.log("✅ Service Worker enregistré");
-
-          // --- TON SYSTÈME DE PERIODIC SYNC ---
-          if ('periodicSync' in reg) {
-            const status = await navigator.permissions.query({
-              name: 'periodic-background-sync',
-            });
-            if (status.state === 'granted') {
-              await reg.periodicSync.register('update-cache', {
-                minInterval: 24 * 60 * 60 * 1000, // 24h
-              });
-            }
-          }
-        } catch (err) {
-          console.error("❌ Échec SW:", err);
-        }
-      }
-    }
-
-    // Gestion de la version et redirection
-    async function initApp() {
-      await registerSW();
-
-      const stored = localStorage.getItem("APP_VERSION");
-
-      if (stored !== APP_VERSION) {
-        localStorage.setItem("APP_VERSION", APP_VERSION);
-        // On force le rafraîchissement pour vider le cache navigateur
-        location.reload(true); 
-      } else {
-        // --- MODIFICATION CRUCIALE POUR PWABUILDER ---
-        // On laisse 1.5 seconde pour que le Service Worker ait le temps 
-        // de mettre en cache le menu.html avant de rediriger.
-        setTimeout(() => {
-          location.replace("./menu.html");
-        }, 1500);
-      }
-    }
-
-    window.addEventListener('DOMContentLoaded', initApp);
-  </script>
-
-  <style>
-    body {
-      background: #4FB3C2;
-      color: white;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-  </style>
+  <!-- 09/10/2026 : redirection immédiate vers le menu (plus d'écran de version).
+       Le service worker est enregistré par menu.html. -->
+  <script>location.replace('./menu.html' + location.search + location.hash);</script>
+  <meta http-equiv="refresh" content="0; url=./menu.html">
+  <style>body{margin:0;background:#4FB3C2}</style>
 </head>
 <body>
-  <div style="text-align: center;">
-    <p>Chargement du simulateur RPG...</p>
-    <small>Version v10.0.0</small>
-  </div>
+  <noscript><a href="./menu.html">Ouvrir le simulateur</a></noscript>
 </body>
 </html>
