@@ -1,2 +1,5 @@
 include:
   - .well-known
+  # Jekyll (GitHub Pages) ignore les fichiers qui commencent par "_" : on les force
+  - _reference-loi.html
+  - outils/_reference-loi.html
