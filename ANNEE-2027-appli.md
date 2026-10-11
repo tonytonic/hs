@@ -645,3 +645,7 @@ Hors dates précises (« 01/06/2026 », « 2026-06-01 ») qui restent vraies. À
 
 - ligne 22 : …lité Dernière mise à jour : 23 septembre 2026 Cette Politique de Confidentialité dé…
 
+
+## IDCC 1516 (organismes de formation) — grille 2027 déjà connue
+
+Avenant du 17 avril 2026, effet **1er janvier 2027** : 31 paliers de 22 532,19 € (palier 1) à 69 633,07 € (palier 31) par an brut. Le tableau complet est enregistré dans `GrillePaye/ccn-data.json` sous `grilles.1516.prochain`. Au 1er janvier 2027 : remplacer la grille 2026 par ces montants, puis retirer la clé `prochain`. Vérifier l'extension (arrêté) et le BOCC avant de basculer.
