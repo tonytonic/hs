@@ -121,14 +121,14 @@ const GLOSSAIRE = [
   {
     terme: 'Contrat écrit — mentions obligatoires',
     art: 'Art. L3123-6',
-    def: "Le contrat de travail à temps partiel est obligatoirement écrit et mentionne : qualification, rémunération, durée hebdo/mensuelle, répartition entre jours ou semaines, cas de modification, modalités de communication des horaires, limites des heures complémentaires.",
+    def: "Le contrat de travail à temps partiel est obligatoirement écrit et mentionne : qualification, rémunération, durée hebdo/mensuelle, répartition entre jours ou semaines (sauf aide à domicile et accord de modulation L3121-44), cas de modification, modalités de communication des horaires, limites des heures complémentaires. Sans la durée ou, hors exceptions, sans la répartition, le contrat est présumé à temps complet (Cass. soc. 30 sept. 2026, n° 25-18.800).",
     exemple: "Si ton contrat ne mentionne PAS la possibilité de faire des heures complémentaires, ton employeur ne peut pas t'en imposer.",
     tags: ['contrat','écrit','mentions']
   },
   {
     terme: 'Requalification en temps plein',
     art: 'Art. L3123-9 + jurisprudence',
-    def: "Si tes heures complémentaires t'amènent à atteindre ou dépasser 35h/sem (ou la durée conventionnelle), si ton contrat n'est pas écrit, ou si tes horaires varient sans prévenance permettant de connaître ton rythme, ton contrat peut être requalifié en CDI temps plein par le juge — avec rappel de salaire sur 3 ans.",
+    def: "Si tes heures complémentaires t'amènent à atteindre ou dépasser 35h/sem (ou la durée conventionnelle), si ton contrat n'est pas écrit ou ne mentionne pas la durée du travail et, hors exceptions, sa répartition (présomption de temps complet que l'employeur doit renverser), ou si tes horaires varient sans prévenance permettant de connaître ton rythme, ton contrat peut être requalifié en CDI temps plein par le juge — avec rappel de salaire sur 3 ans.",
     exemple: "Tu travailles 34h sur un contrat 25h de manière systématique pendant plusieurs mois → le Conseil de prud'hommes peut requalifier ton contrat.",
     tags: ['requalification','35h','temps plein','prud\'hommes']
   },
