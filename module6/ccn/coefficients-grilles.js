@@ -101,7 +101,7 @@ const CCN_COEFFICIENTS = [
   // ── 1979 HCR / Hôtels Cafés Restaurants ───────────────────────
   {
     idcc: 1979, nom: 'Hôtels Cafés Restaurants',
-    miseAjour: '2024-02',
+    miseAjour: '2026-10',
     categories: {
       Niveau: [
         { position: 'I-1',   coef: 240, description: 'Niveau I échelon 1 — Employé débutant' },
@@ -121,7 +121,7 @@ const CCN_COEFFICIENTS = [
         { position: 'V-3',   coef: 540, description: 'Niveau V échelon 3 — Cadre dirigeant L3111-2' },
       ],
     },
-    notes: 'Avenant 30 + grille salaires en vigueur. Niveau V = encadrement. V-3 souvent associé au cadre dirigeant L3111-2.',
+    notes: 'Salaires : avenant n° 36 du 4 juin 2026 (étendu, JO du 15/10/2026), en vigueur au 1er novembre 2026 ; avant cette date, avenant n° 33. Niveau V = encadrement. V-3 souvent associé au cadre dirigeant L3111-2.',
     refLegifrance: 'KALICONT000005635624',
   },
 
