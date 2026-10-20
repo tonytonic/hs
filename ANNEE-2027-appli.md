@@ -649,3 +649,20 @@ Hors dates précises (« 01/06/2026 », « 2026-06-01 ») qui restent vraies. À
 ## IDCC 1516 (organismes de formation) — grille 2027 déjà connue
 
 Avenant du 17 avril 2026, effet **1er janvier 2027** : 31 paliers de 22 532,19 € (palier 1) à 69 633,07 € (palier 31) par an brut. Le tableau complet est enregistré dans `GrillePaye/ccn-data.json` sous `grilles.1516.prochain`. Au 1er janvier 2027 : remplacer la grille 2026 par ces montants, puis retirer la clé `prochain`. Vérifier l'extension (arrêté) et le BOCC avant de basculer.
+
+
+## Ajouts du 20/10/2026 (veille)
+
+### Plafond de la sécurité sociale 2027 (annoncé BOSS, arrêté pas encore publié)
+- PASS 2027 : 48 900 € / an ; PMSS : 4 075 € / mois (+1,74 % vs 2026). Source : BOSS, actualités (capture du 19/10/2026). Un arrêté fixant le plafond sera publié avant fin 2026.
+- À NE PAS appliquer avant le 01/01/2027 ni avant l'arrêté. Quand il paraît, changer : `outils/articles-loi.js` (pmss, et valeurs dérivées IJSS), `outils/module-bulletin.html` et `outils/module-parentalite.html` (valeurs par défaut 4005), `glossaire.js` (« 4005€/mois »), `module6/js/features/rupture-calculateur.js` (commentaire), `nouveautes.html` (bloc « Valeurs 2026 »), et les textes « PASS 2026 = 48 060 € ».
+- Autres points BOSS à suivre : net social (projet de décret, revenus dus à compter du 01/01/2027), seuils des réductions proportionnelles maladie/allocations familiales (LFSS 2025).
+
+### IDCC 1431 (optique-lunetterie) — grille au 01/11/2026
+- Accord du 9 juillet 2026 étendu par arrêté du 12/10/2026 (JO 15/10/2026) : effet le 01/11/2026. Grille complète (27 coefficients, 1 903 € à 3 859 €) enregistrée dans `GrillePaye/ccn-data.json` → `grilles.1431.prochain`. À basculer en grille courante le 1er novembre, après contrôle sur le texte officiel.
+
+### Accords étendus mais montants introuvables (rien appliqué)
+- IDCC 998 et 1256 : accords du 17 juillet 2026 (minima + primes pour 998), effet annoncé 01/07/2026.
+- IDCC 2528 : accord du 1er juillet 2026 (salaires minima).
+- IDCC 538 : accord du 29 juillet 2026 (salaires garantis fin 2026).
+Dès que les barèmes sont dans le corpus droit (ou fournis en PDF), mettre à jour les grilles correspondantes.
