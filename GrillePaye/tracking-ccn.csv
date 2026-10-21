@@ -69,7 +69,7 @@
 45,Caoutchouc industrie,3,vérifiée,10,2025,ACTIF,,,
 247,Industries de l'habillement,3,vérifiée,8,01/06/2026,ACTIF,,,
 303,Couture parisienne,3,estimation à confirmer,16,2026,ACTIF,,,
-573,Commerce de gros alimentaire,3,vérifiée,28,01/03/2026,ACTIF,,Accord du 17/03/2026 étendu par arrêté du 11/06/2026 (JO n°0149 du 27/06/2026) — vérifié ligne à ligne contre le fonds droit le 21/09/2026,
+573,Commerce de gros alimentaire,3,sourcée,28,01/09/2026,ACTIF,,Accord du 17/03/2026 étendu par arrêté du 11/06/2026 (JO n°0149 du 27/06/2026) — vérifié ligne à ligne contre le fonds droit le 21/09/2026,
 998,Exploitation équipements thermiques génie climatique,3,vérifiée,6,01/06/2026,ACTIF,,,
 1000,,3,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1043,Gardiens concierges employés immeubles résidences,3,vérifiée,5,01/06/2026,ACTIF,,,
@@ -127,7 +127,7 @@
 1408,Distribution logistique services énergies proximité,1,vérifiée,2,01/06/2026,ACTIF,,juristique.org+salaire-minimum.com+convention.fr (croisés),"Négoce/distribution combustibles (brochure 3004) — identité DARES confirmée, contenu plausible (livreur cohérent avec distribution). Renommée depuis 'Distribution, logistique et services des énergies de proximité' (même IDCC/brochure, juste un nouveau nom). Accord du 3/04/2026, effectif 01/05/2026, +1%, range 1870,64€-7597,85€/mois (signé, en attente d'extension au 28/05/2026 - à reconfirmer). ⚠️ Ne pas confondre avec IDCC 1388 (Pétrole/majors, minima plus élevés) — vérifié, ce sont deux CCN cousines distinctes, 1408 est la bonne pour ce contenu."
 1512,Promotion immobilière,1,vérifiée,14,01/01/2026,,,"Avenant n° 51 du 12/01/2026 (minima au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1513,Bière et boissons rafraîchissantes,1,sourcée,23,03/02/2026,,oui (1839.8 €),,
-1580,Chaussure industrie,1,estimation à confirmer,8,01/01/2026,,,,
+1580,Chaussure industrie,1,sourcée,8,01/06/2026,,,,
 1606,Bricolage commerce de détail,1,vérifiée,10,01/01/2026,ACTIF,,,
 1607,Industries des jeux jouets et connexes,1,sourcée,22,01/04/2026,ACTIF,,DARES,IDCC 1607 réel = jeux/jouets/articles de fêtes/Noël/puériculture. Contenu actuel = 'Ouvrier filature coton' (textile). Aucun rapport. À signaler.
 1761,Commerce de gros des tissus tapis linge de maison,1,fusionnée — grille de la convention de rattachement,1,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 573","Ancien nom officiel: Convention collective du commerce de gros des tissus, tapis et linge de maison. Ce numéro est remplacé par le 573 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
@@ -145,7 +145,7 @@
 3186,(identité non confirmée),1,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 3205,Coopératives de consommation,1,vérifiée,3,01/05/2026,ACTIF,,"DARES (identité propre, grille à chercher)",Coopératives de consommation — identité ET contenu plausibles ('employé administratif'). Grille pas encore sourcée.
 3212,Cadres des travaux publics,1,vérifiée,5,01/01/2026,ACTIF,,,
-3224,Distribution commerce de gros papiers-cartons,1,vérifiée,7,01/06/2026,,,,
+3224,Distribution commerce de gros papiers-cartons,1,sourcée,13,01/06/2026,,,,
 3233,Industrie de la fabrication des ciments,1,vérifiée,12,01/01/2026,ACTIF,,cobham-solutions.fr,"IDCC 3233 réel = Industrie de la fabrication des ciments (a remplacé les anciens 832/833 en 2019). Contenu actuel = 'Formateur(rice) N1/N2' — quasi identique au contenu de 1516 (organismes de formation), probable copie erronée. A signaler."
 3242,Presse quotidienne et hebdomadaire en régions,1,vérifiée,12,01/06/2026,,,,
 7025,ETARF,1,vérifiée,3,01/03/2026,ACTIF,,,"IDCC 7025 réel = Travaux et services agricoles/ruraux/forestiers (confirmé LégiSocial). Contenu actuel = 'fruitier/légumier' — thème agricole cohérent mais peut-être trop spécifique vs le champ réel (générique travaux agricoles). Pas un mismatch flagrant comme les autres, mais pas 100% confirmé non plus. Grille pas encore cherchée."
@@ -235,7 +235,7 @@
 1539,Bureau et numérique Commerces et services,0,vérifiée,5,01/06/2026,ACTIF,,,
 1540,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1517",Ancien nom officiel: Convention collective départementale des commerces de détail non alimentaires de Toulouse et des communes limitrophes. Ce numéro est remplacé par le 1517 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 1554,Fabrication de la bière (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
-1555,Industrie pharmaceutique vétérinaire,0,vérifiée,3,01/06/2026,ACTIF,,juristique.org+convention.fr (extension JORF confirmée),"Fabrication/commerce produits pharmaceutiques, parapharmaceutiques et vétérinaires (brochure 3063) — identité ET contenu cohérents ('employé de vente' plausible pour la distribution). Accord du 28/01/2026, ÉTENDU (arrêté 4/05/2026, JORF n°0108 du 8/05/2026), en vigueur depuis 01/03/2026. +1,46%. OETAM: 1835€-2942,22€/mois. Cadres (à partir niveau III.1): 37 381€-79 171€/an."
+1555,Industrie pharmaceutique vétérinaire,0,sourcée,23,01/06/2026,ACTIF,,juristique.org+convention.fr (extension JORF confirmée),"Fabrication/commerce produits pharmaceutiques, parapharmaceutiques et vétérinaires (brochure 3063) — identité ET contenu cohérents ('employé de vente' plausible pour la distribution). Accord du 28/01/2026, ÉTENDU (arrêté 4/05/2026, JORF n°0108 du 8/05/2026), en vigueur depuis 01/03/2026. +1,46%. OETAM: 1835€-2942,22€/mois. Cadres (à partir niveau III.1): 37 381€-79 171€/an."
 1557,Commerce articles sport équipement loisirs,0,sourcée,20,01/03/2025,ACTIF,oui (1801.8 €),,
 1558,Personnel des industries céramiques de France,,sourcée,10,26/02/2026,,oui (1831.26 €),,
 1561,Cordonnerie multiservice,0,vérifiée,3,01/01/2026,HISTORIQUE_PERIME,,,
@@ -243,7 +243,7 @@
 1564,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1586,Industrie de la salaison charcuterie en gros,0,sourcée,49,01/02/2026,ACTIF,,DARES,Salaison/charcuterie industrielle vs 'employé poissonnerie' actuel. Secteurs alimentaires différents.
 1588,Sociétés coopératives d'H.L.M.,0,vérifiée,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3220",Ancien nom officiel: Convention collective nationale du personnel des sociétés coopératives d'HLM. Ce numéro est remplacé par le 3220 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
-1589,Mareyeurs-expéditeurs,,sourcée,8,18/12/2025,,oui (1830.66 €),,
+1589,Mareyeurs-expéditeurs,,sourcée,8,01/07/2026,,,,
 1592,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3248",Ancien nom officiel: Convention collective de la métallurgie du Valenciennois et du Cambrésis. Ce numéro est remplacé par le 3248 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 1598,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1600,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1880",Ancien nom officiel: Convention collective nationale de l'ameublement. Ce numéro est remplacé par le 1880 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
@@ -377,10 +377,10 @@
 3203,Structures coopératives agricoles bétail viande,0,estimation à confirmer,2,2026,ACTIF,,DARES,Structures associatives de pêche de loisir vs 'ouvrier abattoir' actuel. Aucun rapport.
 3210,Banque Populaire,0,sourcée,11,01/01/2024,,,,
 3211,Salariés des établissements privés (OGEC),0,estimation à confirmer,7,01/06/2026,,,,
-3213,Économistes de la construction et métreurs-vérificateurs,,vérifiée,10,01/01/2025,,,,
+3213,Économistes de la construction et métreurs-vérificateurs,,vérifiée,10,11/07/2026,,,,
 3216,Ouvriers négoce matériaux construction,0,vérifiée,6,01/06/2026,,,,
 3220,Offices publics de l'habitat,0,vérifiée,3,01/01/2026,ACTIF,,DARES + analyse terminologique,"TRANCHÉ: IDCC 3220 réel = personnel des OFFICES PUBLICS DE L'HABITAT (organismes publics gestionnaires de HLM). Le contenu actuel utilise le terme 'Employé(e) de maison' — un statut juridique précis en France réservé à l'emploi domestique PRIVÉ chez un particulier (relève normalement d'une CCN distincte, 'Salariés du particulier employeur'). Un office public de l'habitat emploierait plutôt des 'gardien(ne)s d'immeuble' ou 'agents d'entretien d'immeubles', pas des 'employés de maison'. Terminologie incompatible avec le champ réel — signalé comme mismatch, pas juste ambigu."
-3221,"Agences de presse (employés, techniciens, cadres)",,sourcée,5,01/01/2025,,,,
+3221,"Agences de presse (employés, techniciens, cadres)",,sourcée,9,01/07/2026,,,,
 3223,Personnels navigants officiers maritimes,,sourcée,5,01/01/2025,,,,
 3225,Éditeurs de la presse magazine (fusionnée dans l'IDCC 3230),,sourcée,5,01/01/2024,,,,
 3227,Industries de fabrication de la chaux,0,vérifiée,3,01/01/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3249",Ancien nom officiel: Convention collective nationale des industries de la fabrication de la chaux. Ce numéro est remplacé par le 3249 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
