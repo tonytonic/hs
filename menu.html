@@ -4627,9 +4627,9 @@ function hasConsent(){
     try{
       var seen = localStorage.getItem('NV_SEEN');
       // Dernière version publiée dans nouveautes.html : à changer en même temps
-      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026).
+      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026 ; v10.13 le 27/10/2026).
       // Avant, le badge ne s'affichait qu'une seule fois dans la vie de l'appli.
-      var NV_DERNIERE = 'v10.12';
+      var NV_DERNIERE = 'v10.13';
       var badge = document.getElementById('badgeNew');
       if(badge && seen !== NV_DERNIERE){ badge.style.display='inline'; }
     }catch(e){}
