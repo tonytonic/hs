@@ -201,7 +201,7 @@
 915,Expertises évaluations industrielles commerciales,0,vérifiée,6,01/06/2026,ACTIF,,,
 925,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 951,Théâtres privés spectacle vivant lieux fixes,0,vérifiée,7,01/06/2026,HISTORIQUE_PERIME,,,
-953,Charcuterie de détail,0,vérifiée,13,01/01/2026,,,"Avenant n° 64 du 15/01/2026 (salaires au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
+953,Charcuterie de détail,0,sourcée,13,01/06/2026,,,"Avenant n° 64 du 15/01/2026 (salaires au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 993,Prothèse dentaire laboratoires,0,estimation à confirmer,12,01/10/2026,ACTIF,,"Protocole du 15/06/2026, étendu par arrêté du 24/08/2026 (JO 04/09/2026), en vigueur au 01/10/2026 — montants de sources secondaires concordantes, à recouper avec le BOCC 2026/28",
 1031,Associations Familles rurales,0,estimation à confirmer,8,01/06/2026,ACTIF,,,
 1040,,0,absente de CCN_ALL — hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
@@ -406,7 +406,7 @@
 7004,Coopératives laitières,0,vérifiée,8,01/01/2026,ACTIF,,,
 7010,Élevages aquacoles,,sourcée,11,01/05/2018,,,,
 7012,Centres équestres (personnel),,sourcée,11,01/01/2023,,,,
-7016,Coopératives agricoles céréales meunerie alimentation bétail (identité non confirmée),0,estimation à confirmer,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 99999",Ancien nom officiel: Convention collective nationale de travail concernant les jardiniers et jardiniers-gardiens de propriétés privées. Ce numéro est remplacé par le 99999 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
+7016,Jardiniers et jardiniers-gardiens de propriétés privées (convention éteinte),0,fusionnée — grille de la convention de rattachement,1,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 99999",Ancien nom officiel: Convention collective nationale de travail concernant les jardiniers et jardiniers-gardiens de propriétés privées. Ce numéro est remplacé par le 99999 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 7017,Parcs et jardins zoologiques,,sourcée,11,01/04/2017,,,,
 7019,Conchyliculture,,sourcée,6,01/08/2026,,,,
 7020,Centres de gestion agréés agricoles,0,estimation à confirmer,2,2026,,,,
