@@ -731,7 +731,7 @@ try{var _eco=sessionStorage.getItem('ecoBack')==='1';sessionStorage.removeItem('
           <span style="font-size:22px;flex-shrink:0;line-height:1;">🎓</span>
           <div>
             <div style="font-weight:700;font-size:13px;color:#1a6b7a;">Outil pédagogique privé</div>
-            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">SimulHeures est un simulateur éducatif créé par un particulier. Il n'est affilié à aucune entité gouvernementale ou officielle.</div>
+            <div style="font-size:11.5px;color:#444;margin-top:3px;line-height:1.5;">SimulHeures est un simulateur éducatif édité par CELMAR APPS, la micro-entreprise d'Anthony Chauvel. Il n'est affilié à aucune entité gouvernementale ou officielle.</div>
           </div>
         </div>
 
@@ -2732,7 +2732,7 @@ document.addEventListener('keydown', function(e){
     <!-- Auteur + contact -->
     <div style="padding:18px 16px 14px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.07);">
       <div style="font-size:11px;color:rgba(200,212,232,0.5);letter-spacing:0.5px;margin-bottom:10px;">
-        Développé par C. Anthony · <span id="app-version">v10.1.0</span>
+        Édité par CELMAR APPS · <span id="app-version">v10.1.0</span>
       </div>
       <button onclick="openContactPopup()" style="
         background:linear-gradient(135deg,#4FB3C2,#2196a6);
@@ -2751,7 +2751,7 @@ document.addEventListener('keydown', function(e){
       <span style="font-size:18px;flex-shrink:0;margin-top:1px;">⚠️</span>
       <div style="font-size:11.5px;color:#c8d4e8;line-height:1.6;">
         <strong style="color:#f0a0a0;">Application indépendante</strong><br>
-        Simulateur Heures Sup France <strong style="color:#fff;">n'est PAS affilié</strong> au gouvernement français, au Ministère du Travail, à l'URSSAF, à Légifrance, ni à aucune autre entité publique. C'est un outil privé développé par un particulier.
+        Simulateur Heures Sup France <strong style="color:#fff;">n'est PAS affilié</strong> au gouvernement français, au Ministère du Travail, à l'URSSAF, à Légifrance, ni à aucune autre entité publique. C'est un outil privé, édité par CELMAR APPS (Anthony Chauvel, entrepreneur individuel).
       </div>
     </div>
 
@@ -3362,7 +3362,7 @@ document.addEventListener('DOMContentLoaded', function(){
   </div>
   <div style="color:#ccc;line-height:1.8;font-size:13px;">
     <p style="color:#fff;font-weight:700;margin-bottom:2px;">LICENCE PROPRIÉTAIRE — SIMULHEURES</p>
-    <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel. Tous droits réservés.</p>
+    <p style="color:rgba(255,255,255,0.5);font-size:11px;margin-bottom:16px;">Copyright (c) 2024-2026 Anthony Chauvel — CELMAR APPS. Tous droits réservés.</p>
 
     <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">1. Droits accordés</p>
     <p>L'auteur accorde à tout utilisateur le droit d'utiliser l'application à titre <strong style="color:#fff">personnel et non commercial</strong>, de consulter le code source à des fins d'information, et de signaler des bugs via GitHub.</p>
@@ -4627,9 +4627,9 @@ function hasConsent(){
     try{
       var seen = localStorage.getItem('NV_SEEN');
       // Dernière version publiée dans nouveautes.html : à changer en même temps
-      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026 ; v10.13 et v10.14 le 27/10/2026).
+      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026 ; v10.13 et v10.14 le 27/10/2026 ; v10.15 le 01/11/2026).
       // Avant, le badge ne s'affichait qu'une seule fois dans la vie de l'appli.
-      var NV_DERNIERE = 'v10.14';
+      var NV_DERNIERE = 'v10.15';
       var badge = document.getElementById('badgeNew');
       if(badge && seen !== NV_DERNIERE){ badge.style.display='inline'; }
     }catch(e){}

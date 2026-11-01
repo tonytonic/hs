@@ -81,4 +81,4 @@ En cas de litige, seuls les documents officiels de l’employeur font foi.
 ## 👤 Auteur
 
 Développé par **C. Anthony**  
-Projet personnel – évolution continue selon les besoins réels
+Édité depuis le 1er novembre 2026 par CELMAR APPS (Anthony Chauvel, entrepreneur individuel – micro-entreprise) – évolution continue selon les besoins réels
