@@ -62,9 +62,23 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">2 novembre 2026</span>
+    <span class="v-num">v10.17</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Statistiques de fréquentation, sans cookie</b> : pour savoir quelles pages t'aident le plus, l'appli compte de nouveau les pages vues avec Cloudflare Web Analytics, <b>sans cookie, sans identifiant et sans pistage</b>. Tes saisies ne sont jamais concernées : elles restent sur ton téléphone. La politique de confidentialité l'explique en détail. <span class="v-tag tag-fix">Mise à jour</span></div>
+  </div>
+</div>
+
+<div class="sep"></div>
+
+<div class="version">
+  <div class="v-head">
     <span class="v-date">1<sup>er</sup> novembre 2026</span>
     <span class="v-num">v10.16</span>
-    <span class="v-new-badge">NOUVEAU</span>
   </div>
 
   <div class="item">
@@ -921,7 +935,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <script>
 // Marquer comme vu quand l'utilisateur ouvre la page
 /* La version lue (et plus seulement « déjà vu ») : le badge du menu revient à chaque nouvelle version. */
-try{ localStorage.setItem('NV_SEEN','v10.16'); }catch(e){}
+try{ localStorage.setItem('NV_SEEN','v10.17'); }catch(e){}
 </script>
 </body>
 </html>

@@ -3412,11 +3412,11 @@ document.addEventListener('DOMContentLoaded', function(){
     <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">2. Stockage local (LocalStorage)</p>
     <p>Toutes vos données sont conservées exclusivement sur votre appareil. Vous pouvez les effacer à tout moment en vidant le cache ou en désinstallant l'application.</p>
 
-    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">3. Pas de suivi ni analytics</p>
-    <p>Aucun outil de suivi, cookie publicitaire ou service d'analyse tiers n'est utilisé. Votre utilisation reste totalement anonyme.</p>
+    <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">3. Mesure d'audience, sans cookie</p>
+    <p>Seules des statistiques de fréquentation agrégées (pages vues, pays, type d'appareil) sont mesurées avec Cloudflare Web Analytics, sans cookie, sans identifiant et sans pistage. Aucune de vos saisies n'est concernée. Aucun cookie publicitaire ni autre service d'analyse n'est utilisé.</p>
 
     <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">4. Sécurité</p>
-    <p>Aucune donnée n'est transmise sur Internet. La sécurité de vos données dépend uniquement de la sécurité de votre appareil.</p>
+    <p>Aucune de vos saisies n'est transmise sur Internet. La sécurité de vos données dépend uniquement de la sécurité de votre appareil.</p>
 
     <p style="color:#00c8ff;font-weight:600;margin-bottom:4px;">5. Modifications</p>
     <p>Toute modification de cette politique sera publiée dans l'application.</p>
@@ -4627,9 +4627,9 @@ function hasConsent(){
     try{
       var seen = localStorage.getItem('NV_SEEN');
       // Dernière version publiée dans nouveautes.html : à changer en même temps
-      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026 ; v10.13 et v10.14 le 27/10/2026 ; v10.15 et v10.16 le 01/11/2026).
+      // que la ligne NV_SEEN tout en bas de nouveautes.html (01/10/2026 ; v10.11 le 02/10/2026 ; v10.12 le 04/10/2026 ; v10.13 et v10.14 le 27/10/2026 ; v10.15 et v10.16 le 01/11/2026 ; v10.17 le 02/11/2026).
       // Avant, le badge ne s'affichait qu'une seule fois dans la vie de l'appli.
-      var NV_DERNIERE = 'v10.16';
+      var NV_DERNIERE = 'v10.17';
       var badge = document.getElementById('badgeNew');
       if(badge && seen !== NV_DERNIERE){ badge.style.display='inline'; }
     }catch(e){}
