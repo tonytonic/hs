@@ -666,3 +666,8 @@ Avenant du 17 avril 2026, effet **1er janvier 2027** : 31 paliers de 22 532,19 �
 - IDCC 2528 : accord du 1er juillet 2026 (salaires minima).
 - IDCC 538 : accord du 29 juillet 2026 (salaires garantis fin 2026).
 Dès que les barèmes sont dans le corpus droit (ou fournis en PDF), mettre à jour les grilles correspondantes.
+
+### IJ AT/MP — plafond lié au PASS (ajout du 02/11/2026)
+- Depuis le décret n° 2026-909 du 30/09/2026 (art. R433-2 CSS), le salaire journalier maximal AT/MP = 0,226 % du PASS, pour les AT/MP survenus depuis le 01/11/2026.
+- Valeurs 2026 (PASS 48 060 €) : salaire journalier max 108,62 € ; IJ max 65,17 €/j (J1-J28) et 86,90 €/j (J29+).
+- Au 01/01/2027, si le PASS 2027 est bien fixé à 48 900 € : 110,51 € ; IJ max 66,31 €/j et 88,41 €/j. À changer dans `outils/module-atmp.html` (calcul + note), `outils/articles-loi.js` (R433-2), et côté guide `accident-travail-droits.html` et `reference-chiffres-cles-2026-guide.html`.
