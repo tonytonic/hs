@@ -336,7 +336,15 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
           <input class="ip" id="fSalJour" type="number" min="0" step="0.01" placeholder="0" aria-label="Salaire journalier de référence">
           <span class="unit">€/jour</span>
         </div>
-        <div class="hint">Saisis ton salaire mensuel brut (M-1). Le SJR est calculé automatiquement : salaire ÷ 30,42.</div>
+        <div class="hint">Ton salaire brut du mois précédant l'arrêt, divisé par 30,42 (ex. : 2 500 € → 82,18 €/jour).</div>
+      </div>
+      <div class="field">
+        <label>Date de l'accident ou de la maladie professionnelle</label>
+        <select class="ip" id="fDateAT" aria-label="Date de l'accident ou de la maladie professionnelle">
+          <option value="apres">À partir du 1er novembre 2026</option>
+          <option value="avant">Avant le 1er novembre 2026</option>
+        </select>
+        <div class="hint">Le plafond a fortement baissé pour les accidents et maladies professionnelles survenus depuis le 1er novembre 2026 (décret n° 2026-909 du 30 septembre 2026).</div>
       </div>
       <div class="field">
         <label>Période d'arrêt</label>
@@ -384,8 +392,8 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
     </div></div>
   </div>
 
-  <div class="note"><span data-art="L411-1"></span> à <span data-art="L452-5"></span> · <span data-art="L461-1"></span> à <span data-art="L461-7"></span> — Conforme au Code de la sécurité sociale, à jour juin 2026.<br>
-    IJ AT/MP 2026 : 60% (J1–J28, plafond 240,49 €/j) puis 80% (J29+, plafond 320,66 €/j). Sans délai de carence.<br>
+  <div class="note"><span data-art="L411-1"></span> à <span data-art="L452-5"></span> · <span data-art="L461-1"></span> à <span data-art="L461-7"></span> — Conforme au Code de la sécurité sociale, à jour novembre 2026.<br>
+    IJ AT/MP : 60 % du salaire journalier du 1er au 28e jour, puis 80 %, sans délai de carence. Salaire journalier retenu au maximum : 0,226 % du plafond annuel de la Sécurité sociale (108,62 € en 2026), soit une IJ de <b>65,17 €/j</b> puis <b>86,90 €/j</b> au plus, pour un accident ou une maladie professionnelle survenu depuis le 1er novembre 2026 (<span data-art="R433-2"></span>, décret n° 2026-909). Avant cette date : 240,49 €/j puis 320,66 €/j.<br>
     🦺 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Outil indicatif & pédagogique · Seule la CPAM fait foi pour la reconnaissance et l'indemnisation</div>
@@ -426,17 +434,21 @@ function calcIndem(){
   var per = $('fPeriode').value;
   if(sal<=0){$('indemResults').style.display='none';return;}
   var taux = per==='j1_28' ? 0.60 : 0.80;
-  var plafond = per==='j1_28' ? 240.49 : 320.66; // plafonds IJ AT/MP 2026 (1er janvier 2026)
+  // Plafond de l'IJ AT/MP = taux × salaire journalier maximal (art. R433-2 CSS × PASS 2026 = 48 060 €).
+  // Depuis le décret n° 2026-909 du 30/09/2026 : 0,226 % du PASS (108,62 €/j) pour les AT/MP survenus
+  // à compter du 01/11/2026 ; avant : 0,834 % du PASS (400,82 €/j).
+  var dateAT = ($('fDateAT') && $('fDateAT').value) || 'apres';
+  var plafond = dateAT==='avant' ? (per==='j1_28' ? 240.49 : 320.66) : (per==='j1_28' ? 65.17 : 86.90);
   var ijBrute = sal * taux;
   var ij = Math.min(ijBrute, plafond);
   $('rIJ').textContent = eur(ij)+' / jour';
   $('rIJDetail').textContent = eur(sal)+'/j × '+(taux*100)+'% · '+
     (per==='j1_28'?'Jours 1 à 28':'À partir du 29e jour') +
-    (ijBrute>plafond ? ' · plafond légal '+eur(plafond)+'/j appliqué (calcul théorique : '+eur(ijBrute)+')' : '');
+    (ijBrute>plafond ? ' · plafond légal '+eur(plafond)+'/j appliqué ('+(dateAT==='avant'?'AT/MP survenu avant le 01/11/2026':'AT/MP survenu depuis le 01/11/2026')+' ; calcul théorique : '+eur(ijBrute)+')' : '');
   $('rTaux').textContent = (taux*100)+'%';
   $('indemResults').style.display='block';
 }
-['fSalJour','fPeriode'].forEach(function(id){
+['fSalJour','fPeriode','fDateAT'].forEach(function(id){
   $(id).addEventListener('input',calcIndem);
   $(id).addEventListener('change',calcIndem);
 });
