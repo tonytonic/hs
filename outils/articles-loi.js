@@ -561,6 +561,8 @@
       texte:"Si l'accident résulte d'une faute intentionnelle de l'employeur (distincte de la faute inexcusable, art. L452-1 à L452-4), la victime conserve le droit d'agir en réparation de droit commun contre l'auteur, pour la part du préjudice non couverte par les prestations. (La majoration de rente et l'indemnisation des préjudices complémentaires en cas de faute INEXCUSABLE relèvent des art. L452-2 et L452-3.)" },
     'L461-7':  { code:'CSS', titre:'Maladies professionnelles — déclaration',
       texte:"Précise les modalités et délais de déclaration et de reconnaissance des maladies professionnelles." },
+    'R433-2':  { code:'CSS', titre:'IJ AT/MP — salaire journalier maximal',
+      texte:"Le salaire journalier pris en compte pour l'indemnité journalière AT/MP est limité à 0,226 % du plafond annuel de la Sécurité sociale (108,62 € par jour en 2026), pour les accidents du travail et maladies professionnelles survenus à compter du 1er novembre 2026 (décret n° 2026-909 du 30 septembre 2026). Auparavant : 0,834 %." },
 
     /* --- Alternance --- */
     'L6325-8':{ code:'CT', titre:'Contrat de professionnalisation — rémunération',
