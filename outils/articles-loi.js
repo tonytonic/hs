@@ -156,6 +156,7 @@
     /* ----- Transport / mobilités ----- */
     fmd_plafond_seul: { v: 600,    u: '€/an',    maj: '2025-01-01', src: 'Forfait mobilités durables seul, secteur privé — art. L3261-3-1 et R3261-13-1 code du travail ; plafond d\'exonération : art. 81, 19° ter du CGI (l\'ancien D3261-15-2 est abrogé depuis le décret du 9 mai 2020). La limite temporaire de 700 € (2022-2024) n\'a pas été reconduite ; 600 € s\'applique depuis le 1er janvier 2025 (urssaf.fr/employeur/beneficier-exonerations/frais-professionnels ; ecologie.gouv.fr/politiques-publiques/soutien-employeurs-aux-mobilites-durables)' },
     fmd_plafond_cumul:{ v: 900,    u: '€/an',    maj: '2025-01-01', src: 'Cumul FMD + prise en charge transports en commun — 900 € (contre 800 € auparavant), confirmé urssaf.fr' },
+    fmd_plafond_social_2026:{ v: 1000, u: '€/an', maj: '2026-10-21', src: 'Décret n° 2026-974 du 20/10/2026 (JO 21/10) : plafond d\'exonération de cotisations global FMD + prime transport (dont carburant) porté à 1 000 €/an/salarié pour les sommes versées jusqu\'au 31/12/2026 (cotisations des périodes à compter du 01/10/2026) — communiqué BOSS du 30/10/2026. Plafond fiscal (IR) inchangé à ce stade.' },
     fmd_plafond_public:{ v: 300,   u: '€/an',    maj: '—',          src: 'Fonction publique — 300 € max (barème progressif 100/200/300 € selon jours d\'usage, inchangé)' },
     tc_prise_charge:  { v: 0.50,   u: '',        maj: '—',          src: '50 % abonnement TC obligatoire' },
 
