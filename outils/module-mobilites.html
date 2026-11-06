@@ -159,14 +159,14 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
     <div class="wiz-step on" data-s="0">
       <span class="wiz-emoji">🚲</span>
       <div class="wiz-h">Forfait Mobilités</div>
-      <div class="wiz-p">L'employeur peut financer les déplacements domicile-travail durables jusqu'à 600 €/an (900 € en cumul avec les transports en commun). <b>Fin 2026 :</b> plafond social exceptionnel de 1 000 €/an (décret n° 2026-974).</div>
+      <div class="wiz-p">L'employeur peut financer les déplacements domicile-travail durables jusqu'à 600 €/an (900 € en cumul avec les transports en commun).</div>
       <div class="wiz-p" style="font-size:12px;opacity:.6;">Vélo · Covoiturage · Exo.</div>
     </div>
     <div class="wiz-step" data-s="1">
       <div class="wiz-feat"><div class="wi">🚲</div><div class="wt"><b>Qui est concerné ?</b>Tous les salariés utilisant un vélo, trottinette, covoiturage ou transports partagés.</div></div>
     </div>
     <div class="wiz-step" data-s="2">
-      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Montant & cumul</b>Jusqu'à 600 €/an exonérés (900 € en cumul avec la prise en charge des transports en commun). Pour les sommes versées jusqu'au 31/12/2026 : plafond de cotisations relevé à 1 000 €/an.</div></div>
+      <div class="wiz-feat"><div class="wi">⚖️</div><div class="wt"><b>💶 Montant & cumul</b>Jusqu'à 600 €/an exonérés (900 € en cumul avec la prise en charge des transports en commun). En 2026 : jusqu'à 1 000 € sans cotisations avec la prime transport.</div></div>
       <div class="wiz-legal"><span data-txt="disclaimer"></span> Vos saisies restent sur votre appareil.</div>
     </div>
     <div class="wiz-legal" style="margin-top:10px;font-size:11px;opacity:.7;line-height:1.5;"><strong>⚠️ À titre indicatif uniquement.</strong> Résultats non opposables — ni avis juridique, ni valeur légale. Consultez un professionnel pour toute décision.</div>
@@ -189,6 +189,14 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
   <div class="panel">
     <div class="panel-t">🚲 Ta situation</div>
     <div class="field">
+      <label>Année du versement</label>
+      <select class="ip" id="fAnnee" aria-label="Année du versement">
+        <option value="2026">2026 (sommes versées jusqu'au 31/12/2026)</option>
+        <option value="2027">2027 et après</option>
+      </select>
+      <div class="hint">En 2026, plafond de cotisations exceptionnel de 1 000 € (décret n° 2026-974).</div>
+    </div>
+    <div class="field">
       <label>Mode de transport utilisé</label>
       <select class="ip" id="fMode" aria-label="Mode de transport utilisé">
         <option value="velo">Vélo personnel (ou électrique)</option>
@@ -206,14 +214,6 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
       <div class="hint">Environ 200 jours pour un temps plein (hors congés, fériés, RTT).</div>
     </div>
     <div class="field">
-      <label>Année de versement</label>
-      <select class="ip" id="fAnnee" aria-label="Année de versement">
-        <option value="2026">Sommes versées en 2026 (jusqu'au 31/12/2026)</option>
-        <option value="2027">Sommes versées à partir du 1er janvier 2027</option>
-      </select>
-      <div class="hint">Relèvement temporaire du plafond de cotisations à 1 000 €/an pour 2026 (décret n° 2026-974 du 20/10/2026).</div>
-    </div>
-    <div class="field">
       <label>Montant versé par l'entreprise (si connu)</label>
       <div class="inline">
         <input class="ip" id="fVerse" type="number" min="0" step="1" placeholder="0" aria-label="Montant versé par l'entreprise (si connu)">
@@ -226,14 +226,14 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
   <div id="results" style="display:none;">
     <div class="res-grid">
       <div class="res main">
-        <div class="rl" id="rPlafLbl">Plafond exonéré de cotisations 2026</div>
+        <div class="rl" id="rPlafondLbl">Plafond exonéré de cotisations 2026</div>
         <div class="rbig" id="rPlafond">—</div>
         <div class="rsub" id="rDetail"></div>
       </div>
       <div class="res half">
         <div class="rl">Exonéré IR</div>
         <div style="font-size:20px;font-weight:800;" id="rIR">—</div>
-        <div class="rsub">Impôt sur le revenu (inchangé)</div>
+        <div class="rsub">Impôt sur le revenu</div>
       </div>
       <div class="res half">
         <div class="rl">Versé / Plafond</div>
@@ -245,20 +245,20 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
 
   <div style="font-weight:800;font-size:13px;color:var(--acc-l);margin-bottom:10px;">📊 Plafonds 2026 par mode</div>
   <div class="modes">
+    <div class="mode"><div><div class="mn">⛽ 2026 : prime transport + FMD réunis</div><div class="msub">Exo. cotisations seulement, versé jusqu'au 31/12/2026</div></div><div class="mp">1 000 €/an</div></div>
     <div class="mode"><div><div class="mn">🚲 Vélo / Trottinette</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">600 €/an</div></div>
     <div class="mode"><div><div class="mn">🚗 Covoiturage</div><div class="msub">Exo. cotisations + IR</div></div><div class="mp">600 €/an</div></div>
     <div class="mode"><div><div class="mn">🔀 Cumul FMD + transports</div><div class="msub">FMD + abonnement transport public</div></div><div class="mp">900 €/an</div></div>
-    <div class="mode"><div><div class="mn">⛽ Exceptionnel 2026</div><div class="msub">Cotisations : FMD + prime transport/carburant, sommes versées jusqu'au 31/12/2026</div></div><div class="mp">1 000 €/an</div></div>
   </div>
-  <div class="rule"><div class="ri">⛽</div><div><div class="rt">Relèvement temporaire 2026 (hausse du carburant)</div><div class="rd">Pour les sommes versées jusqu'au 31 décembre 2026, l'exonération de cotisations du forfait mobilités durables et de la prime transport (dont frais de carburant) passe à un plafond global de 1 000 € par an et par salarié. Le plafond est annuel : un employeur qui a déjà versé 300 € de prime carburant avant octobre peut compléter jusqu'à 1 000 €. Ce relèvement vaut pour les cotisations sociales : le plafond d'exonération d'impôt sur le revenu reste à 600 € (900 € en cumul) à ce stade. Décret n° 2026-974 du 20/10/2026, communiqué BOSS du 30/10/2026.</div></div></div>
 
   <div style="font-weight:800;font-size:13px;color:var(--acc-l);margin-bottom:10px;">⚖️ Règles essentielles</div>
   <div class="rule"><div class="ri">📋</div><div><div class="rt">Facultatif pour l'entreprise</div><div class="rd">Le Forfait Mobilités Durables est une faculté, pas une obligation légale. L'entreprise peut décider de le mettre en place ou non. Certaines conventions le rendent obligatoire.</div></div></div>
   <div class="rule"><div class="ri">🧾</div><div><div class="rt">Justificatifs requis</div><div class="rd">Le salarié doit attester sur l'honneur de l'utilisation du mode de transport éligible. L'entreprise peut demander des justificatifs (attestation de covoiturage, facture vélo...).</div></div></div>
+  <div class="rule"><div class="ri">⛽</div><div><div class="rt">2026 : jusqu'à 1 000 € sans cotisations</div><div class="rd">Pour les sommes versées jusqu'au 31 décembre 2026, la prime transport (carburant, recharge) et le forfait mobilités durables réunis sont exonérés de cotisations jusqu'à 1 000 € par an et par salarié, sur toute l'année (un versement fait avant octobre compte dans les 1 000 €). Côté impôt sur le revenu, la limite reste 600 € à ce stade. Décrets n° 2026-973 et 2026-974 du 20 octobre 2026.</div></div></div>
   <div class="rule"><div class="ri">🔀</div><div><div class="rt">Cumul possible avec les transports en commun</div><div class="rd">Le FMD est cumulable avec le remboursement obligatoire de 50 % de l'abonnement de transport en commun. En cas de cumul, le plafond global d'exonération est porté à 900 €/an.</div></div></div>
   <div class="rule"><div class="ri">🚌</div><div><div class="rt">Modes éligibles</div><div class="rd">Vélo (avec ou sans assistance), trottinette, covoiturage, engins de déplacement personnel motorisés, transports en commun sans abonnement, autopartage à faibles émissions.</div></div></div>
 
-  <div class="note"><span data-art="L3261-3-1"></span> — Décret n°2020-541 · Plafonds 2026 : 600 € (FMD seul) · 900 € (cumul transports en commun) · cotisations : 1 000 € pour les sommes versées jusqu'au 31/12/2026 (décret n° 2026-974) · à jour novembre 2026. Montants indicatifs.<br>🚲 Tout reste sur ton appareil.
+  <div class="note"><span data-art="L3261-3-1"></span> — Décret n°2020-541 · Plafonds : 600 € (FMD seul) · 900 € (cumul transports en commun) · 2026 : 1 000 € de cotisations pour prime transport + FMD (décret n° 2026-974) · à jour novembre 2026. Montants indicatifs.<br>🚲 Tout reste sur ton appareil.
     <button onclick="resetState()" style="background:none;border:none;color:var(--faded);font-size:11px;cursor:pointer;text-decoration:underline;margin-top:10px;">🔄 Réinitialiser</button></div>
   <div class="foot">Outil indicatif & pédagogique · Consulte ton accord d'entreprise ou de branche</div>
 </div>
@@ -266,7 +266,7 @@ select.ip{-webkit-appearance:none;appearance:none;overflow:hidden;white-space:no
 <div id="help" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.8);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:16px;">
   <div style="background:#0e1e12;border:1.5px solid var(--card-edge);border-radius:16px;max-width:430px;width:100%;padding:20px;">
     <div style="font-weight:800;font-size:18px;margin-bottom:12px;">💡 Mode d'emploi</div>
-    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">Sélectionne ton mode de transport et indique tes jours de trajet par an. Le module calcule le plafond d'exonération applicable au titre du Forfait Mobilités Durables (avec le relèvement temporaire à 1 000 € pour les sommes versées en 2026).</div>
+    <div style="font-size:13px;color:var(--ink2);line-height:1.6;">Sélectionne ton mode de transport et indique tes jours de trajet par an. Choisis l'année du versement : le module applique le plafond d'exonération du Forfait Mobilités Durables (1 000 € de cotisations en 2026, 600 € ensuite sauf nouveau texte).</div>
     <button onclick="document.getElementById('help').style.display='none'" style="margin-top:16px;width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-weight:700;font-size:14px;cursor:pointer;">Fermer</button>
   </div>
 </div>
@@ -277,21 +277,22 @@ function $(id){ return document.getElementById(id); }
 function eur(n){ return n.toLocaleString('fr-FR',{minimumFractionDigits:0,maximumFractionDigits:0})+' €'; }
 
 var PLAFONDS = { velo:600, trottinette:600, covoiturage:600, transport_perso:600 };
+/* 2026 : plafond de cotisations exceptionnel (décret n° 2026-974), l'impôt reste à 600 €. Valeur lue dans articles-loi.js si chargé. */
+function plafSocial2026(){ try{ var v = window.SH && SH.val('fmd_plafond_social_2026'); if(typeof v==='number') return v; }catch(e){} return 1000; }
 
 function recalc(){
   var mode  = $('fMode').value;
   var jours = parseFloat($('fJours').value) || 200;
   var verse = parseFloat($('fVerse').value) || 0;
-  var annee = $('fAnnee').value;
+  var annee = $('fAnnee') ? $('fAnnee').value : '2026';
   var plafIR = PLAFONDS[mode] || 600;
-  /* Décret n° 2026-974 : plafond social global porté à 1 000 €/an pour les sommes versées jusqu'au 31/12/2026 */
-  var plaf  = annee === '2026' ? 1000 : plafIR;
+  var plaf   = annee === '2026' ? plafSocial2026() : plafIR;
 
-  $('rPlafLbl').textContent = annee === '2026' ? 'Plafond exonéré de cotisations 2026' : 'Plafond exonéré de cotisations 2027';
+  $('rPlafondLbl').textContent = 'Plafond exonéré de cotisations ' + (annee === '2026' ? '2026' : '(2027 et après)');
   $('rPlafond').textContent = eur(plaf);
   $('rDetail').textContent  = annee === '2026'
-    ? 'Plafond exceptionnel 2026 (décret n° 2026-974), global avec la prime transport/carburant. Côté impôt, la limite reste 600 €.'
-    : 'Exonéré de cotisations sociales et d\'impôt sur le revenu dans cette limite annuelle (sauf nouveau texte pour 2027).';
+    ? 'Prime transport et forfait mobilités réunis, sommes versées jusqu\'au 31/12/2026, sur toute l\'année. Impôt : 600 €.'
+    : 'Exonéré de cotisations sociales et d\'impôt sur le revenu dans cette limite annuelle (sauf nouveau texte).';
   $('rIR').textContent      = eur(plafIR);
   
   if(verse > 0){
@@ -300,6 +301,9 @@ function recalc(){
     $('rVerseDetail').textContent = diff >= 0
       ? 'Marge restante : ' + eur(diff)
       : 'Dépassement de ' + eur(Math.abs(diff)) + ' (soumis à charges)';
+    if(annee === '2026' && verse > plafIR && diff >= 0){
+      $('rVerseDetail').textContent += ' · au-delà de ' + eur(plafIR) + ' imposable';
+    }
   } else {
     $('rVerse').textContent     = '—';
     $('rVerseDetail').textContent = 'Montant non renseigné';
@@ -307,7 +311,7 @@ function recalc(){
   $('results').style.display = 'block';
 }
 
-['fMode','fJours','fVerse','fAnnee'].forEach(function(id){
+['fAnnee','fMode','fJours','fVerse'].forEach(function(id){
   $(id).addEventListener('input', recalc);
   $(id).addEventListener('change', recalc);
 });
