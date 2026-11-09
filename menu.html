@@ -5201,6 +5201,8 @@ function hasConsent(){
       return true;
     });
   }
+  /* exposée pour le menu à trois vues : on recentre en changeant de vue (09/11/2026) */
+  window.centerLoneTiles=function(){ centerLoneTiles(); };
   function centerLoneTiles(){
     var sober=document.body.classList.contains('mode-pro');
     ['heures','paie','sante'].forEach(function(cat){
@@ -5339,7 +5341,9 @@ function hasConsent(){
       /* fond et barre d'état selon le contrat (Temps plein / partiel / cadre), comme avant */
       try{ if(typeof window.applyContractHighlight==='function') window.applyContractHighlight(); }catch(e){}
     }
-    try{ if(typeof centerLoneTiles==='function') centerLoneTiles(); }catch(e){}
+    /* tuile seule sur sa ligne : recentrée à chaque changement de vue (elle était calculée
+       une fois au démarrage, donc fausse si l'appli s'ouvrait sur « Mes droits » ou « Mes heures ») */
+    try{ if(typeof window.centerLoneTiles==='function') window.centerLoneTiles(); }catch(e){}
   }
 
   /* Ouvre l'assistant à l'étape Contrat (« Passer, je verrai plus tard » reste possible) */
