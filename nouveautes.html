@@ -62,9 +62,21 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <!-- ═══ VERSION LA PLUS RÉCENTE — TOUJOURS EN PREMIER ═══ -->
 <div class="version">
   <div class="v-head">
+    <span class="v-date">10 novembre 2026</span>
+    <span class="v-num">v10.23</span>
+    <span class="v-new-badge">NOUVEAU</span>
+  </div>
+
+  <div class="item">
+    <div class="dot"></div>
+    <div class="txt"><b>Contrôle de cohérence des calculs</b> : on a vérifié que le compteur annuel, les heures mensualisées, Fox, Zenji et Lumina appliquent bien les mêmes règles d'heures supplémentaires pour chaque convention. C'est le cas. Dans Zenji (forfait heures), une ancienne liste de secours qui n'était plus à jour a été retirée : en cas de souci de chargement, c'est le droit commun qui s'affiche, clairement indiqué. <span class="v-tag tag-fix">Correction</span></div>
+  </div>
+</div>
+
+<div class="version">
+  <div class="v-head">
     <span class="v-date">9 novembre 2026</span>
     <span class="v-num">v10.22</span>
-    <span class="v-new-badge">NOUVEAU</span>
   </div>
 
   <div class="item">
@@ -1036,7 +1048,7 @@ body{font-family:-apple-system,'Manrope',sans-serif;background:var(--ink);color:
 <script>
 // Marquer comme vu quand l'utilisateur ouvre la page
 /* La version lue (et plus seulement « déjà vu ») : le badge du menu revient à chaque nouvelle version. */
-try{ localStorage.setItem('NV_SEEN','v10.22'); }catch(e){}
+try{ localStorage.setItem('NV_SEEN','v10.23'); }catch(e){}
 </script>
 </body>
 </html>
