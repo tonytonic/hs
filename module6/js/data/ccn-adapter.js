@@ -39,31 +39,16 @@ const FALLBACK_FJ = [
     notes: 'Base légale applicable sans convention spécifique.' },
 ];
 
+/* 10/11/2026 : table de secours réduite au droit commun. Elle ne sert que si
+   ../ccn/conventions-collectives.js (source unique des règles HS de toute l'appli) n'est pas
+   chargé. L'ancienne liste de 23 conventions datait de 2024 et contredisait la source commune
+   sur 12 d'entre elles (ex. sécurité 120 h au lieu de 329 h, hospitalisation privée 220 h au
+   lieu de 130 h) : mieux vaut le droit commun annoncé comme tel qu'une valeur conventionnelle
+   fausse. Le repli par défaut pointait aussi sur l'entrée HCR (index 2) au lieu du droit commun. */
 const FALLBACK_HS = [
-  // Contingents réels 2024 — sources : Légifrance + avenants de branche
-  { idcc: 1486, nom: 'Syntec / Bureaux études',      contingent: 130, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 3248, nom: 'Métallurgie (ANI 2024)',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.99.4 : 220h (175h si annualisé) + 80h complémentaire 1 an/2
-  { idcc: 1979, nom: 'HCR',                           contingent: 360, seuil: 35, taux1: 10, palier1: 4, taux_inter: 20, palier_inter: 4, taux2: 50 },
-  { idcc: 2120, nom: 'Banque AFB',                    contingent: 202, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1672, nom: 'Sociétés assurances',           contingent:  70, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // art.46 CCN 1672 : contingent individuel 70h
-  { idcc: 1996, nom: 'Pharmacie officine',            contingent: 180, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc:   16, nom: 'Transport routier',             contingent: 195, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 2511, nom: 'Sport',                         contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1501, nom: 'Restauration rapide',           contingent: 220, seuil: 35, taux1: 10, palier1: 8, taux_inter: 20, palier_inter: 8, taux2: 50 },
-  { idcc: 1597, nom: 'Bâtiment ETAM',                contingent: 130, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1090, nom: 'Réparation automobile',        contingent: 250, taux1: 25, taux2: 50, seuil: 35, palier1: 8 }, // 03/10/2026 : seuil 35 h (la table de secours ne sert que si ccn/conventions-collectives.js ne charge pas)
-  { idcc: 1413, nom: 'Travail temporaire',            contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 2264, nom: 'Hospitalisation privée',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 2941, nom: 'Aide à domicile (BASS)',        contingent:  90, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1351, nom: 'Gardiennage sécurité',         contingent: 120, taux1: 10, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc:  650, nom: 'Métallurgie OETAM (pré-2024)', contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1619, nom: 'Cabinets dentaires',            contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 7 },
-  { idcc: 3127, nom: 'Services à la personne',        contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 5730, nom: 'Commerce gros non alim.',       contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc:  573, nom: 'Commerce gros alim.',           contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 1517, nom: 'Commerce détail non alim.',     contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc: 5005, nom: 'Banque (Caisse Épargne)',       contingent: 202, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
-  { idcc:    0, nom: 'Droit commun',                  contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8 },
+  { idcc: 0, nom: 'Droit commun', contingent: 220, taux1: 25, taux2: 50, seuil: 35, palier1: 8,
+    taux_inter: null, palier_inter: null, groupe: 'DC',
+    notes: 'Règles légales (L3121-28, L3121-36) : la convention n\'a pas pu être chargée.' },
 ];
 
 function _norm(s) {
@@ -105,7 +90,7 @@ const M6_CCN_Adapter = {
         const r = hasNum ? global.CCN_API.getGroupeForCCN(num) : (global.CCN_API.search(q,1)||[])[0];
         if (r) return this._normalizeHS(r);
       }
-      return FALLBACK_HS.find(c => _norm(c.nom).includes(_norm(q))) || FALLBACK_HS[2];
+      return FALLBACK_HS.find(c => _norm(c.nom).includes(_norm(q))) || FALLBACK_HS[0];
     }
 
     if (_hasCadresAPI()) {
@@ -320,7 +305,7 @@ const M6_CCN_Adapter = {
     return FALLBACK_HS.filter(c => _norm(c.nom).includes(q)||String(c.idcc).includes(q));
   },
   _getDroitCommun(regime) {
-    if (regime === 'forfait_heures') return FALLBACK_HS[2];
+    if (regime === 'forfait_heures') return FALLBACK_HS[0];
     return this._normalizeFJ(FALLBACK_FJ[3], regime);
   },
   _getRegimeBadge(r, regime) {
