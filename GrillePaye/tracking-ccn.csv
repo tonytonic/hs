@@ -58,7 +58,7 @@
 1285,Entreprises artistiques et culturelles,4,sourcée,9,01/08/2026,ACTIF,,,
 1411,Fabrication de l'ameublement,4,sourcée,10,01/07/2026,ACTIF,,,"IDCC 1411 réel = Fabrication de l'ameublement (brochure 3155). Contenu actuel = labels commerciaux (employé commercial, technico-commercial, chef de rayon) qui collent mal à un secteur manufacturier. Pas confirmé mismatch mais suspect - à vérifier par l'autre agent avant de chercher une grille."
 1413,Salariés permanents des entreprises de travail temporaire,4,sourcée,13,01/09/2026,ACTIF,,,
-1431,Optique lunetterie de détail,4,vérifiée,3,01/01/2026,,,,
+1431,Optique lunetterie de détail,4,sourcée,27,01/11/2026,,,,
 1702,Travaux publics ouvriers,4,vérifiée,5,01/01/2026,ACTIF,,salairebtp.fr+juristique.org (plusieurs régions croisées),"Travaux publics OUVRIERS - identité confirmée DARES. IMPORTANT: grille RÉGIONALE, pas nationale unique (chaque région FRTP négocie son propre barème, 1,2%-2,9% de hausse 2026 selon régions). Repère Bretagne (accord 9/12/2025 étendu, maj FNTP 24/02/2026): Niveau I coef.100 = 23 863€/an, Niveau IV coef.180 = 34 529€/an. Autres régions 2026: Grand Est 23 294-33 525€, Nouvelle-Aquitaine 23 242-34 040€, IDF 23 709-34 569€ (certaines encore non étendues). Un seul chiffre 'national' serait trompeur — si le schéma doit rester simple, Bretagne est une base raisonnable mais à annoter clairement comme variable selon région."
 2002,"Blanchisserie, teinturerie et nettoyage (pressing)",4,estimation à confirmer,13,01/01/2026,ACTIF,,,Contenu actuel = 'conduite ferroviaire' mais IDCC 2002 réel = teinturerie/pressing (confirmé par l'audit du guide). A signaler.
 2528,Industries de la maroquinerie,4,vérifiée,3,01/01/2026,ACTIF,,,Contenu actuel = 'saisonnier réception/animation' (tourisme?) mais IDCC 2528 réel = maroquinerie (confirmé). A signaler.
@@ -121,14 +121,14 @@
 804,Voyageurs représentants placiers VRP accord national,1,estimation à confirmer,4,01/06/2026,INTROUVABLE_DARES,,,
 992,Boucherie boucherie-charcuterie triperie volailles,1,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1256,Cadres entreprises équipements thermiques climatisation,1,vérifiée,3,01/06/2026,ACTIF,,,
-1286,Confiserie chocolaterie biscuiterie détail artisans,1,vérifiée,6,01/06/2026,ACTIF,oui (1842.79 €),,
+1286,Confiserie chocolaterie biscuiterie détail artisans,1,vérifiée,12,01/11/2026,ACTIF,,,
 1314,Maisons alimentation succursales gérants mandataires,1,vérifiée,6,01/06/2026,HISTORIQUE_PERIME,,,
 1405,Expédition exportation fruits légumes,1,vérifiée,5,01/06/2026,ACTIF,,,
 1408,Distribution logistique services énergies proximité,1,vérifiée,2,01/06/2026,ACTIF,,juristique.org+salaire-minimum.com+convention.fr (croisés),"Négoce/distribution combustibles (brochure 3004) — identité DARES confirmée, contenu plausible (livreur cohérent avec distribution). Renommée depuis 'Distribution, logistique et services des énergies de proximité' (même IDCC/brochure, juste un nouveau nom). Accord du 3/04/2026, effectif 01/05/2026, +1%, range 1870,64€-7597,85€/mois (signé, en attente d'extension au 28/05/2026 - à reconfirmer). ⚠️ Ne pas confondre avec IDCC 1388 (Pétrole/majors, minima plus élevés) — vérifié, ce sont deux CCN cousines distinctes, 1408 est la bonne pour ce contenu."
 1512,Promotion immobilière,1,vérifiée,14,01/01/2026,,,"Avenant n° 51 du 12/01/2026 (minima au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1513,Bière et boissons rafraîchissantes,1,sourcée,23,03/02/2026,,oui (1839.8 €),,
 1580,Chaussure industrie,1,sourcée,8,01/06/2026,,,,
-1606,Bricolage commerce de détail,1,vérifiée,10,01/01/2026,ACTIF,,,
+1606,Bricolage commerce de détail,1,sourcée,13,01/09/2026,ACTIF,,,
 1607,Industries des jeux jouets et connexes,1,sourcée,22,01/04/2026,ACTIF,,DARES,IDCC 1607 réel = jeux/jouets/articles de fêtes/Noël/puériculture. Contenu actuel = 'Ouvrier filature coton' (textile). Aucun rapport. À signaler.
 1761,Commerce de gros des tissus tapis linge de maison,1,fusionnée — grille de la convention de rattachement,1,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 573","Ancien nom officiel: Convention collective du commerce de gros des tissus, tapis et linge de maison. Ce numéro est remplacé par le 573 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant."
 1921,Commissaires de justice (ex-huissiers),1,périmée — pas de grille,0,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3250",Ancien nom officiel: Convention collective nationale des huissiers de justice. Ce numéro est remplacé par le 3250 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
@@ -151,7 +151,7 @@
 7025,ETARF,1,vérifiée,3,01/03/2026,ACTIF,,,"IDCC 7025 réel = Travaux et services agricoles/ruraux/forestiers (confirmé LégiSocial). Contenu actuel = 'fruitier/légumier' — thème agricole cohérent mais peut-être trop spécifique vs le champ réel (générique travaux agricoles). Pas un mismatch flagrant comme les autres, mais pas 100% confirmé non plus. Grille pas encore cherchée."
 7508,Maisons familiales rurales,1,estimation à confirmer,3,2026,ACTIF,,DARES (déjà en base),"IDCC 7508 réel = Maisons familiales rurales, instituts ruraux (établissements d'ENSEIGNEMENT rural, formation par alternance) — pas une exploitation laitière. Contenu actuel = 'Ouvrier(ère) laitier(ère) débutant(e)'. Mismatch net (enseignement vs production laitière). À signaler."
 9661,Exploitations agricoles Bas-Rhin,1,sans grille (estimation % SMIC),0,,ACTIF,,,
-18,Industrie textile,,sourcée,21,15/01/2026,,oui (1853 €),,
+18,Industrie textile,,sourcée,21,01/06/2026,,,,
 83,Menuiseries charpentes constructions industrialisées,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 112,Industrie laitière,0,vérifiée,28,01/02/2026,ACTIF,,"Avenant n° 57 du 22/01/2026 à l'annexe I (minima mensuels au 1/02/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 179,Personnel des coopératives de consommation du 30 avril 1956.,0,sourcée,9,01/01/2013,HISTORIQUE_PERIME,,,
@@ -167,8 +167,8 @@
 435,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 438,Echelons intermédiaires assurances production,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 454,Remontées mécaniques domaines skiables,0,vérifiée,7,01/12/2025,ACTIF,,,
-468,Chaussure commerce succursaliste,0,sourcée,9,03/12/2024,,oui (1808.88 €),,
-500,Commerce gros habillement mercerie chaussure jouet,0,vérifiée,8,01/01/2026,ACTIF,,,
+468,Chaussure commerce succursaliste,0,sourcée,18,01/08/2026,,,,
+500,Commerce gros habillement mercerie chaussure jouet,0,sourcée,19,01/07/2026,ACTIF,,,
 504,Industries alimentaires diverses 5 branches,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 506,Fabricants importateurs produits exotiques,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 533,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
@@ -212,9 +212,9 @@
 1182,Ports de plaisance,0,estimation à confirmer,3,2026,ACTIF,,,
 1237,Centres de gestion agréés,0,vérifiée,11,01/03/2026,HISTORIQUE_PERIME,,,
 1240,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
-1267,Pâtisserie,0,sourcée,34,01/01/2026,ACTIF,,,
+1267,Pâtisserie,0,vérifiée,34,01/06/2026,ACTIF,,,
 1278,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
-1307,Exploitation cinématographique,0,vérifiée,44,01/02/2025,ACTIF,,"Avenant n° 70 du 12/11/2024, Annexe 2 (barème au 1/02/2025), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
+1307,Exploitation cinématographique,0,vérifiée,44,01/06/2026,ACTIF,,"Avenant n° 70 du 12/11/2024, Annexe 2 (barème au 1/02/2025), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1309,Presse quotidienne régionale (identité non confirmée),0,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 1311,Restauration ferroviaire,0,estimation à confirmer,2,2026,ACTIF,,DARES,Restauration ferroviaire (wagons-restaurants) vs 'employé négoce bois' actuel. Aucun rapport.
 1316,Organismes de tourisme social et familial,0,vérifiée,7,09/05/2026,ACTIF,,DARES (ambigu),Tourisme social/familial (centres vacances) vs 'agent blanchisserie' actuel — poste plausible dans ce contexte mais très étroit pour représenter toute la CCN. Pas tranché.
