@@ -309,11 +309,23 @@ const DataStore = {
     if(typeof window==='undefined' || !window.CCN_PARTIEL_API) return false;
     try {
       const rules = window.CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom);
-      // Liste des groupes CCN ayant un accord de branche étendu prévoyant L3123-22
-      // (seuls ceux-ci peuvent utiliser les avenants compléments d'heures)
-      const groupesAvecAvenant = ['HCR','BOULAN329','COIF200','SECU329','PROP190','HOSPI130','ANIM70'];
-      return groupesAvecAvenant.includes(rules.groupe);
+      // 11/11/2026 : avenantPossible est calculé dans ccn-partiel.js (groupes ayant un accord
+      // de branche L3123-22 + conventions qui l'autorisent par x.avenant, ex. IDCC 1801).
+      return rules.avenantPossible === true;
     } catch(_) { return false; }
+  },
+
+  // 11/11/2026 : règles d'avenant propres à la convention (majoration des heures de l'avenant,
+  // nombre maximal par an). Par défaut : taux normal, 8 avenants.
+  avenantRules() {
+    const def = { maj:0, max:8, semaines:null, nonEtendu:false };
+    try {
+      const c = Contract.get();
+      if(!c.idcc || !window.CCN_PARTIEL_API) return def;
+      const r = window.CCN_PARTIEL_API.getRules(c.idcc,c.ccnNom);
+      return { maj: Number(r.avenantMaj)||0, max: Number(r.avenantMax)||8,
+               semaines: r.avenantSemaines||null, nonEtendu: r.avenantNonEtendu===true };
+    } catch(_) { return def; }
   },
 
   getAvenant(mondayStr, year) {
