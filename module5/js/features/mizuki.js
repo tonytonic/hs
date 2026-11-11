@@ -174,9 +174,9 @@ const Mizuki = {
     const isAvenant = analysis && analysis.weekMode === 'avenant';
     if (isAvenant && weekResult) {
       if (weekResult.compH25 > 0) {
-        return `🦊 ${name ? name + ' ! ' : ''}Avenant cette semaine — ${weekResult.avenatPaidH?.toFixed(1) || 0}h au taux normal + ${weekResult.compH25.toFixed(1)}h à +25%. Vérifie ton bulletin.`;
+        return `🦊 ${name ? name + ' ! ' : ''}Avenant cette semaine — ${weekResult.avenatPaidH?.toFixed(1) || 0}h ${weekResult.avenatMaj>0?'majorées de +'+Math.round(weekResult.avenatMaj*100)+' %':'au taux normal'} + ${weekResult.compH25.toFixed(1)}h à +25%. Vérifie ton bulletin.`;
       }
-      return `🦊 ${name ? name + ' ! ' : ''}Semaine avec avenant — ${weekResult.avenatPaidH?.toFixed(1) || 0}h au taux normal. Tout est dans les clous.`;
+      return `🦊 ${name ? name + ' ! ' : ''}Semaine avec avenant — ${weekResult.avenatPaidH?.toFixed(1) || 0}h ${weekResult.avenatMaj>0?'majorées de +'+Math.round(weekResult.avenatMaj*100)+' %':'au taux normal'}. Tout est dans les clous.`;
     }
 
     if (isVacWeek) {
