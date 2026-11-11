@@ -718,7 +718,7 @@ addEventListener('pageswap',function(e){try{if(!e.viewTransition)return;var u=e.
         <input type="checkbox" id="week-avenant-toggle" onchange="toggleAvenat()" style="width:18px;height:18px;accent-color:var(--miz-primary);">
         📋 Avenant complément d'heures (Art. L3123-22)
       </label>
-      <div style="font-size:11px;color:var(--miz-text3);margin:4px 0 0 28px;">Augmentation temporaire — les heures dans l'avenant ne sont pas majorées</div>
+      <div style="font-size:11px;color:var(--miz-text3);margin:4px 0 0 28px;">Augmentation temporaire — les heures dans l'avenant sont au taux normal, sauf si ta convention prévoit une majoration</div>
       <div id="week-avenant-section" style="display:none;margin-top:10px;">
         <div class="m5-label">Heures prévues par l'avenant</div>
         <input type="number" inputmode="decimal" class="m5-input" id="week-avenant-hours"
@@ -728,7 +728,7 @@ addEventListener('pageswap',function(e){try{if(!e.viewTransition)return;var u=e.
         <div id="avenant-counter" style="font-size:11px;color:var(--miz-text3);margin-top:4px;text-align:right;"></div>
         <div class="m5-alert info" style="margin-top:8px;font-size:12px;padding:6px 10px;">
           <span>ℹ️</span>
-          <div>Les heures entre ton contrat et l'avenant → taux normal.<br>Les heures au-delà de l'avenant → +25% obligatoire.</div>
+          <div>Les heures entre ton contrat et l'avenant → taux normal (ou majoration prévue par ta convention, voir ci-dessus).<br>Les heures au-delà de l'avenant → +25% obligatoire.</div>
         </div>
       </div>
     </div>
@@ -1054,16 +1054,16 @@ function confirmResetM5() {
   }
 }
 </script>
-<script src="js/data/ccn-partiel.js?v=r6"></script>
-<script src="js/core/calc-engine.js?v=r6"></script>
-<script src="js/features/saisie.js?v=r8"></script>
-<script src="js/features/mizuki.js?v=r7"></script>
+<script src="js/data/ccn-partiel.js?v=r7"></script>
+<script src="js/core/calc-engine.js?v=r7"></script>
+<script src="js/features/saisie.js?v=r9"></script>
+<script src="js/features/mizuki.js?v=r8"></script>
 <script src="js/features/pdf-report.js?v=r8"></script>
 <script src="../legi-ref.js"></script>
 <script src="js/features/glossaire.js?v=r6"></script>
 <script src="js/features/wellbeing.js?v=r9"></script>
 <script src="../js/vendor/jspdf.umd.min.js"></script>
-<script src="js/app.js?v=r16"></script>
+<script src="js/app.js?v=r17"></script>
 <script src="../js/rappel-sauvegarde.js"></script>
 <script src="../js/bilan-annee.js"></script>
 <script src="../js/nouvel-exercice.js"></script>
