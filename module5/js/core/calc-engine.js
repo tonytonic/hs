@@ -309,7 +309,9 @@ const CalcEngine = {
   /**
    * Complément d'heures par avenant (Art. L3123-22)
    */
-  calcAvenant(contractH, avenatH, workedH, hourlyRate=0) {
+  calcAvenant(contractH, avenatH, workedH, hourlyRate=0, avMaj=0) {
+    // avMaj : majoration conventionnelle des heures de l'avenant (0 = taux normal ; IDCC 1801 : 0,10)
+    avMaj = Number(avMaj)||0;
     if(avenatH <= contractH) return null;
     const alerts=[];
     let baseH=Math.min(workedH,contractH), avenatPaidH=0, compH25=0;
@@ -328,11 +330,11 @@ const CalcEngine = {
       }
     }
     const baseAmount   = baseH       * hourlyRate;
-    const avenatAmount = avenatPaidH * hourlyRate;
+    const avenatAmount = avenatPaidH * hourlyRate * (1 + avMaj);
     const comp25Amount = compH25     * hourlyRate * 1.25;
     const totalAmount  = baseAmount + avenatAmount + comp25Amount;
     return {
-      mode:'avenant', contractH, avenatH, workedH,
+      mode:'avenant', contractH, avenatH, workedH, avenatMaj: avMaj,
       baseH: Math.round(baseH*100)/100,
       avenatPaidH: Math.round(avenatPaidH*100)/100,
       compH25: Math.round(compH25*100)/100,
