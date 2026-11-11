@@ -56,7 +56,7 @@ function runAnalysis() {
   let weekResult=null;
   if(wk.total!==null&&!isVac) {
     if(av && av.avenatH > contract.hoursBase) {
-      weekResult=CalcEngine.calcAvenant(contract.hoursBase,av.avenatH,wk.total,contract.hourlyRate||0);
+      weekResult=CalcEngine.calcAvenant(contract.hoursBase,av.avenatH,wk.total,contract.hourlyRate||0,M5_DataStore.avenantRules().maj);
     } else {
       weekResult=CalcEngine.calcWeek(
         contract.hoursBase, wk.total, contract, contract.hourlyRate||0,
@@ -197,7 +197,7 @@ function _weekResultFor(monday){
     if(wk.total===null||isVac) return null;
     const feriesMap=typeof M5_getFeriesYear!=='undefined'?M5_getFeriesYear(parseInt(year)):null;
     if(av && av.avenatH > contract.hoursBase){
-      return CalcEngine.calcAvenant(contract.hoursBase,av.avenatH,wk.total,contract.hourlyRate||0);
+      return CalcEngine.calcAvenant(contract.hoursBase,av.avenatH,wk.total,contract.hourlyRate||0,M5_DataStore.avenantRules().maj);
     }
     return CalcEngine.calcWeek(contract.hoursBase, wk.total, contract, contract.hourlyRate||0,
       { feriesMap, neutraliseFeries: contract.neutraliseFeries===true || contract.neutraliseFeries===undefined, mondayStr:monday, joursOuvresContrat: contract.joursOuvresContrat||5, workedDaysMap:_workedDaysMap(monday,year) });
@@ -690,7 +690,11 @@ function openWeeklySaisie() {
   // Compteur avenants
   const count=M5_DataStore.countAvenants(year);
   const counterEl=document.getElementById('avenant-counter');
-  if(counterEl) counterEl.textContent=`${count}/8 avenants utilisés cette année (Art. L3123-22)`;
+  const _avR=M5_DataStore.avenantRules();
+  if(counterEl) counterEl.textContent=`${count}/${_avR.max} avenants utilisés cette année (Art. L3123-22)`
+    + (_avR.maj>0?` · heures de l'avenant majorées de +${Math.round(_avR.maj*100)} %`:'')
+    + (_avR.semaines?` · ${_avR.semaines} semaines max par an`:'')
+    + (_avR.nonEtendu?' · accord non étendu : seulement si ton employeur adhère au syndicat signataire':'');
 
   // Propositions rapides semaine
   const base=contract.hoursBase;
@@ -733,15 +737,17 @@ function updateWeekPreview() {
   let result, html='';
 
   if(useAvenant && avenatH>contract.hoursBase) {
-    result=CalcEngine.calcAvenant(contract.hoursBase,avenatH,worked,contract.hourlyRate||0);
+    const _avR=M5_DataStore.avenantRules();
+    const _avLbl=_avR.maj>0?'majorées de +'+Math.round(_avR.maj*100)+' %':'taux normal';
+    result=CalcEngine.calcAvenant(contract.hoursBase,avenatH,worked,contract.hourlyRate||0,_avR.maj);
     if(result) {
       html+=`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
-        <span class="m5-preview-tag">${result.avenatPaidH>0?window._m5fmtH(result.avenatPaidH)+' avenant (taux normal)':'✓ Dans le contrat'}</span>
+        <span class="m5-preview-tag">${result.avenatPaidH>0?window._m5fmtH(result.avenatPaidH)+' avenant ('+_avLbl+')':'✓ Dans le contrat'}</span>
         ${result.compH25>0?`<span class="m5-preview-tag warn">+${window._m5fmtH(result.compH25)} à +25%</span>`:''}
         <span class="m5-preview-tag ${pct35>=95?'danger':''}">${pct35}% temps plein</span>
       </div>`;
       if(result.avenatPaidH>0&&!result.compH25) {
-        html+=`<div class="m5-alert ok" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>📋</span> Heures dans l'avenant — taux normal, pas de majoration.</div>`;
+        html+=`<div class="m5-alert ok" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>📋</span> Heures dans l'avenant — ${_avR.maj>0?'majorées de +'+Math.round(_avR.maj*100)+' % par ta convention':'taux normal, pas de majoration'}.</div>`;
       }
       result.alerts.forEach(a=>{
         html+=`<div class="m5-alert ${a.level}" style="font-size:12px;padding:6px 10px;margin-bottom:4px;"><span>${a.level==='critique'?'🚨':'ℹ️'}</span> ${a.msg}</div>`;
