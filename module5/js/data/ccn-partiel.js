@@ -7,6 +7,7 @@
  * - cap=0.10 : droit commun, à défaut d'accord (Art. L3123-28)
  * - notice=7 : délai de prévenance défaut (L3123-31) ; 3 si CCN prévoit un accord (L3123-24)
  * - avenantPossible : true si la CCN prévoit un accord de branche étendu L3123-22
+ *   (ou x.avenant:true ; x.avenantMaj = majoration des heures de l'avenant, x.avenantMax = nb max/an)
  * - Sources : Légifrance, code.travail.gouv.fr, convention.fr
  * - v2.1 : IDCC 1979 doublons aliasés (19791/19792/19793), IDCC inventés corrigés,
  *          SYNTEC rate1 ramené à 0.10 (minimum légal)
@@ -235,7 +236,7 @@ const CCN_PARTIEL_ALIASES = [
   {i:1760,n:"Jardineries et graineteries",s:"Jardineries graineteries",g:"DC",cap:0.33,fj:false},
   {i:1790,n:"Espaces de loisirs, d'attractions et culturels",s:"Loisirs attractions culturels",g:"DC",cap:0.1,fj:false},
   {i:1794,n:"Personnel des institutions de retraite complémentaire",s:"Retraite complémentaire",g:"DC",cap:0.1,fj:false},
-  {i:1801,n:"Sociétés d'assistance",s:"Sociétés d'assistance",g:"DC",cap:0.33,fj:false,x:{notice:3,src:'art. 59 : plafond 1/3, prévenance 3 jours'}},
+  {i:1801,n:"Sociétés d'assistance",s:"Sociétés d'assistance",g:"DC",cap:0.33,fj:false,x:{notice:3,avenant:true,avenantMaj:0.10,avenantMax:8,avenantSemaines:26,avenantNonEtendu:true,src:'art. 59 : plafond 1/3, prévenance 3 jours ; avenant n° 56 du 14/04/2026 (non étendu, en vigueur le 08/07/2026) : compléments d\'heures par avenant, 8 par an, 26 semaines cumulées (32 à la demande du salarié), heures de l\'avenant majorées de 10 %'}},
   {i:1821,n:"Professions regroupées du cristal, du verre et du vitrail",s:"Cristal verre vitrail",g:"DC",cap:0.1,fj:false},
   {i:1875,n:"Cabinets et cliniques vétérinaires, personnel salarié",s:"Cliniques vétérinaires",g:"DC",cap:0.33,fj:false,x:{notice:15,src:'accord du 30/06/2014 : prévenance 15 jours (25 % dès la 1re heure sinon)'}},
   {i:1880,n:"Négoce de l'ameublement",s:"Négoce ameublement",g:"DC",cap:0.33,fj:false},
@@ -392,7 +393,9 @@ const CCN_PARTIEL_API = {
       : base.note;
     // Liste des groupes CCN avec accord de branche étendu permettant L3123-22 (avenant complément d'heures)
     const AVENANT_GROUPES = ['HCR','BOULAN329','COIF200','SECU329','PROP190','HOSPI130','ANIM70'];
-    const avenantPossible = AVENANT_GROUPES.includes(ccn.g);
+    // 11/11/2026 : une convention peut aussi l'autoriser par son champ x (x.avenant, ex. IDCC 1801, avenant n° 56),
+    // avec une majoration propre des heures de l'avenant (x.avenantMaj, 0 par défaut = taux normal).
+    const avenantPossible = AVENANT_GROUPES.includes(ccn.g) || !!(ccn.x && ccn.x.avenant === true);
     // 03/10/2026 : exceptions propres a la convention (champ x), verifiees contre le texte
     // en vigueur (fonds droit) : cap, rate1, rate2, threshold, notice, tempsPlein, sansMajoration.
     const x = ccn.x || {};
