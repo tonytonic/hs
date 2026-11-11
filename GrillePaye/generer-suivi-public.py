@@ -43,8 +43,13 @@ from datetime import datetime
 INTERNE = re.compile(
     r"RÉSOLU|CORRECTION|erreur antérieur|peu fiable|CONTRÔLE COMPLET|À VÉRIFIER"
     r"|identité|CRÉÉ \d\d/|écarté|prétendait|non confirmé|à reconstruire"
-    r"|recherches répétées|session|ATTENTION|pattern",
+    r"|recherches répétées|session|ATTENTION|pattern"
+    # Notes de veille (« Veille 11/11/2026 : texte vu sans effet… ») : elles
+    # citent des textes qui ne fondent PAS la grille, jamais une référence.
+    r"|Veille \d|sans effet sur la grille|textes? (?:2026 )?vus?|NON report|grille inchangée",
     re.I)
+
+VEILLE = re.compile(r"Veille \d|sans effet sur la grille|textes? (?:2026 )?vus?|NON report|grille inchangée", re.I)
 
 # Référence juridique exploitable, dans l'ordre de préférence : un accord daté
 # vaut mieux qu'un simple numéro de brochure.
@@ -88,7 +93,11 @@ def reference_publique(src):
         return ""
     segments = [s.strip() for s in str(src).split("|")]
     propres = [s for s in segments if not INTERNE.search(s)]
-    for zone in (propres, [str(src)]):
+    # Dernier recours : la chaîne entière, MOINS les notes de veille, qui citent
+    # des textes ne fondant pas la grille (sinon « Veille … : accord du 17 juillet
+    # 2026, montants non reportés » deviendrait la référence affichée).
+    hors_veille = " | ".join(s for s in segments if not VEILLE.search(s))
+    for zone in (propres, [hors_veille]):
         for motif in REFERENCES:
             for s in zone:
                 m = motif.search(s)
