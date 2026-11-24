@@ -87,7 +87,7 @@
 3218,Enseignement privé non lucratif (EPNL),3,vérifiée,3,01/09/2024,ACTIF,,légifrance+synadic.fr,IDCC 3218 réel = Enseignement privé non lucratif (EPNL). Contenu actuel = 'Coursier(ère)/Porteur(se) débutant(e)' (messagerie). Aucun rapport. A signaler.
 3237,Commerce de détail alimentaire spécialisé,3,vérifiée,8,01/06/2026,ACTIF,,fiche-paie.net+salaire-minimum.com+juristique.org (croisés),"Commerce détail alimentaire spécialisé (boucherie/boulangerie/fromagerie/primeur, brochure 3387) — identité ET contenu cohérents ('Employé de vente débutant' correspond bien). Avenant n°9 du 13/01/2026, en vigueur dès le 14/01/2026 (lendemain dépôt), +1,79%, non encore étendu au JO à la date des sources. Range confirmé (2 sources indépendantes concordantes): 1838,81€-3425,90€/mois. REJETÉ (3e fois): AdvizExperts redonne quasi le MÊME chiffre '1747€' qu'il avait déjà donné pour 2931 et 3090 sur des secteurs totalement différents — pattern confirmé de contenu template/peu fiable, à ignorer systématiquement pour ce site sur le reste du travail."
 3245,Opérateurs de voyages et des guides,3,estimation à confirmer,3,2026,,,,
-3250,Commissaires de justice et sociétés de ventes volontaires,3,estimation à confirmer,33,01/01/2026,,,,
+3250,Commissaires de justice et sociétés de ventes volontaires,3,vérifiée,37,01/07/2026,,,,
 5001,Industries électriques et gazières IEG,3,vérifiée,6,01/06/2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 158,Bois scieries négoce importation,2,sourcée,9,01/04/2026,ACTIF,,,
 218,Organismes de Sécurité sociale (UCANSS),2,vérifiée,3,01/2026,ACTIF,,convention.fr+jooble (offres réelles),"Identité CORRECTE : organismes de sécurité sociale (CPAM/CAF/URSSAF), coefficient/points UCANSS, secrétariat plausible. Pas de tableau officiel unique trouvé (grosse réforme classification 2024-2026 en cours), mais points réels récents via offres d'emploi UCANSS: coef 252->2161€, coef 277->2351€, coef 305->2527€, coef 320->2678€, coef 360->3036€ (Ségur inclus). À affiner avec le texte de l'accord du 22/11/2024 si besoin de précision totale."
@@ -124,7 +124,7 @@
 1286,Confiserie chocolaterie biscuiterie détail artisans,1,vérifiée,12,01/11/2026,ACTIF,,,
 1314,Maisons alimentation succursales gérants mandataires,1,vérifiée,6,01/06/2026,HISTORIQUE_PERIME,,,
 1405,Expédition exportation fruits légumes,1,vérifiée,5,01/06/2026,ACTIF,,,
-1408,Distribution logistique services énergies proximité,1,vérifiée,2,01/06/2026,ACTIF,,juristique.org+salaire-minimum.com+convention.fr (croisés),"Négoce/distribution combustibles (brochure 3004) — identité DARES confirmée, contenu plausible (livreur cohérent avec distribution). Renommée depuis 'Distribution, logistique et services des énergies de proximité' (même IDCC/brochure, juste un nouveau nom). Accord du 3/04/2026, effectif 01/05/2026, +1%, range 1870,64€-7597,85€/mois (signé, en attente d'extension au 28/05/2026 - à reconfirmer). ⚠️ Ne pas confondre avec IDCC 1388 (Pétrole/majors, minima plus élevés) — vérifié, ce sont deux CCN cousines distinctes, 1408 est la bonne pour ce contenu."
+1408,Distribution logistique services énergies proximité,1,vérifiée,16,01/05/2026,ACTIF,,juristique.org+salaire-minimum.com+convention.fr (croisés),"Négoce/distribution combustibles (brochure 3004) — identité DARES confirmée, contenu plausible (livreur cohérent avec distribution). Renommée depuis 'Distribution, logistique et services des énergies de proximité' (même IDCC/brochure, juste un nouveau nom). Accord du 3/04/2026, effectif 01/05/2026, +1%, range 1870,64€-7597,85€/mois (signé, en attente d'extension au 28/05/2026 - à reconfirmer). ⚠️ Ne pas confondre avec IDCC 1388 (Pétrole/majors, minima plus élevés) — vérifié, ce sont deux CCN cousines distinctes, 1408 est la bonne pour ce contenu."
 1512,Promotion immobilière,1,vérifiée,14,01/01/2026,,,"Avenant n° 51 du 12/01/2026 (minima au 1/01/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
 1513,Bière et boissons rafraîchissantes,1,sourcée,23,03/02/2026,,oui (1839.8 €),,
 1580,Chaussure industrie,1,sourcée,8,01/06/2026,,,,
@@ -143,7 +143,7 @@
 3013,Librairie indépendante,1,vérifiée,2,01/06/2026,ACTIF,,"juristique.org+salaire-minimum.com+lofficieldesmetiers.fr+convention.fr (4 sources croisées, extension confirmée JORF)","Librairie (brochure 3252) — identité ET contenu parfaitement cohérents ('Libraire débutant/qualifié'). Accord du 25/11/2025, ÉTENDU (arrêté 24/02/2026, JORF n°0055 du 5/03/2026), en vigueur depuis le 01/04/2026. +0,93% en moyenne. Range confirmé (3 sources indépendantes concordantes): 1834€-3965€/mois, 12 niveaux. Nouveauté 2026: prime d'ancienneté étendue progressivement aux cadres (niveaux 9-12), auparavant réservée aux niveaux 1-8."
 3097,Production cinématographique acteurs,1,estimation à confirmer,5,01/06/2026,,,,
 3186,(identité non confirmée),1,estimation à confirmer,2,2026,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
-3205,Coopératives de consommation,1,vérifiée,3,01/05/2026,ACTIF,,"DARES (identité propre, grille à chercher)",Coopératives de consommation — identité ET contenu plausibles ('employé administratif'). Grille pas encore sourcée.
+3205,Coopératives de consommation,1,vérifiée,11,01/07/2026,ACTIF,,"DARES (identité propre, grille à chercher)",Coopératives de consommation — identité ET contenu plausibles ('employé administratif'). Grille pas encore sourcée.
 3212,Cadres des travaux publics,1,vérifiée,5,01/01/2026,ACTIF,,,
 3224,Distribution commerce de gros papiers-cartons,1,sourcée,13,01/06/2026,,,,
 3233,Industrie de la fabrication des ciments,1,vérifiée,12,01/01/2026,ACTIF,,cobham-solutions.fr,"IDCC 3233 réel = Industrie de la fabrication des ciments (a remplacé les anciens 832/833 en 2019). Contenu actuel = 'Formateur(rice) N1/N2' — quasi identique au contenu de 1516 (organismes de formation), probable copie erronée. A signaler."
@@ -209,7 +209,7 @@
 1077,Négoce industrie produits sol engrais,0,vérifiée,5,01/06/2026,ACTIF,,,
 1170,,0,absente de CCN_ALL — sans grille (estimation % SMIC),0,,ACTIF,,,
 1177,Industrie fabrication de la chaux ouvriers,0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
-1182,Ports de plaisance,0,estimation à confirmer,3,2026,ACTIF,,,
+1182,Ports de plaisance,0,sourcée,2,01/09/2026,ACTIF,,,
 1237,Centres de gestion agréés,0,vérifiée,11,01/03/2026,HISTORIQUE_PERIME,,,
 1240,,0,absente de CCN_ALL — périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
 1267,Pâtisserie,0,vérifiée,34,01/06/2026,ACTIF,,,
@@ -391,7 +391,7 @@
 3241,Télédiffusion (CDDU),,estimation à confirmer,12,01/06/2026,,,,
 3243,Quincaillerie fournitures industrielles (grandes chaînes),0,vérifiée,3,01/06/2026,,,,
 3244,Professions réglementées auprès des juridictions,0,vérifiée,5,01/06/2026,,,,
-3252,Entreprises au service de la création et de l'événement,,vérifiée,8,01/01/2025,,,,
+3252,Entreprises au service de la création et de l'événement,,vérifiée,9,01/06/2026,,,,
 3257,Mutuelles organismes mutualistes (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,,
 3326,Bâtiment agents de maîtrise et techniciens (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
 3381,Acteurs du lien social et familial ALISFA (identité non confirmée),0,hors référentiel — pas de grille,0,,INTROUVABLE_DARES,,DARES: numéro introuvable,Ce numéro IDCC n'existe nulle part dans l'historique DARES depuis 1936. Probablement fabriqué. Bloqué tant que le bon numéro n'est pas identifié — pas la peine de chercher une grille pour l'instant.
@@ -402,8 +402,8 @@
 5564,APEC — Association Pour l'Emploi des Cadres,0,vérifiée,6,01/06/2026,,,,
 5730,Commerce de gros non alimentaire,0,vérifiée,28,01/03/2026,ALIAS_OK,,Accord du 17/03/2026 étendu par arrêté du 11/06/2026 (JO n°0149 du 27/06/2026) — vérifié ligne à ligne contre le fonds droit le 21/09/2026,
 7001,Convention collective nationale des coopératives et SIC,,vérifiée,11,01/03/2026,,,"Avenant n° 142 du 4/03/2026 (salaires au 1/03/2026), étendu — vérifié ligne à ligne contre le fonds droit le 21/09/2026",
-7002,"Coopératives céréales, meunerie, oléagineux",0,vérifiée,6,01/06/2026,ACTIF,,,
-7004,Coopératives laitières,0,vérifiée,8,01/01/2026,ACTIF,,,
+7002,"Coopératives céréales, meunerie, oléagineux",0,vérifiée,26,01/01/2026,ACTIF,,,
+7004,Coopératives laitières,0,vérifiée,28,01/02/2026,ACTIF,,,
 7010,Élevages aquacoles,,sourcée,11,01/05/2018,,,,
 7012,Centres équestres (personnel),,sourcée,11,01/02/2026,,,,
 7016,Jardiniers et jardiniers-gardiens de propriétés privées (convention éteinte),0,fusionnée — grille de la convention de rattachement,1,,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 99999",Ancien nom officiel: Convention collective nationale de travail concernant les jardiniers et jardiniers-gardiens de propriétés privées. Ce numéro est remplacé par le 99999 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
