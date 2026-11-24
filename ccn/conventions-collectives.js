@@ -824,7 +824,7 @@ const CCN_ALIASES = [
   {i:3223,b:null,n:"Transports et services maritimes, personnels navigants officiers",s:"Transports maritimes officiers",g:"DC",fj:false},
   {i:3225,b:null,n:"Éditeurs de la presse magazine (fusionnée dans l'IDCC 3230)",s:"Presse magazine",g:"DC",fj:false},
   {i:3228,b:null,n:"Armateurs de services de passages d'eau, personnel navigant",s:"Passages d'eau navigants",g:"DC",fj:false},
-  {i:3229,b:null,n:"Personnel sédentaire du transport de marchandises en navigation intérieure",s:"Navigation intérieure marchandises",g:"DC",fj:false},
+  {i:3229,b:null,n:"Personnel sédentaire du transport de marchandises en navigation intérieure",s:"Navigation intérieure marchandises",g:"DC",fj:true}, // 24/11/2026 : annexe 6 (accord du 17/12/2025, étendue le 9/11/2026) — forfait annuel en jours possible pour le personnel sédentaire ; contingent 220 h (droit commun)
   {i:3232,b:null,n:"Agents de direction des organismes du régime général de sécurité sociale",s:"Sécu agents de direction",g:"DC",fj:false},
   {i:3233,b:null,n:"Industrie de la fabrication des ciments",s:"Ciment fabrication",g:"DC",fj:false},
   {i:3235,b:null,n:"Parfumerie sélective",s:"Parfumerie sélective",g:"DC",fj:false},
