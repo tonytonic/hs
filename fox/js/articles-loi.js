@@ -328,8 +328,8 @@ const ARTICLES_LOI = [
   },
   {
     art: "Art. L3121-64", titre: "Forfait jours — accord collectif obligatoire",
-    def: "Le recours au forfait jours nécessite un accord collectif qui détermine les catégories concernées, le nombre maximum de jours, les modalités de suivi de la charge de travail et du droit à la déconnexion.",
-    ex: "Sans accord collectif valide, le forfait jours est nul et le salarié peut revendiquer le paiement de toutes ses heures supplémentaires sur 3 ans.",
+    def: "Le recours au forfait jours nécessite un accord collectif qui détermine les catégories concernées, le nombre maximum de jours, les modalités de suivi de la charge de travail et du droit à la déconnexion. Si l'accord ne prévoit pas ce suivi, l'employeur peut appliquer lui-même les garanties de l'article L3121-65 (document de contrôle des jours, suivi de la charge, entretien annuel) ; s'il en oublie une seule, la convention est nulle (Cass. soc. 18 nov. 2026, n° 24-18.263 et 25-15.641).",
+    ex: "Sans accord collectif valide, le forfait jours est nul et le salarié peut revendiquer le paiement de toutes ses heures supplémentaires sur 3 ans. Pour la période avant le 10 août 2016, un accord insuffisant rend la convention nulle, sans rattrapage possible.",
     mots: ["forfait jours", "accord collectif", "validité", "suivi charge", "entretien annuel"]
   },
   {
