@@ -52,7 +52,7 @@ const M6_SimulateurNullite = {
     conditions.push({
       id: 'accord_branche',
       titre: 'Accord de branche ou d\'entreprise valide',
-      loi: 'Art. L3121-64 + Cass. Soc. 29/06/2011',
+      loi: 'Art. L3121-64 + Cass. Soc. 29/06/2011 + Cass. Soc. 18/11/2026 (accord insuffisant : garanties L3121-65 obligatoires)',
       ok: accordOk,
       // warning (pas danger) même sans CCN → l'utilisateur peut attester manuellement
       // que sa CCN ou un accord d'entreprise couvre le forfait jours
