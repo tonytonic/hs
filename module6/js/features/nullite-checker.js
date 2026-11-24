@@ -3,7 +3,8 @@
  * + Calculateur d'indemnités de rupture
  * + Types de journées étendus (maladie, CSS, formation, CET, astreinte, télétravail)
  *
- * Sources : L3121-58 à L3121-65, Cass. Soc. 29 juin 2011, Cass. Soc. 2 mars 2022
+ * Sources : L3121-58 à L3121-65, Cass. Soc. 29 juin 2011, Cass. Soc. 2 mars 2022,
+ *           Cass. Soc. 18 nov. 2026 n° 24-18.263 et 25-15.641 (accord insuffisant : nul avant le 10/08/2016, puis L3121-65) — ajouté le 24/11/2026
  */
 'use strict';
 
@@ -54,7 +55,7 @@ const CONDITIONS_VALIDITE = [
     art: 'L3121-63',
     question: 'Votre CCN ou accord d\'entreprise prévoit-il expressément le forfait annuel en jours ?',
     risque_si_non: 'CRITIQUE — Sans accord collectif valide, le forfait est nul de plein droit. Toutes les heures >35h deviennent des HS rétroactives.',
-    jurisprudence: 'Cass. Soc. 29 juin 2011 + Cass. Soc. 2 mars 2022 — Nullité si l\'accord ne garantit pas le respect des durées maximales.',
+    jurisprudence: 'Cass. Soc. 29 juin 2011 + Cass. Soc. 2 mars 2022 — Nullité si l\'accord ne garantit pas le respect des durées maximales. Cass. Soc. 18 nov. 2026 (n° 24-18.263 et 25-15.641) : si l\'accord ne permet pas de suivre la charge de travail, le forfait est nul pour la période avant le 10 août 2016 ; depuis, il ne tient que si l\'employeur a respecté les 3 garanties de l\'art. L3121-65 (document de contrôle des jours, suivi de la charge, entretien annuel) — un seul manquement suffit à le rendre nul, même si le salarié était lui-même chargé de faire appliquer le droit du travail.',
   },
   {
     id: 'mention_contrat',
