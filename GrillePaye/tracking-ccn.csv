@@ -14,7 +14,7 @@
 1597,Bâtiment Ouvriers moins 10 salariés,17,vérifiée,7,01/01/2026,ACTIF,,,
 1518,Animation ÉCLAT structures employant animateurs,16,vérifiée,11,01/01/2026,ACTIF,,,
 1351,Prévention et sécurité privée gardiennage,14,vérifiée,10,01/06/2026,ACTIF,,,
-7024,Production agricole et CUMA,14,vérifiée,7,01/05/2026,ACTIF,,juristique.org (page complète),"Production agricole/CUMA. Table complète 12 paliers horaires: 12,02€ à 24,16€. Avenant n°10 du 20/01/2026 — statut extension: en attente au moment de l'article (à reconfirmer, l'avenant n°9 précédent lui était déjà étendu 01/07/2025)."
+7024,Production agricole et CUMA,14,vérifiée,12,01/10/2026,ACTIF,,juristique.org (page complète),"Production agricole/CUMA. Table complète 12 paliers horaires: 12,02€ à 24,16€. Avenant n°10 du 20/01/2026 — statut extension: en attente au moment de l'article (à reconfirmer, l'avenant n°9 précédent lui était déjà étendu 01/07/2025)."
 3239,Particuliers employeurs emploi à domicile,12,vérifiée,12,01/11/2026,ACTIF,,,
 2098,Prestataires de services secteur tertiaire,11,sourcée,23,01/08/2026,ACTIF,,,
 1090,Commerce réparation automobile cycle motocycle,10,vérifiée,12,01/06/2026,ACTIF,,,
@@ -148,7 +148,7 @@
 3224,Distribution commerce de gros papiers-cartons,1,sourcée,13,01/06/2026,,,,
 3233,Industrie de la fabrication des ciments,1,vérifiée,12,01/01/2026,ACTIF,,cobham-solutions.fr,"IDCC 3233 réel = Industrie de la fabrication des ciments (a remplacé les anciens 832/833 en 2019). Contenu actuel = 'Formateur(rice) N1/N2' — quasi identique au contenu de 1516 (organismes de formation), probable copie erronée. A signaler."
 3242,Presse quotidienne et hebdomadaire en régions,1,vérifiée,12,01/06/2026,,,,
-7025,ETARF,1,vérifiée,3,01/03/2026,ACTIF,,,"IDCC 7025 réel = Travaux et services agricoles/ruraux/forestiers (confirmé LégiSocial). Contenu actuel = 'fruitier/légumier' — thème agricole cohérent mais peut-être trop spécifique vs le champ réel (générique travaux agricoles). Pas un mismatch flagrant comme les autres, mais pas 100% confirmé non plus. Grille pas encore cherchée."
+7025,ETARF,1,vérifiée,14,01/10/2026,ACTIF,,,"IDCC 7025 réel = Travaux et services agricoles/ruraux/forestiers (confirmé LégiSocial). Contenu actuel = 'fruitier/légumier' — thème agricole cohérent mais peut-être trop spécifique vs le champ réel (générique travaux agricoles). Pas un mismatch flagrant comme les autres, mais pas 100% confirmé non plus. Grille pas encore cherchée."
 7508,Maisons familiales rurales,1,estimation à confirmer,3,2026,ACTIF,,DARES (déjà en base),"IDCC 7508 réel = Maisons familiales rurales, instituts ruraux (établissements d'ENSEIGNEMENT rural, formation par alternance) — pas une exploitation laitière. Contenu actuel = 'Ouvrier(ère) laitier(ère) débutant(e)'. Mismatch net (enseignement vs production laitière). À signaler."
 9661,Exploitations agricoles Bas-Rhin,1,sans grille (estimation % SMIC),0,,ACTIF,,,
 18,Industrie textile,,sourcée,21,01/06/2026,,,,
@@ -349,7 +349,7 @@
 2190,Missions locales et PAIO,0,vérifiée,3,2026,ACTIF,,DARES,Missions locales/PAIO (insertion jeunes) vs 'agent service hospitalier CLCC' actuel. Aucun rapport.
 2219,Taxis,,sourcée,11,01/10/2026,,,,
 2230,Surveillance de la qualité de l air,0,vérifiée,17,01/06/2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 1486",Ancien nom officiel: Convention collective nationale des associations agréées de surveillance de la qualité de l'air. Ce numéro est remplacé par le 1486 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
-2272,Assainissement et maintenance industrielle,,sourcée,15,20/02/2026,,oui (1863 €),,
+2272,Assainissement et maintenance industrielle,,sourcée,15,20/02/2026,,,,
 2344,Sidérurgie,0,vérifiée,2,2026,HISTORIQUE_PERIME,,"DARES: périmé, remplacé par 3248",Ancien nom officiel: Convention collective de la sidérurgie. Ce numéro est remplacé par le 3248 selon DARES (déjà dans le fichier ccn_a_renumeroter.csv). Bloqué tant que le renumérotage n'est pas fait — pas la peine de chercher une grille pour l'instant.
 2372,Distribution directe,0,estimation à confirmer,3,2026,ACTIF,,DARES,Distribution directe (prospectus/imprimés pub) vs 'clerc commissaire de justice' actuel. Aucun rapport.
 2395,"Assistants maternels du particulier employeur (ancienne convention, fusionnée dans l'IDCC 3239)",0,périmée — pas de grille,0,,HISTORIQUE_PERIME,,,
